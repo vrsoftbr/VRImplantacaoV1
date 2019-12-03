@@ -15,6 +15,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.ControlXDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -154,6 +155,17 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
 
                         tabProdutos.executarImportacao();
                         
+                        List<OpcaoProduto> opcoesProduto = new ArrayList<>();
+                        
+                        if (chkIcmsForaEstado.isSelected()) {
+                            opcoesProduto.add(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO);
+                            opcoesProduto.add(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO);
+                        }
+                        
+                        if (!opcoesProduto.isEmpty()) {
+                            importador.atualizarProdutos(opcoesProduto);
+                        }
+                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -248,6 +260,8 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteValorLimite = new vrframework.bean.checkBox.VRCheckBox();
+        tabParametro = new javax.swing.JPanel();
+        chkIcmsForaEstado = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -324,6 +338,27 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
+
+        chkIcmsForaEstado.setText("ICMS Fora Estado");
+
+        javax.swing.GroupLayout tabParametroLayout = new javax.swing.GroupLayout(tabParametro);
+        tabParametro.setLayout(tabParametroLayout);
+        tabParametroLayout.setHorizontalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkIcmsForaEstado)
+                .addContainerGap(399, Short.MAX_VALUE))
+        );
+        tabParametroLayout.setVerticalGroup(
+            tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkIcmsForaEstado)
+                .addContainerGap(206, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Ajuste", tabParametro);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -473,6 +508,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private javax.swing.JCheckBox chkIcmsForaEstado;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
@@ -490,6 +526,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
+    private javax.swing.JPanel tabParametro;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTextField txtCompLoja;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;

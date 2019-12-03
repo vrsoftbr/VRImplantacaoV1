@@ -796,18 +796,20 @@ public class ProdutoRepository {
                 consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
             }
         } else {
-            int icmsCstSaida = imp.getIcmsCstSaida();            
+            int icmsCstSaida = imp.getIcmsCstSaida();
+            double icmsAliqSaidaForaEstado = 0;
             double icmsAliqSaida = 0;
             double icmsReducaoSaida = 0;
 
             if (icmsCstSaida == 20 || icmsCstSaida == 0) {
                 icmsAliqSaida = imp.getIcmsAliqSaida();
                 icmsReducaoSaida = imp.getIcmsReducaoSaida();
+                icmsAliqSaidaForaEstado = imp.getIcmsAliqSaidaForaEstado();
             }
             
             aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
-            debitoForaEstado = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
-            debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
+            debitoForaEstado = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaidaForaEstado, icmsReducaoSaida);
+            debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaidaForaEstado, icmsReducaoSaida);
 
             if (imp.getIcmsCstConsumidor() == null) {
                 if (icmsCstSaida == 20) {
