@@ -1154,8 +1154,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pagto p\n" +
                     "WHERE\n" +
                     "	pagamento IS NULL and\n" +
-                    "	p.id_banco = " + v_carteiraContaPagar + " and\n" +
-                    "   p.emissao >= '2019-01-01'\n" +        
+                    "	p.id_banco = " + v_carteiraContaPagar + "\n" +
+                    //"   p.emissao between '2016-01-01' and '2018-12-31'\n" +        
                     "ORDER BY\n" +
                     "	vencimento"
             )) {
