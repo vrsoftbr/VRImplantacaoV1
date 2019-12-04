@@ -2,9 +2,10 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -137,6 +138,114 @@ public class AdmMacenoDAO extends InterfaceDAO {
         }
         
         return result;
+    }
+
+    /*
+    AS LINHAS ABAIXO SÃO PURA GAMBIARRA, 
+    FOI PROVISÓRIO PRA GERAR UM RELATÓRIO PRO BOLT, PARA LISTAR AS CONTAS QUE FORAM BAIXADAS NO SISTEMA ADM
+    E QUE ESTÃO EM ABERTO NO VR
+    
+    
+    SE POR ACASO ALGUÉM PODE ME COMUNICAR PRA SABER A LÓGICA KKKKKKKKK
+   
+    */
+    public List<CreditoRotativoIMP> getCreditoRotativoBaixado() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	CCM01 id_cliente,\n"
+                    + "	CCM03 datacadastro,\n"
+                    + "	CCM04 vencimento,\n"
+                    + "	CCM07 valor,\n"
+                    + "	CCM09 cupom\n"
+                    + "from\n"
+                    + "	FILE003\n"
+                    + "where\n"
+                    + "	CCM08 = 'D'\n"
+                    + "and CCM02 = 0\n"
+                    + "and CCM02 is not null\n"
+                    + "and CCM03 >= '2019-01-01'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(String.format("%s-%s-%s-%s-%s", 
+                            rst.getString("id_cliente"),
+                            rst.getString("datacadastro"),
+                            rst.getString("vencimento"),
+                            rst.getString("valor"),
+                            rst.getString("cupom")
+                    ));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setDataEmissao(rst.getDate("datacadastro"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    public void migrarCreditoRotativoBaixado() throws Exception {
+        List<CreditoRotativoIMP> imp = new ArrayList<>();
+        
+        try {
+            ProgressBar.setStatus("Carregando dados para importação...Contas receber baixadas ADM...");
+            
+            imp = getCreditoRotativoBaixado();
+            
+            ProgressBar.setMaximum(imp.size());
+            salvar(imp);
+            
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    
+    public void salvar(List<CreditoRotativoIMP> vo) throws Exception {        
+        StringBuilder sql = null;
+        Statement stm = null;
+        
+        try {
+            Conexao.begin();
+            
+            stm = Conexao.createStatement();
+            
+            ProgressBar.setStatus("Gravando dados...");
+            
+            for (CreditoRotativoIMP imp: vo) {
+                
+                sql = new StringBuilder();
+                sql.append("insert into implantacao.contas_baixadas_adm (");
+                sql.append("id, id_cliente, datacadastro, vencimento, valor, cupom )");
+                sql.append("values (");
+                sql.append("'" + imp.getId() + "', ");
+                sql.append("'" + imp.getIdCliente() + "', ");
+                sql.append("'" + imp.getDataEmissao() + "', ");
+                sql.append("'" + imp.getDataVencimento() + "', ");
+                sql.append(imp.getValor() + ", ");
+                sql.append("'" + imp.getNumeroCupom() + "');");
+                
+                stm.execute(sql.toString());
+                
+                ProgressBar.next();
+            }
+            
+            stm.close();
+            
+            Conexao.commit();
+            
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;            
+        }
+        
     }
     
 }
