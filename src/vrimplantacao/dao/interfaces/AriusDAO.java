@@ -958,16 +958,20 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "   tf.fornecedor,\n"
-                    + "   tf.produto,\n"
-                    + "   pf.referencia,\n"
-                    + "   tf.datahora_alteracao,\n"
-                    + "   tf.qtde_embalageme qtdembalagem\n"
-                    + "from\n"
-                    + "   tabela_fornecedor tf \n"
-                    + "join produtos_fornecedor pf on tf.produto = pf.produto and tf.fornecedor = pf.fornecedor \n"
-                    + /*"where not pf.referencia is null\n" +*/ "order by tf.fornecedor, tf.produto"
+                    "select\n" +
+                    "	tf.fornecedor,\n" +
+                    "	tf.produto,\n" +
+                    "	pf.referencia,\n" +
+                    "	tf.datahora_alteracao,\n" +
+                    "	tf.qtde_embalageme qtdembalagem\n" +
+                    "from\n" +
+                    "	tabela_fornecedor tf \n" +
+                    "	join produtos_fornecedor pf on tf.produto = pf.produto and tf.fornecedor = pf.fornecedor\n" +
+                    "where\n" +
+                    "    not pf.referencia is null\n" +
+                    "order by\n" +
+                    "	tf.fornecedor,\n" +
+                    "	tf.produto"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
