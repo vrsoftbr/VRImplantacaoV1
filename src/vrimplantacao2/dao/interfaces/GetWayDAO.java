@@ -1557,7 +1557,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "CLIENTES.RAZAO, "
                     + "CODRECEBER AS ID, "
                     + "CLIENTES.CNPJ_CPF, "
-                    + "CLIENTES.RG, "
+                    + "CLIENTES.RG, " 
                     + "CLIENTES.IE, "
                     + "CODRECEBER, NUMTIT, "
                     + "RECEBER.CODCLIE, "

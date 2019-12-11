@@ -32,7 +32,7 @@ public class MapaVendaDAO {
                     "	codigoatual integer,\n" +
                     "	novo boolean,\n" +
                     "	primary key(sistema, loja, codigo)\n" +
-                    ")"
+                    " )"
             );
         }
         this.sistema = sistema;
