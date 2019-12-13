@@ -132,6 +132,7 @@ import vrimplantacao2.gui.interfaces.G3GUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
 import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
+import vrimplantacao2.gui.interfaces.GestorPdvGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI;
@@ -706,6 +707,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSTI3 = new javax.swing.JMenuItem();
         mnuG3 = new javax.swing.JMenuItem();
         mnuG4 = new javax.swing.JMenuItem();
+        mnuGestorPDV = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2219,6 +2221,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuG4);
+
+        mnuGestorPDV.setText("Gestor PDV");
+        mnuGestorPDV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGestorPDVActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuGestorPDV);
 
         mnuDatabase.add(jMenu10);
 
@@ -4245,6 +4255,10 @@ public final class MenuGUI extends VRMdiFrame {
         NATISistemasGUI.exibir(this);
     }//GEN-LAST:event_mnuNATISistemasActionPerformed
 
+    private void mnuGestorPDVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGestorPDVActionPerformed
+        GestorPdvGUI.exibir(this);
+    }//GEN-LAST:event_mnuGestorPDVActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4392,6 +4406,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG4;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
+    private javax.swing.JMenuItem mnuGestorPDV;
     private javax.swing.JMenuItem mnuHRTechV1;
     private javax.swing.JMenuItem mnuHRTechV2;
     private javax.swing.JMenuItem mnuHercules;
