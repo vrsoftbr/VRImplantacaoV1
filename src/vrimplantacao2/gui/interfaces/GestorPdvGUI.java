@@ -19,15 +19,15 @@ import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.PdvDAO;
+import vrimplantacao2.dao.interfaces.GestorPdvDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
-public class PdvGUI extends VRInternalFrame {
+public class GestorPdvGUI extends VRInternalFrame {
 
     private static final String SISTEMA = "PDV";
-    private static PdvGUI instance;
+    private static GestorPdvGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -61,9 +61,9 @@ public class PdvGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private PdvDAO pdvDAO = new PdvDAO();
+    private GestorPdvDAO pdvDAO = new GestorPdvDAO();
 
-    private PdvGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private GestorPdvGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -127,7 +127,7 @@ public class PdvGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new PdvGUI(i_mdiFrame);
+                instance = new GestorPdvGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
