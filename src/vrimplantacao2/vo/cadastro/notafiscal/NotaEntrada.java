@@ -393,7 +393,7 @@ public class NotaEntrada implements Nota {
     }
 
     public void setModelo(String modelo) {
-        this.modelo = modelo;
+        this.modelo = modelo == null || modelo.length() > 2 ? "55" : modelo;
     }
 
     public boolean isLiberadoPedido() {
