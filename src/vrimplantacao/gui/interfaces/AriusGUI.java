@@ -1816,7 +1816,7 @@ public class AriusGUI extends VRInternalFrame {
                 try (Statement st = ConexaoOracle.createStatement()) {                    
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    /*ProgressBar.setStatus("Notas de Entrada - Executando SQL");
+                    ProgressBar.setStatus("Notas de Entrada - Executando SQL");
                     try (ResultSet rs = st.executeQuery(
                             "select\n" +
                             "    er.ID_EMPRESA id_empresa,\n" +
@@ -1859,7 +1859,7 @@ public class AriusGUI extends VRInternalFrame {
                         }
                     } finally {
                         ProgressBar.dispose();
-                    }*/
+                    }
                                         
                     ProgressBar.setStatus("Notas de Saída - Executando SQL");
                     try (ResultSet rs = st.executeQuery(

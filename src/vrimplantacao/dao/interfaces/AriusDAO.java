@@ -376,11 +376,12 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "FROM\n"
                 + "     produtos a\n"
                 + "     join empresas emp on emp.id = " + getLojaOrigem() + "\n"
+                + "     join config on config.id = emp.id\n"
                 + "	join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
                 + "	join politicas_empresa poli on poli.empresa = emp.id\n"
                 + "	join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1\n"
                 + "	join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
-                + "	join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
+                + "	join estoques e on e.empresa = emp.id and e.id = config.estoque_saida\n"
                 + "	join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n"
                 + "	left join produtos_ean ean on ean.produto = a.id\n"
                 + "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
@@ -1514,6 +1515,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    arius.fis_t_c100 nfe\n" +
                     "where\n" +
                     "    nfe.id_empresa_a = " + getLojaOrigem() + " and\n" +
+                    "    nfe.cod_part like 'F%' and\n" +
                     "    not nfe.cod_part is null and\n" +
                     "    nfe.dt_doc between '" 
                             + DATE_FORMAT.format(notasDataInicio)
@@ -1541,6 +1543,12 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoDestinatario(TipoDestinatario.FORNECEDOR);
                         } else {
                             imp.setTipoDestinatario(TipoDestinatario.CLIENTE_EVENTUAL);
+                        }
+                        if (
+                                idParticipante.equals("34695") ||
+                                idParticipante.equals("34695")
+                        ) {
+                            System.out.println(tipoParticipante + " - " + idParticipante);
                         }
                         imp.setIdDestinatario(idParticipante);                        
                     }
