@@ -33,6 +33,9 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
+import vrimplantacao2.vo.cadastro.notafiscal.TipoFreteNotaFiscal;
+import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -373,11 +376,12 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "FROM\n"
                 + "     produtos a\n"
                 + "     join empresas emp on emp.id = " + getLojaOrigem() + "\n"
+                + "     join config on config.id = emp.id\n"
                 + "	join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
                 + "	join politicas_empresa poli on poli.empresa = emp.id\n"
                 + "	join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1\n"
                 + "	join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
-                + "	join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
+                + "	join estoques e on e.empresa = emp.id and e.id = config.estoque_saida\n"
                 + "	join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n"
                 + "	left join produtos_ean ean on ean.produto = a.id\n"
                 + "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
@@ -1478,336 +1482,184 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
         List<NotaFiscalIMP> result = new ArrayList<>();
         
-        if (i_notaEntrada) {
-            try (Statement stm = ConexaoOracle.createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select     \n"
-                        + "	nfe.id_entrada_recebimento as id,\n"
-                        + "	ind_oper as notaoperacao,\n"
-                        + "	er.id_participante as iddestinatario,\n"
-                        + "	nfe.modelo,\n"
-                        + "	nfe.serie,\n"
-                        + "	nfe.numero_nota_fiscal as numeronota,\n"
-                        + "	nfe.data_hora_emissao as dataemissao,\n"
-                        + "     to_date(er.data_hora_entrada) as dataentrada,"
-                        + "	nfe.valor_total_ipi as valoripi,\n"
-                        + "	nfe.valor_frete as valorfrete,\n"
-                        + "	nfe.valor_outras_despesas as valoroutrasdespesas,\n"
-                        + "	nfe.valor_total_produtos as valorproduto,\n"
-                        + "	nfe.valor_total_nota as valortotal,\n"
-                        // + " nfe.base_calculo_icms as valorbasecalculo,\n"
-                        + "	nfe.valor_icms as valoricms,\n"
-                        //+ " nfe.base_calculo_icms_substituicao as valorbasesubstituicao,\n"
-                        + "	nfe.valor_icms_substituicao as valoricmssubstituicao,\n"
-                        + "	nfe.valor_seguro as valorseguro,\n"
-                        + "	nfe.valor_desconto as valordesconto,\n"
-                        + "	nfe.chv_nfe as chavenfe,\n"
-                        + "	xml\n"
-                        + "from arius.rec_t_entrada_nota nfe\n"
-                        + "	inner join arius.rec_t_entrada_recebimento er\n"
-                        + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                        + "where to_date(er.data_hora_entrada) between "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                        + "and "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
-                        + "and er.ID_EMPRESA = " + getLojaOrigem() + "\n"
-                        + "order by id"
-                )) {
-                    while (rs.next()) {
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    nfe.id_c100 id,\n" +
+                    "    nfe.ind_oper notaoperacao,\n" +
+                    "    nfe.nf_complementar_a e_complementar, --tiponota\n" +
+                    "    coalesce(nfe.cod_part,'') participante,\n" +
+                    "    nfe.cod_mod modelo,\n" +
+                    "    nfe.ser serie,\n" +
+                    "    nfe.num_doc numeronota,\n" +
+                    "    nfe.dt_doc dataemissao,\n" +
+                    "    nfe.dt_e_s dataentrasasaida,\n" +
+                    "    nfe.vl_ipi,\n" +
+                    "    nfe.vl_frt vl_frete,\n" +
+                    "    nfe.vl_out_da vl_outrasdespesas,\n" +
+                    "    nfe.vl_merc vl_produto,\n" +
+                    "    nfe.vl_doc vl_total,\n" +
+                    "    nfe.vl_bc_icms,\n" +
+                    "    nfe.vl_icms,\n" +
+                    "    nfe.vl_bc_icms_st,\n" +
+                    "    nfe.vl_icms_st,\n" +
+                    "    nfe.vl_ipi,\n" +
+                    "    nfe.vl_seg vl_seguro,\n" +
+                    "    nfe.vl_desc vl_desconto,\n" +
+                    "    nfe.ind_frt ind_tipofrete,\n" +
+                    "    nfe.observacao_a info_complementar,\n" +
+                    "    nfe.nota_impressa_a impressa,\n" +
+                    "    nfe.cod_sit situacaonfe,\n" +
+                    "    nfe.chv_nfe\n" +
+                    "from\n" +
+                    "    arius.fis_t_c100 nfe\n" +
+                    "where\n" +
+                    "    nfe.id_empresa_a = " + getLojaOrigem() + " and\n" +
+                    "    nfe.cod_part like 'F%' and\n" +
+                    "    not nfe.cod_part is null and\n" +
+                    "    nfe.dt_doc between '" 
+                            + DATE_FORMAT.format(notasDataInicio)
+                            + "' and '" 
+                            + DATE_FORMAT.format(notasDataTermino) + "'\n" +
+                    "order by\n" +
+                    "    nfe.id_c100"
+            )) {
+                while (rs.next()) {
 
-                        NotaFiscalIMP imp = new NotaFiscalIMP();
-                        imp.setId(
-                                rs.getString("id")
-                                + rs.getString("iddestinatario")
-                                + rs.getString("numeronota")
-                                + rs.getString("dataentrada")
-                        );
-                        imp.setOperacao(NotaOperacao.ENTRADA);
-                        imp.setIdDestinatario(rs.getString("iddestinatario"));
-                        imp.setModelo(rs.getString("modelo"));
-                        imp.setSerie(rs.getString("serie"));
-                        imp.setNumeroNota(rs.getInt("numeronota"));
-                        
-                        if ((rs.getString("dataemissao") != null)
-                                && (!rs.getString("dataemissao").trim().isEmpty())) {
-                            imp.setDataEmissao(rs.getDate("dataemissao"));
-                        } else {
-                            imp.setDataEmissao(rs.getDate("dataentrada"));
-                        }
-
-                        if ((rs.getString("dataentrada") != null)
-                                && (!rs.getString("dataentrada").trim().isEmpty())) {
-                            imp.setDataEntradaSaida(rs.getDate("dataentrada"));
-                        } else {
-                            imp.setDataEntradaSaida(rs.getDate("dataemissao"));
-                        }
-                                                
-                        imp.setValorIpi(rs.getDouble("valoripi"));
-                        imp.setValorFrete(rs.getDouble("valorfrete"));
-                        imp.setValorOutrasDespesas(rs.getDouble("valoroutrasdespesas"));
-                        imp.setValorProduto(rs.getDouble("valorproduto"));
-                        imp.setValorTotal(rs.getDouble("valortotal"));
-                        imp.setValorIcms(rs.getDouble("valoricms"));
-                        imp.setValorIcmsSubstituicao(rs.getDouble("valoricmssubstituicao"));
-                        imp.setValorSeguro(rs.getDouble("valorseguro"));
-                        imp.setValorDesconto(rs.getDouble("valordesconto"));
-                        imp.setChaveNfe(rs.getString("chavenfe"));
-                        imp.setXml(rs.getString("xml"));
-                        imp.setDataHoraAlteracao(rs.getDate("dataentrada"));
-
-                        getNotasItem(
-                                imp,
-                                rs.getString("id"),
-                                String.valueOf(imp.getNumeroNota()),
-                                imp.getIdDestinatario()
-                        );
-
-                        result.add(imp);
+                    NotaFiscalIMP imp = new NotaFiscalIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setOperacao(NotaOperacao.get(rs.getInt("notaoperacao")));
+                    if ("T".equals(rs.getString("e_complementar"))) {
+                        imp.setTipoNota(TipoNota.COMPLEMENTO);
+                    } else {
+                        imp.setTipoNota(TipoNota.NORMAL);
                     }
+                    {
+                        String str = rs.getString("participante");
+                        char tipoParticipante = str.charAt(0);
+                        String idParticipante = str.substring(1, str.length());
+                        
+                        if (tipoParticipante == 'F') {
+                            imp.setTipoDestinatario(TipoDestinatario.FORNECEDOR);
+                        } else {
+                            imp.setTipoDestinatario(TipoDestinatario.CLIENTE_EVENTUAL);
+                        }
+                        if (
+                                idParticipante.equals("34695") ||
+                                idParticipante.equals("34695")
+                        ) {
+                            System.out.println(tipoParticipante + " - " + idParticipante);
+                        }
+                        imp.setIdDestinatario(idParticipante);                        
+                    }
+                    imp.setModelo(rs.getString("modelo"));
+                    imp.setSerie(rs.getString("serie"));
+                    imp.setNumeroNota(rs.getInt("numeronota"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntradaSaida(rs.getDate("dataentrasasaida"));
+                    imp.setValorIpi(rs.getDouble("vl_ipi"));
+                    imp.setValorFrete(rs.getDouble("vl_frete"));
+                    //imp.setValorOutrasDespesas(rs.getDouble("vl_outrasdespesas"));
+                    imp.setValorProduto(rs.getDouble("vl_produto"));
+                    imp.setValorTotal(rs.getDouble("vl_total"));
+                    imp.setValorIcms(rs.getDouble("vl_icms"));
+                    imp.setValorIcmsSubstituicao(rs.getDouble("vl_icms_st"));
+                    imp.setValorSeguro(rs.getDouble("vl_seguro"));
+                    imp.setValorDesconto(rs.getDouble("vl_desconto"));
+                    imp.setTipoFreteNotaFiscal(TipoFreteNotaFiscal.get(rs.getInt("ind_tipofrete")));
+                    imp.setInformacaoComplementar(rs.getString("info_complementar"));
+                    imp.setImpressao("T".equals(rs.getString("impressa")));
+                    imp.setSituacaoNfe(SituacaoNfe.getByCodigo(rs.getInt("situacaonfe")));
+                    imp.setDataHoraAlteracao(rs.getDate("dataentrasasaida"));
+                    imp.setChaveNfe(rs.getString("chv_nfe"));
+
+                    getNotasItem(imp);
+
+                    result.add(imp);
                 }
             }
-        } else {            
-            try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select \n"
-                        + "sai.id_c100 as id,\n"
-                        + "sai.ind_oper as tipooperacao,\n"
-                        + "sai.cod_part as iddestinatario,\n"
-                        + "sai.cod_mod as modelo,\n"
-                        + "sai.ser as serie,\n"
-                        + "sai.num_doc as numero_documento,\n"
-                        + "sai.chv_nfe as chave_nfe,\n"
-                        + "sai.dt_doc as data_documento,\n"
-                        + "sai.dt_e_s as data_saida,\n"
-                        + "sai.vl_doc as valor_documento,\n"
-                        + "sai.vl_desc as valor_desconto,\n"
-                        + "sai.vl_merc as valor_mercadoria,\n"
-                        + "sai.vl_bc_icms as valor,\n"
-                        + "sai.vl_icms as valor_icms,\n"
-                        + "sai.vl_bc_icms_st,\n"
-                        + "sai.vl_icms_st,\n"
-                        + "sai.vl_pis,\n"
-                        + "sai.vl_pis_st,\n"
-                        + "sai.vl_cofins,\n"
-                        + "sai.vl_cofins_st,\n"
-                        + "sai.observacao_a,\n"
-                        + "sai.vl_frt as valor_frete,\n"
-                        + "sai.vl_seg as valor_seguro,\n"
-                        + "sai.vl_out_da as valor_outras_despesas,\n"
-                        + "sai.vl_ipi as valor_ipi\n"
-                        + "from arius.fis_t_c100 sai\n"
-                        + "left join arius.fis_t_notas_nfe nfe on nfe.id_nota = sai.id_c100 \n"
-                        + "where sai.id_empresa_a = " + getLojaOrigem() + "\n"
-                        + "and sai.IND_OPER = 1\n"
-                        + "and sai.dt_e_s between "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                        + "and "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
-                )) {
-                    while (rs.next()) {
-                        
-                        if ((rs.getString("iddestinatario") != null)
-                                && (!rs.getString("iddestinatario").trim().isEmpty())) {
-                            if ((rs.getString("iddestinatario").startsWith("C"))
-                                    || (rs.getString("iddestinatario").startsWith("F"))) {
-
-                                NotaFiscalIMP imp = new NotaFiscalIMP();
-                                
-                                imp.setId(
-                                        rs.getString("id")
-                                        + rs.getString("iddestinatario")
-                                        + rs.getString("numero_documento")
-                                        + rs.getString("data_saida")
-                                );
-
-                                imp.setOperacao(NotaOperacao.SAIDA);
-                                imp.setIdDestinatario(Utils.formataNumero(rs.getString("iddestinatario")));
-                                imp.setTipoDestinatario(rs.getString("iddestinatario").startsWith("C") ? TipoDestinatario.CLIENTE_EVENTUAL : TipoDestinatario.FORNECEDOR);
-                                imp.setModelo(rs.getString("modelo"));
-                                imp.setSerie(rs.getString("serie"));
-                                imp.setNumeroNota(rs.getInt("numero_documento"));
-                                imp.setDataEmissao(rs.getDate("data_documento"));
-                                imp.setDataEntradaSaida(rs.getDate("data_saida"));
-                                imp.setValorProduto(rs.getDouble("valor_mercadoria"));
-                                imp.setValorTotal(rs.getDouble("valor_documento"));
-                                imp.setValorIcms(rs.getDouble("valor_icms"));
-                                //imp.setValorIcmsSubstituicao(rs.getDouble("valoricmssubstituicao"));
-                                imp.setValorSeguro(rs.getDouble("valor_seguro"));
-                                imp.setValorIpi(rs.getDouble("valor_ipi"));
-                                imp.setValorOutrasDespesas(rs.getDouble("valor_outras_despesas"));
-                                imp.setValorDesconto(rs.getDouble("valor_desconto"));
-                                imp.setValorFrete(rs.getDouble("valor_frete"));
-                                imp.setChaveNfe(rs.getString("chave_nfe"));
-                                imp.setDataHoraAlteracao(rs.getDate("data_saida"));
-
-                                getNotasItem(
-                                        imp,
-                                        rs.getString("id"),
-                                        rs.getString("numero_documento"),
-                                        rs.getString("iddestinatario")
-                                );
-
-                                result.add(imp);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        }            
+        
         return result;
     }
 
-    private void getNotasItem(NotaFiscalIMP imp, String idNota, String numeroNota, String partic) throws Exception {
+    private void getNotasItem(NotaFiscalIMP imp) throws Exception {
         
-        if (i_notaEntrada) {
-            try (Statement stm = ConexaoOracle.createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select\n"
-                        + "i.id_c170 as id,\n"
-                        + "i.numero_nf as notafiscal,\n"
-                        + "i.num_item as numeroitem,\n"
-                        + "i.cod_item as idproduto,\n"
-                        + "i.ncm,\n"
-                        + "i.cest_a as cest,\n"
-                        + "i.cfop,\n"
-                        + "i.descr_compl as descricao,\n"
-                        + "i.unid as unidade,\n"
-                        + "i.ean,\n"
-                        + "i.embalagem_a as quantidadeembalagem,\n"
-                        + "i.qtd as quantidade,\n"
-                        + "i.vl_item as valortotalproduto,\n"
-                        + "i.cst_icms as icmscst,\n"
-                        + "i.aliq_icms as icmsaliquota,\n"
-                        + "i.valor_reducao_base_a as icmsreduzido,\n"
-                        + "i.vl_bc_icms as icmsbasecalculo,\n"
-                        + "i.vl_icms as icmsvalor,\n"
-                        + "i.vl_bc_icms_st as icmsbasecalculost,\n"
-                        + "i.vl_icms_st as icmsvalorst,\n"
-                        + "i.vl_bc_ipi as ipivalorbase,\n"
-                        + "i.vl_ipi as ipivalor,\n"
-                        + "i.cst_pis as piscofinscst,\n"
-                        + "i.cod_nat as tiponaturezareceita\n"
-                        + "from arius.fis_vs_notas_itens i\n"
-                        + "inner join arius.rec_t_entrada_nota c\n"
-                        + "	on i.numero_nf = c.numero_nota_fiscal	\n"
-                        + "inner join arius.rec_t_entrada_recebimento er\n"
-                        + "	on c.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                        + "where to_date(er.data_hora_entrada) between "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                        + "and "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
-                        + "and c.id_entrada_recebimento = '" + idNota + "'\n"
-                        + "and c.numero_nota_fiscal = '" + numeroNota + "'\n"
-                        + "and er.id_participante = " + partic + "\n"
-                        + "and er.ID_EMPRESA = " + getLojaOrigem() + "\n"
-                        + "order by numero_nf"
-                )) {
-                    while (rs.next()) {
-                        NotaFiscalItemIMP item = imp.addItem();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    i.id_c170 id,\n" +
+                    "    i.id_c100 id_notafiscal,\n" +
+                    "    i.num_item numeroitem,\n" +
+                    "    i.cod_item id_produto,\n" +
+                    "    p.classificacao_fiscal ncm,\n" +
+                    "    i.cest_a cest,\n" +
+                    "    i.cfop,\n" +
+                    "    i.descr_compl descricao,\n" +
+                    "    i.unid unidade,\n" +
+                    "    1 as qtd_embalagem,\n" +
+                    "    i.qtd quantidade,\n" +
+                    "    i.vl_item,\n" +
+                    "    i.vl_desc,\n" +
+                    "    i.vl_isentas_a vl_isento,\n" +
+                    "    i.vl_outras_a vl_outras,\n" +
+                    "    \n" +
+                    "    i.cst_icms,\n" +
+                    "    i.aliq_icms,\n" +
+                    "    i.vl_red_bc_a,\n" +
+                    "    i.vl_bc_icms,\n" +
+                    "    i.vl_icms,\n" +
+                    "    i.vl_bc_icms_st,\n" +
+                    "    i.vl_icms_st,\n" +
+                    "    \n" +
+                    "    i.vl_bc_ipi,\n" +
+                    "    i.vl_ipi_a,\n" +
+                    "    \n" +
+                    "    i.cst_pis,\n" +
+                    "    i.vl_pis,\n" +
+                    "    i.nat_rec,\n" +
+                    "    \n" +
+                    "    i.iva_valor_a,\n" +
+                    "    i.cst_icms_a,\n" +
+                    "    i.aliq_icms_a\n" +
+                    "from\n" +
+                    "    arius.fis_t_c170 i\n" +
+                    "    join produtos p on\n" +
+                    "        i.cod_item = p.id\n" +
+                    "where\n" +
+                    "    i.id_c100 = " + imp.getId() + "\n" +
+                    "order by\n" +
+                    "    i.id_c170"
+            )) {
+                while (rs.next()) {
+                    NotaFiscalItemIMP item = imp.addItem();
 
-                        
-                        item.setId(rs.getString("id"));
-                        item.setNumeroItem(rs.getInt("numeroitem"));
-                        item.setIdProduto(rs.getString("idproduto"));
-                        item.setNcm(rs.getString("ncm"));
-                        item.setCest(rs.getString("cest"));
-                        item.setCfop(rs.getString("cfop"));
-                        item.setDescricao(rs.getString("descricao"));
-                        item.setUnidade(rs.getString("unidade"));
-                        item.setEan(rs.getString("ean"));
-                        item.setQuantidadeEmbalagem(rs.getInt("quantidadeembalagem"));
-                        item.setQuantidade(rs.getDouble("quantidade"));
-                        item.setValorTotalProduto(rs.getDouble("valortotalproduto"));
-                        item.setIcmsCst(rs.getInt("icmscst"));
-                        item.setIcmsAliquota(rs.getDouble("icmsaliquota"));
-                        item.setIcmsValor(rs.getDouble("icmsvalor"));
-                        item.setIcmsBaseCalculoST(rs.getDouble("icmsbasecalculost"));
-                        item.setIcmsValorST(rs.getDouble("icmsvalorst"));
-                        item.setIpiValorBase(rs.getDouble("ipivalorbase"));
-                        item.setIpiValor(rs.getDouble("ipivalor"));
-                        item.setPisCofinsCst(rs.getInt("piscofinscst"));
-                        item.setTipoNaturezaReceita(rs.getInt("tiponaturezareceita"));
-                    }
-                }
-            }
-        } else {            
-            try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select \n"
-                        + "ite.id_c170 as id,\n"
-                        + "ite.id_c100 as id_nota_saida,\n"
-                        + "ite.num_item as numeroitem,\n"
-                        + "ite.cod_item as idproduto,\n"
-                        + "ite.descr_compl as descricao_produto,\n"
-                        + "ite.qtd as qtd_produto,\n"
-                        + "ite.unid as unidade,\n"
-                        + "ite.vl_item as valor_produto,\n"
-                        + "ite.vl_desc as valor_desconto,\n"
-                        + "ite.cst_icms,\n"
-                        + "ite.cfop,\n"
-                        + "ite.cod_nat,\n"
-                        + "ite.vl_bc_icms,\n"
-                        + "ite.aliq_icms,\n"
-                        + "ite.vl_icms,\n"
-                        + "ite.vl_bc_icms_st,\n"
-                        + "ite.aliq_st,\n"
-                        + "ite.cst_pis,\n"
-                        + "ite.vl_bc_pis,\n"
-                        + "ite.aliq_pis_percentual,\n"
-                        + "ite.vl_pis,\n"
-                        + "ite.cst_cofins,\n"
-                        + "ite.vl_bc_cofins,\n"
-                        + "ite.aliq_cofins_percentual,\n"
-                        + "ite.vl_cofins,\n"
-                        + "ite.embalagem_a,\n"
-                        + "ite.valor_reducao_base_a,\n"
-                        + "ite.base_icms_st_int_a,\n"
-                        + "ite.valor_icms_st_int_a,\n"
-                        + "ite.isentas_red_bc_a,\n"
-                        + "ite.valor_unitario_a,\n"
-                        + "ite.cst_icms_destino_a,\n"
-                        + "ite.cst_icms_a,\n"
-                        + "ite.vl_bc_icms_a,\n"
-                        + "ite.vl_isentas_a,\n"
-                        + "ite.vl_outras_a,\n"
-                        + "ite.vl_contabil_a,\n"
-                        + "ite.aliq_icms_a,\n"
-                        + "ite.vl_icms_a,\n"
-                        + "ite.vl_ipi as valor_ipi,\n"
-                        + "ite.vl_bc_ipi as ipivalorbase\n"
-                        + "from arius.fis_t_c170 ite\n"
-                        + "inner join arius.fis_t_c100 nfe on nfe.id_c100 = ite.id_c100\n"
-                        + "    and nfe.id_empresa_a = "+getLojaOrigem()+"\n"
-                        + "    and nfe.IND_OPER = 1\n"
-                        + "and nfe.dt_e_s between "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                        + "and "
-                        + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
-                        + "and ite.id_c100 = " + idNota + "\n"
-                        + "and nfe.cod_part = '" + partic + "'\n"
-                        + "and nfe.num_doc = '" + numeroNota + "'"
-                )) {
-                    while (rs.next()) {
-                        NotaFiscalItemIMP item = imp.addItem();
-                        
-                        item.setId(rs.getString("id"));
-                        item.setNumeroItem(rs.getInt("numeroitem"));
-                        item.setIdProduto(rs.getString("idproduto"));
-                        item.setCfop(rs.getString("cfop"));
-                        item.setDescricao(rs.getString("descricao_produto"));
-                        item.setUnidade(rs.getString("unidade"));
-                        item.setQuantidade(rs.getDouble("qtd_produto"));
-                        item.setValorTotalProduto(rs.getDouble("valor_produto"));
-                        item.setIcmsCst(rs.getInt("cst_icms"));
-                        item.setIcmsAliquota(rs.getDouble("aliq_icms"));
-                        item.setIcmsValor(rs.getDouble("vl_icms"));
-                        item.setIcmsBaseCalculoST(rs.getDouble("vl_bc_icms_st"));
-                        item.setIcmsValorST(rs.getDouble("aliq_st"));
-                        item.setIpiValorBase(rs.getDouble("ipivalorbase"));
-                        item.setIpiValor(rs.getDouble("valor_ipi"));
-                        item.setPisCofinsCst(rs.getInt("cst_pis"));
-                        item.setTipoNaturezaReceita(rs.getInt("cod_nat"));
-                    }
+                    item.setId(rs.getString("id"));
+                    item.setNumeroItem(rs.getInt("numeroitem"));
+                    item.setIdProduto(rs.getString("id_produto"));
+                    item.setNcm(rs.getString("ncm"));
+                    item.setCest(rs.getString("cest"));
+                    item.setCfop(rs.getString("cfop"));
+                    item.setDescricao(rs.getString("descricao"));
+                    item.setUnidade(rs.getString("unidade"));
+                    //item.setEan(rs.getString("ean"));
+                    //item.setQuantidadeEmbalagem(rs.getInt("quantidadeembalagem"));
+                    item.setQuantidade(rs.getDouble("quantidade"));
+                    item.setValorTotalProduto(rs.getDouble("vl_item"));
+                    item.setValorDesconto(rs.getDouble("vl_desc"));
+                    item.setValorIsento(rs.getDouble("vl_isento"));
+                    //item.setValorOutras(rs.getDouble("vl_outras"));
+                    item.setIcmsCst(rs.getInt("cst_icms"));
+                    item.setIcmsAliquota(rs.getDouble("aliq_icms"));
+                    item.setIcmsReduzido(rs.getDouble("vl_red_bc_a"));
+                    item.setIcmsBaseCalculo(rs.getDouble("vl_bc_icms"));
+                    item.setIcmsValor(rs.getDouble("vl_icms"));
+                    item.setIcmsBaseCalculoST(rs.getDouble("vl_bc_icms_st"));
+                    item.setIcmsValorST(rs.getDouble("vl_icms_st"));
+                    item.setIpiValorBase(rs.getDouble("vl_bc_ipi"));
+                    item.setIpiValor(rs.getDouble("vl_ipi_a"));
+                    item.setPisCofinsCst(rs.getInt("cst_pis"));
+                    item.setTipoNaturezaReceita(rs.getInt("nat_rec"));
                 }
             }
         }
