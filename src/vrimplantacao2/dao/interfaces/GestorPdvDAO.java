@@ -93,7 +93,7 @@ public class GestorPdvDAO extends InterfaceDAO {
                     "  coalesce(redbase, 0) icmsreducaodebito,\n" +
                     "  pesavel,\n" +
                     "  coalesce(validade, 0) validade,\n" +
-                    "  dtcad datacadastro,\n" +
+                    "  case when dtcad = '0000-00-00' then now() else dtcad end datacadastro,\n" +
                     "  ativo,\n" +
                     "  compvenda margem,\n" +
                     "  pesobruto,\n" +
@@ -143,8 +143,8 @@ public class GestorPdvDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rs.getString("cstpiscofinscredito"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpiscofinsdebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    
                     imp.setDataCadastro(rs.getDate("datacadastro"));
+                    
                     imp.setSituacaoCadastro(rs.getInt("ativo"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliq"));
@@ -289,12 +289,12 @@ public class GestorPdvDAO extends InterfaceDAO {
                     "  fax,\n" +
                     "  celular,\n" +
                     "  mail,\n" +
-                    "  datacad,\n" +
+                    "  case when datacad = '0000-00-00' then now() else datacad end datacadastro,\n" +
                     "  contato,\n" +
                     "  obs,\n" +
                     "  ativo,\n" +
                     "  limite,\n" +
-                    "  datanasc,\n" +
+                    "  case when datanasc = '0000-00-00' then now() else datanasc end datanasc,\n" +
                     "  saldodev,\n" +
                     "  salario,\n" +
                     "  limref limiteref\n" +
@@ -323,8 +323,8 @@ public class GestorPdvDAO extends InterfaceDAO {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setFax(rs.getString("fax"));
-                    imp.setEmail(rs.getString("email"));
-                    imp.setDataCadastro(rs.getDate("datacad"));
+                    imp.setEmail(rs.getString("mail"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
                     
                     if(rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
                         imp.addContato("1", rs.getString("contato"), null, null, null);

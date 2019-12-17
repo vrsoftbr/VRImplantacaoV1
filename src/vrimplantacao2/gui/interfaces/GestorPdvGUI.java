@@ -163,9 +163,6 @@ public class GestorPdvGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        if(chkContaPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        } 
                         if(chkEndereco.isSelected()) {
                             importador.atualizarFornecedor(OpcaoFornecedor.ENDERECO);
                         }
@@ -231,11 +228,6 @@ public class GestorPdvGUI extends VRInternalFrame {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        if(chkPdvVendas.isSelected()) {
-                            //pdvDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //pdvDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
-                            //importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -283,13 +275,10 @@ public class GestorPdvGUI extends VRInternalFrame {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkContaPagar = new javax.swing.JCheckBox();
         chkEndereco = new javax.swing.JCheckBox();
         chkContato = new javax.swing.JCheckBox();
         chkCondPagamento = new javax.swing.JCheckBox();
         chkPrazoEntrega = new javax.swing.JCheckBox();
-        cmbPlanoContaPagar = new javax.swing.JComboBox();
-        jLabel6 = new javax.swing.JLabel();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -305,22 +294,8 @@ public class GestorPdvGUI extends VRInternalFrame {
         chkClienteEventual = new javax.swing.JCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        cmbTipoDocRotativo = new javax.swing.JComboBox();
-        cmbTipoCarteira = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         tabCheque = new vrframework.bean.panel.VRPanel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
-        cmbTipoDocCheque = new javax.swing.JComboBox();
-        cmbTipoCarteiraCheque = new javax.swing.JComboBox();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        tabVenda = new vrframework.bean.panel.VRPanel();
-        pnlDadosDataVenda = new vrframework.bean.panel.VRPanel();
-        pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
-        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
-        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
-        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -396,8 +371,6 @@ public class GestorPdvGUI extends VRInternalFrame {
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
 
-        chkContaPagar.setText("Conta a Pagar");
-
         chkEndereco.setText("Endereço");
 
         chkContato.setText("Contatos");
@@ -406,8 +379,6 @@ public class GestorPdvGUI extends VRInternalFrame {
 
         chkPrazoEntrega.setText("Prazo Entrega");
 
-        jLabel6.setText("Carteira");
-
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -415,22 +386,17 @@ public class GestorPdvGUI extends VRInternalFrame {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabFornecedorLayout.createSequentialGroup()
-                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(15, 15, 15)
-                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkEndereco)
-                            .addComponent(chkContato))
-                        .addGap(18, 18, 18)
-                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkPrazoEntrega)
-                            .addComponent(chkCondPagamento)))
-                    .addComponent(chkContaPagar)
-                    .addComponent(cmbPlanoContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addContainerGap(229, Short.MAX_VALUE))
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkEndereco)
+                    .addComponent(chkContato))
+                .addGap(18, 18, 18)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkPrazoEntrega)
+                    .addComponent(chkCondPagamento))
+                .addContainerGap(233, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -445,13 +411,7 @@ public class GestorPdvGUI extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkContato)
                     .addComponent(chkPrazoEntrega))
-                .addGap(18, 18, 18)
-                .addComponent(chkContaPagar)
-                .addGap(7, 7, 7)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbPlanoContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(180, Short.MAX_VALUE))
+                .addContainerGap(268, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -542,12 +502,6 @@ public class GestorPdvGUI extends VRInternalFrame {
 
         chkRotativo.setText("Crédito Rotativo");
 
-        cmbTipoDocRotativo.setEnabled(false);
-
-        jLabel2.setText("Carteira");
-
-        jLabel3.setText("Documento");
-
         javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
         tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
         tablCreditoRotativoLayout.setHorizontalGroup(
@@ -555,43 +509,19 @@ public class GestorPdvGUI extends VRInternalFrame {
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tablCreditoRotativoLayout.createSequentialGroup()
-                .addContainerGap(23, Short.MAX_VALUE)
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cmbTipoCarteira, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addGap(8, 8, 8)
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(119, 119, 119))
+                .addContainerGap(463, Short.MAX_VALUE))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addGap(5, 5, 5)
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbTipoCarteira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(224, Short.MAX_VALUE))
+                .addContainerGap(265, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
 
         chkCheque.setText("Cheque");
-
-        cmbTipoDocCheque.setEnabled(false);
-
-        jLabel4.setText("Carteira");
-
-        jLabel5.setText("Documento");
 
         javax.swing.GroupLayout tabChequeLayout = new javax.swing.GroupLayout(tabCheque);
         tabCheque.setLayout(tabChequeLayout);
@@ -599,112 +529,18 @@ public class GestorPdvGUI extends VRInternalFrame {
             tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cmbTipoCarteiraCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabChequeLayout.createSequentialGroup()
-                        .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 128, Short.MAX_VALUE))
-                    .addGroup(tabChequeLayout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 501, Short.MAX_VALUE))
         );
         tabChequeLayout.setVerticalGroup(
             tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7)
-                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
-                .addGap(7, 7, 7)
-                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbTipoCarteiraCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(215, Short.MAX_VALUE))
+                .addContainerGap(263, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Cheque", tabCheque);
-
-        pnlDadosDataVenda.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
-
-        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtDtVendaIniActionPerformed(evt);
-            }
-        });
-
-        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtDtVendaFimActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnlPdvVendaDatasLayout = new javax.swing.GroupLayout(pnlPdvVendaDatas);
-        pnlPdvVendaDatas.setLayout(pnlPdvVendaDatasLayout);
-        pnlPdvVendaDatasLayout.setHorizontalGroup(
-            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPdvVendaDatasLayout.createSequentialGroup()
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnlPdvVendaDatasLayout.setVerticalGroup(
-            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        chkPdvVendas.setEnabled(true);
-        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkPdvVendasActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnlDadosDataVendaLayout = new javax.swing.GroupLayout(pnlDadosDataVenda);
-        pnlDadosDataVenda.setLayout(pnlDadosDataVendaLayout);
-        pnlDadosDataVendaLayout.setHorizontalGroup(
-            pnlDadosDataVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDadosDataVendaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnlDadosDataVendaLayout.setVerticalGroup(
-            pnlDadosDataVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDadosDataVendaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlDadosDataVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout tabVendaLayout = new javax.swing.GroupLayout(tabVenda);
-        tabVenda.setLayout(tabVendaLayout);
-        tabVendaLayout.setHorizontalGroup(
-            tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabVendaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(263, Short.MAX_VALUE))
-        );
-        tabVendaLayout.setVerticalGroup(
-            tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabVendaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(206, Short.MAX_VALUE))
-        );
-
-        tabCliente.addTab("Venda", tabVenda);
 
         tab.addTab("Clientes", tabCliente);
 
@@ -838,22 +674,6 @@ public class GestorPdvGUI extends VRInternalFrame {
 
     }//GEN-LAST:event_chkClientePreferencialActionPerformed
 
-    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
-        if (edtDtVendaIni.getDate() == null) {
-            edtDtVendaIni.setDate(new Date());
-        }
-    }//GEN-LAST:event_edtDtVendaIniActionPerformed
-
-    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
-        if (edtDtVendaFim.getDate() == null) {
-            edtDtVendaFim.setDate(new Date());
-        }
-    }//GEN-LAST:event_edtDtVendaFimActionPerformed
-
-    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
-
-    }//GEN-LAST:event_chkPdvVendasActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -867,14 +687,12 @@ public class GestorPdvGUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkCondPagamento;
-    private javax.swing.JCheckBox chkContaPagar;
     private javax.swing.JCheckBox chkContato;
     private javax.swing.JCheckBox chkDataCadastro;
     private javax.swing.JCheckBox chkEndereco;
     private javax.swing.JCheckBox chkEstCivil;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkObservacao;
-    private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private javax.swing.JCheckBox chkPermiteRotativo;
     private javax.swing.JCheckBox chkPrazoEntrega;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
@@ -884,23 +702,9 @@ public class GestorPdvGUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkValorLimite;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private javax.swing.JComboBox cmbPlanoContaPagar;
-    private javax.swing.JComboBox cmbTipoCarteira;
-    private javax.swing.JComboBox cmbTipoCarteiraCheque;
-    private javax.swing.JComboBox cmbTipoDocCheque;
-    private javax.swing.JComboBox cmbTipoDocRotativo;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
-    private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
-    private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private vrframework.bean.panel.VRPanel pnlDadosDataVenda;
     private vrframework.bean.panel.VRPanel pnlLoja;
-    private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrframework.bean.panel.VRPanel tabCheque;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
@@ -909,7 +713,6 @@ public class GestorPdvGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
-    private vrframework.bean.panel.VRPanel tabVenda;
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
