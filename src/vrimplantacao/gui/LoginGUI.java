@@ -11,6 +11,7 @@ import vrframework.classe.Properties;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.PropertiesDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
@@ -21,13 +22,12 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.UsuarioVO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.parametro.Versao;
-import vrimplantacao.gui.MenuGUI;
 
 public class LoginGUI extends VRDialog {
 
     private UsuarioVO oUsuario = null;
     private VRMdiFrame mdiFrame = null;
-    private List<EmpresaVO> vEmpresa = null;
+    private List<DadosConexaoPostgreSQL> vEmpresa = null;
 
     public LoginGUI() throws Exception {
         initComponents();
@@ -115,7 +115,7 @@ public class LoginGUI extends VRDialog {
     }
 
     private void carregarEmpresa() throws Exception {
-        Properties oProperties = new Properties(Util.getRoot() + "vr/vr.properties");
+        Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
 
         vEmpresa = new ArrayList();
         cboEmpresa.removeAllItems();
@@ -128,7 +128,7 @@ public class LoginGUI extends VRDialog {
             if (oProperties.getString("database" + empresa + ".ip").isEmpty()) {
                 break;
             }
-            EmpresaVO oEmpresa = new EmpresaVO();
+            DadosConexaoPostgreSQL oEmpresa = new DadosConexaoPostgreSQL();
             oEmpresa.ipBanco = oProperties.getString("database" + empresa + ".ip");
             oEmpresa.ipSecBanco = oProperties.getString("database" + empresa + ".ipsec");
             oEmpresa.portaBanco = oProperties.getInt("database" + empresa + ".porta");
@@ -145,6 +145,7 @@ public class LoginGUI extends VRDialog {
 
         if (vEmpresa.size() <= 1) {
             cboEmpresa.setVisible(false);
+            Parametros.get().setEmpresaAtiva(vEmpresa.get(0));
             return;
         }
 
@@ -170,7 +171,7 @@ public class LoginGUI extends VRDialog {
             return;
         }
 
-        EmpresaVO oEmpresa = vEmpresa.get(cboEmpresa.getSelectedIndex());
+        DadosConexaoPostgreSQL oEmpresa = vEmpresa.get(cboEmpresa.getSelectedIndex());
 
         Conexao.abrirConexao(oEmpresa.ipBanco, oEmpresa.ipSecBanco, oEmpresa.portaBanco, oEmpresa.nomeBanco, oEmpresa.usuarioBanco, oEmpresa.senhaBanco);
 
@@ -178,6 +179,8 @@ public class LoginGUI extends VRDialog {
         cboLoja.setId(Global.idLoja);
 
         Global.idUsuario = -1;
+        
+        Parametros.get().setEmpresaAtiva(oEmpresa);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -395,15 +398,4 @@ public class LoginGUI extends VRDialog {
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
-}
-
-class EmpresaVO {
-
-    public String ipBanco = "";
-    public String ipSecBanco = "";
-    public int portaBanco = 0;
-    public String nomeBanco = "";
-    public String usuarioBanco = "";
-    public String senhaBanco = "";
-    public String alias = "";
 }

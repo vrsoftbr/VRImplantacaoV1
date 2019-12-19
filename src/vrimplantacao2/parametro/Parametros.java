@@ -14,7 +14,9 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.EmpresaVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
@@ -470,5 +472,13 @@ public final class Parametros implements Iterable<Parametro>{
             LOG.log(Level.SEVERE, "Erro ao gravar", ex);
             throw new RuntimeException(ex);            
         }
+    }
+
+    private DadosConexaoPostgreSQL empresaAtiva;
+    public void setEmpresaAtiva(DadosConexaoPostgreSQL empresaAtiva) {
+        this.empresaAtiva = empresaAtiva;
+    }
+    public DadosConexaoPostgreSQL getEmpresaAtiva() {
+        return empresaAtiva;
     }
 }
