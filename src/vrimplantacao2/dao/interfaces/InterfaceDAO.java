@@ -15,6 +15,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
+import vrimplantacao2.dao.repositories.Recorder;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -525,6 +526,12 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
     
+    public void getProdutos(Recorder<ProdutoIMP> rec) throws Exception {
+        for (ProdutoIMP imp: getProdutos()) {
+            rec.add(imp);
+        }
+    }
+    
     /**
      * Utilize esta classe para casos onde não haja cadastro de família, utilize
      * um sql que ordene por código agrupador e por descrição, depois utilize a
@@ -595,6 +602,7 @@ public abstract class InterfaceDAO {
     public List<ReceitaIMP> getReceitas() throws Exception {
         return new ArrayList<>();
     }
+    
     /**
     *Listagem com as informações de Receita
     * @return List com as receitas
