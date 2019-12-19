@@ -399,10 +399,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
-                    imp.setCodMercadologico4(rst.getString("merc4"));
+                    imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
+                    imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
+                    imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
+                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
