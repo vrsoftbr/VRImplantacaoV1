@@ -341,6 +341,10 @@ public enum OpcaoProduto {
      * produtos unitários.
      */
     IMPORTAR_EAN_MENORES_QUE_7_DIGITOS, 
+    /**
+     * Faz com que uma nova listagem de produtos seja gerada.
+     */
+    IMPORTAR_NAO_GERAR_NOVA_LISTAGEM,
     VOLUME_TIPO_EMBALAGEM, 
     VOLUME_QTD, 
     IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO {

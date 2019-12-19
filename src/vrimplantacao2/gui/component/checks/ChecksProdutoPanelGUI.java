@@ -46,7 +46,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
         }
         
-    }; 
+    };
+    private boolean utilizarVersao2 = false;
 
     public void setParametrosExtras(List<OpcaoProduto> parametrosExtras) {
         this.parametrosExtras = parametrosExtras;
@@ -1324,6 +1325,14 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkCopiarIcmsDebitoNaEntrada.setSelected(parametros.getBool(concat(params, "COPIAR_DEBITO_NO_CREDITO" )));
         
     }
+
+    /**
+     * Aciona o novo produto repository para fazer a importação dos produtos.
+     * @param b 
+     */
+    public void setUtilizarVersao2(boolean utilizarVersao2) {
+        this.utilizarVersao2 = utilizarVersao2;
+    }
     
     public class ProdutoPanelImportador {
         public void importar() throws Exception {
@@ -1352,7 +1361,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     opt.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
                 }
                 opt.addAll(getParametrosExtras());
-                importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
+                if (utilizarVersao2) {
+                    importador.importarProdutoNovo(opt.toArray(new OpcaoProduto[]{}));
+                } else {
+                    importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
+                }
             }
             
             if (chkPautaFiscal.isSelected()) {
@@ -1526,7 +1539,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 opcoes.addAll(getParametrosExtras());
                 if (!opcoes.isEmpty()) {
-                    importador.atualizarProdutos(opcoes);
+                    if (utilizarVersao2) {
+                        importador.importarProdutoNovo(opcoes.toArray(new OpcaoProduto[]{}));
+                    } else {
+                        importador.atualizarProdutos(opcoes);
+                    }
                 }
             }
             if (chkEAN.isSelected()) {

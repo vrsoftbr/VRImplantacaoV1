@@ -1,117 +1,128 @@
 package vrimplantacao2.vo.importacao;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
 
+@DatabaseTable(tableName = "miglog.produto")
 public class ProdutoIMP {
-    
-    private String importSistema;
-    private String importLoja;
-    private String importId;
-    
-    private Date dataCadastro = new Date();
-    private Date dataAlteracao = new Date();
-    private String ean = "-2";
-    private int qtdEmbalagemCotacao = 1;
-    private int qtdEmbalagem = 1;
-    private String tipoEmbalagem = "UN";
-    private String tipoEmbalagemCotacao = null;
-    private boolean eBalanca = false;
-    private int validade = 0;
-    
-    private String descricaoCompleta = "SEM DESCRICAO";
-    private String descricaoReduzida = "SEM DESCRICAO";
-    private String descricaoGondola = "SEM DESCRICAO";
-    
-    private String codMercadologico1 = "";
-    private String codMercadologico2 = "";
-    private String codMercadologico3 = "";
-    private String codMercadologico4 = "";
-    private String codMercadologico5 = "";
-    private String idFamiliaProduto = "";
-    
-    private double pesoBruto = 0;
-    private double pesoLiquido = 0;
-    private double estoqueMaximo = 0;
-    private double estoqueMinimo = 0;
-    private double estoque = 0;
-    private double troca = 0;
-    
-    private double margem = 0;
-    private double margemMinima = 0;
-    private double custoSemImposto = 0;
-    private double custoComImposto = 0;    
-    private double custoAnteriorSemImposto = 0;
-    private double custoAnteriorComImposto = 0;
-    private double precovenda = 0;    
-    
-    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
-    private boolean descontinuado = false;
-    private String ncm;
-    private String cest;
-    
-    private int piscofinsCstDebito = 0;
-    private int piscofinsCstCredito = 0;
-    private int piscofinsNaturezaReceita = -1;
-    
-    private int icmsCstEntrada = 60;
-    private double icmsAliqEntrada = 0;
-    private double icmsReducaoEntrada = 0;
-    
-    private int icmsCstEntradaForaEstado = 60;
-    private double icmsAliqEntradaForaEstado = 0;
-    private double icmsReducaoEntradaForaEstado = 0;
-    
-    private int icmsCstSaida = 60;
-    private double icmsAliqSaida = 0;
-    private double icmsReducaoSaida = 0;
 
-    private int icmsCstSaidaForaEstado = 60;
-    private double icmsAliqSaidaForaEstado = 0;
-    private double icmsReducaoSaidaForaEstado = 0;
+    public ProdutoIMP() {
+    }
+    
+    /**
+     * ID do registro no banco temporário
+     */
+    @DatabaseField(generatedId = true, columnDefinition = "bigint default nextval('miglog.produto_id_seq')")
+    public Long recordId;
+    @DatabaseField private String importSistema;
+    @DatabaseField private String importLoja;
+    @DatabaseField private String importId;
+    
+    @DatabaseField private Date dataCadastro = new Date();
+    @DatabaseField private Date dataAlteracao = new Date();
+    @DatabaseField private String ean = "-2";
+    @DatabaseField private int qtdEmbalagemCotacao = 1;
+    @DatabaseField private int qtdEmbalagem = 1;
+    @DatabaseField private String tipoEmbalagem = "UN";
+    @DatabaseField private String tipoEmbalagemCotacao = null;
+    @DatabaseField private boolean eBalanca = false;
+    @DatabaseField private int validade = 0;
+    
+    @DatabaseField private String descricaoCompleta = "SEM DESCRICAO";
+    @DatabaseField private String descricaoReduzida = "SEM DESCRICAO";
+    @DatabaseField private String descricaoGondola = "SEM DESCRICAO";
+    
+    @DatabaseField private String codMercadologico1 = "";
+    @DatabaseField private String codMercadologico2 = "";
+    @DatabaseField private String codMercadologico3 = "";
+    @DatabaseField private String codMercadologico4 = "";
+    @DatabaseField private String codMercadologico5 = "";
+    @DatabaseField private String idFamiliaProduto = "";
+    
+    @DatabaseField private double pesoBruto = 0;
+    @DatabaseField private double pesoLiquido = 0;
+    @DatabaseField private double estoqueMaximo = 0;
+    @DatabaseField private double estoqueMinimo = 0;
+    @DatabaseField private double estoque = 0;
+    @DatabaseField private double troca = 0;
+    
+    @DatabaseField private double margem = 0;
+    @DatabaseField private double margemMinima = 0;
+    @DatabaseField private double custoSemImposto = 0;
+    @DatabaseField private double custoComImposto = 0;    
+    @DatabaseField private double custoAnteriorSemImposto = 0;
+    @DatabaseField private double custoAnteriorComImposto = 0;
+    @DatabaseField private double precovenda = 0;    
+    
+    @DatabaseField private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+    @DatabaseField private boolean descontinuado = false;
+    @DatabaseField private String ncm;
+    @DatabaseField private String cest;
+    
+    @DatabaseField private int piscofinsCstDebito = 0;
+    @DatabaseField private int piscofinsCstCredito = 0;
+    @DatabaseField private int piscofinsNaturezaReceita = -1;
+    
+    @DatabaseField private int icmsCstEntrada = 60;
+    @DatabaseField private double icmsAliqEntrada = 0;
+    @DatabaseField private double icmsReducaoEntrada = 0;
+    
+    @DatabaseField private int icmsCstEntradaForaEstado = 60;
+    @DatabaseField private double icmsAliqEntradaForaEstado = 0;
+    @DatabaseField private double icmsReducaoEntradaForaEstado = 0;
+    
+    @DatabaseField private int icmsCstSaida = 60;
+    @DatabaseField private double icmsAliqSaida = 0;
+    @DatabaseField private double icmsReducaoSaida = 0;
 
-    private int icmsCstSaidaForaEstadoNF = 60;
-    private double icmsAliqSaidaForaEstadoNF = 0;
-    private double icmsReducaoSaidaForaEstadoNF = 0;
+    @DatabaseField private int icmsCstSaidaForaEstado = 60;
+    @DatabaseField private double icmsAliqSaidaForaEstado = 0;
+    @DatabaseField private double icmsReducaoSaidaForaEstado = 0;
+
+    @DatabaseField private int icmsCstSaidaForaEstadoNF = 60;
+    @DatabaseField private double icmsAliqSaidaForaEstadoNF = 0;
+    @DatabaseField private double icmsReducaoSaidaForaEstadoNF = 0;
     
-    private String icmsCstConsumidor = null;
-    private double icmsAliqConsumidor;
-    private double icmsReducaoConsumidor;
+    @DatabaseField private String icmsCstConsumidor = null;
+    @DatabaseField private double icmsAliqConsumidor;
+    @DatabaseField private double icmsReducaoConsumidor;
     
-    private String icmsDebitoId;
-    private String icmsDebitoForaEstadoId;
-    private String icmsDebitoForaEstadoNfId;
-    private String icmsCreditoId;
-    private String icmsCreditoForaEstadoId;
+    @DatabaseField private String icmsDebitoId;
+    @DatabaseField private String icmsDebitoForaEstadoId;
+    @DatabaseField private String icmsDebitoForaEstadoNfId;
+    @DatabaseField private String icmsCreditoId;
+    @DatabaseField private String icmsCreditoForaEstadoId;
     
-    private double atacadoPreco = 0;
-    private double atacadoPorcentagem = 0;
-    private String codigoSped = "";
+    @DatabaseField private double atacadoPreco = 0;
+    @DatabaseField private double atacadoPorcentagem = 0;
+    @DatabaseField private String codigoSped = "";
     
-    private boolean sugestaoCotacao;
-    private boolean sugestaoPedido;
+    @DatabaseField private boolean sugestaoCotacao;
+    @DatabaseField private boolean sugestaoPedido;
     
-    private String fornecedorFabricante;
+    @DatabaseField private String fornecedorFabricante;
     
-    private String pautaFiscalId;
-    private boolean vendaPdv = true;
-    private String idComprador;
+    @DatabaseField private String pautaFiscalId;
+    @DatabaseField private boolean vendaPdv = true;
+    @DatabaseField private String idComprador;
     
-    private String uf;
-    private String codigoGIA;
-    private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
-    private boolean fabricacaoPropria = false;
-    private boolean manterEAN = false;
-    private boolean emiteEtiqueta = true;
-    private boolean aceitaMultiplicacaoPDV = true;
+    @DatabaseField private String uf;
+    @DatabaseField private String codigoGIA;
+    @DatabaseField private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
+    @DatabaseField private boolean fabricacaoPropria = false;
+    @DatabaseField private boolean manterEAN = false;
+    @DatabaseField private boolean emiteEtiqueta = true;
+    @DatabaseField private boolean aceitaMultiplicacaoPDV = true;
     
-    private String divisao;
+    @DatabaseField private String divisao;
     
-    private String tipoEmbalagemVolume;
-    private double volume = 1;
+    @DatabaseField private String tipoEmbalagemVolume;
+    @DatabaseField private double volume = 1;
     
     public String getImportSistema() {
         return importSistema;
