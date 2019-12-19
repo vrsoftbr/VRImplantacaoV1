@@ -16,6 +16,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -44,8 +45,10 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     1 as id,\n"
                     + "     identificador as cnpj,\n"
                     + "     nomefantasia as nome\n"
-                    + "from vw_pessoas\n"
-                    + "     where id = 1428"
+                    + "from dadospessoajuridica dpj\n"
+                    + "     join dados d \n"
+                    + "     on d.id = dpj.id\n"
+                    + " where d.id = 1428"
             )) {
                 while (rs.next()) {
                     lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
@@ -90,19 +93,19 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select distinct\n"
-                        + "	tp.id::varchar Merc1ID,\n"
-                        + "	tp.descricao Merc1Descricao,\n"
-                        + "	sb.id::varchar Merc2ID,\n"
-                        + "	sb.descricao Merc2Descricao,\n"
-                        + "	s.id::varchar Merc3ID,\n"
-                        + "	s.descricao Merc3Descricao\n"
+                    + "     tp.id::varchar Merc1ID,\n"
+                    + "     tp.descricao Merc1Descricao,\n"
+                    + "     sb.id::varchar Merc2ID,\n"
+                    + "     sb.descricao Merc2Descricao,\n"
+                    + "     s.id::varchar Merc3ID,\n"
+                    + "     s.descricao Merc3Descricao\n"
                     + "from produto p\n"
-                        + "	inner join tipoproduto tp\n"
-                        + "		on tp.id::varchar = p.tipoprodutoid::varchar\n"
-                        + "	inner join subsecao sb\n"
-                        + "		on p.subsecaoid = sb.id\n"
-                        + "	inner join secao s\n"
-                        + "		on sb.secaoid::varchar = s.id::varchar\n"
+                    + "     inner join tipoproduto tp\n"
+                    + "		on tp.id::varchar = p.tipoprodutoid::varchar\n"
+                    + "	inner join subsecao sb\n"
+                    + "		on p.subsecaoid = sb.id\n"
+                    + "	inner join secao s\n"
+                    + "		on sb.secaoid::varchar = s.id::varchar\n"
                     + "order by 1,3,5"
             )) {
                 while (rs.next()) {
@@ -299,6 +302,38 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPiscofinsCstCredito(71);
                         imp.setPiscofinsCstDebito(7);
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<OfertaIMP> getOfertas() throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select     \n"
+                    + "	pp.produtoid idProduto,\n"
+                    + "	p.inicio dataInicio,\n"
+                    + "	p.fim dataFim,\n"
+                    + "	pp.precoatual precoNormal,\n"
+                    + "	pp.precopromocional precoOferta,\n"
+                    + "	case when p.statusid = 29 then 1 else 0 end situacaoOferta\n"
+                    + "from promocao p\n"
+                    + "	left join promocaoproduto pp\n"
+                    + "		on p.id = pp.promocaoid\n"
+                    + "         where p.fim >= now()\n"
+                    + "	order by pp.produtoid "
+            )) {
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("dataInicio"));
+                    imp.setDataFim(rs.getDate("dataFim"));
+                    imp.setPrecoNormal(rs.getDouble("precoNormal"));
+                    imp.setPrecoOferta(rs.getDouble("precoOferta"));
+
                     result.add(imp);
                 }
             }
