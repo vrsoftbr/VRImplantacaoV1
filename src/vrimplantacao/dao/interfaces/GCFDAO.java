@@ -279,8 +279,8 @@ public class GCFDAO extends InterfaceDAO {
                     "    P.DBA_GIT_PESO_VND PESO,\n" +
                     "    EST.DBA_CADCESTQ_ESTOQUE ESTOQUE,\n" +
                     "    coalesce(merc.dba_ncc_margem1, merc.dba_ncc_margem2, merc.dba_ncc_margem3, MRG.DBA_CAD_MRG_LUCRO) MARGEM,\n" +
-                    "    P.DBA_GIT_CUS_REP CUSTOCOMIMPOSTO,\n" +
-                    "    P.DBA_GIT_CUS_ULT_ENT_BRU CUSTOMSEMIMPOSTO,\n" +
+                    "    P.DBA_GIT_CUS_REP CUSTOMSEMIMPOSTO,\n" +
+                    "    P.DBA_GIT_CUS_ULT_ENT_BRU CUSTOCOMIMPOSTO,\n" +
                     "    p.DBA_GIT_PRC_VEN" + getNivel() + " PRECO,\n" +
                     "    case WHEN P.DBA_GIT_DAT_SAI_LIN = 0 THEN 0 ELSE 1 END descontinuado,\n" +
                     "    P.DBA_GIT_CLASS_FIS NCM,\n" +
