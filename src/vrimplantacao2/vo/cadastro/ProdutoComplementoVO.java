@@ -2,6 +2,7 @@ package vrimplantacao2.vo.cadastro;
 
 import java.util.Date;
 import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
 
@@ -27,6 +28,7 @@ public class ProdutoComplementoVO {
     private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
     private int idAliquotaCredito = 0;
     private Date dataPrimeiraAlteracao;
+    private NormaCompra normaReposicao = NormaCompra.CAIXA;
 
     public void setId(int id) {
         this.id = id;
@@ -188,4 +190,12 @@ public class ProdutoComplementoVO {
         this.dataPrimeiraAlteracao = dataPrimeiraAlteracao;
     }
 
+    public NormaCompra getNormaReposicao() {
+        return normaReposicao;
+    }
+
+    public void setNormaReposicao(NormaCompra normaReposicao) {
+        this.normaReposicao = normaReposicao == null ? NormaCompra.CAIXA : normaReposicao;
+    }
+    
 }

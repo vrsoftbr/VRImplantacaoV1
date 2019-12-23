@@ -104,6 +104,7 @@ public class ProdutoComplementoDAO {
                         sql.put("id_tipoproduto", vo.getTipoProduto().getId());
                         sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                     }
+                    sql.put("id_normareposicao", vo.getNormaReposicao().getId());
                     sql.getReturning().add("id");
 
                     try (ResultSet rst = stm.executeQuery(
@@ -171,6 +172,7 @@ public class ProdutoComplementoDAO {
                     sql.put("id_tipoproduto", vo.getTipoProduto().getId());
                     sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                 }
+                sql.put("id_normareposicao", vo.getNormaReposicao().getId());
                 sql.getReturning().add("id");
 
                 try (ResultSet rst = stm.executeQuery(
@@ -237,6 +239,9 @@ public class ProdutoComplementoDAO {
                 }
                 if (opt.contains(OpcaoProduto.ICMS)) {
                     sql.put("id_aliquotacredito", vo.getIdAliquotaCredito());
+                }
+                if (opt.contains(OpcaoProduto.NORMA_REPOSICAO)) {
+                    sql.put("id_normareposicao", vo.getNormaReposicao().getId());
                 }
                 if (opt.contains(OpcaoProduto.CUSTO)) {
                     sql.setWhere(
@@ -329,6 +334,9 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.ICMS)) {
                 sql.put("id_aliquotacredito", complemento.getIdAliquotaCredito());
+            }
+            if (opt.contains(OpcaoProduto.NORMA_REPOSICAO)) {
+                sql.put("id_normareposicao", complemento.getNormaReposicao().getId());
             }
             if ((opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO))
                     || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))
@@ -454,7 +462,8 @@ public class ProdutoComplementoDAO {
                 "	customediocomimpostoanterior, \n" +
                 "	customediosemimpostoanterior, \n" +
                 "	id_tipopiscofinscredito, \n" +
-                "	valoroutrassubstituicao)\n" +
+                "	valoroutrassubstituicao,\n" +
+                "	id_normareposicao)\n" +
                 "SELECT\n" +
                 "	id_produto, \n" +
                 "	prateleira, \n" +
@@ -491,7 +500,8 @@ public class ProdutoComplementoDAO {
                 "	customediocomimpostoanterior, \n" +
                 "	customediosemimpostoanterior, \n" +
                 "	id_tipopiscofinscredito, \n" +
-                "	valoroutrassubstituicao\n" +
+                "	valoroutrassubstituicao,\n" +
+                "	id_normareposicao\n" + 
                 "FROM 	\n" +
                 "	produtocomplemento pc\n" +
                 "where\n" +

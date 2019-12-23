@@ -5,6 +5,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
 
@@ -123,6 +124,7 @@ public class ProdutoIMP {
     
     @DatabaseField private String tipoEmbalagemVolume;
     @DatabaseField private double volume = 1;
+    @DatabaseField private NormaCompra normaReposicao = NormaCompra.CAIXA;
     
     public String getImportSistema() {
         return importSistema;
@@ -910,6 +912,14 @@ public class ProdutoIMP {
      */
     public void setMargemMinima(double margemMinima) {
         this.margemMinima = margemMinima;
+    }
+
+    public NormaCompra getNormaReposicao() {
+        return normaReposicao;
+    }
+
+    public void setNormaReposicao(NormaCompra normaReposicao) {
+        this.normaReposicao = normaReposicao;
     }
     
 }

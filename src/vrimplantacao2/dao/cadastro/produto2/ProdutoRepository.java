@@ -1038,6 +1038,7 @@ public class ProdutoRepository {
         complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
         complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
         complemento.setDataPrimeiraAlteracao(imp.getDataCadastro());
+        complemento.setNormaReposicao(imp.getNormaReposicao());
 
         return complemento;
     }

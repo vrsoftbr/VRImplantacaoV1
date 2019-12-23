@@ -315,6 +315,12 @@ public enum OpcaoProduto {
             return "Emite Etiqueta (Prod. Compl.)";
         }
     },
+    NORMA_REPOSICAO {
+        @Override
+        public String toString() {
+            return "Norma de Reposição";
+        }
+    }, 
     DIVISAO_PRODUTO {
         @Override
         public String toString() {
