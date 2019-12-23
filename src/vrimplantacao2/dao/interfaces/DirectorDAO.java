@@ -7,8 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -254,6 +259,173 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setIcmsAliq(rs.getDouble("icms_debito"));
                     imp.setIcmsReducao(rs.getDouble("icms_reducao_debito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	f.DFcod_fornecedor id,\n" +
+                    "	f.DFnome razao,\n" +
+                    "	f.DFnome_fantasia fantasia,\n" +
+                    "	f.DFcgc cnpj,\n" +
+                    "	f.DFinscr_estadual ie,\n" +
+                    "	f.DFprazo_entrega prazo_entrega,\n" +
+                    "	f.DFobservacao obs,\n" +
+                    "	f.DFdata_cadastro data_cadastro,\n" +
+                    "	ft.DFid_tipo_estabelecimento idtipo_empresa,\n" +
+                    "	ft.DFdescricao tipo_empresa,\n" +
+                    "	fp.DFdescricao forma_pagamento,\n" +
+                    "	f.DFinscricao_municipal inscricao_municipal,\n" +
+                    "	fr.DFid_ramo_atividade ramo_atividade,\n" +
+                    "	fr.DFdescricao descricao_ramo_atividade,\n" +
+                    "	cl.DFcod_cep cep,\n" +
+                    "	tl.DFdescricao + ' ' + lo.DFdescricao endereco,\n" +
+                    "	f.DFcomplemento_endereco numero,\n" +
+                    "	lo.DFcomplemento complemento,\n" +
+                    "	ba.DFdescricao bairro,\n" +
+                    "	lc.DFdescricao municipio,\n" +
+                    "	lc.DFcod_uf uf,\n" +
+                    "	ct.DFe_mail email,\n" +
+                    "	ct.DFfax fax,\n" +
+                    "	ct.DFtelefone telefone,\n" +
+                    "	ct.DFtelefone_celular celular,\n" +
+                    "	ct.DFcontato contato,\n" +
+                    "	ct.DFcargo_contato cargo_contato,\n" +
+                    "	sc.DFdescricao setor\n" +
+                    "from\n" +
+                    "	TBfornecedor f\n" +
+                    "left join \n" +
+                    "	TBtipo_estabelecimento ft on f.DFid_tipo_estabelecimento = ft.DFid_tipo_estabelecimento\n" +
+                    "left join\n" +
+                    "	TBplano_pagamento fp on f.DFcod_plano_pagamento = fp.DFcod_plano_pagamento\n" +
+                    "left join\n" +
+                    "	TBramo_atividade fr on f.DFid_ramo_atividade = fr.DFid_ramo_atividade\n" +
+                    "left join\n" +
+                    "	TBcep_logradouro cl on f.DFid_cep_logradouro = cl.DFid_cep_logradouro\n" +
+                    "left join\n" +
+                    "	TBlogradouro lo on cl.DFid_logradouro = lo.DFid_logradouro\n" +
+                    "left join\n" +
+                    "	TBtipo_logradouro tl on lo.DFcod_tipo_logradouro = tl.DFcod_tipo_logradouro\n" +
+                    "left join\n" +
+                    "	TBbairro ba on lo.DFid_bairro = ba.DFid_bairro\n" +
+                    "left join\n" +
+                    "	TBlocalidade lc on ba.DFcod_localidade = lc.DFcod_localidade\n" +
+                    "left join\n" +
+                    "	TBcontato_fornecedor ct on f.DFcod_fornecedor = ct.DFcod_fornecedor\n" +
+                    "left join\n" +
+                    "	TBsetor_contato sc on ct.DFid_setor_contato = sc.DFid_setor_contato\n" +
+                    "order by\n" +
+                    "	f.DFcod_fornecedor")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
+                    imp.setObservacao(rs.getString("obs") + " Forma Pag.: " + rs.getString("forma_pagamento"));
+                    imp.setDatacadastro(rs.getDate("data_cadastro"));
+                    imp.setInsc_municipal(rs.getString("inscricao_municipal"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    
+                    int idTipoEmpresa = rs.getInt("idtipo_empresa");
+                    if(idTipoEmpresa == 57) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    } else if(idTipoEmpresa == 98) {
+                        imp.setTipoEmpresa(TipoEmpresa.PESSOA_FISICA);
+                    } else if(idTipoEmpresa == 99) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    } else if(idTipoEmpresa == 101) {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    } else if(idTipoEmpresa == 102) {
+                        imp.setProdutorRural();
+                    } else if(idTipoEmpresa == 103) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    }
+                    
+                    int idTipoFornecedor = rs.getInt("ramo_atividade");
+                    if(idTipoFornecedor == 2) {
+                        imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                    } else if(idTipoFornecedor == 3) {
+                        imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                    } else if(idTipoFornecedor == 7) {
+                        imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                    } else if(idTipoFornecedor == 57) {
+                        imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                    } else if(idTipoFornecedor == 45) {
+                        imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                    } else {
+                        imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                    }
+                    
+                    if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
+                        imp.addContato("1", rs.getString("contato"), null, null, TipoContato.COMERCIAL, rs.getString("email"));
+                    }
+                    
+                    if(rs.getString("fax") != null && !"".equals(rs.getString("fax"))) {
+                        imp.addContato("2", "FAX", null, null, TipoContato.COMERCIAL, null);
+                    }
+                    
+                    if(rs.getString("celular") != null && !"".equals(rs.getString("celular"))) {
+                        imp.addContato("3", "CELULAR", null, rs.getString("celular"), TipoContato.COMERCIAL, null);
+                    }
+                    
+                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
+                        imp.addContato("4", rs.getString("contato"), null, rs.getString("celular"), TipoContato.COMERCIAL, rs.getString("setor"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	DFcod_fornecedor idfornecedor,\n" +
+                    "	DFcod_item_estoque idproduto,\n" +
+                    "	DFpart_number codigoexterno\n" +
+                    "from\n" +
+                    "	TBfornecedor_item\n" +
+                    "order by\n" +
+                    "	1, 2")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
                 }
