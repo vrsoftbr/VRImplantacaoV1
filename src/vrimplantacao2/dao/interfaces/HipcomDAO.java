@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaItemIterator;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -32,7 +34,6 @@ import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -167,6 +168,47 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.TROCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.SUGESTAO_COTACAO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.OFERTA
+        ));
     }
 
     @Override
@@ -322,6 +364,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	coalesce(ean.barqtemb, 1) qtdembalagem,\n" +
                     "	coalesce(cot.embqtemb, 1) qtdcotacao,\n" +
                     "	substring(p.proembu, 1,2) tipoembalagem,\n" +
+                    "	substring(p.proemb, 1,2) tipoembalagemcotacao,\n" +
                     "	case p.propesado\n" +
                     "	when 'S' then 1\n" +
                     "	else 0 end as ebalanca,\n" +
@@ -334,7 +377,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.progrupo merc3,\n" +
                     "	p.prosubgr merc4,\n" +
                     "	p.procodfam id_familia,\n" +
-                    "	p.propeso peso,\n" +
+                    "	p.propeso pesoliquido,\n" +
+                    "	p.propesobruto pesobruto,\n" +
                     "	prc.prlestoq estoque,\n" +
                     "	trc.estoquetroca,\n" +
                     "	prc.prlmargind margemunit,\n" +
@@ -394,6 +438,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdcotacao"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcotacao"));
                     imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -406,7 +451,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPesoBruto(rst.getDouble("peso"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setTroca(rst.getDouble("estoquetroca"));
