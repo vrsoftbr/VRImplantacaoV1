@@ -162,8 +162,14 @@
                                   <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblDocRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="cmbDocumentoCheque" alignment="0" pref="212" max="32767" attributes="0"/>
+                                  <Component id="cmbDocumentoRotativo" alignment="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="231" max="32767" attributes="0"/>
+                          <EmptySpace pref="227" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -178,7 +184,15 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="174" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="lblDocRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="cmbDocumentoRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                          <Component id="cmbDocumentoCheque" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="82" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -202,6 +216,30 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteValorLimite">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Valor Limite"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="cmbDocumentoRotativo">
+                  <Properties>
+                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                      <StringArray count="0"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="lblDocRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Documento Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="cmbDocumentoCheque">
+                  <Properties>
+                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                      <StringArray count="0"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabel2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Documento Cheque"/>
                   </Properties>
                 </Component>
               </SubComponents>

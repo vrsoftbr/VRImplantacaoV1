@@ -39,6 +39,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        carregarDocumentoRotativo();
+        
     }
 
     private void gravarParametros() throws Exception {
@@ -111,6 +113,16 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
+    
+     private void carregarDocumentoRotativo() throws Exception {
+        cmbDocumentoRotativo.setModel(new DefaultComboBoxModel());
+        cmbDocumentoRotativo.removeAllItems();
+
+        for (ItemComboVO item : dao.getDocumentoRotativo()) {
+            cmbDocumentoRotativo.addItem(item);
+            cmbDocumentoCheque.addItem(item);
+        }
+    }
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -139,6 +151,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                     ProgressBar.setCancel(true);
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    dao.codigoDocumentoRotativo = ((ItemComboVO) cmbDocumentoRotativo.getSelectedItem()).id;
+                    dao.codigoDocumentoCheque = ((ItemComboVO) cmbDocumentoCheque.getSelectedItem()).id;
                     
                     if(!txtCompLoja.getText().trim().isEmpty()) {
                         idLojaCliente = txtCompLoja.getText();
@@ -260,6 +274,10 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteValorLimite = new vrframework.bean.checkBox.VRCheckBox();
+        cmbDocumentoRotativo = new javax.swing.JComboBox();
+        lblDocRotativo = new javax.swing.JLabel();
+        cmbDocumentoCheque = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
         tabParametro = new javax.swing.JPanel();
         chkIcmsForaEstado = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -308,6 +326,10 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkClienteValorLimite.setText("Valor Limite");
 
+        lblDocRotativo.setText("Documento Rotativo");
+
+        jLabel2.setText("Documento Cheque");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -321,8 +343,13 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(231, Short.MAX_VALUE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDocRotativo)
+                    .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(cmbDocumentoCheque, javax.swing.GroupLayout.Alignment.LEADING, 0, 212, Short.MAX_VALUE)
+                        .addComponent(cmbDocumentoRotativo, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel2))
+                .addContainerGap(227, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -334,7 +361,15 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(174, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblDocRotativo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbDocumentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addGap(4, 4, 4)
+                .addComponent(cmbDocumentoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -515,11 +550,15 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private javax.swing.JComboBox cmbDocumentoCheque;
+    private javax.swing.JComboBox cmbDocumentoRotativo;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblCompLoja;
+    private javax.swing.JLabel lblDocRotativo;
     private vrframework.bean.label.VRLabel lblLojaCliente;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.panel.VRPanel tabClientes;

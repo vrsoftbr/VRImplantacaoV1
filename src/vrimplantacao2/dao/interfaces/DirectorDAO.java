@@ -6,12 +6,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -25,6 +28,9 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class DirectorDAO extends InterfaceDAO {
 
+    public int codigoDocumentoRotativo;
+    public int codigoDocumentoCheque;
+    
     @Override
     public String getSistema() {
         return "Director";
@@ -570,6 +576,94 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setFax(rs.getString("fax"));
                     
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<ItemComboVO> getDocumentoRotativo() throws SQLException {
+        List<ItemComboVO> result = new ArrayList<>();
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    " DFcod_tipo_documento id,\n" +
+                    " DFdescricao descricao\n" +
+                    "from \n" +
+                    "	TBtipo_documento")) {
+                while(rs.next()) {
+                    result.add(new ItemComboVO(rs.getInt("id"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	tr.DFid_titulo_receber id,\n" +
+                    "	tr.DFcod_cliente idcliente,\n" +
+                    "	tr.DFcod_tipo_documento tipo_doc,\n" +
+                    "	tr.DFnumero_titulo titulo,\n" +
+                    "	tr.DFdata_emissao emissao,\n" +
+                    "	tr.DFdata_vencimento vencimento,\n" +
+                    "	tr.DFvalor valor,\n" +
+                    "	tr.DFobservacao obs\n" +
+                    "from\n" +
+                    "	TBtitulo_receber tr\n" +
+                    "where\n" +
+                    "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n" +
+                    "	tr.DFcod_tipo_documento = " + codigoDocumentoRotativo + " and\n" +
+                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber)\n" +
+                    "order by\n" +
+                    "	tr.DFdata_vencimento")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("titulo"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	tr.DFid_titulo_receber id,\n" +
+                    "	tr.DFcod_cliente idcliente,\n" +
+                    "	tr.DFcod_tipo_documento tipo_doc,\n" +
+                    "	tr.DFnumero_titulo titulo,\n" +
+                    "	tr.DFdata_emissao emissao,\n" +
+                    "	tr.DFdata_vencimento vencimento,\n" +
+                    "	tr.DFvalor valor,\n" +
+                    "	tr.DFobservacao obs\n" +
+                    "from\n" +
+                    "	TBtitulo_receber tr\n" +
+                    "where\n" +
+                    "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n" +
+                    "	tr.DFcod_tipo_documento = " + codigoDocumentoCheque + " and\n" +
+                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber)\n" +
+                    "order by\n" +
+                    "	tr.DFdata_vencimento")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
                 }
             }
         }
