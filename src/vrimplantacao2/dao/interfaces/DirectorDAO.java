@@ -4,15 +4,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -426,6 +429,145 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	p.DFid_promocao id,\n" +
+                    "	p.DFdata_inicial datainicial,\n" +
+                    "	p.DFdata_final datafinal,\n" +
+                    "	p.DFdescricao descricao,\n" +
+                    "	pi.DFid_unidade_item_estoque idproduto,\n" +
+                    "	pi.dfpreco precopromocao,\n" +
+                    "	ie.DFpreco_venda precovenda\n" +
+                    "from\n" +
+                    "	tbpromocao p\n" +
+                    "join\n" +
+                    "	TBpromocao_empresa pe on p.DFid_promocao = pe.DFid_promocao\n" +
+                    "join\n" +
+                    "	TBpromocao_unidade_item_estoque pi on p.DFid_promocao = pi.DFid_promocao \n" +
+                    "join\n" +
+                    "	TBunidade_item_estoque_preco ie on pi.DFid_unidade_item_estoque = ie.DFid_unidade_item_estoque and\n" +
+                    "	ie.DFcod_empresa = pe.DFcod_empresa\n" +
+                    "where\n" +
+                    "	p.DFdata_final >= GETDATE() and\n" +
+                    "	pe.DFcod_empresa = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	p.DFdata_final\n" +
+                    "	p.DFdata_final")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("datainicial"));
+                    imp.setDataFim(rs.getDate("datafinal"));
+                    imp.setPrecoOferta(rs.getDouble("precopromocao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.DFcod_cliente id,\n" +
+                    "	c.DFnome razao,\n" +
+                    "	c.DFnome_fantasia fantasia,\n" +
+                    "	c.DFcnpj_cpf cnpj,\n" +
+                    "	c.DFfisico_juridico tipo,\n" +
+                    "	c.DFinscr_estadual ie,\n" +
+                    "	c.DFcarteira_identidade rg,\n" +
+                    "	c.DFdata_cadastro data_cadastro,\n" +
+                    "	c.DFobservacao obs,\n" +
+                    "	c.DFlimite_credito valor_limite,\n" +
+                    "	c.DFdata_inativacao inativacao,\n" +
+                    "	ce.DFcomplemento_endereco numero,\n" +
+                    "	ce.DFponto_referencia referencia,\n" +
+                    "	cc.DFcod_cep cep,\n" +
+                    "	tl.DFdescricao + ' ' + cl.DFdescricao endereco,\n" +
+                    "	cl.DFcomplemento complemento,\n" +
+                    "	lo.DFdescricao municipio,\n" +
+                    "	lo.DFcod_uf uf,\n" +
+                    "	cn.DFe_mail email,\n" +
+                    "	cn.DFdata_aniversario data_aniversario,\n" +
+                    "	cn.DFcontato contato,\n" +
+                    "	sc.DFdescricao setor,\n" +
+                    "	cn.DFfax fax,\n" +
+                    "	cn.DFtelefone telefone,\n" +
+                    "	cn.DFtelefone_celular celular\n" +
+                    "from\n" +
+                    "	TBcliente c\n" +
+                    "left join\n" +
+                    "	TBendereco_cliente ce on c.DFcod_cliente = ce.DFcod_cliente\n" +
+                    "left join	\n" +
+                    "	TBcep_logradouro cc on ce.DFid_cep_logradouro = cc.DFid_cep_logradouro\n" +
+                    "left join\n" +
+                    "	TBlogradouro cl on cc.DFid_logradouro = cl.DFid_logradouro\n" +
+                    "left join\n" +
+                    "	TBtipo_logradouro tl on cl.DFcod_tipo_logradouro = tl.DFcod_tipo_logradouro\n" +
+                    "left join\n" +
+                    "	TBlocalidade lo on cl.DFcod_localidade = lo.DFcod_localidade\n" +
+                    "left join\n" +
+                    "	TBcontato_cliente cn on c.DFcod_cliente = cn.DFcod_cliente\n" +
+                    "left join\n" +
+                    "	TBsetor_contato sc on cn.DFid_setor_contato = sc.DFid_setor_contato\n" +
+                    "where\n" +
+                    "	ce.DFtipo_endereco = 'C'\n" +
+                    "order by\n" +
+                    "	c.DFcod_cliente")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    
+                    if("F".equals(rs.getString("tipo"))) {
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    } else {
+                        imp.setInscricaoestadual(rs.getString("ie"));
+                    }
+                    
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setValorLimite(rs.getDouble("valor_limite"));
+                    
+                    if(rs.getDate("inativacao") != null) {
+                        imp.setAtivo(false);
+                    } else {
+                        imp.setAtivo(true);
+                    }
+                    
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setDataNascimento(rs.getDate("data_aniversario"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setFax(rs.getString("fax"));
                     
                     result.add(imp);
                 }
