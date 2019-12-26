@@ -4,11 +4,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -17,6 +28,9 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class DirectorDAO extends InterfaceDAO {
 
+    public int codigoDocumentoRotativo;
+    public int codigoDocumentoCheque;
+    
     @Override
     public String getSistema() {
         return "Director";
@@ -256,6 +270,400 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	f.DFcod_fornecedor id,\n" +
+                    "	f.DFnome razao,\n" +
+                    "	f.DFnome_fantasia fantasia,\n" +
+                    "	f.DFcgc cnpj,\n" +
+                    "	f.DFinscr_estadual ie,\n" +
+                    "	f.DFprazo_entrega prazo_entrega,\n" +
+                    "	f.DFobservacao obs,\n" +
+                    "	f.DFdata_cadastro data_cadastro,\n" +
+                    "	ft.DFid_tipo_estabelecimento idtipo_empresa,\n" +
+                    "	ft.DFdescricao tipo_empresa,\n" +
+                    "	fp.DFdescricao forma_pagamento,\n" +
+                    "	f.DFinscricao_municipal inscricao_municipal,\n" +
+                    "	fr.DFid_ramo_atividade ramo_atividade,\n" +
+                    "	fr.DFdescricao descricao_ramo_atividade,\n" +
+                    "	cl.DFcod_cep cep,\n" +
+                    "	tl.DFdescricao + ' ' + lo.DFdescricao endereco,\n" +
+                    "	f.DFcomplemento_endereco numero,\n" +
+                    "	lo.DFcomplemento complemento,\n" +
+                    "	ba.DFdescricao bairro,\n" +
+                    "	lc.DFdescricao municipio,\n" +
+                    "	lc.DFcod_uf uf,\n" +
+                    "	ct.DFe_mail email,\n" +
+                    "	ct.DFfax fax,\n" +
+                    "	ct.DFtelefone telefone,\n" +
+                    "	ct.DFtelefone_celular celular,\n" +
+                    "	ct.DFcontato contato,\n" +
+                    "	ct.DFcargo_contato cargo_contato,\n" +
+                    "	sc.DFdescricao setor\n" +
+                    "from\n" +
+                    "	TBfornecedor f\n" +
+                    "left join \n" +
+                    "	TBtipo_estabelecimento ft on f.DFid_tipo_estabelecimento = ft.DFid_tipo_estabelecimento\n" +
+                    "left join\n" +
+                    "	TBplano_pagamento fp on f.DFcod_plano_pagamento = fp.DFcod_plano_pagamento\n" +
+                    "left join\n" +
+                    "	TBramo_atividade fr on f.DFid_ramo_atividade = fr.DFid_ramo_atividade\n" +
+                    "left join\n" +
+                    "	TBcep_logradouro cl on f.DFid_cep_logradouro = cl.DFid_cep_logradouro\n" +
+                    "left join\n" +
+                    "	TBlogradouro lo on cl.DFid_logradouro = lo.DFid_logradouro\n" +
+                    "left join\n" +
+                    "	TBtipo_logradouro tl on lo.DFcod_tipo_logradouro = tl.DFcod_tipo_logradouro\n" +
+                    "left join\n" +
+                    "	TBbairro ba on lo.DFid_bairro = ba.DFid_bairro\n" +
+                    "left join\n" +
+                    "	TBlocalidade lc on ba.DFcod_localidade = lc.DFcod_localidade\n" +
+                    "left join\n" +
+                    "	TBcontato_fornecedor ct on f.DFcod_fornecedor = ct.DFcod_fornecedor\n" +
+                    "left join\n" +
+                    "	TBsetor_contato sc on ct.DFid_setor_contato = sc.DFid_setor_contato\n" +
+                    "order by\n" +
+                    "	f.DFcod_fornecedor")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
+                    imp.setObservacao(rs.getString("obs") + " Forma Pag.: " + rs.getString("forma_pagamento"));
+                    imp.setDatacadastro(rs.getDate("data_cadastro"));
+                    imp.setInsc_municipal(rs.getString("inscricao_municipal"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    
+                    int idTipoEmpresa = rs.getInt("idtipo_empresa");
+                    if(idTipoEmpresa == 57) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    } else if(idTipoEmpresa == 98) {
+                        imp.setTipoEmpresa(TipoEmpresa.PESSOA_FISICA);
+                    } else if(idTipoEmpresa == 99) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    } else if(idTipoEmpresa == 101) {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    } else if(idTipoEmpresa == 102) {
+                        imp.setProdutorRural();
+                    } else if(idTipoEmpresa == 103) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    }
+                    
+                    int idTipoFornecedor = rs.getInt("ramo_atividade");
+                    if(idTipoFornecedor == 2) {
+                        imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                    } else if(idTipoFornecedor == 3) {
+                        imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                    } else if(idTipoFornecedor == 7) {
+                        imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                    } else if(idTipoFornecedor == 57) {
+                        imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                    } else if(idTipoFornecedor == 45) {
+                        imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                    } else {
+                        imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                    }
+                    
+                    if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
+                        imp.addContato("1", rs.getString("contato"), null, null, TipoContato.COMERCIAL, rs.getString("email"));
+                    }
+                    
+                    if(rs.getString("fax") != null && !"".equals(rs.getString("fax"))) {
+                        imp.addContato("2", "FAX", null, null, TipoContato.COMERCIAL, null);
+                    }
+                    
+                    if(rs.getString("celular") != null && !"".equals(rs.getString("celular"))) {
+                        imp.addContato("3", "CELULAR", null, rs.getString("celular"), TipoContato.COMERCIAL, null);
+                    }
+                    
+                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
+                        imp.addContato("4", rs.getString("contato"), null, rs.getString("celular"), TipoContato.COMERCIAL, rs.getString("setor"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	DFcod_fornecedor idfornecedor,\n" +
+                    "	DFcod_item_estoque idproduto,\n" +
+                    "	DFpart_number codigoexterno\n" +
+                    "from\n" +
+                    "	TBfornecedor_item\n" +
+                    "order by\n" +
+                    "	1, 2")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	p.DFid_promocao id,\n" +
+                    "	p.DFdata_inicial datainicial,\n" +
+                    "	p.DFdata_final datafinal,\n" +
+                    "	p.DFdescricao descricao,\n" +
+                    "	pi.DFid_unidade_item_estoque idproduto,\n" +
+                    "	pi.dfpreco precopromocao,\n" +
+                    "	ie.DFpreco_venda precovenda\n" +
+                    "from\n" +
+                    "	tbpromocao p\n" +
+                    "join\n" +
+                    "	TBpromocao_empresa pe on p.DFid_promocao = pe.DFid_promocao\n" +
+                    "join\n" +
+                    "	TBpromocao_unidade_item_estoque pi on p.DFid_promocao = pi.DFid_promocao \n" +
+                    "join\n" +
+                    "	TBunidade_item_estoque_preco ie on pi.DFid_unidade_item_estoque = ie.DFid_unidade_item_estoque and\n" +
+                    "	ie.DFcod_empresa = pe.DFcod_empresa\n" +
+                    "where\n" +
+                    "	p.DFdata_final >= GETDATE() and\n" +
+                    "	pe.DFcod_empresa = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	p.DFdata_final\n" +
+                    "	p.DFdata_final")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("datainicial"));
+                    imp.setDataFim(rs.getDate("datafinal"));
+                    imp.setPrecoOferta(rs.getDouble("precopromocao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.DFcod_cliente id,\n" +
+                    "	c.DFnome razao,\n" +
+                    "	c.DFnome_fantasia fantasia,\n" +
+                    "	c.DFcnpj_cpf cnpj,\n" +
+                    "	c.DFfisico_juridico tipo,\n" +
+                    "	c.DFinscr_estadual ie,\n" +
+                    "	c.DFcarteira_identidade rg,\n" +
+                    "	c.DFdata_cadastro data_cadastro,\n" +
+                    "	c.DFobservacao obs,\n" +
+                    "	c.DFlimite_credito valor_limite,\n" +
+                    "	c.DFdata_inativacao inativacao,\n" +
+                    "	ce.DFcomplemento_endereco numero,\n" +
+                    "	ce.DFponto_referencia referencia,\n" +
+                    "	cc.DFcod_cep cep,\n" +
+                    "	tl.DFdescricao + ' ' + cl.DFdescricao endereco,\n" +
+                    "	cl.DFcomplemento complemento,\n" +
+                    "	lo.DFdescricao municipio,\n" +
+                    "	lo.DFcod_uf uf,\n" +
+                    "	cn.DFe_mail email,\n" +
+                    "	cn.DFdata_aniversario data_aniversario,\n" +
+                    "	cn.DFcontato contato,\n" +
+                    "	sc.DFdescricao setor,\n" +
+                    "	cn.DFfax fax,\n" +
+                    "	cn.DFtelefone telefone,\n" +
+                    "	cn.DFtelefone_celular celular\n" +
+                    "from\n" +
+                    "	TBcliente c\n" +
+                    "left join\n" +
+                    "	TBendereco_cliente ce on c.DFcod_cliente = ce.DFcod_cliente\n" +
+                    "left join	\n" +
+                    "	TBcep_logradouro cc on ce.DFid_cep_logradouro = cc.DFid_cep_logradouro\n" +
+                    "left join\n" +
+                    "	TBlogradouro cl on cc.DFid_logradouro = cl.DFid_logradouro\n" +
+                    "left join\n" +
+                    "	TBtipo_logradouro tl on cl.DFcod_tipo_logradouro = tl.DFcod_tipo_logradouro\n" +
+                    "left join\n" +
+                    "	TBlocalidade lo on cl.DFcod_localidade = lo.DFcod_localidade\n" +
+                    "left join\n" +
+                    "	TBcontato_cliente cn on c.DFcod_cliente = cn.DFcod_cliente\n" +
+                    "left join\n" +
+                    "	TBsetor_contato sc on cn.DFid_setor_contato = sc.DFid_setor_contato\n" +
+                    "where\n" +
+                    "	ce.DFtipo_endereco = 'C'\n" +
+                    "order by\n" +
+                    "	c.DFcod_cliente")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    
+                    if("F".equals(rs.getString("tipo"))) {
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    } else {
+                        imp.setInscricaoestadual(rs.getString("ie"));
+                    }
+                    
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setValorLimite(rs.getDouble("valor_limite"));
+                    
+                    if(rs.getDate("inativacao") != null) {
+                        imp.setAtivo(false);
+                    } else {
+                        imp.setAtivo(true);
+                    }
+                    
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setDataNascimento(rs.getDate("data_aniversario"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setFax(rs.getString("fax"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<ItemComboVO> getDocumentoRotativo() throws SQLException {
+        List<ItemComboVO> result = new ArrayList<>();
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    " DFcod_tipo_documento id,\n" +
+                    " DFdescricao descricao\n" +
+                    "from \n" +
+                    "	TBtipo_documento")) {
+                while(rs.next()) {
+                    result.add(new ItemComboVO(rs.getInt("id"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	tr.DFid_titulo_receber id,\n" +
+                    "	tr.DFcod_cliente idcliente,\n" +
+                    "	tr.DFcod_tipo_documento tipo_doc,\n" +
+                    "	tr.DFnumero_titulo titulo,\n" +
+                    "	tr.DFdata_emissao emissao,\n" +
+                    "	tr.DFdata_vencimento vencimento,\n" +
+                    "	tr.DFvalor valor,\n" +
+                    "	tr.DFobservacao obs\n" +
+                    "from\n" +
+                    "	TBtitulo_receber tr\n" +
+                    "where\n" +
+                    "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n" +
+                    "	tr.DFcod_tipo_documento = " + codigoDocumentoRotativo + " and\n" +
+                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber)\n" +
+                    "order by\n" +
+                    "	tr.DFdata_vencimento")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("titulo"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	tr.DFid_titulo_receber id,\n" +
+                    "	tr.DFcod_cliente idcliente,\n" +
+                    "	tr.DFcod_tipo_documento tipo_doc,\n" +
+                    "	tr.DFnumero_titulo titulo,\n" +
+                    "	tr.DFdata_emissao emissao,\n" +
+                    "	tr.DFdata_vencimento vencimento,\n" +
+                    "	tr.DFvalor valor,\n" +
+                    "	tr.DFobservacao obs\n" +
+                    "from\n" +
+                    "	TBtitulo_receber tr\n" +
+                    "where\n" +
+                    "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n" +
+                    "	tr.DFcod_tipo_documento = " + codigoDocumentoCheque + " and\n" +
+                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber)\n" +
+                    "order by\n" +
+                    "	tr.DFdata_vencimento")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
                 }
             }
         }

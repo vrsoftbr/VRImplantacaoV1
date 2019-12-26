@@ -69,6 +69,7 @@ public final class Parametros implements Iterable<Parametro>{
             try {
                 singleton = new Parametros();
             } catch (Exception ex) {
+                ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
         }

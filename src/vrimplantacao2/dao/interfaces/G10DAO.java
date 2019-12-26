@@ -28,6 +28,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
     public String lojaMesmoID;
+    public boolean situacaoOferta;
 
     @Override
     public String getSistema() {
@@ -132,26 +133,14 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	pro idproduto,\n"
-                    + "	ccf idfornecedor,\n"
-                    + "	qnt qtdembalagem,\n"
-                    + "	uni,\n"
-                    + "	(select \n"
-                    + "		ref \n"
-                    + "	from \n"
-                    + "		gceref01 ref \n"
-                    + "	where \n"
-                    + "		ref.cfr = forn.ccf and \n"
-                    + "		ref.pro = forn.pro\n"
-                    + "		limit 1) as referencia,\n"
-                    + "	dtr dataalteracao\n"
-                    + "from\n"
-                    + "	gcefor01 forn \n"
-                    + "where \n"
-                    + "   emp = " + getLojaOrigem() + " \n"
-                    + "order by \n"
-                    + "	pro, \n"
-                    + "	ccf")) {
+                    + "     fornecedorid idFornecedor,\n"
+                    + "     produtoid idProduto,\n"
+                    + "     codprodfornecedor codigoExterno,\n"
+                    + "     (select qtdeembalagem::varchar from produto p where p.id::varchar = pf.produtoid::varchar) as qtdEmbalagem,\n"
+                    + "     data dataAlteracao,\n"
+                    + "     aliquotaipi ipi\n"
+                    + "from produtofornecedor pf\n"
+                    + "     order by 1")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -160,7 +149,8 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setCodigoExterno(rs.getString("referencia"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setIpi(rs.getDouble("ipi"));
 
                     result.add(imp);
                 }
@@ -174,68 +164,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      distinct\n"
-                    + "      prod.cod::integer as id,\n"
-                    + "      prod.dsc as descricaocompleta,\n"
-                    + "      prod.dsr as descricaoresumida,\n"
-                    + "      prod.dsr as descricaogondola,\n"
-                    + "      coalesce(prod.dep, 1) as mercadologico1,\n"
-                    + "      coalesce(prod.sec, 1) as mercadologico2,\n"
-                    + "      coalesce(prod.grp, 1) as mercadologico3,\n"
-                    + "      coalesce(prod.seg, 1) as mercadologico4,\n"
-                    + "      coalesce(prod.ssg, 1) as mercadologico5,\n"
-                    + "      prod.dtc as datacadastro,\n"
-                    + "      ean.bar::bigint as ean,\n"
-                    + "      prod.emb as qtdembalagem,\n"
-                    + "      prod.uni as tipoembalagem,\n"
-                    + "      prod.tip as balanca,\n"
-                    + "      val.dvl as validade,\n"
-                    + "      prod.fl_situacao as ativo,\n"
-                    + "      prod.psb as pesobruto,\n"
-                    + "      prod.psl as pesoliquido,\n"
-                    + "      prod.clf as ncm,\n"
-                    + "      custo.cci as custocomimposto,\n"
-                    + "      custo.csi as custosemimposto,\n"
-                    + "      preco.mrg as margem,\n"
-                    + "      preco.pv1 as vlvenda,\n"
-                    + "      est.nr_quantidade as estoque,\n"
-                    + "      proest.emn as estoquemin,\n"
-                    + "      proest.emx as estoquemax,\n"
-                    + "      prod.cd_especificadorst as cest,\n"
-                    + "      custo.icm as icmscredito,\n"
-                    + "      fis.ctr as cstdebito,\n"
-                    + "      fis.icf as icmsdebito,\n"
-                    + "      fis.icr as icmsreducao,\n"
-                    + "      prod.fpc::integer as piscofins\n"
-                    + "from\n"
-                    + "      gcepro02 as prod\n"
-                    + "left join gcebar01 as ean on ean.pro = prod.cod\n"
-                    + "left join gcepro05 as custo on custo.cod = prod.cod\n"
-                    + "left join gcepro04 as preco on preco.cod = prod.cod\n"
-                    + "join spsemp00 as emp on emp.cod = custo.emp\n"
-                    + "left join gcepro06 val on emp.cod = val.emp and\n"
-                    + "     val.cod = prod.cod\n"
-                    + "join tb_produtoestoque est on prod.cod = est.cd_produto\n"
-                    + "left join (select\n"
-                    + "            fiscal.cod,\n"
-                    + "            fiscal.ctr,\n"
-                    + "            fiscal.ica,\n"
-                    + "            fiscal.icr,\n"
-                    + "            fiscal.icf\n"
-                    + "      from\n"
-                    + "          gceffs01 fiscal\n"
-                    + "      where\n"
-                    + "           fiscal.ufo = 'RJ' and\n"
-                    + "           fiscal.ufd = 'RJ' and\n"
-                    + "           fiscal.rgf = 0) as fis on prod.ffs = fis.cod\n"
-                    + "join gcepro03 as proest on prod.cod = proest.cod and\n"
-                    + "     proest.emp = emp.cod and\n"
-                    + "     est.cd_empresa = emp.cod and\n"
-                    + "     emp.cod = preco.emp and\n"
-                    + "     emp.cod = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "      prod.cod::integer")) {
+                    "scp de produtos")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -248,14 +177,12 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
-                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
-                    imp.setCodMercadologico5(rs.getString("mercadologico5"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     imp.setEan(rs.getString("ean"));
                     imp.setValidade(rs.getInt("validade"));
 
-                    if (("B".equals(rs.getString("balanca").trim()))) {
+                    if (("1".equals(rs.getString("balanca").trim()))) {
                         if (v_usar_arquivoBalanca) {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
@@ -333,7 +260,9 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataFim(rs.getDate("dataFim"));
                     imp.setPrecoNormal(rs.getDouble("precoNormal"));
                     imp.setPrecoOferta(rs.getDouble("precoOferta"));
-
+                    //imp.setSituacaoOferta(rs.getBoolean("situacaoOferta"));
+                    
+                    
                     result.add(imp);
                 }
             }

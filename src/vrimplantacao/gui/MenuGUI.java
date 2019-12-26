@@ -35,7 +35,6 @@ import vrimplantacao2.gui.interfaces.ControlWareGUI;
 import vrimplantacao.gui.interfaces.ControllGUI;
 import vrimplantacao.gui.interfaces.DGComGUI;
 import vrimplantacao2.gui.interfaces.DelphiGUI;
-import vrimplantacao.gui.interfaces.DirectorGUI;
 import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
 import vrimplantacao.gui.interfaces.EverastGUI;
 import vrimplantacao.gui.interfaces.FGGUI;
@@ -117,6 +116,7 @@ import vrimplantacao2.gui.interfaces.ControlXGUI;
 import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
+import vrimplantacao2.gui.interfaces.DirectorGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
 import vrimplantacao2.gui.interfaces.EsSystemGUI;
@@ -645,6 +645,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAtma = new javax.swing.JMenuItem();
         mnuControlX = new javax.swing.JMenuItem();
         mnuNATISistemas = new javax.swing.JMenuItem();
+        mnuDirector = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1441,7 +1442,8 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(jMenuItemKairos);
 
-        jMenuItemDirector.setText("Director");
+        jMenuItemDirector.setText("Director (OLD)");
+        jMenuItemDirector.setEnabled(false);
         jMenuItemDirector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemDirectorActionPerformed(evt);
@@ -1740,6 +1742,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuNATISistemas);
+
+        mnuDirector.setText("Director");
+        mnuDirector.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDirectorActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuDirector);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -3136,7 +3146,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItemDirectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDirectorActionPerformed
 
-        try {
+        /*try {
             this.setWaitCursor();
             if (formImportarDirector == null || formImportarDirector.isClosed()) {
                 formImportarDirector = new DirectorGUI(this);
@@ -3147,7 +3157,7 @@ public final class MenuGUI extends VRMdiFrame {
 
         } finally {
             this.setDefaultCursor();
-        }
+        }*/
     }//GEN-LAST:event_jMenuItemDirectorActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -4259,6 +4269,10 @@ public final class MenuGUI extends VRMdiFrame {
         GestorPdvGUI.exibir(this);
     }//GEN-LAST:event_mnuGestorPDVActionPerformed
 
+    private void mnuDirectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDirectorActionPerformed
+        DirectorGUI.exibir(this);
+    }//GEN-LAST:event_mnuDirectorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4384,6 +4398,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
     private javax.swing.JMenuItem mnuDelfi;
+    private javax.swing.JMenuItem mnuDirector;
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
