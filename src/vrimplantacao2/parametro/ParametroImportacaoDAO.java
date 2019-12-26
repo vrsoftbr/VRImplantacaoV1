@@ -22,13 +22,16 @@ public class ParametroImportacaoDAO {
                 "do $$\n" +
                 "declare\n" +
                 "begin\n" +
-                "	if not exists(select table_name from information_schema.tables where table_schema = 'implantacao' and table_name = 'parametro') then\n" +
-                "		create table implantacao.parametro (\n" +
-                "			key varchar not null primary key,\n" +
-                "			value varchar\n" +
-                "		);\n" +
-                "		raise notice 'tabela criada';\n" +
-                "	end if;\n" +
+                "   if not exists(select * from information_schema.schemata where schema_name = 'implantacao') then\n" +
+                "       create schema implantacao;\n" +
+                "   end if;\n" +
+                "   if not exists(select table_name from information_schema.tables where table_schema = 'implantacao' and table_name = 'parametro') then\n" +
+                "       create table implantacao.parametro (\n" +
+                "           key varchar not null primary key,\n" +
+                "           value varchar\n" +
+                "       );\n" +
+                "       raise notice 'tabela criada';\n" +
+                "   end if;\n" +
                 "end;\n" +
                 "$$;"
             );
