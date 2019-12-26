@@ -79,9 +79,12 @@ public class GCFGUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents();
         
+        dao.gui = this;
+        pnlArquivoBalanca.setSistema(dao.getSistema());
+        
         //tabProdutos.setUtilizarVersao2(true);
         tabProdutos.setOpcoesDisponiveis(dao);
-
+        
         carregarParametros();
         
         centralizarForm();
@@ -259,7 +262,7 @@ public class GCFGUI extends VRInternalFrame {
         cmbLojaOrigem = new javax.swing.JComboBox();
         cmbNivel = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
-        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        pnlArquivoBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -406,6 +409,11 @@ public class GCFGUI extends VRInternalFrame {
         jLabel2.setText("Loja Origem");
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
 
         cmbNivel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5" }));
         cmbNivel.addActionListener(new java.awt.event.ActionListener() {
@@ -626,7 +634,7 @@ public class GCFGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlArquivoBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -642,7 +650,7 @@ public class GCFGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -721,6 +729,10 @@ public class GCFGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkProdutoFornecedorActionPerformed
 
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -739,6 +751,7 @@ public class GCFGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlArquivoBalanca;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedores;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
@@ -750,7 +763,6 @@ public class GCFGUI extends VRInternalFrame {
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private javax.swing.JTextField txtStrConexao;
     private vrframework.bean.textField.VRTextField txtUsuario;
-    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;
@@ -763,5 +775,9 @@ public class GCFGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
+
+    public void setLojaBalanca(String LojaOrigem) {
+        pnlArquivoBalanca.setLoja(LojaOrigem);
+    }
 
 }

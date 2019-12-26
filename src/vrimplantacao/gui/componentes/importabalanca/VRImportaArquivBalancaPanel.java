@@ -147,6 +147,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
         tabsOpcoes.addTab("Pesáveis", tabPesaveis);
 
+        rdbNutriconal.add(rdbFilizolaRdc360);
         rdbFilizolaRdc360.setSelected(true);
         rdbFilizolaRdc360.setText("Filizola (RDC-360)");
 
@@ -157,8 +158,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
             }
         });
 
+        rdbNutriconal.add(rdbToledo);
         rdbToledo.setText("Toledo");
 
+        rdbNutriconal.add(rdbToledoProduto);
         rdbToledoProduto.setText("Toledo x Produto");
 
         javax.swing.GroupLayout tabNutricionalLayout = new javax.swing.GroupLayout(tabNutricional);

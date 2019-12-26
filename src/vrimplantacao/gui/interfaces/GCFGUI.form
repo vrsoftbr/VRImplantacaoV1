@@ -26,7 +26,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRImportaArquivBalancaPanel1" max="32767" attributes="0"/>
+                  <Component id="pnlArquivoBalanca" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
                   <Component id="tabs" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
@@ -46,7 +46,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel6" min="-2" pref="152" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
+              <Component id="pnlArquivoBalanca" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tabs" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -334,6 +334,9 @@
               <Connection code="new DefaultComboBoxModel()" type="code"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbLojaOrigemActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="cmbNivel">
           <Properties>
@@ -358,7 +361,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
+    <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlArquivoBalanca">
     </Component>
     <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabs">
 

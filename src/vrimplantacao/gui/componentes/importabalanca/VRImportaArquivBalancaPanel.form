@@ -201,6 +201,9 @@
           <SubComponents>
             <Component class="javax.swing.JRadioButton" name="rdbFilizolaRdc360">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="rdbNutriconal"/>
+                </Property>
                 <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Filizola (RDC-360)"/>
               </Properties>
@@ -217,11 +220,17 @@
             </Component>
             <Component class="javax.swing.JRadioButton" name="rdbToledo">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="rdbNutriconal"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Toledo"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JRadioButton" name="rdbToledoProduto">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="rdbNutriconal"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Toledo x Produto"/>
               </Properties>
             </Component>

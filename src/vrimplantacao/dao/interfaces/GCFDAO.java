@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -35,7 +36,8 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class GCFDAO extends InterfaceDAO {
-        
+       
+    public GCFGUI gui;
     private int nivel = 1;
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("d/MM/yyyy");
 
@@ -50,6 +52,14 @@ public class GCFDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "GCF";
+    }
+
+    @Override
+    public void setLojaOrigem(String LojaOrigem) {
+        super.setLojaOrigem(LojaOrigem);
+        if (gui != null) {
+            gui.setLojaBalanca(LojaOrigem);
+        }
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
