@@ -320,7 +320,16 @@ public enum OpcaoProduto {
         public String toString() {
             return "Norma de Reposição";
         }
-    }, 
+    },
+    /**
+     * Utilize para produtos alcoólicos ou de controle especial.
+     */
+    VENDA_CONTROLADA {
+        @Override
+        public String toString() {
+            return "Venda controlada";
+        }
+    },
     DIVISAO_PRODUTO {
         @Override
         public String toString() {

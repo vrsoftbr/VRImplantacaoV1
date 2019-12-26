@@ -125,6 +125,7 @@ public class ProdutoIMP {
     @DatabaseField private String tipoEmbalagemVolume;
     @DatabaseField private double volume = 1;
     @DatabaseField private NormaCompra normaReposicao = NormaCompra.CAIXA;
+    @DatabaseField private boolean vendaControlada = false;
     
     public String getImportSistema() {
         return importSistema;
@@ -920,6 +921,30 @@ public class ProdutoIMP {
 
     public void setNormaReposicao(NormaCompra normaReposicao) {
         this.normaReposicao = normaReposicao;
+    }
+
+    /**
+     * Venda de produtos alcoólicos ou controlados.
+     * @return 
+     */
+    public boolean isVendaControlada() {
+        return vendaControlada;
+    }
+
+    /**
+     * Venda de produtos alcoólicos ou controlados.
+     * @param vendaControlada 
+     */
+    public void setVendaControlada(boolean vendaControlada) {
+        this.vendaControlada = vendaControlada;
+    }
+    
+    /**
+     * Venda de produtos alcoólicos ou controlados.
+     * @param produtoControlado 
+     */
+    public void setProdutoControlado(String produtoControlado) {
+        this.vendaControlada = Utils.stringToBool(produtoControlado != null ? produtoControlado.toUpperCase() : "F");
     }
     
 }

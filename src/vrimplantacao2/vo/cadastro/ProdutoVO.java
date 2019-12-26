@@ -50,6 +50,7 @@ public class ProdutoVO {
     private int idDivisaoFornecedor = 0;
     private TipoEmbalagem tipoEmbalagemVolume = TipoEmbalagem.UN;
     private double volume = 1.0;
+    private boolean vendaControlada = false;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -411,6 +412,14 @@ public class ProdutoVO {
      */
     public void setMargemMinima(double margemMinima) {
         this.margemMinima = margemMinima;
+    }
+
+    public boolean isVendaControlada() {
+        return vendaControlada;
+    }
+
+    public void setVendaControlada(boolean vendaControlada) {
+        this.vendaControlada = vendaControlada;
     }
     
 }

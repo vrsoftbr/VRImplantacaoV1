@@ -163,7 +163,7 @@ public class ProdutoDAO {
             sql.put("ipi", 0);
             sql.put("pesavel", vo.isPesavel());
             sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
-            sql.put("vendacontrolada", false);
+            sql.put("vendacontrolada", vo.isVendaControlada());
             sql.put("tiponaturezareceita", vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
             sql.put("vendapdv", true);
             sql.put("conferido", false);
@@ -333,6 +333,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.VOLUME_QTD)) {
             sql.put("volume", vo.getVolume());
+        }
+        if (opt.contains(OpcaoProduto.VENDA_CONTROLADA)) {
+            sql.put("vendacontrolada", vo.isVendaControlada());
         }
 
         sql.setWhere("id = " + vo.getId());

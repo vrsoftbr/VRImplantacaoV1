@@ -1231,6 +1231,7 @@ public class ProdutoRepository {
             vo.setTipoEmbalagemVolume(TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagemVolume()));
         }
         vo.setVolume(imp.getVolume());
+        vo.setVendaControlada(imp.isVendaControlada());
 
         return vo;
     }

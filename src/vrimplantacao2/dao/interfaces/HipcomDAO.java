@@ -207,7 +207,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.SUGESTAO_COTACAO,
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
-                OpcaoProduto.OFERTA
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.VENDA_CONTROLADA,
+                OpcaoProduto.NORMA_REPOSICAO
         ));
     }
 
@@ -400,7 +402,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlpivast p_iva,\n" +
                     "	prc.prlvivast v_iva,\n" +
                     "	prc.prlcotacao sugestaocotacao,\n" +
-                    "	prc.prlcodcmp id_comprador\n" +
+                    "	prc.prlcodcmp id_comprador,\n" +
+                    "	p.proalcoolico\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -452,7 +455,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("peso"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setTroca(rst.getDouble("estoquetroca"));
                     imp.setMargem(rst.getDouble("margemunit"));
@@ -500,6 +503,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     ));
                     imp.setSugestaoCotacao("S".equals(rst.getString("sugestaocotacao")));
                     imp.setIdComprador(rst.getString("id_comprador"));
+                    imp.setProdutoControlado(rst.getString("proalcoolico"));
                     
                     result.add(imp);
                 }
