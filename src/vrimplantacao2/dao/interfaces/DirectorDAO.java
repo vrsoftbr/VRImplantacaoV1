@@ -619,7 +619,8 @@ public class DirectorDAO extends InterfaceDAO {
                     "where\n" +
                     "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n" +
                     "	tr.DFcod_tipo_documento = " + codigoDocumentoRotativo + " and\n" +
-                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber)\n" +
+                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber) and\n" +
+                    "   tr.DFcliente_fornecedor_empresa = 'C'\n" +        
                     "order by\n" +
                     "	tr.DFdata_vencimento")) {
                 while(rs.next()) {
@@ -659,11 +660,14 @@ public class DirectorDAO extends InterfaceDAO {
                     "where\n" +
                     "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n" +
                     "	tr.DFcod_tipo_documento = " + codigoDocumentoCheque + " and\n" +
-                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber)\n" +
+                    "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber) and\n" +
+                    "   tr.DFcliente_fornecedor_empresa = 'C'\n" +         
                     "order by\n" +
                     "	tr.DFdata_vencimento")) {
                 while(rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
+                    
+                    
                 }
             }
         }
