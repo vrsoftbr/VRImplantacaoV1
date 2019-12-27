@@ -40,6 +40,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -209,7 +210,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.VENDA_CONTROLADA,
-                OpcaoProduto.NORMA_REPOSICAO
+                OpcaoProduto.NORMA_REPOSICAO,
+                OpcaoProduto.TIPO_PRODUTO,
+                OpcaoProduto.FABRICACAO_PROPRIA
         ));
     }
 
@@ -403,7 +406,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlvivast v_iva,\n" +
                     "	prc.prlcotacao sugestaocotacao,\n" +
                     "	prc.prlcodcmp id_comprador,\n" +
-                    "	p.proalcoolico\n" +
+                    "	p.proalcoolico,\n" +
+                    "	p.profinalidade,\n" +
+                    "	p.profabterc\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -447,6 +452,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    switch(rst.getInt("profinalidade")) {
+                        case 0: imp.setTipoProduto(TipoProduto.MERCADORIA_REVENDA); break;
+                            //TODO: Incluir os outros tipos.
+                    }
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
@@ -462,6 +471,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setFabricacaoPropria("T".equals(rst.getString("profabterc")));
                     
                     switch (Utils.acertarTexto(rst.getString("id_situacaocadastro"))) {
                         case "S":
