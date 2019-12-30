@@ -167,7 +167,7 @@
                                   <Component id="cmbDocumentoCheque" alignment="0" pref="212" max="32767" attributes="0"/>
                                   <Component id="cmbDocumentoRotativo" alignment="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblDocCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="227" max="32767" attributes="0"/>
                       </Group>
@@ -189,7 +189,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="cmbDocumentoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblDocCheque" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
                           <Component id="cmbDocumentoCheque" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="82" max="32767" attributes="0"/>
@@ -237,7 +237,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jLabel2">
+                <Component class="javax.swing.JLabel" name="lblDocCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Documento Cheque"/>
                   </Properties>

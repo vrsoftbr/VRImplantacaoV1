@@ -277,7 +277,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         cmbDocumentoRotativo = new javax.swing.JComboBox();
         lblDocRotativo = new javax.swing.JLabel();
         cmbDocumentoCheque = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
+        lblDocCheque = new javax.swing.JLabel();
         tabParametro = new javax.swing.JPanel();
         chkIcmsForaEstado = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -328,7 +328,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         lblDocRotativo.setText("Documento Rotativo");
 
-        jLabel2.setText("Documento Cheque");
+        lblDocCheque.setText("Documento Cheque");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -348,7 +348,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(cmbDocumentoCheque, javax.swing.GroupLayout.Alignment.LEADING, 0, 212, Short.MAX_VALUE)
                         .addComponent(cmbDocumentoRotativo, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jLabel2))
+                    .addComponent(lblDocCheque))
                 .addContainerGap(227, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -366,7 +366,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmbDocumentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addComponent(lblDocCheque)
                 .addGap(4, 4, 4)
                 .addComponent(cmbDocumentoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(82, Short.MAX_VALUE))
@@ -556,8 +556,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblCompLoja;
+    private javax.swing.JLabel lblDocCheque;
     private javax.swing.JLabel lblDocRotativo;
     private vrframework.bean.label.VRLabel lblLojaCliente;
     private vrframework.bean.panel.VRPanel pnlLoja;
