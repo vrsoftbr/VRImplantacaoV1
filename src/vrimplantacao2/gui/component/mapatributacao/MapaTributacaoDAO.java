@@ -92,8 +92,8 @@ public class MapaTributacaoDAO {
                                 rst.getInt("id_aliquota"),
                                 rst.getString("descricao"),
                                 rst.getInt("situacaotributaria"),
-                                rst.getInt("porcentagem"),
-                                rst.getInt("reduzido")
+                                rst.getDouble("porcentagem"),
+                                rst.getDouble("reduzido")
                             )
                         );
                     }

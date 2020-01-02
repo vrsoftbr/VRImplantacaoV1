@@ -341,9 +341,9 @@ public class MapaTributacaoView extends JPanel {
                 dados[i][2] = row.getAliquota().getId();
                 dados[i][3] = row.getAliquota().getDescricao();
                 dados[i][4] = String.format("%02d", row.getAliquota().getCst());
-                dados[i][5] = String.format("%.02f", row.getAliquota().getAliquota());
-                dados[i][6] = String.format("%.02f", row.getAliquota().getReduzido());
-                dados[i][7] = String.format("%.02f", aliqFinal);
+                dados[i][5] = String.format("%.2f", row.getAliquota().getAliquota());
+                dados[i][6] = String.format("%.2f", row.getAliquota().getReduzido());
+                dados[i][7] = String.format("%.2f", aliqFinal);
             }
             i++;
         }            
