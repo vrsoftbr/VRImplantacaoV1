@@ -730,9 +730,9 @@ public class RMSDAO extends InterfaceDAO {
                     "SELECT \n" +
                     "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n" +
                     "	GIT_COD_ITEM PRODUTO,\n" +
-                    //"	GIT_COD_ITEM||GIT_DIGITO PRODUTO,\n" +
                     "	FORITE_REFERENCIA AS REFERENCIA,\n" +
-                    "	PROD.GIT_EMB_FOR AS EMBALAGEM  \n" +
+                    "	PROD.GIT_EMB_FOR AS EMBALAGEM,  \n" +
+                    "	forn.forite_uf_fator_conv AS FATOR_COVERSAO  \n" +
                     "FROM \n" +
                     "	AA1FORIT FORN\n" +
                     "	join AA3CITEM PROD on\n" +
@@ -744,7 +744,7 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdFornecedor(rst.getString("fornecedor"));
                     imp.setIdProduto(rst.getString("produto"));
-                    imp.setQtdEmbalagem(rst.getInt("embalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("FATOR_COVERSAO"));
                     imp.setCodigoExterno(rst.getString("referencia"));
                     result.add(imp);
                 }
