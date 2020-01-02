@@ -59,7 +59,7 @@
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabOperacoes" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" pref="258" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -130,7 +130,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jPanel3" pref="175" max="32767" attributes="0"/>
+                          <Component id="jPanel3" pref="114" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlOutrasReceitas" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -183,6 +183,16 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFRazaoSocial">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Raz&#xe3;o Social"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFNomeFantasia">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -320,7 +330,7 @@
                           <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="129" max="32767" attributes="0"/>
+                          <EmptySpace pref="52" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -481,7 +491,7 @@
                               <Component id="txtDtCPEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDtCPFim" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="215" max="32767" attributes="0"/>
+                          <EmptySpace pref="140" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
