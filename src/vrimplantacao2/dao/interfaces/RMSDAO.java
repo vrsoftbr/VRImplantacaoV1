@@ -46,6 +46,7 @@ import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -380,7 +381,8 @@ public class RMSDAO extends InterfaceDAO {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
-                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.NCM,
                 OpcaoProduto.EXCECAO,
                 OpcaoProduto.CEST,
@@ -394,8 +396,37 @@ public class RMSDAO extends InterfaceDAO {
                 OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.OFERTA,
-                OpcaoProduto.DESCONTINUADO
+                OpcaoProduto.DESCONTINUADO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.FABRICANTE
         ));
+    }
+
+    @Override
+    public List<CompradorIMP> getCompradores() throws Exception {
+        List<CompradorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    to_number(tab_acesso) id_comprador,\n" +
+                    "    tab_conteudo nome\n" +
+                    "from\n" +
+                    "    AA2CTABE\n" +
+                    "where\n" +
+                    "    tab_codigo = 1 and \n" +
+                    "    length(trim(tab_acesso)) = 3\n" +
+                    "order by\n" +
+                    "    tab_acesso"
+            )) {
+                while (rst.next()) {
+                    result.add(new CompradorIMP(rst.getString("id_comprador"), rst.getString("nome")));
+                }
+            }
+        }
+        
+        return result;
     }
     
     @Override
@@ -422,6 +453,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	p.GIT_GRUPO merc3,\n" +
                     "	p.GIT_SUBGRUPO merc4,\n" +
                     "	p.GIT_CATEGORIA merc5,\n" +
+                    "	p.GIT_COMPRADOR id_comprador,\n" +
+                    "	F.TIP_CODIGO||F.TIP_DIGITO id_fabricante,\n" +
                     "	coalesce(cast(nullif(familia.it_pai, 0) as varchar(20)),p.git_cod_item||p.git_digito) id_familia,\n" +
                     "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
                     "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n" +
@@ -435,8 +468,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	case when coalesce(preco.preco, 0) != 0 \n" +
                     "	then preco.preco\n" +
                     "	else coalesce(est.get_preco_venda,0) end precovenda,\n" +
-                    "	coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n" +
-                    "	coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custosemimposto,\n" +
+                    "   coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n" +
+                    "	p.git_cus_rep custosemimposto,\n" +
                     "	det.DET_CLASS_FIS ncm,\n" +
                     "	det.DET_NCM_EXCECAO excecao,\n" +
                     "	det.DET_CEST cest,\n" +
@@ -528,6 +561,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	    ) atac on\n" +
                     "	    atac.filial = loja.LOJ_CODIGO and\n" +
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
+                    "left join AA2CTIPO f on\n" +
+                    "       p.git_cod_for = f.TIP_CODIGO\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
                     (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "") +
@@ -558,7 +593,9 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
-                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));                    
+                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    imp.setFornecedorFabricante(rst.getString("id_fabricante"));
+                    imp.setIdComprador(rst.getString("id_comprador"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("id_situacaocadastral"))));
                     imp.setPesoBruto(rst.getDouble("pesoliquido"));
