@@ -122,7 +122,7 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select lojcod, concat(lojcod,' - ', lojfantas) descricao from hiploj order by 1"
+                    "select recnum lojcod, concat(filial, ' - ', nome_fantasia) descricao from filial order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("lojcod"), rst.getString("descricao")));
@@ -135,7 +135,7 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Hipcom";
+        return "Exodus";
     }
 
     @Override
