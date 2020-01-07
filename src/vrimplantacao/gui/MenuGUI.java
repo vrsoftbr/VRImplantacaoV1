@@ -175,6 +175,7 @@ import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.RPInfoGUI;
+import vrimplantacao2.gui.interfaces.RensoftwareGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
@@ -646,6 +647,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuControlX = new javax.swing.JMenuItem();
         mnuNATISistemas = new javax.swing.JMenuItem();
         mnuDirector = new javax.swing.JMenuItem();
+        mnuRensoftware = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1750,6 +1752,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuDirector);
+
+        mnuRensoftware.setText("Rensoftware");
+        mnuRensoftware.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRensoftwareActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuRensoftware);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4273,6 +4283,10 @@ public final class MenuGUI extends VRMdiFrame {
         DirectorGUI.exibir(this);
     }//GEN-LAST:event_mnuDirectorActionPerformed
 
+    private void mnuRensoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRensoftwareActionPerformed
+        RensoftwareGUI.exibir(this);
+    }//GEN-LAST:event_mnuRensoftwareActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4472,6 +4486,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMS_3;
     private javax.swing.JMenuItem mnuRPInfo;
+    private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
     private javax.swing.JMenuItem mnuSDInformatica;
     private javax.swing.JMenu mnuSQLite;
