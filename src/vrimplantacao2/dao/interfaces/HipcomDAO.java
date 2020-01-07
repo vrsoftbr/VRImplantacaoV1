@@ -229,6 +229,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "	hipdep m1	\n" +
                     "where\n" +
+                    "	not depdepto in (11,12,13) and \n" +
                     "	depsecao = 0\n" +
                     "order by 1"
             )) {
@@ -297,7 +298,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             
-            try (ResultSet rst = stm.executeQuery(
+            /*try (ResultSet rst = stm.executeQuery(
                     "select \n" +
                     "	m.depdepto merc1,\n" +
                     "	m.depsecao merc2,\n" +
@@ -314,7 +315,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "order by 1,2, 3, 4"
             )) {
                 while (rst.next()) {
-                    LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc4") + " - " + rst.getString("merc4desc"));
+                    LOG.fine("NIVEL4: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc4") + " - " + rst.getString("merc4desc"));
                     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"), rst.getString("merc3"));
                     if (pai != null) {
                         MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc4"), rst.getString("merc4desc"));
@@ -326,7 +327,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         );
                     }
                 }
-            }
+            }*/
         }
         
         return result;
@@ -459,7 +460,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
-                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    //imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
