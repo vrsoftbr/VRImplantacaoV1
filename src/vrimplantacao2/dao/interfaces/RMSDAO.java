@@ -46,6 +46,7 @@ import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -78,7 +79,6 @@ public class RMSDAO extends InterfaceDAO {
     public static int digito;
     
     private boolean utilizarViewMixFiscal = true;
-    private boolean incluirNivel4 = true;
     
     private boolean importarVendasAntigas = false;
     
@@ -90,10 +90,6 @@ public class RMSDAO extends InterfaceDAO {
 
     public void setUtilizarViewMixFiscal(boolean utilizarViewMixFiscal) {
         this.utilizarViewMixFiscal = utilizarViewMixFiscal;
-    }
-
-    public void setIncluirNivel4(boolean incluirNivel4) {
-        this.incluirNivel4 = incluirNivel4;
     }
 
     public void setImportarVendasAntigas(boolean importarVendasAntigas) {
@@ -162,66 +158,77 @@ public class RMSDAO extends InterfaceDAO {
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
         
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct \n" +
-                    "    nvl(m.ncc_secao,0) AS MERC1,\n" +
-                    "    nvl(m.ncc_descricao,'MERCADOLOGICO VR') AS merc1_desc     \n" +
-                    "from \n" +
-                    "    aa3cnvcc m\n" +
-                    "where\n" +
-                    "    m.ncc_secao != 0 and\n" +
-                    "    m.ncc_grupo = 0 and\n" +
-                    "    m.ncc_subgrupo = 0 and\n" +
-                    "    m.ncc_categoria = 0" 
+        try (Statement st = ConexaoOracle.createStatement()) {
+            
+            //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 1">
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                            "    f_numerico(substr(tab_acesso,1,3)) tab_acesso,\n" +
+                            "    rtrim(tab_conteudo) tab_conteudo\n" +
+                            "from\n" +
+                            "    AA2CTABE\n" +
+                            "where\n" +
+                            "    tab_codigo = 16 and \n" +
+                            "    f_numerico(substr(tab_acesso,1,3)) > 0\n" +
+                            "order by\n" +
+                            "    tab_acesso"
             )) {
-                while (rst.next()) {
+                while (rs.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
-
-                    imp.setId(rst.getString("merc1"));
-                    imp.setDescricao(rst.getString("merc1_desc"));
+                    
+                    imp.setId(rs.getString("tab_acesso"));
+                    imp.setDescricao(rs.getString("tab_conteudo"));
                     
                     merc.put(imp.getId(), imp);
                 }
             }
+            //</editor-fold>
             
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct \n" +
-                    "    nvl(m.ncc_secao, 0) AS MERC1,\n" +
-                    "    nvl(m.ncc_grupo, 0) as merc2,\n" +
-                    "    nvl(m.ncc_descricao,'MERCADOLOGICO VR') AS merc2_desc     \n" +
-                    "from \n" +
-                    "    aa3cnvcc m\n" +
-                    "where    \n" +
-                    "    m.ncc_secao != 0 and\n" +
-                    "    m.ncc_grupo != 0 and\n" +
-                    "    m.ncc_subgrupo = 0 and\n" +
-                    "    m.ncc_categoria = 0" 
+            //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 2">
+            try (ResultSet rs = st.executeQuery(
+                    "select \n" +
+                            "    NCC_DEPARTAMENTO as merc1,\n" +
+                            "    NCC_SECAO as merc2,\n" +
+                            "    NCC_DESCRICAO as merc2_desc\n" +
+                            "from\n" +
+                            "    AA3CNVCC merc2        \n" +
+                            "where\n" +
+                            "    NCC_SECAO > 0\n" +
+                            "    and NCC_GRUPO = 0\n" +
+                            "    and NCC_SUBGRUPO = 0\n" +
+                            "order by\n" +
+                            "    merc2.ncc_departamento,\n" +
+                            "    merc2.ncc_secao"
             )) {
-                while (rst.next()) {
-                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
-                    if (merc1 != null) {
-                        merc1.addFilho(
-                            rst.getString("merc2"),
-                            rst.getString("merc2_desc")
+                while (rs.next()) {
+                    MercadologicoNivelIMP merc2 = merc.get(rs.getString("merc1"));
+                    if (merc2 != null) {
+                        merc2.addFilho(
+                                rs.getString("merc2"),
+                                rs.getString("merc2_desc")
                         );
                     }
                 }
             }
+            //</editor-fold>
             
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct \n" +
-                    "    nvl(m.ncc_secao, 0) AS MERC1,\n" +
-                    "    nvl(m.ncc_grupo, 0) as merc2,\n" +
-                    "    nvl(m.ncc_subgrupo, 0) as merc3,\n" +
-                    "    nvl(m.ncc_descricao,'MERCADOLOGICO VR') AS merc3_desc\n" +
-                    "from \n" +
-                    "    aa3cnvcc m\n" +
+            //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 3">
+            try (ResultSet rst = st.executeQuery(
+                    "select \n" +
+                    "    NCC_DEPARTAMENTO as merc1,\n" +
+                    "    NCC_SECAO as merc2,\n" +
+                    "	NCC_GRUPO as merc3,\n" +
+                    "    NCC_DESCRICAO as merc3_desc\n" +
+                    "from\n" +
+                    "    AA3CNVCC        \n" +
                     "where\n" +
-                    "    m.ncc_secao != 0 and\n" +
-                    "    m.ncc_grupo != 0 and\n" +
-                    "    m.ncc_subgrupo != 0 and\n" +
-                    "    m.ncc_categoria = 0" 
+                    "    NCC_SECAO > 0\n" +
+                    "    and NCC_GRUPO > 0\n" +
+                    "    and NCC_SUBGRUPO = 0\n" +
+                    "order by\n" +
+                    "    ncc_departamento,\n" +
+                    "    ncc_secao,\n" +
+                    "    ncc_grupo"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
@@ -229,41 +236,45 @@ public class RMSDAO extends InterfaceDAO {
                         MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
                         if (merc2 != null) {
                             merc2.addFilho(
-                                rst.getString("merc3"),
-                                rst.getString("merc3_desc")
+                                    rst.getString("merc3"),
+                                    rst.getString("merc3_desc")
                             );
                         }
                     }
                 }
             }
-            if (incluirNivel4) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select distinct \n" +
-                        "    nvl(m.ncc_secao, 0) AS merc1,\n" +
-                        "    nvl(m.ncc_grupo, 0) as merc2,\n" +
-                        "    nvl(m.ncc_subgrupo, 0) as merc3,\n" +
-                        "    nvl(m.ncc_categoria, 0) as merc4,\n" +
-                        "    nvl(m.ncc_descricao,'MERCADOLOGICO VR') AS merc4_desc " +
-                        "from \n" +
-                        "    aa3cnvcc m\n" +
-                        "where\n" +
-                        "    m.ncc_secao != 0 and\n" +
-                        "    m.ncc_grupo != 0 and\n" +
-                        "    m.ncc_subgrupo != 0 and\n" +
-                        "    m.ncc_categoria != 0" 
-                )) {
-                    while (rst.next()) { 
-                        MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
-                        if (merc1 != null) {
-                            MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
-                            if (merc2 != null) {
-                                MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("merc3"));
-                                if (merc3 != null) {
-                                    merc3.addFilho(
-                                        rst.getString("merc4"),
-                                        rst.getString("merc4_desc")
-                                    );
-                                }
+            //</editor-fold>
+            
+            try (ResultSet rst = st.executeQuery(
+                    "select \n" +
+                    "    NCC_DEPARTAMENTO as merc1,\n" +
+                    "    NCC_SECAO as merc2,\n" +
+                    "    NCC_GRUPO as merc3,\n" +
+                    "    NCC_SUBGRUPO as merc4,\n" +
+                    "    NCC_DESCRICAO as merc4_desc\n" +
+                    "from\n" +
+                    "    AA3CNVCC        \n" +
+                    "where\n" +
+                    "    NCC_SECAO > 0\n" +
+                    "    and NCC_GRUPO > 0\n" +
+                    "    and NCC_SUBGRUPO > 0\n" +
+                    "order by\n" +
+                    "    ncc_departamento,\n" +
+                    "    ncc_secao,\n" +
+                    "    ncc_grupo,\n" +
+                    "    ncc_subgrupo" 
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                        if (merc2 != null) {
+                            MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("merc3"));
+                            if (merc3 != null) {
+                                merc3.addFilho(
+                                    rst.getString("merc4"),
+                                    rst.getString("merc4_desc")
+                                );
                             }
                         }
                     }
@@ -370,7 +381,8 @@ public class RMSDAO extends InterfaceDAO {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
-                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.NCM,
                 OpcaoProduto.EXCECAO,
                 OpcaoProduto.CEST,
@@ -384,8 +396,37 @@ public class RMSDAO extends InterfaceDAO {
                 OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.OFERTA,
-                OpcaoProduto.DESCONTINUADO
+                OpcaoProduto.DESCONTINUADO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.FABRICANTE
         ));
+    }
+
+    @Override
+    public List<CompradorIMP> getCompradores() throws Exception {
+        List<CompradorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    to_number(tab_acesso) id_comprador,\n" +
+                    "    tab_conteudo nome\n" +
+                    "from\n" +
+                    "    AA2CTABE\n" +
+                    "where\n" +
+                    "    tab_codigo = 1 and \n" +
+                    "    length(trim(tab_acesso)) = 3\n" +
+                    "order by\n" +
+                    "    tab_acesso"
+            )) {
+                while (rst.next()) {
+                    result.add(new CompradorIMP(rst.getString("id_comprador"), rst.getString("nome")));
+                }
+            }
+        }
+        
+        return result;
     }
     
     @Override
@@ -407,10 +448,13 @@ public class RMSDAO extends InterfaceDAO {
                     "	p.GIT_DESCRICAO descricaocompleta,\n" +
                     "	p.GIT_DESC_REDUZ descricaoreduzida,\n" +
                     "	p.GIT_DESCRICAO descricaogondola,\n" +
-                    "	p.GIT_SECAO merc1,\n" +
-                    "	p.GIT_GRUPO merc2,\n" +
-                    "	p.GIT_SUBGRUPO merc3,\n" +
-                    "	p.GIT_CATEGORIA merc4,\n" +
+                    "	p.git_depto merc1,\n" +
+                    "	p.GIT_SECAO merc2,\n" +
+                    "	p.GIT_GRUPO merc3,\n" +
+                    "	p.GIT_SUBGRUPO merc4,\n" +
+                    "	p.GIT_CATEGORIA merc5,\n" +
+                    "	p.GIT_COMPRADOR id_comprador,\n" +
+                    "	F.TIP_CODIGO||F.TIP_DIGITO id_fabricante,\n" +
                     "	coalesce(cast(nullif(familia.it_pai, 0) as varchar(20)),p.git_cod_item||p.git_digito) id_familia,\n" +
                     "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
                     "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n" +
@@ -424,8 +468,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	case when coalesce(preco.preco, 0) != 0 \n" +
                     "	then preco.preco\n" +
                     "	else coalesce(est.get_preco_venda,0) end precovenda,\n" +
-                    "	coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n" +
-                    "	coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custosemimposto,\n" +
+                    "   coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n" +
+                    "	p.git_cus_rep custosemimposto,\n" +
                     "	det.DET_CLASS_FIS ncm,\n" +
                     "	det.DET_NCM_EXCECAO excecao,\n" +
                     "	det.DET_CEST cest,\n" +
@@ -517,6 +561,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	    ) atac on\n" +
                     "	    atac.filial = loja.LOJ_CODIGO and\n" +
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
+                    "left join AA2CTIPO f on\n" +
+                    "       p.git_cod_for = f.TIP_CODIGO\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
                     (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "") +
@@ -547,9 +593,9 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
-                    if (incluirNivel4) {
-                        imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
-                    }
+                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    imp.setFornecedorFabricante(rst.getString("id_fabricante"));
+                    imp.setIdComprador(rst.getString("id_comprador"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("id_situacaocadastral"))));
                     imp.setPesoBruto(rst.getDouble("pesoliquido"));
