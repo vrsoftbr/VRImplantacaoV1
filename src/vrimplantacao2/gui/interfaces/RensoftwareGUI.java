@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -19,6 +20,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.RensoftwareDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
@@ -64,6 +67,32 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
         super(i_mdiFrame);
         initComponents();
 
+        tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+            
+        });
+
         this.title = "Importação " + SISTEMA;
 
         conexao.host = "localhost";
@@ -74,7 +103,6 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
-        tabProdutos.setOpcoesDisponiveis(dao);
 
         conexao.setOnConectar(this);
 

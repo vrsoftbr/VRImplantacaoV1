@@ -31,6 +31,7 @@ import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoIte
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -55,6 +56,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
@@ -72,7 +74,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  * o mesmo gera os scripts e nomes da tabela, caso necessário.
  * Site com manual do sistema: https://tdn.totvs.com/display/public/LRMS/Manual+de+Extrato+de+Itens
 */
-public class RMSDAO extends InterfaceDAO {
+public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(RMSDAO.class.getName());
     public static String tabela_venda = "";
@@ -101,6 +103,35 @@ public class RMSDAO extends InterfaceDAO {
         return "RMS";
     }
 
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    tab_acesso,\n" +
+                    "    tab_conteudo\n" +
+                    "from\n" +
+                    "    AA2CTABE\n" +
+                    "where\n" +
+                    "    tab_codigo = 3\n" +
+                    "order by\n" +
+                    "    tab_acesso"
+            )) {
+                while (rst.next()) {
+                    if (Utils.stringToInt(rst.getString("tab_acesso")) > 0) {
+                        result.add(
+                                MapaTributoIMP.make(rst.getString("tab_acesso"), rst.getString("tab_conteudo"))
+                        );
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
@@ -648,6 +679,10 @@ public class RMSDAO extends InterfaceDAO {
                         imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
                         imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
                         imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
+                    }
+                    
+                    if ("112170".equals(imp.getImportId())) {
+                        System.out.println("OK");
                     }
                     
                     result.add(imp);

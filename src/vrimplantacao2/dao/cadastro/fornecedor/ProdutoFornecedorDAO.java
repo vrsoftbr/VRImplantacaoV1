@@ -214,6 +214,11 @@ public class ProdutoFornecedorDAO {
             Conexao.begin();
         
             for (ProdutoFornecedorIMP imp: produtos) {
+                //Impede a importação de códigos externos em branco.
+                if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {                    
+                    ProgressBar.next();
+                    continue;
+                }
                 FornecedorVO fornecedor = null;
                 if (fornAntDAO.getAnteriores().containsKey(
                     imp.getImportSistema(),
@@ -408,10 +413,9 @@ public class ProdutoFornecedorDAO {
                                 stm.execute(sql.getUpdate());
                             }  
                         }
-                        ProgressBar.next();
                     }
                 }
-                
+                ProgressBar.next();                
             }
             Conexao.commit();
         } catch (Exception e) {
