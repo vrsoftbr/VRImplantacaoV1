@@ -121,6 +121,7 @@ import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
 import vrimplantacao2.gui.interfaces.EsSystemGUI;
 import vrimplantacao2.gui.interfaces.EticaGUI;
+import vrimplantacao2.gui.interfaces.ExodusGUI;
 import vrimplantacao2.gui.interfaces.FHOnlineGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.Farm2000GUI;
@@ -711,6 +712,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuG3 = new javax.swing.JMenuItem();
         mnuG4 = new javax.swing.JMenuItem();
         mnuGestorPDV = new javax.swing.JMenuItem();
+        mnuExodus = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2249,6 +2251,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuGestorPDV);
+
+        mnuExodus.setText("Exodus");
+        mnuExodus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuExodusActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuExodus);
 
         mnuDatabase.add(jMenu10);
 
@@ -4287,6 +4297,10 @@ public final class MenuGUI extends VRMdiFrame {
         RensoftwareGUI.exibir(this);
     }//GEN-LAST:event_mnuRensoftwareActionPerformed
 
+    private void mnuExodusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuExodusActionPerformed
+        ExodusGUI.exibir(this);
+    }//GEN-LAST:event_mnuExodusActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4417,6 +4431,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuEtica;
+    private javax.swing.JMenuItem mnuExodus;
     private javax.swing.JMenuItem mnuFG;
     private javax.swing.JMenuItem mnuFHOnline;
     private javax.swing.JMenuItem mnuFabTech;
