@@ -121,8 +121,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     if (Utils.stringToInt(rst.getString("tab_acesso")) > 0) {
+                        String id = String.valueOf(Utils.stringToInt(rst.getString("tab_acesso")));
                         result.add(
-                                MapaTributoIMP.make(rst.getString("tab_acesso"), rst.getString("tab_conteudo"))
+                                MapaTributoIMP.make(id, rst.getString("tab_conteudo"))
                         );
                     }
                 }
@@ -506,6 +507,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	det.DET_CEST cest,\n" +
                     "	trib.piscofins_debito,\n" +
                     "	det.DET_NAT_REC nat_rec,\n" +
+                    "	p.git_nat_fiscal icms_id,\n" +
                     "	trib.icms_cst,\n" +
                     "	trib.icms_aliq,\n" +
                     "	trib.icms_red,\n" +
@@ -663,6 +665,13 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
                         
+                        imp.setIcmsDebitoId(rst.getString("icms_id"));
+                        imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
+                        imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_id"));
+                        imp.setIcmsCreditoId(rst.getString("icms_id"));
+                        imp.setIcmsCreditoForaEstadoId(rst.getString("icms_id"));
+                        
+                        /*
                         imp.setIcmsCstSaida(rst.getInt("icms_cst"));
                         imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
                         imp.setIcmsReducaoSaida(rst.getDouble("icms_red"));
@@ -679,10 +688,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
                         imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
                         imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
-                    }
-                    
-                    if ("112170".equals(imp.getImportId())) {
-                        System.out.println("OK");
+                        */
                     }
                     
                     result.add(imp);

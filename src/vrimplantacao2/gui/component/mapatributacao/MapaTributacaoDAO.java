@@ -75,7 +75,8 @@ public class MapaTributacaoDAO {
                     + "		mp.id_aliquota = a.id\n"
                     + "where	\n"
                     + "	mp.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
-                    + "	mp.agrupador = " + SQLUtils.stringSQL(agrupador)
+                    + "	mp.agrupador = " + SQLUtils.stringSQL(agrupador) + "\n"
+                    + "order by mp.orig_id"
             )) {
                 while (rst.next()) {
                     MapaTributoVO vo = new MapaTributoVO();
