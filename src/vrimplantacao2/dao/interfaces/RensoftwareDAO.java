@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -388,6 +389,58 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCelular(rst.getString("CELULAR"));
                     imp.setEmail(rst.getString("EMAIL"));
                     imp.setFax(rst.getString("FAX"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	ch.CODIGO id,\n" +
+                    "	ch.NCGCPF cpf,\n" +
+                    "	ch.NCHEQUE numerocheque,\n" +
+                    "	ch.NBANCO banco,\n" +
+                    "	ch.NCONTA conta,\n" +
+                    "	ch.EMISSAO data,\n" +
+                    "	ch.DATADIGT deposito,\n" +
+                    "	ch.NFISCAL cupom,\n" +
+                    "	ch.NUMCAIXAPDV pdv,\n" +
+                    "	ch.VALOR,\n" +
+                    "	ch.VLJUROS juros,\n" +
+                    "	ch.VENCIMENTO,\n" +
+                    "	ch.CREDOR id_cliente,\n" +
+                    "	ch.OBSERVACAO\n" +
+                    "from\n" +
+                    "	TITCHEQUES ch\n" +
+                    "where\n" +
+                    "	ch.CODLOJA = 1\n" +
+                    "order by\n" +
+                    "	ch.codigo"
+            )) {
+                while (rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setNumeroCheque(rs.getString("numerocheque"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setConta(rs.getString("conta"));
+                    imp.setDate(rs.getDate("VENCIMENTO"));
+                    imp.setDataDeposito(rs.getDate("deposito"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setEcf(rs.getString("pdv"));
+                    imp.setValor(rs.getDouble("VALOR"));
+                    imp.setValorJuros(rs.getDouble("juros"));
+                    imp.setObservacao(rs.getString("OBSERVACAO"));
                     
                     result.add(imp);
                 }

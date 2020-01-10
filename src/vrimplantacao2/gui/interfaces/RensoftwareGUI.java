@@ -202,6 +202,9 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
+                        if (chkCCheques.isSelected()) {
+                            importador.importarCheque();
+                        }
                         
                         List<OpcaoCliente> opt = new ArrayList<>();
                         if (!opt.isEmpty()) {
