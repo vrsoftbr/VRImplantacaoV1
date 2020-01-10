@@ -140,7 +140,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	pl.FORNECEDOR id_fabricante,\n" +
                     "	pl.PCO_COMPRA,\n" +
                     "	coalesce(pxl.PRECOSISTEMA, pl.PCO_VENDA) / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem, 0))) preco,\n" +
-                    "	coalesce(pxc.ATIVO, 'N') ativo,\n" +
+                    "	coalesce(p.ATIVO, 'S') ativo,\n" +
                     "	p.CODIGO_NCM ncm,\n" +
                     "	p.cod_cest cest,\n" +
                     "	p.COD_CSTPIS pis_saida,\n" +
@@ -193,7 +193,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCustoComImposto(rs.getDouble("PCO_COMPRA"));
                     imp.setCustoSemImposto(rs.getDouble("PCO_COMPRA"));
                     imp.setPrecovenda(rs.getDouble("preco"));
-                    imp.setSituacaoCadastro("S".equals(rs.getString("ATIVO")) ? 1 : 0);
+                    imp.setSituacaoCadastro("N".equals(rs.getString("ATIVO")) ? 0 : 1);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("pis_saida"));
