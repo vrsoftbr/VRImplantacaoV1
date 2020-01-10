@@ -12,6 +12,10 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -86,6 +90,28 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoProduto.ATACADO
         ));
     }
+    
+    /*
+    --Produto - fornecedor sem código externo
+    select * from 
+            dbo.NFITENS nfi
+            join dbo.NFITENS_TRIBUTOS nft on
+                    nfi.NNF = nft.NUMERO_NF and
+                    nfi.CODLOJA = nft.CODLOJA and
+                    nfi.ITEM = nft.ITEM
+            join dbo.NFISCAL nf on
+                    nfi.NNF = nf.NF and
+                    nfi.CODLOJA = nf.CODLOJA
+    where
+            nfi.produto = 967
+            and nf.EMISSAO between '2019-01-01' and '2020-01-08'
+    order by
+            nf.EMISSAO
+
+    --select * from dbo.NFISCAL
+
+    --select * from NFITENS_TRIBUTOS where codigo = 1408
+    */
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -98,8 +124,9 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	coalesce(dt.DATA_INC, p.DATA_ALTERACAO) datacadastro,\n" +
                     "	coalesce(dt.data_alt, p.DATA_ALTERACAO) dataalteracao,\n" +
                     "	coalesce(pxc.CODIGOBARRAS, p.cbarra, p.cbarra2, p.cbarra3) ean,\n" +
-                    "	coalesce(pxc.fator, p.embalagem) qtdembalagem,\n" +
-                    "	coalesce(pxc.UNIDADE, p.unidade) unidadevenda,\n" +
+                    "	p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0)) qtdembalagem,\n" +
+                    "	coalesce(pxc.UNIDADE, p.unidade) unidadevenda,	\n" +
+                    "	p.UNIDADE_COMPRA unidadecotacao,\n" +
                     "	p.EMBALAGEM qtdembalagemcotacao,\n" +
                     "	p.QTD_VOLUMES qtdembalagem,\n" +
                     "	p.BALANCA balanca,\n" +
@@ -111,7 +138,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	pl.EST_LOJA estoque,\n" +
                     "	pl.FORNECEDOR id_fabricante,\n" +
                     "	pl.PCO_COMPRA,\n" +
-                    "	coalesce(pxl.PRECOSISTEMA, pl.PCO_VENDA) preco,\n" +
+                    "	coalesce(pxl.PRECOSISTEMA, pl.PCO_VENDA) / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem, 0))) preco,\n" +
                     "	coalesce(pxc.ATIVO, 'N') ativo,\n" +
                     "	p.CODIGO_NCM ncm,\n" +
                     "	p.cod_cest cest,\n" +
@@ -120,7 +147,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	pl.COD_FIG_FISCAL_ent icms_entrada_id,\n" +
                     "	pl.COD_FIG_FISCAL_sai icms_saida_id,\n" +
                     "	pl.PER_IVA iva,	\n" +
-                    "	pxl.PRECOVENDA precoatacado\n" +
+                    "	pxl.PRECOVENDA / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0))) precoatacado\n" +
                     "from\n" +
                     "	produtos p\n" +
                     "	join EMPRESA e on\n" +
@@ -206,6 +233,163 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                                     0
                             )
                     );
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	f.codigo id,\n" +
+                    "	f.RAZAO,\n" +
+                    "	f.NOME fantasia,\n" +
+                    "	f.cgc cnpj,\n" +
+                    "	f.INSCR inscricaoestadual,\n" +
+                    "	f.INSC_MUNICIPAL inscricaomunicipal,\n" +
+                    "	f.ATIVO,\n" +
+                    "	f.ENDERECO,\n" +
+                    "	f.NUMERO_END,\n" +
+                    "	f.BAIRRO,\n" +
+                    "	f.CIDADE municipio,\n" +
+                    "	f.ESTADO uf,\n" +
+                    "	f.CEP,\n" +
+                    "	f.FONE,\n" +
+                    "	f.DATAC datacadastro,\n" +
+                    "	f.OBJS,\n" +
+                    "	f.INFOADICIONAIS,\n" +
+                    "	f.P_DIASENTREG prazoentrega,\n" +
+                    "	f.P_DIASFREQVI prazovisita,\n" +
+                    "	f.TIPO\n" +
+                    "from\n" +
+                    "	cadfor f\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("RAZAO"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("inscricaoestadual"));
+                    imp.setInsc_municipal(rs.getString("inscricaomunicipal"));
+                    imp.setAtivo("S".equals(rs.getString("ATIVO")));
+                    imp.setEndereco(rs.getString("ENDERECO"));
+                    imp.setNumero(rs.getString("NUMERO_END"));
+                    imp.setBairro(rs.getString("BAIRRO"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("CEP"));
+                    imp.setTel_principal(rs.getString("FONE"));
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
+                    imp.setObservacao(rs.getString("OBJS"));
+                    //imp.set(rs.getString("INFOADICIONAIS"));
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    imp.setPrazoVisita(rs.getInt("prazovisita"));
+                    switch (rs.getString("TIPO")) {
+                        case "D": imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR); break;
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.CODIGO id,\n" +
+                    "	c.CGC_CPF cnpj_cpf,\n" +
+                    "	c.INS_RG ie_rg,\n" +
+                    "	c.INSC_MUNICIPAL inscricaomunicipal,\n" +
+                    "	c.RAZAO,\n" +
+                    "	c.NOME fantasia,\n" +
+                    "	c.ECLIENTE,\n" +
+                    "	c.ENDERECO,\n" +
+                    "	c.NUMERO_END,\n" +
+                    "	c.BAIRRO,\n" +
+                    "	c.CIDADE,\n" +
+                    "	c.ESTADO,\n" +
+                    "	c.CEP,\n" +
+                    "	c.EST_CIVIL,\n" +
+                    "	c.DATA_NASC,\n" +
+                    "	c.DATA_CAD,\n" +
+                    "	c.SEXO,	\n" +
+                    "	c.ONDE_TRB nomeempresa,\n" +
+                    "	c.END_TRAB,\n" +
+                    "	c.CAR_TRAB cargo,\n" +
+                    "	c.SALARIO,\n" +
+                    "	c.LIMITE_CR limite,\n" +
+                    "	c.CONJUGE,\n" +
+                    "	c.N_PAI nomepai,\n" +
+                    "	c.N_MAE nomemae,\n" +
+                    "	c.OBJS observacoes,\n" +
+                    "	c.INFOADICIONAIS,\n" +
+                    "	c.FONE,\n" +
+                    "	c.FONE2,\n" +
+                    "	c.FONE3,\n" +
+                    "	c.CELULAR,\n" +
+                    "	c.EMAIL,\n" +
+                    "	c.FAX\n" +
+                    "from\n" +
+                    "	CLIENTES c\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj_cpf"));
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
+                    imp.setRazao(rst.getString("RAZAO"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("ENDERECO"));
+                    imp.setNumero(rst.getString("NUMERO_END"));
+                    imp.setBairro(rst.getString("BAIRRO"));
+                    imp.setMunicipio(rst.getString("CIDADE"));
+                    imp.setUf(rst.getString("ESTADO"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setEstadoCivil(rst.getString("EST_CIVIL"));
+                    imp.setDataNascimento(rst.getDate("DATA_NASC"));
+                    imp.setDataCadastro(rst.getDate("DATA_CAD"));
+                    imp.setSexo("F".equals(rst.getString("SEXO")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setEmpresa(rst.getString("nomeempresa"));
+                    imp.setEmpresaEndereco(rst.getString("END_TRAB"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("SALARIO"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setNomeConjuge(rst.getString("CONJUGE"));
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setObservacao(rst.getString("observacoes"));
+                    imp.setObservacao2(rst.getString("INFOADICIONAIS"));
+                    imp.setTelefone(rst.getString("FONE"));
+                    imp.addTelefone("FONE 2", rst.getString("FONE2"));
+                    imp.addTelefone("FONE 3", rst.getString("FONE3"));
+                    imp.setCelular(rst.getString("CELULAR"));
+                    imp.setEmail(rst.getString("EMAIL"));
+                    imp.setFax(rst.getString("FAX"));
+                    
+                    result.add(imp);
                 }
             }
         }
