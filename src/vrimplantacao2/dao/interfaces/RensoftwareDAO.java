@@ -209,6 +209,59 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "  a.CODIGOPRODUTO as id, \n"
+                        + "  a.ITEM, \n"
+                        + "  a.UNIDADE, \n"
+                        + "  a.PRINCIPAL, \n"
+                        + "  a.CODIGOBARRAS as ean,\n"
+                        + "  (select FATOR \n"
+                        + "     from PRODEXPL_CADASTRO \n"
+                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                        + "      and FATOR > 1) as qtde,\n"
+                        + "  b.PRECOSISTEMA,\n"
+                        + "  b.PRECOVENDA,\n"
+                        + "  (select b.PRECOVENDA / (select FATOR \n"
+                        + "     from PRODEXPL_CADASTRO \n"
+                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                        + "      and FATOR > 1)) as precoatacado,\n"
+                        + "(select b.PRECOSISTEMA / (select FATOR \n"
+                        + "     from PRODEXPL_CADASTRO \n"
+                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                        + "      and FATOR > 1)) as preocvenda\n"
+                        + "from PRODEXPL_CADASTRO a\n"
+                        + "inner join PRODEXPL_CADASTROLOJA b on b.CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                        + "and a.ITEM = b.ITEM\n"
+                        + "and a.FATOR = 1\n"
+                        + "and a.CODLOJA = " + getLojaOrigem() + "\n"
+                        + "and b.CODLOJA = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde"));
+                        imp.setPrecovenda(rst.getDouble("preocvenda"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }            
+        }
+        return null;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
