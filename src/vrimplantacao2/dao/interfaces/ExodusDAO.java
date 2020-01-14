@@ -21,28 +21,19 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaItemIterator;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
-import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
-import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
-import vrimplantacao2.vo.enums.TipoFornecedor;
-import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -50,10 +41,8 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -400,77 +389,85 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "	p.cd_produto importId,\n"
-                    + "	p.dt_cadastro dataCadastro,\n"
-                    + "	ean.cd_ean ean,\n"
-                    + "	u.ds_sigla tipoEmbalagem,\n"
-                    + "	p.in_balanca eBalanca,\n"
-                    + "	p.qt_validade validade,\n"
-                    + "	p.ds_descricao descricaoCompleta,\n"
-                    + "	p.ds_descricao_pdv descricaoReduzida,\n"
-                    + "	p.ds_descricao descricaoGondola,\n"
-                    + "	p.id_marca merc1,\n"
-                    + "	p.id_agrupamento merc2,\n"
-                    + "	l.id_secao merc3,\n"
-                    + "	p.id_linha merc4,\n"
-                    + "	p.qt_peso_bruto	pesoBruto,\n"
-                    + "	p.qt_peso_liquido pesoLiquido,\n"
-                    + "	pe.qt_estoque_minimo estoqueMinimo,\n"
-                    + "	(pe.pc_margem_lucro*100) margem,\n"
-                    + "	pp.vr_preco precovenda,    \n"
-                    + "	p.in_ativo situacaoCadastro,\n"
-                    + "	p.cd_ncm ncm,\n"
-                    + "	pe.cd_cest cest,\n"
-                    + "	stc.cd_codigo piscofinsCstDebito,\n"
-                    + "	stc.cd_codigo piscofinsCstCredito,\n"
-                    + " rc.cd_receitacofins piscofinsNaturezaReceita\n"        
-                    + "from produto p\n"
-                    + "	left join produtoean ean\n"
-                    + "		on p.id_produto = ean.id_produto\n"
-                    + "	left join produtoempresa pe\n"
-                    + "		on p.id_produto = pe.id_produto	\n"
-                    + "	left join linha l\n"
-                    + "		on l.id_linha = p.id_linha\n"
-                    + "	left join produtopreco pp\n"
-                    + "		on pp.id_produto = p.id_produto\n"
-                    + "	left join unidade u\n"
-                    + "		on u.id_unidade = pe.id_unidade\n"
-                    + "	left join situacaotributariacofins stc\n"
-                    + "		on stc.id_situacaotributariacofins = pe.id_situacaotributariacofins_entrada\n"
-                    + " left join receitacofins rc\n"
-                    + "         on rc.id_receitacofins = pe.id_receitacofins_saida\n"
-                    + "where pe.id_empresa = " + getLojaOrigem() + "\n"
-                    + "	group by p.cd_produto"
+                    "select\n" +
+                    "	p.cd_produto id,\n" +
+                    "	p.dt_cadastro datacadastro,\n" +
+                    "	ean.cd_ean codigobarras,\n" +
+                    "	u.ds_sigla unidade,\n" +
+                    "	p.in_balanca balanca,\n" +
+                    "	p.qt_validade validade,\n" +
+                    "	p.ds_descricao descricaocompleta,\n" +
+                    "	p.ds_descricao_pdv descricaoreduzida,\n" +
+                    "	p.ds_descricao descricaogondola,\n" +
+                    "	p.id_marca cod_mercadologico1,\n" +
+                    "	p.id_agrupamento cod_mercadologico2,\n" +
+                    "	l.id_secao cod_mercadologico3,\n" +
+                    "	p.id_linha cod_mercadologico4,\n" +
+                    "	p.qt_peso_bruto	pesobruto,\n" +
+                    "	p.qt_peso_liquido pesoliquido,\n" +
+                    "	pe.qt_estoque_minimo estoqueminimo,\n" +
+                    "	(pe.pc_margem_lucro * 100) margem,\n" +
+                    "	pp.vr_preco precovenda,    \n" +
+                    "	p.in_ativo ativo,\n" +
+                    "	p.cd_ncm ncm,\n" +
+                    "	pe.cd_cest cest,\n" +
+                    "	stcs.cd_codigo piscofins_cst_debito,\n" +
+                    "	stc.cd_codigo piscofins_cst_credito,\n" +
+                    "	 rc.cd_receitacofins piscofins_natureza_receita,\n" +
+                    "	 pe.id_tributo id_icms\n" +
+                    "from \n" +
+                    "	produto p\n" +
+                    "	left join produtoean ean on\n" +
+                    "		p.id_produto = ean.id_produto\n" +
+                    "	left join produtoempresa pe on\n" +
+                    "		p.id_produto = pe.id_produto	\n" +
+                    "	left join linha l on\n" +
+                    "		l.id_linha = p.id_linha\n" +
+                    "	left join produtopreco pp on\n" +
+                    "		pp.id_produto = p.id_produto\n" +
+                    "        and pp.id_tipopreco = 1\n" +
+                    "	left join unidade u on\n" +
+                    "		u.id_unidade = pe.id_unidade\n" +
+                    "	left join situacaotributariacofins stc on\n" +
+                    "		stc.id_situacaotributariacofins = pe.id_situacaotributariacofins_entrada\n" +
+                    "	left join situacaotributariacofins stcs on\n" +
+                    "		stcs.id_situacaotributariacofins = pe.id_situacaotributariacofins_saida\n" +
+                    "	left join receitacofins rc\n" +
+                    "		on rc.id_receitacofins = pe.id_receitacofins_saida\n" +
+                    "where\n" +
+                    "	pe.id_empresa = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	p.cd_produto"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("importId"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.seteBalanca(rst.getBoolean("ebalanca"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.seteBalanca(rst.getBoolean("balanca"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaoGondola"));
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
-                    imp.setCodMercadologico4(rst.getString("merc4"));
+                    imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
+                    imp.setCodMercadologico4(rst.getString("cod_mercadologico4"));
                     imp.setPesoBruto(rst.getDouble("pesoBruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoLiquido"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueMinimo"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaoCadastro"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofinsCstDebito"));
-                    imp.setPiscofinsCstCredito(rst.getString("piscofinsCstCredito"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_debito"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
 
                     result.add(imp);
                 }
