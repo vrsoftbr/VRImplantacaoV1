@@ -488,7 +488,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.GIT_COMPRADOR id_comprador,\n" +
                     "	F.TIP_CODIGO||F.TIP_DIGITO id_fabricante,\n" +
                     "	coalesce(cast(nullif(familia.it_pai, 0) as varchar(20)),p.git_cod_item||p.git_digito) id_familia,\n" +
-                    "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
+                    "	case when p.GIT_DAT_SAI_LIN = 0 then 1 else 0 end id_situacaocadastral,\n" +
                     "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n" +
                     "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n" +
                     "	0 estoqueminimo,\n" +
@@ -598,7 +598,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       p.git_cod_for = f.TIP_CODIGO\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
-                    (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "") +
+                    (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "where p.GIT_DAT_SAI_LIN = 1\n") +
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {
@@ -669,26 +669,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
                         imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_id"));
                         imp.setIcmsCreditoId(rst.getString("icms_id"));
-                        imp.setIcmsCreditoForaEstadoId(rst.getString("icms_id"));
-                        
-                        /*
-                        imp.setIcmsCstSaida(rst.getInt("icms_cst"));
-                        imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducaoSaida(rst.getDouble("icms_red"));
-                        imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
-                        imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_red"));
-                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
-                        imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_red"));
-                        
-                        imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
-                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_red"));
-                        imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
-                        imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
-                        */
+                        imp.setIcmsCreditoForaEstadoId(rst.getString("icms_id"));                        
                     }
                     
                     result.add(imp);

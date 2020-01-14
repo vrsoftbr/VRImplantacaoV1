@@ -121,7 +121,7 @@ public class Icms {
                 "from \n" +
                 "	aliquota \n" +
                 "where\n" +
-                "       id_situacaocadastro = 1\n" +
+                "       id_situacaocadastro = 1 and porcentagemfcp = 0\n" +
                 "order by \n" +
                 "	situacaotributaria, \n" +
                 "	porcentagem, \n" +
