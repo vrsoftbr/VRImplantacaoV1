@@ -173,9 +173,9 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
-                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                //OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
@@ -211,44 +211,27 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
 
-    public List<MercadologicoIMP> getMercadologico() throws Exception {
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	p.cd_produto id_produto,\n"
-                    + "	p.ds_descricao descricao_produto,\n"
-                    + "	p.id_marca merc1id,\n"
-                    + "	m.ds_descricao merc1descricao,\n"
-                    + "	p.id_agrupamento merc2id,\n"
-                    + "	a.ds_descricao merc2descricao,\n"
-                    + "	l.id_secao merc3id,\n"
-                    + "	l.ds_descricao merc3descricao,\n"
-                    + "	p.id_linha merc4id,\n"
-                    + "	p.ds_descricao merc4descricao\n"
-                    + "from produto p \n"
-                    + "	left join marca m\n"
-                    + "		on p.id_marca = m.id_marca\n"
-                    + "	left join agrupamento a\n"
-                    + "		on a.id_agrupamento = p.id_agrupamento\n"
-                    + "	left join linha l\n"
-                    + "		on l.id_linha = p.id_linha\n"
-                    + "	left join secao s\n"
-                    + "		on l.id_secao = s.id_secao"
+                    "select\n"
+                    + "     id_linha merc1,\n"
+                    + "     ds_descricao merc1descricao\n"
+                    + "from linha\n"
+                    + "     order by id_linha;"
             )) {
                 while (rst.next()) {
 
                     MercadologicoIMP imp = new MercadologicoIMP();
 
-                    imp.setMerc1ID(rst.getString("merc1id"));
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    
+                    imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("merc1descricao"));
-                    imp.setMerc2ID(rst.getString("merc2id"));
-                    imp.setMerc2Descricao(rst.getString("merc2descricao"));
-                    imp.setMerc3ID(rst.getString("merc3id"));
-                    imp.setMerc3Descricao(rst.getString("merc3descricao"));
-                    imp.setMerc4ID(rst.getString("merc4id"));
-                    imp.setMerc4Descricao(rst.getString("merc4descricao"));
 
                     result.add(imp);
 
@@ -257,134 +240,135 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    /*
+     @Override
+     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+     List<MercadologicoNivelIMP> result = new ArrayList<>();
 
-    @Override
-    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
-        List<MercadologicoNivelIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+     MultiMap<String, MercadologicoNivelIMP> maps = new MultiMap<>();
+     try (ResultSet rst = stm.executeQuery(
+     "select \n"
+     + "	p.cd_produto id_produto,\n"
+     + "	p.ds_descricao descricao_produto,\n"
+     + "	p.id_marca merc1id,\n"
+     + "	m.ds_descricao merc1descricao,\n"
+     + "	p.id_agrupamento merc2id,\n"
+     + "	a.ds_descricao merc2descricao,\n"
+     + "	l.id_secao merc3id,\n"
+     + "	l.ds_descricao merc3descricao,\n"
+     + "	p.id_linha merc4id,\n"
+     + "	p.ds_descricao merc4descricao\n"
+     + "from produto p \n"
+     + "	left join marca m\n"
+     + "		on p.id_marca = m.id_marca\n"
+     + "	left join agrupamento a\n"
+     + "		on a.id_agrupamento = p.id_agrupamento\n"
+     + "	left join linha l\n"
+     + "		on l.id_linha = p.id_linha\n"
+     + "	left join secao s\n"
+     + "		on l.id_secao = s.id_secao	"
+     )) {
+     while (rst.next()) {
+     LOG.fine("NIVEL1: " + rst.getString("merc1") + " - " + rst.getString("merc1desc"));
+     MercadologicoNivelIMP merc = new MercadologicoNivelIMP(rst.getString("merc1"), rst.getString("merc1desc"));
+     maps.put(merc,
+     rst.getString("merc1")
+     );
+     result.add(merc);
+     }
+     }
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            MultiMap<String, MercadologicoNivelIMP> maps = new MultiMap<>();
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	p.cd_produto id_produto,\n"
-                    + "	p.ds_descricao descricao_produto,\n"
-                    + "	p.id_marca merc1id,\n"
-                    + "	m.ds_descricao merc1descricao,\n"
-                    + "	p.id_agrupamento merc2id,\n"
-                    + "	a.ds_descricao merc2descricao,\n"
-                    + "	l.id_secao merc3id,\n"
-                    + "	l.ds_descricao merc3descricao,\n"
-                    + "	p.id_linha merc4id,\n"
-                    + "	p.ds_descricao merc4descricao\n"
-                    + "from produto p \n"
-                    + "	left join marca m\n"
-                    + "		on p.id_marca = m.id_marca\n"
-                    + "	left join agrupamento a\n"
-                    + "		on a.id_agrupamento = p.id_agrupamento\n"
-                    + "	left join linha l\n"
-                    + "		on l.id_linha = p.id_linha\n"
-                    + "	left join secao s\n"
-                    + "		on l.id_secao = s.id_secao	"
-            )) {
-                while (rst.next()) {
-                    LOG.fine("NIVEL1: " + rst.getString("merc1") + " - " + rst.getString("merc1desc"));
-                    MercadologicoNivelIMP merc = new MercadologicoNivelIMP(rst.getString("merc1"), rst.getString("merc1desc"));
-                    maps.put(merc,
-                            rst.getString("merc1")
-                    );
-                    result.add(merc);
-                }
-            }
+     try (ResultSet rst = stm.executeQuery(
+     "select \n"
+     + "	m.depdepto merc1,\n"
+     + "	m.depsecao merc2,\n"
+     + "	m.depdescr merc2desc\n"
+     + "from\n"
+     + "	hipdep m	\n"
+     + "where\n"
+     + "	m.depdepto != 0 and\n"
+     + "	m.depsecao != 0 and\n"
+     + "	m.depgrupo = 0\n"
+     + "order by 1,2"
+     )) {
+     while (rst.next()) {
+     LOG.fine("NIVEL2: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc2desc"));
+     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"));
+     if (pai != null) {
+     MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc2"), rst.getString("merc2desc"));
+     maps.put(merc,
+     rst.getString("merc1"),
+     rst.getString("merc2")
+     );
+     }
+     }
+     }
 
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	m.depdepto merc1,\n"
-                    + "	m.depsecao merc2,\n"
-                    + "	m.depdescr merc2desc\n"
-                    + "from\n"
-                    + "	hipdep m	\n"
-                    + "where\n"
-                    + "	m.depdepto != 0 and\n"
-                    + "	m.depsecao != 0 and\n"
-                    + "	m.depgrupo = 0\n"
-                    + "order by 1,2"
-            )) {
-                while (rst.next()) {
-                    LOG.fine("NIVEL2: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc2desc"));
-                    MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"));
-                    if (pai != null) {
-                        MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc2"), rst.getString("merc2desc"));
-                        maps.put(merc,
-                                rst.getString("merc1"),
-                                rst.getString("merc2")
-                        );
-                    }
-                }
-            }
+     try (ResultSet rst = stm.executeQuery(
+     "select \n"
+     + "	m.depdepto merc1,\n"
+     + "	m.depsecao merc2,\n"
+     + "	m.depgrupo merc3,\n"
+     + "	m.depdescr merc3desc\n"
+     + "from\n"
+     + "	hipdep m	\n"
+     + "where\n"
+     + "	m.depdepto != 0 and\n"
+     + "	m.depsecao != 0 and\n"
+     + "	m.depgrupo != 0 and\n"
+     + "	m.depsubgr = 0\n"
+     + "order by 1,2, 3"
+     )) {
+     while (rst.next()) {
+     LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc3desc"));
+     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"));
+     if (pai != null) {
+     MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc3"), rst.getString("merc3desc"));
+     maps.put(merc,
+     rst.getString("merc1"),
+     rst.getString("merc2"),
+     rst.getString("merc3")
+     );
+     }
+     }
+     }
 
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	m.depdepto merc1,\n"
-                    + "	m.depsecao merc2,\n"
-                    + "	m.depgrupo merc3,\n"
-                    + "	m.depdescr merc3desc\n"
-                    + "from\n"
-                    + "	hipdep m	\n"
-                    + "where\n"
-                    + "	m.depdepto != 0 and\n"
-                    + "	m.depsecao != 0 and\n"
-                    + "	m.depgrupo != 0 and\n"
-                    + "	m.depsubgr = 0\n"
-                    + "order by 1,2, 3"
-            )) {
-                while (rst.next()) {
-                    LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc3desc"));
-                    MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"));
-                    if (pai != null) {
-                        MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc3"), rst.getString("merc3desc"));
-                        maps.put(merc,
-                                rst.getString("merc1"),
-                                rst.getString("merc2"),
-                                rst.getString("merc3")
-                        );
-                    }
-                }
-            }
+     try (ResultSet rst = stm.executeQuery(
+     "select \n"
+     + "	m.depdepto merc1,\n"
+     + "	m.depsecao merc2,\n"
+     + "	m.depgrupo merc3,\n"
+     + "	m.depsubgr merc4,\n"
+     + "	m.depdescr merc4desc\n"
+     + "from\n"
+     + "	hipdep m	\n"
+     + "where\n"
+     + "	m.depdepto != 0 and\n"
+     + "	m.depsecao != 0 and\n"
+     + "	m.depgrupo != 0 and\n"
+     + "	m.depsubgr != 0\n"
+     + "order by 1,2, 3, 4"
+     )) {
+     while (rst.next()) {
+     LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc4") + " - " + rst.getString("merc4desc"));
+     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"), rst.getString("merc3"));
+     if (pai != null) {
+     MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc4"), rst.getString("merc4desc"));
+     maps.put(merc,
+     rst.getString("merc1"),
+     rst.getString("merc2"),
+     rst.getString("merc3"),
+     rst.getString("merc4")
+     );
+     }
+     }
+     }
+     }
 
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	m.depdepto merc1,\n"
-                    + "	m.depsecao merc2,\n"
-                    + "	m.depgrupo merc3,\n"
-                    + "	m.depsubgr merc4,\n"
-                    + "	m.depdescr merc4desc\n"
-                    + "from\n"
-                    + "	hipdep m	\n"
-                    + "where\n"
-                    + "	m.depdepto != 0 and\n"
-                    + "	m.depsecao != 0 and\n"
-                    + "	m.depgrupo != 0 and\n"
-                    + "	m.depsubgr != 0\n"
-                    + "order by 1,2, 3, 4"
-            )) {
-                while (rst.next()) {
-                    LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc4") + " - " + rst.getString("merc4desc"));
-                    MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"), rst.getString("merc3"));
-                    if (pai != null) {
-                        MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc4"), rst.getString("merc4desc"));
-                        maps.put(merc,
-                                rst.getString("merc1"),
-                                rst.getString("merc2"),
-                                rst.getString("merc3"),
-                                rst.getString("merc4")
-                        );
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
+     return result;
+     }
+     */
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
@@ -425,6 +409,7 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.qt_validade validade,\n"
                     + "	p.ds_descricao descricaoCompleta,\n"
                     + "	p.ds_descricao_pdv descricaoReduzida,\n"
+                    + "	p.ds_descricao descricaoGondola,\n"
                     + "	p.id_marca merc1,\n"
                     + "	p.id_agrupamento merc2,\n"
                     + "	l.id_secao merc3,\n"
@@ -438,7 +423,8 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cd_ncm ncm,\n"
                     + "	pe.cd_cest cest,\n"
                     + "	stc.cd_codigo piscofinsCstDebito,\n"
-                    + "	stc.cd_codigo piscofinsCstCredito\n"
+                    + "	stc.cd_codigo piscofinsCstCredito,\n"
+                    + " rc.cd_receitacofins piscofinsNaturezaReceita\n"        
                     + "from produto p\n"
                     + "	left join produtoean ean\n"
                     + "		on p.id_produto = ean.id_produto\n"
@@ -452,6 +438,8 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		on u.id_unidade = pe.id_unidade\n"
                     + "	left join situacaotributariacofins stc\n"
                     + "		on stc.id_situacaotributariacofins = pe.id_situacaotributariacofins_entrada\n"
+                    + " left join receitacofins rc\n"
+                    + "         on rc.id_receitacofins = pe.id_receitacofins_saida\n"
                     + "where pe.id_empresa = " + getLojaOrigem() + "\n"
                     + "	group by p.cd_produto"
             )) {
@@ -468,6 +456,7 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rst.getString("descricaoGondola"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
@@ -759,7 +748,7 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select distinct   \n"
+                    "select distinct   \n"
                     + "     cd_emitente	id,\n"
                     + "     cd_cnpj_cpf cnpj,\n"
                     + "     cd_ie inscricaoestadual,\n"
@@ -801,11 +790,11 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
-                    
+
                     if ((rst.getString("inscricaoestadual") != null) && (!"".equals(rst.getString("inscricaoestadual")))) {
                         imp.setInscricaoestadual(rst.getString("inscricaoestadual").replace("\\", "").replace("-", "").replace(".", ""));
                     }
-                    
+
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setAtivo(rst.getBoolean("ativo"));
@@ -818,22 +807,21 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUfIBGE(rst.getInt("ufIBGE"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
-                    
+
                     /*
-                    String estCiv = Utils.acertarTexto(rst.getString("estadocivil"));
-                    if (estCiv.startsWith("CAS")) {
-                        imp.setEstadoCivil(TipoEstadoCivil.CASADO);
-                    } else if (estCiv.startsWith("DIV")) {
-                        imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
-                    } else if (estCiv.startsWith("SOL")) {
-                        imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
-                    } else if (estCiv.startsWith("SEP")) {
-                        imp.setEstadoCivil(TipoEstadoCivil.CASADO);
-                    } else {
-                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
-                    }
-                    */
-                    
+                     String estCiv = Utils.acertarTexto(rst.getString("estadocivil"));
+                     if (estCiv.startsWith("CAS")) {
+                     imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                     } else if (estCiv.startsWith("DIV")) {
+                     imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                     } else if (estCiv.startsWith("SOL")) {
+                     imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                     } else if (estCiv.startsWith("SEP")) {
+                     imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                     } else {
+                     imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                     }
+                     */
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSexo(rst.getString("sexo"));
@@ -841,7 +829,7 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
-                                        
+
                     result.add(imp);
                 }
             }
@@ -904,28 +892,29 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<CompradorIMP> getCompradores() throws Exception {
-        List<CompradorIMP> result = new ArrayList<>();
+    /*
+     @Override
+     public List<CompradorIMP> getCompradores() throws Exception {
+     List<CompradorIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct cmpcod, cmpnome from hipcmp order by 1"
-            )) {
-                while (rst.next()) {
-                    CompradorIMP imp = new CompradorIMP();
+     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select distinct cmpcod, cmpnome from hipcmp order by 1"
+     )) {
+     while (rst.next()) {
+     CompradorIMP imp = new CompradorIMP();
 
-                    imp.setId(rst.getString("cmpcod"));
-                    imp.setDescricao(rst.getString("cmpnome"));
+     imp.setId(rst.getString("cmpcod"));
+     imp.setDescricao(rst.getString("cmpnome"));
 
-                    result.add(imp);
-                }
-            }
-        }
+     result.add(imp);
+     }
+     }
+     }
 
-        return result;
-    }
-
+     return result;
+     }
+     */
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
