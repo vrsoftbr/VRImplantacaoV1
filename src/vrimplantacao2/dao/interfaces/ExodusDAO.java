@@ -229,135 +229,6 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    /*
-     @Override
-     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
-     List<MercadologicoNivelIMP> result = new ArrayList<>();
-
-     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-     MultiMap<String, MercadologicoNivelIMP> maps = new MultiMap<>();
-     try (ResultSet rst = stm.executeQuery(
-     "select \n"
-     + "	p.cd_produto id_produto,\n"
-     + "	p.ds_descricao descricao_produto,\n"
-     + "	p.id_marca merc1id,\n"
-     + "	m.ds_descricao merc1descricao,\n"
-     + "	p.id_agrupamento merc2id,\n"
-     + "	a.ds_descricao merc2descricao,\n"
-     + "	l.id_secao merc3id,\n"
-     + "	l.ds_descricao merc3descricao,\n"
-     + "	p.id_linha merc4id,\n"
-     + "	p.ds_descricao merc4descricao\n"
-     + "from produto p \n"
-     + "	left join marca m\n"
-     + "		on p.id_marca = m.id_marca\n"
-     + "	left join agrupamento a\n"
-     + "		on a.id_agrupamento = p.id_agrupamento\n"
-     + "	left join linha l\n"
-     + "		on l.id_linha = p.id_linha\n"
-     + "	left join secao s\n"
-     + "		on l.id_secao = s.id_secao	"
-     )) {
-     while (rst.next()) {
-     LOG.fine("NIVEL1: " + rst.getString("merc1") + " - " + rst.getString("merc1desc"));
-     MercadologicoNivelIMP merc = new MercadologicoNivelIMP(rst.getString("merc1"), rst.getString("merc1desc"));
-     maps.put(merc,
-     rst.getString("merc1")
-     );
-     result.add(merc);
-     }
-     }
-
-     try (ResultSet rst = stm.executeQuery(
-     "select \n"
-     + "	m.depdepto merc1,\n"
-     + "	m.depsecao merc2,\n"
-     + "	m.depdescr merc2desc\n"
-     + "from\n"
-     + "	hipdep m	\n"
-     + "where\n"
-     + "	m.depdepto != 0 and\n"
-     + "	m.depsecao != 0 and\n"
-     + "	m.depgrupo = 0\n"
-     + "order by 1,2"
-     )) {
-     while (rst.next()) {
-     LOG.fine("NIVEL2: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc2desc"));
-     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"));
-     if (pai != null) {
-     MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc2"), rst.getString("merc2desc"));
-     maps.put(merc,
-     rst.getString("merc1"),
-     rst.getString("merc2")
-     );
-     }
-     }
-     }
-
-     try (ResultSet rst = stm.executeQuery(
-     "select \n"
-     + "	m.depdepto merc1,\n"
-     + "	m.depsecao merc2,\n"
-     + "	m.depgrupo merc3,\n"
-     + "	m.depdescr merc3desc\n"
-     + "from\n"
-     + "	hipdep m	\n"
-     + "where\n"
-     + "	m.depdepto != 0 and\n"
-     + "	m.depsecao != 0 and\n"
-     + "	m.depgrupo != 0 and\n"
-     + "	m.depsubgr = 0\n"
-     + "order by 1,2, 3"
-     )) {
-     while (rst.next()) {
-     LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc3desc"));
-     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"));
-     if (pai != null) {
-     MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc3"), rst.getString("merc3desc"));
-     maps.put(merc,
-     rst.getString("merc1"),
-     rst.getString("merc2"),
-     rst.getString("merc3")
-     );
-     }
-     }
-     }
-
-     try (ResultSet rst = stm.executeQuery(
-     "select \n"
-     + "	m.depdepto merc1,\n"
-     + "	m.depsecao merc2,\n"
-     + "	m.depgrupo merc3,\n"
-     + "	m.depsubgr merc4,\n"
-     + "	m.depdescr merc4desc\n"
-     + "from\n"
-     + "	hipdep m	\n"
-     + "where\n"
-     + "	m.depdepto != 0 and\n"
-     + "	m.depsecao != 0 and\n"
-     + "	m.depgrupo != 0 and\n"
-     + "	m.depsubgr != 0\n"
-     + "order by 1,2, 3, 4"
-     )) {
-     while (rst.next()) {
-     LOG.fine("NIVEL3: " + rst.getString("merc1") + " - " + rst.getString("merc2") + " - " + rst.getString("merc3") + " - " + rst.getString("merc4") + " - " + rst.getString("merc4desc"));
-     MercadologicoNivelIMP pai = maps.get(rst.getString("merc1"), rst.getString("merc2"), rst.getString("merc3"));
-     if (pai != null) {
-     MercadologicoNivelIMP merc = pai.addFilho(rst.getString("merc4"), rst.getString("merc4desc"));
-     maps.put(merc,
-     rst.getString("merc1"),
-     rst.getString("merc2"),
-     rst.getString("merc3"),
-     rst.getString("merc4")
-     );
-     }
-     }
-     }
-     }
-
-     return result;
-     }
-     */
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
@@ -745,42 +616,43 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct   \n"
-                    + "     cd_emitente	id,\n"
-                    + "     cd_cnpj_cpf cnpj,\n"
-                    + "     cd_ie inscricaoestadual,\n"
-                    + "     ds_razao_social razao,\n"
-                    + "     ds_nome_fantasia fantasia,\n"
-                    + "     cp.in_ativo ativo,\n"
-                    + "     case when lc.in_bloqueado = 0 then 'F' else 'T' end bloqueado,\n"
-                    + "     ds_endereco endereco,\n"
-                    + "     qt_numero numero,\n"
-                    + "     ds_complemento complemento,\n"
-                    + "     ds_bairro bairro,\n"
-                    + "     c.cd_codigo_ibge municipioIBGE,\n"
-                    + "     c.ds_descricao municipio,\n"
-                    + "     e.cd_codigo_ibge ufIBGE,\n"
-                    + "     e.ds_sigla uf,\n"
-                    + "     ds_cep cep,\n"
-                    + "     dt_data_fundacao_nascimento dataNascimento,\n"
-                    + "     dt_data_cadastro dataCadastro,\n"
-                    + "     case when cp.cd_sexo = 1 then 0 else 1 end sexo,\n"
-                    + "     lc.vr_limite_credito valorLimite,\n"
-                    + "     ds_observacoes observacao,\n"
-                    + "     t.ds_numero telefone,\n"
-                    + "     ds_email email\n"
-                    + "from emitente cp\n"
-                    + "     left join emitentelimitecredito lc\n"
-                    + "		on cp.id_emitente = cp.id_emitente\n"
-                    + "     left join cidade c\n"
-                    + "		on c.id_cidade = cp.id_cidade\n"
-                    + "     left join estado e\n"
-                    + "		on e.id_estado = c.id_estado\n"
-                    + "     left join emitentetelefone t\n"
-                    + "		on cp.id_emitente = t.id_emitente\n"
-                    + "where cd_tipo_pessoa = 1\n"
-                    + "     group by ds_razao_social\n"
-                    + "  order by 1;"
+                    "select distinct\n" +
+                    "     cd_emitente id,\n" +
+                    "     cd_cnpj_cpf cnpj,\n" +
+                    "     coalesce(cd_ie, cd_rg) inscricaoestadual,\n" +
+                    "     ds_razao_social razao,\n" +
+                    "     case when ds_nome_fantasia = '.' then ds_razao_social else ds_nome_fantasia end fantasia,\n" +
+                    "     cp.in_ativo ativo,\n" +
+                    "     case when lc.in_bloqueado = 0 then 'F' else 'T' end bloqueado,\n" +
+                    "     ds_endereco endereco,\n" +
+                    "     QT_NUMERO numero,\n" +
+                    "     ds_complemento complemento,\n" +
+                    "     ds_bairro bairro,\n" +
+                    "     c.cd_codigo_ibge municipioIBGE,\n" +
+                    "     c.ds_descricao municipio,\n" +
+                    "     e.cd_codigo_ibge ufIBGE,\n" +
+                    "     e.ds_sigla uf,\n" +
+                    "     ds_cep cep,\n" +
+                    "     dt_data_fundacao_nascimento dataNascimento,\n" +
+                    "     dt_data_cadastro dataCadastro,\n" +
+                    "     case when cp.cd_sexo = 1 then 0 else 1 end sexo,\n" +
+                    "     lc.vr_limite_credito valorLimite,\n" +
+                    "     ds_observacoes observacao,\n" +
+                    "     t.ds_numero telefone,\n" +
+                    "     ds_email email\n" +
+                    "from emitente cp\n" +
+                    "     left join emitentelimitecredito lc\n" +
+                    "		on cp.id_emitente = lc.id_emitente\n" +
+                    "     left join cidade c\n" +
+                    "		on c.id_cidade = cp.id_cidade\n" +
+                    "     left join estado e\n" +
+                    "		on e.id_estado = c.id_estado\n" +
+                    "     left join emitentetelefone t\n" +
+                    "		on cp.id_emitente = t.id_emitente\n" +
+                    "where\n" +
+                    "	cd_tipo_pessoa = 1\n" +
+                    "order by \n" +
+                    "	1"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -804,21 +676,6 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUfIBGE(rst.getInt("ufIBGE"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
-
-                    /*
-                     String estCiv = Utils.acertarTexto(rst.getString("estadocivil"));
-                     if (estCiv.startsWith("CAS")) {
-                     imp.setEstadoCivil(TipoEstadoCivil.CASADO);
-                     } else if (estCiv.startsWith("DIV")) {
-                     imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
-                     } else if (estCiv.startsWith("SOL")) {
-                     imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
-                     } else if (estCiv.startsWith("SEP")) {
-                     imp.setEstadoCivil(TipoEstadoCivil.CASADO);
-                     } else {
-                     imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
-                     }
-                     */
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSexo(rst.getString("sexo"));
