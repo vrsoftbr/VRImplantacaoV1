@@ -857,6 +857,8 @@ public class ProdutoRepository {
             aliquota.setAliquotaCreditoFornecedor(idIcmsCreditoFornecedor);
         }
         
+        aliquota.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
+        
         return aliquota;
     }
 
@@ -1006,6 +1008,8 @@ public class ProdutoRepository {
         if(idIcmsCreditoFornecedor != null) {
             aliquota.setAliquotaCreditoFornecedor(idIcmsCreditoFornecedor);
         }
+        
+        aliquota.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
         
         return aliquota;
     }
