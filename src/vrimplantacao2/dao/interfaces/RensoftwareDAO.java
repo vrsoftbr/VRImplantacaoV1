@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -199,13 +200,15 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setSituacaoCadastro("N".equals(rs.getString("ATIVO")) ? 0 : 1);
-                    imp.setNcm(rs.getString("ncm"));
+                    imp.setNcm(String.valueOf(rs.getInt("ncm")));
                     imp.setCest(rs.getString("cest"));
-                    imp.setPiscofinsCstDebito(rs.getString("pis_saida"));
-                    imp.setPiscofinsCstCredito(rs.getString("pis_entrada"));
+                    imp.setPiscofinsCstDebito(String.valueOf(rs.getInt("pis_saida")));
+                    imp.setPiscofinsCstCredito(String.valueOf(rs.getInt("pis_entrada")));
                     imp.setIcmsCreditoId(rs.getString("icms_entrada_id"));
                     imp.setIcmsDebitoId(rs.getString("icms_saida_id"));
                     imp.setAtacadoPreco(rs.getDouble("precoatacado"));
+                    
+                    System.out.println(String.valueOf(rs.getInt("ncm")));
                     
                     result.add(imp);
                 }
