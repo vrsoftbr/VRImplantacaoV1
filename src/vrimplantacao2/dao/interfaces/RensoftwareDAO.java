@@ -18,6 +18,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -126,10 +127,11 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	coalesce(dt.data_alt, p.DATA_ALTERACAO) dataalteracao,\n" +
                     "	coalesce(pxc.CODIGOBARRAS, p.cbarra, p.cbarra2, p.cbarra3) ean,\n" +
                     "	p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0)) qtdembalagem,\n" +
+                    "   p.embalagem,\n" +
                     "	coalesce(pxc.UNIDADE, p.unidade) unidadevenda,	\n" +
                     "	p.UNIDADE_COMPRA unidadecotacao,\n" +
                     "	p.EMBALAGEM qtdembalagemcotacao,\n" +
-                    "	p.QTD_VOLUMES qtdembalagem,\n" +
+                    "	p.QTD_VOLUMES qtdembalagem2,\n" +
                     "	p.BALANCA balanca,\n" +
                     "	p.VALIDIAS validade,\n" +
                     "	p.NOME descricaocompleta,\n" +
@@ -148,7 +150,10 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	pl.COD_FIG_FISCAL_ent icms_entrada_id,\n" +
                     "	pl.COD_FIG_FISCAL_sai icms_saida_id,\n" +
                     "	pl.PER_IVA iva,	\n" +
-                    "	pxl.PRECOVENDA / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0))) precoatacado\n" +
+                    "	pxl.PRECOVENDA / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0))) precoatacado,\n" +
+                    "   p.TIPOPRODUTO tipo_produto,\n" + 
+                    "   pl.C_AQUIS as custo, \n" + 
+                    "   pl.PCO_REMAR as precovenda \n" + 
                     "from\n" +
                     "	produtos p\n" +
                     "	join EMPRESA e on\n" +
@@ -176,7 +181,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem((rs.getInt("tipo_produto") == 1 ? 1 : rs.getInt("embalagem")));
                     imp.setTipoEmbalagem(rs.getString("unidadevenda"));
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setTipoEmbalagemCotacao(rs.getString("qtdembalagem"));
@@ -190,9 +195,9 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setFornecedorFabricante(rs.getString("id_fabricante"));
-                    imp.setCustoComImposto(rs.getDouble("PCO_COMPRA"));
-                    imp.setCustoSemImposto(rs.getDouble("PCO_COMPRA"));
-                    imp.setPrecovenda(rs.getDouble("preco"));
+                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoSemImposto(rs.getDouble("custo"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setSituacaoCadastro("N".equals(rs.getString("ATIVO")) ? 0 : 1);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
@@ -213,6 +218,62 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select CODIGOPRODUTO, CODIGOBARRAS ean, UNIDADE \n"
+                        + "from PRODEXPL_CADASTRO\n"
+                        + "where CODLOJA = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        String complEan = "9999";
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("CODIGOPRODUTO"));
+                        imp.setEan(rst.getString("ean").trim().length() <= 6
+                                ? complEan + rst.getString("ean") : rst.getString("ean"));
+                        imp.setTipoEmbalagem(rst.getString("UNIDADE"));
+                        result.add(imp);
+
+                    }
+                }
+                return result;
+            }
+        }
+        
+        /* PROVISORIO */
+        if (opt == OpcaoProduto.QTD_EMBALAGEM_EAN) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "  a.CODIGOPRODUTO as id, \n"
+                        + "  a.codigobarras as ean,\n"
+                        + "  (select FATOR \n"
+                        + "     from PRODEXPL_CADASTRO \n"
+                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                        + "      and FATOR > 1) as qtde\n"
+                        + "from PRODEXPL_CADASTRO a\n"
+                        + "inner join PRODEXPL_CADASTROLOJA b on b.CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                        + "and a.ITEM = b.ITEM\n"
+                        + "and a.FATOR = 1\n"
+                        + "and a.CODLOJA = " + getLojaOrigem() + "\n"
+                        + "and b.CODLOJA = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
         
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -245,11 +306,14 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                         + "and b.CODLOJA = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
+                        
+                        String complEan = "9999";
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rst.getString("id"));
-                        imp.setEan(rst.getString("ean"));
+                        imp.setEan(rst.getString("ean").trim().length() <= 6 ? 
+                                complEan + rst.getString("ean") : rst.getString("ean"));
                         imp.setQtdEmbalagem(rst.getInt("qtde"));
                         imp.setPrecovenda(rst.getDouble("preocvenda"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
@@ -362,6 +426,34 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         return result;
     }
 
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	CODIGO as idproduto, \n"
+                    + "	FORNECEDOR as idfornecedor, \n"
+                    + "	ALTERNATI as codigoexterno, \n"
+                    + "	EMBALAGEM as qtdembalagem\n"
+                    + "from VPRODUTOS"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
