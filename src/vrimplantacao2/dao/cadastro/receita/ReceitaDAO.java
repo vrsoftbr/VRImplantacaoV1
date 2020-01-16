@@ -44,11 +44,18 @@ public class ReceitaDAO {
             SQLBuilder sql = new SQLBuilder();
 
             sql.setTableName("receita");
-            sql.put("id", vo.getId());
+            sql.putSql("id", "(select coalesce(max(id) + 1, 1) from receita)");
             sql.put("descricao", vo.getDescricao());
             sql.put("fichatecnica", vo.getFichatecnica());
             sql.put("id_situacaocadastro", vo.getId_situacaocadastro());
-            stm.execute(sql.getInsert());
+            sql.getReturning().add("id");
+            
+            try (ResultSet rst = stm.executeQuery(
+                    sql.getInsert()
+            )) {
+                rst.next();
+                vo.setId(rst.getInt("id"));
+            }
         }
     }
 

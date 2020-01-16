@@ -3,8 +3,12 @@ package vrimplantacao2.dao.interfaces;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import receita.ReceitaItemIMP;
+import receita.ReceitaProdutoIMP;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -595,17 +599,72 @@ public abstract class InterfaceDAO {
                     }
                 }
             }
-        }
-        
+        }        
     }
-
+    
+    /**
+    * Listagem com as informações de Receita<br>
+    * Utilize {@link #getReceitasProducao()}
+    * @return List com as receitas
+    * @throws Exception
+    */    
+    @Deprecated
     public List<ReceitaIMP> getReceitas() throws Exception {
         return new ArrayList<>();
     }
     
     /**
-    *Listagem com as informações de Receita
+    * Listagem com as informações de Receita
     * @return List com as receitas
     * @throws Exception
     */    
+    public List<receita.ReceitaIMP> getReceitasProducao() throws Exception {
+        Map<String, receita.ReceitaIMP> result = new LinkedHashMap<>();
+        for (ReceitaIMP imp: getReceitas()) {
+            receita.ReceitaIMP a = result.get(imp.getImportid());
+            if (a == null) {
+                a = new receita.ReceitaIMP();
+                a.setId(imp.getImportid());
+                a.setDescricao(imp.getDescricao());
+                a.setFichaTecnica(imp.getFichatecnica());
+                a.setSituacaoCadastro(imp.getId_situacaocadastro());
+            }
+            {
+                boolean existe = false;
+                for (ReceitaProdutoIMP rp: a.getRendimento()) {
+                    if (rp.getIdProduto().equals(imp.getIdproduto())) {
+                        existe = true;
+                        break;
+                    }
+                }
+                if (!existe) {
+                    a.addRendimento(imp.getIdproduto(), imp.getRendimento());
+                }
+            }
+            {
+                for (String id: imp.getProdutos()) {
+                    boolean existe = false;
+                    for (ReceitaProdutoIMP rc: a.getRendimento()) {
+                        if (id.equals(rc.getIdProduto())) {
+                            existe = true;
+                            break;
+                        }
+                    }
+                    if (!existe) {
+                        ReceitaItemIMP i = a.addItem();
+                        i.setFatorConversao(imp.getFator());
+                        i.setIdProduto(id);
+                        i.setQtdEmbalagemProduto(imp.getQtdembalagemproduto());
+                        i.setQtdEmbalagemReceita(imp.getQtdembalagemreceita());
+                    }
+                }
+            }
+            
+            result.put(imp.getIdproduto(), a);
+            
+        }
+        return new ArrayList<>(result.values());
+    }
+    
+    
 }

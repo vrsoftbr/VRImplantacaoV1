@@ -57,6 +57,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -212,7 +213,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.VENDA_CONTROLADA,
                 OpcaoProduto.NORMA_REPOSICAO,
                 OpcaoProduto.TIPO_PRODUTO,
-                OpcaoProduto.FABRICACAO_PROPRIA
+                OpcaoProduto.FABRICACAO_PROPRIA,
+                OpcaoProduto.RECEITA
         ));
     }
 
@@ -1617,5 +1619,51 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	r.grpcodgrp id,\n" +
+                    "    p.prodescr descricao,\n" +
+                    "    r.grpativo ativo,\n" +
+                    "    r.grprendim rendimento,\n" +
+                    "    1 quantidadereceita,\n" +
+                    "    1 quantidadeproduto,\n" +
+                    "    r.grpqtde fator,\n" +
+                    "    r.grpcodplu id_produto\n" +
+                    "from\n" +
+                    "	hipgrp r\n" +
+                    "    join hippro p on\n" +
+                    "		r.grpcodgrp = p.procodplu\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rs.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rs.getString("id"));
+                    imp.setIdproduto(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setId_situacaocadastro("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setRendimento(rs.getDouble("rendimento"));
+                    imp.setQtdembalagemproduto(rs.getInt("quantidadereceita"));
+                    imp.setQtdembalagemreceita(rs.getInt("quantidadeproduto"));
+                    imp.setFator(rs.getDouble("fator"));
+                    imp.getProdutos().add(rs.getString("id_produto"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    } 
+    
     
 }

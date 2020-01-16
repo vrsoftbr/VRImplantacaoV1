@@ -5,6 +5,8 @@
  */
 package vrimplantacao2.vo.cadastro.receita;
 
+import java.util.HashSet;
+import java.util.Set;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 /**
@@ -24,6 +26,9 @@ public class ReceitaAnteriorVO {
   private int qtdembalagemreceita;
   private int qtdembalagemproduto;
   private int codigoAtual;
+  
+  private Set<Integer> itens = new HashSet<>();
+  private Set<Integer> rendimentos = new HashSet<>();
 
     /**
      * @return the importsistema
@@ -178,4 +183,13 @@ public class ReceitaAnteriorVO {
     public void setCodigoAtual(int codigoAtual) {
         this.codigoAtual = codigoAtual;
     }
+
+    public Set<Integer> getItens() {
+        return itens;
+    }
+
+    public Set<Integer> getRendimentos() {
+        return rendimentos;
+    }
+    
 }
