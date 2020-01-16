@@ -174,6 +174,8 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
                         idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     }
 
+                    dao.atacadoQtdMinima = chkAtacadoQtdMinima.isSelected();
+                    
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -270,6 +272,8 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkCClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCCheques = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkAtacadoQtdMinima = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -331,6 +335,27 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
+
+        chkAtacadoQtdMinima.setText("Importar Atacado - Qtd Mínima");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAtacadoQtdMinima, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(333, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAtacadoQtdMinima, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(205, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Parametros Adicionais", vRPanel1);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -474,6 +499,7 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAtacadoQtdMinima;
     private vrframework.bean.checkBox.VRCheckBox chkCCheques;
     private vrframework.bean.checkBox.VRCheckBox chkCClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
@@ -497,6 +523,7 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTextField txtCompLoja;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
 

@@ -29,10 +29,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
+    public boolean atacadoQtdMinima = false;
     
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
-    }
+    }    
     
     @Override
     public String getSistema() {
@@ -209,8 +210,6 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIcmsDebitoId(rs.getString("icms_saida_id"));
                     imp.setAtacadoPreco(rs.getDouble("precoatacado"));
                     
-                    System.out.println(String.valueOf(rs.getInt("ncm")));
-                    
                     result.add(imp);
                 }
             }
@@ -280,52 +279,83 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         
         if (opt == OpcaoProduto.ATACADO) {
-            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "  a.CODIGOPRODUTO as id, \n"
-                        + "  a.ITEM, \n"
-                        + "  a.UNIDADE, \n"
-                        + "  a.PRINCIPAL, \n"
-                        + "  a.CODIGOBARRAS as ean,\n"
-                        + "  (select FATOR \n"
-                        + "     from PRODEXPL_CADASTRO \n"
-                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
-                        + "      and FATOR > 1) as qtde,\n"
-                        + "  b.PRECOSISTEMA,\n"
-                        + "  b.PRECOVENDA,\n"
-                        + "  (select b.PRECOVENDA / (select FATOR \n"
-                        + "     from PRODEXPL_CADASTRO \n"
-                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
-                        + "      and FATOR > 1)) as precoatacado,\n"
-                        + "(select b.PRECOSISTEMA / (select FATOR \n"
-                        + "     from PRODEXPL_CADASTRO \n"
-                        + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
-                        + "      and FATOR > 1)) as preocvenda\n"
-                        + "from PRODEXPL_CADASTRO a\n"
-                        + "inner join PRODEXPL_CADASTROLOJA b on b.CODIGOPRODUTO = a.CODIGOPRODUTO\n"
-                        + "and a.ITEM = b.ITEM\n"
-                        + "and a.FATOR = 1\n"
-                        + "and a.CODLOJA = " + getLojaOrigem() + "\n"
-                        + "and b.CODLOJA = " + getLojaOrigem()
-                )) {
-                    while (rst.next()) {
-                        
-                        String complEan = "9999";
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportSistema(getSistema());
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("id"));
-                        imp.setEan(rst.getString("ean").trim().length() <= 6 ? 
-                                complEan + rst.getString("ean") : rst.getString("ean"));
-                        imp.setQtdEmbalagem(rst.getInt("qtde"));
-                        imp.setPrecovenda(rst.getDouble("preocvenda"));
-                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
-                        result.add(imp);
+
+            if (!atacadoQtdMinima) {
+                try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                    try (ResultSet rst = stm.executeQuery(
+                            "select \n"
+                            + "  a.CODIGOPRODUTO as id, \n"
+                            + "  a.ITEM, \n"
+                            + "  a.UNIDADE, \n"
+                            + "  a.PRINCIPAL, \n"
+                            + "  a.CODIGOBARRAS as ean,\n"
+                            + "  (select FATOR \n"
+                            + "     from PRODEXPL_CADASTRO \n"
+                            + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                            + "      and FATOR > 1) as qtde,\n"
+                            + "  b.PRECOSISTEMA,\n"
+                            + "  b.PRECOVENDA,\n"
+                            + "  (select b.PRECOVENDA / (select FATOR \n"
+                            + "     from PRODEXPL_CADASTRO \n"
+                            + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                            + "      and FATOR > 1)) as precoatacado,\n"
+                            + "(select b.PRECOSISTEMA / (select FATOR \n"
+                            + "     from PRODEXPL_CADASTRO \n"
+                            + "    where CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                            + "      and FATOR > 1)) as preocvenda\n"
+                            + "from PRODEXPL_CADASTRO a\n"
+                            + "inner join PRODEXPL_CADASTROLOJA b on b.CODIGOPRODUTO = a.CODIGOPRODUTO\n"
+                            + "and a.ITEM = b.ITEM\n"
+                            + "and a.FATOR = 1\n"
+                            + "and a.CODLOJA = " + getLojaOrigem() + "\n"
+                            + "and b.CODLOJA = " + getLojaOrigem()
+                    )) {
+                        while (rst.next()) {
+
+                            String complEan = "9999";
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportSistema(getSistema());
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportId(rst.getString("id"));
+                            imp.setEan(rst.getString("ean").trim().length() <= 6
+                                    ? complEan + rst.getString("ean") : rst.getString("ean"));
+                            imp.setQtdEmbalagem(rst.getInt("qtde"));
+                            imp.setPrecovenda(rst.getDouble("preocvenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            result.add(imp);
+                        }
                     }
+                    return result;
                 }
-                return result;
-            }            
+            } else {
+                try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                    try (ResultSet rst = stm.executeQuery(
+                            "select\n"
+                            + "  CODIGO as id_produto, \n"
+                            + "  PCO_REMAR as precovenda, \n"
+                            + "  PCO_AREMAR as precoatacado,\n"
+                            + "  QTD_MINIMA_ATACADO as qtde \n"
+                            + "from PRODLOJAS \n"
+                            + "where QTD_MINIMA_ATACADO > 1\n"
+                            + "and CODIGO in (select CODIGO from PRODUTOS where TIPOPRODUTO = 1)\n"
+                            + "and CODLOJA = " + getLojaOrigem()
+                    )) {
+                        while (rst.next()) {
+                            String complEan = "999999";
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportSistema(getSistema());
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportId(rst.getString("id_produto"));
+                            imp.setEan(complEan + rst.getString("id_produto"));
+                            imp.setQtdEmbalagem(rst.getInt("qtde"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            result.add(imp);                            
+                        }
+                    }
+                    return result;
+                }
+            }
         }
         return null;
     }
