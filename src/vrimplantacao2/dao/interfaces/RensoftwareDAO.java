@@ -90,7 +90,8 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.ATACADO
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.NATUREZA_RECEITA
         ));
     }
     
