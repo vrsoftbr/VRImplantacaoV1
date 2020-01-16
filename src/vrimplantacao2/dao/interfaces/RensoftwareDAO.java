@@ -331,14 +331,16 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                     try (ResultSet rst = stm.executeQuery(
                             "select\n"
-                            + "  CODIGO as id_produto, \n"
-                            + "  PCO_REMAR as precovenda, \n"
-                            + "  PCO_AREMAR as precoatacado,\n"
-                            + "  QTD_MINIMA_ATACADO as qtde \n"
-                            + "from PRODLOJAS \n"
-                            + "where QTD_MINIMA_ATACADO > 1\n"
-                            + "and CODIGO in (select CODIGO from PRODUTOS where TIPOPRODUTO = 1)\n"
-                            + "and CODLOJA = " + getLojaOrigem()
+                            + "  l.CODIGO as id_produto, \n"
+                            + "  l.PCO_REMAR as precovenda, \n"
+                            + "  l.PCO_AREMAR as precoatacado,\n"
+                            + "  l.QTD_MINIMA_ATACADO as qtde, \n"
+                            + "  p.EMBALAGEM\n"
+                            + "from PRODLOJAS l\n"
+                            + "inner join PRODUTOS p on p.CODIGO = l.CODIGO\n"
+                            + "and l.QTD_MINIMA_ATACADO > 1\n"
+                            + "and l.QTD_MINIMA_ATACADO <> p.EMBALAGEM\n"
+                            + "and l.CODLOJA = " + getLojaOrigem()
                     )) {
                         while (rst.next()) {
                             String complEan = "999999";
