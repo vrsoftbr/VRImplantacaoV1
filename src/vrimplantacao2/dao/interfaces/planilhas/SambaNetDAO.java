@@ -98,6 +98,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
             OpcaoProduto.ESTOQUE,
             OpcaoProduto.CUSTO,
             OpcaoProduto.PRECO,
@@ -375,15 +377,15 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(sheet.getCell(0, i).getContents());
-                        imp.setEan(sheet.getCell(3, i).getContents());
-                        imp.setDescricaoCompleta(sheet.getCell(6, i).getContents());
-                        imp.setDescricaoReduzida(sheet.getCell(6, i).getContents());
-                        imp.setDescricaoGondola(sheet.getCell(6, i).getContents());
-                        imp.setQtdEmbalagemCotacao(Math.round(Float.parseFloat(String.valueOf(sheet.getCell(11, i).getContents()).replace(',', '.'))));
-                        imp.setEstoque(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
-                        imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
-                        imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
-                        imp.setPrecovenda(Utils.stringToDouble(sheet.getCell(21, i).getContents()));
+                        imp.setEan(sheet.getCell(2, i).getContents());
+                        imp.setDescricaoCompleta(sheet.getCell(7, i).getContents());
+                        imp.setDescricaoReduzida(sheet.getCell(7, i).getContents());
+                        imp.setDescricaoGondola(sheet.getCell(7, i).getContents());
+                        imp.setQtdEmbalagemCotacao(Utils.stringToInt(sheet.getCell(10, i).getContents(), 1));
+                        imp.setEstoque(Utils.stringToDouble(sheet.getCell(13, i).getContents()));
+                        imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(15, i).getContents()));
+                        imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(15, i).getContents()));
+                        imp.setPrecovenda(Utils.stringToDouble(sheet.getCell(18, i).getContents()));
                         imp.setCodMercadologico1(centroReceita);
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);
@@ -404,7 +406,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                             }
                         }
                         
-                        produtos.put(imp, imp.getImportId(), sheet.getCell(3, i).getContents());
+                        produtos.put(imp, imp.getImportId(), sheet.getCell(2, i).getContents());
                         
                     } else if (
                             sheet.getCell(0, i) != null &&
@@ -523,7 +525,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                             !val(sh, 5, i).equals("")
                     ) {
                         ProdutoIMP imp = produtos.get(val(sh, 0, i),val(sh, 1, i));
-                        
+                    
                         if (!imp.isBalanca()) {
                             imp.setTipoEmbalagem(val(sh,6,i));
                         }
@@ -655,7 +657,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                 //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
                 if (
                         val(sh, 0, i).equals("Cód.") &&
-                        val(sh, 3, i).equals("Razão Social:")                             
+                        val(sh, 1, i).equals("Razão Social:")                             
                 ) {
                     if (imp != null) {
                         result.add(imp);
@@ -664,20 +666,21 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (inativacao) {
                         imp.setAtivo(false);
                     }
-                    imp.setId(val(sh, 1, i));
+                    imp.setId(val(sh, 0, i));
                     imp.setRazao(val(sh, 8, i));
                     imp.setCnpj(val(sh, 12, i));
-                    imp.setInscricaoestadual(val(sh, 14, i));
-                    if (!val(sh, 18, i).equals("")) {
-                        imp.addContato(val(sh, 18, i), val(sh, 18, i), val(sh, 24, i), "", "");
+                    imp.setInscricaoestadual(val(sh, 7, i));
+                    if (!val(sh, 10, i).equals("")) {
+                        imp.addContato(val(sh, 10, i), val(sh, 1018, i), val(sh, 24, i), "", "");
                     }
-                    if (!val(sh, 24, i).equals("")) {
-                        imp.setTelefone(val(sh, 24, i));
-                    }
+                    if (!val(sh, 8, i).equals("")) {
+                        imp.setTelefone(val(sh, 8, i));
+                    imp.setObservacao(val(sh, 11, i));
+                    /*}
                 } else if (
-                        val(sh, 0, i).equals("") &&
-                        !val(sh, 19, i).equals("") &&
-                        !val(sh, 25, i).equals("")
+                        val(sh, 0, i).equals("") //&&
+                        //!val(sh, 19, i).equals("") &&
+                        //!val(sh, 25, i).equals("")
                 ) {
                     imp.setBairro(val(sh, 19, i));
                     imp.setMunicipio(val(sh, 25, i));
@@ -685,28 +688,28 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         val(sh, 0, i).equals("Fantasia:") &&
                         val(sh, 9, i).equals("Endereço:")
                 ) {
-                    imp.setFantasia(val(sh, 2, i));
+                    imp.setFantasia(val(sh, 1, i));
                     if (imp.getFantasia().equals("")) {
                         imp.setFantasia(imp.getRazao());
                     }
-                    imp.setEndereco(val(sh, 10, i));
+                    imp.setEndereco(val(sh, 11, i));
 
-                    if (!val(sh, 18, i).equals("")) {                    
+                    if (!val(sh, 11, i).equals("")) {                    
                         imp.setBairro(val(sh, 17, i));
                     }                    
                     if (
                         !val(sh, 25, i).equals("")
                     ) {                        
-                        imp.setUf(val(sh, 25, i));
+                        imp.setUf(val(sh, 25, i));*/
                     }
                 }
-
+                if (imp != null) {
+                    result.add(imp);
+                }
                 ProgressBar.next();
             }            
             
-            if (imp != null) {
-                result.add(imp);
-            }
+            
 
         } catch (Exception ex) {
             System.out.println(linha);
