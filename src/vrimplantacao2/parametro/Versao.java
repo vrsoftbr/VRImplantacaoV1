@@ -24,7 +24,7 @@ public final class Versao {
         String versao = "";
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select versao from versao where id_programa = 0"
+                    "select versao from versao where id_programa = 86"
             )) {
                 if (rst.next()) {
                     

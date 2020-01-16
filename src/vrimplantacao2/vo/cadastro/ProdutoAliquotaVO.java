@@ -15,6 +15,7 @@ public class ProdutoAliquotaVO {
     private Icms aliquotaDebitoForaEstadoNf;
     private Icms aliquotaConsumidor;
     private String aliquotaCreditoFornecedor;
+    private int excecao = 0;
     
     public int getId() {
         return id;
@@ -95,4 +96,13 @@ public class ProdutoAliquotaVO {
     public void setAliquotaCreditoFornecedor(String aliquotaCreditoFornecedor) {
         this.aliquotaCreditoFornecedor = aliquotaCreditoFornecedor;
     }
+
+    public int getExcecao() {
+        return excecao;
+    }
+
+    public void setExcecao(int excecao) {
+        this.excecao = excecao;
+    }
+    
 }
