@@ -167,6 +167,54 @@ select
   codigoitemfornecedor as codigoexterno
 from itemcodigofornecedor
 
+    
+clientes
+    
+select  
+  p.codigo as id,
+  p.nomerazao as razao,
+  pf.estadocivil,
+  pf.cpf,
+  pf.rg,
+  pf.siglaemissorrg,
+  pf.uf_emissorrg,
+  pf.dataexpedicao,
+  pf.datanascimento,
+  pf.filiacaopai as pai,
+  pf.filiacaomae as mae,
+  p.tipopessoa as tipopessoa,
+  p.datacadastro,
+  pe.endereco_codigo,
+  e.logradouro as endereco,
+  e.numero,
+  e.complemento,
+  e.uf_codigo as uf_ibge,
+  e.cidade_codigo as municipio_ibge,
+  e.cep,
+  b.nome as bairro,
+  b.ceppadrao,
+  c.cep as cep2,
+  cid.nome as municipio,
+  uf.nome as uf,
+  tel.numero as telefone,
+  ema.email,
+  pc.bloqueado,
+  pc.limitecredito,
+  pc.diavencimentofatura
+from participante p
+left join participantepf pf on pf.participante_codigo = p.codigo
+left join participanteendereco pe on pe.participante_codigo = p.codigo
+left join endereco e on e.codigo = pe.endereco_codigo
+left join bairro b on b.codigo = e.bairro_codigo
+left join cep c on c.bairro_codigo = b.codigo
+left join cidade cid on cid.codigo = e.cidade_codigo
+left join uf on uf.codigo = e.uf_codigo
+left join participantetelefone tel on tel.participante_codigo = p.codigo
+left join participantecliente pc on pc.participante_codigo = p.codigo
+left join participanteemails ema on ema.participante_codigo = p.codigo
+where p.cliente = 1
+order by p.codigo
+    
 
 select * from endereco
 select * from bairro
