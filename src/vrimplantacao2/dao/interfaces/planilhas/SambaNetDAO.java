@@ -94,7 +94,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.DESC_COMPLETA,
             OpcaoProduto.DESC_GONDOLA,
             OpcaoProduto.DESC_REDUZIDA,
-            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO, 
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
@@ -351,7 +351,6 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             
             
             MultiMap<String, ProdutoIMP> produtos = new MultiMap<>();
-            Map<String, Integer> mapaBalanca = getProdutoBalanca();
             Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
             
             try {
@@ -391,19 +390,20 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico3(categoria);
                         imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
                         
-                        Integer plu = mapaBalanca.get(imp.getImportId());
-                        if (plu != null) {
-                            ProdutoBalancaVO prod = produtosBalanca.get(plu);
-                            if (prod != null) {
-                                imp.seteBalanca(true);
-                                imp.setValidade(prod.getValidade());
-                                if ("U".equals(prod.getPesavel())) {
-                                    imp.setTipoEmbalagem("UN");
-                                } else {
-                                    imp.setTipoEmbalagem("KG");
-                                }
-                                imp.setEan(String.valueOf(prod.getCodigo()));
+                        ProdutoBalancaVO prod = produtosBalanca.get(Utils.stringToInt(imp.getEan()));
+                        if (prod != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(prod.getValidade());
+                            if ("U".equals(prod.getPesavel())) {
+                                imp.setTipoEmbalagem("UN");
+                            } else {
+                                imp.setTipoEmbalagem("KG");
                             }
+                            imp.setEan(String.valueOf(prod.getCodigo()));
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setValidade(0);
+                            imp.setTipoEmbalagem("UN");
                         }
                         
                         produtos.put(imp, imp.getImportId(), sheet.getCell(2, i).getContents());

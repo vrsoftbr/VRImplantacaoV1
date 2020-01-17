@@ -51,30 +51,48 @@ public class ReceitaAnteriorDAO {
         
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "  sistema,\n"
-                    + "  loja,\n"
-                    + "  id,\n"
-                    + "  idproduto,\n"
-                    + "  descricao,\n"
-                    + "  fichatecnica,\n"
-                    + "  qtdembalagemreceita,\n"
-                    + "  qtdembalagemproduto,\n"
-                    + "  fatorembalagem,\n"
-                    + "  baixaestoque,\n"
-                    + "  embalagem,\n"
-                    + "  rendimento\n"
-                    + "from implantacao.codant_receita\n"
-                    + "where sistema = '" + sistema + "' \n"
-                    + "  and loja = '" + loja + "'\n"
-                    + "order by 1,2,3 "
+                    "select\n" +
+                    "	sistema,\n" +
+                    "	loja,\n" +
+                    "	id,\n" +
+                    "	codigoatual,\n" +
+                    "	idproduto,\n" +
+                    "	descricao,\n" +
+                    "	fichatecnica,\n" +
+                    "	qtdembalagemreceita,\n" +
+                    "	qtdembalagemproduto,\n" +
+                    "	fatorembalagem,\n" +
+                    "	baixaestoque,\n" +
+                    "	embalagem,\n" +
+                    "	rendimento\n" +
+                    "from\n" +
+                    "	implantacao.codant_receita\n" +
+                    "where\n" +
+                    "	sistema = '" + sistema + "' and\n" +
+                    "	loja = '" + loja + "'\n" +
+                    "order by 1,2,3 "
             )) {
                 while (rst.next()) {
-                    ReceitaAnteriorVO ant = new ReceitaAnteriorVO();                    
+                    ReceitaAnteriorVO ant = new ReceitaAnteriorVO();
+                    
                     ant.setImportsistema(rst.getString("sistema"));
                     ant.setImportloja(rst.getString("loja"));
                     ant.setImportid(rst.getString("id"));
-                    ant.setDescricao(rst.getString("descricao"));                    
+                    ant.setDescricao(rst.getString("descricao"));
+                    ant.setCodigoAtual(rst.getInt("codigoatual"));
+                    ant.setIdproduto(rst.getString("idproduto"));
+                    ant.setDescricao(rst.getString("descricao"));
+                    ant.setFichatecnica(rst.getString("fichatecnica"));
+                    ant.setQtdembalagemreceita(rst.getInt("qtdembalagemreceita"));
+                    ant.setQtdembalagemproduto(rst.getInt("qtdembalagemproduto"));
+                    //ant.setFator(rst.getString("fatorembalagem"));
+                    //ant.set(rst.getString("baixaestoque"));
+                    //ant.set(rst.getString("embalagem"));
+                    ant.setRendimento(rst.getDouble("rendimento"));
+                    
+                    getRendimentos(ant);
+                    getItens(ant);
+                    
                     result.put(ant.getImportid(), ant);
                 }
             }
@@ -99,6 +117,61 @@ public class ReceitaAnteriorDAO {
             sql.put("rendimento", vo.getRendimento());
             sql.put("codigoatual", vo.getCodigoAtual());
             stm.execute(sql.getInsert());            
+        }
+    }
+
+    public void atualizar(ReceitaAnteriorVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("implantacao");
+            sql.setTableName("codant_receita");
+            sql.put("idproduto", vo.getIdproduto());
+            sql.put("descricao", vo.getDescricao());
+            sql.put("fichatecnica", vo.getFichatecnica());
+            sql.put("qtdembalagemreceita", vo.getQtdembalagemreceita());
+            sql.put("qtdembalagemproduto", vo.getQtdembalagemproduto());
+            sql.put("rendimento", vo.getRendimento());
+            sql.put("codigoatual", vo.getCodigoAtual());
+            sql.setWhere("sistema = '" + vo.getImportsistema() + "' and loja = '" + vo.getImportloja() + "' and id = '" + vo.getImportid() + "'");
+            stm.execute(sql.getUpdate());            
+        }
+    }
+
+    private void getRendimentos(ReceitaAnteriorVO ant) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	id_produto\n" +
+                    "from\n" +
+                    "	receitaproduto\n" +
+                    "where\n" +
+                    "	id_receita = " + ant.getCodigoAtual() + "\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ant.getRendimentos().add(rst.getInt("id_produto"));
+                }
+            }
+        }
+    }
+
+    private void getItens(ReceitaAnteriorVO ant) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	id_produto\n" +
+                    "from\n" +
+                    "	receitaitem\n" +
+                    "where\n" +
+                    "	id_receita = " + ant.getCodigoAtual() + "\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ant.getItens().add(rst.getInt("id_produto"));
+                }
+            }
         }
     }
 }

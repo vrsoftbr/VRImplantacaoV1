@@ -799,7 +799,6 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n" +
                     "	GIT_COD_ITEM PRODUTO,\n" +
                     "	FORITE_REFERENCIA AS REFERENCIA,\n" +
-                    "	PROD.GIT_EMB_FOR AS EMBALAGEM,  \n" +
                     "	forn.forite_uf_fator_conv AS FATOR_COVERSAO  \n" +
                     "FROM \n" +
                     "	AA1FORIT FORN\n" +
@@ -808,18 +807,17 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "    not coalesce(nullif(trim(BOTH ' ' from FORITE_REFERENCIA),''),'()AA') = '()AA'\n" +
                     "union\n" +
-                    "SELECT \n" +
-                    "	FORITE_COD_FORN||FORITE_DIG_FORN AS FORNECEDOR,\n" +
-                    "	GIT_COD_ITEM PRODUTO,\n" +
-                    "    prod.git_referencia  AS REFERENCIA,\n" +
-                    "	PROD.GIT_EMB_FOR AS EMBALAGEM,  \n" +
-                    "	forn.forite_uf_fator_conv AS FATOR_COVERSAO  \n" +
+                    "SELECT\n" +
+                    "    p.git_cod_for||f.tip_digito AS FORNECEDOR,\n" +
+                    "	p.GIT_COD_ITEM PRODUTO,\n" +
+                    "    p.git_referencia  AS REFERENCIA,\n" +
+                    "	p.git_emb_for fator_conversao\n" +
                     "FROM \n" +
-                    "	AA1FORIT FORN\n" +
-                    "	join AA3CITEM PROD on\n" +
-                    "		PROD.GIT_COD_ITEM = FORN.FORITE_COD_ITEM\n" +
+                    "	AA3CITEM p\n" +
+                    "	join AA2CTIPO f on\n" +
+                    "        p.git_cod_for = f.tip_codigo\n" +
                     "where\n" +
-                    "    not coalesce(nullif(trim(BOTH ' ' from git_referencia),''),'()AA') = '()AA'"
+                    "    not coalesce(nullif(trim(BOTH ' ' from p.git_referencia),''),'()AA') = '()AA'"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
