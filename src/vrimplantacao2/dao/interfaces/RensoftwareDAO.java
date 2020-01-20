@@ -362,6 +362,40 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         return null;
     }
     
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "codigo as id,\n"
+                    + "cbarra2 as ean\n"
+                    + "from PRODUTOS\n"
+                    + "where CBARRA2 is not null\n"
+                    + "and CBARRA2 <> ''\n"
+                    + "union all\n"
+                    + "select \n"
+                    + "codigo as id,\n"
+                    + "cbarra3 as ean\n"
+                    + "from produtos\n"
+                    + "where cbarra3 is not null\n"
+                    + "and CBARRA3 <> ''"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem("UN");
+                    imp.setQtdEmbalagem(1);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
