@@ -193,6 +193,7 @@ import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
 import vrimplantacao2.gui.interfaces.Sifat_2GUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
+import vrimplantacao2.gui.interfaces.SiitGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
@@ -713,6 +714,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuG4 = new javax.swing.JMenuItem();
         mnuGestorPDV = new javax.swing.JMenuItem();
         mnuExodus = new javax.swing.JMenuItem();
+        mnuSiit = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -824,7 +826,7 @@ public final class MenuGUI extends VRMdiFrame {
         getContentPane().add(tlbToolBar, gridBagConstraints);
 
         vrDesktopPane.setBackground(java.awt.SystemColor.menu);
-        vrDesktopPane.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        vrDesktopPane.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -834,7 +836,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.weighty = 100.0;
         getContentPane().add(vrDesktopPane, gridBagConstraints);
 
-        vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
 
         lblRazaoSocial.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRazaoSocial.setText("@@@@@@@@");
@@ -861,7 +863,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel5, gridBagConstraints);
 
-        vRPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        vRPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
 
         lblVersao.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblVersao.setText("@@@@");
@@ -888,7 +890,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel6, gridBagConstraints);
 
-        vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
 
         lblLoja.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblLoja.setText("@@@");
@@ -915,7 +917,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel3, gridBagConstraints);
 
-        vRPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        vRPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
 
         lblData.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblData.setText("@@@@@@");
@@ -2259,6 +2261,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuExodus);
+
+        mnuSiit.setText("Siit");
+        mnuSiit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSiitActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuSiit);
 
         mnuDatabase.add(jMenu10);
 
@@ -4301,6 +4311,11 @@ public final class MenuGUI extends VRMdiFrame {
         ExodusGUI.exibir(this);
     }//GEN-LAST:event_mnuExodusActionPerformed
 
+    private void mnuSiitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSiitActionPerformed
+        // TODO add your handling code here:
+        SiitGUI.exibir(this);
+    }//GEN-LAST:event_mnuSiitActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4517,6 +4532,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
     private javax.swing.JMenuItem mnuSigma;
+    private javax.swing.JMenuItem mnuSiit;
     private javax.swing.JMenu mnuSistema;
     private javax.swing.JMenuItem mnuSistemaLogin;
     private javax.swing.JMenuItem mnuSoftcom;
