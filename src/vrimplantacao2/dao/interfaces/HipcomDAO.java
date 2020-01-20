@@ -656,8 +656,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pf.prfprtab precopacote\n" +
                     "from\n" +
                     "	hipprf pf\n" +
-                    "where\n" +
-                    "	pf.prfloja = " + getLojaOrigem() + "\n" +
+                    "where \n" +
+                    "	not nullif(trim(pf.prfreffor),'') is null\n" +
                     "order by 1,2"
             )) {
                 while (rst.next()) {
