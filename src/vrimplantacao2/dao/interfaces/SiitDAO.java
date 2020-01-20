@@ -74,11 +74,11 @@ public class SiitDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-            "select \n"
-            + "  codigo,\n"
-            + "  nomefantasia as nome\n"
-            + "from filial"
-            + "order by 1"
+                    "select \n"
+                    + "  codigo,\n"
+                    + "  nomefantasia as nome\n"
+                    + "from filial\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("nome")));
@@ -88,7 +88,7 @@ public class SiitDAO extends InterfaceDAO {
 
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -103,8 +103,10 @@ public class SiitDAO extends InterfaceDAO {
                     + "order by codigo"
             )) {
                 while (rst.next()) {
-                    
+
                     MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     
                     if (rst.getString("codigo").contains(".")) {
 
@@ -126,20 +128,20 @@ public class SiitDAO extends InterfaceDAO {
                         }
 
                         imp.setMerc3ID("1");
-                        imp.setMerc3Descricao("descricao");
-                        
-                    } else {                        
+                        imp.setMerc3Descricao(rst.getString("descricao"));
+
+                    } else {
                         imp.setMerc1ID(rst.getString("codigo"));
                         imp.setMerc1Descricao(rst.getString("descricao"));
                     }
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-/*
+    /*
     
 
 select 
@@ -368,5 +370,5 @@ order by
   Column_name
       
     
-*/    
+     */
 }
