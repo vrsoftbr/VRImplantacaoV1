@@ -215,65 +215,172 @@ public class IntelliCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             //String loja = getLojaOrigem().split("-")[0];
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    p.id,\n"
-                    + "    p.datacadastro,\n"
-                    + "    ob1.descricao as tipoEmbalagem,\n"
-                    + "    case when not bal.codigo is null then bal.codigo else e.ean end ean,\n"
-                    + "    case when not bal.codigo is null then 1 else 0 end eBalanca,\n"
-                    + "    coalesce(bal.validade, 0) validade,\n"
-                    + "    p.descricao descricaoCompleta,\n"
-                    + "    p.ref descricaoReduzida,\n"
-                    + "    p.descricao descricaoGondola,\n"
-                    + "    p.grupo codMercadologico1,\n"
-                    + "    ob2.descricao as mercadologico1,\n"
-                    + "    p.secao codMercadologico2,\n"
-                    + "    ob3.descricao as mercadologico2, \n"
-                    + "    p.subgrupo codMercadologico3,\n"
-                    + "    subg.descricao as mercadologico3,\n"
-                    + "    f.id as idFamiliaProduto,\n"
-                    + "    f.descricao as desc_familia,\n"
-                    + "    p.estqmin estoqueMinimo,\n"
-                    + "    p.estqmax estoqueMaximo,\n"
-                    + "    (select qtde from getestqprod(p.id, emp.id)) estoque,\n"
-                  //+ "    p.mkp as margem,\n"
-                    + "    c.custoatual custoSemImposto,\n"
-                    + "    c.custoatual custoComImposto,\n"
-                    + "    prc.vpreco preco,\n"
-                    + "    prc.vpreconormal precoVenda,\n"       
-                    + "    p.ativo,\n"
-                    + "    fisco.ncm,\n"
-                    + "    pst.cod_cest cest,\n"
-                    + "    coalesce(fisco.pis_cst_s, 13) pis_cst_e,\n"
-                    + "    coalesce(fisco.pis_cst_s, 1) pis_cst_s,\n"
-                    + "    fisco.cod_natureza_receita pis_natureza_receita,\n"
-                    + "    case substring(icms.descricao from 1 for 1)\n"
-                    + "    when 'F' then 60\n"
-                    + "    when 'T' then 0\n"
-                    + "    when 'I' then 40\n"
-                    + "    when 'N' then 41\n"
-                    + "    end icms_cst,\n"
-                    + "    icms.valor icms_aliq\n"
-                    + "from\n"
-                    + "    produtos p\n"
-                    + "    left join empresas emp on emp.id = " + getLojaOrigem() + "\n"
-                    + "    left join pesaveis bal on p.id = bal.id\n"
-                    + "    left join estoque est on p.id = est.idprod\n"
-                    + "    left join prodst pst on p.id = pst.id\n"
-                    + "    left join mxf_vw_pis_cofins fisco on fisco.codigo_produto = p.id\n"
-                    + "    left join eans e on e.produto = p.id\n"
-                    + "    left join semelhantes fd on fd.idprod = p.id\n"
-                    + "    left join semelhancas f on f.id = fd.idclasse\n"
-                    + "    left join objetos ob1 on ob1.id = p.unidade\n"
-                    + "    left join objetos ob2 on ob2.id = p.secao\n"
-                    + "    left join objetos ob3 on ob3.id = p.grupo\n"
-                    + "    left join objetos icms on icms.id = p.trib\n"
-                    + "    left join objetos subg on subg.id = p.subgrupo\n"
-                    + "    left join custoanterior c on c.id = p.id\n"
-                    + "    left join VW_EC_EXPT_PRODUTOS prc on prc.idproduto = p.id and\n"
-                    + "    emp.id = prc.empresa\n"        
-                    + "order by\n"
-                    + "    p.id"
+                    "with fisco as (\n" +
+                    "    SELECT\n" +
+                    "      P.ID AS CODIGO_PRODUTO,\n" +
+                    "      (SELECT FIRST 1 E.EAN FROM EANS E WHERE E.PRODUTO = P.ID AND E.ATIVO = 1 ORDER BY E.ID DESC) AS EAN,\n" +
+                    "      P.DESCRICAO AS DESCRITIVO_PRODUTO,\n" +
+                    "      (SELECT FIRST 1 C.CODIGO FROM CFPROD C WHERE C.ID = P.ID ORDER BY C.ID DESC) AS NCM,\n" +
+                    "      PN.CODIGO AS COD_NATURAZA_RECEITA,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN '50'\n" +
+                    "        WHEN 1 THEN '70'\n" +
+                    "        WHEN 2 THEN '73'\n" +
+                    "        WHEN 3 THEN '75'\n" +
+                    "        WHEN 4 THEN '71'\n" +
+                    "        WHEN 5 THEN '74'\n" +
+                    "        WHEN 6 THEN '72'\n" +
+                    "      END AS PIS_CST_E,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN '01'\n" +
+                    "        WHEN 1 THEN '06'\n" +
+                    "        WHEN 2 THEN '04'\n" +
+                    "        WHEN 3 THEN '05'\n" +
+                    "        WHEN 4 THEN '07'\n" +
+                    "        WHEN 5 THEN '08'\n" +
+                    "        WHEN 6 THEN '09'\n" +
+                    "      END AS PIS_CST_S,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN 7.6\n" +
+                    "        ELSE 0\n" +
+                    "      END AS PIS_ALIQ_E,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN 1.65\n" +
+                    "        ELSE 0\n" +
+                    "      END AS PIS_ALIQ_S,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN '50'\n" +
+                    "        WHEN 1 THEN '70'\n" +
+                    "        WHEN 2 THEN '73'\n" +
+                    "        WHEN 3 THEN '75'\n" +
+                    "        WHEN 4 THEN '71'\n" +
+                    "        WHEN 5 THEN '74'\n" +
+                    "        WHEN 6 THEN '72'\n" +
+                    "      END AS COFINS_CST_E,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN '01'\n" +
+                    "        WHEN 1 THEN '06'\n" +
+                    "        WHEN 2 THEN '04'\n" +
+                    "        WHEN 3 THEN '05'\n" +
+                    "        WHEN 4 THEN '07'\n" +
+                    "        WHEN 5 THEN '08'\n" +
+                    "        WHEN 6 THEN '09'\n" +
+                    "      END AS COFINS_CST_S,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN 7.6\n" +
+                    "        ELSE 0\n" +
+                    "      END AS COFINS_ALIQ_E,\n" +
+                    "      CASE P.ISENTOIF\n" +
+                    "        WHEN 0 THEN 1.65\n" +
+                    "        ELSE 0\n" +
+                    "      END AS COFINS_ALIQ_S,\n" +
+                    "      '' AS DEPTO,\n" +
+                    "      S.DESCRICAO AS SECAO,\n" +
+                    "      G.DESCRICAO AS GRUPO,\n" +
+                    "      SG.DESCRICAO AS SUBGRUPOS, \n" +
+                    "      IIF(P.ATIVO = 1, 'ATIVO', 'INATIVO') AS STATUS\n" +
+                    "    FROM PRODUTOS P JOIN OBJETOS O ON O.ID = P.TRIB\n" +
+                    "                    JOIN OBJETOS S ON S.ID = P.SECAO\n" +
+                    "                    JOIN OBJETOS G ON G.ID = P.GRUPO\n" +
+                    "                    JOIN OBJETOS SG ON SG.ID = P.SUBGRUPO\n" +
+                    "               LEFT JOIN PRODNTPISCOFINS PN ON PN.ID = P.ID\n" +
+                    "), prc as (\n" +
+                    "SELECT P.ID AS IDPRODUTO,\n" +
+                    "       SUBSTRING(P.DESCRICAO FROM 1 FOR 512) AS DESCRICAO,\n" +
+                    "       SUBSTRING(P.REF FROM 1 FOR 100) AS SUCINTA,\n" +
+                    "       V.CUSTO AS VCUSTO,\n" +
+                    "       IIF(A.PRECO IS NOT NULL, A.PRECO, V.PRECO) AS VPRECO,\n" +
+                    "       P.UNIDADE AS IDTIPOUN,\n" +
+                    "       V.MAXDESC,\n" +
+                    "       P.MULTI,\n" +
+                    "       P.ORIGEM,\n" +
+                    "       P.DATACADASTRO,\n" +
+                    "       IIF(P.TRIB = 10, CAST(C1.VALOR AS BIGINT) , CAST(C2.VALOR AS BIGINT)) AS IDCFOP,\n" +
+                    "       P.TRIB AS IDTIPOTRIBICMS,  /* Considerando T30 */\n" +
+                    "       P.ISENTOIF AS IDTIPOTRIBPISCOFINS,\n" +
+                    "       B.CODIGO AS BALANCA_CODIGO,\n" +
+                    "       B.DESCRICAO AS BALANCA_DESCRICAO,\n" +
+                    "       B.VALIDADE AS BALANCA_VALIDADE,\n" +
+                    "       PN.CODIGO AS CODIGORFD_CODIGO,\n" +
+                    "       PS.MVA AS MVA_MVA,\n" +
+                    "       PS.VALIQ AS MVA_ALIQ,\n" +
+                    "       PS.MVAAJUSTADO AS MVA_MVA_AJUSTADO,\n" +
+                    "       PS.ALIQSTUF AS MVA_ALIQSTDE,\n" +
+                    "       PS.ALIQSTFORA AS MVA_ALIQSTFE,\n" +
+                    "       CF.CODIGO AS NCM_CODIGONCMPADRAO,\n" +
+                    "       CF.IPI AS NCM_IPI,\n" +
+                    "       IIF((CT.TIPO IS NULL OR (CT.TIPO = 0)), 'T', 'P') AS IPPT,\n" +
+                    "       CT.TIPO AS COMPOSTO_TIPO,\n" +
+                    "       CT.CUSTOADD AS COMPOSTO_CUSTOADD,\n" +
+                    "       CT.QTDE AS COMPOSTO_QTDE,\n" +
+                    "       P.FIM,\n" +
+                    "       (SELECT FIRST 1 PM.ID FROM PROMOCOES PM WHERE PM.IDPROD = P.ID AND PM.INICIO <= CURRENT_DATE AND PM.ENCERRADA = 0),\n" +
+                    "       (SELECT FIRST 1 PM.PRECONORMAL FROM PROMOCOES PM WHERE PM.IDPROD = P.ID AND PM.INICIO <= CURRENT_DATE AND PM.ENCERRADA = 0) VPRECONORMAL,\n" +
+                    "       P.MODBC,\n" +
+                    "       V.EMPRESA\n" +
+                    "FROM PRODUTOS P LEFT JOIN COMPOSTOSTIPO   CT ON CT.ID = P.ID\n" +
+                    "                LEFT JOIN PESAVEIS        B  ON B.ID  = P.ID\n" +
+                    "                LEFT JOIN PRODNTPISCOFINS PN ON PN.ID = P.ID\n" +
+                    "                LEFT JOIN PRODST          PS ON PS.ID = P.ID\n" +
+                    "                LEFT JOIN CFPROD          CF ON CF.ID = P.ID\n" +
+                    "                     JOIN CONFIGURACAO    C1 ON C1.ID = 6402 /* CFOP VENDA ST   */\n" +
+                    "                     JOIN CONFIGURACAO    C2 ON C2.ID = 6502 /* CFOP VENDA ICMS */\n" +
+                    "                LEFT JOIN PRECOXAREA      A  ON A.IDPROD = P.ID AND A.IDAREA = (SELECT VALOR FROM CONFIGURACAO C WHERE C.ID = 1704)\n" +
+                    "                                                                                AND EXISTS(SELECT 1 FROM CONFIGURACAO WHERE ID = 1504 AND VALOR = 1)\n" +
+                    "                     JOIN VALORESPROD V  ON V.IDPROD  = P.ID\n" +
+                    "WHERE (IIF(A.PRECO IS NOT NULL, A.PRECO, V.PRECO)>0)\n" +
+                    ")\n" +
+                    "select\n" +
+                    "    p.id,\n" +
+                    "    p.datacadastro,\n" +
+                    "    ob1.descricao as tipoEmbalagem,\n" +
+                    "    case when not bal.codigo is null then bal.codigo else e.ean end ean,\n" +
+                    "    case when not bal.codigo is null then 1 else 0 end eBalanca,\n" +
+                    "    coalesce(bal.validade, 0) validade,\n" +
+                    "    p.descricao descricaoCompleta,\n" +
+                    "    p.ref descricaoReduzida,\n" +
+                    "    p.descricao descricaoGondola,\n" +
+                    "    p.grupo codMercadologico1,\n" +
+                    "    p.secao codMercadologico2,\n" +
+                    "    p.subgrupo codMercadologico3,\n" +
+                    "    f.id as idFamiliaProduto,\n" +
+                    "    f.descricao as desc_familia,\n" +
+                    "    p.estqmin estoqueMinimo,\n" +
+                    "    p.estqmax estoqueMaximo,\n" +
+                    "    (select qtde from getestqprod(p.id, emp.id)) estoque,\n" +
+                    "    prc.vcusto custoSemImposto,\n" +
+                    "    prc.vcusto custoComImposto,\n" +
+                    "    prc.vpreco preco,\n" +
+                    "    prc.vpreconormal precoVenda,       \n" +
+                    "    p.ativo,\n" +
+                    "    fisco.ncm,\n" +
+                    "    pst.cod_cest cest,\n" +
+                    "    coalesce(fisco.pis_cst_s, 13) pis_cst_e,\n" +
+                    "    coalesce(fisco.pis_cst_s, 1) pis_cst_s,\n" +
+                    "    fisco.COD_NATURAZA_RECEITA pis_natureza_receita,\n" +
+                    "    case substring(icms.descricao from 1 for 1)\n" +
+                    "    when 'F' then 60\n" +
+                    "    when 'T' then 0\n" +
+                    "    when 'I' then 40\n" +
+                    "    when 'N' then 41\n" +
+                    "    end icms_cst,\n" +
+                    "    icms.valor icms_aliq\n" +
+                    "from\n" +
+                    "    produtos p\n" +
+                    "    left join empresas emp on emp.id = " + getLojaOrigem() + "\n" +
+                    "    left join pesaveis bal on p.id = bal.id\n" +
+                    "    left join estoque est on p.id = est.idprod\n" +
+                    "    left join prodst pst on p.id = pst.id\n" +
+                    "    left join fisco on fisco.codigo_produto = p.id\n" +
+                    "    left join eans e on e.produto = p.id\n" +
+                    "    left join semelhantes fd on fd.idprod = p.id\n" +
+                    "    left join semelhancas f on f.id = fd.idclasse\n" +
+                    "    left join objetos ob1 on ob1.id = p.unidade\n" +
+                    "    left join objetos icms on icms.id = p.trib\n" +
+                    "    left join prc on prc.idproduto = p.id and\n" +
+                    "    emp.id = prc.empresa        \n" +
+                    "order by\n" +
+                    "    p.id"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
