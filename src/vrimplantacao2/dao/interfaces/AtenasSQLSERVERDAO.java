@@ -11,6 +11,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -79,57 +80,105 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    codigo,\n"
-                    + "    codbarra,\n"
-                    + "    usa_balanca,\n"
-                    + "    validade,\n"
-                    + "    situacao,\n"
-                    + "    produto,\n"
-                    + "    unidade,\n"
-                    + "    data_cadastro,\n"
-                    + "    codgrupo merc1,\n"
-                    + "    precocusto,\n"
-                    + "    precovenda,\n"
-                    + "    e.estoque_atual estoque,\n"
-                    + "    estoqueminimo,\n"
-                    + "    classificacao_fiscal ncm,\n"
-                    + "    cst,\n"
-                    + "    situacao_tributaria,\n"
-                    + "    csosn,\n"
-                    + "    aliquota,\n"
-                    + "    cest\n"
-                    + "from\n"
-                    + "    c000025 p\n"
-                    + "left join c000100 e on p.codigo = e.codproduto\n"
-                    + "order by\n"
-                    + "    p.codigo")) {
+                      "select \n"
+                    + "     p.codigo importid,\n"
+                    + "     data_cadastro datacadastro,\n"
+                    + "     alterado_em dataalteracao,\n"
+                    + "     codigobarras ean,\n"
+                    + "     unidade tipoembalagem,\n"
+                    + "     case when balanca = 'NAO' then 0 else 1 end ebalanca,\n"
+                    + "     p.Descricao descricaocompleta,\n"
+                    + "     descricaoredusida descricaoreduzida,\n"
+                    + "     p.Descricao descricaogondola,\n"
+                    + "     codcategoria codmercadologico1,\n"
+                    + "     codsubcategoria codmercadologico2,\n"
+                    + "     codmarca codmercadologico3,\n"
+                    + "     codfamilia idfamiliaproduto,\n"
+                    + "     peso_bruto pesobruto,\n"
+                    + "     peso_liquido pesoliquido,\n"
+                    + "     estoqueminimo,\n"
+                    + "     estoqueatual estoque,\n"
+                    + "     margemlucro margem,\n"
+                    + "     precocusto custosemimposto,\n"
+                    + "     precocustofinal custocomimposto,\n"
+                    + "     precovenda,\n"
+                    + "     case when oculto = 'NAO' then 1 else 0 end situacaocadastro,\n"
+                    + "     classificacaofiscal ncm,\n"
+                    + "     c.cest cest,\n"
+                    + "     cst_pis piscofinscstdebito,\n"
+                    + "     cst_pis_entrada piscofinscstcredito,\n"
+                    + "     cod_nat_receita piscofinsnaturezareceita,\n"
+                    + "     ali.cst icmscstsaida,\n"
+                    + "     ali.porcentagem icmsaliqsaida,\n"
+                    + "     ali.redusidade icmsreducaosaida\n"
+                    + "from cadprodutos p\n"
+                    + "		left join cadaliquotasicms ali\n"
+                    + "		on p.icmsentrada = ali.descricao\n"
+                    + "		left join icms_cest c\n"
+                    + "		on p.icms_cest = c.codigo\n"
+                    + "	order by p.codigo")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("codigo"));
-                    imp.setEan(rs.getString("codbarra"));
-                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("produto")));
-                    imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("produto")));
-                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("produto")));
-                    imp.seteBalanca(rs.getInt("usa_balanca") == 1);
-                    //imp.setValidade(rs.getInt("validade"));
-                    imp.setSituacaoCadastro(1);
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc1"));
-                    imp.setCodMercadologico3(rs.getString("merc1"));
-                    imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setCustoComImposto(rs.getDouble("precocusto"));
-                    imp.setCustoSemImposto(rs.getDouble("precocusto"));
-                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setImportId(rs.getString("importid"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                    imp.seteBalanca(rs.getBoolean("ebalanca"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaogondola")));
+                    imp.setCodMercadologico1(rs.getString("codmercadologico1"));
+                    imp.setCodMercadologico2(rs.getString("codmercadologico2"));
+                    imp.setCodMercadologico3(rs.getString("codmercadologico3"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamiliaproduto"));
+                    imp.setPesoBruto(rs.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setIcmsCst(rs.getInt("cst"));
-                    imp.setIcmsAliq(rs.getDouble("aliquota"));
+                    imp.setPiscofinsCstDebito(rs.getInt("piscofinscstdebito"));
+                    imp.setPiscofinsCstCredito(rs.getInt("piscofinscstcredito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getInt("piscofinsnaturezareceita"));
+                    imp.setIcmsCstSaida(rs.getInt("icmscstsaida"));
+                    imp.setIcmsAliqSaida(rs.getDouble("icmsaliqsaida"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icmsreducaosaida"));
+
+                    //imp.setValidade(rs.getInt("validade"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    " select distinct\n"
+                    + "     CodFamilia,\n"
+                    + "     DescricaoFamilia\n"
+                    + " from CadProdutos\n"
+                    + "     order by CodFamilia")) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+
+                    imp.setImportId(rs.getString("CodFamilia"));
+                    imp.setDescricao(rs.getString("DescricaoFamilia"));
 
                     result.add(imp);
                 }
@@ -143,7 +192,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "     codigo,\n"
                     + "     CodigoFornecedor,\n"
                     + "     codigo externo\n"
@@ -153,6 +202,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setIdProduto(rs.getString("codigo"));
                     imp.setIdFornecedor(rs.getString("CodigoFornecedor"));
                     imp.setCodigoExterno(rs.getString("externo"));
@@ -196,6 +246,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+
                     imp.setImportId(rs.getString("importId"));
                     imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
                     imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
@@ -212,10 +263,9 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setTel_principal(rs.getString("tel_principal"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setObservacao(rs.getString("observacao"));
-                    
-                    imp.addContato("1", "VENDEDORNOME","VENDEDORTELEFONE","VENDEDORCELULAR", TipoContato.NFE, rs.getString("VENDEDOREMAIL"));
-                                      
-                  
+
+                    imp.addContato("1", "VENDEDORNOME", "VENDEDORTELEFONE", "VENDEDORCELULAR", TipoContato.NFE, rs.getString("VENDEDOREMAIL"));
+
                     result.add(imp);
                 }
             }
