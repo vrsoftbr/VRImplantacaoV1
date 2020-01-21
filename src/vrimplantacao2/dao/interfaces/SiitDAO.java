@@ -327,6 +327,7 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join cidade cid on cid.codigo = e.cidade_codigo\n"
                     + "left join uf on uf.codigo = e.uf_codigo\n"
                     + "left join participantetelefone tel on tel.participante_codigo = p.codigo\n"
+                    + "left join participantefornecedor fo on fo.participante_codigo = p.codigo\n"
                     + "where p.fornecedor = 1\n"
                     + "order by p.codigo"
             )) {
@@ -391,12 +392,12 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "    group by participante_codigo\n"
                                 + "   having count(participante_codigo) > 1)\n"
                                 + "and participante_codigo = " + imp.getImportId()
-                                + "order by participante_codigo"
+                                + " order by participante_codigo"
                         )) {
                             while (rst2.next()) {
-                                
+
                                 imp.addTelefone(
-                                        "TELEFONE", 
+                                        "TELEFONE",
                                         rst.getString("telefone")
                                 );
                             }
