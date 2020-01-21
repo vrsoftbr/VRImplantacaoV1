@@ -197,38 +197,6 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarProdutoFornecedor();
                         }
 
-                        {
-                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                            if (chkFContatos.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.CONTATOS);
-                            }
-                            if (chkFTipoPagamento.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.TIPO_PAGAMENTO);
-                            }
-                            if (chkFEndereco.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.ENDERECO);
-                            }
-                            if (chkFNumero.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.NUMERO);
-                            }
-                            if (chkFTipoEmp.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
-                            }
-                            if (chkFTipoForn.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.TIPO_FORNECEDOR);
-                            }
-                            if (chkFRazaoSocial.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.RAZAO_SOCIAL);
-                            }
-                            if (chkFNomeFantasia.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.NOME_FANTASIA);
-                            }
-
-                            if (!opcoes.isEmpty()) {
-                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
-                            }
-                        }
-                        
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
                         }
@@ -285,21 +253,7 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
-        chkFTipoPagamento = new vrframework.bean.checkBox.VRCheckBox();
-        chkFEndereco = new vrframework.bean.checkBox.VRCheckBox();
-        chkFNumero = new vrframework.bean.checkBox.VRCheckBox();
-        chkFTipoEmp = new vrframework.bean.checkBox.VRCheckBox();
-        chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkFRazaoSocial = new vrframework.bean.checkBox.VRCheckBox();
-        chkFNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
-        pnlOutrasReceitas = new javax.swing.JPanel();
-        chkOutrasReceitas = new vrframework.bean.checkBox.VRCheckBox();
-        txtOtRecDtIni = new org.jdesktop.swingx.JXDatePicker();
-        txtOtRecDtFim = new org.jdesktop.swingx.JXDatePicker();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
@@ -341,76 +295,8 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
         chkFornecedor.setText("Fornecedor");
         jPanel3.add(chkFornecedor);
 
-        chkFContatos.setText("Contatos");
-        jPanel3.add(chkFContatos);
-
-        chkFTipoPagamento.setText("Tipo Pagamento");
-        jPanel3.add(chkFTipoPagamento);
-
-        chkFEndereco.setText("Endereço");
-        jPanel3.add(chkFEndereco);
-
-        chkFNumero.setText("Número");
-        jPanel3.add(chkFNumero);
-
-        chkFTipoEmp.setText("Tipo Empresa");
-        jPanel3.add(chkFTipoEmp);
-
-        chkFTipoForn.setText("Tipo Fornecedor");
-        jPanel3.add(chkFTipoForn);
-
         chkProdutoFornecedor.setText("Produto Fornecedor");
         jPanel3.add(chkProdutoFornecedor);
-
-        chkFRazaoSocial.setText("Razão Social");
-        jPanel3.add(chkFRazaoSocial);
-
-        chkFNomeFantasia.setText("Nome Fantasia");
-        jPanel3.add(chkFNomeFantasia);
-
-        pnlOutrasReceitas.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        chkOutrasReceitas.setText("Outras receitas");
-
-        jLabel6.setText("Dt. Inicial");
-
-        jLabel7.setText("Dt. Termino");
-
-        javax.swing.GroupLayout pnlOutrasReceitasLayout = new javax.swing.GroupLayout(pnlOutrasReceitas);
-        pnlOutrasReceitas.setLayout(pnlOutrasReceitasLayout);
-        pnlOutrasReceitasLayout.setHorizontalGroup(
-            pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
-                        .addGap(67, 67, 67))
-                    .addComponent(txtOtRecDtIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
-                        .addGap(56, 56, 56))
-                    .addComponent(txtOtRecDtFim, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(5, 5, 5))
-        );
-        pnlOutrasReceitasLayout.setVerticalGroup(
-            pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtOtRecDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtOtRecDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(5, 5, 5))
-        );
 
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
@@ -418,19 +304,15 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(pnlOutrasReceitas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
                 .addContainerGap())
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+                .addGap(74, 74, 74))
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
@@ -681,16 +563,7 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClienteTipoInscricao;
     private javax.swing.JCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
-    private vrframework.bean.checkBox.VRCheckBox chkFContatos;
-    private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
-    private vrframework.bean.checkBox.VRCheckBox chkFNomeFantasia;
-    private vrframework.bean.checkBox.VRCheckBox chkFNumero;
-    private vrframework.bean.checkBox.VRCheckBox chkFRazaoSocial;
-    private vrframework.bean.checkBox.VRCheckBox chkFTipoEmp;
-    private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
-    private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private javax.swing.JCheckBox chkVendaUtilizaDigito;
     private javax.swing.JCheckBox chkVendas;
@@ -700,13 +573,10 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
-    private javax.swing.JPanel pnlOutrasReceitas;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
@@ -719,8 +589,6 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
     private org.jdesktop.swingx.JXDatePicker txtDtCPFim;
     private org.jdesktop.swingx.JXDatePicker txtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker txtDtVendaIni;
-    private org.jdesktop.swingx.JXDatePicker txtOtRecDtFim;
-    private org.jdesktop.swingx.JXDatePicker txtOtRecDtIni;
     private org.jdesktop.swingx.JXDatePicker txtRotDtFim;
     private org.jdesktop.swingx.JXDatePicker txtRotDtIni;
     private vrframework.bean.label.VRLabel vRLabel1;

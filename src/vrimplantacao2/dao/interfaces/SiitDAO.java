@@ -16,8 +16,11 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -253,7 +256,7 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
-                    
+
                     if (rst.getString("mercadologico").contains(".")) {
 
                         String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
@@ -276,6 +279,156 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico2("1");
                         imp.setCodMercadologico3("1");
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "  p.codigo as id,\n"
+                    + "  p.nomerazao as razao,\n"
+                    + "  pj.nomefantasia as fantasia,\n"
+                    + "  pj.cnpj,\n"
+                    + "  pj.ie,\n"
+                    + "  p.tipopessoa as tipopessoa,\n"
+                    + "  p.datacadastro,\n"
+                    + "  pe.endereco_codigo,\n"
+                    + "  e.logradouro as endereco,\n"
+                    + "  e.numero,\n"
+                    + "  e.complemento,\n"
+                    + "  e.uf_codigo as uf_ibge,\n"
+                    + "  e.cidade_codigo as municipio_ibge,\n"
+                    + "  e.cep,\n"
+                    + "  b.nome as bairro,\n"
+                    + "  b.ceppadrao,\n"
+                    + "  c.cep as cep2,\n"
+                    + "  cid.nome as municipio,\n"
+                    + "  uf.nome as uf,\n"
+                    + "  tel.numero as telefone,\n"
+                    + "  p.observacao,\n"
+                    + "  fo.prazoentregadias as prazoentrega,\n"
+                    + "  fo.contato,\n"
+                    + "  fo.representante,\n"
+                    + "  fo.emailrepresentante\n"
+                    + "from participante p\n"
+                    + "left join participantepj pj on pj.participante_codigo = p.codigo\n"
+                    + "left join participanteendereco pe on pe.participante_codigo = p.codigo\n"
+                    + "left join endereco e on e.codigo = pe.endereco_codigo\n"
+                    + "left join bairro b on b.codigo = e.bairro_codigo\n"
+                    + "left join cep c on c.bairro_codigo = b.codigo\n"
+                    + "left join cidade cid on cid.codigo = e.cidade_codigo\n"
+                    + "left join uf on uf.codigo = e.uf_codigo\n"
+                    + "left join participantetelefone tel on tel.participante_codigo = p.codigo\n"
+                    + "where p.fornecedor = 1\n"
+                    + "order by p.codigo"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIbge_uf(rst.getInt("uf_ibge"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+
+                    if ((rst.getString("emailrepresentante") != null)
+                            && (!rst.getString("emailrepresentante").trim().isEmpty())) {
+
+                        String contato;
+
+                        if ((rst.getString("contato") != null)
+                                && (!rst.getString("contato").trim().isEmpty())) {
+
+                            contato = rst.getString("contato");
+
+                        } else if ((rst.getString("representante") != null)
+                                && (!rst.getString("representante").trim().isEmpty())) {
+
+                            contato = rst.getString("representante");
+                        } else {
+
+                            contato = "EMAIL REPRESENTANTE";
+                        }
+
+                        imp.addEmail(
+                                contato,
+                                rst.getString("emailrepresentante").toLowerCase(),
+                                TipoContato.COMERCIAL
+                        );
+
+                    }
+
+                    try (Statement stm2 = ConexaoMySQL.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + "  numero as telefone\n"
+                                + "from participantetelefone \n"
+                                + "where participante_codigo in (\n"
+                                + "  select participante_codigo \n"
+                                + "    from participantetelefone\n"
+                                + "    group by participante_codigo\n"
+                                + "   having count(participante_codigo) > 1)\n"
+                                + "and participante_codigo = " + imp.getImportId()
+                                + "order by participante_codigo"
+                        )) {
+                            while (rst2.next()) {
+                                
+                                imp.addTelefone(
+                                        "TELEFONE", 
+                                        rst.getString("telefone")
+                                );
+                            }
+                        }
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  participante_codigo as id_fornecedor,\n"
+                    + "  item_codigo as id_produto,\n"
+                    + "  codigoitemfornecedor as codigoexterno\n"
+                    + "from itemcodigofornecedor\n"
+                    + "order by participante_codigo"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
                     result.add(imp);
                 }
             }

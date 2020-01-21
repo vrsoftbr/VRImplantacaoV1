@@ -118,10 +118,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jPanel3" pref="0" max="32767" attributes="0"/>
-                              <Component id="pnlOutrasReceitas" alignment="0" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="jPanel3" pref="450" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -130,10 +127,8 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jPanel3" pref="114" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="pnlOutrasReceitas" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jPanel3" pref="116" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -150,125 +145,9 @@
                         <Property name="text" type="java.lang.String" value="Fornecedor"/>
                       </Properties>
                     </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFContatos">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Contatos"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoPagamento">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Pagamento"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFEndereco">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Endere&#xe7;o"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFNumero">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoEmp">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoForn">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
-                      </Properties>
-                    </Component>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFRazaoSocial">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Raz&#xe3;o Social"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFNomeFantasia">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
-                      </Properties>
-                    </Component>
-                  </SubComponents>
-                </Container>
-                <Container class="javax.swing.JPanel" name="pnlOutrasReceitas">
-                  <Properties>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
-                        <EtchetBorder/>
-                      </Border>
-                    </Property>
-                  </Properties>
-
-                  <Layout>
-                    <DimensionLayout dim="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                              <Component id="chkOutrasReceitas" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel6" pref="98" max="32767" attributes="0"/>
-                                      <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="txtOtRecDtIni" alignment="0" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel7" pref="108" max="32767" attributes="0"/>
-                                      <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="txtOtRecDtFim" alignment="0" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                    <DimensionLayout dim="1">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="txtOtRecDtIni" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkOutrasReceitas" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtOtRecDtFim" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                  </Layout>
-                  <SubComponents>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOutrasReceitas">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Outras receitas"/>
-                      </Properties>
-                    </Component>
-                    <Component class="org.jdesktop.swingx.JXDatePicker" name="txtOtRecDtIni">
-                    </Component>
-                    <Component class="org.jdesktop.swingx.JXDatePicker" name="txtOtRecDtFim">
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel6">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Dt. Inicial"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JLabel" name="jLabel7">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Dt. Termino"/>
                       </Properties>
                     </Component>
                   </SubComponents>
