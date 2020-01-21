@@ -29,7 +29,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         return "Atenas";
     }
 
-    public List<Estabelecimento> getLojasCliente() throws SQLException {
+    public List<Estabelecimento> getLojas() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -109,9 +109,9 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "     cst_pis piscofinscstdebito,\n"
                     + "     cst_pis_entrada piscofinscstcredito,\n"
                     + "     cod_nat_receita piscofinsnaturezareceita,\n"
-                    + "     ali.cst icmscstsaida,\n"
-                    + "     ali.porcentagem icmsaliqsaida,\n"
-                    + "     ali.redusidade icmsreducaosaida\n"
+                    + "     replace(ali.cst,',','.') icmscstsaida,\n"
+                    + "     replace(ali.porcentagem,',','.') icmsaliqsaida,\n"
+                    + "     replace(ali.redusidade,',','.') icmsreducaosaida\n"
                     + "from cadprodutos p\n"
                     + "		left join cadaliquotasicms ali\n"
                     + "		on p.icmsentrada = ali.descricao\n"
@@ -149,7 +149,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinscstdebito"));
                     imp.setPiscofinsCstCredito(rs.getInt("piscofinscstcredito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getInt("piscofinsnaturezareceita"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
                     imp.setIcmsCstSaida(rs.getInt("icmscstsaida"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsaliqsaida"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icmsreducaosaida"));
@@ -314,6 +314,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "    nome")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rs.getString("codigo"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("apelido"));
@@ -382,9 +383,5 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
             }
         }
         return result;
-    }
-
-    public Iterable<Estabelecimento> getLojas() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

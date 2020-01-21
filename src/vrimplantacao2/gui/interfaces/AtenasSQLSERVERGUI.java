@@ -26,7 +26,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class AtenasSQLSERVERGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "NATISistemas";
+    private static final String SISTEMA = "AtenasSQLSERVER";
     private static final String SERVIDOR_SQL = "Sql Server";
     private static AtenasSQLSERVERGUI instance;
     private String vLojaCliente = "-1";
