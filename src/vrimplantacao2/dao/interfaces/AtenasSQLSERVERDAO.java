@@ -22,6 +22,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Importacao
  */
 public class AtenasSQLSERVERDAO extends InterfaceDAO {
+    public String v_lojaMesmoId;
 
     @Override
     public String getSistema() {
@@ -381,5 +382,9 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    public Iterable<Estabelecimento> getLojas() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
