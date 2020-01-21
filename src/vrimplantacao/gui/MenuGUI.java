@@ -96,6 +96,7 @@ import vrimplantacao2.gui.interfaces.ApolloGUI;
 import vrimplantacao2.gui.interfaces.ArtSystemGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AtenasGUI;
+import vrimplantacao2.gui.interfaces.AtenasSQLSERVERGUI;
 import vrimplantacao2.gui.interfaces.AtmaGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AutomaqGUI;
@@ -650,6 +651,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuNATISistemas = new javax.swing.JMenuItem();
         mnuDirector = new javax.swing.JMenuItem();
         mnuRensoftware = new javax.swing.JMenuItem();
+        mnuAtenasSQLServer = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -826,7 +828,7 @@ public final class MenuGUI extends VRMdiFrame {
         getContentPane().add(tlbToolBar, gridBagConstraints);
 
         vrDesktopPane.setBackground(java.awt.SystemColor.menu);
-        vrDesktopPane.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vrDesktopPane.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -836,7 +838,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.weighty = 100.0;
         getContentPane().add(vrDesktopPane, gridBagConstraints);
 
-        vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblRazaoSocial.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRazaoSocial.setText("@@@@@@@@");
@@ -863,7 +865,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel5, gridBagConstraints);
 
-        vRPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblVersao.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblVersao.setText("@@@@");
@@ -890,7 +892,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel6, gridBagConstraints);
 
-        vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblLoja.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblLoja.setText("@@@");
@@ -917,7 +919,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel3, gridBagConstraints);
 
-        vRPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblData.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblData.setText("@@@@@@");
@@ -1764,6 +1766,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuRensoftware);
+
+        mnuAtenasSQLServer.setText("Atenas (SQL Server)");
+        mnuAtenasSQLServer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAtenasSQLServerActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuAtenasSQLServer);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4316,6 +4326,10 @@ public final class MenuGUI extends VRMdiFrame {
         SiitGUI.exibir(this);
     }//GEN-LAST:event_mnuSiitActionPerformed
 
+    private void mnuAtenasSQLServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAtenasSQLServerActionPerformed
+        AtenasSQLSERVERGUI.exibir(this);
+    }//GEN-LAST:event_mnuAtenasSQLServerActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4414,6 +4428,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuArtSystem;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
+    private javax.swing.JMenuItem mnuAtenasSQLServer;
     private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
