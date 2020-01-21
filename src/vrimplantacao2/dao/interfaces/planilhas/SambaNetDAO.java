@@ -583,14 +583,14 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(val(sh, 1, i));
-                    imp.setRazao(val(sh, 7, i));
-                    imp.setCnpj_cpf(val(sh, 11, i));
-                    imp.setIe_rg(val(sh, 15, i));
-                    if (!val(sh, 19, i).equals("")) {
-                        imp.addContato(val(sh, 19, i), val(sh, 22, i), "", TipoContato.COMERCIAL, "");
+                    imp.setRazao(val(sh, 8, i));
+                    imp.setCnpj_cpf(val(sh, 12, i));
+                    imp.setIe_rg(val(sh, 16, i));
+                    if (!val(sh, 20, i).equals("")) {
+                        imp.addContato(val(sh, 20, i), val(sh, 20, i), "", TipoContato.COMERCIAL, "");
                     }
-                    if (!val(sh, 24, i).equals("")) {
-                        imp.setTel_principal(val(sh, 24, i));
+                    if (!val(sh, 23, i).equals("")) {
+                        imp.setTel_principal(val(sh, 23, i));
                     }
                 } else if (
                         val(sh, 0, i).equals("") &&
@@ -601,7 +601,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(val(sh, 20, i));
                 } else if (
                         val(sh, 0, i).equals("Fantasia:") &&
-                        val(sh, 8, i).equals("Endereço:")
+                        val(sh, 9, i).equals("Endereço:")
                 ) {
                     imp.setFantasia(val(sh, 2, i));
                     if (imp.getFantasia().equals("")) {
@@ -618,6 +618,13 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setMunicipio(val(sh, 20, i));
                     }
                     imp.setUf(val(sh, 25, i));
+                    
+                    if (
+                        val(sh, 9, i).equals("Endereço:")) {
+                        imp.setObservacao(val(sh, 10, i));
+}
+                    
+                    // imp.setObservacao(val(sh, 10, i));
                 }
 
                 ProgressBar.next();

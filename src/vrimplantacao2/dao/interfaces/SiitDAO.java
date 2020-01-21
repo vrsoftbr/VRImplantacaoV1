@@ -5,14 +5,143 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+
 /**
  *
  * @author Importacao
  */
-public class SiitDAO {
+public class SiitDAO extends InterfaceDAO {
 
-    
-/*
+    @Override
+    public String getSistema() {
+        return "Siit";
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                //OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.TROCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.SUGESTAO_COTACAO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.OFERTA
+        ));
+    }
+
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  codigo,\n"
+                    + "  nomefantasia as nome\n"
+                    + "from filial\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("nome")));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  codigo,\n"
+                    + "  descricao,\n"
+                    + "  nivel\n"
+                    + "from departamento\n"
+                    + "order by codigo"
+            )) {
+                while (rst.next()) {
+
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    
+                    if (rst.getString("codigo").contains(".")) {
+
+                        String merc = rst.getString("codigo") != null ? rst.getString("codigo") : "";
+                        String[] cods = merc.split("\\.");
+
+                        for (int i = 0; i < cods.length; i++) {
+
+                            switch (i) {
+                                case 0:
+                                    imp.setMerc1ID(cods[i]);
+                                    imp.setMerc1Descricao(rst.getString("descricao"));
+                                    break;
+                                case 1:
+                                    imp.setMerc2ID(cods[i]);
+                                    imp.setMerc2Descricao(rst.getString("descricao"));
+                                    break;
+                            }
+                        }
+
+                        imp.setMerc3ID("1");
+                        imp.setMerc3Descricao(rst.getString("descricao"));
+
+                    } else {
+                        imp.setMerc1ID(rst.getString("codigo"));
+                        imp.setMerc1Descricao(rst.getString("descricao"));
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    /*
     
 
 select 
@@ -241,5 +370,5 @@ order by
   Column_name
       
     
-*/    
+     */
 }
