@@ -272,7 +272,7 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         imp.setCodMercadologico3("1");
                     } else {
-                        imp.setCodMercadologico1(rst.getString("codigo"));
+                        imp.setCodMercadologico1(rst.getString("mercadologico"));
                         imp.setCodMercadologico2("1");
                         imp.setCodMercadologico3("1");
                     }
