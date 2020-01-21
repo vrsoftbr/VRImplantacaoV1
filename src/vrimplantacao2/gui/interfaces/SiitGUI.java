@@ -75,7 +75,7 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
         
         tabProdutos.setOpcoesDisponiveis(dao);
         
-        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -98,13 +98,13 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
                 return mdiFrame;
             }
             
-        });*/
+        });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "exodus_prime";
+        conexaoMySQL.database = "mais_vo";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "vrsoftware";
+        conexaoMySQL.pass = "JesusCristo";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -386,13 +386,13 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
                         .addGap(67, 67, 67))
                     .addComponent(txtOtRecDtIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
                         .addGap(56, 56, 56))
                     .addComponent(txtOtRecDtFim, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(5, 5, 5))
@@ -457,13 +457,13 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
                         .addGap(67, 67, 67))
                     .addComponent(txtRotDtIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
                         .addGap(56, 56, 56))
                     .addComponent(txtRotDtFim, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(5, 5, 5))
@@ -629,7 +629,7 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabs)
+                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

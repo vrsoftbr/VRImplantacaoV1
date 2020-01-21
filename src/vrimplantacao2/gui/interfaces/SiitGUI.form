@@ -35,7 +35,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tabs" max="32767" attributes="0"/>
+                  <Component id="tabs" pref="484" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -215,7 +215,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel6" pref="298" max="32767" attributes="0"/>
+                                      <Component id="jLabel6" pref="98" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtOtRecDtIni" alignment="0" max="32767" attributes="0"/>
@@ -223,7 +223,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel7" pref="309" max="32767" attributes="0"/>
+                                      <Component id="jLabel7" pref="108" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtOtRecDtFim" alignment="0" max="32767" attributes="0"/>
@@ -364,7 +364,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel2" pref="295" max="32767" attributes="0"/>
+                                      <Component id="jLabel2" pref="95" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtRotDtIni" alignment="0" max="32767" attributes="0"/>
@@ -372,7 +372,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel3" pref="306" max="32767" attributes="0"/>
+                                      <Component id="jLabel3" pref="105" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtRotDtFim" alignment="0" max="32767" attributes="0"/>
