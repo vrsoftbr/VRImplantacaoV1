@@ -11,8 +11,11 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -285,6 +288,101 @@ public class ProtonDAO extends InterfaceDAO {
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_entrada"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_red_entrada"));
                     imp.setIcmsCstEntrada(rs.getInt("icms_cst_entrada"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  tlnk_fornec_mercad_fk_pk id_fornecedor,\n" +
+                    "  tlnk_mercad_pri_fk_pk id_produto\n" +
+                    "from\n" +
+                    "  tlnk_fornecedor_mercadoria\n" +
+                    "where\n" +
+                    "  tlnk_unidade_fk_pk = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  f.tfor_fornecedor_pk id,\n" +
+                    "  f.tfor_nome_razao razao,\n" +
+                    "  f.tfor_fantasia fantasia,\n" +
+                    "  f.tfor_num_documento cnpj,\n" +
+                    "  f.tfor_inscr_estadual ie,\n" +
+                    "  f.tfor_endereco endereco,\n" +
+                    "  f.tfor_endereco_numero nr,\n" +
+                    "  f.tfor_endereco_logradouro logradouro,\n" +
+                    "  f.tfor_bairro bairro,\n" +
+                    "  f.tfor_complemento complemento,\n" +
+                    "  c.tloc_cidade_cep_pk cidade_ibge,\n" +
+                    "  c.tloc_nome cidade,\n" +
+                    "  c.tloc_uf_fk uf,\n" +
+                    "  f.tfor_fone_ddd || '' || \n" +
+                    "  f.tfor_fone_prefixo || '' || f.tfor_fone_final telefone,\n" +
+                    "  f.tfor_fone2_ddd || '' || \n" +
+                    "  f.tfor_fone2_prefixo || '' || f.tfor_fone2_final telefone2,\n" +
+                    "  f.tfor_fax_ddd || '' || \n" +
+                    "  f.tfor_fax_prefixo || '' || f.tfor_fax_final fax,\n" +
+                    "  f.tfor_email email,\n" +
+                    "  f.tfor_data_cadastro datacadastro\n" +
+                    "from\n" +
+                    "  tfor_fornecedor f\n" +
+                    "left join \n" +
+                    "  tloc_cidade_cep c on f.tfor_cidade_cep_fk = c.tloc_cidade_cep_pk")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("logradouro"));
+                    imp.setNumero(rs.getString("nr"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    if(rs.getString("telefone2") != null && !"".equals(rs.getString("telefone2"))) {
+                        imp.addContato("1", "TELEFONE2", rs.getString("telefone2"), null, TipoContato.COMERCIAL, null);
+                    }
+                    if(rs.getString("fax") != null && !"".equals(rs.getString("fax"))) {
+                        imp.addContato("2", "FAX", rs.getString("fax"), null, TipoContato.COMERCIAL, null);
+                    }
+                    if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
+                        imp.addContato("3", "EMAIL", null, null, TipoContato.COMERCIAL, rs.getString("email"));
+                    }
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
                     
                     result.add(imp);
                 }
