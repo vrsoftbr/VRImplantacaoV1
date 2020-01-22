@@ -171,6 +171,7 @@ import vrimplantacao2.gui.interfaces.OryonGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PomaresGUI;
+import vrimplantacao2.gui.interfaces.ProtonGUI;
 import vrimplantacao2.gui.interfaces.PwGestorGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
@@ -667,6 +668,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuWmsi1 = new javax.swing.JMenuItem();
         mnuCefas = new javax.swing.JMenuItem();
         mnuViaSoft = new javax.swing.JMenuItem();
+        mnuProton = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -826,7 +828,7 @@ public final class MenuGUI extends VRMdiFrame {
         getContentPane().add(tlbToolBar, gridBagConstraints);
 
         vrDesktopPane.setBackground(java.awt.SystemColor.menu);
-        vrDesktopPane.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vrDesktopPane.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -836,7 +838,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.weighty = 100.0;
         getContentPane().add(vrDesktopPane, gridBagConstraints);
 
-        vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblRazaoSocial.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRazaoSocial.setText("@@@@@@@@");
@@ -863,7 +865,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel5, gridBagConstraints);
 
-        vRPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblVersao.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblVersao.setText("@@@@");
@@ -890,7 +892,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel6, gridBagConstraints);
 
-        vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblLoja.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblLoja.setText("@@@");
@@ -917,7 +919,7 @@ public final class MenuGUI extends VRMdiFrame {
         gridBagConstraints.insets = new java.awt.Insets(1, 2, 1, 2);
         getContentPane().add(vRPanel3, gridBagConstraints);
 
-        vRPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        vRPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
         lblData.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblData.setText("@@@@@@");
@@ -1897,6 +1899,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuViaSoft);
+
+        mnuProton.setText("Proton");
+        mnuProton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuProtonActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuProton);
 
         mnuDatabase.add(jMenu7);
 
@@ -4316,6 +4326,10 @@ public final class MenuGUI extends VRMdiFrame {
         SiitGUI.exibir(this);
     }//GEN-LAST:event_mnuSiitActionPerformed
 
+    private void mnuProtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuProtonActionPerformed
+        ProtonGUI.exibir(this);
+    }//GEN-LAST:event_mnuProtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4510,6 +4524,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
+    private javax.swing.JMenuItem mnuProton;
     private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;
     private javax.swing.JMenuItem mnuRCNet;

@@ -1,7 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -10,27 +9,21 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.ProtonDAO;
 import vrimplantacao2.dao.interfaces.ViaSoftDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
-import vrimplantacao2.vo.enums.OpcaoFiscal;
 
-public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
+public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "ViaSoft";
-    private static ViaSoftGUI instance;
+    private static final String SISTEMA = "PROTON";
+    private static ProtonGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -62,19 +55,19 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private ViaSoftDAO dao = new ViaSoftDAO();
+    private ProtonDAO dao = new ProtonDAO();
 
-    private ViaSoftGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private ProtonGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
 
-        conexaoOracle.host = "10.69.0.153";
-        conexaoOracle.database = "PAULISTA3793";
+        conexaoOracle.host = "localhost";
+        conexaoOracle.database = "XE";
         conexaoOracle.port = "1522";
-        conexaoOracle.user = "VIASOFTMERC";
-        conexaoOracle.pass = "VIASOFTMERC";
+        conexaoOracle.user = "dbauser";
+        conexaoOracle.pass = "1";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -105,7 +98,7 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : dao.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojaCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -119,7 +112,7 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new ViaSoftGUI(i_mdiFrame);
+                instance = new ProtonGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
