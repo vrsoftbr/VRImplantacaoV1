@@ -17,6 +17,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -436,234 +438,167 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    /*
-    
 
-select 
-  codigo,
-  codigopai,
-  descricao,
-  nivel
-from departamento
-order by codigo;
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
 
-select * from item
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "  p.codigo as id,\n"
+                    + "  p.nomerazao as razao,\n"
+                    + "  pf.estadocivil,\n"
+                    + "  pf.cpf,\n"
+                    + "  pf.rg,\n"
+                    + "  pf.siglaemissorrg,\n"
+                    + "  pf.uf_emissorrg,\n"
+                    + "  pf.dataexpedicao,\n"
+                    + "  pf.datanascimento,\n"
+                    + "  pf.filiacaopai as pai,\n"
+                    + "  pf.filiacaomae as mae,\n"
+                    + "  p.tipopessoa as tipopessoa,\n"
+                    + "  p.datacadastro,\n"
+                    + "  pe.endereco_codigo,\n"
+                    + "  e.logradouro as endereco,\n"
+                    + "  e.numero,\n"
+                    + "  e.complemento,\n"
+                    + "  e.uf_codigo as uf_ibge,\n"
+                    + "  e.cidade_codigo as municipio_ibge,\n"
+                    + "  e.cep,\n"
+                    + "  b.nome as bairro,\n"
+                    + "  b.ceppadrao,\n"
+                    + "  c.cep as cep2,\n"
+                    + "  cid.nome as municipio,\n"
+                    + "  uf.nome as uf,\n"
+                    + "  tel.numero as telefone,\n"
+                    + "  ema.email,\n"
+                    + "  pc.bloqueado,\n"
+                    + "  pc.limitecredito,\n"
+                    + "  pc.diavencimentofatura,\n"
+                    + "p.observacao\n"
+                    + "from participante p\n"
+                    + "left join participantepf pf on pf.participante_codigo = p.codigo\n"
+                    + "left join participanteendereco pe on pe.participante_codigo = p.codigo\n"
+                    + "left join endereco e on e.codigo = pe.endereco_codigo\n"
+                    + "left join bairro b on b.codigo = e.bairro_codigo\n"
+                    + "left join cep c on c.bairro_codigo = b.codigo\n"
+                    + "left join cidade cid on cid.codigo = e.cidade_codigo\n"
+                    + "left join uf on uf.codigo = e.uf_codigo\n"
+                    + "left join participantetelefone tel on tel.participante_codigo = p.codigo\n"
+                    + "left join participantecliente pc on pc.participante_codigo = p.codigo\n"
+                    + "left join participanteemails ema on ema.participante_codigo = p.codigo\n"
+                    + "where p.cliente = 1\n"
+                    + "or p.funcionario = 1\n"
+                    + "order by p.codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setOrgaoemissor(rst.getString("siglaemissorrg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getString("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setUfIBGE(rst.getInt("uf_ibge"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setBloqueado(rst.getInt("bloqueado") == 0);
+                    imp.setValorLimite(rst.getDouble("limitecredito"));
+                    imp.setDiaVencimento(rst.getInt("diavencimentofatura"));
+                    imp.setObservacao(rst.getString("observacao"));
 
-select * from item
+                    try (Statement stm2 = ConexaoMySQL.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + "  numero as telefone\n"
+                                + "from participantetelefone \n"
+                                + "where participante_codigo in (\n"
+                                + "  select participante_codigo \n"
+                                + "    from participantetelefone\n"
+                                + "    group by participante_codigo\n"
+                                + "   having count(participante_codigo) > 1)\n"
+                                + "and participante_codigo = " + imp.getId()
+                                + " order by participante_codigo"
+                        )) {
+                            while (rst2.next()) {
 
+                                imp.addTelefone(
+                                        "TELEFONE",
+                                        rst.getString("telefone")
+                                );
+                            }
+                        }
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
-select 
-  p.codigo as id,
-  ean.codigobarras as ean,
-  p.descricao as descricaocompleta,
-  p.descricaocupom as descricaoreduzida,
-  p.ncm as ncm,
-  p.cest as cest,
-  p.tributacaoicms_codigo as id_icms,
-  p.receitapiscofins as naturezareceita,
-  p.datacadastro as datacadastro,
-  p.unidademedida_codigo as tipoembalagem,
-  iv.departamento_codigo as mercadologico,
-  case p.excluido when 1 then 0 else 1 end situacaocadastro,
-  e.quantidade as estoque,
-  e.estoqueminimo,
-  e.estoquemaximo,
-  pr.margemideal as margem,
-  pr.precovenda,
-  p.tributacaopiscofins_codigo as cst_pis,  
-  pc.codigo as codigo_pis,
-  pc.descricao as descricao_pis,
-  pc2.cst as cst_piscofins,
-  i.codigo as codigo_icms,
-  i.descricao as descricao_icms,
-  i2.cstcsosn as cst_icms,
-  i2.picms as aliquota_icms,
-  i2.predbc as reducao_icms  
-from item p
-left join itemvenda iv on iv.item_codigo = p.codigo
-left join itemestoque e on e.item_codigo = p.codigo
-left join itemunidadepreco pr on pr.item_codigo = p.codigo
-left join itemunidadecodigobarras ean on ean.item_codigo = p.codigo
-inner join tributacaopiscofins pc on pc.codigo = p.tributacaopiscofins_codigo
-inner join tributacaopiscofinsitem pc2 on pc2.tributacaopiscofins_codigo = pc.codigo
-  and pc2.uf = 'GO'
-  and pc2.cfop = 5102
-inner join tributacaoicms i on i.codigo = p.tributacaoicms_codigo
-inner join tributacaoicmsitem i2 on i2.tributacaoicms_codigo = i.codigo
-  and i2.uf = 'GO'
-  and i2.cfop = 5102
-order by p.codigo;
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
 
-select * from grupotelaitem
-select distinct(secao_codigo) from itemvenda
-select * from itemvenda
-select * from departamento
-select * from secao where codigo in ('001', '010', '011')
-
-select 
-  pc.codigo as codigo_pis,
-  pc.descricao as descricao_pis,
-  pc2.cst as cst_pis
-from tributacaopiscofins pc
-inner join tributacaopiscofinsitem pc2 on pc2.tributacaopiscofins_codigo = pc.codigo
-and pc2.uf = 'GO'
-and pc2.cfop = 5102
-
-
-select
-  i.codigo as codigo_icms,
-  i.descricao as descricao_icms,
-  i2.cstcsosn as cst_icms,
-  i2.picms as aliquota_icms,
-  i2.predbc as reducao_icms
-from tributacaoicms i
-inner join tributacaoicmsitem i2 on i2.tributacaoicms_codigo = i.codigo
-and i2.uf = 'GO'
-and i2.cfop = 5102
-
-
-select  
-  p.codigo as id,
-  p.nomerazao as razao,
-  pj.nomefantasia as fantasia,
-  pj.cnpj,
-  pj.ie,
-  p.tipopessoa as tipopessoa,
-  p.datacadastro,
-  pe.endereco_codigo,
-  e.logradouro as endereco,
-  e.numero,
-  e.complemento,
-  e.uf_codigo as uf_ibge,
-  e.cidade_codigo as municipio_ibge,
-  e.cep,
-  b.nome as bairro,
-  b.ceppadrao,
-  c.cep as cep2,
-  cid.nome as municipio,
-  uf.nome as uf,
-  tel.numero as telefone 
-from participante p
-left join participantepj pj on pj.participante_codigo = p.codigo
-left join participanteendereco pe on pe.participante_codigo = p.codigo
-left join endereco e on e.codigo = pe.endereco_codigo
-left join bairro b on b.codigo = e.bairro_codigo
-left join cep c on c.bairro_codigo = b.codigo
-left join cidade cid on cid.codigo = e.cidade_codigo
-left join uf on uf.codigo = e.uf_codigo
-left join participantetelefone tel on tel.participante_codigo = p.codigo
-where p.fornecedor = 1
-order by p.codigo
-
-select * from participantetelefone
-
-select 
-  pe.participante_codigo,
-  pe.endereco_codigo,
-  e.logradouro as endereco,
-  e.numero,
-  e.complemento,
-  e.uf_codigo as uf_ibge,
-  e.cidade_codigo as municipio_ibge,
-  e.cep,
-  b.nome as bairro,
-  b.ceppadrao,
-  c.cep as cep2,
-  cid.nome as municipio,
-  uf.nome as uf
-from participanteendereco pe
-left join endereco e on e.codigo = pe.endereco_codigo
-left join bairro b on b.codigo = e.bairro_codigo
-left join cep c on c.bairro_codigo = b.codigo
-left join cidade cid on cid.codigo = e.cidade_codigo
-left join uf on uf.codigo = e.uf_codigo
-
-
-select 
-  participante_codigo as id_fornecedor,
-  email
-from participanteemails
-
-
-select 
-  participante_codigo as id_fornecedor,
-  item_codigo as id_produto,
-  codigoitemfornecedor as codigoexterno
-from itemcodigofornecedor
-
-    
-clientes
-    
-select  
-  p.codigo as id,
-  p.nomerazao as razao,
-  pf.estadocivil,
-  pf.cpf,
-  pf.rg,
-  pf.siglaemissorrg,
-  pf.uf_emissorrg,
-  pf.dataexpedicao,
-  pf.datanascimento,
-  pf.filiacaopai as pai,
-  pf.filiacaomae as mae,
-  p.tipopessoa as tipopessoa,
-  p.datacadastro,
-  pe.endereco_codigo,
-  e.logradouro as endereco,
-  e.numero,
-  e.complemento,
-  e.uf_codigo as uf_ibge,
-  e.cidade_codigo as municipio_ibge,
-  e.cep,
-  b.nome as bairro,
-  b.ceppadrao,
-  c.cep as cep2,
-  cid.nome as municipio,
-  uf.nome as uf,
-  tel.numero as telefone,
-  ema.email,
-  pc.bloqueado,
-  pc.limitecredito,
-  pc.diavencimentofatura
-from participante p
-left join participantepf pf on pf.participante_codigo = p.codigo
-left join participanteendereco pe on pe.participante_codigo = p.codigo
-left join endereco e on e.codigo = pe.endereco_codigo
-left join bairro b on b.codigo = e.bairro_codigo
-left join cep c on c.bairro_codigo = b.codigo
-left join cidade cid on cid.codigo = e.cidade_codigo
-left join uf on uf.codigo = e.uf_codigo
-left join participantetelefone tel on tel.participante_codigo = p.codigo
-left join participantecliente pc on pc.participante_codigo = p.codigo
-left join participanteemails ema on ema.participante_codigo = p.codigo
-where p.cliente = 1
-order by p.codigo
-    
-
-select * from endereco
-select * from bairro
-select * from participantefornecedor
-select * from cep
-select * from cidade
-select * from uf
-
-
-select * from participantepj
-select * from endereco
-
-SELECT DISTINCT
-  Table_schema,
-  Table_name,
-  Column_name,
-  Data_type
-FROM INFORMATION_SCHEMA.COLUMNS
-WHERE upper(COLUMN_NAME) LIKE upper('%participante%')
-and Table_schema like '%mais_vo%'
-order by
-  Table_schema,
-  Table_name,
-  Column_name
-      
-    
-     */
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "  ch.codigo as id,\n"
+                    + "  ch.participante_codigo,\n"
+                    + "  p.nomerazao as nome,\n"
+                    + "  pf.cpf,\n"
+                    + "  pf.rg,\n"
+                    + "  tel.numero as telefone,\n"
+                    + "  ch.dataemissao,\n"
+                    + "  ch.datavencimento,\n"
+                    + "  ch.valortitulo as valor,\n"
+                    + "  ch.numerocheque,\n"
+                    + "  ch.codigobanco as banco,\n"
+                    + "  ch.codigoagencia as agencia,\n"
+                    + "  ch.numeroconta,\n"
+                    + "  ch.parcela,\n"
+                    + "  ch.atraso,\n"
+                    + "  ch.observacao\n"
+                    + "from contareceber ch\n"
+                    + "left join participante p on p.codigo = ch.participante_codigo \n"
+                    + "left join participantepf pf on pf.participante_codigo = p.codigo\n"
+                    + "left join participantetelefone tel on tel.participante_codigo = p.codigo\n"
+                    + "where numerocheque <> ''\n"
+                    + "and ch.databaixa is null"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDate(rst.getDate("dataemissao"));
+                    imp.setDataDeposito(rst.getDate("datavencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("numeroconta"));
+                    imp.setObservacao(rst.getString("observacao")
+                            + " " + rst.getString("atraso") + " DIAS ATRASO"
+                            + " PARCELA " + rst.getString("parcela"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

@@ -190,7 +190,11 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
 
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
-                        }                        
+                        } 
+                        
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
+                        }
                     }
 
                     ProgressBar.dispose();
