@@ -172,6 +172,7 @@ import vrimplantacao2.gui.interfaces.OryonGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PomaresGUI;
+import vrimplantacao2.gui.interfaces.ProtonGUI;
 import vrimplantacao2.gui.interfaces.PwGestorGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
@@ -669,6 +670,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuWmsi1 = new javax.swing.JMenuItem();
         mnuCefas = new javax.swing.JMenuItem();
         mnuViaSoft = new javax.swing.JMenuItem();
+        mnuProton = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -1907,6 +1909,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuViaSoft);
+
+        mnuProton.setText("Proton");
+        mnuProton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuProtonActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuProton);
 
         mnuDatabase.add(jMenu7);
 
@@ -4326,9 +4336,14 @@ public final class MenuGUI extends VRMdiFrame {
         SiitGUI.exibir(this);
     }//GEN-LAST:event_mnuSiitActionPerformed
 
+    private void mnuProtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuProtonActionPerformed
+        ProtonGUI.exibir(this);
+    }//GEN-LAST:event_mnuProtonActionPerformed
+
     private void mnuAtenasSQLServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAtenasSQLServerActionPerformed
         AtenasSQLSERVERGUI.exibir(this);
     }//GEN-LAST:event_mnuAtenasSQLServerActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4525,6 +4540,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
+    private javax.swing.JMenuItem mnuProton;
     private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;
     private javax.swing.JMenuItem mnuRCNet;
