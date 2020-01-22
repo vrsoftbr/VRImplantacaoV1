@@ -13,6 +13,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -145,6 +146,145 @@ public class ProtonDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  p.tmer_codigo_pri_pk id,\n" +
+                    "  p.tmer_codigo_merc_balanca_ukn codigo_balanca,\n" +
+                    "  p.tmer_tipo_quantidade pesavel,\n" +
+                    "  p.tmer_nome descricaocompleta,\n" +
+                    "  p.tmer_grupo_mercadoria_fk merc1,\n" +
+                    "  p.tmer_subgrupo_mercadoria_fk merc2,\n" +
+                    "  e.tmer_familia_fkn familia,\n" +
+                    "  p.tmer_unidade_fisica_fk unidade,\n" +
+                    "  p.tmer_codigo_barras_ukn ean,\n" +
+                    "  p.tmer_qtde_emb_venda qtdembalagem_venda,\n" +
+                    "  p.tmer_qtde_emb_forn qtdembalagem_compra,\n" +
+                    "  p.tmer_data_cadastro datacadastro,\n" +
+                    "  p.tmer_peso_liquido peso_liquido,\n" +
+                    "  p.tmer_peso_bruto peso_bruto,\n" +
+                    "  p.tmer_codigo_ncm_fkn ncm,\n" +
+                    "  ncm.tmer_nat_receita natureza_receita,\n" +
+                    "  p.tmer_codigo_cest_fkn cest,\n" +
+                    "  e.tmer_prazo_mercadoria validade_estoque,\n" +
+                    "  e.tmer_preco_venda preco_venda,\n" +
+                    "  e.tmer_custo_ultimo_real_final custo,\n" +
+                    "  e.tmer_margem_lucro margem,\n" +
+                    "  e.tmer_estoque_atual estoque,\n" +
+                    "  e.tmer_estoque_minimo estoque_minimo,\n" +
+                    "  e.tmer_estoque_maximo estoque_maximo,\n" +
+                    "  e.tmer_ativo_compra ativo_compra,\n" +
+                    "  e.tmer_ativo_venda ativo_venda,\n" +
+                    "  e.tmer_data_alteracao dataalteracao,\n" +
+                    "  e.tmer_cst_pis cst_pis,\n" +
+                    "  e.tmer_cst_cofins cst_cofins,\n" +
+                    "  e.tmer_grupo_icms_entrada_fk grupo_icms_entrada,\n" +
+                    "  e.tmer_grupo_icms_saida_fk grupo_icms_saida,\n" +
+                    "  icms_deb.icms icms_saida,\n" +
+                    "  icms_deb.cst icms_cst_saida,\n" +
+                    "  icms_deb.icms_reducao icms_red_saida,\n" +
+                    "  icms_cred.icms icms_entrada,\n" +
+                    "  icms_cred.cst cst_entrada,\n" +
+                    "  icms_cred.icms_reducao icms_red_entrada\n" +
+                    "from\n" +
+                    "  tmer_mercadoria p\n" +
+                    "join tmer_estoque e on p.tmer_codigo_pri_pk = e.tmer_codigo_pri_fk_pk and\n" +
+                    "  p.tmer_codigo_sec_pk = e.tmer_codigo_sec_fk_pk\n" +
+                    "left join tmer_ncm ncm on p.tmer_codigo_ncm_fkn = ncm.tmer_codigo_ncm_pk\n" +
+                    "left join\n" +
+                    "     (select \n" +
+                    "        t.tbas_grupo_icms_fk_pk grp,\n" +
+                    "        t.tbas_situacao_tributaria st,\n" +
+                    "        t.tbas_codigo_tributacao cst,\n" +
+                    "        t.tbas_aliquota_icms_normal icms,\n" +
+                    "        t.tbas_reducao_base_normal icms_reducao,\n" +
+                    "        t.tbas_unidade_fk_pk loja \n" +
+                    "      from \n" +
+                    "        DBAUSER.TBAS_ALIQUOTA_ICMS t\n" +
+                    "      where\n" +
+                    "        tbas_uf_origem_fk_pk = 'BA' and\n" +
+                    "        tbas_uf_destino_fk_pk = 'BA' and\n" +
+                    "        tbas_tipo_movimentacao_pk = 'VM' and\n" +
+                    "        tbas_classificacao_fiscal_pk = 'NO') icms_deb \n" +
+                    "                         on e.tmer_grupo_icms_saida_fk = icms_deb.grp and\n" +
+                    "     icms_deb.loja = e.tmer_unidade_fk_pk\n" +
+                    "left join\n" +
+                    "     (select \n" +
+                    "        t.tbas_grupo_icms_fk_pk grp,\n" +
+                    "        t.tbas_situacao_tributaria st,\n" +
+                    "        t.tbas_codigo_tributacao cst,\n" +
+                    "        t.tbas_aliquota_icms_normal icms,\n" +
+                    "        t.tbas_reducao_base_normal icms_reducao,\n" +
+                    "        t.tbas_unidade_fk_pk loja \n" +
+                    "      from \n" +
+                    "        DBAUSER.TBAS_ALIQUOTA_ICMS t\n" +
+                    "      where\n" +
+                    "        tbas_uf_origem_fk_pk = 'BA' and\n" +
+                    "        tbas_uf_destino_fk_pk = 'BA' and\n" +
+                    "        tbas_tipo_movimentacao_pk = 'VM' and\n" +
+                    "        tbas_classificacao_fiscal_pk = 'NO') icms_cred\n" +
+                    "                         on e.tmer_grupo_icms_entrada_fk = icms_cred.grp and\n" +
+                    "    icms_cred.loja = e.tmer_unidade_fk_pk \n" +
+                    "where\n" +
+                    "  e.tmer_unidade_fk_pk = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "  1")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.seteBalanca("P".equals(rs.getString("pesavel")));
+                    imp.setEan(rs.getString("ean"));
+                    if(imp.isBalanca() && rs.getString("codigo_balanca") != null){ 
+                        imp.setEan(rs.getString("codigo_balanca"));
+                    }
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3("1");
+                    imp.setIdFamiliaProduto(rs.getString("familia"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem_venda"));
+                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagem_compra"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setPesoBruto(rs.getDouble("peso_bruto"));
+                    imp.setPesoLiquido(rs.getDouble("peso_liquido"));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("natureza_receita"));
+                    imp.setCest(rs.getString("cest"));
+                    imp.setValidade(rs.getInt("validade_estoque"));
+                    imp.setPrecovenda(rs.getDouble("preco_venda"));
+                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoque_maximo"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoque_minimo"));
+                    imp.setSituacaoCadastro("S".equals(rs.getString("ativo_venda")) ? 1 : 0);
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setPiscofinsCstCredito(rs.getString("cst_pis"));
+                    imp.setIcmsAliqSaida(rs.getDouble("icms_saida"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red_saida"));
+                    imp.setIcmsCstSaida(rs.getInt("icms_cst_saida"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_entrada"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_red_entrada"));
+                    imp.setIcmsCstEntrada(rs.getInt("icms_cst_entrada"));
                     
                     result.add(imp);
                 }
