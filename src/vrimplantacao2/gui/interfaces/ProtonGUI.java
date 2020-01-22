@@ -246,7 +246,7 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
 
-        setTitle("Importação Via Soft");
+        setTitle("Importação Proton");
         setToolTipText("");
 
         vRLabel1.setText("Loja (Cliente):");
@@ -488,7 +488,7 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap())
         );
 
-        getAccessibleContext().setAccessibleName("Via Soft");
+        getAccessibleContext().setAccessibleName("Proton");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
