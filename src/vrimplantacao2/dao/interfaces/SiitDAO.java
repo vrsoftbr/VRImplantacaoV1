@@ -287,6 +287,48 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.CUSTO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "distinct(item_codigo) as id\n"
+                        + "  from itemestoquediario"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+
+                        try (Statement stm2 = ConexaoMySQL.getConexao().createStatement()) {
+                            try (ResultSet rst2 = stm2.executeQuery(
+                                    "select "
+                                    + "  max(dataestoque),"
+                                    + "  custoliquido as custo\n"
+                                    + "from itemestoquediario\n"
+                                    + "where item_codigo = " + imp.getImportId()
+                                    + " and filialestoque_codigo = " + getLojaOrigem()
+                            )) {
+                                while (rst2.next()) {
+                                    imp.setCustoComImposto(rst2.getDouble("custo"));
+                                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                                }
+                            }
+                        }
+                        result.add(imp);
+                    }
+                }                
+            }
+            return result;
+        }
+        
+        return null;
+    }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
