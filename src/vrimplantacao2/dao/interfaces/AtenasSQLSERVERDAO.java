@@ -22,6 +22,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Importacao
  */
 public class AtenasSQLSERVERDAO extends InterfaceDAO {
+
     public String v_lojaMesmoId;
 
     @Override
@@ -81,43 +82,51 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select \n"
-                    + "     p.codigo importid,\n"
-                    + "     data_cadastro datacadastro,\n"
-                    + "     alterado_em dataalteracao,\n"
-                    + "     codigobarras ean,\n"
-                    + "     unidade tipoembalagem,\n"
-                    + "     case when balanca = 'NAO' then 0 else 1 end ebalanca,\n"
-                    + "     p.Descricao descricaocompleta,\n"
-                    + "     descricaoredusida descricaoreduzida,\n"
-                    + "     p.Descricao descricaogondola,\n"
-                    + "     codcategoria codmercadologico1,\n"
-                    + "     codsubcategoria codmercadologico2,\n"
-                    + "     codmarca codmercadologico3,\n"
-                    + "     codfamilia idfamiliaproduto,\n"
-                    + "     peso_bruto pesobruto,\n"
-                    + "     peso_liquido pesoliquido,\n"
-                    + "     estoqueminimo,\n"
-                    + "     estoqueatual estoque,\n"
-                    + "     margemlucro margem,\n"
-                    + "     precocusto custosemimposto,\n"
-                    + "     precocustofinal custocomimposto,\n"
-                    + "     precovenda,\n"
-                    + "     case when oculto = 'NAO' then 1 else 0 end situacaocadastro,\n"
-                    + "     classificacaofiscal ncm,\n"
-                    + "     c.cest cest,\n"
-                    + "     cst_pis piscofinscstdebito,\n"
-                    + "     cst_pis_entrada piscofinscstcredito,\n"
-                    + "     cod_nat_receita piscofinsnaturezareceita,\n"
-                    + "     replace(ali.cst,',','.') icmscstsaida,\n"
-                    + "     replace(ali.porcentagem,',','.') icmsaliqsaida,\n"
-                    + "     replace(ali.redusidade,',','.') icmsreducaosaida\n"
-                    + "from cadprodutos p\n"
-                    + "		left join cadaliquotasicms ali\n"
-                    + "		on p.icmsentrada = ali.descricao\n"
-                    + "		left join icms_cest c\n"
-                    + "		on p.icms_cest = c.codigo\n"
-                    + "	order by p.codigo")) {
+                    "select \n"
+                    + "       p.codigo importid,\n"
+                    + "       data_cadastro datacadastro,\n"
+                    + "       alterado_em dataalteracao,\n"
+                    + "       codigobarras ean,\n"
+                    + "       unidade tipoembalagem,\n"
+                    + "       case when balanca = 'NAO' then 0 else 1 end ebalanca,\n"
+                    + "       p.Descricao descricaocompleta,\n"
+                    + "       descricaoredusida descricaoreduzida,\n"
+                    + "       p.Descricao descricaogondola,\n"
+                    + "       codcategoria codmercadologico1,\n"
+                    + "       codsubcategoria codmercadologico2,\n"
+                    + "       codmarca codmercadologico3,\n"
+                    + "       codfamilia idfamiliaproduto,\n"
+                    + "       peso_bruto pesobruto,\n"
+                    + "       peso_liquido pesoliquido,\n"
+                    + "       estoqueminimo,\n"
+                    + "       estoqueatual estoque,\n"
+                    + "       margemlucro margem,\n"
+                    + "       precocusto custosemimposto,\n"
+                    + "       precocustofinal custocomimposto,\n"
+                    + "       precovenda,\n"
+                    + "       ultimoprecovenda custoAnteriorComImposto,\n"
+                    + "       case when oculto = 'NAO' then 1 else 0 end situacaocadastro,\n"
+                    + "       classificacaofiscal ncm,\n"
+                    + "       c.cest cest,\n"
+                    + "       cst_pis piscofinscstdebito,\n"
+                    + "       cst_pis_entrada piscofinscstcredito,\n"
+                    + "       p.cod_nat_receita piscofinsnaturezareceita,\n"
+                    + "       replace(ali.cst,',','.') icmscstsaida,\n"
+                    + "       replace(ali.porcentagem,',','.') icmsaliqsaida,\n"
+                    + "       replace(ali.redusidade,',','.') icmsreducaosaida,\n"
+                    + "       replace(alie.cst,',','.') icmscstentrada,\n"
+                    + "       replace(alie.porcentagem,',','.') icmsaliqentrada,\n"
+                    + "       replace(alie.redusidade,',','.') icmsreducaoentrada\n"
+                    + "  from cadprodutos p\n"
+                    + "  	left join cadaliquotasicms ali\n"
+                    + "  		on p.icmssaida = ali.descricao\n"
+                    + "		left join cadaliquotasicms alie\n"
+                    + "  		on p.icmsentrada = alie.descricao\n"
+                    + "  	left join icms_cest c\n"
+                    + "  		on p.icms_cest = c.codigo\n"
+                    + "		left join cad_cod_nat_receita cnr\n"
+                    + "                 on p.cod_nat_receita = cnr.cod_nat_receita and p.tabela_nat_receita = cnr.tabela\n"
+                    + "order by p.codigo")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -127,8 +136,17 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setEan(rs.getString("ean"));
+
+                    if (imp.getEan() != null && !"".equals(imp.getEan())) {
+                        if (rs.getInt("ebalanca") == 1) {
+                            imp.seteBalanca(true);
+                            String ean = "";
+                            ean = imp.getEan().substring(8, 13);
+                            imp.setEan(ean);
+                        }
+                    }
+
                     imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
-                    imp.seteBalanca(rs.getBoolean("ebalanca"));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaogondola")));
@@ -144,18 +162,22 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setCustoAnteriorComImposto(rs.getDouble("custoAnteriorComImposto"));
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinscstdebito"));
                     imp.setPiscofinsCstCredito(rs.getInt("piscofinscstcredito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
+                    //imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
                     imp.setIcmsCstSaida(rs.getInt("icmscstsaida"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsaliqsaida"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icmsreducaosaida"));
-
-                    //imp.setValidade(rs.getInt("validade"));
                     
+                    imp.setIcmsCstEntrada(rs.getInt("icmscstentrada"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("icmsaliqentrada"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducaoentrada"));
+                    
+
                     result.add(imp);
                 }
             }
@@ -236,6 +258,8 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "     cep,\n"
                     + "     telefone tel_principal,\n"
                     + "     datacadastro,\n"
+                    + "     coalesce (prazo,'0') condicoesPagamentos,\n"
+                    + "     coalesce(prazoEntrega,0) prazoEntrega,\n"
                     + "     obs observacao,\n"
                     + "     VENDEDORNOME,\n"
                     + "     VENDEDORTELEFONE,\n"
@@ -263,9 +287,12 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(rs.getString("tel_principal"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
+                    imp.setCondicaoPagamento(Integer.parseInt(Utils.formataNumero(rs.getString("condicoesPagamentos"))));
                     imp.setObservacao(rs.getString("observacao"));
 
-                    imp.addContato("1", "VENDEDORNOME", "VENDEDORTELEFONE", "VENDEDORCELULAR", TipoContato.NFE, rs.getString("VENDEDOREMAIL"));
+                    imp.addDivisao(imp.getImportId(), 0, rs.getInt("prazoentrega"), 0);
+
+                    imp.addContato("1", (rs.getString("VENDEDORNOME")), (rs.getString("VENDEDORTELEFONE")), (rs.getString("VENDEDORCELULAR")), TipoContato.COMERCIAL, rs.getString("VENDEDOREMAIL"));
 
                     result.add(imp);
                 }
@@ -314,7 +341,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "    nome")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rs.getString("codigo"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("apelido"));
