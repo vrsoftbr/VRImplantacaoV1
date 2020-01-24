@@ -91,6 +91,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.EAN,
             OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.ESTOQUE,
             OpcaoProduto.DESC_COMPLETA,
             OpcaoProduto.DESC_GONDOLA,
             OpcaoProduto.DESC_REDUZIDA,

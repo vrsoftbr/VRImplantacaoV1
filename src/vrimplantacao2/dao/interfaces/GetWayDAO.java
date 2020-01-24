@@ -279,7 +279,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prod.preco_cust custocomimposto,\n" +
                     "	prod.preco_cust custosemimposto,\n" +
                     "	prod.preco_unit precovenda,\n" +
-                    "	prod.margem_bruta margem,\n" +
+                    "	prod.margem_bruta margem_bruta,\n" +
                     "	prod.margem_param margem_param,\n" +
                     "	prod.lucroliq margemliquidapraticada,\n" +
                     "   cast(round(((prod.PRECO_CUST / \n" +
