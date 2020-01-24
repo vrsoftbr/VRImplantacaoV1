@@ -107,11 +107,13 @@ public class MapaTributacaoDAO {
     }
 
     public void gravarTributacaoOrigem(List<MapaTributoVO> tributos) throws Exception {
+        MapaTributoVO maVO = null;
         try {
             Conexao.begin();
 
             try (Statement stm = Conexao.createStatement()) {
                 for (MapaTributoVO vo : tributos) {
+                    maVO = vo;
                     SQLBuilder sql = new SQLBuilder();
                     sql.setSchema("implantacao");
                     sql.setTableName("mapatributacao");
@@ -126,13 +128,13 @@ public class MapaTributacaoDAO {
                         sql.put("id_aliquota", vo.getAliquota().getId());
                     }
                     try (ResultSet rst = stm.executeQuery(
-                            "select\n"
+                            "select"
                             + "	mp.sistema,\n"
                             + "	mp.agrupador,\n"
                             + "	mp.orig_id\n"
                             + "from\n"
                             + "	implantacao.mapatributacao mp\n"
-                            + "where	\n"
+                            + "where\n"
                             + "	mp.sistema = " + SQLUtils.stringSQL(vo.getSistema()) + " and\n"
                             + "	mp.agrupador = " + SQLUtils.stringSQL(vo.getAgrupador()) + " and\n"
                             + "	mp.orig_id = " + SQLUtils.stringSQL(vo.getOrigId())
@@ -146,6 +148,16 @@ public class MapaTributacaoDAO {
 
             Conexao.commit();
         } catch (Exception e) {
+            System.out.println("select"
+                            + "	mp.sistema,\n"
+                            + "	mp.agrupador,\n"
+                            + "	mp.orig_id\n"
+                            + "from\n"
+                            + "	implantacao.mapatributacao mp\n"
+                            + "where\n"
+                            + "	mp.sistema = " + SQLUtils.stringSQL(maVO.getSistema()) + " and\n"
+                            + "	mp.agrupador = " + SQLUtils.stringSQL(maVO.getAgrupador()) + " and\n"
+                            + "	mp.orig_id = " + SQLUtils.stringSQL(maVO.getOrigId()));
             Conexao.rollback();
             throw e;
         }
