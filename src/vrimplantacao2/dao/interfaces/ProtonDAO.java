@@ -12,6 +12,7 @@ import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -117,7 +118,7 @@ public class ProtonDAO extends InterfaceDAO {
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
                     imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID(rs.getString("merc2"));
+                    imp.setMerc3ID("1");
                     imp.setMerc3Descricao(rs.getString("descmerc2"));
                     
                     result.add(imp);
@@ -169,7 +170,7 @@ public class ProtonDAO extends InterfaceDAO {
                     "  p.tmer_tipo_quantidade pesavel,\n" +
                     "  p.tmer_nome descricaocompleta,\n" +
                     "  p.tmer_grupo_mercadoria_fk merc1,\n" +
-                    "  p.tmer_subgrupo_mercadoria_fk merc2,\n" +
+                    "  p.tmer_subgrupo_mercadoria_fk merc2,\n" +        
                     "  e.tmer_familia_fkn familia,\n" +
                     "  p.tmer_unidade_fisica_fk unidade,\n" +
                     "  p.tmer_codigo_barras_ukn ean,\n" +
@@ -199,7 +200,7 @@ public class ProtonDAO extends InterfaceDAO {
                     "  icms_deb.cst icms_cst_saida,\n" +
                     "  icms_deb.icms_reducao icms_red_saida,\n" +
                     "  icms_cred.icms icms_entrada,\n" +
-                    "  icms_cred.cst cst_entrada,\n" +
+                    "  icms_cred.cst icms_cst_entrada,\n" +
                     "  icms_cred.icms_reducao icms_red_entrada\n" +
                     "from\n" +
                     "  tmer_mercadoria p\n" +
@@ -297,6 +298,44 @@ public class ProtonDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "     p.tmer_codigo_pri_pk id,\n" +
+                    "     p.tmer_nome descricao,\n" +
+                    "     p.tmer_codigo_barras_ukn ean_principal,\n" +
+                    "     ean.tmer_codigo_barras_alter_pk ean_alternativo \n" +
+                    "from\n" +
+                    "     tmer_mercadoria p\n" +
+                    "join \n" +
+                    "     tmer_codigo_barras ean \n" +
+                    "     on p.tmer_codigo_barras_ukn = ean.tmer_codigo_barras_ean_fkn\n" +
+                    "join\n" +
+                    "     tmer_estoque pe on p.tmer_codigo_pri_pk = pe.tmer_codigo_pri_fk_pk and\n" +
+                    "     p.tmer_codigo_sec_pk = pe.tmer_codigo_sec_fk_pk\n" +
+                    "where\n" +
+                    "     pe.tmer_unidade_fk_pk = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "      2")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportId(rs.getString("id"));
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setEan(rs.getString("ean_alternativo"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
@@ -331,6 +370,7 @@ public class ProtonDAO extends InterfaceDAO {
         try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
+                    "  fu.tlnk_unidade_fk_pk loja,\n" +
                     "  f.tfor_fornecedor_pk id,\n" +
                     "  f.tfor_nome_razao razao,\n" +
                     "  f.tfor_fantasia fantasia,\n" +
@@ -341,7 +381,7 @@ public class ProtonDAO extends InterfaceDAO {
                     "  f.tfor_endereco_logradouro logradouro,\n" +
                     "  f.tfor_bairro bairro,\n" +
                     "  f.tfor_complemento complemento,\n" +
-                    "  c.tloc_cidade_cep_pk cidade_ibge,\n" +
+                    "  c.tloc_cidade_cep_pk cep,\n" +
                     "  c.tloc_nome cidade,\n" +
                     "  c.tloc_uf_fk uf,\n" +
                     "  f.tfor_fone_ddd || '' || \n" +
@@ -351,11 +391,27 @@ public class ProtonDAO extends InterfaceDAO {
                     "  f.tfor_fax_ddd || '' || \n" +
                     "  f.tfor_fax_prefixo || '' || f.tfor_fax_final fax,\n" +
                     "  f.tfor_email email,\n" +
-                    "  f.tfor_data_cadastro datacadastro\n" +
+                    "  f.tfor_data_cadastro datacadastro,\n" +
+                    "  fu.tlnk_ativo ativo,\n" +
+                    "  fu.tlnk_condicao_compra_fk,\n" +
+                    "  cp.tped_prazo_parcela prazo_compra,\n" +
+                    "  fu.tlnk_prazo_entrega prazo_entrega\n" +
                     "from\n" +
                     "  tfor_fornecedor f\n" +
                     "left join \n" +
-                    "  tloc_cidade_cep c on f.tfor_cidade_cep_fk = c.tloc_cidade_cep_pk")) {
+                    "  tloc_cidade_cep c on f.tfor_cidade_cep_fk = c.tloc_cidade_cep_pk\n" +
+                    "join\n" +
+                    "  tlnk_fornecedor_unidade fu on f.tfor_fornecedor_pk = fu.tlnk_fornecedor_fk_pk\n" +
+                    "left join\n" +
+                    "  tlnk_condicao_compra_unidade cu on fu.tlnk_unidade_fk_pk = cu.tlnk_unidade_fk_pk and\n" +
+                    "  fu.tlnk_condicao_compra_fk = cu.tlnk_condicao_compra_fk_pk\n" +
+                    "left join\n" +
+                    "  tped_condicao_compra pc on pc.tped_condicao_compra_pk = cu.tlnk_condicao_compra_fk_pk and\n" +
+                    "  pc.tped_unidade_fk = cu.tlnk_unidade_fk_pk\n" +
+                    "left join\n" +
+                    "  tped_condicao_compra_prazo cp on pc.tped_condicao_compra_pk = cp.tped_condicao_compra_fk_pk\n" +
+                    "where\n" +
+                    "  fu.tlnk_unidade_fk_pk = " + getLojaOrigem())) {
                 while(rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     
@@ -371,6 +427,7 @@ public class ProtonDAO extends InterfaceDAO {
                     imp.setBairro(rs.getString("bairro"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setMunicipio(rs.getString("cidade"));
+                    imp.setCep(rs.getString("cep"));
                     imp.setUf(rs.getString("uf"));
                     imp.setTel_principal(rs.getString("telefone"));
                     if(rs.getString("telefone2") != null && !"".equals(rs.getString("telefone2"))) {
@@ -383,6 +440,83 @@ public class ProtonDAO extends InterfaceDAO {
                         imp.addContato("3", "EMAIL", null, null, TipoContato.COMERCIAL, rs.getString("email"));
                     }
                     imp.setDatacadastro(rs.getDate("datacadastro"));
+                    imp.setAtivo("S".equals(rs.getString("ativo")));
+                    imp.setCondicaoPagamento(rs.getInt("prazo_compra"));
+                    imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  c.tcli_cliente_pk id,\n" +
+                    "  c.tcli_nome_razao razao,\n" +
+                    "  c.tcli_fantasia fantasia,\n" +
+                    "  c.tcli_num_documento cnpj,\n" +
+                    "  c.tcli_inscricao_estadual ie,\n" +
+                    "  c.tcli_endereco endereco,\n" +
+                    "  c.tcli_bairro bairro,\n" +
+                    "  ci.tloc_nome cidade,\n" +
+                    "  ci.tloc_uf_fk uf,\n" +
+                    "  c.tcli_ponto_referencia referencia,\n" +
+                    "  c.tcli_data_cadastramento datacadastro,\n" +
+                    "  c.tcli_cidade_cep_fk cep,\n" +
+                    "  c.tcli_fone1_ddd || '' || c.tcli_fone1_prefixo || '' ||\n" +
+                    "  c.tcli_fone1_final telefone,\n" +
+                    "  c.tcli_fone2_ddd || '' || c.tcli_fone2_prefixo || '' ||\n" +
+                    "  c.tcli_fone2_final telefone2,\n" +
+                    "  c.tcli_fax_ddd || '' || c.tcli_fax_prefixo || '' ||\n" +
+                    "  c.tcli_fax_final fax,\n" +
+                    "  c.tcli_email email,\n" +
+                    "  c.tcli_primeiro_contato contato,\n" +
+                    "  c.tcli_observacao obs,\n" +
+                    "  cu.tlnk_limite_credito limite,\n" +
+                    "  cu.tlnk_ativo situacao\n" +
+                    "from\n" +
+                    "  tcli_cliente c\n" +
+                    "left join\n" +
+                    "  tloc_cidade_cep ci on c.tcli_cidade_cep_fk = ci.tloc_cidade_cep_pk\n" +
+                    "join\n" +
+                    "  tlnk_cliente_unidade cu on c.tcli_cliente_pk = cu.tlnk_cliente_fk_pk\n" +
+                    "where\n" +
+                    "  cu.tlnk_unidade_fk_pk = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "  1")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setFax(rs.getString("fax"));
+                    imp.setObservacao(rs.getString("obs"));
+                    if(rs.getString("telefone2") != null && !"".equals(rs.getString("telefone2"))) {
+                        imp.addContato("1", "TELEFONE2", rs.getString("telefone2"), null, null);
+                    }
+                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
+                        imp.addContato("2", rs.getString("contato"), null, null, null);
+                    }
+                    imp.setAtivo("S".equals(rs.getString("situacao")));
+                    imp.setValorLimite(rs.getDouble("limite"));
                     
                     result.add(imp);
                 }
