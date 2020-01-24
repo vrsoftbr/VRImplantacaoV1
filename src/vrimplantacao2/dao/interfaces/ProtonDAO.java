@@ -341,13 +341,20 @@ public class ProtonDAO extends InterfaceDAO {
         
         try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "  tlnk_fornec_mercad_fk_pk id_fornecedor,\n" +
-                    "  tlnk_mercad_pri_fk_pk id_produto\n" +
-                    "from\n" +
-                    "  tlnk_fornecedor_mercadoria\n" +
-                    "where\n" +
-                    "  tlnk_unidade_fk_pk = " + getLojaOrigem())) {
+                    "select \n" +
+                    "  pf.tlnk_fornec_mercad_fk_pk id_fornecedor,\n" +
+                    "  e.tmer_codigo_pri_fk_pk id_produto,\n" +
+                    "  e.tmer_fornecedor_principal_fk fornecedor_prin \n" +
+                    "from \n" +
+                    "  tlnk_fornecedor_mercadoria pf\n" +
+                    "join\n" +
+                    "  tmer_estoque e on pf.tlnk_mercad_pri_fk_pk = e.tmer_codigo_pri_fk_pk and\n" +
+                    "  pf.tlnk_mercad_sec_fk_pk = e.tmer_codigo_sec_fk_pk and\n" +
+                    "  pf.tlnk_unidade_fk_pk = e.tmer_unidade_fk_pk\n" +
+                    "where \n" +
+                    "  e.tmer_unidade_fk_pk = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "  1, 2")) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
