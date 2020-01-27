@@ -344,13 +344,22 @@ public class ProtonDAO extends InterfaceDAO {
                     "select \n" +
                     "  pf.tlnk_fornec_mercad_fk_pk id_fornecedor,\n" +
                     "  e.tmer_codigo_pri_fk_pk id_produto,\n" +
-                    "  e.tmer_fornecedor_principal_fk fornecedor_prin \n" +
+                    "  e.tmer_fornecedor_principal_fk fornecedor_prin,\n" +
+                    "  p.tmer_codigo_original \n" +
                     "from \n" +
                     "  tlnk_fornecedor_mercadoria pf\n" +
                     "join\n" +
                     "  tmer_estoque e on pf.tlnk_mercad_pri_fk_pk = e.tmer_codigo_pri_fk_pk and\n" +
                     "  pf.tlnk_mercad_sec_fk_pk = e.tmer_codigo_sec_fk_pk and\n" +
                     "  pf.tlnk_unidade_fk_pk = e.tmer_unidade_fk_pk\n" +
+                    "join\n" +
+                    "  tfor_fornecedor f on pf.tlnk_fornec_mercad_fk_pk = f.tfor_fornecedor_pk\n" +
+                    "join\n" +
+                    "  tlnk_fornecedor_unidade fu on fu.tlnk_unidade_fk_pk = pf.tlnk_unidade_fk_pk and\n" +
+                    "  fu.tlnk_fornecedor_fk_pk = f.tfor_fornecedor_pk and\n" +
+                    "  e.tmer_unidade_fk_pk = fu.tlnk_unidade_fk_pk\n" +
+                    "join\n" +
+                    "  tmer_mercadoria p on pf.tlnk_mercad_pri_fk_pk = p.tmer_codigo_pri_pk\n" +
                     "where \n" +
                     "  e.tmer_unidade_fk_pk = " + getLojaOrigem() + "\n" +
                     "order by\n" +
@@ -362,6 +371,7 @@ public class ProtonDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setCodigoExterno(imp.getIdProduto());
                     
                     result.add(imp);
                 }
