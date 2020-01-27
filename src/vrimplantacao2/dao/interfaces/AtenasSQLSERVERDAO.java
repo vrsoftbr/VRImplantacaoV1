@@ -5,9 +5,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -89,6 +92,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "       codigobarras ean,\n"
                     + "       unidade tipoembalagem,\n"
                     + "       case when balanca = 'NAO' then 0 else 1 end ebalanca,\n"
+                    + "       BalancaValidade validade,\n"
                     + "       p.Descricao descricaocompleta,\n"
                     + "       descricaoredusida descricaoreduzida,\n"
                     + "       p.Descricao descricaogondola,\n"
@@ -127,6 +131,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "		left join cad_cod_nat_receita cnr\n"
                     + "                 on p.cod_nat_receita = cnr.cod_nat_receita and p.tabela_nat_receita = cnr.tabela\n"
                     + "order by p.codigo")) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -135,18 +140,31 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setImportId(rs.getString("importid"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setEan(rs.getString("ean"));
 
-                    if (imp.getEan() != null && !"".equals(imp.getEan())) {
-                        if (rs.getInt("ebalanca") == 1) {
+                    long longEAN = Utils.stringToLong(imp.getEan(), -2);
+                    String strEAN = String.valueOf(longEAN);
+
+                    if (strEAN.startsWith("2") && strEAN.length() == 6) {
+                        final String eanBal = strEAN.substring(1);
+                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(eanBal, -2));
+                        if (bal != null) {
+                            imp.setEan(String.valueOf(bal.getCodigo()));
                             imp.seteBalanca(true);
-                            String ean = "";
-                            ean = imp.getEan().substring(8, 13);
-                            imp.setEan(ean);
+                            imp.setValidade(bal.getValidade());
+                            imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                            imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                            imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                            imp.setValidade(rs.getInt("validade"));
                         }
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                        imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                        imp.setValidade(rs.getInt("validade"));
                     }
 
-                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaogondola")));
@@ -172,11 +190,10 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setIcmsCstSaida(rs.getInt("icmscstsaida"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsaliqsaida"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icmsreducaosaida"));
-                    
+
                     imp.setIcmsCstEntrada(rs.getInt("icmscstentrada"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsaliqentrada"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducaoentrada"));
-                    
 
                     result.add(imp);
                 }
@@ -216,19 +233,26 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "     codigo,\n"
-                    + "     CodigoFornecedor,\n"
-                    + "     codigo externo\n"
-                    + "from CadProdutos\n"
-                    + "     where CodigoFornecedor != 0")) {
+                    + "     p.codigo idproduto,\n"
+                    + "     f.codigo CodigoFornecedor,\n"
+                    + "     COD_PROD_FORN codigoexterno,\n"
+                    + "     QTD_EMBALAGEM_PROD_FORN qtdEmbalagem\n"
+                    + "from CADCOMPRAS_COD_PROD_FORN pf\n"
+                    + "     left join CadProdutos p\n"
+                    + "     on pf.codigo_barras = p.codigobarras\n"
+                    + "     left join CADFORNECEDORES f\n"
+                    + "     on pf.CNPF_FORN = f.cnpjcpf\n"
+                    + "where p.codigo is not null\n"
+                    + "     order by 2,1")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setIdProduto(rs.getString("codigo"));
+                    imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("CodigoFornecedor"));
-                    imp.setCodigoExterno(rs.getString("externo"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdEmbalagem"));
 
                     result.add(imp);
                 }
