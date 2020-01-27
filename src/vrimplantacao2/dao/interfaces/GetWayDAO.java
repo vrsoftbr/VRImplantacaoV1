@@ -479,7 +479,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	PER_REDUC icms_debito_red_nf,\n" +
                     "	PER_REDUC_ENT icms_credito_red_nf,\n" +
                     "	CODTRIB_ENT cst_credito_nf,\n" +
-                    "	ULTICMSCRED icms_credito_nf\n" +
+                    "	ULTICMSCRED icms_credito_nf,\n" +
+                    "   p.ALIQICMS_INTER aliq_interna,\n" +
+                    "	p.PERMVA mva\n" +        
                     "from\n" +
                     "	PRODUTOS p\n" +
                     "left join ALIQUOTA_ICMS aliq_s_nf on p.CODALIQ_NF = aliq_s_nf.CODALIQ\n" +
@@ -493,8 +495,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     //Aliquota Crédito
                     imp.setIcmsAliqEntrada(rs.getInt("icms_credito_nf"));
-                    imp.setIcmsCstEntrada(0);
-                    imp.setIcmsReducaoEntrada(0);
+                    imp.setIcmsCstEntrada(rs.getInt("cst_credito_nf"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_credito_red_nf"));
                     
                     imp.setIcmsDebitoId(null);
                     imp.setIcmsCreditoId(null);
