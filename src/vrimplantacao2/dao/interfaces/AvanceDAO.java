@@ -113,7 +113,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT id_loja, fantasia FROM adm_empresas_estab ORDER BY 1"
+                    "SELECT distinct id_loja, fantasia FROM adm_empresas_estab ORDER BY 1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id_loja"), rst.getString("fantasia")));
@@ -390,12 +390,13 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codigo"));
                     imp.setEan(rst.getString("ean"));
-                    if (imp.getEan().length() < 7) {
-                        imp.setEan("999999" + rst.getString("ean"));
-                    }
                     imp.setQtdEmbalagem(rst.getInt("quantidade"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
 
+                    /*if (imp.getEan().length() < 7) {
+                        imp.setEan("999999" + rst.getString("ean"));
+                    }*/
+                    
                     result.add(imp);
                 }
             }
@@ -796,7 +797,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaMunicipio(rst.getString("empcid"));
                     imp.setEmpresaUf(rst.getString("empuf"));
                     imp.setEmpresaTelefone(rst.getString("empfone"));
-                    imp.setDataAdmissao(rst.getDate("admissao"));
+                    //imp.setDataAdmissao(rst.getDate("admissao"));
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limitecheque"));
                     imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - " + 
