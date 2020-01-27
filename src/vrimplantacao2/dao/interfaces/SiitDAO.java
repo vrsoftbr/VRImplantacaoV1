@@ -74,7 +74,9 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.MAPA_TRIBUTACAO,
-                OpcaoProduto.IMPORTAR_MANTER_BALANCA
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST
         ));
     }
 
