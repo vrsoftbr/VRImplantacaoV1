@@ -4,11 +4,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -136,7 +133,7 @@ public class GDoorDAO extends InterfaceDAO {
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_reducao"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_reducao"));
                     imp.setIcmsCst(Utils.formataNumero(rs.getString("icmscst")));
-                    imp.setIcmsCstConsumidor(Utils.formataNumero(rs.getString("icmscst")));
+                    imp.setIcmsCstConsumidor(Utils.stringToInt(rs.getString("icmscst")));
                     String ean = imp.getEan().trim();
                     if ("SEM GTIN".equals(ean)) {
                         ean = ean.replace("SEM GTIN", imp.getImportId());

@@ -943,8 +943,12 @@
                                       </Group>
                                   </Group>
                               </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -962,7 +966,7 @@
                               <Component id="chkIcmsCredito" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsDebitoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkPautaFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPautaFiscalProduto" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -970,6 +974,9 @@
                               <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsCreditoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1036,6 +1043,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsCreditoForaEstado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ICMS Cr&#xe9;dito Fora Estado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsConsumidor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Consumidor"/>
                   </Properties>
                 </Component>
               </SubComponents>

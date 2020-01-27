@@ -242,31 +242,31 @@ public class G3DAO extends InterfaceDAO {
                     imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
                     
                     if (rst.getString("aliquotaconsumidor").contains("18")) {
-                        imp.setIcmsCstConsumidor("0");
+                        imp.setIcmsCstConsumidor(0);
                         imp.setIcmsAliqConsumidor(18);
                         imp.setIcmsReducaoConsumidor(0);
                     } else if (rst.getString("aliquotaconsumidor").contains("25")) {
-                        imp.setIcmsCstConsumidor("0");
+                        imp.setIcmsCstConsumidor(0);
                         imp.setIcmsAliqConsumidor(25);
                         imp.setIcmsReducaoConsumidor(0);
                     } else if (rst.getString("aliquotaconsumidor").contains("27")) {
-                        imp.setIcmsCstConsumidor("0");
+                        imp.setIcmsCstConsumidor(0);
                         imp.setIcmsAliqConsumidor(27);
                         imp.setIcmsReducaoConsumidor(0);
                     } else if (rst.getString("aliquotaconsumidor").contains("FF")) {
-                        imp.setIcmsCstConsumidor("60");
+                        imp.setIcmsCstConsumidor(60);
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     } else if (rst.getString("aliquotaconsumidor").contains("II")) {
-                        imp.setIcmsCstConsumidor("40");
+                        imp.setIcmsCstConsumidor(40);
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     } else if (rst.getString("aliquotaconsumidor").contains("NN")) {
-                        imp.setIcmsCstConsumidor("41");
+                        imp.setIcmsCstConsumidor(41);
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     } else {
-                        imp.setIcmsCstConsumidor("40");
+                        imp.setIcmsCstConsumidor(40);
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     }

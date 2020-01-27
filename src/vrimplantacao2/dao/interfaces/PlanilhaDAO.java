@@ -92,6 +92,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(INVENTARIO);
         result.add(OpcaoProduto.OFERTA);
         result.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        result.add(OpcaoProduto.ICMS_CONSUMIDOR);
+        result.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
 
         return result;
     }
@@ -313,6 +315,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada_foraestado"));
                     produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada_foraestado"));
                     produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada_foraestado"));
+                } else {
+                    produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada"));
+                    produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada"));
+                    produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada"));
                 }
 
                 if (linha.existsColumn("icms_credito_id")) {
@@ -333,12 +339,27 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida_foraestado"));
                     produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida_foraestado"));
                     produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida_foraestado"));
+                } else {
+                    produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida"));
+                    produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida"));
+                    produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida"));
+                    
                 }
 
                 if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
                     produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida_foraestadonf"));
                     produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida_foraestadonf"));
                     produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida_foraestadonf"));
+                } else {
+                    produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida"));
+                    produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida"));
+                    produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida"));
+                }
+                
+                if (linha.existsColumn("icms_cst_consumidor")) {
+                    produto.setIcmsCstConsumidor(linha.getInt("icms_cst_consumidor"));
+                    produto.setIcmsAliqConsumidor(linha.getDouble("icms_aliq_consumidor"));
+                    produto.setIcmsReducaoConsumidor(linha.getDouble("icms_reduzido_consumidor"));
                 }
 
                 if (linha.existsColumn("icms_debito_id")) {
@@ -350,6 +371,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (linha.existsColumn("icms_debito_foraestadonf_id")) {
                     produto.setIcmsDebitoForaEstadoNfId(linha.getString("icms_debito_foraestadonf_id"));
                 }
+                if (linha.existsColumn("icms_consumidor_id")) {
+                    produto.setIcmsConsumidorId(linha.getString("icms_consumidor_id"));
+                }
+                
 
                 //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));

@@ -438,7 +438,13 @@ public enum OpcaoProduto {
                 CEST,
                 ICMS,
                 PIS_COFINS,
-                NATUREZA_RECEITA
+                NATUREZA_RECEITA,
+                ICMS_CONSUMIDOR,
+                ICMS_ENTRADA,
+                ICMS_SAIDA,
+                ICMS_ENTRADA_FORA_ESTADO,
+                ICMS_SAIDA_FORA_ESTADO,
+                ICMS_SAIDA_NF
         ));
     }
 

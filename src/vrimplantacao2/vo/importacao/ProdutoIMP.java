@@ -69,27 +69,27 @@ public class ProdutoIMP {
     @DatabaseField private int piscofinsCstCredito = 0;
     @DatabaseField private int piscofinsNaturezaReceita = -1;
     
-    @DatabaseField private int icmsCstEntrada = 60;
+    @DatabaseField private int icmsCstEntrada = 40;
     @DatabaseField private double icmsAliqEntrada = 0;
     @DatabaseField private double icmsReducaoEntrada = 0;
     
-    @DatabaseField private int icmsCstEntradaForaEstado = 60;
+    @DatabaseField private int icmsCstEntradaForaEstado = 40;
     @DatabaseField private double icmsAliqEntradaForaEstado = 0;
     @DatabaseField private double icmsReducaoEntradaForaEstado = 0;
     
-    @DatabaseField private int icmsCstSaida = 60;
+    @DatabaseField private int icmsCstSaida = 40;
     @DatabaseField private double icmsAliqSaida = 0;
     @DatabaseField private double icmsReducaoSaida = 0;
 
-    @DatabaseField private int icmsCstSaidaForaEstado = 60;
+    @DatabaseField private int icmsCstSaidaForaEstado = 40;
     @DatabaseField private double icmsAliqSaidaForaEstado = 0;
     @DatabaseField private double icmsReducaoSaidaForaEstado = 0;
 
-    @DatabaseField private int icmsCstSaidaForaEstadoNF = 60;
+    @DatabaseField private int icmsCstSaidaForaEstadoNF = 40;
     @DatabaseField private double icmsAliqSaidaForaEstadoNF = 0;
     @DatabaseField private double icmsReducaoSaidaForaEstadoNF = 0;
     
-    @DatabaseField private String icmsCstConsumidor = null;
+    @DatabaseField private int icmsCstConsumidor = -1;
     @DatabaseField private double icmsAliqConsumidor;
     @DatabaseField private double icmsReducaoConsumidor;
     
@@ -98,6 +98,7 @@ public class ProdutoIMP {
     @DatabaseField private String icmsDebitoForaEstadoNfId;
     @DatabaseField private String icmsCreditoId;
     @DatabaseField private String icmsCreditoForaEstadoId;
+    @DatabaseField private String icmsConsumidorId;
     
     @DatabaseField private double atacadoPreco = 0;
     @DatabaseField private double atacadoPorcentagem = 0;
@@ -333,6 +334,10 @@ public class ProdutoIMP {
     
     public String getIcmsCreditoForaEstadoId() {
         return icmsCreditoForaEstadoId;
+    }
+
+    public String getIcmsConsumidorId() {
+        return icmsConsumidorId;
     }
 
     public void setImportSistema(String importSistema) {
@@ -797,11 +802,11 @@ public class ProdutoIMP {
         this.fabricacaoPropria = fabricacaoPropria;
     }
 
-    public String getIcmsCstConsumidor() {
+    public int getIcmsCstConsumidor() {
         return icmsCstConsumidor;
     }
 
-    public void setIcmsCstConsumidor(String icmsCstConsumidor) {
+    public void setIcmsCstConsumidor(int icmsCstConsumidor) {
         this.icmsCstConsumidor = icmsCstConsumidor;
     }
 
@@ -843,6 +848,10 @@ public class ProdutoIMP {
 
     public void setIcmsDebitoForaEstadoNfId(String icmsDebitoForaEstadoNfId) {
         this.icmsDebitoForaEstadoNfId = icmsDebitoForaEstadoNfId;
+    }
+
+    public void setIcmsConsumidorId(String icmsConsumidorId) {
+        this.icmsConsumidorId = icmsConsumidorId;
     }
 
     public void setManterEAN(boolean manterEAN) {
