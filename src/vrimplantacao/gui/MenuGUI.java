@@ -130,6 +130,7 @@ import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
+import vrimplantacao2.gui.interfaces.G10GUI;
 import vrimplantacao2.gui.interfaces.G3GUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
 import vrimplantacao2.gui.interfaces.GR7_2GUI;
@@ -688,6 +689,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMrs = new javax.swing.JMenuItem();
         mnuMrs1 = new javax.swing.JMenuItem();
         mnuMrs2 = new javax.swing.JMenuItem();
+        mnuG10 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2049,6 +2051,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuMrs2);
+
+        mnuG10.setText("G10");
+        mnuG10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG10ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuG10);
 
         mnuDatabase.add(jMenu8);
 
@@ -4344,6 +4354,10 @@ public final class MenuGUI extends VRMdiFrame {
         AtenasSQLSERVERGUI.exibir(this);
     }//GEN-LAST:event_mnuAtenasSQLServerActionPerformed
 
+    private void mnuG10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuG10ActionPerformed
+        G10GUI.exibir(this);
+    }//GEN-LAST:event_mnuG10ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4491,6 +4505,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
+    private javax.swing.JMenuItem mnuG10;
     private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuG4;
     private javax.swing.JMenuItem mnuGDoor;
