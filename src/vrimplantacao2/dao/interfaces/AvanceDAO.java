@@ -797,7 +797,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaMunicipio(rst.getString("empcid"));
                     imp.setEmpresaUf(rst.getString("empuf"));
                     imp.setEmpresaTelefone(rst.getString("empfone"));
-                    imp.setDataAdmissao(rst.getDate("admissao"));
+                    //imp.setDataAdmissao(rst.getDate("admissao"));
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limitecheque"));
                     imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - " + 
