@@ -157,5 +157,12 @@ public class PautaFiscalIMP {
     public void setAliquotaCreditoForaEstadoId(String aliquotaCreditoForaEstadoId) {
         this.aliquotaCreditoForaEstadoId = aliquotaCreditoForaEstadoId;
     }
+
+    @Override
+    public String toString() {
+        return "PautaFiscalIMP{" + "id=" + id + ", ncm=" + ncm + ", uf=" + uf + ", iva=" + iva + ", tipoIva=" + tipoIva + ", aliquotaCredito=" + aliquotaCredito + ", aliquotaDebito=" + aliquotaDebito + ", aliquotaDebitoForaEstado=" + aliquotaDebitoForaEstado + ", aliquotaCreditoForaEstado=" + aliquotaCreditoForaEstado + ", aliquotaCreditoId=" + aliquotaCreditoId + ", aliquotaDebitoId=" + aliquotaDebitoId + ", aliquotaDebitoForaEstadoId=" + aliquotaDebitoForaEstadoId + ", aliquotaCreditoForaEstadoId=" + aliquotaCreditoForaEstadoId + ", ivaAjustado=" + ivaAjustado + ", icmsRecolhidoAntecipadamente=" + icmsRecolhidoAntecipadamente + '}';
+    }
+    
+    
         
 }

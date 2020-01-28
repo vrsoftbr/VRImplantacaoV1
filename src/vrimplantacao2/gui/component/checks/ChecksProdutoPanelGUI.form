@@ -333,7 +333,7 @@
                               <Component id="rdbPautaEan" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPautaUsarEansMenores" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -932,20 +932,14 @@
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="chkIcmsCreditoForaEstado" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="chkPautaFiscal" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="chkPautaFiscalProduto" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkNcm" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCest" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -968,15 +962,12 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkPautaFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkPautaFiscalProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNcm" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsCreditoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsConsumidor" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1015,16 +1006,6 @@
                     <Property name="text" type="java.lang.String" value="CEST"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscal">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Pauta Fiscal"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscalProduto">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Pauta Fiscal X Produto"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsDebito">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito"/>
@@ -1048,6 +1029,125 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsConsumidor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ICMS Consumidor"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlImpPautaFiscal">
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                  <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPautaFiscal" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkPautaFiscalProduto" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsCredito" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsCreditoForaEst" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsDebito" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsDebitoForaEst" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsIva" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsIvaAjustado" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPfIcmsTipoIva" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                          <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkPautaFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPautaFiscalProduto" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPfIcmsCredito" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPfIcmsCreditoForaEst" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPfIcmsDebito" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkPfIcmsDebitoForaEst" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPfIcmsIva" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPfIcmsIvaAjustado" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPfIcmsTipoIva" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jLabel12">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="PAUTA FISCAL"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscal">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pauta Fiscal"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscalProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pauta Fiscal X Produto"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsCredito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Cr&#xe9;dito"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsCreditoForaEst">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Cr&#xe9;dito Fora Est."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsDebito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsDebitoForaEst">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito Fora Est."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsIva">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="IVA"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsIvaAjustado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="IVA Ajustado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPfIcmsTipoIva">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo IVA"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -1481,7 +1581,23 @@
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="14_pnlImpInfoAdic">
+                <CodeExpression id="14_pnlImpPautaFiscal">
+                  <CodeVariable name="pnlImpPautaFiscal" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
+                  <ExpressionOrigin>
+                    <ExpressionProvider type="ComponentRef">
+                      <ComponentRef name="pnlImpPautaFiscal"/>
+                    </ExpressionProvider>
+                  </ExpressionOrigin>
+                </CodeExpression>
+              </Parameters>
+            </CodeStatement>
+            <CodeStatement>
+              <CodeExpression id="8_tabImportacao"/>
+              <StatementProvider type="CodeMethod">
+                <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
+              </StatementProvider>
+              <Parameters>
+                <CodeExpression id="15_pnlImpInfoAdic">
                   <CodeVariable name="pnlImpInfoAdic" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1497,7 +1613,7 @@
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="15_pnlImpOutrosDados">
+                <CodeExpression id="16_pnlImpOutrosDados">
                   <CodeVariable name="pnlImpOutrosDados" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
