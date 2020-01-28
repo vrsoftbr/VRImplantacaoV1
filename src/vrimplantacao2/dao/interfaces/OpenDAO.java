@@ -361,7 +361,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     
                     imp.setId(rst.getString("codpro"));
-                    imp.setNcm(rst.getString("codpro"));
+                    imp.setNcm(rst.getString("ncm"));
                     imp.setUf(rst.getString("uf"));
                     imp.setIva(rst.getDouble("iva"));
                     imp.setIvaAjustado(rst.getDouble("ivaAjustado"));
