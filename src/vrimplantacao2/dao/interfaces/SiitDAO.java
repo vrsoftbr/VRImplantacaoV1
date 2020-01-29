@@ -249,6 +249,7 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setMargem(rst.getDouble("margem"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
@@ -462,12 +463,15 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "  participante_codigo as id_fornecedor,\n"
-                    + "  item_codigo as id_produto,\n"
-                    + "  codigoitemfornecedor as codigoexterno\n"
-                    + "from itemcodigofornecedor\n"
-                    + "order by participante_codigo"
+            "select\n"
+            + "  pf.participante_codigo as id_fornecedor,\n"
+            + "  pf.item_codigo as id_produto,\n"
+            + "  pf.codigoitemfornecedor as codigoexterno,\n"
+            + "  i.fatorconversao as qtd\n"
+            + "from itemcodigofornecedor pf\n"
+            + "left join itemfatorconversao i on i.item_codigo = pf.item_codigo and \n"
+            + "  i.unidademedida_codigo = pf.unidademedida_codigo\n"
+            + "order by pf.participante_codigo"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -476,6 +480,7 @@ public class SiitDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd"));
                     result.add(imp);
                 }
             }
