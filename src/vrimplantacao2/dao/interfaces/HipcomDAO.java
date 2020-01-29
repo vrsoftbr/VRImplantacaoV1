@@ -506,14 +506,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("icmsentradaid"));
                     imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                     imp.setAtacadoPorcentagem(rst.getDouble("margematacado"));
-                    imp.setPautaFiscalId(formatPautaFiscalId(
-                            rst.getString("estado"),
-                            rst.getString("ncm"),
-                            rst.getDouble("p_iva"),
-                            rst.getDouble("v_iva"),
-                            rst.getInt("icmssaidaid"),
-                            rst.getInt("icmsentradaid")
-                    ));
+                    imp.setPautaFiscalId(rst.getString("id"));
                     imp.setSugestaoCotacao("S".equals(rst.getString("sugestaocotacao")));
                     imp.setIdComprador(rst.getString("id_comprador"));
                     imp.setProdutoControlado(rst.getString("proalcoolico"));
@@ -733,6 +726,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n" +
+                    "	p.procodplu id,\n" +
                     "	l.lojestado uf,\n" +
                     "	p.proclasfisc ncm,\n" +
                     "	pl.prlpivast p_iva,\n" +
@@ -767,14 +761,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     
-                    imp.setId(formatPautaFiscalId(
-                            rst.getString("uf"),
-                            rst.getString("ncm"),
-                            rst.getDouble("p_iva"),
-                            rst.getDouble("v_iva"),
-                            rst.getInt("icmssaidaid"),
-                            rst.getInt("icmsentradaid")
-                    ));
+                    imp.setId(rst.getString("id"));
                     
                     imp.setNcm(rst.getString("ncm"));
                     imp.setUf(rst.getString("uf"));

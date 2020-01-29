@@ -367,7 +367,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Importar - Copiar ICMS débito no crédito";
         }        
-    };
+    }, 
+    /***
+     * Força a atualização de custo mesmo que o usuário já os tenha alterado.
+     */
+    FORCAR_ATUALIZACAO;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

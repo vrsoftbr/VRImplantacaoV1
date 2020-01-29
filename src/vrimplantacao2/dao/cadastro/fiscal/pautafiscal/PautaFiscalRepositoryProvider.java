@@ -1,6 +1,9 @@
 package vrimplantacao2.dao.cadastro.fiscal.pautafiscal;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
@@ -10,6 +13,7 @@ import vrimplantacao2.dao.cadastro.produto.NcmDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
@@ -104,8 +108,8 @@ public class PautaFiscalRepositoryProvider {
         return localDAO.getEstados();
     }
 
-    public int getAliquota(int cst, double aliquota, double reduzido) throws Exception {
-        return Icms.getIcms(cst, aliquota, reduzido).getId();
+    public Icms getAliquota(int cst, double aliquota, double reduzido) throws Exception {
+        return Icms.getIcmsPorValor(cst, aliquota, reduzido);
     }
 
     public NcmVO getNcm(String ncm) throws Exception {
@@ -125,14 +129,8 @@ public class PautaFiscalRepositoryProvider {
                     icms.put(vo.getOrigId(), vo.getAliquota());
                 }
             }
-        }
-
-        Icms icm = icms.get(icmsId);
-        if (icm == null) {
-            icm = Icms.getIsento();
-        }
-
-        return icm;
+        }        
+        return icms.get(icmsId);
     }
 
     public Map<String, ProdutoPautaVO> getNcmsProduto() throws Exception {
@@ -142,5 +140,47 @@ public class PautaFiscalRepositoryProvider {
     public Map<Long, ProdutoPautaVO> getNcmsEan() throws Exception {
         return dao.getNcmsProduto(getLojaVR());
     }
+
+    Set<Integer> getPautasAlteradasPelousuario() throws Exception {
+        Set<Integer> result = new HashSet<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct id_referencia from logtransacao where id_formulario in (54, 161)"//<-Formulário Pauta Fiscal
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getInt("id_referencia"));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    void saveLog(String tipo, String info) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("implantacao");
+        sql.setTableName("log_pautafiscal");
+        sql.putSql("data", "current_timestamp");
+        sql.put("tipo", tipo);
+        sql.put("info", info);
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.getInsert());
+        }
+    }
+
+    void createLog() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "create table if not exists implantacao.log_pautafiscal (\n" +
+                    "    id serial not null primary key,\n" +
+                    "    data timestamp not null default current_timestamp,\n" +
+                    "    tipo varchar not null,\n" +
+                    "    info varchar\n" +
+                    ");"
+            );
+        }
+    }
     
 }
+

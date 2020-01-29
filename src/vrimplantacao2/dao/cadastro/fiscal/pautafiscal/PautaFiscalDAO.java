@@ -21,6 +21,29 @@ public class PautaFiscalDAO {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("pautafiscal");
+            
+            if (opt.contains(OpcaoFiscal.ALIQUOTA_CREDITO)) {
+                sql.put("id_aliquotaCredito", vo.getId_aliquotaCredito());
+            }
+            if (opt.contains(OpcaoFiscal.ALIQUOTA_CREDITO_FORA_ESTADO)) {
+                sql.put("id_aliquotaCreditoForaEstado", vo.getId_aliquotaCreditoForaEstado());
+            }
+            if (opt.contains(OpcaoFiscal.ALIQUOTA_DEBITO)) {
+                sql.put("id_aliquotaDebito", vo.getId_aliquotaDebito());
+            }
+            if (opt.contains(OpcaoFiscal.ALIQUOTA_DEBITO_FORA_ESTADO)) {
+                sql.put("id_aliquotaDebitoForaEstado", vo.getId_aliquotaDebitoForaEstado());
+            }
+            if (opt.contains(OpcaoFiscal.IVA)) {
+                sql.put("iva", vo.getIva());
+            }
+            if (opt.contains(OpcaoFiscal.IVA_AJUSTADO)) {
+                sql.put("ivaAjustado", vo.getIvaAjustado());
+            }
+            if (opt.contains(OpcaoFiscal.TIPO_IVA)) {
+                sql.put("tipoIva", vo.getTipoIva().getId());
+            }
+            
             sql.setWhere("id = " + vo.getId());
             
             if (!sql.isEmpty()) {

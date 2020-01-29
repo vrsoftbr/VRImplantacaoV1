@@ -312,9 +312,6 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.VENDA_PDV)) {
             sql.put("vendapdv", vo.isVendaPdv());
         }
-        if (opt.contains(OpcaoProduto.EXCECAO)) {
-            sql.put("excecao", vo.getExcecao());
-        }
         if (opt.contains(OpcaoProduto.DATA_ALTERACAO)) {
             sql.put("dataalteracao", vo.getDataAlteracao());
         }

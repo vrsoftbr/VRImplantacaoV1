@@ -77,5 +77,10 @@ public class PautaFiscalAnteriorVO {
     public void setIvaAjustado(double ivaAjustado) {
         this.ivaAjustado = ivaAjustado;
     }
+
+    @Override
+    public String toString() {
+        return "PautaFiscalAnteriorVO{" + "sistema=" + sistema + ", loja=" + loja + ", id=" + id + ", codigoAtual=" + codigoAtual + ", cstDebito=" + cstDebito + ", cstCredito=" + cstCredito + ", iva=" + iva + ", ivaAjustado=" + ivaAjustado + '}';
+    }
     
 }
