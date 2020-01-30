@@ -811,7 +811,7 @@ public class ProdutoRepository {
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaidaForaEstado, icmsReducaoSaida);
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaidaForaEstado, icmsReducaoSaida);
 
-            if (imp.getIcmsCstConsumidor() == null) {
+            if (imp.getIcmsCstConsumidor() == -1) {
                 if (icmsCstSaida == 20) {
                     double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
                     consumidor = provider.tributo().getIcms(0, aliq, 0);
@@ -819,8 +819,7 @@ public class ProdutoRepository {
                     consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
                 }
             } else {
-                consumidor = provider.tributo().getIcms(Integer.parseInt(imp.getIcmsCstConsumidor()), 
-                                                                         imp.getIcmsAliqConsumidor(), 0);
+                consumidor = provider.tributo().getIcms(imp.getIcmsCstConsumidor(), imp.getIcmsAliqConsumidor(), 0);
             }
         }
         
@@ -886,12 +885,14 @@ public class ProdutoRepository {
         String idIcmsCredito = imp.getIcmsCreditoId();
         String idIcmsCreditoForaEstado = imp.getIcmsCreditoForaEstadoId();
         String idIcmsCreditoFornecedor = imp.getIcmsCreditoId();
+        String idIcmsConsumidor = imp.getIcmsConsumidorId();
 
         if (idIcmsDebito != null) {
 
             aliqDebito = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
             debitoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsDebitoForaEstado);
             debitoForaEstadoNfe = provider.tributo().getAliquotaByMapaId(idIcmsDebitoForaEstadoNf);
+            consumidor = provider.tributo().getAliquotaByMapaId(idIcmsConsumidor);
             
             if (debitoForaEstado == null) {
                 debitoForaEstado = aliqDebito;
@@ -904,11 +905,13 @@ public class ProdutoRepository {
             double icmsAliqSaida = aliqDebito.getAliquota();
             double icmsReducaoSaida = aliqDebito.getReduzido();
 
-            if (icmsCstSaida == 20) {
-                double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);
-                consumidor = provider.tributo().getIcms(0, aliq, 0);
-            } else {
-                consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
+            if (consumidor == null) {
+                if (icmsCstSaida == 20) {
+                    double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);
+                    consumidor = provider.tributo().getIcms(0, aliq, 0);
+                } else {
+                    consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
+                }
             }
         } else {
             int icmsCstSaida = imp.getIcmsCstSaida();            
@@ -922,6 +925,10 @@ public class ProdutoRepository {
             int icmsCstSaidaForaEstadoNF = imp.getIcmsCstSaidaForaEstadoNF();            
             double icmsAliqSaidaForaEstadoNF = 0;
             double icmsReducaoSaidaForaEstadoNF = 0;
+
+            int icmsCstConsumidor = imp.getIcmsCstConsumidor();            
+            double icmsAliqConsumidor = 0;
+            double icmsReducaoConsumidor = 0;
             
             if (icmsCstSaida == 20 || icmsCstSaida == 0) {
                 icmsAliqSaida = imp.getIcmsAliqSaida();
@@ -935,10 +942,15 @@ public class ProdutoRepository {
                 icmsAliqSaidaForaEstadoNF = imp.getIcmsAliqSaidaForaEstadoNF();
                 icmsReducaoSaidaForaEstadoNF = imp.getIcmsReducaoSaidaForaEstadoNF();
             }
+            if (icmsCstConsumidor == 20 || icmsCstConsumidor == 0) {
+                icmsAliqConsumidor = imp.getIcmsAliqConsumidor();
+                icmsReducaoConsumidor = imp.getIcmsReducaoConsumidor();
+            }
             
             aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaidaForaEstado, icmsAliqSaidaForaEstado, icmsReducaoSaidaForaEstado);
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaidaForaEstadoNF, icmsAliqSaidaForaEstadoNF, icmsReducaoSaidaForaEstadoNF);
+            consumidor = provider.tributo().getIcms(icmsCstConsumidor, icmsAliqConsumidor, icmsReducaoConsumidor);
             
             if (debitoForaEstado == null) {
                 debitoForaEstado = aliqDebito;
@@ -947,16 +959,13 @@ public class ProdutoRepository {
                 debitoForaEstadoNfe = aliqDebito;
             }
 
-            if (imp.getIcmsCstConsumidor() == null) {
+            if (consumidor == null) {
                 if (icmsCstSaida == 20) {
                     double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
                     consumidor = provider.tributo().getIcms(0, aliq, 0);
                 } else {
                     consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
                 }
-            } else {
-                consumidor = provider.tributo().getIcms(Integer.parseInt(imp.getIcmsCstConsumidor()), 
-                                                                         imp.getIcmsAliqConsumidor(), 0);
             }
         }
         

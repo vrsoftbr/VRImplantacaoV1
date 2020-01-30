@@ -1610,12 +1610,28 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OfertaIMP> getOfertas(java.util.Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
-        SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+        SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd");
         
         try (Statement stm = ConexaoOracle.createStatement()) {
+            String sql = "select\n" +
+                    "    p.pdv_filial id_loja,\n" +
+                    "    p.pdv_item id_produto,\n" +
+                    "    p.pdv_oferta_ini datainicio,\n" +
+                    "    p.pdv_oferta_fim datafim,\n" +
+                    "    p.pdv_oferta_preco preco_oferta,\n" +
+                    "    p.pdv_preco_normal preco_normal\n" +
+                    "from\n" +
+                    "    AG1PDVPD p\n" +
+                    "where\n" +
+                    "    p.pdv_oferta_fim > 0 and\n" +
+                    "    p.pdv_oferta_fim >= 1" + format.format(new Date()) + " and\n" +
+                    "    p.pdv_filial = " + getLojaOrigem().substring(0, 1) + "\n" +
+                    "order by\n" +
+                    "    1, 2";
+            System.out.println(sql);
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
+                    /*"select\n" +
                     "    i.pof_loja id_loja,\n" +
                     "    i.pof_cod_item id_produto,\n" +
                     "    o.ofta_ini_vig datainicio,\n" +
@@ -1629,22 +1645,24 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    o.OFTA_FIM_VIG >= (1||substr(extract(year from current_date),3,4) || \n" +
                     "        lpad(extract(month from current_date), 2, '0') ||\n" +
                     "        lpad(extract(day from current_date), 2, '0'))\n" +
-                    "    and i.POF_LOJA = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1)
+                    "    and i.POF_LOJA = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1)*/
+                    sql
             )) {
-
+                
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
                     
                     imp.setIdProduto(rst.getString("id_produto"));
-                    imp.setDataInicio(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datainicio")))));
-                    imp.setDataFim(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datafim")))));
-                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setDataInicio(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datainicio").substring(1)))));
+                    imp.setDataFim(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datafim").substring(1)))));
+                    imp.setPrecoOferta(rst.getDouble("preco_oferta"));
+                    imp.setPrecoNormal(rst.getDouble("preco_normal"));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);
                     
                     result.add(imp);
                 }
-            }
+            }/*
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "  git_cod_item id_produto,\n" +
@@ -1677,7 +1695,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         result.add(imp);
                     }
                 }
-            }
+            }*/
         }
         
         return result;

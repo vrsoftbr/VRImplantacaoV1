@@ -92,6 +92,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(INVENTARIO);
         result.add(OpcaoProduto.OFERTA);
         result.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        result.add(OpcaoProduto.ICMS_CONSUMIDOR);
+        result.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        result.add(OpcaoProduto.PAUTA_FISCAL);
+        result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
 
         return result;
     }
@@ -313,6 +317,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada_foraestado"));
                     produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada_foraestado"));
                     produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada_foraestado"));
+                } else {
+                    produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada"));
+                    produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada"));
+                    produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada"));
                 }
 
                 if (linha.existsColumn("icms_credito_id")) {
@@ -333,12 +341,27 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida_foraestado"));
                     produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida_foraestado"));
                     produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida_foraestado"));
+                } else {
+                    produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida"));
+                    produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida"));
+                    produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida"));
+                    
                 }
 
                 if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
                     produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida_foraestadonf"));
                     produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida_foraestadonf"));
                     produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida_foraestadonf"));
+                } else {
+                    produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida"));
+                    produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida"));
+                    produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida"));
+                }
+                
+                if (linha.existsColumn("icms_cst_consumidor")) {
+                    produto.setIcmsCstConsumidor(linha.getInt("icms_cst_consumidor"));
+                    produto.setIcmsAliqConsumidor(linha.getDouble("icms_aliq_consumidor"));
+                    produto.setIcmsReducaoConsumidor(linha.getDouble("icms_reduzido_consumidor"));
                 }
 
                 if (linha.existsColumn("icms_debito_id")) {
@@ -350,6 +373,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (linha.existsColumn("icms_debito_foraestadonf_id")) {
                     produto.setIcmsDebitoForaEstadoNfId(linha.getString("icms_debito_foraestadonf_id"));
                 }
+                if (linha.existsColumn("icms_consumidor_id")) {
+                    produto.setIcmsConsumidorId(linha.getString("icms_consumidor_id"));
+                }
+                
 
                 //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
@@ -989,43 +1016,43 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setIvaAjustado(linha.getDouble("ivaajustado"));
 
             imp.setIcmsRecolhidoAntecipadamente(linha.getBoolean("recolhidoantecipado"));
-            if (linha.existsColumn("id_aliquotadebito")) {
-                imp.setAliquotaDebitoId(linha.getString("id_aliquotadebito"));
+            if (linha.existsColumn("pauta_debito_id")) {
+                imp.setAliquotaDebitoId(linha.getString("pauta_debito_id"));
             } else {
                 imp.setAliquotaDebito(
-                        linha.getInt("aliquotadebito_cst"),
-                        linha.getDouble("aliquotadebito_aliquota"),
-                        linha.getDouble("aliquotadebito_reduzido")
+                        linha.getInt("pauta_debito_cst"),
+                        linha.getDouble("pauta_debito_aliquota"),
+                        linha.getDouble("pauta_debito_reduzido")
                 );
             }
 
-            if (linha.existsColumn("id_aliquotacredito")) {
-                imp.setAliquotaCreditoId(linha.getString("id_aliquotacredito"));
+            if (linha.existsColumn("pauta_credito_id")) {
+                imp.setAliquotaCreditoId(linha.getString("pauta_credito_id"));
             } else {
                 imp.setAliquotaCredito(
-                        linha.getInt("aliquotacredito_cst"),
-                        linha.getDouble("aliquotacredito_aliquota"),
-                        linha.getDouble("aliquotacredito_reduzido")
+                        linha.getInt("pauta_credito_cst"),
+                        linha.getDouble("pauta_credito_aliquota"),
+                        linha.getDouble("pauta_credito_reduzido")
                 );
             }
 
-            if (linha.existsColumn("id_aliquotacreditoforaestado")) {
-                imp.setAliquotaCreditoForaEstadoId(linha.getString("id_aliquotacreditoforaestado"));
+            if (linha.existsColumn("pauta_creditoforaestado_id")) {
+                imp.setAliquotaCreditoForaEstadoId(linha.getString("pauta_creditoforaestado_id"));
             } else {
                 imp.setAliquotaCreditoForaEstado(
-                        linha.getInt("aliquotacreditoforaestado_cst"),
-                        linha.getDouble("aliquotacreditoforaestado_aliquota"),
-                        linha.getDouble("aliquotacreditoforaestado_reduzido")
+                        linha.getInt("pauta_creditoforaestado_cst"),
+                        linha.getDouble("pauta_creditoforaestado_aliquota"),
+                        linha.getDouble("pauta_creditoforaestado_reduzido")
                 );
             }
 
-            if (linha.existsColumn("id_aliquotadebitoforaestado")) {
-                imp.setAliquotaDebitoForaEstadoId(linha.getString("id_aliquotadebitoforaestado"));
+            if (linha.existsColumn("pauta_debitoforaestado_id")) {
+                imp.setAliquotaDebitoForaEstadoId(linha.getString("pauta_debitoforaestado_id"));
             } else {
                 imp.setAliquotaDebitoForaEstado(
-                        linha.getInt("aliquotadebitoforaestado_cst"),
-                        linha.getDouble("aliquotadebitoforaestado_aliquota"),
-                        linha.getDouble("aliquotadebitoforaestado_reduzido")
+                        linha.getInt("pauta_debitoforaestado_cst"),
+                        linha.getDouble("pauta_debitoforaestado_aliquota"),
+                        linha.getDouble("pauta_debitoforaestado_reduzido")
                 );
             }
 

@@ -63,7 +63,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     public String idLojaContaPagar;
 
     private static final Logger LOG = Logger.getLogger(AvanceDAO.class.getName());
-    
+
     @Override
     public String getSistema() {
         return "Avance";
@@ -218,13 +218,13 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.lojaestmin estoqueminimo,\n"
                     + "	est.lojaestmax estoquemaximo,\n"
                     + "	est.lojaest estoque,\n"
-                    + "	p.dentrouf margem,\n"
+                    //+ "	p.dentrouf margem,\n"
+                    + "	p.indice margem,\n"
                     + "	p.custo custosemimposto,\n"
-                    + "	p.custofinal custocomimposto,\n"
-                    + " p.custoant custoanteriorsemimposto,\n"
+                    + "	p.custofinal custocomimposto,\n" + " p.custoant custoanteriorsemimposto,\n"
                     + " p.custofinalant custoanteriorcomimposto,\n"
                     + "	p.atualvenda precovenda,\n"
-                    + " est.venda_atual precovendaloja,\n"        
+                    + " est.venda_atual precovendaloja,\n"
                     + "	p.inativo situacaocadastro,\n"
                     + "	p.nbm ncm,\n"
                     + "	p.cest,\n"
@@ -233,7 +233,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cod_nat_receita piscofins_nat_receita,\n"
                     + "	p.cst icms_cst,\n"
                     + "	p.aliquota,\n"
-                    + " p.ecotacao sugestaocotacao\n"        
+                    + " p.ecotacao sugestaocotacao\n"
                     + "FROM\n"
                     + "	cadmer p\n"
                     + "	LEFT JOIN codbarra ean ON p.codigo = ean.codigo\n"
@@ -308,7 +308,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoAnteriorSemImposto(rst.getDouble("custoanteriorsemimposto"));
                     imp.setCustoAnteriorComImposto(rst.getDouble("custoanteriorcomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    if(rst.getDouble("precovendaloja") != 0) {
+                    if (rst.getDouble("precovendaloja") != 0) {
                         imp.setPrecovenda(rst.getDouble("precovendaloja"));
                     }
                     imp.setSituacaoCadastro((rst.getInt("situacaocadastro") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO));
@@ -320,7 +320,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("aliquota"));
                     imp.setIcmsCreditoId(rst.getString("aliquota"));
                     imp.setPautaFiscalId(imp.getImportId());
-                    
+
                     imp.setSugestaoCotacao(rst.getInt("sugestaocotacao") == 1);
 
                     result.add(imp);
@@ -396,7 +396,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     /*if (imp.getEan().length() < 7) {
                         imp.setEan("999999" + rst.getString("ean"));
                     }*/
-                    
                     result.add(imp);
                 }
             }
@@ -522,9 +521,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.codibge,\n"
                     + "UPPER(u.uf) UFSIGLA,\n"
                     + "UPPER(u.descricao) NOMEESTADO,\n"
-                    + "f.fpagto_padr condpagamento,\n"          
-                    + "f.produtor_rural\n"        
-                  + "FROM fornece f\n"
+                    + "f.fpagto_padr condpagamento,\n"
+                    + "f.produtor_rural\n"
+                    + "FROM fornece f\n"
                     + "LEFT JOIN cidade c ON c.id = f.id_cidade\n"
                     + "LEFT JOIN uf u ON u.id = c.id_uf"
             )) {
@@ -599,13 +598,13 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setCondicaoPagamento(Utils.stringToInt(Utils.formataNumero(rst.getString("condpagamento"))));
                     imp.setPrazoEntrega(rst.getInt("prev_entrega"));
-                    
-                    if(rst.getInt("produtor_rural") == 1) {
+
+                    if (rst.getInt("produtor_rural") == 1) {
                         imp.setProdutorRural();
                     }
-                    
+
                     adicionaContatosFornecedor(imp);
-                    
+
                     result.add(imp);
                 }
             }
@@ -614,31 +613,31 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private void adicionaContatosFornecedor(FornecedorIMP imp) throws SQLException {
-        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT\n" +
-                    "	id,\n" +
-                    "	id_cli,\n" +
-                    "	contato,\n" +
-                    "	telefone,\n" +
-                    "	email\n" +
-                    "FROM\n" +
-                    "	contato\n" +
-                    "where\n" +
-                    "	id_cli = " + imp.getImportId()
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	id,\n"
+                    + "	id_cli,\n"
+                    + "	contato,\n"
+                    + "	telefone,\n"
+                    + "	email\n"
+                    + "FROM\n"
+                    + "	contato\n"
+                    + "where\n"
+                    + "	id_cli = " + imp.getImportId()
             )) {
-                while(rs.next()) {
+                while (rs.next()) {
                     imp.addContato(rs.getString("id"),
                             rs.getString("contato"),
-                            rs.getString("telefone"), 
+                            rs.getString("telefone"),
                             null,
-                            TipoContato.COMERCIAL, 
+                            TipoContato.COMERCIAL,
                             rs.getString("email") == null ? "" : rs.getString("email"));
                 }
             }
         }
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -677,7 +676,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                   "SELECT \n"
+                    "SELECT \n"
                     + "c.codigo,\n"
                     + "c.nome,\n"
                     + "c.nascimento,\n"
@@ -743,8 +742,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.natureza_juridica,\n"
                     + "c.endereco,\n"
                     + "case when cadastro = '0000-00-00' then NOW()\n"
-                    + "	else cadastro end cadastro\n"        
-                  + "FROM clientes c"
+                    + "	else cadastro end cadastro,\n"
+                    + "c.bloqueado_crd\n"
+                    + "FROM clientes c"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -797,47 +797,57 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaMunicipio(rst.getString("empcid"));
                     imp.setEmpresaUf(rst.getString("empuf"));
                     imp.setEmpresaTelefone(rst.getString("empfone"));
-                    imp.setDataAdmissao(rst.getDate("admissao"));
+                    //imp.setDataAdmissao(rst.getDate("admissao"));
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limitecheque"));
-                    imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - " + 
-                            rst.getString("obs") + " " + rst.getString("anotacoes"));
-                    
-                    if(rst.getDouble("limite") > 0) {
+                    imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - "
+                            + rst.getString("obs") + " " + rst.getString("anotacoes"));
+
+                    /*if (rst.getDouble("limite") > 0) {
                         imp.setPermiteCreditoRotativo(true);
+                    }*/
+                    
+                    if (rst.getInt("bloqueado_crd") == 1) {
+                        imp.setPermiteCreditoRotativo(false);
+                        imp.setBloqueado(true);
+                    }
+                    
+                    if (rst.getInt("bloqueado") == 1) {
+                        imp.setPermiteCheque(false);
                     }
 
-                    if(rst.getDouble("limitecheque") > 0) {
+                    /*if (rst.getDouble("limitecheque") > 0) {
                         imp.setPermiteCheque(true);
-                    }
-                    
-                    imp.setBloqueado(rst.getInt("bloqueado") == 0 ? false : true);
-                    
-                    if(rst.getString("sexo") != null && !"".equals(rst.getString("sexo"))) {
+                    }*/
+
+                    //imp.setBloqueado(rst.getInt("bloqueado") == 0 ? false : true);
+
+                    if (rst.getString("sexo") != null && !"".equals(rst.getString("sexo"))) {
                         imp.setSexo("F".equals(rst.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     }
-                    
-                    if(rst.getString("estcivil") != null && !"".equals(rst.getString("estcivil"))) {
-                        switch(rst.getString("estcivil").toUpperCase()) {
-                            case "CASADO" :
+
+                    if (rst.getString("estcivil") != null && !"".equals(rst.getString("estcivil"))) {
+                        switch (rst.getString("estcivil").toUpperCase()) {
+                            case "CASADO":
                                 imp.setEstadoCivil(TipoEstadoCivil.CASADO);
                                 break;
-                            case "SEPARADO" :
+                            case "SEPARADO":
                                 imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
                                 break;
-                            case "SOLTEIRO" :
+                            case "SOLTEIRO":
                                 imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
-                                break;    
-                            case "VIÚVO" :
+                                break;
+                            case "VIÚVO":
                                 imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
-                                break;    
-                            case "DIVORCIADO" :
+                                break;
+                            case "DIVORCIADO":
                                 imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
                                 break;
-                            case "AMASIADO" :
+                            case "AMASIADO":
                                 imp.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
                                 break;
-                            default : imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                            default:
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
                                 break;
                         }
                     }
@@ -852,10 +862,10 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
-                    if(rst.getString("cadastro") != null && !"0000-00-00".equals(rst.getString("cadastro").trim())) {
+                    if (rst.getString("cadastro") != null && !"0000-00-00".equals(rst.getString("cadastro").trim())) {
                         imp.setDataCadastro(rst.getDate("cadastro"));
                     }
-                    
+
                     result.add(imp);
                 }
             }
@@ -868,7 +878,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                   "SELECT\n"
+                    "SELECT\n"
                     + "id,\n"
                     + "emissao,\n"
                     + "vencimento,\n"
@@ -881,8 +891,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "(valor - valorpago) valorconta,\n"
                     + "historico,\n"
                     + "caixa\n"
-                 + "FROM receb\n"
-                 + "WHERE valorpago < valor\n"
+                    + "FROM receb\n"
+                    + "WHERE valorpago < valor\n"
                     + "AND pago = 0\n"
                     + "AND codcli IS NOT NULL\n"
                     + "AND id_banco = " + v_contaCarteira
@@ -915,37 +925,37 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "	r.id,\n" +
-                    "	r.emissao,\n" +
-                    "	r.documento,\n" +
-                    "	r.ncheque cheque,\n" +
-                    "	r.tipodoc,\n" +
-                    "	r.codcli cliente,\n" +
-                    "	c.nome,\n" +
-                    "	c.telefone,\n" +
-                    "	r.vencimento,\n" +
-                    "	r.valor_original valor,\n" +
-                    "	r.historico,\n" +
-                    "	r.numbanco banco,\n" +
-                    "	r.agencia,\n" +
-                    "	r.cpfcgc cpf,\n" +
-                    "	r.caixa,\n" +
-                    "   r.datahora_alteracao\n" +       
-                    "FROM\n" +
-                    "	receb r\n" +
-                    "LEFT JOIN clientes c ON r.codcli = c.codigo\n" +
-                    "WHERE\n" +
-                    "	r.id_banco = " + v_carteiraCheque + " and\n" +
-                    "	r.pago = 0 and\n" +
-                    "	r.cancelado = 0 and\n" +
-                    "   r.valor_original > 0\n" +        
-                    "ORDER BY\n" +
-                    "	r.emissao"
+                    "SELECT\n"
+                    + "	r.id,\n"
+                    + "	r.emissao,\n"
+                    + "	r.documento,\n"
+                    + "	r.ncheque cheque,\n"
+                    + "	r.tipodoc,\n"
+                    + "	r.codcli cliente,\n"
+                    + "	c.nome,\n"
+                    + "	c.telefone,\n"
+                    + "	r.vencimento,\n"
+                    + "	r.valor_original valor,\n"
+                    + "	r.historico,\n"
+                    + "	r.numbanco banco,\n"
+                    + "	r.agencia,\n"
+                    + "	r.cpfcgc cpf,\n"
+                    + "	r.caixa,\n"
+                    + "   r.datahora_alteracao\n"
+                    + "FROM\n"
+                    + "	receb r\n"
+                    + "LEFT JOIN clientes c ON r.codcli = c.codigo\n"
+                    + "WHERE\n"
+                    + "	r.id_banco = " + v_carteiraCheque + " and\n"
+                    + "	r.pago = 0 and\n"
+                    + "	r.cancelado = 0 and\n"
+                    + "   r.valor_original > 0\n"
+                    + "ORDER BY\n"
+                    + "	r.emissao"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCpf(rst.getString("cpf"));
                     imp.setNumeroCheque(rst.getString("cheque"));
@@ -961,7 +971,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataDeposito(rst.getDate("vencimento"));
                     imp.setDataHoraAlteracao(rst.getTimestamp("datahora_alteracao"));
                     imp.setAlinea(0);
-                    
+
                     result.add(imp);
                 }
             }
@@ -1040,18 +1050,18 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.promocao precopromocao,\n"
                     + "	p.venda precovenda,\n"
                     + "	p.status\n"
-                  + "FROM\n"
+                    + "FROM\n"
                     + "	promocao_itens as p\n"
-                  + "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n"
-                  + "WHERE\n"
+                    + "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n"
+                    + "WHERE\n"
                     + "	cast(pc.fim AS DATE) >= NOW() and\n"
                     + "	pc.id_loja = " + getLojaOrigem() + " and\n"
                     + "	pc.status = 0\n"
-                  + "ORDER BY\n"
+                    + "ORDER BY\n"
                     + "	pc.fim")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    
+
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setDataInicio(rs.getDate("datainicio"));
                     imp.setDataFim(rs.getDate("datafim"));
@@ -1086,16 +1096,16 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
-     public List<ItemComboVO> getTipoCarteira() throws Exception {
+
+    public List<ItemComboVO> getTipoCarteira() throws Exception {
         List<ItemComboVO> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "id, "
                     + "nome "
-                  + "from banco "
-                  + "order by id"
+                    + "from banco "
+                    + "order by id"
             )) {
                 while (rst.next()) {
                     result.add(new ItemComboVO(rst.getInt("id"), rst.getString("id") + " - " + rst.getString("nome")));
@@ -1104,26 +1114,26 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-     
-     public List<ItemComboVO> getTipoCarteiraContaPagar() throws Exception {
+
+    public List<ItemComboVO> getTipoCarteiraContaPagar() throws Exception {
         List<ItemComboVO> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n" +
-                    "	id,\n" +
-                    "	nome \n" +
-                    "FROM \n" +
-                    "	banco \n" +
-                    "WHERE \n" +
-                    "	id IN \n" +
-                    "		(SELECT \n" +
-                    "			DISTINCT id_banco\n" +
-                    "		FROM\n" +
-                    "			pagto p\n" +
-                    "		WHERE\n" +
-                    "			p.pagamento IS null\n" +
-                    "		ORDER BY\n" +
-                    "			id_banco)"
+                    "SELECT \n"
+                    + "	id,\n"
+                    + "	nome \n"
+                    + "FROM \n"
+                    + "	banco \n"
+                    + "WHERE \n"
+                    + "	id IN \n"
+                    + "		(SELECT \n"
+                    + "			DISTINCT id_banco\n"
+                    + "		FROM\n"
+                    + "			pagto p\n"
+                    + "		WHERE\n"
+                    + "			p.pagamento IS null\n"
+                    + "		ORDER BY\n"
+                    + "			id_banco)"
             )) {
                 while (rst.next()) {
                     result.add(new ItemComboVO(rst.getInt("id"), rst.getString("id") + " - " + rst.getString("nome")));
@@ -1140,43 +1150,43 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT\n" +
-                    "	p.id,\n" +
-                    "	p.id_for,\n" +
-                    "	p.documento,\n" +
-                    "	p.emissao,\n" +
-                    "	p.vencimento,\n" +
-                    "	p.valor,\n" +
-                    "	p.valor_original,\n" +
-                    "	p.historico\n" +
-                    "FROM	\n" +
-                    "	pagto p\n" +
-                    "WHERE\n" +
-                    "	pagamento IS NULL and\n" +
-                    "	p.id_banco = " + v_carteiraContaPagar + "\n" +
-                    //"   p.emissao between '2016-01-01' and '2018-12-31'\n" +        
-                    "ORDER BY\n" +
-                    "	vencimento"
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	p.id,\n"
+                    + "	p.id_for,\n"
+                    + "	p.documento,\n"
+                    + "	p.emissao,\n"
+                    + "	p.vencimento,\n"
+                    + "	p.valor,\n"
+                    + "	p.valor_original,\n"
+                    + "	p.historico\n"
+                    + "FROM	\n"
+                    + "	pagto p\n"
+                    + "WHERE\n"
+                    + "	pagamento IS NULL and\n"
+                    + "	p.id_banco = " + v_carteiraContaPagar + "\n"
+                    + //"   p.emissao between '2016-01-01' and '2018-12-31'\n" +        
+                    "ORDER BY\n"
+                    + "	vencimento"
             )) {
-                while(rs.next()) {
+                while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("id_for"));
                     imp.setNumeroDocumento(rs.getString("documento"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
                     imp.setObservacao(rs.getString("historico"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
@@ -1233,9 +1243,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCpf(rst.getString("cpf"));
                         next.setNomeCliente(rst.getString("nome"));
                         String endereco = "";
-                        endereco = rst.getString("endereco") + ", " + rst.getString("bairro") + ", " +
-                                rst.getString("numero") + " - " + rst.getString("cidade") + ", " + 
-                                rst.getString("uf") + " - " + rst.getString("cep");
+                        endereco = rst.getString("endereco") + ", " + rst.getString("bairro") + ", "
+                                + rst.getString("numero") + " - " + rst.getString("cidade") + ", "
+                                + rst.getString("uf") + " - " + rst.getString("cep");
                         next.setEnderecoCliente(endereco);
                     }
                 }
@@ -1247,53 +1257,53 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "SELECT\n" +
-                    "	concat(v.NOTA, v.CAIXA, v.DATA) id, \n" +
-                    "	v.NOTA cupom,\n" +
-                    "	v.CAIXA,\n" +
-                    "	v.`DATA`,\n" +
-                    "	max(v.datahora) datahora,\n" +
-                    "	max(v.HORA) hora,\n" +
-                    "	round(sum(coalesce(v.valor, 0) * quant), 2) valor,\n" +
-                    "	v.ecf,\n" +
-                    "	max(v.CANCELADO) cancelado,\n" +
-                    "	v.CLIENTE id_cliente,\n" +
-                    "	c.nome,\n" +
-                    "	c.cpf,\n" +
-                    "	c.endereco,\n" +
-                    "	c.bairro,\n" +
-                    "	c.numero,\n" +
-                    "	c.cidade,\n" +
-                    "	c.uf,\n" +
-                    "	c.cep,\n" +
-                    "	c.telefone\n" +
-                    "FROM\n" +
-                    "	vendas v\n" +
-                    "LEFT JOIN clientes c ON v.CLIENTE = c.codigo\n" +
-                    "WHERE\n" +
-                    "	v.`DATA` BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "' and\n" +
-                    "	v.loja = " + idLojaCliente + " and\n" +
-                    "	v.e_transferencia = 0 and\n" +
-                    "	v.nao_bx_estoque = 0 and\n" +
-                    "	v.caixa <> '999' and\n" +
-                    "   v.valor > 0\n" +
-                    "GROUP BY\n" +
-                    "	v.NOTA,\n" +
-                    "	v.CAIXA,\n" +
-                    "	v.`DATA`,\n" +
-                    "	v.ecf,\n" +
-                    "	v.CLIENTE,\n" +
-                    "	c.nome,\n" +
-                    "	c.cpf,\n" +
-                    "	c.endereco,\n" +
-                    "	c.bairro,\n" +
-                    "	c.numero,\n" +
-                    "	c.cidade,\n" +
-                    "	c.uf,\n" +
-                    "	c.cep,\n" +
-                    "	c.telefone\n" +
-                    "ORDER  BY\n" +
-                    "	v.CAIXA, v.data, v.datahora";
+                    = "SELECT\n"
+                    + "	concat(v.NOTA, v.CAIXA, v.DATA) id, \n"
+                    + "	v.NOTA cupom,\n"
+                    + "	v.CAIXA,\n"
+                    + "	v.`DATA`,\n"
+                    + "	max(v.datahora) datahora,\n"
+                    + "	max(v.HORA) hora,\n"
+                    + "	round(sum(coalesce(v.valor, 0) * quant), 2) valor,\n"
+                    + "	v.ecf,\n"
+                    + "	max(v.CANCELADO) cancelado,\n"
+                    + "	v.CLIENTE id_cliente,\n"
+                    + "	c.nome,\n"
+                    + "	c.cpf,\n"
+                    + "	c.endereco,\n"
+                    + "	c.bairro,\n"
+                    + "	c.numero,\n"
+                    + "	c.cidade,\n"
+                    + "	c.uf,\n"
+                    + "	c.cep,\n"
+                    + "	c.telefone\n"
+                    + "FROM\n"
+                    + "	vendas v\n"
+                    + "LEFT JOIN clientes c ON v.CLIENTE = c.codigo\n"
+                    + "WHERE\n"
+                    + "	v.`DATA` BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "' and\n"
+                    + "	v.loja = " + idLojaCliente + " and\n"
+                    + "	v.e_transferencia = 0 and\n"
+                    + "	v.nao_bx_estoque = 0 and\n"
+                    + "	v.caixa <> '999' and\n"
+                    + "   v.valor > 0\n"
+                    + "GROUP BY\n"
+                    + "	v.NOTA,\n"
+                    + "	v.CAIXA,\n"
+                    + "	v.`DATA`,\n"
+                    + "	v.ecf,\n"
+                    + "	v.CLIENTE,\n"
+                    + "	c.nome,\n"
+                    + "	c.cpf,\n"
+                    + "	c.endereco,\n"
+                    + "	c.bairro,\n"
+                    + "	c.numero,\n"
+                    + "	c.cidade,\n"
+                    + "	c.uf,\n"
+                    + "	c.cep,\n"
+                    + "	c.telefone\n"
+                    + "ORDER  BY\n"
+                    + "	v.CAIXA, v.data, v.datahora";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1354,7 +1364,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                                     next.setIcmsCst(40);
                                     next.setIcmsReduzido(0);
                                     break;
-                                
+
                                 case "N":
                                     next.setIcmsAliq(0);
                                     next.setIcmsCst(41);
@@ -1388,7 +1398,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                                 case "T05":
                                     next.setIcmsAliq(30);
                                     next.setIcmsCst(0);
-                                    next.setIcmsReduzido(0) ;
+                                    next.setIcmsReduzido(0);
                                     break;
 
                                 default:
@@ -1409,36 +1419,36 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "SELECT\n" +
-                    "	v.id,\n" +
-                    "   CONCAT(v.NOTA, v.CAIXA, v.DATA) id_venda,\n" +
-                    "	v.CAIXA,\n" +
-                    "	v.NOTA cupom,\n" +
-                    "	v.`DATA`,\n" +
-                    "	v.CODBARRA ean,\n" +
-                    "	v.CODIGO id_produto,\n" +
-                    "   c.unidade,\n" +
-                    "	v.DESCRICAO,\n" +
-                    "	v.itemno sequenceia,\n" +
-                    "	v.QUANT quantidade,\n" +
-                    "	v.valor,\n" +
-                    "	v.ALIQUOTA,\n" +
-                    "	v.cancelado\n" +
-                    "FROM\n" +
-                    "	vendas v\n" +
-                    "JOIN cadmer c ON v.CODIGO = c.Codigo\n" +
-                    "WHERE\n" +
-                    "	v.`DATA` BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND "
-                                      + "'" + VendaIterator.FORMAT.format(dataTermino) + "' AND\n" +
-                    "	v.loja = " + idLojaCliente + " and\n" +
-                    "	v.e_transferencia = 0 and\n" +
-                    "	v.nao_bx_estoque = 0 and\n" +
-                    " 	v.caixa <> '999' and\n" +
-                    "   v.valor > 0\n" +
-                    "ORDER BY\n" +
-                    "	v.CAIXA, \n" +
-                    "	v.data, \n" +
-                    "	v.HORA";
+                    = "SELECT\n"
+                    + "	v.id,\n"
+                    + "   CONCAT(v.NOTA, v.CAIXA, v.DATA) id_venda,\n"
+                    + "	v.CAIXA,\n"
+                    + "	v.NOTA cupom,\n"
+                    + "	v.`DATA`,\n"
+                    + "	v.CODBARRA ean,\n"
+                    + "	v.CODIGO id_produto,\n"
+                    + "   c.unidade,\n"
+                    + "	v.DESCRICAO,\n"
+                    + "	v.itemno sequenceia,\n"
+                    + "	v.QUANT quantidade,\n"
+                    + "	v.valor,\n"
+                    + "	v.ALIQUOTA,\n"
+                    + "	v.cancelado\n"
+                    + "FROM\n"
+                    + "	vendas v\n"
+                    + "JOIN cadmer c ON v.CODIGO = c.Codigo\n"
+                    + "WHERE\n"
+                    + "	v.`DATA` BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND "
+                    + "'" + VendaIterator.FORMAT.format(dataTermino) + "' AND\n"
+                    + "	v.loja = " + idLojaCliente + " and\n"
+                    + "	v.e_transferencia = 0 and\n"
+                    + "	v.nao_bx_estoque = 0 and\n"
+                    + " 	v.caixa <> '999' and\n"
+                    + "   v.valor > 0\n"
+                    + "ORDER BY\n"
+                    + "	v.CAIXA, \n"
+                    + "	v.data, \n"
+                    + "	v.HORA";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

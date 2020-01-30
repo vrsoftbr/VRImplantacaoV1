@@ -8,6 +8,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
+import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
@@ -43,6 +44,7 @@ public class PautaFiscalRepository {
             boolean utilizarEansMenores = opt.contains(OpcaoFiscal.UTILIZAR_EANS_MENORES);
             
             Map<String, PautaFiscalAnteriorVO> anteriores = provider.getAnteriores();
+            Set<Integer> pautasAlteradasPeloUsuario = provider.getPautasAlteradasPelousuario();
 
             Map<String, ProdutoPautaVO> ncmsProduto = null;
             Map<Long, ProdutoPautaVO> ncmsEan = null;
@@ -50,7 +52,9 @@ public class PautaFiscalRepository {
                 ncmsProduto = provider.getNcmsProduto();
             } else if (isEan) {
                 ncmsEan = provider.getNcmsEan();
-            }            
+            }
+            
+            provider.createLog();
             
             provider.notificar("Pauta Fiscal...Gravando...", organizados.size());
             for (PautaFiscalIMP imp: organizados.values()) {
@@ -103,6 +107,12 @@ public class PautaFiscalRepository {
                         provider.gravarAnterior(anterior);
                         //Inclui na listagem de anteriores.
                         anteriores.put(anterior.getId(), anterior);
+                        
+                        provider.saveLog(
+                                "PAUTA INCLUSA",
+                                anterior.toString() + "\n" +
+                                imp.toString()
+                        );
                     } else {
                         /**
                          * Se a tabela código anterior possuir o registro, mas por 
@@ -121,14 +131,36 @@ public class PautaFiscalRepository {
                                 anterior.setCodigoAtual(vo);
                             }
                             provider.atualizar(anterior);
+                            provider.saveLog(
+                                    "PAUTA INCLUSA - COD. ANT. EXISTENTE",
+                                        anterior.toString() + "\n" +
+                                        imp.toString()
+                            );
                         } 
                         /**
                          * Senão atualiza as informações.
                          */
                         else {
-                            PautaFiscalVO vo = converterPauta(imp, ncm);
-                            provider.atualizar(vo, opt);
-                            provider.atualizar(anterior);
+                            if (!pautasAlteradasPeloUsuario
+                                    .contains(anterior
+                                            .getCodigoAtual()
+                                            .getId()
+                                    ) || opt.contains(OpcaoFiscal.FORCAR_ALTERACAO)) {
+                                PautaFiscalVO vo = converterPauta(imp, ncm);
+                                provider.atualizar(vo, opt);
+                                provider.atualizar(anterior);
+                                provider.saveLog(
+                                        "PAUTA ATUALIZADA",
+                                        anterior.toString() + "\n" +
+                                        imp.toString()
+                                );
+                            } else {
+                                provider.saveLog(
+                                        "PAUTA ALTERADA PELO USUARIO",
+                                        anterior.toString() + "\n" +
+                                        imp.toString()
+                                );
+                            }
                         }
                     }
                 } else {
@@ -168,38 +200,69 @@ public class PautaFiscalRepository {
         PautaFiscalVO vo = new PautaFiscalVO();
         
         String idIcmsCredito = imp.getAliquotaCreditoId();
+        String idIcmsCreditoForaEstado = imp.getAliquotaCreditoForaEstadoId();
         String idIcmsDebito = imp.getAliquotaDebitoId();
         String idIcmsDebitoForaEstado = imp.getAliquotaDebitoForaEstadoId();
         
-        if (idIcmsDebito != null || idIcmsCredito != null) {
-            if (idIcmsDebito != null && idIcmsCredito == null) {
-                idIcmsCredito = idIcmsDebito;
-            } else if (idIcmsDebito == null && idIcmsCredito != null) {
-                idIcmsDebito = idIcmsCredito;
+        //Localiza aliquota de crédito
+        if (idIcmsCredito != null) {
+            Icms icms = provider.getAliquotaByMapaId(idIcmsCredito);
+            if (icms == null) {
+                icms = provider.getAliquota(
+                        imp.getAliquotaCredito().getCst(),
+                        imp.getAliquotaCredito().getAliquota(),
+                        imp.getAliquotaCredito().getReduzido()
+                );
             }
-            if (idIcmsDebitoForaEstado == null) {
-                idIcmsDebitoForaEstado = idIcmsDebito;
-            }  
-            
-            vo.setId_aliquotaCredito(provider.getAliquotaByMapaId(idIcmsCredito).getId());
-            vo.setId_aliquotaDebito(provider.getAliquotaByMapaId(idIcmsDebito).getId());
-            vo.setId_aliquotaDebitoForaEstado(provider.getAliquotaByMapaId(idIcmsDebitoForaEstado).getId());
-        } else {
-            vo.setId_aliquotaCredito(provider.getAliquota(
-                    imp.getAliquotaCredito().getCst(),
-                    imp.getAliquotaCredito().getAliquota(),
-                    imp.getAliquotaCredito().getReduzido()
-            ));
-            vo.setId_aliquotaDebito(provider.getAliquota(
-                    imp.getAliquotaDebito().getCst(),
-                    imp.getAliquotaDebito().getAliquota(),
-                    imp.getAliquotaDebito().getReduzido()
-            ));
-            vo.setId_aliquotaDebitoForaEstado(provider.getAliquota(
-                    imp.getAliquotaDebitoForaEstado().getCst(),
-                    imp.getAliquotaDebitoForaEstado().getAliquota(),
-                    imp.getAliquotaDebitoForaEstado().getReduzido()
-            ));
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaCredito(icms.getId());
+        }
+        //Localiza aliquota de crédito fora estado
+        if (idIcmsCreditoForaEstado != null) {
+            Icms icms = provider.getAliquotaByMapaId(idIcmsCreditoForaEstado);
+            if (icms == null) {
+                icms = provider.getAliquota(
+                        imp.getAliquotaCreditoForaEstado().getCst(),
+                        imp.getAliquotaCreditoForaEstado().getAliquota(),
+                        imp.getAliquotaCreditoForaEstado().getReduzido()
+                );
+            }
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaCreditoForaEstado(icms.getId());
+        }
+        //Localiza aliquota de débito
+        if (idIcmsDebito != null) {
+            Icms icms = provider.getAliquotaByMapaId(idIcmsDebito);
+            if (icms == null) {
+                icms = provider.getAliquota(
+                        imp.getAliquotaDebito().getCst(),
+                        imp.getAliquotaDebito().getAliquota(),
+                        imp.getAliquotaDebito().getReduzido()
+                );
+            }
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaDebito(icms.getId());
+        }
+        //Localiza aliquota de debito fora estado
+        if (idIcmsDebitoForaEstado != null) {
+            Icms icms = provider.getAliquotaByMapaId(idIcmsDebitoForaEstado);
+            if (icms == null) {
+                icms = provider.getAliquota(
+                        imp.getAliquotaDebitoForaEstado().getCst(),
+                        imp.getAliquotaDebitoForaEstado().getAliquota(),
+                        imp.getAliquotaDebitoForaEstado().getReduzido()
+                );
+            }
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaDebitoForaEstado(icms.getId());
         }
         
         EstadoVO uf = this.ufs.get(imp.getUf());
@@ -229,21 +292,6 @@ public class PautaFiscalRepository {
 
     private PautaFiscalVO converterPauta(PautaFiscalIMP imp, ProdutoPautaVO ppauta) throws Exception {
         PautaFiscalVO result = converterPauta(imp, ppauta.getNcm());
-        
-        /*if (ppauta.getId_aliquotaCredito() != 0) {
-            result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());
-        }
-        
-        if (ppauta.getId_aliquotaCreditoForaEstado() != 0) {
-            result.setId_aliquotaCreditoForaEstado(ppauta.getId_aliquotaCreditoForaEstado());
-        }
-        
-        if (ppauta.getId_aliquotaDebito() != 0) {
-            result.setId_aliquotaDebito(ppauta.getId_aliquotaDebito());
-        }
-        if (ppauta.getId_aliquotaDebitoForaEstado() != 0) {
-            result.setId_aliquotaDebitoForaEstado(ppauta.getId_aliquotaDebitoForaEstado());
-        }*/
         
         if (result.getId_aliquotaCredito() == -1) {
             result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());

@@ -26,9 +26,12 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
@@ -361,7 +364,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     
                     imp.setId(rst.getString("codpro"));
-                    imp.setNcm(rst.getString("codpro"));
+                    imp.setNcm(rst.getString("ncm"));
                     imp.setUf(rst.getString("uf"));
                     imp.setIva(rst.getDouble("iva"));
                     imp.setIvaAjustado(rst.getDouble("ivaAjustado"));
@@ -494,7 +497,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
@@ -559,6 +562,175 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }*/
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n" +
+                    "    codigo id,\n" +
+                    "    cpf_cnpj cnpj,\n" +
+                    "    IDEN_INSC ie,\n" +
+                    "    nome_razao razao,\n" +
+                    "    '' fantasia,\n" +
+                    "    coalesce(deletado, 'N') desativado,\n" +
+                    "    endereco,\n" +
+                    "    bairro,\n" +
+                    "    cidade,\n" +
+                    "    uf,\n" +
+                    "    numero,\n" +
+                    "    dtnasc nascimento,\n" +
+                    "    dtalt alteracao,\n" +
+                    "    mae,\n" +
+                    "    cep,\n" +
+                    "    telefones,\n" +
+                    "    email,\n" +
+                    "    limite2,\n" +
+                    "    obs,\n" +
+                    "    tipocli\n" +
+                    "FROM \n" +
+                    "	cliente c\n" +
+                    "order by\n" +
+                    "	codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(!"S".equals(rst.getString("desativado")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setObservacao2(rst.getString("obs"));
+                    imp.setTelefone(rst.getString("telefones"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setValorLimite(rst.getDouble("limite2"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.codigo id,\n" +
+                    "	c.cgc cnpj,\n" +
+                    "	c.inscricao ie,\n" +
+                    "	c.razaos razao,\n" +
+                    "	coalesce(nullif(c.reduzido,''), c.razaos) fantasia,\n" +
+                    "	c.desativado,\n" +
+                    "	c.endereco,\n" +
+                    "	c.numero,\n" +
+                    "	c.complemento,\n" +
+                    "	c.bairro,\n" +
+                    "	c.codibge cidadeibge,\n" +
+                    "	c.cidade,\n" +
+                    "	c.estado,\n" +
+                    "	c.cep,\n" +
+                    "	c.estado_civil,\n" +
+                    "	c.datacad datacadastro,\n" +
+                    "	coalesce(c.sexo,'') sexo,\n" +
+                    "	c.infadicionais observacoes,\n" +
+                    "	c.telefone,\n" +
+                    "	c.fax,\n" +
+                    "	c.email,\n" +
+                    "	c.email_xml,\n" +
+                    "   '2020-01-01' datainicio,\n" +
+                    "   '2020-12-31' datatermino\n" +        
+                    "from \n" +
+                    "	estcli c\n" +
+                    "order by 1")) {
+                while(rs.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoEstadual(rs.getString("ie"));
+                    imp.setRazao(rs.getString("razao"));
+                    
+                    imp.setSituacaoCadastro(!"S".equals(rs.getString("desativado")) ? 
+                            SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataTermino(rs.getDate("datatermino"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "    codigo id_cliente,\n" +
+                    "    CPF_CNPJ,\n" +
+                    "    cupom,\n" +
+                    "    EQUIPAMENTO ecf,\n" +
+                    "    data,\n" +
+                    "    dtvenc vencimento,\n" +
+                    "    hora,\n" +
+                    "    valor,\n" +
+                    "    obs\n" +
+                    "FROM \n" +
+                    "	climov\n" +
+                    "where\n" +
+                    "    situacao = 0 and\n" +
+                    "    dtvenc is not null and\n" +
+                    "    dtvenc != '1899-12-30' and dtvenc >= '2018-01-01'\n" +
+                    "order by\n" +
+                    "	dtvenc")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id_cliente") + "-" + 
+                            rs.getString("cupom") + "-" + 
+                            rs.getString("ecf") + "-" +
+                            rs.getString("data"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setDataEmissao(rs.getDate("data"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     private Date dataVendaInicio;
@@ -607,8 +779,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setData(rst.getDate("data"));
                         next.setHoraInicio(rst.getTime("horainicio"));
                         next.setHoraInicio(rst.getTime("horatermino"));
-                        next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setCpf(rst.getString("cnpj"));
+                        //next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        //next.setCpf(rst.getString("cnpj"));
                         if (rst.getDouble("subtotalimpressora") == 0) {
                             next.setCancelado(true);
                             next.setSubTotalImpressora(rst.getDouble("valorcancelado"));
@@ -631,8 +803,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	mov.data,\n" +
                 "	min(mov.hora) horainicio,\n" +
                 "	max(mov.hora) horatermino,\n" +
-                "	if(cli.cgc = 0, null, mov.cliente) id_cliente,\n" +
-                "	cli.cgc cnpj,\n" +
+                "	##if(cli.cgc = 0, null, mov.cliente) id_cliente,\n" +
+                "	##cli.cgc cnpj,\n" +
                 "	SUM(\n" +
                 "		IF(\n" +
                 "			(mov.ENTRSAI = \"S\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"C\"), \n" +
@@ -664,13 +836,13 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 "		OR  (mov.ENTRSAI = \"S\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"\")\n" +
                 "		OR  (mov.ENTRSAI = \"S\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"C\")\n" +
                 "		OR  (mov.ENTRSAI = \"E\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"C\")\n" +
-                "	)\n" +
+                "	) AND mov.valor > 0\n" +
                 "group by\n" +
                 "	mov.nrequip,\n" +
                 "	mov.cupom,\n" +
                 "	mov.data,\n" +
-                "	mov.cliente,\n" +
-                "	cli.cgc,\n" +
+                "	##mov.cliente,\n" +
+                "	##cli.cgc,\n" +
                 "	mc.ser,\n" +
                 "	mc.cod_mod\n" +
                 "order by\n" +
@@ -717,7 +889,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rst.getString("nrequip") + "-" + 
                                 rst.getString("cupom") + "-" + 
                                 VENDA_DATE_FORMAT.format(rst.getDate("data")) + "-" + 
-                                rst.getString("item")
+                                rst.getString("item") +
+                                rst.getString("id_produto")
                         );
                         next.setVenda(
                                 rst.getString("nrequip") + "-" + 

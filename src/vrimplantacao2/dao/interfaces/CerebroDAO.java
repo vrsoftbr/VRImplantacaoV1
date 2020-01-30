@@ -541,19 +541,19 @@ public class CerebroDAO extends InterfaceDAO {
                         if (null != rst.getString("tipo_trib")) {
                             switch (rst.getString("tipo_trib")) {
                                 case "T":
-                                    imp.setIcmsCstConsumidor(String.valueOf(0));
+                                    imp.setIcmsCstConsumidor(0);
                                     break;
                                 case "N":
-                                    imp.setIcmsCstConsumidor(String.valueOf(41));
+                                    imp.setIcmsCstConsumidor(41);
                                     break;
                                 case "I":
-                                    imp.setIcmsCstConsumidor(String.valueOf(40));
+                                    imp.setIcmsCstConsumidor(40);
                                     break;
                                 case "F":
-                                    imp.setIcmsCstConsumidor(String.valueOf(60));
+                                    imp.setIcmsCstConsumidor(60);
                                     break;
                                 default:
-                                    imp.setIcmsCstConsumidor(String.valueOf(40));
+                                    imp.setIcmsCstConsumidor(40);
                                     break;
                             }
                         }

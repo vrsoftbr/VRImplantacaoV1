@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -265,8 +266,21 @@ public class ProdutoComplementoDAO {
         }
     }
     
+    Set<Integer> custoAjustadoPeloUsuario = null;
     public void atualizar(ProdutoComplementoVO complemento, Set<OpcaoProduto> opt) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            
+            if (custoAjustadoPeloUsuario == null) {
+                custoAjustadoPeloUsuario = new HashSet<>();
+                try (ResultSet rst = stm.executeQuery(
+                        "select distinct id_produto from logcusto where id_loja = " + complemento.getIdLoja()
+                )) {
+                    while (rst.next()) {
+                        custoAjustadoPeloUsuario.add(rst.getInt("id_produto"));
+                    }
+                }
+            }
+            
             SQLBuilder sql = new SQLBuilder();
             String oft = "";
             sql.setTableName("produtocomplemento");
@@ -285,19 +299,25 @@ public class ProdutoComplementoDAO {
                     oft = "update oferta set preconormal = " + MathUtils.round(complemento.getPrecoVenda(), 2) + " where id = " + oferta.getId();
                 }
             }
-            if (opt.contains(OpcaoProduto.CUSTO)) {
+            boolean atualizar = 
+                    !custoAjustadoPeloUsuario.contains(complemento.getProduto().getId()) ||
+                    opt.contains(OpcaoProduto.FORCAR_ATUALIZACAO);
+            if (!atualizar) {
+                log("PRODUTO ATUALIZADO PELO USUARIO", "ID:" + complemento.getProduto().getId());
+            }
+            if (opt.contains(OpcaoProduto.CUSTO) && atualizar) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
-            if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO)) {
+            if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) && atualizar) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
             }
-            if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO)) {
+            if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) && atualizar) {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
             }
-            if(opt.contains(OpcaoProduto.CUSTO_ANTERIOR)) {
+            if(opt.contains(OpcaoProduto.CUSTO_ANTERIOR) && atualizar) {
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
@@ -596,5 +616,28 @@ public class ProdutoComplementoDAO {
         }
         
         return result;
+    }
+
+    boolean logCriado = false;
+    private void log(String titulo, String info) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            if (!logCriado) {
+                stm.execute(
+                        "create table if not exists implantacao.log_produtocomplemento (\n" +
+                        "   id serial not null primary key,\n" +
+                        "   data timestamp not null default current_timestamp,\n" +
+                        "   titulo varchar not null,\n" +
+                        "   info varchar\n" +
+                        ");"
+                );
+                logCriado = true;
+            }
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("implantacao");
+            sql.setTableName("log_produtocomplemento");
+            sql.put("titulo", titulo);
+            sql.put("info", info);
+            stm.execute(sql.getInsert());
+        }        
     }
 }

@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Iterator;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 
 /**
  * Classe que controla e executa operações sobre a versão do VRMaster.
@@ -38,7 +39,7 @@ public final class Versao {
                     String[] array = versao.split("\\.");
                     versaoArray = new Integer[array.length];
                     for (int i = 0; i < array.length; i++) {
-                        versaoArray[i] = Integer.parseInt(array[i]);
+                        versaoArray[i] = Utils.stringToInt(array[i], 0);
                     }                    
                 }
             }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.cadastro.fiscal.pautafiscal;
 
 import java.util.ArrayList;
@@ -54,9 +49,9 @@ public class PautaFiscalRepositoryTest {
         when(provider.getSistema()).thenReturn("TESTE");
         when(provider.getLoja()).thenReturn("1");
         when(provider.getLojaVR()).thenReturn(1);
-        when(provider.getAliquota(eq(0), eq(7d), eq(0d))).thenReturn(0);
-        when(provider.getAliquota(eq(0), eq(12d), eq(0d))).thenReturn(1);
-        when(provider.getAliquota(eq(0), eq(25d), eq(0d))).thenReturn(3);
+        //when(provider.getAliquota(eq(0), eq(7d), eq(0d))).thenReturn(0);
+        //when(provider.getAliquota(eq(0), eq(12d), eq(0d))).thenReturn(1);
+        //when(provider.getAliquota(eq(0), eq(25d), eq(0d))).thenReturn(3);
         when(provider.getUfPadrao()).thenReturn(new EstadoVO(35, "SP", "SAO PAULO"));
         Map<String, EstadoVO> ufs = new LinkedHashMap<>();
         ufs.put("SP", new EstadoVO(35, "SP", "SAO PAULO"));

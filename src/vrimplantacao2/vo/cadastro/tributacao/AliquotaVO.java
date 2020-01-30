@@ -69,6 +69,10 @@ public class AliquotaVO {
     public void setReduzido(double reduzido) {
         this.reduzido = reduzido;
     }
-    
+
+    @Override
+    public String toString() {
+        return "AliquotaVO{" + "cst=" + cst + ", aliquota=" + aliquota + ", reduzido=" + reduzido + '}';
+    }
     
 }

@@ -414,7 +414,10 @@ public class ProdutoFornecedorDAO {
                             }  
                         }
                     }
+                } else {
+                    System.out.println("Fornecedor: " + imp.getIdFornecedor() + " and Produto: " + imp.getIdProduto() + " não localizado.");
                 }
+                
                 ProgressBar.next();                
             }
             Conexao.commit();

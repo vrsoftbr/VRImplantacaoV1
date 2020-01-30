@@ -256,16 +256,16 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setIcmsReducao(rst.getDouble("icms_reducao"));
                                         
                     if (rst.getString("icms_consumidor").contains("IS")) {
-                        imp.setIcmsCstConsumidor("40");
+                        imp.setIcmsCstConsumidor(40);
                         imp.setIcmsAliqConsumidor(0);
                     } else if (rst.getString("icms_consumidor").contains("ST")) {
-                        imp.setIcmsCstConsumidor("60");
+                        imp.setIcmsCstConsumidor(60);
                         imp.setIcmsAliqConsumidor(0);
                     } else if (rst.getString("icms_consumidor").contains("NT")) {
-                        imp.setIcmsCstConsumidor("41");
+                        imp.setIcmsCstConsumidor(41);
                         imp.setIcmsAliqConsumidor(0);
                     } else {
-                        imp.setIcmsCstConsumidor("0");
+                        imp.setIcmsCstConsumidor(0);
                         imp.setIcmsAliqConsumidor(Double.parseDouble(rst.getString("icms_consumidor").replace(",", ".")));
                     }
                     imp.setIcmsReducaoConsumidor(0);
