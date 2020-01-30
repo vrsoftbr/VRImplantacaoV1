@@ -273,7 +273,9 @@ public class ProdutoComplementoDAO {
             if (custoAjustadoPeloUsuario == null) {
                 custoAjustadoPeloUsuario = new HashSet<>();
                 try (ResultSet rst = stm.executeQuery(
-                        "select distinct id_produto from logcusto where id_loja = " + complemento.getIdLoja()
+                        "select distinct id_produto from logcusto where id_loja = " + complemento.getIdLoja() + "\n" +
+                        "union\n" +
+                        "select distinct id_produto from notaentradaitem join notaentrada on id_notaentrada = notaentrada.id where id_loja = " + complemento.getIdLoja()
                 )) {
                     while (rst.next()) {
                         custoAjustadoPeloUsuario.add(rst.getInt("id_produto"));
