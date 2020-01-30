@@ -207,6 +207,10 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarCreditoRotativo();
                         }
                         
+                        if(chkConvenioEmpresa.isSelected()) {
+                            importador.importarConvenioEmpresa();
+                        }
+                        
                         if (chkVendas.isSelected()) {
                             dao.setDataVendaInicio(txtDtVendaIni.getDate());
                             dao.setDataVendaTermino(txtDtVendaFim.getDate());
@@ -249,6 +253,7 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvenioEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         tabOutras = new javax.swing.JPanel();
         chkVendas = new javax.swing.JCheckBox();
         txtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
@@ -307,6 +312,8 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCreditoRotativo.setText("Crédito Rotativo");
 
+        chkConvenioEmpresa.setText("Convênio Empresa");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -318,7 +325,8 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvenioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(273, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -330,7 +338,9 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(159, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chkConvenioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -459,6 +469,7 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkConvenioEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;

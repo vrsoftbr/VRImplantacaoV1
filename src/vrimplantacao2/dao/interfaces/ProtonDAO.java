@@ -140,7 +140,7 @@ public class ProtonDAO extends InterfaceDAO {
                     "from \n" +
                     "  tmer_familia\n" +
                     "where            \n" +
-                    "  tmer_unidade_fk_pk = 1\n" +
+                    "  tmer_unidade_fk_pk = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "  2")) {
                 while(rs.next()) {
