@@ -390,7 +390,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlestoq estoque,\n" +
                     "	trc.estoquetroca,\n" +
                     "	prc.prlmargind margemunit,\n" +
-                    "	case when prc.prlctentru <= 0 then prc.prlctnfu else prc.prlctentru end custosemimposto,\n" +
+                    "	case when prc.prlctnfu <= 0 then prc.prlctentru else prc.prlctnfu end custosemimposto,\n" +
                     "	case when prc.prlctnfu <= 0 then prc.prlctentru else prc.prlctnfu end custocomimposto,\n" +
                     "	prc.prlprvenu precovenda,\n" +
                     "	prc.prlforalin id_situacaocadastro,\n" +
