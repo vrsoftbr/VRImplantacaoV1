@@ -753,7 +753,9 @@
                                   <Component id="chkDescontinuado" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                                   <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkVrAtacado" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkOferta" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                                   <Component id="chkMargem" min="-2" max="-2" attributes="0"/>
@@ -796,7 +798,10 @@
                               <Component id="chkDescontinuado" min="-2" max="-2" attributes="0"/>
                               <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
                               <Component id="chkOferta" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkMargem" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkMargem" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkVrAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkTipoProduto" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFabricacaoPropria" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -899,6 +904,11 @@
                       <Font name="Tahoma" size="11" style="1"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="COMPLEMENTO (POR LOJA)"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVrAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="VR Atacado"/>
                   </Properties>
                 </Component>
               </SubComponents>

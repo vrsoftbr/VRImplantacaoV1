@@ -1626,7 +1626,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "    p.pdv_oferta_fim > 0 and\n" +
                     "    p.pdv_oferta_fim >= 1" + format.format(new Date()) + " and\n" +
-                    "    p.pdv_filial = " + getLojaOrigem().substring(0, 1) + "\n" +
+                    "    p.pdv_filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
                     "order by\n" +
                     "    1, 2";
             System.out.println(sql);

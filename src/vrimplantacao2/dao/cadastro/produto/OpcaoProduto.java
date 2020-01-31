@@ -118,6 +118,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Atacado";
         }
+    }, VR_ATACADO {
+        @Override
+        public String toString() {
+            return "VR Atacado";
+        }
     }, FAMILIA {
         @Override
         public String toString() {

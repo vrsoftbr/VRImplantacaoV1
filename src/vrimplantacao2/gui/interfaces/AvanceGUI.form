@@ -328,24 +328,21 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkCVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkObservacao" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkDataCadastro" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkSexo" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkEstCivil" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
+                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkObservacao" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkHistorico" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkDataCadastro" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSexo" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEstCivil" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="246" max="32767" attributes="0"/>
                       </Group>
@@ -380,7 +377,10 @@
                               <Component id="chkObservacao" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCliIERG" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkHistorico" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="142" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -446,6 +446,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkClienteEventual">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkHistorico">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Hist&#xf3;rico"/>
                   </Properties>
                 </Component>
               </SubComponents>

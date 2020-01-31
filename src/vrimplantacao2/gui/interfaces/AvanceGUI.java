@@ -263,6 +263,9 @@ public class AvanceGUI extends VRInternalFrame {
                             if (chkObservacao.isSelected()) {
                                 opcoes.add(OpcaoCliente.OBSERVACOES);
                             }
+                            if (chkHistorico.isSelected()) {
+                                opcoes.add(OpcaoCliente.OBSERVACOES2);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                             }                            
@@ -346,6 +349,7 @@ public class AvanceGUI extends VRInternalFrame {
         chkValorLimite = new javax.swing.JCheckBox();
         chkObservacao = new javax.swing.JCheckBox();
         chkClienteEventual = new javax.swing.JCheckBox();
+        chkHistorico = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         cmbTipoDocRotativo = new javax.swing.JComboBox();
@@ -529,6 +533,8 @@ public class AvanceGUI extends VRInternalFrame {
 
         chkClienteEventual.setText("Cliente Eventual");
 
+        chkHistorico.setText("Histórico");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -536,21 +542,20 @@ public class AvanceGUI extends VRInternalFrame {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkCVencimento)
-                            .addComponent(chkObservacao)
-                            .addComponent(chkClienteEventual))
-                        .addGap(38, 38, 38)
-                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkValorLimite)
-                            .addComponent(chkPermiteRotativo)
-                            .addComponent(chkDataCadastro)
-                            .addComponent(chkSexo)
-                            .addComponent(chkEstCivil)))
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCVencimento)
+                    .addComponent(chkObservacao)
+                    .addComponent(chkClienteEventual)
                     .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(38, 38, 38)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkValorLimite)
+                    .addComponent(chkPermiteRotativo)
+                    .addComponent(chkDataCadastro)
+                    .addComponent(chkSexo)
+                    .addComponent(chkEstCivil))
                 .addContainerGap(246, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
@@ -577,7 +582,9 @@ public class AvanceGUI extends VRInternalFrame {
                     .addComponent(chkValorLimite)
                     .addComponent(chkObservacao))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(142, Short.MAX_VALUE))
         );
 
@@ -916,6 +923,7 @@ public class AvanceGUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkEndereco;
     private javax.swing.JCheckBox chkEstCivil;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkHistorico;
     private javax.swing.JCheckBox chkObservacao;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private javax.swing.JCheckBox chkPermiteRotativo;

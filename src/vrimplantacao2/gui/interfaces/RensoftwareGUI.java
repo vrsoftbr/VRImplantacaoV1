@@ -211,7 +211,9 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCCheques.isSelected()) {
                             importador.importarCheque();
                         }
-                        
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
                         List<OpcaoCliente> opt = new ArrayList<>();
                         if (!opt.isEmpty()) {
                             importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
@@ -272,6 +274,7 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkCClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCCheques = new vrframework.bean.checkBox.VRCheckBox();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkAtacadoQtdMinima = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -313,6 +316,8 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCCheques.setText("Cheques");
 
+        chkCreditoRotativo.setText("Crédito Rotativo");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -321,7 +326,8 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkCClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(387, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -331,7 +337,9 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkCClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(178, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(159, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -502,6 +510,7 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkAtacadoQtdMinima;
     private vrframework.bean.checkBox.VRCheckBox chkCCheques;
     private vrframework.bean.checkBox.VRCheckBox chkCClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
