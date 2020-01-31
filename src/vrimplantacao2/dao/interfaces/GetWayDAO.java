@@ -218,7 +218,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
     
-    @Override
+     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         
@@ -820,25 +820,32 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select  \n"
-                        + "	codprod id_produto, \n"
-                        + "	rtrim(barra_emb) ean, \n"
-                        + "	qtd qtdembalagem,\n"
-                        + "	preco_unit preco\n"
-                        + "from embalagens \n"
-                        + "where  \n"
-                        + "	barra_emb is not null \n"
-                        + "and \n"
-                        + "	coalesce(PRECO_UNIT, 0) > 0"
+                        "select  \n" +
+                        "	e.codprod id_produto, \n" +
+                        "	rtrim(e.barra_emb) ean, \n" +
+                        "	e.qtd qtdembalagem,\n" +
+                        "	e.preco_unit precoAtacado,\n" +
+                        "	p.PRECO_UNIT precoVenda\n" +
+                        "from \n" +
+                        "	EMBALAGENS e, PRODUTOS p\n" +
+                        "where \n" +
+                        "	e.CODPROD = p.CODPROD and\n" +
+                        "	barra_emb is not null and\n" +
+                        "	coalesce(e.PRECO_UNIT, 0) > 0\n" +
+                        "order by \n" +
+                        "	1"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
+                        
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_produto"));
                         imp.setEan(rst.getString("ean"));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        imp.setAtacadoPreco(rst.getDouble("preco"));
+                        imp.setAtacadoPreco(rst.getDouble("precoAtacado"));
+                        imp.setPrecovenda(rst.getDouble("precoVenda"));
+                        
                         vResult.add(imp);
                     }
                 }
