@@ -140,6 +140,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkCliPrefInscricaoEstadual = new vrframework.bean.checkBox.VRCheckBox();
         chkCliCheques = new vrframework.bean.checkBox.VRCheckBox();
         chkCNPJCli = new javax.swing.JCheckBox();
+        chkLimiteRotativo = new javax.swing.JCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -647,6 +648,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkCNPJCli, "CNPJ");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkLimiteRotativo, "Limite Rotativo");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -667,7 +670,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addGroup(vRPanel2Layout.createSequentialGroup()
                         .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCNPJCli)))
+                        .addComponent(chkCNPJCli)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkLimiteRotativo)))
                 .addContainerGap(135, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -682,7 +687,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCNPJCli)))
+                    .addComponent(chkCNPJCli)
+                    .addComponent(chkLimiteRotativo)))
         );
 
         vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente Eventual"));
@@ -1283,6 +1289,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificarProd;
     private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
+    private javax.swing.JCheckBox chkLimiteRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPorEanHistorico;
     private vrframework.bean.checkBox.VRCheckBox chkProdUnifProdutos;
@@ -1462,6 +1469,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         List<OpcaoCliente> opcoes = new ArrayList<>();                                        
                                         if (chkCliPrefInscricaoEstadual.isSelected()) {
                                             opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+                                        }
+                                        if (chkLimiteRotativo.isSelected()) {
+                                            opcoes.add(OpcaoCliente.VALOR_LIMITE);
                                         }
                                         if (!opcoes.isEmpty()) {
                                             importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));                                        

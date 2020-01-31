@@ -963,6 +963,8 @@
                                           <Component id="chkCliPrefInscricaoEstadual" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCNPJCli" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkLimiteRotativo" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <EmptySpace pref="135" max="32767" attributes="0"/>
@@ -983,6 +985,7 @@
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkCliPrefInscricaoEstadual" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkCNPJCli" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkLimiteRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -1022,6 +1025,11 @@
                         <Component class="javax.swing.JCheckBox" name="chkCNPJCli">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="CNPJ"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="chkLimiteRotativo">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Limite Rotativo"/>
                           </Properties>
                         </Component>
                       </SubComponents>
