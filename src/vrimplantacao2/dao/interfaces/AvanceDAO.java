@@ -828,8 +828,11 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setDataAdmissao(rst.getDate("admissao"));
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limitecheque"));
-                    imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - "
-                            + Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));
+                    //imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - "
+                    //        + Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));
+                    
+                    imp.setObservacao(Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));                    
+                    imp.setObservacao2(imp.getObservacao());
 
                     /*if (rst.getDouble("limite") > 0) {
                         imp.setPermiteCreditoRotativo(true);
