@@ -17,6 +17,7 @@ import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -614,9 +615,50 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
     }
 
     @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  CODIGO,\n"
+                    + "  CODLOJA,\n"
+                    + "  CODTIT,\n"
+                    + "  NFISCAL,\n"
+                    + "  CODIGOFAT,\n"
+                    + "  DATADIGT,\n"
+                    + "  EMISSAO,\n"
+                    + "  VENCIMENTO,\n"
+                    + "  VALOR,\n"
+                    + "  VALRECEB,\n"
+                    + "  VLR_REST,\n"
+                    + "  VLABERTO,\n"
+                    + "CREDOR,\n"
+                    + "OBSERVACAO\n"
+                    + "from TITULOS\n"
+                    + "where VLABERTO > 0\n"
+                    + "and CODLOJA = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("CODIGO"));
+                    imp.setNumeroCupom(rst.getString("NFISCAL"));
+                    imp.setDataEmissao(rst.getDate("EMISSAO"));
+                    imp.setDataVencimento(rst.getDate("VENCIMENTO"));
+                    imp.setValor(rst.getDouble("VLABERTO"));
+                    imp.setIdCliente(rst.getString("CREDOR"));
+                    imp.setObservacao(rst.getString("OBSERVACAO"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                     "select\n" +

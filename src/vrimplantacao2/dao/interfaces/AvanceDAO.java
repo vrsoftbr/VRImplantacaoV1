@@ -624,8 +624,14 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                                 (rst.getString("emailsup") == null ? "" : rst.getString("emailsup").trim())
                         );
                     }
-                    imp.setCondicaoPagamento(Utils.stringToInt(Utils.formataNumero(rst.getString("condpagamento"))));
-                    imp.setPrazoEntrega(rst.getInt("prev_entrega"));
+                    
+                    if (Utils.stringToInt(Utils.formataNumero(rst.getString("condpagamento"))) > 0) {
+                        imp.setCondicaoPagamento(Utils.stringToInt(Utils.formataNumero(rst.getString("condpagamento"))));
+                    }
+                    
+                    if (rst.getInt("prev_entrega") > 0) {
+                        imp.setPrazoEntrega(rst.getInt("prev_entrega"));
+                    }
 
                     if (rst.getInt("produtor_rural") == 1) {
                         imp.setProdutorRural();
