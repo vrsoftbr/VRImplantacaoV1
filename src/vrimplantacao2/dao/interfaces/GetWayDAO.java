@@ -1693,7 +1693,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select codaliq, descricao from aliquota_icms"
+                    "select replace(codaliq,'\\','\\\\') codaliq, descricao from aliquota_icms"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));

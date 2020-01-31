@@ -34,6 +34,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -701,14 +702,15 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    data,\n" +
                     "    dtvenc vencimento,\n" +
                     "    hora,\n" +
-                    "    valor,\n" +
+                    "    (valor - valorpago) valor,\n" +
                     "    obs\n" +
                     "FROM \n" +
                     "	climov\n" +
                     "where\n" +
                     "    situacao = 0 and\n" +
                     "    dtvenc is not null and\n" +
-                    "    dtvenc != '1899-12-30' and dtvenc >= '2018-01-01'\n" +
+                    "    dtvenc != '1899-12-30' and data >= '2018-01-01' and\n" +
+                    "    codigo in (2, 8, 10, 14, 18, 217, 220, 313)\n" +        
                     "order by\n" +
                     "	dtvenc")) {
                 while(rs.next()) {
@@ -730,6 +732,44 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n" +
+                    "    ofe.DATAINI datainicio,\n" +
+                    "    ofe.DATAFIM datafim,\n" +
+                    "    ofei.PRODUTO id_produto,\n" +
+                    "    ofei.DESCRICAO descricao_produto,\n" +
+                    "    ofei.PRECOANT precovenda,\n" +
+                    "    ofei.PRECOPRM precopromocao\n" +
+                    "FROM \n" +
+                    "	cadprc ofe\n" +
+                    "join cadpri ofei on ofei.CODIGO = ofe.CODIGO\n" +
+                    "where\n" +
+                    "	ofe.datafim > now() and \n" +
+                    "	ofe.TIPO = 1\n" +
+                    "order by\n" +
+                    "	ofe.datafim"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoOferta(rst.getDouble("precopromocao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 

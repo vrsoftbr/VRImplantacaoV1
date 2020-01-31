@@ -36,6 +36,7 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoComplementoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
@@ -450,6 +451,14 @@ public class ProdutoRepositoryProvider {
         }
     
     }
+
+    public static class VrAtacado {
+        private AtacadoProdutoComplementoDAO atacadoProdutoComplementoDAO = new AtacadoProdutoComplementoDAO();
+        
+        public void salvar(AtacadoProdutoComplementoVO vo, Set<OpcaoProduto> opt) throws Exception {
+            atacadoProdutoComplementoDAO.salvar(vo, opt);
+        }
+    }
     
     public static class Oferta {
         private ProdutoRepositoryProvider provider;
@@ -476,6 +485,7 @@ public class ProdutoRepositoryProvider {
     private EanAnterior eanAnterior = new EanAnterior();
     private Tributo tributo = new Tributo();
     private Atacado atacado = new Atacado();
+    private VrAtacado vrAtacado = new VrAtacado();
     private Oferta oferta = new Oferta(this);
 
     
@@ -499,6 +509,9 @@ public class ProdutoRepositoryProvider {
     }
     public Atacado atacado() {
         return atacado;
+    }
+    public VrAtacado vrAtacado() {
+        return vrAtacado;
     }
     public Oferta oferta() {
         return oferta;
