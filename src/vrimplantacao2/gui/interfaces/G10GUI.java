@@ -26,7 +26,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class G10GUI extends VRInternalFrame {    
     
-    private static final String NOME_SISTEMA = "G10";
+    private static final String NOME_SISTEMA = "G10 Sistemas";
     private static final String SERVIDOR_SQL = "Postgres";
     private static G10GUI instance;
     

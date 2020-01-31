@@ -238,51 +238,66 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select \n"
-                    + "     p.codigo id,\n"
-                    + " 	cadastro dataCadastro,\n"
-                    + "     ultimaalteracao dataAlteracao,\n"
-                    + "     codigobarrasbuscapreco ean,\n"
-                    + "     1 qtdembalagem,\n"
-                    + "     un.descricao tipoEmbalagem,\n"
-                    + "     case when balanca = '1' then 1 else 0 end eBalanca,\n"
-                    + "     p.descricao descricaoCompleta,\n"
-                    + "     descricaofiscal descricaoReduzida,\n"
-                    + "     p.descricao descricaoGondola,\n"
-                    + "     (select saldoatual\n"
-                    + "		from fechamentomensalestoqueloja01\n"
-                    + "			where mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint ) as estoque,\n"
-                    + "     pesobruto,\n"
-                    + "     pesoliquido,\n"
-                    + "     estoqueMaximo,\n"
-                    + "     estoqueMinimo,\n"
-                    + "     margemlucro margem,\n"
-                    + "     margemlucrominima margemMinima,\n"
-                    + "     valorcompra custoSemImposto,\n"
-                    + "     valorcompra custoComImposto,\n"
-                    + "     custoanterior custoAnteriorSemImposto,\n"
-                    + "     valor precovenda,\n"
-                    + "     pa.preco precoatacado,\n"
-                    + "     case when statusid = 29 then 1 else 0 end situacaoCadastro ,\n"
-                    + "     ncmsh ncm,\n"
-                    + "     si.cest,\n"
-                    + "     pc.pis_cst_e piscofinsCstCredito,\n"
-                    + "     pc.pis_cst_s piscofinsCstDebito,\n"
-                    + "     pc.cod_natureza_receita piscofinsNaturezaReceita,\n"
-                    + "     ei.ei_cst icmsCstEntrada,\n"
-                    + "     ei.ei_alq icmsAliqEntrada,\n"
-                    + "     ei.ei_rbc icmsReducaoEntrada,\n"
-                    + "     si.sac_cst icmsCstSaida,\n"
-                    + "     si.sac_alq icmsAliqSaida,\n"
-                    + "     si.sac_rbc icmsReducaoSaida\n"
-                    + " from produto p\n"
-                    + "     left join unidade un on un.id = p.unidadeid\n"
-                    + "     left join familiaproduto f on p.familiaprodutoid = f.id\n"
-                    + "     left join produtoprecoauxiliar pa on p.id = pa.produtoid\n"
-                    + "     left join mxf_vw_icms si on si.codigo_produto = p.codigo\n"
-                    + "     left join mxf_vw_icms_entrada ei on ei.codigo_produto = p.codigo\n"
-                    + "     left join mxf_vw_pis_cofins pc on pc.codigo_produto = p.codigo\n"
-                    + "	order by 1")) {
+                    /*"select * from fechamentomensalestoquemestre loja01\n" +
+                    "    (\n" +
+                    "		select\n" +
+                    "			saldoatual\n" +
+                    "		from\n" +
+                    "			fechamentomensalestoqueloja01\n" +
+                    "		 where\n" +
+                    "			mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint \n" +
+                    "	) as estoque,\n" +*/
+                    "select \n" +
+                    "	p.codigo id,\n" +
+                    "	p.cadastro dataCadastro,\n" +
+                    "	p.ultimaalteracao dataAlteracao,\n" +
+                    "	p.codigobarrasbuscapreco ean,\n" +
+                    "	1 qtdembalagem,\n" +
+                    "	un.descricao tipoEmbalagem,\n" +
+                    "	case \n" +
+                    "		when balanca = '1' then 1 else 0 \n" +
+                    "	end eBalanca,\n" +
+                    "	p.descricao descricaoCompleta,\n" +
+                    "	p.descricaofiscal descricaoReduzida,\n" +
+                    "	p.descricao descricaoGondola,\n" +
+                    "	p.familiaprodutoid mercadologico1,\n" +
+                    "	p.pesobruto,\n" +
+                    "	p.pesoliquido,\n" +
+                    "	p.estoqueMaximo,\n" +
+                    "	p.estoqueMinimo,\n" +
+                    "	p.margemlucro margem,\n" +
+                    "	p.margemlucrominima margemMinima,\n" +
+                    "	p.valorcompra custoSemImposto,\n" +
+                    "	p.valorcompra custoComImposto,\n" +
+                    "	p.custoanterior custoAnteriorSemImposto,\n" +
+                    "	p.valor precovenda,\n" +
+                    "	pa.preco precoatacado,\n" +
+                    "	case \n" +
+                    "		when statusid = 29 then 1 else 0 \n" +
+                    "	end situacaoCadastro ,\n" +
+                    "	ncmsh ncm,\n" +
+                    "	p.cest,\n" +
+                    "	piscste.codigo piscofinsCstCredito,\n" +
+                    "	piscsts.codigo piscofinsCstDebito,\n" +
+                    "	p.cod_natureza_receita piscofinsNaturezaReceita,\n" +
+                    "	icms.tabelaimpostosid\n" +
+                    "from \n" +
+                    "	produto p\n" +
+                    "	join unidade un on \n" +
+                    "		un.id = p.unidadeid\n" +
+                    "	left join produtoprecoauxiliar pa on\n" +
+                    "		p.id = pa.produtoid	\n" +
+                    "	join impostosproduto icms on\n" +
+                    "		icms.produtoid = p.id and\n" +
+                    "		icms.pessoaemitente = 1428\n" +
+                    "	join tabelaimpostos imp ON \n" +
+                    "	 	imp.id = icms.tabelaimpostosid\n" +
+                    "   join cstpis piscste ON\n" +
+                    "		piscste.id = imp.cstpisentradaid\n" +
+                    "	join cstpis piscsts ON\n" +
+                    "		piscsts.id = imp.cstpissaidaid\n" +
+                    "order by 1"
+            )) {
 
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
@@ -301,13 +316,14 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaoGondola"));
+                    imp.setCodMercadologico1(rs.getString("mercadologico1"));
 
                     //imp.setCodMercadologico1(rs.getString("codMercadologico1"));
                     //imp.setCodMercadologico2(rs.getString("codMercadologico2"));
                     //imp.setIdFamiliaProduto(rs.getString("idFamiliaProduto"));
                     imp.setPesoBruto(rs.getInt("pesobruto"));
                     imp.setPesoLiquido(rs.getInt("pesoliquido"));
-                    imp.setEstoque(rs.getDouble("estoque"));
+                    //imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setMargem(rs.getDouble("margem"));
@@ -324,12 +340,12 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsNaturezaReceita"));
 
-                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
-                    imp.setIcmsAliqSaida(rs.getInt("icmsAliqSaida"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
-                    imp.setIcmsCstEntrada(rs.getInt("icmsCstEntrada"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmsAliqEntrada"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsReducaoEntrada"));
+                    imp.setIcmsDebitoId(rs.getString("tabelaimpostosid"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("tabelaimpostosid"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("tabelaimpostosid"));
+                    imp.setIcmsCreditoId(rs.getString("tabelaimpostosid"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("tabelaimpostosid"));
+                    imp.setIcmsConsumidorId(rs.getString("tabelaimpostosid"));
 
                     imp.setAtacadoPreco(rs.getDouble("precoatacado"));
                     //imp.setCodigoSped(rs.getString("codigoSped"));
