@@ -103,7 +103,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.MARGEM
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.VR_ATACADO
                 }
         ));
     }
@@ -132,16 +133,18 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	distinct\n"
-                    + "	d.CODIGO cod_merc1,\n"
-                    + "	d.NOME descmerc1,\n"
-                    + "	g.CODIGO cod_merc2,\n"
-                    + "	g.NOME descmerc2\n"
+                    + "	m.CODIGO cod_merc1,\n"
+                    + " m.NOME descmerc1,	\n"
+                    + "	d.CODIGO cod_merc2,\n"
+                    + "	d.NOME descmerc2,\n"
+                    + "	g.CODIGO cod_merc3,\n"
+                    + "	g.NOME descmerc3\n"
                     + "FROM\n"
                     + "	cadmer p\n"
+                    + "JOIN marca m ON p.MARCA = m.CODIGO	\n"
                     + "JOIN depto d ON p.DEPART = d.CODIGO\n"
                     + "JOIN grupo g ON p.GRUPO = g.CODIGO\n"
-                    + "ORDER BY\n"
-                    + "	1, 3"
+                    + "ORDER BY 1, 3, 5"
             )) {
                 while (rst.next()) {
 
@@ -153,9 +156,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rst.getString("descmerc1"));
                     imp.setMerc2ID(rst.getString("cod_merc2"));
                     imp.setMerc2Descricao(rst.getString("descmerc2"));
-                    imp.setMerc3ID(rst.getString("cod_merc2"));
-                    imp.setMerc3Descricao(rst.getString("descmerc2"));
-
+                    imp.setMerc3ID(rst.getString("cod_merc3"));
+                    imp.setMerc3Descricao(rst.getString("descmerc3"));
                     result.add(imp);
 
                 }
@@ -210,8 +212,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.validade,\n"
                     + "	p.descricao descricaocompleta,\n"
                     + "	p.descecf descricaoreduzida,\n"
-                    + "	p.depart mercadologico1,\n"
-                    + " p.grupo mercadologico2,\n"
+                    + " p.MARCA as mercadologico1,\n"
+                    + "	p.depart mercadologico2,\n"
+                    + " p.grupo mercadologico3,\n"
                     + "	p.id_familia,\n"
                     + "	p.peso_bruto,\n"
                     + "	p.peso_liquido,\n"
@@ -295,7 +298,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
@@ -320,9 +323,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("aliquota"));
                     imp.setIcmsCreditoId(rst.getString("aliquota"));
                     imp.setPautaFiscalId(imp.getImportId());
-
                     imp.setSugestaoCotacao(rst.getInt("sugestaocotacao") == 1);
-
                     result.add(imp);
                 }
             }
@@ -405,8 +406,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
-        if (opcao == OpcaoProduto.ATACADO) {
-            List<ProdutoIMP> result = new ArrayList<>();
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opcao == OpcaoProduto.ATACADO) {            
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rs = stm.executeQuery(
                         "select \n"
@@ -436,6 +438,32 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setEan(rs.getString("ean"));
                         imp.setQtdEmbalagem(rs.getInt("quantidade"));
 
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        
+        if (opcao == OpcaoProduto.VR_ATACADO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n"
+                        + "  id_cab,\n"
+                        + "  id_cadmer AS idproduto,\n"
+                        + "  preco_cadmer AS precovenda,\n"
+                        + "  preco_negociado,\n"
+                        + "  porcentagem\n"
+                        + "FROM precos_item  \n"
+                        + "WHERE id_cab = 2\n"
+                        + "AND preco_negociado > 0"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setPrecovenda(rst.getDouble("preco_negociado"));
                         result.add(imp);
                     }
                 }
@@ -801,21 +829,16 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limitecheque"));
                     imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - "
-                            + rst.getString("obs") + " " + rst.getString("anotacoes"));
+                            + Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));
 
                     /*if (rst.getDouble("limite") > 0) {
                         imp.setPermiteCreditoRotativo(true);
                     }*/
+                                        
+                    imp.setBloqueado(rst.getInt("bloqueado_crd") == 1);
+                    imp.setPermiteCheque((rst.getInt("bloqueado") == 0));
+                    imp.setPermiteCreditoRotativo(rst.getInt("bloqueado_crd") == 0);                    
                     
-                    if (rst.getInt("bloqueado_crd") == 1) {
-                        imp.setPermiteCreditoRotativo(false);
-                        imp.setBloqueado(true);
-                    }
-                    
-                    if (rst.getInt("bloqueado") == 1) {
-                        imp.setPermiteCheque(false);
-                    }
-
                     /*if (rst.getDouble("limitecheque") > 0) {
                         imp.setPermiteCheque(true);
                     }*/

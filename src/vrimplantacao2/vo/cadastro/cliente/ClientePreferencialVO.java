@@ -51,7 +51,7 @@ public class ClientePreferencialVO {
     private String nomeMae;// character varying(40) NOT NULL,
     private String nomePai;// character varying(40) NOT NULL,
     private Date dataRestricao;// date,
-    private boolean bloqueado;// boolean NOT NULL,
+    private boolean bloqueado = false;// boolean NOT NULL,
     private String numero = "0";// character varying(6) NOT NULL,
     private String numeroEmpresa = "0";// character varying(6) NOT NULL DEFAULT '0'::character varying,
     private String complemento;// character varying(30) NOT NULL DEFAULT ''::character varying,

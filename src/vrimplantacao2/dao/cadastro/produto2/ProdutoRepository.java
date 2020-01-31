@@ -19,6 +19,7 @@ import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
@@ -367,6 +368,8 @@ public class ProdutoRepository {
 
                         ProdutoAutomacaoLojaVO precoAtacadoLoja = converterProdutoAutomacaoLoja(imp);
                         ProdutoAutomacaoDescontoVO precoAtacadoDesconto = converterProdutoAutomacaoDesconto(imp);
+                        AtacadoProdutoComplementoVO atacadoProdutoComplemento = converterAtacadoProdutoComplemtnto(imp, id);
+                        
                         precoAtacadoDesconto.setProduto(prod);   
                         
                         provider.atualizar(prod, optSimples);
@@ -385,6 +388,13 @@ public class ProdutoRepository {
                                 provider.eanAnterior().salvar(eanAnterior);
                             }
                         }
+                        
+                        if (optSimples.contains(OpcaoProduto.VR_ATACADO)) {
+                            if (id > 0) {
+                                provider.vrAtacado().salvar(atacadoProdutoComplemento, optSimples);
+                            }
+                        }
+                        
                         provider.automacao().atualizar(automacao, optSimples);
 
                         if (aliquotas.containsKey(prod.getId(), aliquota.getEstado().getId())) {
@@ -1441,6 +1451,14 @@ public class ProdutoRepository {
             }
         }
         vo.setDesconto(desconto);
+        return vo;
+    }
+    
+    private AtacadoProdutoComplementoVO converterAtacadoProdutoComplemtnto(ProdutoIMP imp, int id) {
+        AtacadoProdutoComplementoVO vo = new AtacadoProdutoComplementoVO();
+        vo.setIdLoja(provider.getLojaVR());
+        vo.setIdProduto(id);
+        vo.setPrecoVenda(imp.getPrecovenda());
         return vo;
     }
 
