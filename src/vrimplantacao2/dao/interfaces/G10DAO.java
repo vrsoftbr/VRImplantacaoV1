@@ -44,11 +44,11 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    " select\n"
                     + "     1 as id,\n"
                     + "     identificador as cnpj,\n"
                     + "     nomefantasia as nome\n"
-                    + "from dadospessoajuridica dpj\n"
+                    + " from dadospessoajuridica dpj\n"
                     + "     join dados d \n"
                     + "     on d.id = dpj.id\n"
                     + " where d.id = 1428"
@@ -66,93 +66,98 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      distinct\n"
-                    + "      fiscal.cod::integer,\n"
-                    + "      fiscal.dsc,\n"
-                    + "      fiscal.ctr,\n"
-                    + "      fiscal.ica,\n"
-                    + "      fiscal.icr,\n"
-                    + "      fiscal.icf\n"
-                    + "from\n"
-                    + "    gceffs01 fiscal\n"
-                    + "where\n"
-                    + "     fiscal.ufo = 'RJ' and\n"
-                    + "     fiscal.ufd = 'RJ' and\n"
-                    + "     fiscal.rgf = 0\n"
-                    + "order by\n"
-                    + "     fiscal.cod::integer")) {
+                    " select \n"
+                    + "     i.id cod,\n"
+                    + "     i.descricao dsc,\n"
+                    + "     aliquotaicms aliq,\n"
+                    + "     c.codigo csticms,\n"
+                    + "     percentbasecalcicms reducao\n"
+                    + " from tabelaimpostos i\n"
+                    + "     left join cst c\n"
+                    + "     on i.cstid = c.id\n"
+                    + " order by 1")) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("cod"), rs.getString("dsc")));
+                    result.add(new MapaTributoIMP(rs.getString("cod"),
+                            String.format(
+                                    "%d-%.2f-%.2f-%s",
+                                    rs.getInt("csticms"),
+                                    rs.getDouble("aliq"),
+                                    rs.getDouble("reducao"),
+                                    rs.getString("dsc")
+                            ),
+                            rs.getInt("csticms"),
+                            rs.getDouble("aliq"),
+                            rs.getDouble("reducao")));
                 }
             }
         }
         return result;
     }
 
-/*    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                      "select distinct\n"
-                    + "     tp.id::varchar Merc1ID,\n"
-                    + "     tp.descricao Merc1Descricao,\n"
-                    + "     sb.id::varchar Merc2ID,\n"
-                    + "     sb.descricao Merc2Descricao,\n"
-                    + "     s.id::varchar Merc3ID,\n"
-                    + "     s.descricao Merc3Descricao\n"
-                    + "from produto p\n"
-                    + "     inner join tipoproduto tp\n"
-                    + "		on tp.id::varchar = p.tipoprodutoid::varchar\n"
-                    + "	inner join subsecao sb\n"
-                    + "		on p.subsecaoid = sb.id\n"
-                    + "	inner join secao s\n"
-                    + "		on sb.secaoid::varchar = s.id::varchar\n"
-                    + "order by 1,3,5"
-            )) {
-                while (rs.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rs.getString("Merc1ID"));
-                    imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-                    imp.setMerc2ID(rs.getString("Merc2ID"));
-                    imp.setMerc2Descricao(rs.getString("Merc2Descricao"));
-                    imp.setMerc3ID(rs.getString("Merc3ID"));
-                    imp.setMerc3Descricao(rs.getString("Merc3Descricao"));
+    /*    @Override
+     public List<MercadologicoIMP> getMercadologicos() throws Exception {
+     List<MercadologicoIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+     try (ResultSet rs = stm.executeQuery(
+     "select distinct\n"
+     + "     tp.id::varchar Merc1ID,\n"
+     + "     tp.descricao Merc1Descricao,\n"
+     + "     sb.id::varchar Merc2ID,\n"
+     + "     sb.descricao Merc2Descricao,\n"
+     + "     s.id::varchar Merc3ID,\n"
+     + "     s.descricao Merc3Descricao\n"
+     + "from produto p\n"
+     + "     inner join tipoproduto tp\n"
+     + "		on tp.id::varchar = p.tipoprodutoid::varchar\n"
+     + "	inner join subsecao sb\n"
+     + "		on p.subsecaoid = sb.id\n"
+     + "	inner join secao s\n"
+     + "		on sb.secaoid::varchar = s.id::varchar\n"
+     + "order by 1,3,5"
+     )) {
+     while (rs.next()) {
+     MercadologicoIMP imp = new MercadologicoIMP();
+     imp.setImportLoja(getLojaOrigem());
+     imp.setImportSistema(getSistema());
+     imp.setMerc1ID(rs.getString("Merc1ID"));
+     imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
+     imp.setMerc2ID(rs.getString("Merc2ID"));
+     imp.setMerc2Descricao(rs.getString("Merc2Descricao"));
+     imp.setMerc3ID(rs.getString("Merc3ID"));
+     imp.setMerc3Descricao(rs.getString("Merc3Descricao"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    " select\n"
                     + "     fornecedorid idFornecedor,\n"
-                    + "     produtoid idProduto,\n"
+                    + "     p.codigo idProduto,\n"
                     + "     codprodfornecedor codigoExterno,\n"
-                    + "     (select qtdeembalagem::varchar from produto p where p.id::varchar = pf.produtoid::varchar) as qtdEmbalagem,\n"
+                    + "     p.qtdeembalagem::varchar qtdEmbalagem,\n"
                     + "     data dataAlteracao,\n"
-                    + "     aliquotaipi ipi\n"
-                    + "from produtofornecedor pf\n"
-                    + "     order by 1")) {
+                    + "     pf.aliquotaipi ipi\n"
+                    + " from produtofornecedor pf\n"
+                    + "     left join produto p\n"
+                    + "		on p.id = pf.produtoid\n"
+                    + " order by 1")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idFornecedor"));
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setIpi(rs.getDouble("ipi"));
 
                     result.add(imp);
@@ -167,30 +172,30 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "     (titulo||''||npar)::varchar as id,\n"
-                    + "     datavenda dataEmissao,\n"
-                    + "     numeropedido numeroCupom,\n"
-                    + "     statusgrupoid ecf,\n"
-                    + "     totaltitulo valor,\n"
-                    + "     obstitulo observacao,\n"
-                    + "     pessoaid idCliente,\n"
-                    + "     datavencimento dataVencimento,\n"
-                    + "     npar parcela,\n"
-                    + "     juros,\n"
-                    + "     identificador cnpjCliente\n"
-                    + "from registrobaixatemporaria\n"
-                    + "     where status = 'Aberto'\n"
-                    + "     order by numerocupom, idcliente")) {
+                      " select\n"
+                    + "     cr.id id,\n"
+                    + "     cr.dataperiodoinicial dataemissao,\n"
+                    + "     vc.numeropedido::bigint numerocupom,\n"
+                    + "     valor,\n"
+                    + "     cr.obs observacao,\n"
+                    + "     c.id idcliente,\n"
+                    + "     cr.datavencimento datavencimento,\n"
+                    + "     numerototalparcelas parcela,\n"
+                    + "     case when now() > datavencimento then trunc((valor * (12.0/100.0))::numeric,2) else 0 end juros,\n"
+                    + "     c.identificador cnpjcliente\n"
+                    + " from titulo cr\n"
+                    + "     left join vw_pessoas c on c.id = cr.pessoaid\n"
+                    + "     left join vendacliente vc on cr.id = vc.tituloid\n"
+                    + " where cr.statusid = 1\n"
+                    + "     order by vc.numeropedido")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
-                    imp.setEcf(rs.getString("ecf"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao("Doc.: " + rs.getString("observacao"));
+                    imp.setObservacao(rs.getString("observacao"));
                     imp.setIdCliente(rs.getString("idCliente"));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
                     imp.setParcela(rs.getInt("parcela"));
@@ -204,38 +209,38 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "     id CodFamilia,\n"
-                    + "     descricao DescricaoFamilia\n"
-                    + "from familiaproduto")) {
-                while (rs.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
+    /*
+     @Override
+     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+     List<FamiliaProdutoIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+     try (ResultSet rs = stm.executeQuery(
+     "select\n"
+     + "     id CodFamilia,\n"
+     + "     descricao DescricaoFamilia\n"
+     + "from familiaproduto")) {
+     while (rs.next()) {
+     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+     imp.setImportLoja(getLojaOrigem());
+     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rs.getString("CodFamilia"));
-                    imp.setDescricao(rs.getString("DescricaoFamilia"));
+     imp.setImportId(rs.getString("CodFamilia"));
+     imp.setDescricao(rs.getString("DescricaoFamilia"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select \n"
+                      " select \n"
                     + "     p.codigo id,\n"
-                    + "     cadastro dataCadastro,\n"
+                    + " 	cadastro dataCadastro,\n"
                     + "     ultimaalteracao dataAlteracao,\n"
                     + "     codigobarrasbuscapreco ean,\n"
                     + "     1 qtdembalagem,\n"
@@ -244,9 +249,9 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     p.descricao descricaoCompleta,\n"
                     + "     descricaofiscal descricaoReduzida,\n"
                     + "     p.descricao descricaoGondola,\n"
-                    //+ "     tipoprodutoid codMercadologico1,\n"
-                    //+ "     subsecaoid codMercadologico2,\n"
-                    + "     p.familiaprodutoid idFamiliaProduto,\n"
+                    + "     (select saldoatual\n"
+                    + "		from fechamentomensalestoqueloja01\n"
+                    + "			where mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint ) as estoque,\n"
                     + "     pesobruto,\n"
                     + "     pesoliquido,\n"
                     + "     estoqueMaximo,\n"
@@ -270,15 +275,14 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     si.sac_cst icmsCstSaida,\n"
                     + "     si.sac_alq icmsAliqSaida,\n"
                     + "     si.sac_rbc icmsReducaoSaida\n"
-                    + "from produto p\n"
+                    + " from produto p\n"
                     + "     left join unidade un on un.id = p.unidadeid\n"
                     + "     left join familiaproduto f on p.familiaprodutoid = f.id\n"
-                    //+ "     left join spedcodigoreceita scr on scr.id = p.spedcodigoreceitaid\n"
                     + "     left join produtoprecoauxiliar pa on p.id = pa.produtoid\n"
                     + "     left join mxf_vw_icms si on si.codigo_produto = p.codigo\n"
                     + "     left join mxf_vw_icms_entrada ei on ei.codigo_produto = p.codigo\n"
                     + "     left join mxf_vw_pis_cofins pc on pc.codigo_produto = p.codigo\n"
-                    + "order by 1")) {
+                    + "	order by 1")) {
 
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
@@ -292,42 +296,41 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-                    //imp.setEstoque(rs.getDouble("estoque"));
 
+                    //imp.setEstoque(rs.getDouble("estoque"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaoGondola"));
 
                     //imp.setCodMercadologico1(rs.getString("codMercadologico1"));
                     //imp.setCodMercadologico2(rs.getString("codMercadologico2"));
-                    imp.setIdFamiliaProduto(rs.getString("idFamiliaProduto"));
-
+                    //imp.setIdFamiliaProduto(rs.getString("idFamiliaProduto"));
                     imp.setPesoBruto(rs.getInt("pesobruto"));
                     imp.setPesoLiquido(rs.getInt("pesoliquido"));
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setMargemMinima(rs.getDouble("margemMinima"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rs.getDouble("custoComImposto"));
                     imp.setCustoAnteriorSemImposto(rs.getDouble("custoAnteriorSemImposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rs.getInt("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    
+
                     imp.setPiscofinsCstCredito(rs.getString("piscofinsCstCredito"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsNaturezaReceita"));
+
                     imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
                     imp.setIcmsAliqSaida(rs.getInt("icmsAliqSaida"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
                     imp.setIcmsCstEntrada(rs.getInt("icmsCstEntrada"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsAliqEntrada"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icmsReducaoEntrada"));
-                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
-                    
+
                     imp.setAtacadoPreco(rs.getDouble("precoatacado"));
                     //imp.setCodigoSped(rs.getString("codigoSped"));
 
@@ -465,7 +468,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select distinct\n"
+                    " select distinct\n"
                     + "     c.id as id,\n"
                     + "     vc.identificador as cnpj,\n"
                     + "     dpf.inscricaoestadual as inscricaoestadual,\n"
@@ -484,6 +487,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     dpf.datanascimento as datanascimento,\n"
                     + "     vc.datacadastro as datacadastro,\n"
                     + "     c.limitefinanceiro as valorlimite,\n"
+                    + "     c.diapagamento diavencimento,\n"
                     + "     dpf.conjuge as nomeconjuge,\n"
                     + "     dpf.nomepai as nomepai,\n"
                     + "     dpf.nomemae as nomemae,\n"
@@ -491,7 +495,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     c.limitefinanceiro as limitecompra,\n"
                     + "     vc.inscricaomunicipal as inscricaomunicipal,\n"
                     + "     d.contribuinteicms as tipoindicadorie\n"
-                    + "from cliente c\n"
+                    + " from cliente c\n"
                     + "     left join vw_pessoas vc\n"
                     + "		on c.id = vc.id\n"
                     + "     left  join endereco e\n"
@@ -530,6 +534,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setValorLimite(rs.getDouble("valorlimite"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
                     //imp.setTipoIndicadorIe(rs.getInt("tipoindicadorie"));
                     imp.setNomeConjuge(rs.getString("nomeconjuge"));
                     imp.setNomePai(rs.getString("nomepai"));
