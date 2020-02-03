@@ -355,7 +355,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rs.getDouble("custoComImposto"));
                     imp.setCustoAnteriorSemImposto(rs.getDouble("custoAnteriorSemImposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(rs.getInt("situacaoCadastro"));
+                    imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
 
@@ -393,10 +393,6 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                             }
                         }
                     }
-                    //imp.seteBalanca(rs.getString("tipoembalagem").contains("KG") ? true : false);
-                    //imp.setValidade(rs.getInt("validade"));
-
-                    //imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     result.add(imp);
                 }
             }
@@ -441,34 +437,39 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "vp.id importId,\n"
-                    + "vp.razaosocial razao,\n"
-                    + "vp.nomefantasia fantasia,\n"
-                    + "vp.identificador cnpj_cpf,\n"
-                    + "vp.inscricaoestadual ie_rg,\n"
-                    + "vp.inscricaomunicipal insc_municipal,\n"
-                    + "dpj.suframa suframa,\n"
-                    + "case when vp.status = 18 then 1 else 0 end ativo,\n"
-                    + "logradouro endereco,\n"
-                    + "e.numero,\n"
-                    + "complemento,\n"
-                    + "bairro,\n"
-                    + "e.cidade ibge_municipio,\n"
-                    + "c.cidade municipio,\n"
-                    + "est.descricao uf,\n"
-                    + "cep,\n"
-                    + "t.ddd||''||t.numero tel_principal,\n"
-                    + "vp.datacadastro datacadastro,\n"
-                    + "dpj.obs	observacao\n"
-                    + "from vw_pessoas vp\n"
-                    + "left join endereco e on e.dadosid = vp.id\n"
-                    + "left join estado est on est.id = e.estado::bigint\n"
-                    + "left join cidade c on c.id::varchar = e.cidade\n"
-                    + "left join telefone t on t.dadosid = vp.id\n"
-                    + "left join dadospessoajuridica dpj on vp.id = dpj.id\n"
-                    + "where vp.id in (select id from vw_fornecedor)\n"
-                    + "order by 1"
+                    "select\n" +
+                    "	d.id importId,\n" +
+                    "	coalesce(pj.razaosocial, pf.nome) razao,\n" +
+                    "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n" +
+                    "	d.identificador cnpj_cpf,\n" +
+                    "	coalesce(pf.inscricaoestadual, pf.rg) ie_rg,\n" +
+                    "	pj.inscricaomunicipal insc_municipal,\n" +
+                    "	pj.suframa suframa,\n" +
+                    "	case when coalesce(pj.statusid, pf.statusid) = 18 then 1 else 0 end ativo,\n" +
+                    "	case when coalesce(pj.statusid, pf.statusid) = 20 then 1 else 0 end bloqueado,\n" +
+                    "	e.logradouro endereco,\n" +
+                    "	e.numero,\n" +
+                    "	complemento,\n" +
+                    "	bairro,\n" +
+                    "	e.cidade ibge_municipio,\n" +
+                    "	cd.descricao municipio,\n" +
+                    "	cd.estadoid uf,\n" +
+                    "	e.cep,\n" +
+                    "	d.datacadastro datacadastro,\n" +
+                    "	pj.obs observacao\n" +
+                    "from \n" +
+                    "	dados d\n" +
+                    "	join fornecedor f on\n" +
+                    "		d.id = f.id\n" +
+                    "	left join dadospessoafisica pf on\n" +
+                    "		d.id = pf.id\n" +
+                    "	left join dadospessoajuridica pj on\n" +
+                    "		d.id = pj.id\n" +
+                    "	left join endereco e on\n" +
+                    "		e.dadosid = d.id\n" +
+                    "	left join cidade cd on\n" +
+                    "		e.cidade::integer = cd.id\n" +
+                    "order by 1"
             )) {
 
                 while (rs.next()) {
@@ -491,7 +492,6 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTel_principal(rs.getString("tel_principal"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setObservacao(rs.getString("observacao"));
 
