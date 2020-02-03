@@ -2,7 +2,10 @@ package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -182,15 +185,12 @@ public class G10GUI extends VRInternalFrame {
                         if (chkFamiliaProduto.isSelected()) {                        
                             importador.importarFamiliaProduto();
                         }
-
                         if (chkMercadologico.isSelected()) {
                             importador.importarMercadologico();
                         }
-
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }
-
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
                             if (chkT1Custo.isSelected()) {
@@ -241,9 +241,6 @@ public class G10GUI extends VRInternalFrame {
                             if (chkMargem.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
-                            if (chkOferta.isSelected()){
-                                opcoes.add(OpcaoProduto.OFERTA);
-                            }                            
                             if (chkTipoEmbalagem.isSelected()) {
                                 opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
                             }
@@ -254,11 +251,12 @@ public class G10GUI extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-
+                        if (chkOferta.isSelected()){
+                            importador.importarOfertas(new Date());
+                        }                            
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
                         }
-
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
@@ -295,17 +293,23 @@ public class G10GUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {                            
                             importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
-                        
-                        if (chkLimite.isSelected()) {
-                            importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
-                        }
-                        
-                        if (chkCepCliente.isSelected()) {
-                            importador.atualizarClientePreferencial(OpcaoCliente.CEP);
-                        }
-                        
-                        if (chkComplemento.isSelected()) {
-                            importador.atualizarClientePreferencial(OpcaoCliente.COMPLEMENTO);
+                        {
+                            Set<OpcaoCliente> opcoes = new HashSet<>();
+                            if (chkLimite.isSelected()) {
+                                opcoes.add(OpcaoCliente.VALOR_LIMITE);
+                            }
+                            if (chkCepCliente.isSelected()) {
+                                opcoes.add(OpcaoCliente.CEP);
+                            }
+                            if (chkComplemento.isSelected()) {
+                                opcoes.add(OpcaoCliente.COMPLEMENTO);
+                            }
+                            if (chkVencimentoRotativo.isSelected()) {
+                                opcoes.add(OpcaoCliente.VENCIMENTO_ROTATIVO);
+                            }
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
+                            }
                         }
                         
                          if(chkRotativo.isSelected()){
@@ -415,6 +419,7 @@ public class G10GUI extends VRInternalFrame {
         chkLimite = new vrframework.bean.checkBox.VRCheckBox();
         chkCepCliente = new vrframework.bean.checkBox.VRCheckBox();
         chkComplemento = new vrframework.bean.checkBox.VRCheckBox();
+        chkVencimentoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
@@ -445,20 +450,20 @@ public class G10GUI extends VRInternalFrame {
 
         setTitle("G10");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -774,6 +779,8 @@ public class G10GUI extends VRInternalFrame {
 
         chkComplemento.setText("Complemento");
 
+        chkVencimentoRotativo.setText("Vencimento Rotativo");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -781,16 +788,15 @@ public class G10GUI extends VRInternalFrame {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(319, Short.MAX_VALUE))
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkVencimentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(302, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -804,8 +810,10 @@ public class G10GUI extends VRInternalFrame {
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkVencimentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(162, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
@@ -1155,6 +1163,7 @@ public class G10GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTemBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkVencimentoRotativo;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.comboBox.VRComboBox cmbPlanoContas;

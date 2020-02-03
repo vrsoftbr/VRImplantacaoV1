@@ -10,16 +10,12 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -172,22 +168,35 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select\n"
-                    + "     cr.id id,\n"
-                    + "     cr.dataperiodoinicial dataemissao,\n"
-                    + "     vc.numeropedido::bigint numerocupom,\n"
-                    + "     valor,\n"
-                    + "     cr.obs observacao,\n"
-                    + "     c.id idcliente,\n"
-                    + "     cr.datavencimento datavencimento,\n"
-                    + "     numerototalparcelas parcela,\n"
-                    + "     case when now() > datavencimento then trunc((valor * (12.0/100.0))::numeric,2) else 0 end juros,\n"
-                    + "     c.identificador cnpjcliente\n"
-                    + " from titulo cr\n"
-                    + "     left join vw_pessoas c on c.id = cr.pessoaid\n"
-                    + "     left join vendacliente vc on cr.id = vc.tituloid\n"
-                    + " where cr.statusid = 1\n"
-                    + "     order by vc.numeropedido")) {
+                    "select\n" +
+                    "	cr.id id,\n" +
+                    "	cr.dataperiodoinicial dataemissao,\n" +
+                    "	vc.numeropedido::bigint numerocupom,\n" +
+                    "	parc.valor,\n" +
+                    "	cr.obs observacao,\n" +
+                    "	c.id idcliente,\n" +
+                    "	parc.datavencimento datavencimento,\n" +
+                    "	numerototalparcelas parcela,\n" +
+                    "	round((parc.valor * (j.jurosmora/100) *\n" +
+                    "	(extract(day from now() - parc.datavencimento)))::numeric,2) juros\n" +
+                    "from\n" +
+                    "	titulo cr\n" +
+                    "	join parcela parc on\n" +
+                    "		parc.tituloid = cr.id\n" +
+                    "	join (select * from juros j limit 1) j on\n" +
+                    "		true\n" +
+                    "	join cliente c on\n" +
+                    "		c.id = cr.pessoaid\n" +
+                    "	left join vendacliente vc on\n" +
+                    "		cr.id = vc.tituloid\n" +
+                    "where\n" +
+                    "	cr.statusid = 1\n" +
+                    "	and	cr.tipodocumentoid = 1\n" +
+                    "	and cr.cmfid = 3\n" +
+                    "	and parc.baixacancelada is null\n" +
+                    "order by\n" +
+                    "	parc.datavencimento"
+            )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -200,7 +209,6 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setJuros(rs.getDouble("juros"));
-                    imp.setCnpjCliente(rs.getString("cnpjcliente"));
 
                     result.add(imp);
                 }
@@ -247,11 +255,24 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "		 where\n" +
                     "			mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint \n" +
                     "	) as estoque,\n" +*/
+                    "WITH ean AS (\n" +
+                    "	select\n" +
+                    "		id produtoid,\n" +
+                    "		codigobarrasbuscapreco ean\n" +
+                    "	from\n" +
+                    "		produto p\n" +
+                    "	union\n" +
+                    "	select\n" +
+                    "		produtoid,\n" +
+                    "		codigobarras ean\n" +
+                    "	from\n" +
+                    "		produtovinculovenda pvv\n" +
+                    ")\n" +
                     "select \n" +
                     "	p.codigo id,\n" +
                     "	p.cadastro dataCadastro,\n" +
                     "	p.ultimaalteracao dataAlteracao,\n" +
-                    "	p.codigobarrasbuscapreco ean,\n" +
+                    "	ean.ean,\n" +
                     "	1 qtdembalagem,\n" +
                     "	un.descricao tipoEmbalagem,\n" +
                     "	case \n" +
@@ -283,6 +304,8 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	icms.tabelaimpostosid\n" +
                     "from \n" +
                     "	produto p\n" +
+                    "	JOIN ean ON\n" +
+                    "		ean.produtoid = p.id\n" +
                     "	join unidade un on \n" +
                     "		un.id = p.unidadeid\n" +
                     "	left join produtoprecoauxiliar pa on\n" +
@@ -484,49 +507,48 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select distinct\n"
-                    + "     c.id as id,\n"
-                    + "     vc.identificador as cnpj,\n"
-                    + "     dpf.inscricaoestadual as inscricaoestadual,\n"
-                    + "     vc.nome as razao,\n"
-                    + "     vc.nome as fantasia,\n"
-                    + "     case when vc.status <> 19 then 1 else 0 end as ativo,\n"
-                    + "     case when vc.status = 18 then 0 else 1 end as bloqueado,\n"
-                    + "     logradouro as endereco,\n"
-                    + "     e.numero as numero,\n"
-                    + "     complemento,\n"
-                    + "     bairro,\n"
-                    + "     upper(cd.cidade) as municipio,\n"
-                    + "     est.descricao as uf,\n"
-                    + "     cep as cep,\n"
-                    + "     dpf.estadocivil as tipoestadocivil,\n"
-                    + "     dpf.datanascimento as datanascimento,\n"
-                    + "     vc.datacadastro as datacadastro,\n"
-                    + "     c.limitefinanceiro as valorlimite,\n"
-                    + "     c.diapagamento diavencimento,\n"
-                    + "     dpf.conjuge as nomeconjuge,\n"
-                    + "     dpf.nomepai as nomepai,\n"
-                    + "     dpf.nomemae as nomemae,\n"
-                    + "     dpf.obs as observacao,\n"
-                    + "     c.limitefinanceiro as limitecompra,\n"
-                    + "     vc.inscricaomunicipal as inscricaomunicipal,\n"
-                    + "     d.contribuinteicms as tipoindicadorie\n"
-                    + " from cliente c\n"
-                    + "     left join vw_pessoas vc\n"
-                    + "		on c.id = vc.id\n"
-                    + "     left  join endereco e\n"
-                    + "		on e.dadosid = c.id\n"
-                    + "     left join estado est\n"
-                    + "		on est.id = e.estado::bigint \n"
-                    + "     left join cidade cd\n"
-                    + "		on cd.id::varchar = e.cidade\n"
-                    + "     left join telefone t\n"
-                    + "		on t.dadosid = c.id\n"
-                    + "     left join dados d\n"
-                    + "		on d.id = c.id\n"
-                    + "     left join dadospessoafisica dpf\n"
-                    + "		on c.id = dpf.id\n"
-                    + "order by c.id")) {
+                    "select\n" +
+                    "	 d.id as id,\n" +
+                    "	 d.identificador as cnpj,\n" +
+                    "	 coalesce(pf.rg, pf.inscricaoestadual) as inscricaoestadual,\n" +
+                    "	 coalesce(pf.nome, pj.razaosocial) as razao,\n" +
+                    "	 coalesce(pf.nome, pj.nomefantasia) as fantasia,\n" +
+                    "	 case when coalesce(pf.statusid, pj.statusid) <> 19 then 1 else 0 end as ativo,\n" +
+                    "	 case when coalesce(pf.statusid, pj.statusid) = 18 then 1 else 0 end as bloqueado,\n" +
+                    "	 e.logradouro as endereco,\n" +
+                    "	 e.numero as numero,\n" +
+                    "	 e.complemento,\n" +
+                    "	 e.bairro,\n" +
+                    "	 upper(cd.cidade) as municipio,\n" +
+                    "	 cd.estadoid uf,\n" +
+                    "	 cep as cep,\n" +
+                    "	 pf.estadocivil as tipoestadocivil,\n" +
+                    "	 pf.datanascimento as datanascimento,\n" +
+                    "	 d.datacadastro as datacadastro,\n" +
+                    "	 c.limitefinanceiro as valorlimite,\n" +
+                    "	 c.diapagamento diavencimento,\n" +
+                    "	 pf.conjuge as nomeconjuge,\n" +
+                    "	 pf.nomepai as nomepai,\n" +
+                    "	 pf.nomemae as nomemae,\n" +
+                    "	 pf.obs as observacao,\n" +
+                    "	 c.limitefinanceiro as limitecompra,\n" +
+                    "	 pj.inscricaomunicipal as inscricaomunicipal,\n" +
+                    "	 d.contribuinteicms as tipoindicadorie\n" +
+                    "from \n" +
+                    "	dados d\n" +
+                    "	left join cliente c on\n" +
+                    "		d.id = c.id\n" +
+                    "	left join dadospessoafisica pf on\n" +
+                    "		d.id = pf.id\n" +
+                    "	left join dadospessoajuridica pj on\n" +
+                    "		d.id = pj.id\n" +
+                    "	left join endereco e on\n" +
+                    "		e.dadosid = d.id\n" +
+                    "	left join cidade cd on\n" +
+                    "		e.cidade::integer = cd.id\n" +
+                    "where\n" +
+                    "	not c.id is null"
+            )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 

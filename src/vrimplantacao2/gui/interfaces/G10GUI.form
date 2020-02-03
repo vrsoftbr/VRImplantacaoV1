@@ -587,20 +587,17 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCepCliente" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkComplemento" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkLimite" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
                           </Group>
-                          <EmptySpace pref="319" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkVencimentoRotativo" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkComplemento" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkLimite" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="302" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -618,8 +615,11 @@
                               <Component id="chkComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCepCliente" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="154" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCepCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkVencimentoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="162" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -660,6 +660,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkComplemento">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Complemento"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVencimentoRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Vencimento Rotativo"/>
                   </Properties>
                 </Component>
               </SubComponents>
