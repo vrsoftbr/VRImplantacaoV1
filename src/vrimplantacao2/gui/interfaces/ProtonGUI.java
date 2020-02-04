@@ -16,7 +16,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.ProtonDAO;
-import vrimplantacao2.dao.interfaces.ViaSoftDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
 
@@ -160,6 +159,11 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
                                     OpcaoCliente.SITUACAO_CADASTRO,
                                     OpcaoCliente.EMAIL);
                         }
+                        
+                        if(chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual();
+                        }
+                        
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
                             if (chkBloqueado.isSelected()) {
@@ -235,6 +239,7 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkCliIERG = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabConvenio = new javax.swing.JPanel();
@@ -343,6 +348,8 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCliIERG.setText("IE/RG");
 
+        chkClienteEventual.setText("Cliente Eventual");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -350,16 +357,21 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(415, Short.MAX_VALUE))
+                .addContainerGap(310, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -521,6 +533,7 @@ public class ProtonGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
+    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
