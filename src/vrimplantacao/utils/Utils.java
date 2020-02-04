@@ -1057,6 +1057,9 @@ public class Utils {
              email = new String(bytes, "ISO-8859-1");
             
             if (email.contains("@")) {
+                if (email.length() > tamanho) {
+                    return email.substring(0, tamanho);
+                }
                 return email;
             } else {
                 return "";

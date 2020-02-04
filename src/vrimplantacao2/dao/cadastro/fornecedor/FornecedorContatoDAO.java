@@ -14,8 +14,8 @@ public class FornecedorContatoDAO {
     private static final Logger LOG = Logger.getLogger(FornecedorContatoDAO.class.getName());
     
     public void salvar(FornecedorContatoVO vo) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
         try (Statement stm = Conexao.createStatement()) {
-            SQLBuilder sql = new SQLBuilder();
             sql.setTableName("fornecedorcontato");
             sql.put("id_fornecedor", vo.getFornecedor().getId());
             sql.put("nome", vo.getNome());
@@ -32,6 +32,8 @@ public class FornecedorContatoDAO {
                     vo.setId(rst.getInt("id"));
                 }
             }
+        } catch (Exception ex) {
+            System.out.println(sql.getInsert());
         }
     }
 

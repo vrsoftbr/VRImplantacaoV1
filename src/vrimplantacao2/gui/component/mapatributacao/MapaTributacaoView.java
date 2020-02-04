@@ -8,7 +8,6 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import org.openide.util.Exceptions;
@@ -21,7 +20,7 @@ import vrimplantacao2.vo.enums.Icms;
  *
  * @author Leandro
  */
-public class MapaTributacaoView extends JPanel {
+public class MapaTributacaoView extends JDialog {
     
     private MapaTributacaoController controller = new MapaTributacaoController(this);
 
@@ -59,6 +58,7 @@ public class MapaTributacaoView extends JPanel {
      * Creates new form MapaTributacaoPanel
      */
     public MapaTributacaoView() {
+        super();
         initComponents();
         tblVR.tblTabela.addMouseListener(
                 new MouseListener() {
@@ -120,6 +120,10 @@ public class MapaTributacaoView extends JPanel {
         txtAgrupador = new javax.swing.JTextField();
         btnIncluir = new javax.swing.JButton();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("\"Mapa de Tributação\"");
+        setModal(true);
+
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Buscar");
 
         txtBusca.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -152,8 +156,8 @@ public class MapaTributacaoView extends JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -164,7 +168,7 @@ public class MapaTributacaoView extends JPanel {
                         .addComponent(txtBusca, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnIncluir)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                         .addComponent(btnAtualizar))
                     .addComponent(tblMapa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -199,7 +203,7 @@ public class MapaTributacaoView extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblMapa, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                .addComponent(tblMapa, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
@@ -221,25 +225,20 @@ public class MapaTributacaoView extends JPanel {
         }
     }//GEN-LAST:event_btnAtualizarOnClick
 
-    static JDialog frame;
     public static void exibir(Frame mdiFrame, String sistema, String agrupador, MapaTributoProvider provider) throws Exception {
-        frame = new JDialog(mdiFrame, "Mapa de Tributação", true);
         MapaTributacaoView view = new MapaTributacaoView();
         view.setSistema(sistema);
         view.setAgrupador(agrupador);
         view.setProvider(provider);
         view.controller.atualizarMapa();
-        
-        
-        frame.setContentPane(view);
-        frame.setPreferredSize(new Dimension(600, 600));
-        frame.pack();
+        view.setPreferredSize(new Dimension(1200, 600));
+        view.pack();
 
         Dimension ds = mdiFrame.getSize();
-        Dimension dw = frame.getSize();
+        Dimension dw = view.getSize();
 
         int x = (ds.width - dw.width) / 2;
-        int y = (ds.height - dw.height) / 3;
+        int y = (ds.height - dw.height) / 2;
 
         if (x < 0) {
             x = 0;
@@ -249,13 +248,9 @@ public class MapaTributacaoView extends JPanel {
             y = 0;
         }
 
-        frame.setLocation(x, y);
-
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-        frame.setVisible(true);
-        
-        MapaTributacaoView.frame = null;
+        view.setLocation(x, y);
+        view.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        view.setVisible(true);
     }
     
     private void txtBuscaKeyRelesed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscaKeyRelesed
@@ -270,9 +265,7 @@ public class MapaTributacaoView extends JPanel {
             } else if (keyCode == KeyEvent.VK_UP) {
                 controller.previousTributVR();
             } else if (keyCode == KeyEvent.VK_ESCAPE) {
-                if (MapaTributacaoView.frame != null) {
-                    MapaTributacaoView.frame.setVisible(false);
-                }
+                this.setVisible(false);
             } else if (keyCode == KeyEvent.VK_F2) {
                 controller.incluirTributo();
             } else {
@@ -310,13 +303,17 @@ public class MapaTributacaoView extends JPanel {
 
     void refresh() throws Exception {
         List<VRColumnTable> vColunaProduto = new ArrayList();
-        vColunaProduto.add(new VRColumnTable("Código", true, SwingConstants.LEFT, false, null));
-        vColunaProduto.add(new VRColumnTable("Descrição", true, SwingConstants.LEFT, false, null));      
+        vColunaProduto.add(new VRColumnTable("Código Ant.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Descrição Ant.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("CST Ant.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Aliq. Ant.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Red. Ant", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable(" - - ", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Cód. VR", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Descrição VR", true, SwingConstants.LEFT, false, null));      
-        vColunaProduto.add(new VRColumnTable("CST", true, SwingConstants.LEFT, false, null));
-        vColunaProduto.add(new VRColumnTable("Aliq.", true, SwingConstants.LEFT, false, null));
-        vColunaProduto.add(new VRColumnTable("Red.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("CST VR", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Aliq. VR", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Red. VR", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Aliq. Final", true, SwingConstants.LEFT, false, null));
         tblMapa.configurarColuna(vColunaProduto, this, "Mapa", "mapaTributacoes");
         
@@ -326,24 +323,28 @@ public class MapaTributacaoView extends JPanel {
             
             dados[i][0] = row.getOrigId();
             dados[i][1] = row.getOrigDescricao();
+            dados[i][2] = String.format("%02d", row.getOrigCst());
+            dados[i][3] = String.format("%.2f", row.getOrigAliquota());
+            dados[i][4] = String.format("%.2f", row.getOrigReduzido());
+            dados[i][5] = " >>>> ";
             if (row.getAliquota() == null) {
-                dados[i][2] = "";
-                dados[i][3] = "";
-                dados[i][4] = "";
-                dados[i][5] = "";
                 dados[i][6] = "";
                 dados[i][7] = "";
+                dados[i][8] = "";
+                dados[i][9] = "";
+                dados[i][10] = "";
+                dados[i][11] = "";
             } else {
                 double aliq = row.getAliquota().getAliquota();
                 double red = row.getAliquota().getReduzido();
                 double aliqFinal = MathUtils.round(aliq - (aliq * (red / 100)), 2);
                 
-                dados[i][2] = row.getAliquota().getId();
-                dados[i][3] = row.getAliquota().getDescricao();
-                dados[i][4] = String.format("%02d", row.getAliquota().getCst());
-                dados[i][5] = String.format("%.2f", row.getAliquota().getAliquota());
-                dados[i][6] = String.format("%.2f", row.getAliquota().getReduzido());
-                dados[i][7] = String.format("%.2f", aliqFinal);
+                dados[i][6] = row.getAliquota().getId();
+                dados[i][7] = row.getAliquota().getDescricao();
+                dados[i][8] = String.format("%02d", row.getAliquota().getCst());
+                dados[i][9] = String.format("%.2f", row.getAliquota().getAliquota());
+                dados[i][10] = String.format("%.2f", row.getAliquota().getReduzido());
+                dados[i][11] = String.format("%.2f", aliqFinal);
             }
             i++;
         }            
