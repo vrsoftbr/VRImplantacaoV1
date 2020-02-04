@@ -592,7 +592,11 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setObservacao(rst.getString("forn_obspedidos") + " " + rst.getString("forn_obstrocas"));
 
                     if (rst.getString("email") != null && !"".equals(rst.getString("email"))) {
-                        imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email"));
+                        if(rst.getString("email").length() > 50) {
+                            imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email").substring(0, 50));
+                        } else {
+                            imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email"));
+                        }
                     }
                     switch (rst.getString("tipofornecedor").trim()) {
                         case "A":

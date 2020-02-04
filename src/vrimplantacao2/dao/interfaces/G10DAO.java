@@ -20,7 +20,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
- * @author Guilherme
+ * @author Alan
  */
 public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -40,7 +40,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n"
+                      " select\n"
                     + "     1 as id,\n"
                     + "     identificador as cnpj,\n"
                     + "     nomefantasia as nome\n"
@@ -62,7 +62,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select \n"
+                      " select \n"
                     + "     i.id cod,\n"
                     + "     i.descricao dsc,\n"
                     + "     aliquotaicms aliq,\n"
@@ -133,7 +133,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n"
+                      " select\n"
                     + "     fornecedorid idFornecedor,\n"
                     + "     p.codigo idProduto,\n"
                     + "     codprodfornecedor codigoExterno,\n"
@@ -168,7 +168,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
+                    " select\n" +
                     "	cr.id id,\n" +
                     "	cr.dataperiodoinicial dataemissao,\n" +
                     "	vc.numeropedido::bigint numerocupom,\n" +
@@ -179,7 +179,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	numerototalparcelas parcela,\n" +
                     "	round((parc.valor * (j.jurosmora/100) *\n" +
                     "	(extract(day from now() - parc.datavencimento)))::numeric,2) juros\n" +
-                    "from\n" +
+                    " from\n" +
                     "	titulo cr\n" +
                     "	join parcela parc on\n" +
                     "		parc.tituloid = cr.id\n" +
@@ -189,12 +189,12 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "		c.id = cr.pessoaid\n" +
                     "	left join vendacliente vc on\n" +
                     "		cr.id = vc.tituloid\n" +
-                    "where\n" +
+                    " where\n" +
                     "	cr.statusid = 1\n" +
                     "	and	cr.tipodocumentoid = 1\n" +
                     "	and cr.cmfid = 3\n" +
                     "	and parc.baixacancelada is null\n" +
-                    "order by\n" +
+                    " order by\n" +
                     "	parc.datavencimento"
             )) {
                 while (rs.next()) {
@@ -404,14 +404,14 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select     \n"
+                      " select     \n"
                     + "     pp.produtoid idProduto,\n"
                     + "     p.inicio dataInicio,\n"
                     + "     p.fim dataFim,\n"
                     + "     pp.precoatual precoNormal,\n"
                     + "     pp.precopromocional precoOferta,\n"
                     + "     case when p.statusid = 29 then 1 else 0 end situacaoOferta\n"
-                    + "from promocao p\n"
+                    + " from promocao p\n"
                     + "     left join promocaoproduto pp on p.id = pp.promocaoid\n"
                     + "         where p.statusid = 29\n"
                     + "	order by pp.produtoid"
@@ -437,7 +437,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
+                    " select\n" +
                     "	d.id importId,\n" +
                     "	coalesce(pj.razaosocial, pf.nome) razao,\n" +
                     "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n" +
@@ -457,7 +457,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	e.cep,\n" +
                     "	d.datacadastro datacadastro,\n" +
                     "	pj.obs observacao\n" +
-                    "from \n" +
+                    " from \n" +
                     "	dados d\n" +
                     "	join fornecedor f on\n" +
                     "		d.id = f.id\n" +
@@ -469,7 +469,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "		e.dadosid = d.id\n" +
                     "	left join cidade cd on\n" +
                     "		e.cidade::integer = cd.id\n" +
-                    "order by 1"
+                    " order by 1"
             )) {
 
                 while (rs.next()) {
@@ -507,7 +507,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
+                    " select\n" +
                     "	 d.id as id,\n" +
                     "	 d.identificador as cnpj,\n" +
                     "	 coalesce(pf.rg, pf.inscricaoestadual) as inscricaoestadual,\n" +
@@ -534,7 +534,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	 c.limitefinanceiro as limitecompra,\n" +
                     "	 pj.inscricaomunicipal as inscricaomunicipal,\n" +
                     "	 d.contribuinteicms as tipoindicadorie\n" +
-                    "from \n" +
+                    " from \n" +
                     "	dados d\n" +
                     "	left join cliente c on\n" +
                     "		d.id = c.id\n" +
@@ -546,7 +546,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "		e.dadosid = d.id\n" +
                     "	left join cidade cd on\n" +
                     "		e.cidade::integer = cd.id\n" +
-                    "where\n" +
+                    " where\n" +
                     "	not c.id is null"
             )) {
                 while (rs.next()) {

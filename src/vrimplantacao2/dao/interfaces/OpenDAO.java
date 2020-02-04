@@ -709,8 +709,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "    situacao = 0 and\n" +
                     "    dtvenc is not null and\n" +
-                    "    dtvenc != '1899-12-30' and data >= '2018-01-01' and\n" +
-                    "    codigo in (2, 8, 10, 14, 18, 217, 220, 313)\n" +        
+                    "    dtvenc != '1899-12-30' and data >= '2020-01-31' and\n" +
+                    "    codigo not in (2, 8, 10, 14, 18, 217, 220, 313)\n" +        
                     "order by\n" +
                     "	dtvenc")) {
                 while(rs.next()) {
