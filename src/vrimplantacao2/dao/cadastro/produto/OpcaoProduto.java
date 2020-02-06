@@ -218,6 +218,16 @@ public enum OpcaoProduto {
         public String toString() {
             return "Comprador";
         }
+    }, SECAO {
+        @Override
+        public String toString() {
+            return "Setor";
+        }
+    }, PRATELEIRA {
+        @Override
+        public String toString() {
+            return "Prateleira";
+        }
     },
     /**
      * @deprecated Utilizar {@link #ICMS_ENTRADA}

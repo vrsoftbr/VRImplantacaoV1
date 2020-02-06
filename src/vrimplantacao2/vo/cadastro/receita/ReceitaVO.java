@@ -15,7 +15,7 @@ public class ReceitaVO {
 
     private int id;
     private String descricao;
-    private int id_situacaocadastro;
+    private int id_situacaocadastro = 1;
     private String fichatecnica;
 
     /**

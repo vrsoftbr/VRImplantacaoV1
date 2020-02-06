@@ -1062,6 +1062,8 @@ public class ProdutoRepository {
         complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
         complemento.setDataPrimeiraAlteracao(imp.getDataCadastro());
         complemento.setNormaReposicao(imp.getNormaReposicao());
+        complemento.setSetor(imp.getSetor());
+        complemento.setPrateleira(imp.getPrateleira());
 
         return complemento;
     }

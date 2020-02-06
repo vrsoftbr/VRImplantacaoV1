@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -97,7 +99,10 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.PESAVEL,
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
-            OpcaoProduto.ATACADO
+            OpcaoProduto.ATACADO,
+            OpcaoProduto.RECEITA,
+            OpcaoProduto.SECAO,
+            OpcaoProduto.PRATELEIRA
         }));
     }
     
@@ -347,7 +352,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n"
                     + "	un.prun_prultcomp,\n"
                     + "	un.prun_ctcompra custosemimposto,\n"
-                    //+ "	un.prun_ctfiscal custocomimposto,\n"
+                    //+ " un.prun_ctfiscal custocomimposto,\n"
                     + "	un.prun_prultcomp custocomimposto,\n"
                     + "	un.prun_margem margem,\n"
                     + "	un.prun_prvenda precovenda,\n"
@@ -359,7 +364,9 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	tr.trib_icms icms,\n"
                     + "	tr.trib_redbc icmsreducao,\n"
                     + "	tr.trib_cstpis cstpiscofins,\n"
-                    + "	tr.trib_natpiscof naturezareceita\n"
+                    + "	tr.trib_natpiscof naturezareceita,\n"
+                    + " un.prun_setor setor,\n"
+                    + " un.prun_setordep departamento\n"        
                     + "from\n"
                     + "	produtos p\n"
                     + "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n"
@@ -405,8 +412,8 @@ public class RPInfoDAO extends InterfaceDAO {
 
                         if (pBalanca.length() < 7) {
                             imp.seteBalanca(true);
-                            imp.setEan(rst.getString("ean"));
-                            //imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                            //imp.setEan(rst.getString("ean"));
+                            imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
                         } else {
                             imp.seteBalanca(false);
                             imp.setEan(rst.getString("ean"));
@@ -422,9 +429,9 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    //imp.setCodMercadologico1(rst.getString("merc1"));
-                    //imp.setCodMercadologico2(rst.getString("merc2"));
-                    //imp.setCodMercadologico2("1");
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3("1");
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
@@ -444,6 +451,20 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setIcmsReducao(rst.getDouble("icmsreducao"));
                     imp.setIcmsCst(rst.getInt("cst"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    if(rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
+                        if(rst.getString("setor").length() > 2) {
+                            imp.setSetor(rst.getString("setor").trim().substring(0, 2));
+                        } else {
+                            imp.setSetor(rst.getString("setor").trim());
+                        }   
+                    }
+                    if(rst.getString("departamento") != null && !"".equals(rst.getString("departamento"))) {
+                        if(rst.getString("departamento").length() > 3) {
+                            imp.setPrateleira(rst.getString("departamento").trim().substring(0, 3));
+                        } else {
+                            imp.setPrateleira(rst.getString("departamento").trim());
+                        }
+                    }
 
                     result.add(imp);
                 }
@@ -1020,4 +1041,73 @@ public class RPInfoDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	rp.indc_prod_codigo id_produto,\n" +
+                    "	rp.indc_descricao descricao,\n" +
+                    "	rp.indc_rendimento rendimento,\n" +
+                    "	rp.indc_datacusto datacusto\n" +
+                    "from\n" +
+                    "	industc rp\n" +
+                    "order by\n" +
+                    "	rp.indc_prod_codigo")) {
+                while(rs.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportsistema(getSistema());
+                    imp.setImportid(rs.getString("id_produto"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setRendimento(rs.getDouble("rendimento"));
+                    imp.setIdproduto(rs.getString("id_produto"));
+                    imp.setId_situacaocadastro(SituacaoCadastro.ATIVO);
+                    
+                    addProdutoReceita(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    private void addProdutoReceita(ReceitaIMP imp) throws SQLException {
+        Set<String> produtos = new HashSet<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	rp.indc_prod_codigo id_produto,\n" +
+                    "	rp.indc_descricao descricao,\n" +
+                    "	rp.indc_rendimento rendimento,\n" +
+                    "	rp.indc_datacusto datacusto,\n" +
+                    "	ri.indd_cod2 id_produto_producao,\n" +
+                    "	pr.prod_descricao descricao_producao,\n" +
+                    "	ri.indd_qreceita qtdproducao,\n" +
+                    "   ri.indd_qcomercializacao qtdproduto,\n" +        
+                    "	ri.indd_unid_codigo,\n" +
+                    "   ri.indd_fase fase\n" +        
+                    "from\n" +
+                    "	industc rp\n" +
+                    "join industd ri on rp.indc_prod_codigo = ri.indd_cod1\n" +
+                    "join produtos pr on ri.indd_cod2 = pr.prod_codigo\n" +
+                    "where\n" +
+                    "   rp.indc_prod_codigo = " + imp.getIdproduto() + "\n" +
+                    "order by\n" +
+                    "	rp.indc_prod_codigo")) {
+                while(rs.next()) {
+                    produtos.add(rs.getString("id_produto_producao"));
+                    imp.setQtdembalagemreceita(rs.getInt("qtdproducao"));
+                    imp.setQtdembalagemproduto(rs.getInt("qtdproduto"));
+                }
+            }
+        }
+        imp.setProdutos(produtos);
+    } 
 }

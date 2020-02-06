@@ -772,6 +772,10 @@
                                   <Component id="chkEstoqueMaximo" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                                   <Component id="chkNormaReposicao" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkSecao" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPrateleira" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -810,7 +814,11 @@
                               <Component id="chkMargemMinima" min="-2" max="-2" attributes="0"/>
                               <Component id="chkEstoqueMinimo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkEstoqueMaximo" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkNormaReposicao" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkNormaReposicao" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkSecao" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPrateleira" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -909,6 +917,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVrAtacado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="VR Atacado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSecao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Se&#xe7;&#xe3;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPrateleira">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prateleira"/>
                   </Properties>
                 </Component>
               </SubComponents>

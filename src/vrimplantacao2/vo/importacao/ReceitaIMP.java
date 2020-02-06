@@ -183,5 +183,4 @@ public class ReceitaIMP {
     public void setFator(double fator) {
         this.fator = fator == 0 ? 1 : fator;
     }
-    
 }

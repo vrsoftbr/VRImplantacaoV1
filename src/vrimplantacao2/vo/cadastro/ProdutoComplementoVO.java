@@ -29,6 +29,8 @@ public class ProdutoComplementoVO {
     private int idAliquotaCredito = 0;
     private Date dataPrimeiraAlteracao;
     private NormaCompra normaReposicao = NormaCompra.CAIXA;
+    private String setor = "";
+    private String prateleira = "";
 
     public void setId(int id) {
         this.id = id;
@@ -197,5 +199,20 @@ public class ProdutoComplementoVO {
     public void setNormaReposicao(NormaCompra normaReposicao) {
         this.normaReposicao = normaReposicao == null ? NormaCompra.CAIXA : normaReposicao;
     }
-    
+
+    public String getPrateleira() {
+        return prateleira;
+    }
+
+    public void setPrateleira(String prateleira) {
+        this.prateleira = prateleira;
+    }
+
+    public String getSetor() {
+        return setor;
+    }
+
+    public void setSetor(String setor) {
+        this.setor = setor;
+    }   
 }

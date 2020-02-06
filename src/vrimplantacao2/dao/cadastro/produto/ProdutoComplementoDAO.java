@@ -127,8 +127,8 @@ public class ProdutoComplementoDAO {
                 SQLBuilder sql = new SQLBuilder();
                 sql.setTableName("produtocomplemento");
                 sql.put("id_produto", vo.getProduto().getId());
-                sql.put("prateleira", "");
-                sql.put("secao", "");
+                sql.put("prateleira", vo.getPrateleira());
+                sql.put("secao", vo.getSetor());
                 sql.put("estoqueminimo", vo.getEstoqueMinimo());
                 sql.put("estoquemaximo", vo.getEstoqueMaximo());
                 sql.put("valoripi", 0);
@@ -359,6 +359,12 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.NORMA_REPOSICAO)) {
                 sql.put("id_normareposicao", complemento.getNormaReposicao().getId());
+            }
+            if (opt.contains(OpcaoProduto.SECAO)) {
+                sql.put("secao", complemento.getSetor());
+            }
+            if (opt.contains(OpcaoProduto.PRATELEIRA)) {
+                sql.put("prateleira", complemento.getPrateleira());
             }
             if ((opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO))
                     || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))

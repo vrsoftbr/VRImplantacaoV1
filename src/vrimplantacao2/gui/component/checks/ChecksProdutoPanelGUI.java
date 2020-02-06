@@ -152,6 +152,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkFabricacaoPropria.setVisible(opt.contains(OpcaoProduto.FABRICACAO_PROPRIA));
             chkFabricante.setVisible(opt.contains(OpcaoProduto.FABRICANTE));
             chkNormaReposicao.setVisible(opt.contains(OpcaoProduto.NORMA_REPOSICAO));
+            chkSecao.setVisible(opt.contains(OpcaoProduto.SECAO));
+            chkPrateleira.setVisible(opt.contains(OpcaoProduto.PRATELEIRA));
             tabImportacao.add(pnlImpCompl);
         }
         
@@ -368,6 +370,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkNormaReposicao = new vrframework.bean.checkBox.VRCheckBox();
         jLabel7 = new javax.swing.JLabel();
         chkVrAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkSecao = new vrframework.bean.checkBox.VRCheckBox();
+        chkPrateleira = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpTributacao = new vrframework.bean.panel.VRPanel();
         jLabel4 = new javax.swing.JLabel();
         chkPisCofins = new vrframework.bean.checkBox.VRCheckBox();
@@ -832,6 +836,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkVrAtacado, "VR Atacado");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkSecao, "Seção");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPrateleira, "Prateleira");
+
         javax.swing.GroupLayout pnlImpComplLayout = new javax.swing.GroupLayout(pnlImpCompl);
         pnlImpCompl.setLayout(pnlImpComplLayout);
         pnlImpComplLayout.setHorizontalGroup(
@@ -872,7 +880,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addGap(5, 5, 5)
                         .addComponent(chkEstoqueMaximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(5, 5, 5)
-                        .addComponent(chkNormaReposicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkNormaReposicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkSecao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPrateleira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel7))
                 .addGap(5, 5, 5))
         );
@@ -904,7 +916,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkMargemMinima, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEstoqueMinimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEstoqueMaximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkNormaReposicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(chkNormaReposicao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkSecao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkPrateleira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1353,6 +1368,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPfIcmsIvaAjustado;
     public vrframework.bean.checkBox.VRCheckBox chkPfIcmsTipoIva;
     public vrframework.bean.checkBox.VRCheckBox chkPisCofins;
+    public vrframework.bean.checkBox.VRCheckBox chkPrateleira;
     public vrframework.bean.checkBox.VRCheckBox chkPreco;
     public vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
     public vrframework.bean.checkBox.VRCheckBox chkProdutos;
@@ -1362,6 +1378,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkReceitaProduto;
     public vrframework.bean.checkBox.VRCheckBox chkReceitaToledo;
     public vrframework.bean.checkBox.VRCheckBox chkResetarCodigoBalanca;
+    public vrframework.bean.checkBox.VRCheckBox chkSecao;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkSomarEstoqueAoProduto;
     public vrframework.bean.checkBox.VRCheckBox chkSugestaoCotacao;
@@ -1578,6 +1595,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkEstoque.isSelected()) {
                     opcoes.add(OpcaoProduto.ESTOQUE);
+                }
+                if (chkSecao.isSelected()) {
+                    opcoes.add(OpcaoProduto.SECAO);
+                }
+                if (chkPrateleira.isSelected()) {
+                    opcoes.add(OpcaoProduto.PRATELEIRA);
                 }
                 if (chkPisCofins.isSelected()) {
                     opcoes.add(OpcaoProduto.PIS_COFINS);

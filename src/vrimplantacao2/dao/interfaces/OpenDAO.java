@@ -872,7 +872,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	mov.DATA between " + SQLUtils.dateSQL(dataInicio) + " and " + SQLUtils.dateSQL(dataTermino) + "\n" +
                 "	AND UCASE(mov.SANGRIA) NOT IN (\"F\", \"S\", \"P\", \"R\")\n" +
                 "	AND (\n" +
-                "			  (mov.ENTRSAI = \"E\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"\")\n" +
+                "                   (mov.ENTRSAI = \"E\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"\")\n" +
                 "		OR  (mov.ENTRSAI = \"S\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"\")\n" +
                 "		OR  (mov.ENTRSAI = \"S\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"C\")\n" +
                 "		OR  (mov.ENTRSAI = \"E\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"C\")\n" +

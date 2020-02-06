@@ -127,6 +127,8 @@ public class ProdutoIMP {
     @DatabaseField private double volume = 1;
     @DatabaseField private NormaCompra normaReposicao = NormaCompra.CAIXA;
     @DatabaseField private boolean vendaControlada = false;
+    @DatabaseField private String setor = "";
+    @DatabaseField private String prateleira = "";
     
     public String getImportSistema() {
         return importSistema;
@@ -930,6 +932,22 @@ public class ProdutoIMP {
 
     public void setNormaReposicao(NormaCompra normaReposicao) {
         this.normaReposicao = normaReposicao;
+    }
+
+    public String getSetor() {
+        return setor;
+    }
+
+    public void setSetor(String setor) {
+        this.setor = setor;
+    }
+
+    public String getPrateleira() {
+        return prateleira;
+    }
+
+    public void setPrateleira(String prateleira) {
+        this.prateleira = prateleira;
     }
 
     /**
