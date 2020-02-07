@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrimplantacao2.parametro.Parametros;
+import java.util.Properties;
 
 public class ConexaoAccess {
 
@@ -23,12 +24,16 @@ public class ConexaoAccess {
                         i_usuario,
                         i_senha
                 );*/
+        
+        Properties props = new Properties();
+        props.put("charSet", "ISO-8859-1");
+        
         switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
             case DRIVER: 
                 con = DriverManager.getConnection(
                         "jdbc:odbc:Driver={" + 
                         Parametros.get().getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC") + 
-                        "};DBQ=" + i_database
+                        "};DBQ=" + i_database + ";uid=" + i_usuario + "; pwd=" + i_senha, props
                 );
                 break;
             default: FONTE_DE_DADOS:

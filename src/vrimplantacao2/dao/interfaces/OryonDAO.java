@@ -22,6 +22,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -31,6 +33,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -98,7 +101,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -698,6 +702,39 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "  codigo, \n"
+                    + "  inicio_promocao, \n"
+                    + "  final_promocao,\n"
+                    + "  preco_venda, \n"
+                    + "  preco_promocao \n"
+                    + " from tabela_pro \n"
+                    + "where final_promocao >= Date()\n"
+                    + "order by final_promocao"
+            )) {
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    imp.setIdProduto(rs.getString("codigo"));
+                    imp.setDataInicio(rs.getDate("inicio_promocao"));
+                    imp.setDataFim(rs.getDate("final_promocao"));
+                    imp.setPrecoOferta(rs.getDouble("preco_promocao"));
+                    imp.setPrecoNormal(rs.getDouble("preco_venda"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+       
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 

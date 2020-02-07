@@ -174,7 +174,10 @@
                                       <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkNomeCliente" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Component id="vRPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -190,7 +193,10 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkNomeCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -316,6 +322,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeCliente">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel8">
@@ -349,6 +360,8 @@
                               <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                               <Component id="chkContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="332" max="32767" attributes="0"/>
                       </Group>
@@ -372,7 +385,11 @@
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="98" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="52" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -421,6 +438,16 @@
                 <Component class="javax.swing.JCheckBox" name="chkContaPagar">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Conta a Pagar"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRazaoSocial">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Razao Social"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeFantasia">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
                   </Properties>
                 </Component>
               </SubComponents>
