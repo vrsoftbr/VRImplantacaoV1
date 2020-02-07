@@ -32,6 +32,7 @@ public class ProdutoAnteriorVO {
     private String codigoSped = "";
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private Date dataHora;
+    private String obsImportacao = "";
     
     private final MultiMap<String, ProdutoAnteriorEanVO> eans = new MultiMap<>(
         new Factory<ProdutoAnteriorEanVO>() {
@@ -250,5 +251,13 @@ public class ProdutoAnteriorVO {
 
     public void setDataHora(Date dataHora) {
         this.dataHora = dataHora;
+    }
+
+    public String getObsImportacao() {
+        return obsImportacao;
+    }
+
+    public void setObsImportacao(String obsImportacao) {
+        this.obsImportacao = obsImportacao;
     }
 }
