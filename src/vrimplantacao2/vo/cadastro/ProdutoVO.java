@@ -420,6 +420,5 @@ public class ProdutoVO {
 
     public void setVendaControlada(boolean vendaControlada) {
         this.vendaControlada = vendaControlada;
-    }
-    
+    }   
 }

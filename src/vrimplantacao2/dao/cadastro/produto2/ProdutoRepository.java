@@ -184,6 +184,7 @@ public class ProdutoRepository {
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
                         anterior.setDataHora(dataHoraImportacao);
+                        anterior.setObsImportacao("PRODUTO NOVO - INSERIDO PELO METODO salvar DA CLASSE " + ProdutoRepository.class.getName().toString());
                         
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
@@ -456,6 +457,7 @@ public class ProdutoRepository {
 
             ProdutoIDStack idStack = provider.getIDStack();
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            String obsImportacao = "";
 
             boolean unificarProdutoBalanca = provider.getOpcoes().contains(OpcaoProduto.UNIFICAR_PRODUTO_BALANCA);
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
@@ -517,6 +519,7 @@ public class ProdutoRepository {
                             complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                             provider.salvar(codigoAtual);
+                            obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                             //provider.anterior().salvar(anterior);
                             double estoque = complemento.getEstoque();
                             for (LojaVO loja : provider.getLojas()) {
@@ -549,6 +552,8 @@ public class ProdutoRepository {
                             id = idProdutoExistente;
                             codigoAtual = new ProdutoVO();
                             codigoAtual.setId(id);
+                            obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                            
                     }
                 }
 
@@ -560,6 +565,12 @@ public class ProdutoRepository {
                     ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
                     anterior.setDataHora(dataHoraImportacao);
+                    
+                    if(anterior.getCodigoAtual() == null) {
+                        obsImportacao = "PRODUTO NAO LOCALIZADO NA UNIFICACAO";
+                    }
+                    
+                    anterior.setObsImportacao(obsImportacao);
                     provider.anterior().salvar(anterior);
                 }
                 if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {

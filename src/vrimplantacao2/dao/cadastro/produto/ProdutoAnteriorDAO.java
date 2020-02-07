@@ -97,6 +97,7 @@ public class ProdutoAnteriorDAO {
                     + "                      codigosped varchar,\n"
                     + "                      situacaocadastro integer,\n"
                     + "                      dataimportacao timestamp,\n"
+                    + "                      obsimportacao character varying,\n"
                     + "                      primary key (impsistema, imploja, impid),\n"
                     + "                      unique (impsistema, imploja, codigosped)\n"
                     + "                );\n"
@@ -561,6 +562,7 @@ public class ProdutoAnteriorDAO {
             sql.put("contadorimportacao", contador);
             sql.put("situacaocadastro", anterior.getSituacaoCadastro().getId());
             sql.put("dataimportacao", anterior.getDataHora());
+            sql.put("obsimportacao", anterior.getObsImportacao());
 
             try {
                 stm.execute(sql.getInsert());
