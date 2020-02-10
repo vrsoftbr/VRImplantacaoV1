@@ -534,7 +534,7 @@
                               </Group>
                               <Component id="vRPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="286" max="32767" attributes="0"/>
+                          <EmptySpace pref="235" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -598,20 +598,23 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
                                       <Component id="lblMesVenda" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
                                       <Component id="dtVenda" min="-2" pref="91" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
                                   </Group>
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
                                       <Component id="chkVendas" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="rdbVendasAntigas" min="-2" max="-2" attributes="0"/>
+                                      <Component id="rdbVendasV1" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="rdbVendasAtualizadas" min="-2" max="-2" attributes="0"/>
+                                      <Component id="rdbVendasV2" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="rdbVendasV3" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="52" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -620,8 +623,9 @@
                           <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkVendas" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
-                                  <Component id="rdbVendasAntigas" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="rdbVendasAtualizadas" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="rdbVendasV1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="rdbVendasV2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="rdbVendasV3" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
@@ -640,6 +644,9 @@
                       </Properties>
                     </Component>
                     <Component class="vrframework.bean.textField.VRTextField" name="dtVenda">
+                      <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
+                      </Properties>
                     </Component>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVendas">
                       <Properties>
@@ -649,22 +656,39 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkVendasActionPerformed"/>
                       </Events>
                     </Component>
-                    <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbVendasAntigas">
-                      <Properties>
-                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                          <ComponentRef name="groupVendasPdv"/>
-                        </Property>
-                        <Property name="text" type="java.lang.String" value="Antigo"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbVendasAtualizadas">
+                    <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbVendasV1">
                       <Properties>
                         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                           <ComponentRef name="groupVendasPdv"/>
                         </Property>
                         <Property name="selected" type="boolean" value="true"/>
-                        <Property name="text" type="java.lang.String" value="Atualizado"/>
+                        <Property name="text" type="java.lang.String" value="v1.0"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tipoVendaSelect"/>
+                      </Events>
+                    </Component>
+                    <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbVendasV2">
+                      <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="groupVendasPdv"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="v2.0"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tipoVendaSelect"/>
+                      </Events>
+                    </Component>
+                    <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbVendasV3">
+                      <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="groupVendasPdv"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="v3.0"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tipoVendaSelect"/>
+                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>

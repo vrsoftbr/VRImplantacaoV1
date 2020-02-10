@@ -101,10 +101,10 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "dbIpcom";
+        conexaoMySQL.database = "dbHipcom";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "infor";
+        conexaoMySQL.pass = "hpc00";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 

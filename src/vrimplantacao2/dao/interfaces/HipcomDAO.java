@@ -214,7 +214,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NORMA_REPOSICAO,
                 OpcaoProduto.TIPO_PRODUTO,
                 OpcaoProduto.FABRICACAO_PROPRIA,
-                OpcaoProduto.RECEITA
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
         ));
     }
 
@@ -411,7 +412,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlcodcmp id_comprador,\n" +
                     "	p.proalcoolico,\n" +
                     "	p.profinalidade,\n" +
-                    "	p.profabterc\n" +
+                    "	p.profabterc,\n" +
+                    "	prc.prlcodbenef\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -503,7 +505,11 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
                     imp.setIcmsDebitoId(rst.getString("icmssaidaid"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("icmssaidaid"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("icmssaidaid"));
+                    imp.setIcmsConsumidorId(rst.getString("icmssaidaid"));
                     imp.setIcmsCreditoId(rst.getString("icmsentradaid"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("icmsentradaid"));
                     imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                     imp.setAtacadoPorcentagem(rst.getDouble("margematacado"));
                     imp.setPautaFiscalId(rst.getString("id"));
@@ -1618,9 +1624,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.prodescr descricao,\n" +
                     "    r.grpativo ativo,\n" +
                     "    r.grprendim rendimento,\n" +
-                    "    1 quantidadereceita,\n" +
+                    "    1 fator,\n" +
                     "    1 quantidadeproduto,\n" +
-                    "    r.grpqtde fator,\n" +
+                    "    r.grpqtde * 1000 quantidadereceita,\n" +
                     "    r.grpcodplu id_produto\n" +
                     "from\n" +
                     "	hipgrp r\n" +

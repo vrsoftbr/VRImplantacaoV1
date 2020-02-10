@@ -82,7 +82,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private boolean utilizarViewMixFiscal = true;
     
-    private boolean importarVendasAntigas = false;
+    private int versaoDaVenda = 1;
     
     private boolean somenteAtivos = false;
 
@@ -94,8 +94,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         this.utilizarViewMixFiscal = utilizarViewMixFiscal;
     }
 
-    public void setImportarVendasAntigas(boolean importarVendasAntigas) {
-        this.importarVendasAntigas = importarVendasAntigas;
+    public void setVersaoDaVenda(int versaoDaVenda) {
+        this.versaoDaVenda = versaoDaVenda;
     }
     
     @Override
@@ -1922,7 +1922,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-            if (importarVendasAntigas) {
+            if (versaoDaVenda == 1) {
                 sql = "select distinct\n" +
                     "	vda.mag60i_loja_a id_loja,\n" +
                     "	vda.mag60i_aaammdd data,\n" +
@@ -1958,7 +1958,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vda.mag60i_caixa,\n" +
                     "	vda.mag60i_seri_ecf,\n" +
                     "	vda.mag60i_cupom";
-            } else {
+            } if (versaoDaVenda == 2) {
                     sql = "select distinct\n" +
                     "       vda.r60i_fil idloja,\n" +
                     "       vda.r60i_dta data,\n" +
@@ -2010,6 +2010,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       tip.tip_estado,\n" +
                     "       tip.tip_cep,\n" +
                     "       vda.r60i_chv_cel";
+            } else if (versaoDaVenda == 3) {
+                sql = "";
             }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -2137,34 +2139,39 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select\n" +
-                    "       itm.r60i_cup coo,\n" +
-                    "       itm.r60i_dta data,\n" +
-                    "       itm.r60i_cxa caixa,\n" +
-                    "       case when itm.r60i_ecf_nro = 8 then 25 \n" +
-                    "       when itm.r60i_ecf_nro = 9 then 26 \n" +
-                    "       else itm.r60i_ecf_nro end as ecf, \n" +
-                    "       itm.R60i_Seq sequencia,\n" +
-                    "       itm.R60i_Sec, \n" +
-                    "       itm.r60i_ean ean,\n" +
-                    "       p.git_descricao descricao,\n" +
-                    "       itm.r60i_ite id_produto,\n" +
-                    "       itm.r60i_emb_tpo embalagem,\n" +
-                    "       itm.r60i_sit situacao,\n" +
-                    "       itm.r60i_qtd qtd,\n" +
-                    "       itm.r60i_vlr_uni vlunitario,\n" +
-                    "       itm.r60i_vlr_ctb vltotal,\n" +
-                    "       itm.r60i_vlr_dsc vldesconto,\n" +
-                    "       itm.r60i_icm_trb tributacao,\n" +
-                    "       itm.r60i_icm_alq aliqicms,\n" +
-                    "       itm.r60i_chv_cel chave\n" +
-                    "from\n" +
-                    "       AA1FR60I_" + tabela_venda + " itm\n" +
-                    "join\n" +
-                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n" +
-                    "order by\n" +
-                    "       itm.r60i_cup, itm.r60i_seq";
+            if (versaoDaVenda == 2) {
+                this.sql
+                        = "select\n" +
+                        "       itm.r60i_cup coo,\n" +
+                        "       itm.r60i_dta data,\n" +
+                        "       itm.r60i_cxa caixa,\n" +
+                        "       case when itm.r60i_ecf_nro = 8 then 25 \n" +
+                        "       when itm.r60i_ecf_nro = 9 then 26 \n" +
+                        "       else itm.r60i_ecf_nro end as ecf, \n" +
+                        "       itm.R60i_Seq sequencia,\n" +
+                        "       itm.R60i_Sec, \n" +
+                        "       itm.r60i_ean ean,\n" +
+                        "       p.git_descricao descricao,\n" +
+                        "       itm.r60i_ite id_produto,\n" +
+                        "       itm.r60i_emb_tpo embalagem,\n" +
+                        "       itm.r60i_sit situacao,\n" +
+                        "       itm.r60i_qtd qtd,\n" +
+                        "       itm.r60i_vlr_uni vlunitario,\n" +
+                        "       itm.r60i_vlr_ctb vltotal,\n" +
+                        "       itm.r60i_vlr_dsc vldesconto,\n" +
+                        "       itm.r60i_icm_trb tributacao,\n" +
+                        "       itm.r60i_icm_alq aliqicms,\n" +
+                        "       itm.r60i_chv_cel chave\n" +
+                        "from\n" +
+                        "       AA1FR60I_" + tabela_venda + " itm\n" +
+                        "join\n" +
+                        "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n" +
+                        "order by\n" +
+                        "       itm.r60i_cup, itm.r60i_seq";
+            } else if (versaoDaVenda == 3) {
+                this.sql = 
+                        "";
+            }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

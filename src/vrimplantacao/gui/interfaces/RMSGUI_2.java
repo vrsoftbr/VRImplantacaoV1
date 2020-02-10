@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.radioButton.VRRadioButton;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
@@ -295,7 +296,13 @@ public class RMSGUI_2 extends VRInternalFrame {
                         if(chkVendas.isSelected()) {
                             dao.setDataInicioVenda(edtVendaDtIni.getDate());
                             dao.setDataTerminoVenda(edtVendaDtFim.getDate());
-                            dao.setImportarVendasAntigas(rdbVendasAntigas.isSelected());
+                            if (rdbVendasV1.equals(groupVendasPdv.getSelection())) {
+                                dao.setVersaoDaVenda(1);
+                            } else if (rdbVendasV2.equals(groupVendasPdv.getSelection())) {
+                                dao.setVersaoDaVenda(2);                                
+                            } else if (rdbVendasV3.equals(groupVendasPdv.getSelection())) {
+                                dao.setVersaoDaVenda(3);                                
+                            }                            
                             RMSDAO.tabela_venda = dtVenda.getText();
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
@@ -404,8 +411,9 @@ public class RMSGUI_2 extends VRInternalFrame {
         lblMesVenda = new vrframework.bean.label.VRLabel();
         dtVenda = new vrframework.bean.textField.VRTextField();
         chkVendas = new vrframework.bean.checkBox.VRCheckBox();
-        rdbVendasAntigas = new vrframework.bean.radioButton.VRRadioButton();
-        rdbVendasAtualizadas = new vrframework.bean.radioButton.VRRadioButton();
+        rdbVendasV1 = new vrframework.bean.radioButton.VRRadioButton();
+        rdbVendasV2 = new vrframework.bean.radioButton.VRRadioButton();
+        rdbVendasV3 = new vrframework.bean.radioButton.VRRadioButton();
         tabOutros = new javax.swing.JPanel();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkNotasFiscais = new vrframework.bean.checkBox.VRCheckBox();
@@ -749,6 +757,8 @@ public class RMSGUI_2 extends VRInternalFrame {
 
         lblMesVenda.setText("Mês da Venda");
 
+        dtVenda.setEditable(false);
+
         chkVendas.setText("Importar");
         chkVendas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -756,12 +766,30 @@ public class RMSGUI_2 extends VRInternalFrame {
             }
         });
 
-        groupVendasPdv.add(rdbVendasAntigas);
-        rdbVendasAntigas.setText("Antigo");
+        groupVendasPdv.add(rdbVendasV1);
+        rdbVendasV1.setSelected(true);
+        rdbVendasV1.setText("v1.0");
+        rdbVendasV1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tipoVendaSelect(evt);
+            }
+        });
 
-        groupVendasPdv.add(rdbVendasAtualizadas);
-        rdbVendasAtualizadas.setSelected(true);
-        rdbVendasAtualizadas.setText("Atualizado");
+        groupVendasPdv.add(rdbVendasV2);
+        rdbVendasV2.setText("v2.0");
+        rdbVendasV2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tipoVendaSelect(evt);
+            }
+        });
+
+        groupVendasPdv.add(rdbVendasV3);
+        rdbVendasV3.setText("v3.0");
+        rdbVendasV3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tipoVendaSelect(evt);
+            }
+        });
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
@@ -772,23 +800,27 @@ public class RMSGUI_2 extends VRInternalFrame {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addComponent(lblMesVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(39, 39, 39)
-                        .addComponent(dtVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dtVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addComponent(chkVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(rdbVendasAntigas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(rdbVendasV1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(rdbVendasAtualizadas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(10, 10, 10))
+                        .addComponent(rdbVendasV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(rdbVendasV3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 52, Short.MAX_VALUE))))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(rdbVendasAntigas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(rdbVendasAtualizadas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(rdbVendasV1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbVendasV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbVendasV3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblMesVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -813,7 +845,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                             .addComponent(lblMesVenda2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(286, Short.MAX_VALUE))
+                .addContainerGap(235, Short.MAX_VALUE))
         );
         tabVendasLayout.setVerticalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1243,7 +1275,9 @@ public class RMSGUI_2 extends VRInternalFrame {
     }//GEN-LAST:event_chkHistoricoVendasActionPerformed
 
     private void chkVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendasActionPerformed
-        // TODO add your handling code here:
+        rdbVendasV1.setEnabled(chkVendas.isSelected());
+        rdbVendasV2.setEnabled(chkVendas.isSelected());
+        rdbVendasV2.setEnabled(chkVendas.isSelected());        
     }//GEN-LAST:event_chkVendasActionPerformed
 
     private void chkNotasFiscaisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkNotasFiscaisActionPerformed
@@ -1251,6 +1285,24 @@ public class RMSGUI_2 extends VRInternalFrame {
             edtDtNotaIni.setDate(new Date());
         }
     }//GEN-LAST:event_chkNotasFiscaisActionPerformed
+
+    private void tipoVendaSelect(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tipoVendaSelect
+        VRRadioButton btn = (VRRadioButton) evt.getSource();
+        dtVenda.setEnabled(
+                chkVendas.isSelected() && (
+                    btn.equals(rdbVendasV2) ||
+                    btn.equals(rdbVendasV3)
+                )
+        );
+        edtVendaDtIni.setEnabled(
+                chkVendas.isSelected() &&
+                btn.equals(rdbVendasV1)
+        );
+        edtVendaDtFim.setEnabled(
+                chkVendas.isSelected() &&
+                btn.equals(rdbVendasV1)
+        );
+    }//GEN-LAST:event_tipoVendaSelect
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
@@ -1294,8 +1346,9 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.label.VRLabel lblMesVenda1;
     private vrframework.bean.label.VRLabel lblMesVenda2;
     private vrframework.bean.panel.VRPanel pnlCustom;
-    private vrframework.bean.radioButton.VRRadioButton rdbVendasAntigas;
-    private vrframework.bean.radioButton.VRRadioButton rdbVendasAtualizadas;
+    private vrframework.bean.radioButton.VRRadioButton rdbVendasV1;
+    private vrframework.bean.radioButton.VRRadioButton rdbVendasV2;
+    private vrframework.bean.radioButton.VRRadioButton rdbVendasV3;
     private javax.swing.JPanel tabConvenio;
     private javax.swing.JPanel tabOutros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
