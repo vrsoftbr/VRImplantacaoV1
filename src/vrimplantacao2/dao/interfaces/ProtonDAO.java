@@ -186,7 +186,7 @@ public class ProtonDAO extends InterfaceDAO {
                     "  e.tmer_preco_venda preco_venda,\n" +
                     "  e.tmer_custo_ultimo_real_final custo,\n" +
                     "  e.tmer_margem_lucro margem,\n" +
-                    "  e.tmer_estoque_atual estoque,\n" +
+                    "  e.tmer_estoque_total estoque,\n" +
                     "  e.tmer_estoque_minimo estoque_minimo,\n" +
                     "  e.tmer_estoque_maximo estoque_maximo,\n" +
                     "  e.tmer_ativo_compra ativo_compra,\n" +
