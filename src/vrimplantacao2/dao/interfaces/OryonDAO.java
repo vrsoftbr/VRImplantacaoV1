@@ -17,6 +17,8 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -448,6 +450,38 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+    
+    public void alterarCodAnt_produto() throws Exception {
+
+        Statement stm2 = null;
+        stm2 = Conexao.createStatement();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "p.codigo,"
+                    + "    p.situacao_tributaria_icm_saida_ne as cst_debito,\n"
+                    + "    p.aliquota_icm_saida_ne as aliquota_debito,\n"
+                    + "    p.base_icm_saida_ne as reducao_debito\n"
+                    + "from tabela_pro p"
+            )) {
+                while (rst.next()) {
+                    
+                    String sql = "update implantacao.codant_produto "
+                            + "set "
+                            + "icmscst = " + rst.getInt("cst_debito") + ", "
+                            + "icmsaliq = " + rst.getDouble("aliquota_debito") + ", "
+                            + "icmsreducao = " + rst.getDouble("reducao_debito") + " "
+                            + "where impid = '"+rst.getString("codigo")+"';";
+                    
+                    stm2.execute(sql);
+                    
+                    ProgressBar.next();
+                                        
+                }
+            }
+        }
+    }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
@@ -714,7 +748,7 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  preco_venda, \n"
                     + "  preco_promocao \n"
                     + " from tabela_pro \n"
-                    + "where final_promocao >= Date()\n"
+                    + "where final_promocao > Date()\n"
                     + "order by final_promocao"
             )) {
                 while (rs.next()) {
