@@ -1873,45 +1873,89 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-                if (next == null) {
+                if (next == null) {                    
                     if (rst.next()) {
-                        next = new VendaIMP();
-                        String chave = rst.getString("chave");
                         
-                        if(chave != null && !"".equals(chave)) {
-                            chave = chave.substring(36, 40);
+                        if (versaoDaVenda != 3) {
+                            next = new VendaIMP();
+                            String chave = rst.getString("chave");
+
+                            if (chave != null && !"".equals(chave)) {
+                                chave = chave.substring(36, 40);
+                            } else {
+                                chave = "";
+                            }
+
+                            String id = chave + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                            if (!uk.add(id)) {
+                                LOG.warning("Venda " + id + " já existe na listagem " + rst.getString("chave") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data"));
+                            }
+                            next.setId(id);
+                            next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
+                            next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                            next.setData(format.parse(rst.getString("data")));
+                            next.setIdClientePreferencial(rst.getString("id_cliente"));
+                            String horaInicio = timestampDate.format(format.parse(rst.getString("data"))) + " " + rst.getString("horainicio");
+                            String horaTermino = timestampDate.format(format.parse(rst.getString("data"))) + " " + rst.getString("horafim");
+                            next.setHoraInicio(timestamp.parse(horaInicio));
+                            next.setHoraTermino(timestamp.parse(horaTermino));
+                            next.setCancelado("C".equals(rst.getString("situacao").trim()));
+                            next.setSubTotalImpressora(rst.getDouble("vltotal"));
+                            next.setCpf(rst.getString("cnpj"));
+                            next.setValorDesconto(rst.getDouble("vldesconto"));
+                            next.setNumeroSerie(rst.getString("seriecf"));
+                            next.setModeloImpressora(rst.getString("modeloecf"));
+                            next.setNomeCliente(rst.getString("razaosocial"));
+                            String endereco
+                                    = Utils.acertarTexto(rst.getString("endereco")) + ","
+                                    + Utils.acertarTexto(rst.getString("bairro")) + ","
+                                    + Utils.acertarTexto(rst.getString("municipio")) + "-"
+                                    + Utils.acertarTexto(rst.getString("uf")) + ","
+                                    + Utils.acertarTexto(rst.getString("cep"));
+                            next.setEnderecoCliente(endereco);
+                            next.setChaveCfe(rst.getString("chave"));
+
                         } else {
-                            chave = "";
+                            
+                            next = new VendaIMP();
+                            String chave = rst.getString("chave");
+
+                            if (chave != null && !"".equals(chave)) {
+                                chave = chave.substring(36, 40);
+                            } else {
+                                chave = "";
+                            }
+
+                            String id = rst.getString("id");
+                            if (!uk.add(id)) {
+                                LOG.warning("Venda " + id + " já existe na listagem " + rst.getString("chave") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data"));
+                            }
+                            next.setId(id);
+                            next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                            next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                            next.setData(format.parse(rst.getString("datavenda")));
+                            next.setIdClientePreferencial(rst.getString("idcliente"));
+                            String horaInicio = timestampDate.format(format.parse(rst.getString("datavenda"))) + " '00:00:00'";
+                            String horaTermino = timestampDate.format(format.parse(rst.getString("datavenda"))) + " '00:00:00'";
+                            next.setHoraInicio(timestamp.parse(horaInicio));
+                            next.setHoraTermino(timestamp.parse(horaTermino));
+                            next.setCancelado(false);
+                            next.setSubTotalImpressora(rst.getDouble("valortotal"));
+                            next.setCpf(rst.getString("cnpj"));
+                            next.setValorDesconto(rst.getDouble("desconto"));
+                            next.setNumeroSerie(rst.getString("serieecf"));
+                            next.setModeloImpressora(rst.getString("modeloecf"));
+                            next.setNomeCliente(rst.getString("razaosocial"));
+                            String endereco
+                                    = Utils.acertarTexto(rst.getString("endereco")) + ","
+                                    + Utils.acertarTexto(rst.getString("bairro")) + ","
+                                    + Utils.acertarTexto(rst.getString("municipio")) + "-"
+                                    + Utils.acertarTexto(rst.getString("uf")) + ","
+                                    + Utils.acertarTexto(rst.getString("cep"));
+                            next.setEnderecoCliente(endereco);
+                            next.setChaveCfe(rst.getString("chave"));
+                            
                         }
-                        
-                        String id = chave + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem " + rst.getString("chave") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data"));
-                        }
-                        next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(format.parse(rst.getString("data")));
-                        next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        String horaInicio = timestampDate.format(format.parse(rst.getString("data"))) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(format.parse(rst.getString("data"))) + " " + rst.getString("horafim");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado("C".equals(rst.getString("situacao").trim()));
-                        next.setSubTotalImpressora(rst.getDouble("vltotal"));
-                        next.setCpf(rst.getString("cnpj"));
-                        next.setValorDesconto(rst.getDouble("vldesconto"));
-                        next.setNumeroSerie(rst.getString("seriecf"));
-                        next.setModeloImpressora(rst.getString("modeloecf"));
-                        next.setNomeCliente(rst.getString("razaosocial"));
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("municipio")) + "-"
-                                + Utils.acertarTexto(rst.getString("uf")) + ","
-                                + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);
-                        next.setChaveCfe(rst.getString("chave"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -2011,7 +2055,38 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       tip.tip_cep,\n" +
                     "       vda.r60i_chv_cel";
             } else if (versaoDaVenda == 3) {
-                sql = "";
+            sql = "select\n"
+                    + "    v.NFCC_ID as id,\n"
+                    + "    v.NFCC_LOJ as idloja,\n"
+                    + "    v.NFCC_DTA as datavenda,\n"
+                    + "    v.NFCC_CUP as numerocupom,\n"
+                    + "    v.NFCC_CPF as cpf,\n"
+                    + "    v.NFCC_CLI as idcliente,\n"
+                    + "    v.NFCC_CXA as caixa,\n"
+                    + "    v.NFCC_OPE as operador,\n"
+                    + "    v.NFCC_HRS_EMI as horavenda,\n"
+                    + "    v.NFCC_CHV_NFC as chave,\n"
+                    + "    v.NFCC_PDV_NRO as ecf,\n"
+                    + "    v.NFCC_PDV_SER as serieecf,\n"
+                    + "    v.NFCC_EST as estado,\n"
+                    + "    v.NFCC_CTB_VAL as valortotal,\n"
+                    + "    v.NFCC_ACR_VAL as acrescimo,\n"
+                    + "    v.NFCC_DSC_VAL as desconto,\n"
+                    + "    v.NFCC_PDV_MDL as modeloecf,"
+                    + "    tip.TIP_CODIGO as id_cliente,\n" 
+                    + "    tip.TIP_CGC_CPF as cnpj,\n"
+                    + "    tip.TIP_RAZAO_SOCIAL as razaosocial,\n"
+                    + "    tip.TIP_ENDERECO as endereco,\n"
+                    + "    tip.TIP_BAIRRO as bairro,\n"
+                    + "    tip.TIP_CIDADE as municipio,\n"
+                    + "    tip.TIP_ESTADO as uf,\n"
+                    + "    tip.TIP_CEP as cep \n"
+                    + "from AG3VNFCC_" + tabela_venda + " v\n"
+                    + "left join aa2ctipo tip on tip.TIP_CODIGO = v.NFCC_CLI\n"
+                    + "where v.NFCC_CFO in (5102, 5405)\n"
+                    + "and v.NFCC_EST = 'PE'\n"
+                    + "and v.NFCC_LOJ = " + getLojaOrigem() + "\n"
+                    + "order by v.NFCC_ID";
             }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -2049,34 +2124,60 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             try {
                 if (next == null) {
                     if (rst.next()) {
-                        next = new VendaItemIMP();
                         
-                        String chave = rst.getString("chave");
-                        
-                        if(chave != null && !"".equals(chave)) {
-                            chave = chave.substring(36, 40);
+                        if (versaoDaVenda != 3) {
+                            next = new VendaItemIMP();
+
+                            String chave = rst.getString("chave");
+
+                            if (chave != null && !"".equals(chave)) {
+                                chave = chave.substring(36, 40);
+                            } else {
+                                chave = "";
+                            }
+
+                            String id = chave + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                            String id_vendaitem = rst.getString("vltotal") + "-" + rst.getInt("sequencia") + "-" + rst.getString("R60i_Sec") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+
+                            next.setId(id_vendaitem);
+                            next.setVenda(id);
+                            next.setProduto(rst.getString("id_produto"));
+                            next.setDescricaoReduzida(rst.getString("descricao"));
+                            next.setPrecoVenda(rst.getDouble("vlunitario"));
+                            next.setQuantidade(rst.getDouble("qtd"));
+                            next.setTotalBruto(rst.getDouble("vltotal"));
+                            next.setValorDesconto(rst.getDouble("vldesconto"));
+                            next.setCancelado("C".equals(rst.getString("situacao").trim()));
+                            next.setCodigoBarras(rst.getString("ean"));
+                            next.setUnidadeMedida(rst.getString("embalagem"));
+
+                            String trib = rst.getString("tributacao");
+
+                            obterAliquota(next, trib);
+
                         } else {
-                            chave = "";
+                            next = new VendaItemIMP();
+
+                            String id = rst.getString("idvenda") + "-" + rst.getString("idproduto") + "-" + rst.getString("sequencia");
+                            String idvenda = rst.getString("idvenda");
+
+                            next.setId(id);
+                            next.setVenda(idvenda);
+                            next.setProduto(rst.getString("idproduto"));
+                            next.setDescricaoReduzida(rst.getString("descricaoproduto"));
+                            next.setPrecoVenda(rst.getDouble("precovenda"));
+                            next.setQuantidade(rst.getDouble("qtd"));
+                            next.setTotalBruto(rst.getDouble("valortotal"));
+                            next.setValorDesconto(rst.getDouble("desconto"));
+                            next.setCancelado(false);
+                            next.setCodigoBarras(rst.getString("codigobarras"));
+                            next.setUnidadeMedida(rst.getString("tipoembalagem"));
+
+                            String trib = rst.getString("icmstrib");
+
+                            obterAliquota(next, trib);
                         }
                         
-                        String id = chave + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-                        String id_vendaitem = rst.getString("vltotal") + "-" + rst.getInt("sequencia") + "-" + rst.getString("R60i_Sec") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-
-                        next.setId(id_vendaitem);
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("id_produto"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setPrecoVenda(rst.getDouble("vlunitario"));
-                        next.setQuantidade(rst.getDouble("qtd"));
-                        next.setTotalBruto(rst.getDouble("vltotal"));
-                        next.setValorDesconto(rst.getDouble("vldesconto"));
-                        next.setCancelado("C".equals(rst.getString("situacao").trim()));
-                        next.setCodigoBarras(rst.getString("ean"));
-                        next.setUnidadeMedida(rst.getString("embalagem"));
-                        
-                        String trib = rst.getString("tributacao");
-
-                        obterAliquota(next, trib);
                     }
                 }
             } catch (Exception ex) {
@@ -2169,8 +2270,22 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         "order by\n" +
                         "       itm.r60i_cup, itm.r60i_seq";
             } else if (versaoDaVenda == 3) {
-                this.sql = 
-                        "";
+                this.sql
+                        = "select \n"
+                        + "    i.NFCI_ID as idvenda,\n"
+                        + "    i.NFCI_SEQ as sequencia,\n"
+                        + "    i.NFCI_ITE as idproduto,\n"
+                        + "    i.NFCI_EAN as codigobarras,\n"
+                        + "    i.NFCI_DCR as descricaoproduto,\n"
+                        + "    i.NFCI_TPO_EMB as tipoembalagem,\n"
+                        + "    i.NFCI_QTD_UNI as qtdembalagem,\n"
+                        + "    i.NFCI_VLR_UNI as precovenda,\n"
+                        + "    i.NFCI_CTB_VAL as valortotal,\n"
+                        + "    i.NFCI_ICM_TRB as icmstrib,\n"
+                        + "    i.NFCI_ICM_CST as icmscst,\n"
+                        + "    i.NFCI_ICM_ALQ as icmsaliquota,\n"
+                        + "    i.NFCI_ICM_RED as icmsreducao\n"
+                        + "from AG3VNFCI_" + tabela_venda + " i";
             }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
