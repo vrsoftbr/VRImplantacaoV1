@@ -1731,11 +1731,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkVendaControlada.isSelected()) {
                     opcoes.add(OpcaoProduto.VENDA_CONTROLADA);
                 }
-                if (importador.getInterfaceDAO().getOpcoesDisponiveisProdutos().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)) {
-                    opcoes.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
-                }
                 opcoes.addAll(getParametrosExtras());
                 if (!opcoes.isEmpty()) {
+                    if (importador.getInterfaceDAO().getOpcoesDisponiveisProdutos().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)) {
+                        opcoes.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+                    }
                     if (utilizarVersao2) {
                         importador.importarProdutoNovo(opcoes.toArray(new OpcaoProduto[]{}));
                     } else {

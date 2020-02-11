@@ -1625,8 +1625,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    r.grpativo ativo,\n" +
                     "    r.grprendim rendimento,\n" +
                     "    1 fator,\n" +
-                    "    1 quantidadeproduto,\n" +
-                    "    r.grpqtde * 1000 quantidadereceita,\n" +
+                    "    1000 quantidadereceita,\n" +
+                    "    r.grpqtde * 1000 quantidadeproduto,\n" +
                     "    r.grpcodplu id_produto\n" +
                     "from\n" +
                     "	hipgrp r\n" +
