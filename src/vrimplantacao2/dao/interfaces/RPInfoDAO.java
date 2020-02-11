@@ -331,6 +331,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	p.prod_dataalt dataalteracao,\n"
                     + "	ean.ean,\n"
                     + "	ean.qtdembalagem,\n"
+                    + " p.prod_qemb embalagemcotacao,\n"        
                     + "	case\n"
                     + "	when p.prod_balanca = 'P' then 'KG'\n"
                     + "	when p.prod_balanca = 'U' then 'UN'\n"
@@ -423,6 +424,7 @@ public class RPInfoDAO extends InterfaceDAO {
                         imp.setEan(rst.getString("ean"));
                     }
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("embalagemcotacao"));
                     //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));

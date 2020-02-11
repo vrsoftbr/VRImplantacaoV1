@@ -530,6 +530,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         if (!imp.isBalanca()) {
                             imp.setTipoEmbalagem(val(sh,6,i));
                         }
+                        imp.setDescricaoCompleta(val(sh,5,i));
                         imp.setNcm(val(sh,7,i));
                         imp.setIcmsDebitoId(val(sh,10, i));
                         imp.setIcmsCreditoId(val(sh,10, i));
