@@ -32,6 +32,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -79,6 +80,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.DESC_COMPLETA,
                 OpcaoProduto.DESC_REDUZIDA,
                 OpcaoProduto.DESC_GONDOLA,
@@ -108,6 +111,32 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
 
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct "
+                    + "Familia as codigo, "
+                    + "Familia as descricao  "
+                    + "from tabela_pro "
+                    + "where Familia is not null "
+                    + "order by familia"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -333,7 +362,7 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.peso as pesobruto,\n" +
                     "    p.pesoliquido,\n" +
                     "    p.ncm,\n" +
-                    "    p.cest,\n" +
+                    "    p.cest,\n" +        
 
                     "    p.situacao_tributaria_pis as pis_s,\n" +
                     "    p.situacao_tributaria_pis_entrada as pis_e,\n" +

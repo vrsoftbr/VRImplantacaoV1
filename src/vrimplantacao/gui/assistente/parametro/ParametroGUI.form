@@ -132,12 +132,12 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="pnlDiversos" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="pnlDiversos" max="32767" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="pnlDriverODBC" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="vRPanel5" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -155,7 +155,7 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" attributes="0">
@@ -172,8 +172,11 @@
                                               <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="chkIgnorarClienteImpVenda" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkIgnorarClienteImpVenda" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          </Group>
                                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
@@ -199,7 +202,9 @@
                                       </Group>
                                   </Group>
                                   <Component id="chkIgnorarClienteImpVenda" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace pref="12" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -230,6 +235,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIgnorarClienteImpVenda">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Ignorar cliente n&#xe3;o importado na importa&#xe7;&#xe3;o de venda"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarCadastroProdutoVenda">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="For&#xe7;ar cadastro de produto que n&#xe3;o existe na importa&#xe7;&#xe3;o de venda"/>
                           </Properties>
                         </Component>
                       </SubComponents>
@@ -620,7 +630,7 @@
                           <Component id="pnlTipoLog" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlNivelLog" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="61" max="32767" attributes="0"/>
+                          <EmptySpace pref="102" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

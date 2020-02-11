@@ -47,6 +47,7 @@ public final class Parametros implements Iterable<Parametro>{
     private static final String IMPORTAR_BANCO_IMPLANTACAO = "IMPORTAR_BANCO_IMPLANTACAO";
     private static final String ITEM_VENDA_PADRAO = "ITEM_VENDA_PADRAO";
     private static final String IGNORAR_CLIENTE_IMP_VENDA = "IGNORAR_CLIENTE_IMP_VENDA";
+    private static final String FORCAR_CADASTRO_PRODUTO_NAO_EXISTENTE = "FORCAR CADASTRO DE PRODUTO NAO EXISTENTE";
     private static final SimpleDateFormat DATA_FORMAT= new SimpleDateFormat("yyyy-MM-dd");
     public static String lite;
     
@@ -461,6 +462,13 @@ public final class Parametros implements Iterable<Parametro>{
     public boolean isIgnorarClienteImpVenda() {
         return getBool(IGNORAR_CLIENTE_IMP_VENDA);
     }
+    
+    /**
+     * @return the verificaProdutoNaoExistente
+     */
+    public boolean isForcarCadastroProdutoNaoExistente() {
+        return getBool(FORCAR_CADASTRO_PRODUTO_NAO_EXISTENTE);
+    }
 
     /**
      * @param ignorarClienteImpVenda the verificaClienteImpVenda to set
@@ -475,6 +483,19 @@ public final class Parametros implements Iterable<Parametro>{
         }
     }
 
+    /**
+     * @param forcarCadastroProdutoNaoExistenteImpVenda the verificaProdutoImpVenda to set
+     */
+    public void setForcarCadastroProdutoNaoExistenteImpVenda(boolean forcarCadastroProdutoNaoExistenteImpVenda) {
+        try {
+            put(forcarCadastroProdutoNaoExistenteImpVenda, FORCAR_CADASTRO_PRODUTO_NAO_EXISTENTE);
+            LOG.finer("Importar dados do banco implantacao alterado");
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro ao gravar", ex);
+            throw new RuntimeException(ex);            
+        }
+    }
+    
     private DadosConexaoPostgreSQL empresaAtiva;
     public void setEmpresaAtiva(DadosConexaoPostgreSQL empresaAtiva) {
         this.empresaAtiva = empresaAtiva;

@@ -60,6 +60,7 @@ public class VendaRepository {
             
             int produtoPadrao = Parametros.get().getItemVendaPadrao();
             boolean ignorarClienteImpVenda = Parametros.get().isIgnorarClienteImpVenda();
+            boolean forcarCadastroProdutoNaoExistente = Parametros.get().isForcarCadastroProdutoNaoExistente();
             
             List<VendaItemIMP> divergentes = new ArrayList<>();
 
@@ -226,23 +227,35 @@ public class VendaRepository {
                 provider.commit();
                 return true;
             } else {
-                provider.rollback();
                 
-                provider.begin();
-                try {
-                    for (VendaItemIMP impItem: divergentes) {
+                if (!forcarCadastroProdutoNaoExistente) {
+
+                    provider.rollback();
+
+                    provider.begin();
+                    try {
+                        for (VendaItemIMP impItem : divergentes) {
+                            provider.gravarMapa(
+                                    impItem.getProduto(),
+                                    impItem.getCodigoBarras(),
+                                    impItem.getDescricaoReduzida()
+                            );
+                        }
+                        provider.commit();
+                    } catch (Exception ex) {
+                        provider.rollback();
+                        LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                } else {
+
+                    for (VendaItemIMP impItem : divergentes) {
                         provider.gravarMapa(
                                 impItem.getProduto(),
                                 impItem.getCodigoBarras(),
                                 impItem.getDescricaoReduzida()
                         );
                     }
-                    provider.commit();
-                } catch (Exception ex) {
-                    provider.rollback();
-                    LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
-                
                 return false;
             }
             
