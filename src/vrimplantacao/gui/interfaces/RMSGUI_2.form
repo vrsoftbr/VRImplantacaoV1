@@ -71,7 +71,7 @@
                           <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUtilizarViewMixFiscal" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="0" pref="385" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -645,7 +645,9 @@
                     </Component>
                     <Component class="vrframework.bean.textField.VRTextField" name="dtVenda">
                       <Properties>
-                        <Property name="editable" type="boolean" value="false"/>
+                        <Property name="editable" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="true" type="code"/>
+                        </Property>
                       </Properties>
                     </Component>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVendas">
