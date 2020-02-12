@@ -289,7 +289,7 @@ public class AccesysGUI extends VRInternalFrame implements ConexaoEvent {
         lblCompLoja = new javax.swing.JLabel();
         txtCompLoja = new javax.swing.JTextField();
 
-        setTitle("Importação Director");
+        setTitle("Importação Accesys");
         setToolTipText("");
 
         conexao.setSistema("JM2Online");
@@ -485,7 +485,7 @@ public class AccesysGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap())
         );
 
-        getAccessibleContext().setAccessibleName("Director");
+        getAccessibleContext().setAccessibleName("Accesys");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
