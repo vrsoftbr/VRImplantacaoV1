@@ -87,6 +87,7 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2.dao.interfaces.SircomDAO;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
 import vrimplantacao2.gui.interfaces.AcomGUI;
@@ -197,6 +198,7 @@ import vrimplantacao2.gui.interfaces.SifatGUI;
 import vrimplantacao2.gui.interfaces.Sifat_2GUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
 import vrimplantacao2.gui.interfaces.SiitGUI;
+import vrimplantacao2.gui.interfaces.SircomGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
@@ -603,6 +605,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuThotau = new javax.swing.JMenuItem();
         mnuiWeber = new javax.swing.JMenuItem();
         mnuiSophyx = new javax.swing.JMenuItem();
+        mnuiSircom = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1377,6 +1380,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuiSophyx);
+
+        mnuiSircom.setText("Sircom");
+        mnuiSircom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiSircomActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuiSircom);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4358,6 +4369,10 @@ public final class MenuGUI extends VRMdiFrame {
         G10GUI.exibir(this);
     }//GEN-LAST:event_mnuG10ActionPerformed
 
+    private void mnuiSircomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiSircomActionPerformed
+        SircomGUI.exibir(this);
+    }//GEN-LAST:event_mnuiSircomActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4607,6 +4622,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnuZpf;
+    private javax.swing.JMenuItem mnuiSircom;
     private javax.swing.JMenuItem mnuiSophyx;
     private javax.swing.JMenuItem mnuiSysERP;
     private javax.swing.JMenuItem mnuiWeber;
