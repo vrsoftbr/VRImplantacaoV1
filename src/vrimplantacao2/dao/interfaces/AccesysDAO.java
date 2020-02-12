@@ -14,6 +14,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -289,6 +290,34 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     if(rs.getString("fax") != null && !"".equals(rs.getString("fax"))) {
                         imp.addContato("4", "FAX", null, null, TipoContato.NFE, rs.getString("fax"));
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	COD_PRODFOR id_produto,\n" +
+                    "	CODFOR_PRODFOR id_fornecedor,\n" +
+                    "	CODBARRA_PRODFOR codigoexterno\n" +
+                    "FROM \n" +
+                    "	CONTROLE_ESTOQUE.dbo.CE_PRODFOR")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
                 }
