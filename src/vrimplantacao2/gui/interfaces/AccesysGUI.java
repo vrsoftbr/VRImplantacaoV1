@@ -17,17 +17,17 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.interfaces.AccesysDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.RensoftwareDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
+public class AccesysGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "Rensoftware";
-    private static RensoftwareGUI instance;
+    private static final String SISTEMA = "Accesys";
+    private static AccesysGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -61,9 +61,9 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private RensoftwareDAO dao = new RensoftwareDAO();
+    private AccesysDAO dao = new AccesysDAO();
 
-    private RensoftwareGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private AccesysGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -95,11 +95,11 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
 
         this.title = "Importação " + SISTEMA;
 
-        conexao.host = "localhost";
-        conexao.database = "";
+        conexao.host = "ZINA";
+        conexao.database = "CONTROLE_ESTOQUE";
         conexao.port = "1433";
-        conexao.user = "as";
-        conexao.pass = "vrsoftware";
+        conexao.user = "SA";
+        conexao.pass = "@66E$Y$";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
@@ -144,7 +144,7 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new RensoftwareGUI(i_mdiFrame);
+                instance = new AccesysGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -173,8 +173,6 @@ public class RensoftwareGUI extends VRInternalFrame implements ConexaoEvent {
                     } else {
                         idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     }
-
-                    dao.atacadoQtdMinima = chkAtacadoQtdMinima.isSelected();
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
