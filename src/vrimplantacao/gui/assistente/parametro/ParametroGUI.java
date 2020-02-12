@@ -871,6 +871,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkGerarBancoImplantacao.setSelected(parametros.isGerarBancoImplantacao());
         chkImportarBancoImplantacao.setSelected(parametros.isImportarBancoImplantacao());
         chkIgnorarClienteImpVenda.setSelected(parametros.isIgnorarClienteImpVenda());
+        chkForcarCadastroProdutoVenda.setSelected(parametros.isForcarCadastroProdutoNaoExistente());
         txtVendaProdutoPadrao.setInt(parametros.getItemVendaPadrao());
         switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
             case DRIVER:

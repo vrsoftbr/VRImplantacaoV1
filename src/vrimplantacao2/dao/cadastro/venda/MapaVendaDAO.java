@@ -3,13 +3,9 @@ package vrimplantacao2.dao.cadastro.venda;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
-import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStack;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 
@@ -23,9 +19,6 @@ public class MapaVendaDAO {
     
     private final String sistema;
     private final String loja;
-    private List<LojaVO> lojas;
-    private ProdutoIDStack produtoIDStack;
-    private ProdutoRepositoryProvider provider;   
 
     public MapaVendaDAO(String sistema, String loja) throws Exception {
         try (Statement stm = Conexao.createStatement()) {

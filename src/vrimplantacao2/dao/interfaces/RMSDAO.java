@@ -2307,7 +2307,6 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and NFCC_LOJ = " + idLojaCliente + ")";
             }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
-            System.out.println(sql);
             rst = stm.executeQuery(sql);
         }
 
