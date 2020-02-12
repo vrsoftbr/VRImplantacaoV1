@@ -11,6 +11,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -385,6 +386,48 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmail(rs.getString("email"));
                     imp.setDataCadastro(rs.getDate("dataabertura"));
                     imp.setSexo(rs.getString("sexo"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	 r.Codigo id,\n" +
+                    "	 r.CodVenda coo,\n" +
+                    "	 r.CodCliente idcliente,\n" +
+                    "	 r.Numero parcela,\n" +
+                    "	 r.ValorRestante,\n" +
+                    "	 r.Data dataemissao,\n" +
+                    "	 r.DataVencimento,\n" +
+                    "	 r.NumeroCaixa ecf\n" +
+                    "from \n" +
+                    "	dbo.ParcelasCrediario r\n" +
+                    "where	\n" +
+                    "	r.DataPagamento is null or\n" +
+                    "	ValorRestante < valor and ValorRestante != 0 and\n" +
+                    "	r.CodEmpresa = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	r.data")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setValor(rs.getDouble("valorrestante"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataVencimento(rs.getDate("datavencimento"));
+                    imp.setEcf(rs.getString("ecf"));
                     
                     result.add(imp);
                 }
