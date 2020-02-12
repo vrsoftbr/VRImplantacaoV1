@@ -10,6 +10,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -318,6 +319,72 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.CodCliente id,\n" +
+                    "	c.Carteira,\n" +
+                    "	c.NomeCliente razao,\n" +
+                    "	c.CpfCliente cpf,\n" +
+                    "	c.RgCliente rg,\n" +
+                    "	c.EnderecoCliente endereco,\n" +
+                    "	c.BairroCliente bairro,\n" +
+                    "	c.CidadeCliente cidade,\n" +
+                    "	c.CodMunicipio cidadeibge,\n" +
+                    "	c.UF,\n" +
+                    "	c.CodUf ufibge,\n" +
+                    "	c.NUMERO,\n" +
+                    "	c.CepCliente cep,\n" +
+                    "	c.LimiteCheque,\n" +
+                    "	c.LimiteCliente,\n" +
+                    "	c.TelCliente telefone,\n" +
+                    "	c.CelCliente celular,\n" +
+                    "	c.Datanascimento,\n" +
+                    "	c.Obs,\n" +
+                    "	c.email,\n" +
+                    "	c.Sexo,\n" +
+                    "	c.DataAbertura\n" +
+                    "from\n" +
+                    "	controle_clientes.dbo.cc_clientes c")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setCnpj(rs.getString("cpf"));
+                    imp.setInscricaoestadual(rs.getString("rg"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setMunicipioIBGE(rs.getString("cidadeibge"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setUfIBGE(rs.getInt("ufibge"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setValorLimite(rs.getDouble("limitecliente"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    
+                    if(rs.getString("obs") != null && !"".equals(rs.getString("obs"))) {
+                        imp.setObservacao(rs.getString("obs"));
+                    }
+                    
+                    imp.setEmail(rs.getString("email"));
+                    imp.setDataCadastro(rs.getDate("dataabertura"));
+                    imp.setSexo(rs.getString("sexo"));
                     
                     result.add(imp);
                 }
