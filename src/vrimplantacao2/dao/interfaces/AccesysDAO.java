@@ -362,7 +362,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
-                    imp.setId(rs.getString("id"));
+                    imp.setId(rs.getString("Carteira"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setCnpj(rs.getString("cpf"));
                     imp.setInscricaoestadual(rs.getString("rg"));
@@ -403,7 +403,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n" +
                     "	 r.Codigo id,\n" +
                     "	 r.CodVenda coo,\n" +
-                    "	 r.CodCliente idcliente,\n" +
+                    "	 r.CodCliente carteira,\n" +
                     "	 r.Numero parcela,\n" +
                     "	 r.ValorRestante,\n" +
                     "	 r.Data dataemissao,\n" +
@@ -422,7 +422,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setId(rs.getString("id"));
                     imp.setNumeroCupom(rs.getString("coo"));
-                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setIdCliente(rs.getString("carteira"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valorrestante"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
