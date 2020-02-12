@@ -8,6 +8,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
@@ -82,4 +83,29 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	Codigo,\n" +
+                    "	Descricao\n" +
+                    "FROM \n" +
+                    "	CONTROLE_ESTOQUE.dbo.Familias")) {
+                while(rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
