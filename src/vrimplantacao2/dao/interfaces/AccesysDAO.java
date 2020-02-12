@@ -9,7 +9,9 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -205,6 +207,88 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setSituacaoCadastro(rs.getInt("desativo") == 1 ?
                             SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	f.CODIGO_FORNECEDORES id,\n" +
+                    "	f.RAZAO_FORNECEDORES razao,\n" +
+                    "	f.NomeFantasia fantasia,\n" +
+                    "	f.CNPJ_FORNECEDORES cnpj,\n" +
+                    "	f.IE_FORNECEDORES ie,\n" +
+                    "	f.TELEFONE_FORNECEDORES telefone,\n" +
+                    "	f.ENDERECO_FORNECEDORES endereco,\n" +
+                    "	f.BAIRRO_FORNECEDORES bairro,\n" +
+                    "	f.CIDADE_FORNECEDORES cidade,\n" +
+                    "	f.CEP_FORNECEDORES cep,\n" +
+                    "	f.UF_FORNECEDORES uf,\n" +
+                    "	f.CodMunicipio cidadeibge,\n" +
+                    "	f.CodUF ufibge,\n" +
+                    "	f.NUMERO,\n" +
+                    "	f.Complemento,\n" +
+                    "	f.email1,\n" +
+                    "	f.email2,\n" +
+                    "	f.email3,\n" +
+                    "	f.InscricaoMunicipal,\n" +
+                    "	f.CNAE,\n" +
+                    "	f.Fax,\n" +
+                    "	f.Observacoes\n" +
+                    "from\n" +
+                    "	CE_FORNECEDORES f\n" +
+                    "order by\n" +
+                    "	1")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setIbge_municipio(rs.getInt("cidadeibge"));
+                    imp.setIbge_uf(rs.getInt("ufibge"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setInsc_municipal(rs.getString("inscricaomunicipal"));
+                    
+                    if(rs.getString("observacoes") != null && !"".equals(rs.getString("observacoes"))) {
+                        imp.setObservacao(rs.getString("observacoes"));
+                    }
+                    
+                    if(rs.getString("email1") != null && !"".equals(rs.getString("email1"))) {
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, rs.getString("email1"));
+                    }
+                    
+                    if(rs.getString("email2") != null && !"".equals(rs.getString("email2"))) {
+                        imp.addContato("2", "EMAIL2", null, null, TipoContato.NFE, rs.getString("email2"));
+                    }
+                    
+                    if(rs.getString("email3") != null && !"".equals(rs.getString("email3"))) {
+                        imp.addContato("3", "EMAIL3", null, null, TipoContato.NFE, rs.getString("email3"));
+                    }
+                    
+                    if(rs.getString("fax") != null && !"".equals(rs.getString("fax"))) {
+                        imp.addContato("4", "FAX", null, null, TipoContato.NFE, rs.getString("fax"));
+                    }
                     
                     result.add(imp);
                 }
