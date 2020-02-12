@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.venda;
 
+import java.sql.Statement;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,14 +11,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.Conexao;
+import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao.vo.vrimplantacao.ProdutoVO;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStack;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStackProvider;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.MercadologicoVO;
+import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
+import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
+import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 import vrimplantacao2.vo.enums.Icms;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoCancelamento;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -32,6 +49,10 @@ public class VendaRepository {
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm:ss");
     
     private VendaRepositoryProvider provider;
+    private List<LojaVO> lojas;
+    private ProdutoIDStack produtoIDStack;
+    private ProdutoRepositoryProvider providerProduto;
+    private ProdutoAnteriorDAO produtoAnteriorDAO;
 
     public VendaRepository(VendaRepositoryProvider provider) {
         this.provider = provider;
@@ -60,6 +81,12 @@ public class VendaRepository {
             
             int produtoPadrao = Parametros.get().getItemVendaPadrao();
             boolean ignorarClienteImpVenda = Parametros.get().isIgnorarClienteImpVenda();
+            boolean forcarCadastroProdutoNaoExistente = Parametros.get().isForcarCadastroProdutoNaoExistente();
+            
+            produtoIDStack = new ProdutoIDStack(new ProdutoIDStackProvider());
+            lojas = new LojaDAO().carregar();
+            providerProduto = new ProdutoRepositoryProvider();
+            produtoAnteriorDAO = new ProdutoAnteriorDAO();
             
             List<VendaItemIMP> divergentes = new ArrayList<>();
 
@@ -161,16 +188,89 @@ public class VendaRepository {
                         produto = produtoPadrao;
                     }
                     if ( produto == null ) {
-                        haDivergencia = true;
-                        LOG.warning(
-                            String.format(
-                                "Produto não encontrado - código:%s ean:%s descricao:%s",
-                                impItem.getProduto(),
-                                impItem.getCodigoBarras(),
-                                impItem.getDescricaoReduzida()
-                            )
-                        );
-                        divergentes.add(impItem);
+                        
+                        if (!forcarCadastroProdutoNaoExistente) {
+                            haDivergencia = true;
+                            LOG.warning(
+                                    String.format(
+                                            "Produto não encontrado - código:%s ean:%s descricao:%s",
+                                            impItem.getProduto(),
+                                            impItem.getCodigoBarras(),
+                                            impItem.getDescricaoReduzida()
+                                    )
+                            );
+                            divergentes.add(impItem);
+                        } else {
+                            
+                            try {
+                                
+                                ProdutoAnteriorVO ant = produtoAnteriorDAO.getProdutoAnterior(provider.getSistema(), provider.getLoja(), impItem.getProduto());
+
+                                if (ant == null) {
+                                    
+                                    vrimplantacao2.vo.cadastro.ProdutoVO vo = new vrimplantacao2.vo.cadastro.ProdutoVO();
+
+                                    int codigoAtual = produtoIDStack.obterID(impItem.getProduto(), false);
+                                    MercadologicoVO merc = providerProduto.getMercadologico("-1", "-1", "-1", "0", "0");
+
+                                    vo.setId(codigoAtual);
+                                    vo.setDescricaoCompleta(impItem.getDescricaoReduzida());
+                                    vo.setDescricaoReduzida(vo.getDescricaoCompleta());
+                                    vo.setDescricaoGondola(vo.getDescricaoCompleta());
+                                    vo.setMercadologico(merc);
+                                    vo.setIdFornecedorFabricante(1);
+
+                                    providerProduto.salvar(vo);
+
+                                    for (LojaVO lj : lojas) {
+                                        ProdutoComplementoVO compl = vo.getComplementos().make(lj.getId());
+                                        compl.setIdLoja(lj.getId());
+                                        compl.setDescontinuado(true);
+                                        compl.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                                        compl.setPrecoVenda(impItem.getPrecoVenda());
+                                        providerProduto.complemento().salvar(compl, false);
+                                    }
+
+                                    ProdutoAliquotaVO aliq = vo.getAliquotas().make(Parametros.get().getUfPadrao().getId(), 1);
+                                    aliq.setEstado(Parametros.get().getUfPadrao());
+                                    aliq.setAliquotaCredito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                    aliq.setAliquotaConsumidor(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                    aliq.setAliquotaCreditoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                    aliq.setAliquotaDebito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                    aliq.setAliquotaDebitoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                    aliq.setAliquotaDebitoForaEstadoNf(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                    providerProduto.aliquota().salvar(aliq);
+
+                                    ProdutoAutomacaoVO ean = vo.getEans().make(Long.parseLong(impItem.getCodigoBarras()));
+                                    ean.setCodigoBarras(Long.parseLong(impItem.getCodigoBarras()));
+                                    ean.setTipoEmbalagem("KG".equals(impItem.getUnidadeMedida().trim()) ? TipoEmbalagem.KG : TipoEmbalagem.UN);
+                                    ean.setProduto(vo);
+                                    providerProduto.automacao().salvar(ean);
+
+                                    try (Statement stm = Conexao.createStatement()) {
+                                        SQLBuilder sql = new SQLBuilder();
+
+                                        sql.setSchema("implantacao");
+                                        sql.setTableName("codant_produto");
+                                        sql.put("impsistema", provider.getSistema());
+                                        sql.put("imploja", provider.getLoja());
+                                        sql.put("impid", impItem.getProduto());
+                                        sql.put("descricao", impItem.getDescricaoReduzida());
+                                        sql.put("codigoatual", codigoAtual);
+                                        sql.put("novo", true);
+                                        stm.execute(sql.getInsert());
+                                    }
+
+                                    item.setId_produto(codigoAtual);
+
+                                } else {
+                                    item.setId_produto(ant.getCodigoAtual().getId());
+                                }
+                            } catch (Exception ex) {
+                                throw ex;
+                            }
+                        }
+                        
                     } else {                        
                         item.setId_produto(produto);
                     }
@@ -226,11 +326,12 @@ public class VendaRepository {
                 provider.commit();
                 return true;
             } else {
+
                 provider.rollback();
-                
+
                 provider.begin();
                 try {
-                    for (VendaItemIMP impItem: divergentes) {
+                    for (VendaItemIMP impItem : divergentes) {
                         provider.gravarMapa(
                                 impItem.getProduto(),
                                 impItem.getCodigoBarras(),
@@ -242,7 +343,7 @@ public class VendaRepository {
                     provider.rollback();
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
-                
+
                 return false;
             }
             

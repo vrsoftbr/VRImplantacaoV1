@@ -123,6 +123,7 @@ public class ParametroGUI extends VRInternalFrame {
         txtVendaProdutoPadrao = new VRTextField();
         vRLabel5 = new VRLabel();
         chkIgnorarClienteImpVenda = new VRCheckBox();
+        chkForcarCadastroProdutoVenda = new VRCheckBox();
         pnlLocalizacao = new VRPanel();
         vRLabel1 = new VRLabel();
         vRLabel2 = new VRLabel();
@@ -213,6 +214,8 @@ public class ParametroGUI extends VRInternalFrame {
 
         chkIgnorarClienteImpVenda.setText("Ignorar cliente não importado na importação de venda");
 
+        chkForcarCadastroProdutoVenda.setText("Forçar cadastro de produto que não existe na importação de venda");
+
         GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
         pnlDiversos.setLayout(pnlDiversosLayout);
         pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -230,7 +233,9 @@ public class ParametroGUI extends VRInternalFrame {
                             .addComponent(txtVendaProdutoPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlDiversosLayout.createSequentialGroup()
-                        .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -247,7 +252,9 @@ public class ParametroGUI extends VRInternalFrame {
                             .addComponent(cmbTipoPagamento, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtVendaProdutoPadrao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
                 .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pnlLocalizacao.setBorder(BorderFactory.createTitledBorder("Localização"));
@@ -435,12 +442,12 @@ public class ParametroGUI extends VRInternalFrame {
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(pnlDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         scroll.setViewportView(vRPanel2);
@@ -594,7 +601,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlTipoLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlNivelLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(102, Short.MAX_VALUE))
         );
 
         btnLogExcluir.setText("Excluir");
@@ -762,6 +769,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRButton btnLogCancelar;
     private VRButton btnLogExcluir;
     private VRButton btnLogGravar;
+    private VRCheckBox chkForcarCadastroProdutoVenda;
     private VRCheckBox chkGerarBancoImplantacao;
     private VRCheckBox chkIgnorarClienteImpVenda;
     private VRCheckBox chkImportarBancoImplantacao;
@@ -863,6 +871,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkGerarBancoImplantacao.setSelected(parametros.isGerarBancoImplantacao());
         chkImportarBancoImplantacao.setSelected(parametros.isImportarBancoImplantacao());
         chkIgnorarClienteImpVenda.setSelected(parametros.isIgnorarClienteImpVenda());
+        chkForcarCadastroProdutoVenda.setSelected(parametros.isForcarCadastroProdutoNaoExistente());
         txtVendaProdutoPadrao.setInt(parametros.getItemVendaPadrao());
         switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
             case DRIVER:
@@ -892,6 +901,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setTipoPagamento((TipoPagamento) cmbTipoPagamento.getSelectedItem());
             parametros.setItemVendaPadrao(txtVendaProdutoPadrao.getInt());
             parametros.setIgnorarClienteImpVenda(chkIgnorarClienteImpVenda.isSelected());
+            parametros.setForcarCadastroProdutoNaoExistenteImpVenda(chkForcarCadastroProdutoVenda.isSelected());
             parametros.put(txtNomeDriverODBC.getText(), "ODBC", "DRIVER_ODBC");
             parametros.put(chkNfeSaidaProcessarFinalizacoes.isSelected(), "IMPORT_NFE", "PROCESSAR_FINALIZACOES");
             parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");

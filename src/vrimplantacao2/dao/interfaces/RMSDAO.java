@@ -82,7 +82,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private boolean utilizarViewMixFiscal = true;
     
-    private int versaoDaVenda = 1;
+    private int versaoDaVenda;
     
     private boolean somenteAtivos = false;
 
@@ -1935,8 +1935,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                             next.setData(format.parse(rst.getString("datavenda")));
                             next.setIdClientePreferencial(rst.getString("idcliente"));
-                            String horaInicio = timestampDate.format(format.parse(rst.getString("datavenda"))) + " '00:00:00'";
-                            String horaTermino = timestampDate.format(format.parse(rst.getString("datavenda"))) + " '00:00:00'";
+                            String horaInicio = timestampDate.format(format.parse(rst.getString("datavenda"))) + " 00:00:00";
+                            String horaTermino = timestampDate.format(format.parse(rst.getString("datavenda"))) + " 00:00:00";
                             next.setHoraInicio(timestamp.parse(horaInicio));
                             next.setHoraTermino(timestamp.parse(horaTermino));
                             next.setCancelado(false);
@@ -2055,38 +2055,38 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       tip.tip_cep,\n" +
                     "       vda.r60i_chv_cel";
             } else if (versaoDaVenda == 3) {
-            sql = "select\n"
-                    + "    v.NFCC_ID as id,\n"
-                    + "    v.NFCC_LOJ as idloja,\n"
-                    + "    v.NFCC_DTA as datavenda,\n"
-                    + "    v.NFCC_CUP as numerocupom,\n"
-                    + "    v.NFCC_CPF as cpf,\n"
-                    + "    v.NFCC_CLI as idcliente,\n"
-                    + "    v.NFCC_CXA as caixa,\n"
-                    + "    v.NFCC_OPE as operador,\n"
-                    + "    v.NFCC_HRS_EMI as horavenda,\n"
-                    + "    v.NFCC_CHV_NFC as chave,\n"
-                    + "    v.NFCC_PDV_NRO as ecf,\n"
-                    + "    v.NFCC_PDV_SER as serieecf,\n"
-                    + "    v.NFCC_EST as estado,\n"
-                    + "    v.NFCC_CTB_VAL as valortotal,\n"
-                    + "    v.NFCC_ACR_VAL as acrescimo,\n"
-                    + "    v.NFCC_DSC_VAL as desconto,\n"
-                    + "    v.NFCC_PDV_MDL as modeloecf,"
-                    + "    tip.TIP_CODIGO as id_cliente,\n" 
-                    + "    tip.TIP_CGC_CPF as cnpj,\n"
-                    + "    tip.TIP_RAZAO_SOCIAL as razaosocial,\n"
-                    + "    tip.TIP_ENDERECO as endereco,\n"
-                    + "    tip.TIP_BAIRRO as bairro,\n"
-                    + "    tip.TIP_CIDADE as municipio,\n"
-                    + "    tip.TIP_ESTADO as uf,\n"
-                    + "    tip.TIP_CEP as cep \n"
-                    + "from AG3VNFCC_" + tabela_venda + " v\n"
-                    + "left join aa2ctipo tip on tip.TIP_CODIGO = v.NFCC_CLI\n"
-                    + "where v.NFCC_CFO in (5102, 5405)\n"
-                    + "and v.NFCC_EST = 'PE'\n"
-                    + "and v.NFCC_LOJ = " + getLojaOrigem() + "\n"
-                    + "order by v.NFCC_ID";
+                sql = "select\n"
+                        + "    v.NFCC_ID as id,\n"
+                        + "    v.NFCC_LOJ as idloja,\n"
+                        + "    v.NFCC_DTA as datavenda,\n"
+                        + "    v.NFCC_CUP as numerocupom,\n"
+                        + "    v.NFCC_CPF as cpf,\n"
+                        + "    v.NFCC_CLI as idcliente,\n"
+                        + "    v.NFCC_CXA as caixa,\n"
+                        + "    v.NFCC_OPE as operador,\n"
+                        + "    v.NFCC_HRS_EMI as horavenda,\n"
+                        + "    v.NFCC_CHV_NFC as chave,\n"
+                        + "    v.NFCC_PDV_NRO as ecf,\n"
+                        + "    v.NFCC_PDV_SER as serieecf,\n"
+                        + "    v.NFCC_EST as estado,\n"
+                        + "    v.NFCC_CTB_VAL as valortotal,\n"
+                        + "    v.NFCC_ACR_VAL as acrescimo,\n"
+                        + "    v.NFCC_DSC_VAL as desconto,\n"
+                        + "    v.NFCC_PDV_MDL as modeloecf,"
+                        + "    tip.TIP_CODIGO as id_cliente,\n"
+                        + "    tip.TIP_CGC_CPF as cnpj,\n"
+                        + "    tip.TIP_RAZAO_SOCIAL as razaosocial,\n"
+                        + "    tip.TIP_ENDERECO as endereco,\n"
+                        + "    tip.TIP_BAIRRO as bairro,\n"
+                        + "    tip.TIP_CIDADE as municipio,\n"
+                        + "    tip.TIP_ESTADO as uf,\n"
+                        + "    tip.TIP_CEP as cep \n"
+                        + "from AG3VNFCC_" + tabela_venda + " v\n"
+                        + "left join aa2ctipo tip on tip.TIP_CODIGO = v.NFCC_CLI\n"
+                        + "where v.NFCC_CFO in (5102, 5405)\n"
+                        + "and v.NFCC_EST = 'PE'\n"
+                        + "and v.NFCC_LOJ = " + idLojaCliente + "\n"
+                        + "order by v.NFCC_ID";
             }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -2164,16 +2164,18 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             next.setId(id);
                             next.setVenda(idvenda);
                             next.setProduto(rst.getString("idproduto"));
+                            next.setSequencia(rst.getInt("sequencia"));
                             next.setDescricaoReduzida(rst.getString("descricaoproduto"));
                             next.setPrecoVenda(rst.getDouble("precovenda"));
                             next.setQuantidade(rst.getDouble("qtd"));
                             next.setTotalBruto(rst.getDouble("valortotal"));
                             next.setValorDesconto(rst.getDouble("desconto"));
+                            next.setValorAcrescimo(rst.getDouble("acrescimo"));
                             next.setCancelado(false);
                             next.setCodigoBarras(rst.getString("codigobarras"));
                             next.setUnidadeMedida(rst.getString("tipoembalagem"));
 
-                            String trib = rst.getString("icmstrib");
+                            String trib = rst.getString("icmstrib").trim();
 
                             obterAliquota(next, trib);
                         }
@@ -2225,6 +2227,18 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 case "1100":
                     cst = 0;
                     aliq = 11;
+                    break;
+                case "2700":
+                    cst = 0;
+                    aliq = 27;
+                    break;
+                case "1700":
+                    cst = 0;
+                    aliq = 17;
+                    break;
+                case "0700":
+                    cst = 0;
+                    aliq = 7;
                     break;
                 case "F":
                     cst = 60;
@@ -2278,14 +2292,19 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    i.NFCI_EAN as codigobarras,\n"
                         + "    i.NFCI_DCR as descricaoproduto,\n"
                         + "    i.NFCI_TPO_EMB as tipoembalagem,\n"
-                        + "    i.NFCI_QTD_UNI as qtdembalagem,\n"
+                        + "    i.NFCI_QTD_UNI as qtd,\n"
                         + "    i.NFCI_VLR_UNI as precovenda,\n"
                         + "    i.NFCI_CTB_VAL as valortotal,\n"
                         + "    i.NFCI_ICM_TRB as icmstrib,\n"
                         + "    i.NFCI_ICM_CST as icmscst,\n"
                         + "    i.NFCI_ICM_ALQ as icmsaliquota,\n"
-                        + "    i.NFCI_ICM_RED as icmsreducao\n"
-                        + "from AG3VNFCI_" + tabela_venda + " i";
+                        + "    i.NFCI_ICM_RED as icmsreducao,\n"
+                        + "    i.NFCI_DSC_VAL as desconto,\n"
+                        + "    i.NFCI_ACR_VAL as acrescimo\n"
+                        + "from AG3VNFCI_" + tabela_venda + " i\n"
+                        + "where NFCI_ID in (select NFCC_ID from AG3VNFCC_" + tabela_venda + " where NFCC_CFO in (5102, 5405)\n"
+                        + "and NFCC_EST = 'PE'\n"
+                        + "and NFCC_LOJ = " + idLojaCliente + ")";
             }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);

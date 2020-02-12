@@ -296,13 +296,22 @@ public class RMSGUI_2 extends VRInternalFrame {
                         if(chkVendas.isSelected()) {
                             dao.setDataInicioVenda(edtVendaDtIni.getDate());
                             dao.setDataTerminoVenda(edtVendaDtFim.getDate());
-                            if (rdbVendasV1.equals(groupVendasPdv.getSelection())) {
+                            
+                            if (rdbVendasV1.isSelected()) {
+                                dao.setVersaoDaVenda(1);
+                            } else if (rdbVendasV2.isSelected()) {
+                                dao.setVersaoDaVenda(2);
+                            } else if (rdbVendasV3.isSelected()) {
+                                dao.setVersaoDaVenda(3);
+                            }
+                            
+                            /*if (rdbVendasV1.equals(groupVendasPdv.getSelection())) {
                                 dao.setVersaoDaVenda(1);
                             } else if (rdbVendasV2.equals(groupVendasPdv.getSelection())) {
                                 dao.setVersaoDaVenda(2);                                
                             } else if (rdbVendasV3.equals(groupVendasPdv.getSelection())) {
                                 dao.setVersaoDaVenda(3);                                
-                            }                            
+                            }*/                            
                             RMSDAO.tabela_venda = dtVenda.getText();
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
@@ -467,20 +476,20 @@ public class RMSGUI_2 extends VRInternalFrame {
         setTitle("Importação RMS");
         setToolTipText("");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-                formInternalFrameOpened(evt);
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameOpened(evt);
             }
         });
 
@@ -757,7 +766,7 @@ public class RMSGUI_2 extends VRInternalFrame {
 
         lblMesVenda.setText("Mês da Venda");
 
-        dtVenda.setEditable(false);
+        dtVenda.setEditable(true);
 
         chkVendas.setText("Importar");
         chkVendas.addActionListener(new java.awt.event.ActionListener() {
@@ -1140,7 +1149,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 385, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1277,7 +1286,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private void chkVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendasActionPerformed
         rdbVendasV1.setEnabled(chkVendas.isSelected());
         rdbVendasV2.setEnabled(chkVendas.isSelected());
-        rdbVendasV2.setEnabled(chkVendas.isSelected());        
+        rdbVendasV3.setEnabled(chkVendas.isSelected());        
     }//GEN-LAST:event_chkVendasActionPerformed
 
     private void chkNotasFiscaisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkNotasFiscaisActionPerformed
