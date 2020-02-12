@@ -105,7 +105,7 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.PRATELEIRA
         }));
     }
-    
+
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
@@ -201,7 +201,7 @@ public class RPInfoDAO extends InterfaceDAO {
         }
         return new ArrayList<>(merc.values());
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -331,7 +331,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	p.prod_dataalt dataalteracao,\n"
                     + "	ean.ean,\n"
                     + "	ean.qtdembalagem,\n"
-                    + " p.prod_qemb embalagemcotacao,\n"        
+                    + " p.prod_qemb embalagemcotacao,\n"
                     + "	case\n"
                     + "	when p.prod_balanca = 'P' then 'KG'\n"
                     + "	when p.prod_balanca = 'U' then 'UN'\n"
@@ -367,7 +367,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	tr.trib_cstpis cstpiscofins,\n"
                     + "	tr.trib_natpiscof naturezareceita,\n"
                     + " un.prun_setor setor,\n"
-                    + " un.prun_setordep departamento\n"        
+                    + " un.prun_setordep departamento\n"
                     + "from\n"
                     + "	produtos p\n"
                     + "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n"
@@ -453,15 +453,15 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setIcmsReducao(rst.getDouble("icmsreducao"));
                     imp.setIcmsCst(rst.getInt("cst"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
-                    if(rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
-                        if(rst.getString("setor").length() > 2) {
+                    if (rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
+                        if (rst.getString("setor").length() > 2) {
                             imp.setSetor(rst.getString("setor").trim().substring(0, 2));
                         } else {
                             imp.setSetor(rst.getString("setor").trim());
-                        }   
+                        }
                     }
-                    if(rst.getString("departamento") != null && !"".equals(rst.getString("departamento"))) {
-                        if(rst.getString("departamento").length() > 3) {
+                    if (rst.getString("departamento") != null && !"".equals(rst.getString("departamento"))) {
+                        if (rst.getString("departamento").length() > 3) {
                             imp.setPrateleira(rst.getString("departamento").trim().substring(0, 3));
                         } else {
                             imp.setPrateleira(rst.getString("departamento").trim());
@@ -479,7 +479,7 @@ public class RPInfoDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -515,7 +515,7 @@ public class RPInfoDAO extends InterfaceDAO {
             }
             return result;
         }
-        
+
         if (opt == OpcaoProduto.MERCADOLOGICO) {
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -543,10 +543,10 @@ public class RPInfoDAO extends InterfaceDAO {
             }
             return result;
         }
-        
+
         return null;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -578,7 +578,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	f.forn_datacad datacadastro,\n"
                     + "	f.forn_obspedidos,\n"
                     + "	f.forn_obstrocas,\n"
-                    + "   f.forn_caractrib tipofornecedor\n"
+                    + " f.forn_caractrib tipofornecedor\n"
                     + "from\n"
                     + "	\n"
                     + "	fornecedores f\n"
@@ -613,14 +613,13 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.addTelefone("FAX INDUSTRIA", rst.getString("forn_faxindustria"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("forn_obspedidos") + " " + rst.getString("forn_obstrocas"));
-
-                    if (rst.getString("email") != null && !"".equals(rst.getString("email"))) {
-                        if(rst.getString("email").length() > 50) {
-                            imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email").substring(0, 50));
-                        } else {
-                            imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email"));
-                        }
-                    }
+                    /*if (rst.getString("email") != null && !"".equals(rst.getString("email"))) {
+                     if(rst.getString("email").length() > 50) {
+                     imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email").substring(0, 50));
+                     } else {
+                     imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rst.getString("email"));
+                     }
+                     }*/
                     switch (rst.getString("tipofornecedor").trim()) {
                         case "A":
                             imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
@@ -650,12 +649,42 @@ public class RPInfoDAO extends InterfaceDAO {
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                     }
+                    
+                    addContatoFornecedor(imp);
+                    
                     result.add(imp);
                 }
             }
         }
 
         return result;
+    }
+
+    public void addContatoFornecedor(FornecedorIMP imp) throws SQLException {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	cfor_codigo id,\n"
+                    + "	cfor_forn_codigo id_fornecedor,\n"
+                    + "	cfor_nome contato,\n"
+                    + "	cfor_funcao funcao,\n"
+                    + " cfor_fone telefone,\n"
+                    + "	cfor_celular celular,\n"
+                    + "	cfor_email email\n"
+                    + "from \n"
+                    + "	contforn \n"
+                    + "where \n"
+                    + "	cfor_forn_codigo = " + imp.getImportId())) {
+                while (rs.next()) {
+                    imp.addContato(rs.getString("id"), 
+                            rs.getString("contato"),
+                            rs.getString("telefone"), 
+                            rs.getString("celular"), 
+                            TipoContato.NFE, 
+                            rs.getString("email"));
+                }
+            }
+        }
     }
 
     @Override
@@ -962,14 +991,14 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setNumeroCupom(rs.getString("cupom"));
 
                     incluirLancamentos(imp);
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private void incluirLancamentos(CreditoRotativoIMP imp) throws Exception {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -995,11 +1024,11 @@ public class RPInfoDAO extends InterfaceDAO {
             }
         }
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -1019,7 +1048,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "from pendfin\n"
                     + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
                     + "where\n"
-                    + "pfin_unid_codigo = '"+getLojaOrigem()+"' \n"
+                    + "pfin_unid_codigo = '" + getLojaOrigem() + "' \n"
                     + "and pfin_pr = 'R' \n"
                     + "and pfin_status = 'P' \n"
                     + "and pfin_pger_conta in (112501)"
@@ -1047,21 +1076,21 @@ public class RPInfoDAO extends InterfaceDAO {
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	rp.indc_prod_codigo id_produto,\n" +
-                    "	rp.indc_descricao descricao,\n" +
-                    "	rp.indc_rendimento rendimento,\n" +
-                    "	rp.indc_datacusto datacusto\n" +
-                    "from\n" +
-                    "	industc rp\n" +
-                    "order by\n" +
-                    "	rp.indc_prod_codigo")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	rp.indc_prod_codigo id_produto,\n"
+                    + "	rp.indc_descricao descricao,\n"
+                    + "	rp.indc_rendimento rendimento,\n"
+                    + "	rp.indc_datacusto datacusto\n"
+                    + "from\n"
+                    + "	industc rp\n"
+                    + "order by\n"
+                    + "	rp.indc_prod_codigo")) {
+                while (rs.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
-                    
+
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportsistema(getSistema());
                     imp.setImportid(rs.getString("id_produto"));
@@ -1069,41 +1098,41 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setRendimento(rs.getDouble("rendimento"));
                     imp.setIdproduto(rs.getString("id_produto"));
                     imp.setId_situacaocadastro(SituacaoCadastro.ATIVO);
-                    
+
                     addProdutoReceita(imp);
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private void addProdutoReceita(ReceitaIMP imp) throws SQLException {
         Set<String> produtos = new HashSet<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	rp.indc_prod_codigo id_produto,\n" +
-                    "	rp.indc_descricao descricao,\n" +
-                    "	rp.indc_rendimento rendimento,\n" +
-                    "	rp.indc_datacusto datacusto,\n" +
-                    "	ri.indd_cod2 id_produto_producao,\n" +
-                    "	pr.prod_descricao descricao_producao,\n" +
-                    "	ri.indd_qreceita qtdproducao,\n" +
-                    "   ri.indd_qcomercializacao qtdproduto,\n" +        
-                    "	ri.indd_unid_codigo,\n" +
-                    "   ri.indd_fase fase\n" +        
-                    "from\n" +
-                    "	industc rp\n" +
-                    "join industd ri on rp.indc_prod_codigo = ri.indd_cod1\n" +
-                    "join produtos pr on ri.indd_cod2 = pr.prod_codigo\n" +
-                    "where\n" +
-                    "   rp.indc_prod_codigo = " + imp.getIdproduto() + "\n" +
-                    "order by\n" +
-                    "	rp.indc_prod_codigo")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	rp.indc_prod_codigo id_produto,\n"
+                    + "	rp.indc_descricao descricao,\n"
+                    + "	rp.indc_rendimento rendimento,\n"
+                    + "	rp.indc_datacusto datacusto,\n"
+                    + "	ri.indd_cod2 id_produto_producao,\n"
+                    + "	pr.prod_descricao descricao_producao,\n"
+                    + "	ri.indd_qreceita qtdproducao,\n"
+                    + "   ri.indd_qcomercializacao qtdproduto,\n"
+                    + "	ri.indd_unid_codigo,\n"
+                    + "   ri.indd_fase fase\n"
+                    + "from\n"
+                    + "	industc rp\n"
+                    + "join industd ri on rp.indc_prod_codigo = ri.indd_cod1\n"
+                    + "join produtos pr on ri.indd_cod2 = pr.prod_codigo\n"
+                    + "where\n"
+                    + "   rp.indc_prod_codigo = " + imp.getIdproduto() + "\n"
+                    + "order by\n"
+                    + "	rp.indc_prod_codigo")) {
+                while (rs.next()) {
                     produtos.add(rs.getString("id_produto_producao"));
                     imp.setQtdembalagemreceita(rs.getInt("qtdproducao"));
                     imp.setQtdembalagemproduto(rs.getInt("qtdproduto"));
@@ -1111,5 +1140,5 @@ public class RPInfoDAO extends InterfaceDAO {
             }
         }
         imp.setProdutos(produtos);
-    } 
+    }
 }
