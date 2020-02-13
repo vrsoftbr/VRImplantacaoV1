@@ -1,5 +1,6 @@
 package vrimplantacao.dao.interfaces;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.ParseException;
@@ -13,6 +14,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao.utils.Utils;
@@ -20,18 +25,20 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
-import vrimplantacao2.dao.repositories.Recorder;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -40,6 +47,7 @@ public class GCFDAO extends InterfaceDAO {
     public GCFGUI gui;
     private int nivel = 1;
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("d/MM/yyyy");
+    public String fileOferta = "";
 
     public int getNivel() {
         return nivel;
@@ -115,7 +123,8 @@ public class GCFDAO extends InterfaceDAO {
                 OpcaoProduto.NCM,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
-                OpcaoProduto.ICMS
+                OpcaoProduto.ICMS,
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -434,6 +443,122 @@ public class GCFDAO extends InterfaceDAO {
         return result;
     }
 
+    public List<OfertaIMP> getOferta(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select DBA_CAD_PROD_1 AS IDPRODUTO,\n"
+                    + "       DBA_CAD_INI_OFERTA AS DATAINICIO, \n"
+                    + "       DBA_CAD_FIM_OFERTA AS DATAFIM,\n"
+                    + "       DBA_CAD_PRC_OFERTA AS PRECOOFERTA,\n"
+                    + "       DBA_CAD_PRECO_NORMAL AS PRECONORMAL\n"
+                    + "  from A_AG1PDVST\n"
+                    + " where DBA_CAD_INI_OFERTA <> 0\n"
+                    + "   and DBA_CAD_FIM_OFERTA <> 0\n"
+                    + "   and DBA_CAD_FILIAL = " + getLojaOrigem()
+            )) {                
+                SimpleDateFormat format = new SimpleDateFormat("d/MM/yyyy");
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    String dataInicio = rs.getString("DATAINICIO");
+                    if (dataInicio.length() == 8) {
+                        String dia = dataInicio.substring(0, 2);
+                        String mes = dataInicio.substring(2, 4);
+                        String ano = dataInicio.substring(4, 8);
+                        imp.setDataInicio(format.parse(dia + "/" + mes + "/" + ano));
+                    } else if (dataInicio.length() == 7) {
+                        String dia = dataInicio.substring(0, 1);
+                        String mes = dataInicio.substring(1, 3);
+                        String ano = dataInicio.substring(3, 7);
+                        imp.setDataInicio(format.parse(dia + "/" + mes + "/" + ano));
+                    }
+                    
+                    String dataFim = rs.getString("DATAFIM");
+                    if (dataFim.length() == 8) {
+                        String dia = dataFim.substring(0, 2);
+                        String mes = dataFim.substring(2, 4);
+                        String ano = dataFim.substring(4, 8);
+                        imp.setDataFim(format.parse(dia + "/" + mes + "/" + ano));
+                    } else if (dataFim.length() == 7) {
+                        String dia = dataFim.substring(0, 1);
+                        String mes = dataFim.substring(1, 3);
+                        String ano = dataFim.substring(3, 7);
+                        imp.setDataFim(format.parse(dia + "/" + mes + "/" + ano));
+                    }                    
+                    
+                    imp.setIdProduto(rs.getString("IDPRODUTO"));
+                    imp.setPrecoOferta(rs.getDouble("PRECOOFERTA"));
+                    imp.setPrecoNormal(rs.getDouble("PRECONORMAL"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {        
+        List<OfertaIMP> result = new ArrayList<>();
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        Workbook arquivo = Workbook.getWorkbook(new File(fileOferta), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha = 0;
+        String dataInicio, dataFim;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        
+        try {
+            
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+                
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+
+                    //ignora o cabeçalho
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdProduto = sheet.getCell(0, i);
+                    Cell cellDataInicio = sheet.getCell(2, i);
+                    Cell cellDataFim = sheet.getCell(3, i);
+                    Cell cellPrecoOferta = sheet.getCell(4, i);
+                    Cell cellPrecoVenda = sheet.getCell(5, i);
+                    
+                    dataInicio = cellDataInicio.getContents().substring(6, 10);
+                    dataInicio = dataInicio + "/" + cellDataInicio.getContents().substring(3, 5);
+                    dataInicio = dataInicio + "/" + cellDataInicio.getContents().substring(0, 2);
+                    
+                    dataFim = cellDataFim.getContents().substring(6, 10);
+                    dataFim = dataFim + "/" + cellDataFim.getContents().substring(3, 5);
+                    dataFim = dataFim + "/" + cellDataFim.getContents().substring(0, 2);
+                    
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(cellIdProduto.getContents().trim());
+                    imp.setDataInicio(new java.sql.Date(format.parse(dataInicio).getTime()));
+                    imp.setDataFim(new java.sql.Date(format.parse(dataFim).getTime()));
+                    imp.setPrecoOferta(Double.parseDouble(cellPrecoOferta.getContents().replace(",", ".")));
+                    imp.setPrecoNormal(Double.parseDouble(cellPrecoVenda.getContents().replace(",", ".")));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                    result.add(imp);                    
+                }
+            }
+            
+            return result;
+            
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();

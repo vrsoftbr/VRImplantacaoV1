@@ -188,7 +188,11 @@ public class GCFGUI extends VRInternalFrame {
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);     
+                    importador.setLojaVR(idLojaVR);
+                    
+                    if (!txtFileOferta.getArquivo().isEmpty()) {
+                        dao.fileOferta = txtFileOferta.getArquivo();
+                    }
 
                     if (tabs.getSelectedIndex() == 0) {
                     
@@ -272,6 +276,9 @@ public class GCFGUI extends VRInternalFrame {
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkCliPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEventuais = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        txtFileOferta = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -555,6 +562,33 @@ public class GCFGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Clientes", tabClientes);
 
+        vRLabel1.setText("Diretório arquivo para importar Oferta");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txtFileOferta, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFileOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(143, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Parametros Adicionais", vRPanel1);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -758,17 +792,20 @@ public class GCFGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.textField.VRTextField txtDatabase;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileOferta;
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private javax.swing.JTextField txtStrConexao;
     private vrframework.bean.textField.VRTextField txtUsuario;
+    private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.label.VRLabel vRLabel25;
     private vrframework.bean.label.VRLabel vRLabel26;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel6;
