@@ -428,7 +428,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
