@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -200,15 +201,15 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     //Aliquota Credito
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_alqt_e"));
-                    imp.setIcmsCstEntrada(rs.getInt("icms_cst_e"));
+                    imp.setIcmsCstEntrada(Utils.stringToInt(rs.getString("icms_cst_e")));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_rbc_e"));
                     
                     //Aliquota Debito
                     imp.setIcmsAliqSaida(rs.getDouble("icms_alqt_s"));
-                    imp.setIcmsCstSaida(rs.getInt("icms_cst_s"));
+                    imp.setIcmsCstSaida(Utils.stringToInt(rs.getString("icms_cst_s")));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_rbc_s"));
                     
-                    imp.setSituacaoCadastro(rs.getInt("desativo") == 1 ?
+                    imp.setSituacaoCadastro(rs.getInt("desativado") == 1 ?
                             SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     
                     result.add(imp);
@@ -306,19 +307,20 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	COD_PRODFOR id_produto,\n" +
-                    "	CODFOR_PRODFOR id_fornecedor,\n" +
-                    "	CODBARRA_PRODFOR codigoexterno\n" +
-                    "FROM \n" +
-                    "	CONTROLE_ESTOQUE.dbo.CE_PRODFOR")) {
+                    "select \n" +
+                    "	pf.CODFOR_PRODFOR idfornecedor,\n" +
+                    "	p.CODPROD_PRODUTOS idproduto,\n" +
+                    "	pf.CODBARRA_PRODFOR codigoexterno\n" +
+                    "from \n" +
+                    "	CONTROLE_ESTOQUE.dbo.CE_PRODFOR pf\n" +
+                    "join CONTROLE_ESTOQUE.dbo.CE_PRODUTOS p on pf.CODBARRA_PRODFOR = p.CODBARRA_PRODUTOS")) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
