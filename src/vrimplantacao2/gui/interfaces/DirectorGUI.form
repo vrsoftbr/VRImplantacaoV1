@@ -127,6 +127,16 @@
                     <Property name="text" type="java.lang.String" value="Fornecedor"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTelefone">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Telefone"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContatos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contatos"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCondicaoPagamento">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Condi&#xe7;ao Pagamento"/>

@@ -182,7 +182,15 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarFornecedor();
                         }
 
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                        List<OpcaoFornecedor> opcoes = new ArrayList<>();                        
+                        if (chkTelefone.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.TELEFONE);
+                        }
+                        
+                        if (chkContatos.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
+                        }
+                        
                         if (chkCondicaoPagamento.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
                         }
@@ -269,6 +277,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkTelefone = new vrframework.bean.checkBox.VRCheckBox();
+        chkContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
@@ -312,6 +322,12 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkFornecedor.setText("Fornecedor");
         tabFornecedor.add(chkFornecedor);
+
+        chkTelefone.setText("Telefone");
+        tabFornecedor.add(chkTelefone);
+
+        chkContatos.setText("Contatos");
+        tabFornecedor.add(chkContatos);
 
         chkCondicaoPagamento.setText("Condiçao Pagamento");
         tabFornecedor.add(chkCondicaoPagamento);
@@ -552,10 +568,12 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
     private vrframework.bean.checkBox.VRCheckBox chkCondicaoPagamento;
+    private vrframework.bean.checkBox.VRCheckBox chkContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkIcmsForaEstado;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;

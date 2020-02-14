@@ -527,11 +527,15 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtFileOferta" pref="616" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="txtFileOferta" pref="616" max="32767" attributes="0"/>
+                              <Component id="txtFileAtacado" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -544,7 +548,11 @@
                           <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtFileOferta" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="143" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtFileAtacado" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="96" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -556,6 +564,13 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Diret&#xf3;rio arquivo para importar Oferta"/>
                   </Properties>
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Diret&#xf3;rio arquivo para importar Atacado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtFileAtacado">
                 </Component>
               </SubComponents>
             </Container>

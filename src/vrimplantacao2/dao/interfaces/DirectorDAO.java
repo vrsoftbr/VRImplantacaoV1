@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -294,7 +295,7 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setIdFamiliaProduto(rs.getString("familia"));
+                    imp.setIdFamiliaProduto(rs.getString("familia") == null ? rs.getString("id") : rs.getString("familia"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.seteBalanca(rs.getInt("pesavel") == 1);
                     
@@ -379,8 +380,9 @@ public class DirectorDAO extends InterfaceDAO {
                     "	TBbairro ba on lo.DFid_bairro = ba.DFid_bairro\n" +
                     "left join\n" +
                     "	TBlocalidade lc on ba.DFcod_localidade = lc.DFcod_localidade\n" +
-                    "left join\n" +
+                    "inner join\n" +
                     "	TBcontato_fornecedor ct on f.DFcod_fornecedor = ct.DFcod_fornecedor\n" +
+                    "       and ct.DFtelefone is not null\n" +
                     "left join\n" +
                     "	TBsetor_contato sc on ct.DFid_setor_contato = sc.DFid_setor_contato\n" +
                     "order by\n" +
@@ -439,21 +441,67 @@ public class DirectorDAO extends InterfaceDAO {
                     } else {
                         imp.setTipoFornecedor(TipoFornecedor.ATACADO);
                     }
-                    
-                    if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
-                        imp.addContato("1", rs.getString("contato"), null, null, TipoContato.COMERCIAL, rs.getString("email"));
+
+
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + "	DFcod_fornecedor, \n"
+                                + "	DFtelefone, \n"
+                                + "	DFfax, \n"
+                                + "	DFcontato,\n"
+                                + "	DFe_mail,\n"
+                                + "	DFtelefone_celular \n"
+                                + "from TBcontato_fornecedor\n"
+                                + "where DFcod_fornecedor = " + imp.getImportId() + "\n"
+                                + "order by DFcod_fornecedor "
+                        )) {
+                            while (rst2.next()) {                                
+                                imp.addContato(
+                                        rst2.getString("DFcontato"), 
+                                        rst2.getString("DFtelefone"), 
+                                        rst2.getString("DFtelefone_celular"), 
+                                        TipoContato.COMERCIAL, 
+                                        rst2.getString("DFe_mail") == null ? null : rst2.getString("DFe_mail").toLowerCase()
+                                );
+                            }
+                        }
                     }
                     
-                    if(rs.getString("fax") != null && !"".equals(rs.getString("fax"))) {
-                        imp.addContato("2", "FAX", null, null, TipoContato.COMERCIAL, null);
-                    }
-                    
-                    if(rs.getString("celular") != null && !"".equals(rs.getString("celular"))) {
-                        imp.addContato("3", "CELULAR", null, rs.getString("celular"), TipoContato.COMERCIAL, null);
-                    }
-                    
-                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
-                        imp.addContato("4", rs.getString("contato"), null, rs.getString("celular"), TipoContato.COMERCIAL, rs.getString("setor"));
+                    try (Statement stm3 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst3 = stm3.executeQuery(
+                                "select \n"
+                                + "	f.DFcod_fornecedor,\n"
+                                + "	f.DFcod_plano_pagamento,\n"
+                                + "	fp.DFdescricao forma_pagamento\n"
+                                + " from TBfornecedor f\n"
+                                + "inner join TBplano_pagamento fp \n"
+                                + "   on f.DFcod_plano_pagamento = fp.DFcod_plano_pagamento\n"
+                                + "where f.DFcod_fornecedor = " + imp.getImportId()
+                        )) {
+                            while (rst3.next()) {
+
+                                if (rst3.getString("forma_pagamento").contains("/")) {
+                                    
+                                    String condPagamento = rst3.getString("forma_pagamento");
+                                    String[] cond = condPagamento.split("/");
+                                    
+                                    for (int i = 0; i < cond.length; i++) {
+                                        imp.addCondicaoPagamento(Integer.parseInt(Utils.formataNumero(cond[i])));
+                                    }
+                                } else if (rst3.getString("forma_pagamento").contains(",")) {
+                                    
+                                    String condPagamento = rst3.getString("forma_pagamento");
+                                    String[] cond = condPagamento.split(",");
+                                    
+                                    for (int i = 0; i < cond.length; i++) {
+                                        imp.addCondicaoPagamento(Integer.parseInt(Utils.formataNumero(cond[i])));
+                                    }
+                                } else {
+                                    imp.addCondicaoPagamento(Integer.parseInt(Utils.formataNumero(rst3.getString("forma_pagamento"))));
+                                }
+                            }
+                        }
                     }
                     
                     result.add(imp);

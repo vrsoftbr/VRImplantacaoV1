@@ -193,6 +193,10 @@ public class GCFGUI extends VRInternalFrame {
                     if (!txtFileOferta.getArquivo().isEmpty()) {
                         dao.fileOferta = txtFileOferta.getArquivo();
                     }
+                    
+                    if (!txtFileAtacado.getArquivo().isEmpty()) {
+                        dao.fileAtacado = txtFileAtacado.getArquivo();
+                    }
 
                     if (tabs.getSelectedIndex() == 0) {
                     
@@ -279,6 +283,8 @@ public class GCFGUI extends VRInternalFrame {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         txtFileOferta = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel1 = new vrframework.bean.label.VRLabel();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
+        txtFileAtacado = new vrframework.bean.fileChooser.VRFileChooser();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -564,6 +570,8 @@ public class GCFGUI extends VRInternalFrame {
 
         vRLabel1.setText("Diretório arquivo para importar Oferta");
 
+        vRLabel2.setText("Diretório arquivo para importar Atacado");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -571,10 +579,13 @@ public class GCFGUI extends VRInternalFrame {
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtFileOferta, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txtFileOferta, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE))
+                    .addComponent(txtFileAtacado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         vRPanel1Layout.setVerticalGroup(
@@ -584,7 +595,11 @@ public class GCFGUI extends VRInternalFrame {
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtFileOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFileAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(96, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Parametros Adicionais", vRPanel1);
@@ -792,6 +807,7 @@ public class GCFGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.textField.VRTextField txtDatabase;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileAtacado;
     private vrframework.bean.fileChooser.VRFileChooser txtFileOferta;
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtPorta;
@@ -799,6 +815,7 @@ public class GCFGUI extends VRInternalFrame {
     private javax.swing.JTextField txtStrConexao;
     private vrframework.bean.textField.VRTextField txtUsuario;
     private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;

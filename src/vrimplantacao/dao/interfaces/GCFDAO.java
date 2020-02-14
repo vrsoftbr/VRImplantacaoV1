@@ -23,6 +23,7 @@ import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
@@ -48,6 +49,7 @@ public class GCFDAO extends InterfaceDAO {
     private int nivel = 1;
     private static final SimpleDateFormat FORMAT = new SimpleDateFormat("d/MM/yyyy");
     public String fileOferta = "";
+    public String fileAtacado = "";
 
     public int getNivel() {
         return nivel;
@@ -124,7 +126,8 @@ public class GCFDAO extends InterfaceDAO {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.OFERTA
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.ATACADO
         ));
     }
 
@@ -441,6 +444,59 @@ public class GCFDAO extends InterfaceDAO {
         }
         
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        Workbook arquivo = Workbook.getWorkbook(new File(fileAtacado), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha = 0;
+
+        if (opt == OpcaoProduto.ATACADO) {
+            try {
+
+                for (int sh = 0; sh < sheets.length; sh++) {
+                    Sheet sheet = arquivo.getSheet(sh);
+                    linha = 0;
+
+                    for (int i = 0; i < sheet.getRows(); i++) {
+                        linha++;
+
+                        //ignora o cabeçalho
+                        if (linha == 1) {
+                            continue;
+                        }
+
+                        Cell cellIdProduto = sheet.getCell(0, i);
+                        Cell cellQtdAtacado = sheet.getCell(2, i);
+                        Cell cellPrecoVenda = sheet.getCell(3, i);
+                        Cell cellPrecoAtacado = sheet.getCell(4, i);
+                        
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), cellIdProduto.getContents().trim());
+                        
+                        if (codigoAtual > 0) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(cellIdProduto.getContents().trim());
+                            imp.setEan("99999" + String.valueOf(codigoAtual));
+                            imp.setPrecovenda(Double.parseDouble(cellPrecoVenda.getContents().replace(",", ".")));
+                            imp.setAtacadoPreco(Double.parseDouble(cellPrecoAtacado.getContents().replace(",", ".")));
+                            imp.setQtdEmbalagem(Integer.parseInt(cellQtdAtacado.getContents()));
+                            result.add(imp);
+                        }
+                    }
+                }
+
+                return result;
+            } catch (Exception ex) {
+                throw ex;
+            }
+        }
+        return null;
     }
 
     public List<OfertaIMP> getOferta(Date dataTermino) throws Exception {
