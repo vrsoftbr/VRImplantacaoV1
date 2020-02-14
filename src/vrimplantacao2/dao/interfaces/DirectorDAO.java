@@ -62,6 +62,8 @@ public class DirectorDAO extends InterfaceDAO {
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE_MAXIMO,
                 OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.CUSTO,
