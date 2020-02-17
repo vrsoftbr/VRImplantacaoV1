@@ -72,7 +72,8 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "inner join controle_estoque.dbo.CE_GRUPOS g on p.CODGRU_PRODUTOS = g.CODIGO_GRUPOS\n" +
                     "order by\n" +
                     "	1, 3")) {
-                while(rs.next()) {
+                while(rs.next())
+                {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportLoja(getLojaOrigem());

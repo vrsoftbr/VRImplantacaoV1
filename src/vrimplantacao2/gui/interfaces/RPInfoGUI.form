@@ -133,6 +133,7 @@
                               <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFPrazo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="289" max="32767" attributes="0"/>
                       </Group>
@@ -162,7 +163,9 @@
                           <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="69" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkFPrazo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="43" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -241,6 +244,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeFantasia">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFPrazo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prazos"/>
                   </Properties>
                 </Component>
               </SubComponents>
