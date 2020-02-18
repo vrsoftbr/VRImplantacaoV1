@@ -28,6 +28,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -60,6 +61,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
@@ -149,6 +152,37 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "substring(id_grupos from 1 for position('.', id_grupos) -1 ) as merc1,\n"
+                    + "substring(id_grupos from position('.', id_grupos) + 1) as merc2,\n"
+                    + "nome_grupo as descricao,\n"
+                    + "nivel\n"
+                    + "from est_grupos\n"
+                    + "order by id_grupos, nivel"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("descricao"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -163,6 +197,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    p.id_produto as importid,\n"
+                    + "    substring(p.grupos from 1 for position('.', p.grupos) - 1) as merc1,\n"
+                    + "    substring(p.grupos from position('.', p.grupos) + 1) as merc2,\n"                    
                     + "    p.data_cadastro as datacadastro,\n"
                     + "    p.data_alteracao as dataalteracao,\n"
                     + "    p.cod_preco,\n"
@@ -222,6 +258,9 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIdFamiliaProduto(imp.getImportId());
                     }
                     
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3("1");                    
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estmaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estminimo"));
