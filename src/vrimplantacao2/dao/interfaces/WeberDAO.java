@@ -10,7 +10,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +21,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -61,8 +64,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
@@ -152,34 +155,79 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            
+            //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 1">
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "substring(id_grupos from 1 for position('.', id_grupos) -1 ) as merc1,\n"
-                    + "substring(id_grupos from position('.', id_grupos) + 1) as merc2,\n"
+                    + "id_grupos merc,\n"
                     + "nome_grupo as descricao,\n"
                     + "nivel\n"
                     + "from est_grupos\n"
-                    + "order by id_grupos, nivel"
+                    + "where nivel = 1\n"
+                    + "order by id_grupos"
             )) {
                 while (rst.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("merc1"));
-                    imp.setMerc1Descricao(rst.getString("descricao"));
-                    imp.setMerc2ID(rst.getString("merc2"));
-                    imp.setMerc2Descricao(imp.getMerc1Descricao());
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc1Descricao());
-                    result.add(imp);
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();                    
+                    imp.setId(rst.getString("merc").substring(0, 2));
+                    imp.setDescricao(rst.getString("descricao"));                    
+                    merc.put(imp.getId(), imp);
+                    
                 }
             }
+            //</editor-fold>
+            
+            //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 2">
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id_grupos merc,\n"
+                    + "nome_grupo as descricao,\n"
+                    + "nivel\n"
+                    + "from est_grupos\n"
+                    + "where nivel = 2\n"
+                    + "order by id_grupos"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc2 = merc.get(rst.getString("merc").substring(0, 2));
+                    if (merc2 != null) {
+                        merc2.addFilho(
+                                rst.getString("merc").substring(3, rst.getString("merc").length()),
+                                rst.getString("descricao")
+                        );
+                    }
+                }
+            }
+            //</editor-fold>
+
+            //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 3">
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id_grupos merc,\n"
+                    + "nome_grupo as descricao,\n"
+                    + "nivel\n"
+                    + "from est_grupos\n"
+                    + "where nivel = 2\n"
+                    + "order by id_grupos"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc").substring(0, 2));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc").substring(3, rst.getString("merc").length()));
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    "1",
+                                    rst.getString("descricao")
+                            );
+                        }
+                    }
+                }
+            }
+            //</editor-fold>            
         }
-        return result;
+        return new ArrayList<>(merc.values());
     }
     
     @Override
@@ -197,8 +245,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    p.id_produto as importid,\n"
-                    + "    substring(p.grupos from 1 for position('.', p.grupos) - 1) as merc1,\n"
-                    + "    substring(p.grupos from position('.', p.grupos) + 1) as merc2,\n"                    
+                    + "    p.grupos as merc,\n"
                     + "    p.data_cadastro as datacadastro,\n"
                     + "    p.data_alteracao as dataalteracao,\n"
                     + "    p.cod_preco,\n"
@@ -257,10 +304,15 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (idsFamilia.contains(imp.getImportId())) {
                         imp.setIdFamiliaProduto(imp.getImportId());
                     }
+
+                    if ((rs.getString("merc") != null)
+                            && (!rs.getString("merc").trim().isEmpty())
+                            && (rs.getString("merc").trim().length() > 2)) {
+                        imp.setCodMercadologico1(rs.getString("merc").substring(0, 2));
+                        imp.setCodMercadologico2(rs.getString("merc").substring(3, rs.getString("merc").length()));
+                        imp.setCodMercadologico3("1");
+                    }
                     
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3("1");                    
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estmaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estminimo"));
