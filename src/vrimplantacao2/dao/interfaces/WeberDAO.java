@@ -31,7 +31,6 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -92,7 +91,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
@@ -336,7 +336,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
 
                     //Aliquota de saída
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                    /*imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
                     imp.setIcmsCstSaida(rs.getInt("icms_cst_debito"));
 
                     double reducao = rs.getDouble("icms_reducao_debito");
@@ -345,19 +345,32 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     //Alíquota de saída fora estado
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_debito"));
                     imp.setIcmsCstSaidaForaEstado(rs.getInt("icms_cst_debito"));
-                    imp.setIcmsReducaoSaidaForaEstado(reducao == 100 ? 0 : reducao);
+                    imp.setIcmsReducaoSaidaForaEstado(reducao == 100 ? 0 : reducao);*/
 
-                    //Aliquota de entrada
+                    String icmsDeb = rs.getString("p.tabicm");                    
+                    imp.setIcmsDebitoId(icmsDeb);
+                    imp.setIcmsDebitoForaEstadoId(icmsDeb);
+                    imp.setIcmsDebitoForaEstadoNfId(icmsDeb);
+                    
+                    String icmsCre = getAliquotaCreditoKey(
+                            rs.getString("icms_cst_credito"),
+                            rs.getDouble("icms_credito"),
+                            rs.getDouble("icms_reducao_credito")
+                    );
+                    imp.setIcmsCreditoId(icmsCre);
+                    imp.setIcmsCreditoForaEstadoId(icmsCre);
+                    
+                    /*//Aliquota de entrada
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
                     imp.setIcmsCstEntrada(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
-
+                    
                     reducao = rs.getDouble("icms_reducao_credito");
                     imp.setIcmsReducaoEntrada(reducao == 100 ? 0 : reducao);
 
                     //Aliquota de entrada fora estado
                     imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito"));
                     imp.setIcmsCstEntradaForaEstado(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
-                    imp.setIcmsReducaoEntradaForaEstado(reducao == 100 ? 0 : reducao);
+                    imp.setIcmsReducaoEntradaForaEstado(reducao == 100 ? 0 : reducao);*/
 
                     //Pauta Fiscal
                     imp.setPautaFiscalId(imp.getImportId());
@@ -367,6 +380,15 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    private String getAliquotaCreditoKey(String cst, double aliq, double red) throws SQLException {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
     }
 
     @Override
@@ -772,6 +794,31 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
+                }
+            }
+            try (ResultSet rs = stm.executeQuery(
+                    "select DISTINCT\n" +
+                    "    icm_cst as icms_cst_credito,\n" +
+                    "    icm_aliq as icms_credito,\n" +
+                    "    icm_pbc icms_reducao_credito\n" +
+                    "from\n" +
+                    "    est_produtos p\n" +
+                    "order by\n" +
+                    "    p.icm_cst"
+            )) {
+                while (rs.next()) {
+                    String id = getAliquotaCreditoKey(
+                            rs.getString("icms_cst_credito"),
+                            rs.getDouble("icms_credito"),
+                            rs.getDouble("icms_reducao_credito")
+                    );
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            Utils.stringToInt(rs.getString("icms_cst_credito")),
+                            rs.getDouble("icms_credito"),
+                            rs.getDouble("icms_reducao_credito")
+                    ));
                 }
             }
         }
