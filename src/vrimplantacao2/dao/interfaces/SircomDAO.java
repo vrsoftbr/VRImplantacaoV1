@@ -84,7 +84,7 @@ public class SircomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    cod_cf id,\n"
                     + "    descricao,\n"
                     + "    per_aliq aliquota,\n"
-                    + "    sit_trib_nf cst,\n"
+                    + "    substring(sit_trib_nf from 1 for 3) cst,\n"
                     + "    per_red reducao\n"
                     + "from cat_fiscal"
             )) {
