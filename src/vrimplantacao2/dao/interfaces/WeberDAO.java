@@ -50,13 +50,13 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     public String getSistema() {
         return "Weber";
     }
-    
+
     private String Encoding = "WIN1252";
-    
-    public void setEncoding (String Encoding) {
+
+    public void setEncoding(String Encoding) {
         this.Encoding = Encoding == null ? "WIN1252" : Encoding;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -88,11 +88,18 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
                 }
         ));
     }
@@ -118,7 +125,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoFirebird.getConexao().createStatement()) {
             Set<String> idsFamilia = new HashSet<>();
             try (ResultSet rs = st.executeQuery(
@@ -129,12 +136,12 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             try (ResultSet rs = st.executeQuery(
-                    "select \n" +
-                    "   id_produto, \n" +
-                    "   nome_produto,\n" +
-                    "   cod_preco\n" +
-                    "from\n" +
-                    "   est_produtos \n"
+                    "select \n"
+                    + "   id_produto, \n"
+                    + "   nome_produto,\n"
+                    + "   cod_preco\n"
+                    + "from\n"
+                    + "   est_produtos \n"
             )) {
                 while (rs.next()) {
                     if (idsFamilia.contains(rs.getString("id_produto"))) {
@@ -150,7 +157,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -159,7 +166,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            
+
             //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 1">
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -171,15 +178,15 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by id_grupos"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();                    
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
                     imp.setId(rst.getString("merc").substring(0, 2));
-                    imp.setDescricao(rst.getString("descricao"));                    
+                    imp.setDescricao(rst.getString("descricao"));
                     merc.put(imp.getId(), imp);
-                    
+
                 }
             }
             //</editor-fold>
-            
+
             //<editor-fold defaultstate="collapsed" desc="MERCADOLOGICO 2">
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -229,7 +236,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return new ArrayList<>(merc.values());
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -277,9 +284,9 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    icm.tabicm_aliq icms_debito,\n"
                     + "    icm.tabicm_pbc icms_reducao_debito,\n"
                     + "    tipo_prod as tipoproduto,\n"
-                    + "    p.icm_mva\n"
-                    + "from\n"
-                    + "    est_produtos p\n"
+                    + "    p.icm_mva,\n"
+                    + "    p.tabicm\n"
+                    + "from\n" + "    est_produtos p\n"
                     + "left join est_atual e on p.id_produto = e.id_produto and\n"
                     + "    e.id_loja = " + getLojaOrigem() + "\n"
                     + "left join tab_icm icm on p.tabicm = icm.id_tabicm\n"
@@ -299,7 +306,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     }
                     imp.setDescricaoGondola(rs.getString("descricaocompleta"));
-                    
+
                     imp.setIdFamiliaProduto(rs.getString("cod_preco"));
                     if (idsFamilia.contains(imp.getImportId())) {
                         imp.setIdFamiliaProduto(imp.getImportId());
@@ -312,7 +319,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico2(rs.getString("merc").substring(3, rs.getString("merc").length()));
                         imp.setCodMercadologico3("1");
                     }
-                    
+
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estmaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estminimo"));
@@ -320,7 +327,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.seteBalanca("S".equals(rs.getString("balanca")));
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setSituacaoCadastro(Utils.stringToInt(rs.getString("situacao"))== 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(Utils.stringToInt(rs.getString("situacao")) == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
@@ -346,12 +353,12 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_debito"));
                     imp.setIcmsCstSaidaForaEstado(rs.getInt("icms_cst_debito"));
                     imp.setIcmsReducaoSaidaForaEstado(reducao == 100 ? 0 : reducao);*/
-
-                    String icmsDeb = rs.getString("p.tabicm");                    
+                    String icmsDeb = rs.getString("tabicm");
                     imp.setIcmsDebitoId(icmsDeb);
                     imp.setIcmsDebitoForaEstadoId(icmsDeb);
                     imp.setIcmsDebitoForaEstadoNfId(icmsDeb);
-                    
+                    imp.setIcmsConsumidorId(icmsDeb);
+
                     String icmsCre = getAliquotaCreditoKey(
                             rs.getString("icms_cst_credito"),
                             rs.getDouble("icms_credito"),
@@ -359,7 +366,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     );
                     imp.setIcmsCreditoId(icmsCre);
                     imp.setIcmsCreditoForaEstadoId(icmsCre);
-                    
+
                     /*//Aliquota de entrada
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
                     imp.setIcmsCstEntrada(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
@@ -371,7 +378,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito"));
                     imp.setIcmsCstEntradaForaEstado(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
                     imp.setIcmsReducaoEntradaForaEstado(reducao == 100 ? 0 : reducao);*/
-
                     //Pauta Fiscal
                     imp.setPautaFiscalId(imp.getImportId());
 
@@ -409,7 +415,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and pre_promocao_datai <> '1899-12-30'\n"
                     + "	and pre_promocao_dataf >= '2019-11-01'"
             )) {
-            
+
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
                     imp.setIdProduto(rs.getString("idproduto"));
@@ -417,16 +423,15 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataFim(rs.getDate("datafim"));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
-                    
+
                     result.add(imp);
-                
+
                 }
             }
         }
         return result;
     }
-    
-    
+
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
@@ -462,21 +467,21 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIvaAjustado(imp.getIva());
                     imp.setNcm(rst.getString("ncm"));
                     double reducao = 0;
-                    if(rst.getDouble("icms_aliquota_debito_reducao") == 100) {
+                    if (rst.getDouble("icms_aliquota_debito_reducao") == 100) {
                         reducao = 0;
                     } else {
                         reducao = rst.getDouble("icms_aliquota_debito_reducao");
                     }
-                    imp.setAliquotaDebito(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
+                    imp.setAliquotaDebito(rst.getInt("icms_aliquota_debito") > 0 ? 0 : rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
                     imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
-                    
+
                     if (rst.getDouble("aliquota_reducao_credito") == 100) {
                         reducao = 0;
                     } else {
                         reducao = rst.getDouble("aliquota_reducao_credito");
                     }
                     imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), reducao);
-                    imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliquota_credito"), reducao);
+                    imp.setAliquotaCreditoForaEstado(reducao > 0 ? 20 : 0, rst.getDouble("aliquota_credito"), reducao);
 
                     result.add(imp);
                 }
@@ -662,7 +667,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    /*"select\n"
                     + "    c.id_cliente as idFornecedor,\n"
                     + "    cf.cod_prod as idProduto,\n"
                     + "    fator as qtdEmbalagem,\n"
@@ -674,7 +679,24 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    cf.cod_prod is not null\n"
                     + "order by\n"
-                    + "    idFornecedor"
+                    + "    idFornecedor"*/
+                    "select\n"
+                    + "c.id_cliente as idFornecedor,\n"
+                    + "cf.cod_prod as idProduto,\n"
+                    + "fator as qtdEmbalagem,\n"
+                    + "cf.id_cod codigoexterno\n"
+                    + "from\n"
+                    + "codigo_fornec cf\n"
+                    + "left join clie_dados c\n"
+                    + "on cf.id_cnpj = replace(replace(replace(c.cnpj_cpf,'.',''), '/', ''), '-', '')\n"
+                    + "where cf.cod_prod is not null\n"
+                    + "union all\n"
+                    + "select\n"
+                    + "cod_fornecedor as idFornecedor,\n"
+                    + "id_produto as idProduto,\n"
+                    + "qtd_emb as qtdEmbalagem,\n"
+                    + "'' as codigoexterno\n"
+                    + "from est_produtos"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -797,14 +819,14 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             try (ResultSet rs = stm.executeQuery(
-                    "select DISTINCT\n" +
-                    "    icm_cst as icms_cst_credito,\n" +
-                    "    icm_aliq as icms_credito,\n" +
-                    "    icm_pbc icms_reducao_credito\n" +
-                    "from\n" +
-                    "    est_produtos p\n" +
-                    "order by\n" +
-                    "    p.icm_cst"
+                    "select DISTINCT\n"
+                    + "    icm_cst as icms_cst_credito,\n"
+                    + "    icm_aliq as icms_credito,\n"
+                    + "    icm_pbc icms_reducao_credito\n"
+                    + "from\n"
+                    + "    est_produtos p\n"
+                    + "order by\n"
+                    + "    p.icm_cst"
             )) {
                 while (rs.next()) {
                     String id = getAliquotaCreditoKey(
@@ -1049,7 +1071,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"

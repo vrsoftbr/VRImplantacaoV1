@@ -218,6 +218,17 @@ public class PautaFiscalRepository {
                 icms = Icms.getIsento();
             }
             vo.setId_aliquotaCredito(icms.getId());
+        } else {
+            Icms icms = null;
+            icms = provider.getAliquota(
+                    imp.getAliquotaCredito().getCst(),
+                    imp.getAliquotaCredito().getAliquota(),
+                    imp.getAliquotaCredito().getReduzido()
+            );
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaCredito(icms.getId());
         }
         //Localiza aliquota de crédito fora estado
         if (idIcmsCreditoForaEstado != null) {
@@ -233,6 +244,18 @@ public class PautaFiscalRepository {
                 icms = Icms.getIsento();
             }
             vo.setId_aliquotaCreditoForaEstado(icms.getId());
+        } else {
+            Icms icms = null;
+            icms = provider.getAliquota(
+                    imp.getAliquotaCreditoForaEstado().getCst(),
+                    imp.getAliquotaCreditoForaEstado().getAliquota(),
+                    imp.getAliquotaCreditoForaEstado().getReduzido()
+            );
+
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaCreditoForaEstado(icms.getId());                
         }
         //Localiza aliquota de débito
         if (idIcmsDebito != null) {
@@ -248,6 +271,17 @@ public class PautaFiscalRepository {
                 icms = Icms.getIsento();
             }
             vo.setId_aliquotaDebito(icms.getId());
+        } else {           
+            Icms icms = null;
+            icms = provider.getAliquota(
+                    imp.getAliquotaDebito().getCst(),
+                    imp.getAliquotaDebito().getAliquota(),
+                    imp.getAliquotaDebito().getReduzido()
+            );
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaDebito(icms.getId());            
         }
         //Localiza aliquota de debito fora estado
         if (idIcmsDebitoForaEstado != null) {
@@ -259,6 +293,17 @@ public class PautaFiscalRepository {
                         imp.getAliquotaDebitoForaEstado().getReduzido()
                 );
             }
+            if (icms == null) {
+                icms = Icms.getIsento();
+            }
+            vo.setId_aliquotaDebitoForaEstado(icms.getId());
+        } else {            
+            Icms icms = null;
+            icms = provider.getAliquota(
+                    imp.getAliquotaDebitoForaEstado().getCst(),
+                    imp.getAliquotaDebitoForaEstado().getAliquota(),
+                    imp.getAliquotaDebitoForaEstado().getReduzido()
+            );
             if (icms == null) {
                 icms = Icms.getIsento();
             }

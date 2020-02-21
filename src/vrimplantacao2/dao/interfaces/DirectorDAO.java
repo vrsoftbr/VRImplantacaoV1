@@ -607,6 +607,7 @@ public class DirectorDAO extends InterfaceDAO {
                     "	cc.DFcod_cep cep,\n" +
                     "	tl.DFdescricao + ' ' + cl.DFdescricao endereco,\n" +
                     "	cl.DFcomplemento complemento,\n" +
+                    "   bai.DFdescricao bairro,\n" +        
                     "	lo.DFdescricao municipio,\n" +
                     "	lo.DFcod_uf uf,\n" +
                     "	cn.DFe_mail email,\n" +
@@ -632,6 +633,8 @@ public class DirectorDAO extends InterfaceDAO {
                     "	TBcontato_cliente cn on c.DFcod_cliente = cn.DFcod_cliente\n" +
                     "left join\n" +
                     "	TBsetor_contato sc on cn.DFid_setor_contato = sc.DFid_setor_contato\n" +
+                    "left join\n" +
+                    "   TBbairro bai on bai.DFid_bairro = cl.DFid_bairro\n" +
                     "where\n" +
                     "	ce.DFtipo_endereco = 'C'\n" +
                     "order by\n" +
