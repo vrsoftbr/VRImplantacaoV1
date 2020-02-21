@@ -666,6 +666,7 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setNumero(rs.getString("numero"));
                     imp.setCep(rs.getString("cep"));
                     imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
