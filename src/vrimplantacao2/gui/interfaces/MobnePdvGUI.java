@@ -92,10 +92,10 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "mais_vo";
+        conexaoMySQL.database = "consinco";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "JesusCristo";
+        conexaoMySQL.pass = "vrsoftware";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
