@@ -10,6 +10,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -22,7 +23,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Alan
  */
-public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
+public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
     public String lojaMesmoID;
@@ -33,21 +34,19 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         if (lojaMesmoID == null) {
             lojaMesmoID = "";
         }
-        return "G10 Sistemas" + lojaMesmoID;
+        return "DevMaster Sistemas" + lojaMesmoID;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select\n"
-                    + "     1 as id,\n"
-                    + "     identificador as cnpj,\n"
-                    + "     nomefantasia as nome\n"
-                    + " from dadospessoajuridica dpj\n"
-                    + "     join dados d \n"
-                    + "     on d.id = dpj.id\n"
-                    + " where d.id = 1428"
+                    " select \n"
+                    + "     zzz_codigo as id,\n"
+                    + "     zzz_nome as nome\n"
+                    + " from \n"
+                    + "     dmzzz\n"
+                    + " order by 1"
             )) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
@@ -62,7 +61,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select \n"
+                    " select \n"
                     + "     i.id cod,\n"
                     + "     i.descricao dsc,\n"
                     + "     aliquotaicms aliq,\n"
@@ -133,7 +132,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select\n"
+                    " select\n"
                     + "     fornecedorid idFornecedor,\n"
                     + "     p.codigo idProduto,\n"
                     + "     codprodfornecedor codigoExterno,\n"
@@ -168,34 +167,34 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n" +
-                    "	cr.id id,\n" +
-                    "	cr.dataperiodoinicial dataemissao,\n" +
-                    "	vc.numeropedido::bigint numerocupom,\n" +
-                    "	parc.valor,\n" +
-                    "	cr.obs observacao,\n" +
-                    "	c.id idcliente,\n" +
-                    "	parc.datavencimento datavencimento,\n" +
-                    "	numerototalparcelas parcela,\n" +
-                    "	round((parc.valor * (j.jurosmora/100) *\n" +
-                    "	(extract(day from now() - parc.datavencimento)))::numeric,2) juros\n" +
-                    " from\n" +
-                    "	titulo cr\n" +
-                    "	join parcela parc on\n" +
-                    "		parc.tituloid = cr.id\n" +
-                    "	join (select * from juros j limit 1) j on\n" +
-                    "		true\n" +
-                    "	join cliente c on\n" +
-                    "		c.id = cr.pessoaid\n" +
-                    "	left join vendacliente vc on\n" +
-                    "		cr.id = vc.tituloid\n" +
-                    " where\n" +
-                    "	cr.statusid = 1\n" +
-                    "	and	cr.tipodocumentoid = 1\n" +
-                    "	and cr.cmfid = 3\n" +
-                    "	and parc.baixacancelada is null\n" +
-                    " order by\n" +
-                    "	parc.datavencimento"
+                    " select\n"
+                    + "	cr.id id,\n"
+                    + "	cr.dataperiodoinicial dataemissao,\n"
+                    + "	vc.numeropedido::bigint numerocupom,\n"
+                    + "	parc.valor,\n"
+                    + "	cr.obs observacao,\n"
+                    + "	c.id idcliente,\n"
+                    + "	parc.datavencimento datavencimento,\n"
+                    + "	numerototalparcelas parcela,\n"
+                    + "	round((parc.valor * (j.jurosmora/100) *\n"
+                    + "	(extract(day from now() - parc.datavencimento)))::numeric,2) juros\n"
+                    + " from\n"
+                    + "	titulo cr\n"
+                    + "	join parcela parc on\n"
+                    + "		parc.tituloid = cr.id\n"
+                    + "	join (select * from juros j limit 1) j on\n"
+                    + "		true\n"
+                    + "	join cliente c on\n"
+                    + "		c.id = cr.pessoaid\n"
+                    + "	left join vendacliente vc on\n"
+                    + "		cr.id = vc.tituloid\n"
+                    + " where\n"
+                    + "	cr.statusid = 1\n"
+                    + "	and	cr.tipodocumentoid = 1\n"
+                    + "	and cr.cmfid = 3\n"
+                    + "	and parc.baixacancelada is null\n"
+                    + " order by\n"
+                    + "	parc.datavencimento"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -247,79 +246,79 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     /*"select * from fechamentomensalestoquemestre loja01\n" +
-                    "    (\n" +
-                    "		select\n" +
-                    "			saldoatual\n" +
-                    "		from\n" +
-                    "			fechamentomensalestoqueloja01\n" +
-                    "		 where\n" +
-                    "			mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint \n" +
-                    "	) as estoque,\n" +*/
-                    "WITH ean AS (\n" +
-                    "	select\n" +
-                    "		id produtoid,\n" +
-                    "		codigobarrasbuscapreco ean\n" +
-                    "	from\n" +
-                    "		produto p\n" +
-                    "	union\n" +
-                    "	select\n" +
-                    "		produtoid,\n" +
-                    "		codigobarras ean\n" +
-                    "	from\n" +
-                    "		produtovinculovenda pvv\n" +
-                    ")\n" +
-                    "select \n" +
-                    "	p.codigo id,\n" +
-                    "	p.cadastro dataCadastro,\n" +
-                    "	p.ultimaalteracao dataAlteracao,\n" +
-                    "	ean.ean,\n" +
-                    "	1 qtdembalagem,\n" +
-                    "	un.descricao tipoEmbalagem,\n" +
-                    "	case \n" +
-                    "		when balanca = '1' then 1 else 0 \n" +
-                    "	end eBalanca,\n" +
-                    "	p.descricao descricaoCompleta,\n" +
-                    "	p.descricaofiscal descricaoReduzida,\n" +
-                    "	p.descricao descricaoGondola,\n" +
-                    "	p.familiaprodutoid mercadologico1,\n" +
-                    "	p.pesobruto,\n" +
-                    "	p.pesoliquido,\n" +
-                    "	p.estoqueMaximo,\n" +
-                    "	p.estoqueMinimo,\n" +
-                    "	p.margemlucro margem,\n" +
-                    "	p.margemlucrominima margemMinima,\n" +
-                    "	p.valorcompra custoSemImposto,\n" +
-                    "	p.valorcompra custoComImposto,\n" +
-                    "	p.custoanterior custoAnteriorSemImposto,\n" +
-                    "	p.valor precovenda,\n" +
-                    "	pa.preco precoatacado,\n" +
-                    "	case \n" +
-                    "		when statusid = 29 then 1 else 0 \n" +
-                    "	end situacaoCadastro ,\n" +
-                    "	ncmsh ncm,\n" +
-                    "	p.cest,\n" +
-                    "	piscste.codigo piscofinsCstCredito,\n" +
-                    "	piscsts.codigo piscofinsCstDebito,\n" +
-                    "	p.cod_natureza_receita piscofinsNaturezaReceita,\n" +
-                    "	icms.tabelaimpostosid\n" +
-                    "from \n" +
-                    "	produto p\n" +
-                    "	JOIN ean ON\n" +
-                    "		ean.produtoid = p.id\n" +
-                    "	join unidade un on \n" +
-                    "		un.id = p.unidadeid\n" +
-                    "	left join produtoprecoauxiliar pa on\n" +
-                    "		p.id = pa.produtoid	\n" +
-                    "	join impostosproduto icms on\n" +
-                    "		icms.produtoid = p.id and\n" +
-                    "		icms.pessoaemitente = 1428\n" +
-                    "	join tabelaimpostos imp ON \n" +
-                    "	 	imp.id = icms.tabelaimpostosid\n" +
-                    "   join cstpis piscste ON\n" +
-                    "		piscste.id = imp.cstpisentradaid\n" +
-                    "	join cstpis piscsts ON\n" +
-                    "		piscsts.id = imp.cstpissaidaid\n" +
-                    "order by 1"
+                     "    (\n" +
+                     "		select\n" +
+                     "			saldoatual\n" +
+                     "		from\n" +
+                     "			fechamentomensalestoqueloja01\n" +
+                     "		 where\n" +
+                     "			mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint \n" +
+                     "	) as estoque,\n" +*/
+                    "WITH ean AS (\n"
+                    + "	select\n"
+                    + "		id produtoid,\n"
+                    + "		codigobarrasbuscapreco ean\n"
+                    + "	from\n"
+                    + "		produto p\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		produtoid,\n"
+                    + "		codigobarras ean\n"
+                    + "	from\n"
+                    + "		produtovinculovenda pvv\n"
+                    + ")\n"
+                    + "select \n"
+                    + "	p.codigo id,\n"
+                    + "	p.cadastro dataCadastro,\n"
+                    + "	p.ultimaalteracao dataAlteracao,\n"
+                    + "	ean.ean,\n"
+                    + "	1 qtdembalagem,\n"
+                    + "	un.descricao tipoEmbalagem,\n"
+                    + "	case \n"
+                    + "		when balanca = '1' then 1 else 0 \n"
+                    + "	end eBalanca,\n"
+                    + "	p.descricao descricaoCompleta,\n"
+                    + "	p.descricaofiscal descricaoReduzida,\n"
+                    + "	p.descricao descricaoGondola,\n"
+                    + "	p.familiaprodutoid mercadologico1,\n"
+                    + "	p.pesobruto,\n"
+                    + "	p.pesoliquido,\n"
+                    + "	p.estoqueMaximo,\n"
+                    + "	p.estoqueMinimo,\n"
+                    + "	p.margemlucro margem,\n"
+                    + "	p.margemlucrominima margemMinima,\n"
+                    + "	p.valorcompra custoSemImposto,\n"
+                    + "	p.valorcompra custoComImposto,\n"
+                    + "	p.custoanterior custoAnteriorSemImposto,\n"
+                    + "	p.valor precovenda,\n"
+                    + "	pa.preco precoatacado,\n"
+                    + "	case \n"
+                    + "		when statusid = 29 then 1 else 0 \n"
+                    + "	end situacaoCadastro ,\n"
+                    + "	ncmsh ncm,\n"
+                    + "	p.cest,\n"
+                    + "	piscste.codigo piscofinsCstCredito,\n"
+                    + "	piscsts.codigo piscofinsCstDebito,\n"
+                    + "	p.cod_natureza_receita piscofinsNaturezaReceita,\n"
+                    + "	icms.tabelaimpostosid\n"
+                    + "from \n"
+                    + "	produto p\n"
+                    + "	JOIN ean ON\n"
+                    + "		ean.produtoid = p.id\n"
+                    + "	join unidade un on \n"
+                    + "		un.id = p.unidadeid\n"
+                    + "	left join produtoprecoauxiliar pa on\n"
+                    + "		p.id = pa.produtoid	\n"
+                    + "	join impostosproduto icms on\n"
+                    + "		icms.produtoid = p.id and\n"
+                    + "		icms.pessoaemitente = 1428\n"
+                    + "	join tabelaimpostos imp ON \n"
+                    + "	 	imp.id = icms.tabelaimpostosid\n"
+                    + "   join cstpis piscste ON\n"
+                    + "		piscste.id = imp.cstpisentradaid\n"
+                    + "	join cstpis piscsts ON\n"
+                    + "		piscsts.id = imp.cstpissaidaid\n"
+                    + "order by 1"
             )) {
 
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -404,7 +403,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select     \n"
+                    " select     \n"
                     + "     pp.produtoid idProduto,\n"
                     + "     p.inicio dataInicio,\n"
                     + "     p.fim dataFim,\n"
@@ -437,39 +436,39 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n" +
-                    "	d.id importId,\n" +
-                    "	coalesce(pj.razaosocial, pf.nome) razao,\n" +
-                    "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n" +
-                    "	d.identificador cnpj_cpf,\n" +
-                    "	coalesce(pf.inscricaoestadual, pf.rg) ie_rg,\n" +
-                    "	pj.inscricaomunicipal insc_municipal,\n" +
-                    "	pj.suframa suframa,\n" +
-                    "	case when coalesce(pj.statusid, pf.statusid) = 18 then 1 else 0 end ativo,\n" +
-                    "	case when coalesce(pj.statusid, pf.statusid) = 20 then 1 else 0 end bloqueado,\n" +
-                    "	e.logradouro endereco,\n" +
-                    "	e.numero,\n" +
-                    "	complemento,\n" +
-                    "	bairro,\n" +
-                    "	e.cidade ibge_municipio,\n" +
-                    "	cd.descricao municipio,\n" +
-                    "	cd.estadoid uf,\n" +
-                    "	e.cep,\n" +
-                    "	d.datacadastro datacadastro,\n" +
-                    "	pj.obs observacao\n" +
-                    " from \n" +
-                    "	dados d\n" +
-                    "	join fornecedor f on\n" +
-                    "		d.id = f.id\n" +
-                    "	left join dadospessoafisica pf on\n" +
-                    "		d.id = pf.id\n" +
-                    "	left join dadospessoajuridica pj on\n" +
-                    "		d.id = pj.id\n" +
-                    "	left join endereco e on\n" +
-                    "		e.dadosid = d.id\n" +
-                    "	left join cidade cd on\n" +
-                    "		e.cidade::integer = cd.id\n" +
-                    " order by 1"
+                    " select\n"
+                    + "	d.id importId,\n"
+                    + "	coalesce(pj.razaosocial, pf.nome) razao,\n"
+                    + "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n"
+                    + "	d.identificador cnpj_cpf,\n"
+                    + "	coalesce(pf.inscricaoestadual, pf.rg) ie_rg,\n"
+                    + "	pj.inscricaomunicipal insc_municipal,\n"
+                    + "	pj.suframa suframa,\n"
+                    + "	case when coalesce(pj.statusid, pf.statusid) = 18 then 1 else 0 end ativo,\n"
+                    + "	case when coalesce(pj.statusid, pf.statusid) = 20 then 1 else 0 end bloqueado,\n"
+                    + "	e.logradouro endereco,\n"
+                    + "	e.numero,\n"
+                    + "	complemento,\n"
+                    + "	bairro,\n"
+                    + "	e.cidade ibge_municipio,\n"
+                    + "	cd.descricao municipio,\n"
+                    + "	cd.estadoid uf,\n"
+                    + "	e.cep,\n"
+                    + "	d.datacadastro datacadastro,\n"
+                    + "	pj.obs observacao\n"
+                    + " from \n"
+                    + "	dados d\n"
+                    + "	join fornecedor f on\n"
+                    + "		d.id = f.id\n"
+                    + "	left join dadospessoafisica pf on\n"
+                    + "		d.id = pf.id\n"
+                    + "	left join dadospessoajuridica pj on\n"
+                    + "		d.id = pj.id\n"
+                    + "	left join endereco e on\n"
+                    + "		e.dadosid = d.id\n"
+                    + "	left join cidade cd on\n"
+                    + "		e.cidade::integer = cd.id\n"
+                    + " order by 1"
             )) {
 
                 while (rs.next()) {
@@ -507,47 +506,47 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n" +
-                    "	 d.id as id,\n" +
-                    "	 d.identificador as cnpj,\n" +
-                    "	 coalesce(pf.rg, pf.inscricaoestadual) as inscricaoestadual,\n" +
-                    "	 coalesce(pf.nome, pj.razaosocial) as razao,\n" +
-                    "	 coalesce(pf.nome, pj.nomefantasia) as fantasia,\n" +
-                    "	 case when coalesce(pf.statusid, pj.statusid) <> 19 then 1 else 0 end as ativo,\n" +
-                    "	 case when coalesce(pf.statusid, pj.statusid) = 18 then 1 else 0 end as bloqueado,\n" +
-                    "	 e.logradouro as endereco,\n" +
-                    "	 e.numero as numero,\n" +
-                    "	 e.complemento,\n" +
-                    "	 e.bairro,\n" +
-                    "	 upper(cd.cidade) as municipio,\n" +
-                    "	 cd.estadoid uf,\n" +
-                    "	 cep as cep,\n" +
-                    "	 pf.estadocivil as tipoestadocivil,\n" +
-                    "	 pf.datanascimento as datanascimento,\n" +
-                    "	 d.datacadastro as datacadastro,\n" +
-                    "	 c.limitefinanceiro as valorlimite,\n" +
-                    "	 c.diapagamento diavencimento,\n" +
-                    "	 pf.conjuge as nomeconjuge,\n" +
-                    "	 pf.nomepai as nomepai,\n" +
-                    "	 pf.nomemae as nomemae,\n" +
-                    "	 pf.obs as observacao,\n" +
-                    "	 c.limitefinanceiro as limitecompra,\n" +
-                    "	 pj.inscricaomunicipal as inscricaomunicipal,\n" +
-                    "	 d.contribuinteicms as tipoindicadorie\n" +
-                    " from \n" +
-                    "	dados d\n" +
-                    "	left join cliente c on\n" +
-                    "		d.id = c.id\n" +
-                    "	left join dadospessoafisica pf on\n" +
-                    "		d.id = pf.id\n" +
-                    "	left join dadospessoajuridica pj on\n" +
-                    "		d.id = pj.id\n" +
-                    "	left join endereco e on\n" +
-                    "		e.dadosid = d.id\n" +
-                    "	left join cidade cd on\n" +
-                    "		e.cidade::integer = cd.id\n" +
-                    " where\n" +
-                    "	not c.id is null"
+                      " select \n"
+                    + "     aam_codigo id,\n"
+                    + "     aam_cpfcnpj cnpj,\n"
+                    + "     aam_rgie inscricaoestadual,\n"
+                    + "     aam_nome razao,\n"
+                    + "     aam_fantasia fantasia,\n"
+                    + "     aam_situacao ativo,\n"
+                    + "     aam_bloqueado bloqueado,\n"
+                    + "     aam_endereco endereco,\n"
+                    + "     aam_numero numero,\n"
+                    + "     aam_complemento complemento,\n"
+                    + "     aam_bairro bairro,\n"
+                    + "     aal_codibge municipioIBGE,\n"
+                    + "     aal_descricao municipio,\n"
+                    + "     aam_estado uf,\n"
+                    + "     aam_cep cep,\n"
+                    + "     aam_estcivil estadoCivil,\n"
+                    + "     aam_nascimento dataNascimento,\n"
+                    + "     aam_datacadastro dataCadastro,\n"
+                    + "     aam_sexo sexo,\n"
+                    + "     aam_limcred valorLimite,\n"
+                    + "     aam_nomeconjuge nomeConjuge,\n"
+                    + "     aam_nomepai nomePai,\n"
+                    + "     aam_nomemae nomeMae,\n"
+                    + "     aam_obs observacao,\n"
+                    + "     aam_obsfin observacao2, \n"
+                    + "     aam_venclimite diaVencimento,\n"
+                    + "     aam_telefone1 telefone,\n"
+                    + "     aam_telefone2,\n"
+                    + "     aam_celular celular,\n"
+                    + "     aam_email email,\n"
+                    + "     aam_fax fax,\n"
+                    + "     aam_endcob cobrancaEndereco,\n"
+                    + "     aam_numcob cobrancaNumero,\n"
+                    + "     aam_endcomplcob cobrancaComplemento,\n"
+                    + "     aam_estado cobrancaUf,\n"
+                    + "     aam_cepcob cobrancaCep\n"
+                    + " from dmaam01	\n"
+                    + "	   left join dmaal01 \n"
+                    + "		on aal_codigo = aam_municipio\n"
+                    + " order by 1"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -564,26 +563,32 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioIBGE(rs.getString("municipioIBGE"));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
 
-                    imp.setEstadoCivil(rs.getString("tipoestadocivil"));
+                    imp.setEstadoCivil(rs.getString("estadoCivil"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setValorLimite(rs.getDouble("valorlimite"));
-                    imp.setDiaVencimento(rs.getInt("diavencimento"));
-                    //imp.setTipoIndicadorIe(rs.getInt("tipoindicadorie"));
-                    imp.setNomeConjuge(rs.getString("nomeconjuge"));
-                    imp.setNomePai(rs.getString("nomepai"));
-                    imp.setNomeMae(rs.getString("nomemae"));
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setValorLimite(rs.getDouble("valorLimite"));
+                    imp.setNomeConjuge(rs.getString("nomeConjuge"));
+                    imp.setNomePai(rs.getString("nomePai"));
+                    imp.setNomeMae(rs.getString("nomeMae"));
                     imp.setObservacao(rs.getString("observacao"));
-                    imp.setLimiteCompra(rs.getDouble("limitecompra"));
-                    imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
-
-                    //imp.setTelefone(rs.getString("tel"));
-                    //imp.setCelular(rs.getString("cel"));
-                    //imp.setEmail(rs.getString("email").toLowerCase());
+                    imp.setObservacao2(rs.getString("observacao"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email").toLowerCase());
+                    imp.setFax(rs.getString("fax"));
+                    imp.setCobrancaEndereco(rs.getString("cobrancaEndereco"));
+                    imp.setCobrancaNumero(rs.getString("cobrancaNumero"));
+                    imp.setCobrancaComplemento(rs.getString("cobrancaComplemento"));
+                    imp.setCobrancaUf(rs.getString("cobrancaUf"));
+                    imp.setCobrancaCep(rs.getString("cobrancaCep"));
+                    
                     //imp.addEmail(rs.getString("emailnf").toLowerCase(), TipoContato.NFE);
                     result.add(imp);
 

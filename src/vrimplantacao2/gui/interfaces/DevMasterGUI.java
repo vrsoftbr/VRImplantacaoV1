@@ -22,18 +22,18 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.G10DAO;
+import vrimplantacao2.dao.interfaces.DevMasterDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class G10GUI extends VRInternalFrame {    
+public class DevMasterGUI extends VRInternalFrame {    
     
-    private static final String NOME_SISTEMA = "G10 Sistemas";
+    private static final String NOME_SISTEMA = "DevMaster Sistemas";
     private static final String SERVIDOR_SQL = "Postgres";
-    private static G10GUI instance;
+    private static DevMasterGUI instance;
     
-    private final G10DAO g10DAO = new G10DAO();
+    private final DevMasterDAO devmDAO = new DevMasterDAO();
     private final ConexaoPostgres connSQL = new ConexaoPostgres();
     
     private String vLojaCliente = "-1";
@@ -44,7 +44,7 @@ public class G10GUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHostPostgres.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
-        txtBancoDadosPostgres.setText(params.getWithNull("G10", NOME_SISTEMA, "DATABASE"));
+        txtBancoDadosPostgres.setText(params.getWithNull("DevMaster", NOME_SISTEMA, "DATABASE"));
         txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
         txtSenhaPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "SENHA"));
@@ -74,7 +74,7 @@ public class G10GUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private G10GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private DevMasterGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -87,7 +87,7 @@ public class G10GUI extends VRInternalFrame {
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return g10DAO;
+                return devmDAO;
             }
 
             @Override
@@ -153,7 +153,7 @@ public class G10GUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: g10DAO.getLojas()) {
+        for (Estabelecimento loja: devmDAO.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -175,9 +175,9 @@ public class G10GUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    g10DAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
+                    devmDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
                     
-                    Importador importador = new Importador(g10DAO);
+                    Importador importador = new Importador(devmDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
                     
@@ -360,7 +360,7 @@ public class G10GUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new G10GUI(i_mdiFrame);
+                instance = new DevMasterGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -459,20 +459,20 @@ public class G10GUI extends VRInternalFrame {
 
         setTitle("G10");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
