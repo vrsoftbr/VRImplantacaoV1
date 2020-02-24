@@ -289,7 +289,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         String[] strs = Utils.acertarTexto(sheet.getCell(0, i).getContents()).split("\\-");
                         if (strs.length == 2) {
                             centroReceita = new Mercadologico();
-                            centroReceita.id =  Utils.acertarTexto(strs[0].substring(17));
+                            centroReceita.id =  Utils.acertarTexto(strs[0].substring(17).trim());
                             centroReceita.descricao =  Utils.acertarTexto(strs[1]);
                         }
                     } else if (
@@ -298,7 +298,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         String[] strs = Utils.acertarTexto(sheet.getCell(0, i).getContents()).split("\\-");
                         if (strs.length == 2) {
                             grupo = new Mercadologico();
-                            grupo.id =  Utils.acertarTexto(strs[0].substring(5));
+                            grupo.id =  Utils.acertarTexto(strs[0].substring(5).trim());
                             grupo.descricao =  Utils.acertarTexto(strs[1]);
                         }
                     } else if (
@@ -307,7 +307,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         String[] strs = Utils.acertarTexto(sheet.getCell(0, i).getContents()).split("\\-");
                         if (strs.length == 2) {
                             categoria = new Mercadologico();
-                            categoria.id =  Utils.acertarTexto(strs[0].substring(9));
+                            categoria.id =  Utils.acertarTexto(strs[0].substring(9).trim());
                             categoria.descricao =  Utils.acertarTexto(strs[1]);
 
                             MercadologicoIMP imp = new MercadologicoIMP();

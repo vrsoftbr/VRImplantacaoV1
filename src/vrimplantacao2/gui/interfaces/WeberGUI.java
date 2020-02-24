@@ -84,7 +84,7 @@ public class WeberGUI extends VRInternalFrame {
 
         tabProdutos.setOpcoesDisponiveis(dao);
         
-        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -107,7 +107,7 @@ public class WeberGUI extends VRInternalFrame {
                 return mdiFrame;
             }
             
-        });*/
+        });
         
         centralizarForm();
         this.setMaximum(false);

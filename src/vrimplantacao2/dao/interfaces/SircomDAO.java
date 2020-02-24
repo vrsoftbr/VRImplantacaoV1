@@ -2,33 +2,24 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.classe.ConexaoSQLite;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
+//import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -93,7 +84,7 @@ public class SircomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    cod_cf id,\n"
                     + "    descricao,\n"
                     + "    per_aliq aliquota,\n"
-                    + "    sit_trib_nf cst,\n"
+                    + "    substring(sit_trib_nf from 1 for 3) cst,\n"
                     + "    per_red reducao\n"
                     + "from cat_fiscal"
             )) {
@@ -126,18 +117,20 @@ public class SircomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+    /*@Override
+     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                      "select \n"
                     + "     codigo merc1,\n"
                     + "     descricao descmerc1\n"
                     + "from\n"
                     + "     cat_prod\n"
                     + "order by 1"
-            )) { while (rs.next()) {
+            )) {
+                    while (rs.next()) {
+                
                     MercadologicoIMP imp = new MercadologicoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
@@ -149,8 +142,8 @@ public class SircomDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        return result;
-    }
+            return result;
+    }*/
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
@@ -212,90 +205,75 @@ public class SircomDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "   p.id,\n"
-                    + "   p.codigo_barras ean,\n"
-                    + "   p.codigo_interno,\n"
-                    + "   p.ativo,\n"
-                    + "   p.descricao descricaocompleta,\n"
-                    + "   p.descricao_resumida descricaoreduzida,\n"
-                    + "   p.grupo merc1,\n"
-                    + "   p.departamento merc2,\n"
-                    + "   p.sessao merc3,\n"
-                    + "   p.familia,\n"
-                    + "   p.unidade,\n"
-                    + "   p.margem,\n"
-                    + "   p.f_ult_preco_compra custoanterior,\n"
-                    + "   p.preco_compra custocomimposto,\n"
-                    + "   p.preco_custo custosemimposto,\n"
-                    + "   p.preco_venda1 precovenda,\n"
-                    + "   p.pesado,\n"
-                    + "   p.alt_balanca enviabalanca,\n"
-                    + "   p.validade,\n"
-                    + "   p.estoque_max,\n"
-                    + "   p.estoque_min,\n"
-                    + "   p.estoque_atual,\n"
-                    + "   p.data_inclusao,\n"
-                    + "   p.s_ncm ncm,\n"
-                    + "   p.f_mva_st mva,\n"
-                    + "   p.icms icms_credito,\n"
-                    + "   p.st cst_credito,\n"
-                    + "   p.f_porcent_red_icms icms_red_credito,\n"
-                    + "   a.s_tipo tipoaliquota,\n"
-                    + "   a.f_taxa icms_debito,\n"
-                    + "   a.f_reducao_base_calculo icms_red_debito,\n"
-                    + "   p.s_cod_cst_pis_entrada pis_entrada,\n"
-                    + "   p.s_cod_cst_pis_saida pis_saida,\n"
-                    + "   p.s_cod_cst_cofins_entrada cofins_entrada,\n"
-                    + "   p.s_cod_cst_cofins_saida cofins_saida,\n"
-                    + "   p.s_cest cest,\n"
-                    + "   p.s_cod_pis_saida naturezareceita\n"
-                    + "from\n"
-                    + "    produtos p\n"
-                    + "left join aliquotas a on p.aliquota = a.id\n"
-                    + "order by\n"
-                    + "    p.id"
+                      " select\n"
+                    + "     p.cod_plu importid,\n"
+                    + "     data_inc datacadastro,\n"
+                    + "     p.cod_ean ean,\n"
+                    + "     emb_cpra_und tipoembalagem,\n"
+                    + "     granel ebalanca,\n"
+                    + "     granel_val validade,\n"
+                    + "     descricao descricaocompleta,\n"
+                    + "     descr_reduzida descricaoreduzida,\n"
+                    + "     descricao descricaogondola,\n"
+                    + "     cod_cat_prod idfamiliaproduto,\n"
+                    + "     e.estoque_max estoquemaximo,\n"
+                    + "     e.estoque_min estoqueminimo,\n"
+                    + "     e.estoque estoque,\n"
+                    + "     p.mar_venda margem,\n"
+                    + "     e.custo_final custosemimposto,\n"
+                    + "     e.custo_final custocomimposto,\n"
+                    + "     e.preco_venda precovenda,\n"
+                    + "     case when inativo = 's' then 0 else 1 end situacaocadastro,\n"
+                    + "     codigo_ncm ncm,\n"
+                    + "     codigo_cest	cest\n"
+                    + " from \n"
+                    + "     produtos p\n"
+                    + " left join \n"
+                    + "     estoque e\n"
+                    + "     on p.cod_plu = e.cod_plu\n"
+                    + " where loja = " + getLojaOrigem()
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("codigo_interno"));
+                    imp.setImportId(rs.getString("importid"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setEan(rs.getString("ean"));
-                    if (rs.getInt("pesado") != 0
-                            || (rs.getLong("ean") == rs.getLong("codigo_interno") && rs.getInt("enviabalanca") == 1)) {
-                        imp.setEan(imp.getImportId());
-                        imp.seteBalanca(true);
-                    }
+                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                    imp.seteBalanca(rs.getBoolean("ebalanca"));
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setSituacaoCadastro(rs.getInt("ativo"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setIdFamiliaProduto(rs.getString("familia"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setDescricaoGondola(rs.getString("descricaogondola"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamiliaproduto"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setCustoAnteriorComImposto(rs.getDouble("custoanterior"));
-                    imp.setCustoAnteriorSemImposto(rs.getDouble("custoanterior"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoque_max"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoque_min"));
-                    imp.setEstoque(rs.getDouble("estoque_atual"));
-                    imp.setDataCadastro(rs.getDate("data_inclusao"));
+                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setPiscofinsCstCredito(rs.getString("pis_entrada"));
-                    imp.setPiscofinsCstDebito(rs.getString("pis_saida"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    
+                    
+                    
+                    
+                    
+                    //imp.setCodMercadologico1(rs.getString("merc1"));
+                    //imp.setCodMercadologico2(rs.getString("merc2"));
+                    //imp.setCodMercadologico3(rs.getString("merc3"));
+                                       
+                    
+                    //imp.setPiscofinsCstCredito(rs.getString("pis_entrada"));
+                    //imp.setPiscofinsCstDebito(rs.getString("pis_saida"));
+                    //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
                     // Icms debito
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                    /*imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_red_debito"));
 
                     if (rs.getString("tipoaliquota") != null && !"".equals(rs.getString("tipoaliquota"))) {
@@ -335,7 +313,7 @@ public class SircomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
                     imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
                     imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
-
+                    */
                     result.add(imp);
                 }
             }

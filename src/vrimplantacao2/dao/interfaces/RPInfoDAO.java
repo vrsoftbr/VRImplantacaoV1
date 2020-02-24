@@ -553,39 +553,43 @@ public class RPInfoDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	f.forn_codigo id,\n"
-                    + "	f.forn_nome nomefantasia,\n"
-                    + "	f.forn_razaosocial razaosocial,\n"
-                    + "	f.forn_cnpjcpf cnpjcpf,\n"
-                    + "	f.forn_inscricaoestadual ierg,\n"
-                    + "	f.forn_inscricaomunicipal inscmun,\n"
-                    + "	f.forn_status,\n"
-                    + "	f.forn_endereco endereco,\n"
-                    + "	f.forn_endereconumero numero,\n"
-                    + "	f.forn_enderecocompl complemento,\n"
-                    + "	f.forn_enderecoind,\n"
-                    + "	f.forn_bairro bairro,\n"
-                    + "	m.muni_codigoibge municipioIBGE,\n"
-                    + "	m.muni_nome municipio,\n"
-                    + "	m.muni_uf uf,\n"
-                    + "	f.forn_cep cep,\n"
-                    + "	f.forn_fone,\n"
-                    + "	f.forn_foneindustria,\n"
-                    + "	f.forn_fax,\n"
-                    + "	f.forn_faxindustria,\n"
-                    + "	f.forn_email email,\n"
-                    + "	f.forn_datacad datacadastro,\n"
-                    + "	f.forn_obspedidos,\n"
-                    + "	f.forn_obstrocas,\n"
-                    + " f.forn_caractrib tipofornecedor\n"
-                    + "from\n"
-                    + "	\n"
-                    + "	fornecedores f\n"
-                    + "	join municipios m on\n"
-                    + "		f.forn_muni_codigo = m.muni_codigo\n"
-                    + "order by\n"
-                    + "	id"
+                    "select\n" +
+                    "	f.forn_codigo id,\n" +
+                    "	f.forn_nome nomefantasia,\n" +
+                    "	f.forn_razaosocial razaosocial,\n" +
+                    "	f.forn_cnpjcpf cnpjcpf,\n" +
+                    "	f.forn_inscricaoestadual ierg,\n" +
+                    "	f.forn_inscricaomunicipal inscmun,\n" +
+                    "	f.forn_status,\n" +
+                    "	f.forn_endereco endereco,\n" +
+                    "	f.forn_endereconumero numero,\n" +
+                    "	f.forn_enderecocompl complemento,\n" +
+                    "	f.forn_enderecoind,\n" +
+                    "	f.forn_bairro bairro,\n" +
+                    "	m.muni_codigoibge municipioIBGE,\n" +
+                    "	m.muni_nome municipio,\n" +
+                    "	m.muni_uf uf,\n" +
+                    "	f.forn_cep cep,\n" +
+                    "	f.forn_fone,\n" +
+                    "	f.forn_foneindustria,\n" +
+                    "	f.forn_fax,\n" +
+                    "	f.forn_faxindustria,\n" +
+                    "	f.forn_email email,\n" +
+                    "	f.forn_datacad datacadastro,\n" +
+                    "	f.forn_obspedidos,\n" +
+                    "	f.forn_obstrocas,\n" +
+                    "	f.forn_caractrib tipofornecedor,\n" +
+                    "	fc.rfor_pzentrega prazo_entrega,\n" +
+                    "	fc.rfor_pzrecebimento prazo_recebimento,\n" +
+                    "	fp.fpgt_prazos forma_pagamento\n" +
+                    "from\n" +
+                    "	fornecedores f\n" +
+                    "	left join municipios m on\n" +
+                    "		f.forn_muni_codigo = m.muni_codigo\n" +
+                    "	left join regforn fc on f.forn_codigo = fc.rfor_forn_codigo\n" +
+                    "	left join fpgto fp on fc.rfor_fpgt_codigo = fp.fpgt_codigo\n" +
+                    "order by\n" +
+                    "	id"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -650,7 +654,12 @@ public class RPInfoDAO extends InterfaceDAO {
                             break;
                     }
                     
+                    imp.setPrazoEntrega(rst.getInt("prazo_entrega"));
+                    imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("forma_pagamento")));
+                    
                     addContatoFornecedor(imp);
+                    
+                    imp.addDivisao(imp.getImportId(), 0, imp.getPrazoEntrega(), 0);
                     
                     result.add(imp);
                 }
