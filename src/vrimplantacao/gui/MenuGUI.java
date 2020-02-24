@@ -165,6 +165,7 @@ import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
 import vrimplantacao2.gui.interfaces.MobilityGUI;
+import vrimplantacao2.gui.interfaces.MobnePdvGUI;
 import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.NATISistemasGUI;
@@ -726,6 +727,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuGestorPDV = new javax.swing.JMenuItem();
         mnuExodus = new javax.swing.JMenuItem();
         mnuSiit = new javax.swing.JMenuItem();
+        mnuMobnePdv = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2320,6 +2322,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuSiit);
+
+        mnuMobnePdv.setText("Mobne (PDV)");
+        mnuMobnePdv.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMobnePdvActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuMobnePdv);
 
         mnuDatabase.add(jMenu10);
 
@@ -4387,6 +4397,10 @@ public final class MenuGUI extends VRMdiFrame {
         AccesysGUI.exibir(this);
     }//GEN-LAST:event_mnuAccesysActionPerformed
 
+    private void mnuMobnePdvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMobnePdvActionPerformed
+        MobnePdvGUI.exibir(this);
+    }//GEN-LAST:event_mnuMobnePdvActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4572,6 +4586,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMSIInfor;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
+    private javax.swing.JMenuItem mnuMobnePdv;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
     private javax.swing.JMenuItem mnuMrs2;
