@@ -17,56 +17,49 @@ public class VendaIMP {
     public VendaIMP() {
     }
     
-    @DatabaseField()
-    private int VERSAO = 1;
-    @DatabaseField(id = true, canBeNull = false)
-    private String id;
-    @DatabaseField(uniqueCombo = true)
-    private int numeroCupom;
-    @DatabaseField(uniqueCombo = true)
-    private int ecf;
-    @DatabaseField(uniqueCombo = true, persisterClass = DateTimePersister.class)
-    private Date data;
-    @DatabaseField()
-    private String idClientePreferencial;    
-    @DatabaseField(persisterClass = DateTimePersister.class)
-    private Date horaInicio;
-    @DatabaseField(persisterClass = DateTimePersister.class)
-    private Date horaTermino;
-    @DatabaseField()
-    private boolean cancelado;
-    @DatabaseField()
-    private double subTotalImpressora = 0;
-    @DatabaseField(persisterClass = TipoCancelamento.TipoCancelamentoPersister.class)
-    private TipoCancelamento tipoCancelamento;
-    @DatabaseField()
-    private String cpf;
-    @DatabaseField()
-    private double valorDesconto;
-    @DatabaseField()
-    private double valorAcrescimo;
-    @DatabaseField()
-    private boolean canceladoEmVenda = false;
-    @DatabaseField()
-    private String numeroSerie;
-    @DatabaseField()
-    private String modeloImpressora;
-    @DatabaseField()
-    private String nomeCliente;
-    @DatabaseField()
-    private String enderecoCliente;
-    @DatabaseField()
-    private String clienteEventual;
-    @DatabaseField()
-    private String chaveCfe;
-    @DatabaseField()
-    private String chaveNfCe;
-    @DatabaseField()
-    private String xml;
-    @DatabaseField(persisterClass = TipoDesconto.TipoDescontoPersister.class)
-    private TipoDesconto tipoDesconto;
-    @DatabaseField()
-    private String chaveNfCeContingencia;
+    @DatabaseField() private int VERSAO = 1;
+    @DatabaseField(
+            id = true, 
+            canBeNull = false
+    ) private String id;
+    @DatabaseField(
+            uniqueCombo = true
+    ) private int numeroCupom;
+    @DatabaseField(
+            uniqueCombo = true
+    ) private int ecf;
+    @DatabaseField(
+            uniqueCombo = true, 
+            persisterClass = DateTimePersister.class
+    ) private Date data;
+    @DatabaseField() private String idClientePreferencial;    
+    @DatabaseField(
+            persisterClass = DateTimePersister.class
+    ) private Date horaInicio;
+    @DatabaseField(
+            persisterClass = DateTimePersister.class
+    ) private Date horaTermino;
+    @DatabaseField() private boolean cancelado;
+    @DatabaseField() private double subTotalImpressora = 0;
+    @DatabaseField(
+            persisterClass = TipoCancelamento.TipoCancelamentoPersister.class
+    ) private TipoCancelamento tipoCancelamento;
+    @DatabaseField() private String cpf;
+    @DatabaseField() private double valorDesconto;
+    @DatabaseField() private double valorAcrescimo;
+    @DatabaseField() private boolean canceladoEmVenda = false;
+    @DatabaseField() private String numeroSerie;
+    @DatabaseField() private String modeloImpressora;
+    @DatabaseField() private String nomeCliente;
+    @DatabaseField() private String enderecoCliente;
+    @DatabaseField() private String clienteEventual;
+    @DatabaseField() private String chaveCfe;
+    @DatabaseField() private String chaveNfCe;
+    @DatabaseField() private String xml;
+    @DatabaseField(
+            persisterClass = TipoDesconto.TipoDescontoPersister.class
+    ) private TipoDesconto tipoDesconto;
+    @DatabaseField() private String chaveNfCeContingencia;
 
     public String getId() {
         return id;

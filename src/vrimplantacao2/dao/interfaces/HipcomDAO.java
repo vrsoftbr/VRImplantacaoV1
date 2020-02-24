@@ -49,6 +49,7 @@ import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
@@ -617,10 +618,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                     
-                    imp.addContato(rst.getString("contato"), rst.getString("fonecontato"), "", TipoContato.COMERCIAL, "");
+                    gravarContatoFornecedor(imp);
+                    
+                    /*imp.addContato(rst.getString("contato"), rst.getString("fonecontato"), "", TipoContato.COMERCIAL, "");
                     imp.addEmail("SITE", rst.getString("site"), TipoContato.COMERCIAL);
                     imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
-                    imp.addEmail("NFE", rst.getString("emailnfe"), TipoContato.NFE);
+                    imp.addEmail("NFE", rst.getString("emailnfe"), TipoContato.NFE);*/
                     if (rst.getBoolean("produtorural")) {
                         imp.setProdutorRural();
                     }
@@ -639,6 +642,34 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+    
+    private void gravarContatoFornecedor(FornecedorIMP imp) throws Exception {
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            String sql = "select distinct\n" +
+                    "	h.rfofor id_fornecedor,\n" +
+                    "	h.rfonome nome,\n" +
+                    "	h.rfoemail email,\n" +
+                    "	h.rfofone telefone\n" +
+                    "from\n" +
+                    "	hiprfo h\n" +
+                    "where h.rfofor = " + imp.getImportId();
+            LOG.finer(sql);
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+                    FornecedorContatoIMP c = imp.addContato(
+                            rst.getString("nome"),
+                            rst.getString("telefone"),
+                            "",
+                            TipoContato.COMERCIAL,
+                            rst.getString("email")                            
+                    );
+                    System.out.println(c);
+                }
+            }
+        }
     }
 
     @Override
@@ -1226,7 +1257,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
-    
+
     private static class VendaIterator implements Iterator<VendaIMP> {
         
         private static final SimpleDateFormat TIMESTAMP_DATE = new SimpleDateFormat("yyyy-MM-dd");

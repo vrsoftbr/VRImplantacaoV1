@@ -89,6 +89,10 @@ public class FornecedorContatoIMP {
     public void setCelular(String celular) {
         this.celular = celular;
     }
-    
+
+    @Override
+    public String toString() {
+        return "FornecedorContatoIMP{" + "importSistema=" + importSistema + ", importLoja=" + importLoja + ", importFornecedorId=" + importFornecedorId + ", importId=" + importId + ", nome=" + nome + ", telefone=" + telefone + ", tipoContato=" + tipoContato + ", email=" + email + ", celular=" + celular + '}';
+    }
     
 }
