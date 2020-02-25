@@ -87,6 +87,7 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2.dao.interfaces.DevMasterDAO;
 import vrimplantacao2.dao.interfaces.SircomDAO;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -695,6 +696,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMrs1 = new javax.swing.JMenuItem();
         mnuMrs2 = new javax.swing.JMenuItem();
         mnuG10 = new javax.swing.JMenuItem();
+        mnuDevMaster = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2080,6 +2082,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuG10);
+
+        mnuDevMaster.setText("DevMaster");
+        mnuDevMaster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDevMasterActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuDevMaster);
 
         mnuDatabase.add(jMenu8);
 
@@ -4387,6 +4397,10 @@ public final class MenuGUI extends VRMdiFrame {
         AccesysGUI.exibir(this);
     }//GEN-LAST:event_mnuAccesysActionPerformed
 
+    private void mnuDevMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDevMasterActionPerformed
+        DevMasterGUI.exibir(this);
+    }//GEN-LAST:event_mnuDevMasterActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4515,6 +4529,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
     private javax.swing.JMenuItem mnuDelfi;
+    private javax.swing.JMenuItem mnuDevMaster;
     private javax.swing.JMenuItem mnuDirector;
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;

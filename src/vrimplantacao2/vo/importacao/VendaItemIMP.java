@@ -12,46 +12,39 @@ import vrimplantacao2.vo.enums.TipoDesconto;
 @DatabaseTable(tableName = "vendaitem")
 public class VendaItemIMP {
     
-    @DatabaseField(id = true, canBeNull = false)
-    private String id;
-    @DatabaseField(canBeNull = false)
-    private int sequencia;
-    @DatabaseField(foreign = true, canBeNull = false, index = true)
-    private VendaIMP venda;
-    @DatabaseField()
-    private String produto;
-    @DatabaseField()
-    private String descricaoReduzida;
-    @DatabaseField()
-    private double quantidade;
-    @DatabaseField()
-    private double precoVenda;
-    @DatabaseField()
-    private double totalBruto;
-    @DatabaseField()
-    private boolean cancelado;
-    @DatabaseField(persisterClass = TipoCancelamento.TipoCancelamentoPersister.class)
-    private TipoCancelamento tipoCancelamento;
-    @DatabaseField()
-    private double valorDesconto;
-    @DatabaseField()
-    private double valorAcrescimo;
-    @DatabaseField()
-    private String codigoBarras;
-    @DatabaseField()
-    private String unidadeMedida;
-    @DatabaseField(persisterClass = TipoDesconto.TipoDescontoPersister.class)
-    private TipoDesconto tipoDesconto;
-    @DatabaseField()
-    private int icmsCst = 0;
-    @DatabaseField()
-    private double icmsAliq = 0;
-    @DatabaseField()
-    private double icmsReduzido = 0;
-    @DatabaseField()
-    private int contadorDoc;
-    @DatabaseField()
-    private int idAliquota;
+    @DatabaseField(
+            id = true, 
+            canBeNull = false
+    ) private String id;
+    @DatabaseField(
+            canBeNull = false
+    ) private int sequencia;
+    @DatabaseField(
+            foreign = true, 
+            canBeNull = false, 
+            index = true
+    ) private VendaIMP venda;
+    @DatabaseField() private String produto;
+    @DatabaseField() private String descricaoReduzida;
+    @DatabaseField() private double quantidade;
+    @DatabaseField() private double precoVenda;
+    @DatabaseField() private double totalBruto;
+    @DatabaseField() private boolean cancelado;
+    @DatabaseField(
+            persisterClass = TipoCancelamento.TipoCancelamentoPersister.class
+    ) private TipoCancelamento tipoCancelamento;
+    @DatabaseField() private double valorDesconto;
+    @DatabaseField() private double valorAcrescimo;
+    @DatabaseField() private String codigoBarras;
+    @DatabaseField() private String unidadeMedida;
+    @DatabaseField(
+            persisterClass = TipoDesconto.TipoDescontoPersister.class
+    ) private TipoDesconto tipoDesconto;
+    @DatabaseField() private int icmsCst = 0;
+    @DatabaseField() private double icmsAliq = 0;
+    @DatabaseField() private double icmsReduzido = 0;
+    @DatabaseField() private int contadorDoc;
+    @DatabaseField() private int idAliquota;
 
     public String getId() {
         return id;
