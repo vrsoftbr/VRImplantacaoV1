@@ -19,6 +19,7 @@ import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -345,6 +346,38 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSugestaoCotacao("S".equals(rs.getString("sugestaocotacao")));
                     imp.setSugestaoPedido("S".equals(rs.getString("sugestaopedido")));
                     imp.setPautaFiscalId(rs.getString("id_pautafiscal"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	p.id,\n" +
+                    "	id_produto,\n" +
+                    "	codigobarras,\n" +
+                    "	qtdembalagem,\n" +
+                    "	t.descricao unidade\n" +
+                    "from \n" +
+                    "	produtoautomacao p \n" +
+                    "join tipoembalagem t on p.id_tipoembalagem = t.id")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id_produto"));
+                    imp.setEan(rs.getString("codigobarras"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
                     
                     result.add(imp);
                 }
@@ -803,6 +836,51 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	p.id,\n" +
+                    "	p.id_fornecedor,\n" +
+                    "	p.numerodocumento,\n" +
+                    "   p.id_tipoentrada,\n" +        
+                    "	p.dataentrada,\n" +
+                    "	p.dataemissao,\n" +
+                    "   pp.datahoraalteracao,\n" +        
+                    "	p.valor,\n" +
+                    "	pp.numeroparcela,\n" +
+                    "	pp.datavencimento,\n" +
+                    "	pp.observacao\n" +
+                    "from \n" +
+                    "	pagarfornecedor p \n" +
+                    "join pagarfornecedorparcela pp on p.id = pp.id_pagarfornecedor \n" +
+                    "where\n" +
+                    "	pp.id_situacaopagarfornecedorparcela = 0 and \n" +
+                    "	p.id_loja = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntrada(rs.getDate("dataentrada"));
+                    imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
+                    imp.setIdTipoEntradaVR(rs.getInt("id_tipoentrada"));
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
                     
                     result.add(imp);
                 }
