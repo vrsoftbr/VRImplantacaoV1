@@ -10,11 +10,13 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -89,44 +91,31 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*    @Override
-     public List<MercadologicoIMP> getMercadologicos() throws Exception {
-     List<MercadologicoIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-     try (ResultSet rs = stm.executeQuery(
-     "select distinct\n"
-     + "     tp.id::varchar Merc1ID,\n"
-     + "     tp.descricao Merc1Descricao,\n"
-     + "     sb.id::varchar Merc2ID,\n"
-     + "     sb.descricao Merc2Descricao,\n"
-     + "     s.id::varchar Merc3ID,\n"
-     + "     s.descricao Merc3Descricao\n"
-     + "from produto p\n"
-     + "     inner join tipoproduto tp\n"
-     + "		on tp.id::varchar = p.tipoprodutoid::varchar\n"
-     + "	inner join subsecao sb\n"
-     + "		on p.subsecaoid = sb.id\n"
-     + "	inner join secao s\n"
-     + "		on sb.secaoid::varchar = s.id::varchar\n"
-     + "order by 1,3,5"
-     )) {
-     while (rs.next()) {
-     MercadologicoIMP imp = new MercadologicoIMP();
-     imp.setImportLoja(getLojaOrigem());
-     imp.setImportSistema(getSistema());
-     imp.setMerc1ID(rs.getString("Merc1ID"));
-     imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-     imp.setMerc2ID(rs.getString("Merc2ID"));
-     imp.setMerc2Descricao(rs.getString("Merc2Descricao"));
-     imp.setMerc3ID(rs.getString("Merc3ID"));
-     imp.setMerc3Descricao(rs.getString("Merc3Descricao"));
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "     aad_codigo Merc1ID,\n"
+                    + "     aad_descricao Merc1Descricao\n"
+                    + "from dmaad01\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("Merc1ID"));
+                    imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }*/
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -506,7 +495,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select \n"
+                    " select \n"
                     + "     aam_codigo id,\n"
                     + "     aam_cpfcnpj cnpj,\n"
                     + "     aam_rgie inscricaoestadual,\n"
@@ -532,10 +521,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     aam_nomemae nomeMae,\n"
                     + "     aam_obs observacao,\n"
                     + "     aam_obsfin observacao2, \n"
-                    + "     aam_venclimite diaVencimento,\n"
-                    + "     aam_telefone1 telefone,\n"
-                    + "     aam_telefone2,\n"
-                    + "     aam_celular celular,\n"
+                    //+ "     aam_telefone1 telefone,\n"
+                    + "     aam_telefone2 celular,\n"
                     + "     aam_email email,\n"
                     + "     aam_fax fax,\n"
                     + "     aam_endcob cobrancaEndereco,\n"
@@ -578,7 +565,6 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeMae(rs.getString("nomeMae"));
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setObservacao2(rs.getString("observacao"));
-                    imp.setDiaVencimento(rs.getInt("diavencimento"));
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email").toLowerCase());
@@ -588,8 +574,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaComplemento(rs.getString("cobrancaComplemento"));
                     imp.setCobrancaUf(rs.getString("cobrancaUf"));
                     imp.setCobrancaCep(rs.getString("cobrancaCep"));
+                    //imp.addContato("","","",rs.getString("telefone2"),"");
                     
-                    //imp.addEmail(rs.getString("emailnf").toLowerCase(), TipoContato.NFE);
                     result.add(imp);
 
                 }
