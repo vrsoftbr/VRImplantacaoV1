@@ -495,25 +495,18 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setEcf(Utils.stringToInt(rst.getString("NumeroCaixa")));
                         next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setIdClientePreferencial(rst.getString("CodCliente"));
+                        String horaInicio = timestampDate.format(rst.getDate("DATAHORA")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        next.setHoraTermino(timestamp.parse(horaInicio));
+                        next.setSubTotalImpressora(rst.getDouble("ValorTotal"));
                         next.setCpf(rst.getString("cpf"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setNumeroSerie(rst.getString("numeroserie"));
-                        next.setModeloImpressora(rst.getString("modelo"));
                         next.setNomeCliente(rst.getString("NomeCliente"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
                                 + Utils.acertarTexto(rst.getString("bairro")) + ","
                                 + Utils.acertarTexto(rst.getString("cidade")) + "-"
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
@@ -533,6 +526,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_VendasCaixa.CodVenda id,\n" +
                     "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) as data,\n" +
                     "	dbo.CE_VendasCaixa.Data as DATAHORA,\n" +
+                    "   RIGHT(CONVERT(VARCHAR, dbo.CE_VendasCaixa.Data, 108),7) hora,\n" +
                     "	dbo.CE_VendasCaixa.ValorItens,\n" +
                     "	dbo.CE_VendasCaixa.DescAcr,\n" +
                     "	dbo.CE_VendasCaixa.ValorTotal,\n" +
@@ -553,8 +547,15 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_VendasCaixa.Observacoes,\n" +
                     "	dbo.CE_VendasCaixa.Selecionada,\n" +
                     "	dbo.CE_VendasCaixa.CodEmpresa,\n" +
-                    "	dbo.CE_VendasCaixa.CodCliente idclientepreferencial,\n" +
+                    "	dbo.CE_VendasCaixa.CodCliente,\n" +
                     "	CONTROLE_CLIENTES.dbo.CC_Clientes.NomeCliente,\n" +
+                    "   CONTROLE_CLIENTES.dbo.CC_Clientes.CpfCliente cpf,\n" +
+                    "   CONTROLE_CLIENTES.dbo.CC_Clientes.EnderecoCliente endereco,\n" +
+                    "	CONTROLE_CLIENTES.dbo.CC_Clientes.NUMERO,\n" +
+                    "	CONTROLE_CLIENTES.dbo.CC_Clientes.BairroCliente bairro,\n" +
+                    "	CONTROLE_CLIENTES.dbo.CC_Clientes.CepCliente cep,\n" +
+                    "	CONTROLE_CLIENTES.dbo.CC_Clientes.CidadeCliente cidade,\n" +
+                    "	CONTROLE_CLIENTES.dbo.CC_Clientes.UF estado,\n" +
                     "	dbo.CE_VendasCaixa.DescAcrItens,\n" +
                     "	ISNULL(dbo.CE_VendasCaixa.DescAcr, 0) + ISNULL(dbo.CE_VendasCaixa.DescAcrItens, 0) as TotalDescontoAcrescimo,\n" +
                     "	dbo.CE_VendasCaixa.ValorItens + ISNULL(dbo.CE_VendasCaixa.DescAcrItens, 0) as ValorItensDesconto,\n" +
@@ -614,9 +615,9 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         
-                        String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
+                        String trib = rst.getString("aliquota");
+                        if (trib != null && !"".equals(trib)) {
+                            trib = rst.getString("aliquota");
                         }
 
                         obterAliquota(next, trib);
@@ -635,46 +636,28 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
          * @throws SQLException
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
-             TA	7.00	ALIQUOTA 07%
-             TB	12.00	ALIQUOTA 12%
-             TC	18.00	ALIQUOTA 18%
-             TD	25.00	ALIQUOTA 25%
-             TE	11.00	ALIQUOTA 11%
-             I	0.00	ISENTO
-             F	0.00	SUBST TRIBUTARIA
-             N	0.00	NAO INCIDENTE
-             */
             int cst;
             double aliq;
-            switch (icms) {
-                case "TA":
-                    cst = 0;
-                    aliq = 7;
-                    break;
-                case "TB":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "TC":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "TD":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "TE":
-                    cst = 0;
-                    aliq = 11;
-                    break;
+            switch (icms.trim()) {
                 case "F":
                     cst = 60;
                     aliq = 0;
                     break;
-                case "N":
-                    cst = 41;
+                case "I":
+                    cst = 40;
                     aliq = 0;
+                    break;
+                case "0700":
+                    cst = 0;
+                    aliq = 7;
+                    break;
+                case "1200":
+                    cst = 0;
+                    aliq = 12;
+                    break;
+                case "1800":
+                    cst = 0;
+                    aliq = 18;
                     break;
                 default:
                     cst = 40;
@@ -697,7 +680,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_MOVIMENTACAO.caixa_mov ecf,\n" +
                     "	dbo.CE_MOVIMENTACAO.coo,\n" +
                     "	dbo.CE_MOVIMENTACAO.numimpfiscal,\n" +
-                    "	dbo.CE_MOVIMENTACAO.S_Trib_Aliquota,\n" +
+                    "	dbo.CE_MOVIMENTACAO.S_Trib_Aliquota aliquota,\n" +
                     "	dbo.CE_MOVIMENTACAO.Valor_Icms,\n" +
                     "	dbo.CE_PRODUTOS.CODPROD_PRODUTOS idproduto,\n" +
                     "	dbo.CE_PRODUTOS.DESCRICAO_PRODUTOS descricao,\n" +
