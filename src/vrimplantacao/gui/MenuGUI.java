@@ -120,6 +120,7 @@ import vrimplantacao2.gui.interfaces.ControlXGUI;
 import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
+import vrimplantacao2.gui.interfaces.DevMasterGUI;
 import vrimplantacao2.gui.interfaces.DirectorGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
