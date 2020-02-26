@@ -192,7 +192,7 @@
                               </Group>
                               <Component id="lblDocCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="176" max="32767" attributes="0"/>
+                          <EmptySpace pref="174" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -276,7 +276,7 @@
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBairroCliente">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Barro"/>
+                    <Property name="text" type="java.lang.String" value="Bairro"/>
                   </Properties>
                 </Component>
               </SubComponents>

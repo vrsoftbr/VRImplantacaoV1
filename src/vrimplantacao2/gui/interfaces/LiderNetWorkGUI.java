@@ -17,7 +17,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WeberDAO;
+import vrimplantacao2.dao.interfaces.LiderNetWorkDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -28,7 +28,7 @@ public class LiderNetWorkGUI extends VRInternalFrame {
     private static final String SERVIDOR_SQL = "Firebird";
     private static LiderNetWorkGUI instance;
 
-    private final WeberDAO dao = new WeberDAO();
+    private final LiderNetWorkDAO dao = new LiderNetWorkDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
 
     private String vLojaCliente = "-1";
