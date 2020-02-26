@@ -358,7 +358,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCheque.setText("Cheque");
 
-        chkBairroCliente.setText("Barro");
+        chkBairroCliente.setText("Bairro");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -384,7 +384,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(cmbDocumentoCheque, javax.swing.GroupLayout.Alignment.LEADING, 0, 212, Short.MAX_VALUE)
                         .addComponent(cmbDocumentoRotativo, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(lblDocCheque))
-                .addContainerGap(176, Short.MAX_VALUE))
+                .addContainerGap(174, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

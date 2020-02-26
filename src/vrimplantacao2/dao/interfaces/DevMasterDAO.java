@@ -108,7 +108,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("Merc1ID"));
                     imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -156,34 +156,24 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n"
-                    + "	cr.id id,\n"
-                    + "	cr.dataperiodoinicial dataemissao,\n"
-                    + "	vc.numeropedido::bigint numerocupom,\n"
-                    + "	parc.valor,\n"
-                    + "	cr.obs observacao,\n"
-                    + "	c.id idcliente,\n"
-                    + "	parc.datavencimento datavencimento,\n"
-                    + "	numerototalparcelas parcela,\n"
-                    + "	round((parc.valor * (j.jurosmora/100) *\n"
-                    + "	(extract(day from now() - parc.datavencimento)))::numeric,2) juros\n"
+                      " select \n"
+                    + "     cr.dm_id id,\n"
+                    + "     to_char(abg_emissao,'yyyy-MM-dd') dataEmissao,\n"
+                    + "     abg_numero numeroCupom,\n"
+                    + "     abg_prefixo ecf,\n"
+                    + "     abg_valor valor,\n"
+                    + "     abg_cliente idCliente,\n"
+                    + "     to_char(abg_vencimento,'yyyy-MM-dd') dataVencimento,\n"
+                    + "     abg_parcela parcela,\n"
+                    + "     abg_juros juros,\n"
+                    + "     abg_multa multa,\n"
+                    + "     aam_cpfcnpj cnpjCliente\n"
                     + " from\n"
-                    + "	titulo cr\n"
-                    + "	join parcela parc on\n"
-                    + "		parc.tituloid = cr.id\n"
-                    + "	join (select * from juros j limit 1) j on\n"
-                    + "		true\n"
-                    + "	join cliente c on\n"
-                    + "		c.id = cr.pessoaid\n"
-                    + "	left join vendacliente vc on\n"
-                    + "		cr.id = vc.tituloid\n"
+                    + "     dmabg01 cr\n"
+                    + "     left join dmaam01\n"
+                    + "		on abg_cliente = aam_codigo\n"
                     + " where\n"
-                    + "	cr.statusid = 1\n"
-                    + "	and	cr.tipodocumentoid = 1\n"
-                    + "	and cr.cmfid = 3\n"
-                    + "	and parc.baixacancelada is null\n"
-                    + " order by\n"
-                    + "	parc.datavencimento"
+                    + "     abg_situacao <> 'B'"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -191,12 +181,14 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
+                    imp.setEcf(rs.getString("ecf"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("observacao"));
                     imp.setIdCliente(rs.getString("idCliente"));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setJuros(rs.getDouble("juros"));
+                    imp.setMulta(rs.getDouble("multa"));
+                    imp.setCnpjCliente(rs.getString("cnpjCliente"));
 
                     result.add(imp);
                 }
@@ -575,7 +567,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaUf(rs.getString("cobrancaUf"));
                     imp.setCobrancaCep(rs.getString("cobrancaCep"));
                     //imp.addContato("","","",rs.getString("telefone2"),"");
-                    
+
                     result.add(imp);
 
                 }

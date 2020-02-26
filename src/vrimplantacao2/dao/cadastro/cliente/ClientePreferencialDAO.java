@@ -305,6 +305,12 @@ public class ClientePreferencialDAO {
                     sql.put("id_municipio", vo.getId_municipio());
                     sql.put("id_estado", vo.getId_estado());
                 }
+                if (opt.contains(OpcaoCliente.ENDERECO)) {
+                    sql.put("endereco", vo.getEndereco());
+                }
+                if (opt.contains(OpcaoCliente.BAIRRO)) {
+                    sql.put("bairro", vo.getBairro());
+                }
                 if (opt.contains(OpcaoCliente.PERMITE_CHEQUE)) {
                     sql.put("permitecheque", vo.isPermiteCheque());
                 }
