@@ -42,7 +42,7 @@ public class CreditoRotativoAnteriorVO {
     }
 
     public void setValor(double valor) {
-        this.valor = MathUtils.round(valor, 4, 99999999D);;
+        this.valor = MathUtils.round(valor, 4, 999999D);;
     }
 
     public void setPago(boolean pago) {
