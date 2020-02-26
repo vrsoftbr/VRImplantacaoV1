@@ -581,21 +581,27 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
+                    "   id,\n" +        
                     "	telefone,\n" +
+                    "   nome,\n" +        
                     "	celular,\n" +
                     "	email,\n" +
-                    "	tp.descricao contato\n" +
+                    "	tp.id tipo\n" +
                     "from \n" +
                     "	fornecedorcontato fc\n" +
-                    "join tipocontato tp on fc.id_fornecedor = tp.id \n" +
+                    "join tipocontato tp on fc.id_tipocontato = tp.id\n" +
                     "where 	\n" +
                     "	id_fornecedor = " + imp.getImportId())) {
                 while(rs.next()) {
-                    imp.addContato(imp.getImportId(), 
-                                rs.getString("contato"),
+                    
+                    int id = rs.getInt("tipo");
+                    imp.addContato(rs.getString("id"), 
+                                rs.getString("nome"),
                                 rs.getString("telefone"), 
                                 rs.getString("celular"), 
-                                TipoContato.COMERCIAL,
+                                id == 0 ? TipoContato.COMERCIAL : 
+                                        id == 1 ? TipoContato.FINANCEIRO : 
+                                                id == 2 ? TipoContato.FISCAL : TipoContato.NFE,
                                 rs.getString("email"));
                 }
             }
@@ -787,7 +793,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where 	\n" +
                     "	id_clientepreferencial = " + imp.getId())) {
                 while(rs.next()) {
-                    imp.addContato(rs.getString("id"), rs.getString("contato"), rs.getString("telefone"), rs.getString("celular"), null);
+                    imp.addContato(rs.getString("id"), rs.getString("nome"), rs.getString("telefone"), rs.getString("celular"), null);
                 }
             }
         }
@@ -805,7 +811,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	to_char(r.dataemissao, 'DD/MM/YYYY') emissao,\n" +
                     "	to_char(r.datavencimento, 'DD/MM/YYYY') vencimento,\n" +
                     "	r.ecf,\n" +
-                    "	'P' || r.id_clientepreferencial idcliente,\n" +
+                    "	r.id_clientepreferencial idcliente,\n" +
                     "	r.valorjuros juros,\n" +
                     "	r.valormulta multa,\n" +
                     "	r.numerocupom cupom,\n" +
