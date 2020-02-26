@@ -342,17 +342,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("piscofinscstdebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
 
-                    //Aliquota de saída
-                    /*imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
-                    imp.setIcmsCstSaida(rs.getInt("icms_cst_debito"));
-
-                    double reducao = rs.getDouble("icms_reducao_debito");
-                    imp.setIcmsReducaoSaida(reducao == 100 ? 0 : reducao);
-
-                    //Alíquota de saída fora estado
-                    imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_debito"));
-                    imp.setIcmsCstSaidaForaEstado(rs.getInt("icms_cst_debito"));
-                    imp.setIcmsReducaoSaidaForaEstado(reducao == 100 ? 0 : reducao);*/
                     String icmsDeb = rs.getString("tabicm");
                     imp.setIcmsDebitoId(icmsDeb);
                     imp.setIcmsDebitoForaEstadoId(icmsDeb);
@@ -367,18 +356,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(icmsCre);
                     imp.setIcmsCreditoForaEstadoId(icmsCre);
 
-                    /*//Aliquota de entrada
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
-                    imp.setIcmsCstEntrada(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
-                    
-                    reducao = rs.getDouble("icms_reducao_credito");
-                    imp.setIcmsReducaoEntrada(reducao == 100 ? 0 : reducao);
-
-                    //Aliquota de entrada fora estado
-                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito"));
-                    imp.setIcmsCstEntradaForaEstado(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
-                    imp.setIcmsReducaoEntradaForaEstado(reducao == 100 ? 0 : reducao);*/
-                    //Pauta Fiscal
                     imp.setPautaFiscalId(imp.getImportId());
 
                     result.add(imp);
@@ -413,7 +390,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pre_promocao_datai is not null\n"
                     + "	and pre_promocao_dataf is not null\n"
                     + "	and pre_promocao_datai <> '1899-12-30'\n"
-                    + "	and pre_promocao_dataf >= '2019-11-01'"
+                    + "	and pre_promocao_dataf >= current_date"
             )) {
 
                 while (rs.next()) {
@@ -461,18 +438,40 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    if ("7891000100103".equals(rst.getString("id_produto"))) {
+                        System.out.println("ACHOU");
+                    }
 
                     imp.setId(rst.getString("id_produto"));
                     imp.setIva(rst.getDouble("icm_mva"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setNcm(rst.getString("ncm"));
-                    double reducao = 0;
-                    if (rst.getDouble("icms_aliquota_debito_reducao") == 100) {
-                        reducao = 0;
+                    
+                    int cst;
+                    double aliquota = rst.getDouble("aliquota_credito");
+                    double reduzido = 0;
+                    
+                    if (rst.getDouble("aliquota_reducao_credito") == 100) {
+                        reduzido = 0;
                     } else {
-                        reducao = rst.getDouble("icms_aliquota_debito_reducao");
+                        reduzido = rst.getDouble("aliquota_reducao_credito");
                     }
-                    imp.setAliquotaDebito(rst.getInt("icms_aliquota_debito") > 0 ? 0 : rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
+                    
+                    if (reduzido > 0) {
+                        cst = 20;
+                    } else if (aliquota == 0) {
+                        cst = rst.getInt("cst_debito");
+                    } else {
+                        cst = 0;
+                    }
+                    
+                    imp.setAliquotaDebito(cst, aliquota, reduzido);
+                    imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
+                    imp.setAliquotaCredito(cst, aliquota, reduzido);
+                    imp.setAliquotaCreditoForaEstado(cst, aliquota, reduzido);
+                    
+                    /* imp.setAliquotaDebito(rst.getInt("icms_aliquota_debito") > 0 ? 0 : rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
                     imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
 
                     if (rst.getDouble("aliquota_reducao_credito") == 100) {
@@ -482,7 +481,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), reducao);
                     imp.setAliquotaCreditoForaEstado(reducao > 0 ? 20 : 0, rst.getDouble("aliquota_credito"), reducao);
-
+                    */
+                    
                     result.add(imp);
                 }
             }

@@ -10,11 +10,13 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -89,44 +91,31 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*    @Override
-     public List<MercadologicoIMP> getMercadologicos() throws Exception {
-     List<MercadologicoIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-     try (ResultSet rs = stm.executeQuery(
-     "select distinct\n"
-     + "     tp.id::varchar Merc1ID,\n"
-     + "     tp.descricao Merc1Descricao,\n"
-     + "     sb.id::varchar Merc2ID,\n"
-     + "     sb.descricao Merc2Descricao,\n"
-     + "     s.id::varchar Merc3ID,\n"
-     + "     s.descricao Merc3Descricao\n"
-     + "from produto p\n"
-     + "     inner join tipoproduto tp\n"
-     + "		on tp.id::varchar = p.tipoprodutoid::varchar\n"
-     + "	inner join subsecao sb\n"
-     + "		on p.subsecaoid = sb.id\n"
-     + "	inner join secao s\n"
-     + "		on sb.secaoid::varchar = s.id::varchar\n"
-     + "order by 1,3,5"
-     )) {
-     while (rs.next()) {
-     MercadologicoIMP imp = new MercadologicoIMP();
-     imp.setImportLoja(getLojaOrigem());
-     imp.setImportSistema(getSistema());
-     imp.setMerc1ID(rs.getString("Merc1ID"));
-     imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-     imp.setMerc2ID(rs.getString("Merc2ID"));
-     imp.setMerc2Descricao(rs.getString("Merc2Descricao"));
-     imp.setMerc3ID(rs.getString("Merc3ID"));
-     imp.setMerc3Descricao(rs.getString("Merc3Descricao"));
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "     aad_codigo Merc1ID,\n"
+                    + "     aad_descricao Merc1Descricao\n"
+                    + "from dmaad01\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("Merc1ID"));
+                    imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
 
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }*/
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -167,34 +156,24 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n"
-                    + "	cr.id id,\n"
-                    + "	cr.dataperiodoinicial dataemissao,\n"
-                    + "	vc.numeropedido::bigint numerocupom,\n"
-                    + "	parc.valor,\n"
-                    + "	cr.obs observacao,\n"
-                    + "	c.id idcliente,\n"
-                    + "	parc.datavencimento datavencimento,\n"
-                    + "	numerototalparcelas parcela,\n"
-                    + "	round((parc.valor * (j.jurosmora/100) *\n"
-                    + "	(extract(day from now() - parc.datavencimento)))::numeric,2) juros\n"
+                      " select \n"
+                    + "     cr.dm_id id,\n"
+                    + "     to_char(abg_emissao,'yyyy-MM-dd') dataEmissao,\n"
+                    + "     abg_numero numeroCupom,\n"
+                    + "     abg_prefixo ecf,\n"
+                    + "     abg_valor valor,\n"
+                    + "     abg_cliente idCliente,\n"
+                    + "     to_char(abg_vencimento,'yyyy-MM-dd') dataVencimento,\n"
+                    + "     abg_parcela parcela,\n"
+                    + "     abg_juros juros,\n"
+                    + "     abg_multa multa,\n"
+                    + "     aam_cpfcnpj cnpjCliente\n"
                     + " from\n"
-                    + "	titulo cr\n"
-                    + "	join parcela parc on\n"
-                    + "		parc.tituloid = cr.id\n"
-                    + "	join (select * from juros j limit 1) j on\n"
-                    + "		true\n"
-                    + "	join cliente c on\n"
-                    + "		c.id = cr.pessoaid\n"
-                    + "	left join vendacliente vc on\n"
-                    + "		cr.id = vc.tituloid\n"
+                    + "     dmabg01 cr\n"
+                    + "     left join dmaam01\n"
+                    + "		on abg_cliente = aam_codigo\n"
                     + " where\n"
-                    + "	cr.statusid = 1\n"
-                    + "	and	cr.tipodocumentoid = 1\n"
-                    + "	and cr.cmfid = 3\n"
-                    + "	and parc.baixacancelada is null\n"
-                    + " order by\n"
-                    + "	parc.datavencimento"
+                    + "     abg_situacao <> 'B'"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -202,12 +181,14 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
+                    imp.setEcf(rs.getString("ecf"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("observacao"));
                     imp.setIdCliente(rs.getString("idCliente"));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setJuros(rs.getDouble("juros"));
+                    imp.setMulta(rs.getDouble("multa"));
+                    imp.setCnpjCliente(rs.getString("cnpjCliente"));
 
                     result.add(imp);
                 }
@@ -506,7 +487,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select \n"
+                    " select \n"
                     + "     aam_codigo id,\n"
                     + "     aam_cpfcnpj cnpj,\n"
                     + "     aam_rgie inscricaoestadual,\n"
@@ -532,10 +513,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     aam_nomemae nomeMae,\n"
                     + "     aam_obs observacao,\n"
                     + "     aam_obsfin observacao2, \n"
-                    + "     aam_venclimite diaVencimento,\n"
-                    + "     aam_telefone1 telefone,\n"
-                    + "     aam_telefone2,\n"
-                    + "     aam_celular celular,\n"
+                    //+ "     aam_telefone1 telefone,\n"
+                    + "     aam_telefone2 celular,\n"
                     + "     aam_email email,\n"
                     + "     aam_fax fax,\n"
                     + "     aam_endcob cobrancaEndereco,\n"
@@ -578,7 +557,6 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeMae(rs.getString("nomeMae"));
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setObservacao2(rs.getString("observacao"));
-                    imp.setDiaVencimento(rs.getInt("diavencimento"));
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email").toLowerCase());
@@ -588,8 +566,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaComplemento(rs.getString("cobrancaComplemento"));
                     imp.setCobrancaUf(rs.getString("cobrancaUf"));
                     imp.setCobrancaCep(rs.getString("cobrancaCep"));
-                    
-                    //imp.addEmail(rs.getString("emailnf").toLowerCase(), TipoContato.NFE);
+                    //imp.addContato("","","",rs.getString("telefone2"),"");
+
                     result.add(imp);
 
                 }

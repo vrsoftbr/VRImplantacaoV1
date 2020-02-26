@@ -12,17 +12,17 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.interfaces.SiitDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.MobnePdvDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
+public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "Siit";
-    private static SiitGUI instance;
+    private static final String SISTEMA = "Mobne";
+    private static MobnePdvGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -56,9 +56,9 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private SiitDAO dao = new SiitDAO();
+    private MobnePdvDAO dao = new MobnePdvDAO();
 
-    private SiitGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private MobnePdvGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -92,10 +92,10 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "mais_vo";
+        conexaoMySQL.database = "consinco";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "JesusCristo";
+        conexaoMySQL.pass = "vrsoftware";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -139,7 +139,7 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new SiitGUI(i_mdiFrame);
+                instance = new MobnePdvGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -241,7 +241,7 @@ public class SiitGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         chkFornecedor.setText("Fornecedor");
         jPanel3.add(chkFornecedor);
