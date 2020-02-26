@@ -147,6 +147,7 @@ public class PautaFiscalRepository {
                                             .getId()
                                     ) || opt.contains(OpcaoFiscal.FORCAR_ALTERACAO)) {
                                 PautaFiscalVO vo = converterPauta(imp, ncm);
+                                vo.setId(anterior.getCodigoAtual().getId());
                                 provider.atualizar(vo, opt);
                                 provider.atualizar(anterior);
                                 provider.saveLog(
