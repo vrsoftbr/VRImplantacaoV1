@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -39,10 +41,44 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    ""
+                    "select distinct\n" +
+                    "	trib.situacaotributacao cst,\n" +
+                    "	trib.percaliquota aliquota,\n" +
+                    "	trib.situacaosimples cst_simples\n" +
+                    "from\n" +
+                    "	tb_produto p\n" +
+                    "	join tb_divisao dv on\n" +
+                    "		dv.nrodivisao = 1\n" +
+                    "	left join tb_familia pf on\n" +
+                    "		p.seqfamilia = pf.seqfamilia\n" +
+                    "	left join tb_famdivisao ds on\n" +
+                    "		pf.seqfamilia = ds.seqfamilia\n" +
+                    "		and ds.nrodivisao = dv.nrodivisao\n" +
+                    "	left join tb_tributacaouf trib on\n" +
+                    "		trib.nrotributacao = ds.nrotributacao\n" +
+                    "		and trib.uforigem = 'SP'\n" +
+                    "		and trib.ufdestino = 'SP'\n" +
+                    "		and trib.tipotributacao = 'SN'\n" +
+                    "		and trib.nroregtributacao = 1\n" +
+                    "order by\n" +
+                    "	cst, aliquota, cst_simples"
             )) {
                 while (rs.next()) {
-                
+                    result.add(
+                            new MapaTributoIMP(
+                                getCodigoTributacao(
+                                        rs.getString("cst"),
+                                        rs.getDouble("aliquota"),
+                                        rs.getString("cst_simples")                                        
+                                ),
+                                String.format(
+                                        "CST: %s - ALIQ: %.2f - CSOSN: %s",
+                                        rs.getString("cst"),
+                                        rs.getDouble("aliquota"),
+                                        rs.getString("cst_simples") 
+                                )
+                            )
+                    );
                 }
             }
         }
@@ -168,16 +204,132 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
         return new ArrayList<>(result.values());
     }
 
+    private String getCodigoTributacao(String cst, double aliq, String csosn) {
+        return String.format(
+                "%s-%.2f-%s",
+                cst,
+                aliq,
+                csosn
+        );
+    }
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+            Map<String, String> merc = new HashMap<>();
             try (ResultSet rs = st.executeQuery(
-                    ""
+                    "select\n" +
+                    "	p.seqproduto ,\n" +
+                    "	tf.seqcategoria\n" +
+                    "from\n" +
+                    "	tb_famdivisaocategoria tf\n" +
+                    "	join tb_produto p on\n" +
+                    "		tf.seqfamilia = p.seqfamilia \n" +
+                    "where\n" +
+                    "	tf.nrodivisao = 1"
             )) {
                 while (rs.next()) {
-                   ProdutoIMP imp = new ProdutoIMP(); 
+                    merc.put(rs.getString("seqproduto"), rs.getString("seqcategoria"));
+                }
+            }
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	p.seqproduto id,\n" +
+                    "	coalesce(ean.codacesso, p.seqproduto) ean,\n" +
+                    "	coalesce(ean.qtdembalagem, emb.qtdembalagem) qtdembalagem,\n" +
+                    "	emb.embalagem unidade,\n" +
+                    "	pf.pesavel,\n" +
+                    "	pf.permitemultiplicacao,\n" +
+                    "	coalesce(p.qtddiavalidade, 0) validade,\n" +
+                    "	pf.bebidaalcoolica,\n" +
+                    "	p.desccompleta descricaocompleta,\n" +
+                    "	p.descreduzida descricaoreduzida,\n" +
+                    "	p.descgenerica descricaogondola,\n" +
+                    "	emb.pesobruto,\n" +
+                    "	emb.pesoliquido,\n" +
+                    "	pe.estqloja estoque,\n" +
+                    "	preco.qtdembalagem,\n" +
+                    "	round(preco.preco / preco.qtdembalagem, 2) preco,\n" +
+                    "	coalesce(pe.ativo, p.ativo) ativo,\n" +
+                    "	pf.codnbmsh ncm,\n" +
+                    "	pf.codcest cest,\n" +
+                    "	coalesce(trib.situacaopis, pf.situacaopis) piscofins_debito,\n" +
+                    "	trib.situacaotributacao cst,\n" +
+                    "	trib.percaliquota aliquota,\n" +
+                    "	trib.situacaosimples cst_simples\n" +
+                    "from\n" +
+                    "	tb_produto p\n" +
+                    "	join tb_divisao dv on\n" +
+                    "		dv.nrodivisao = 1\n" +
+                    "	join tb_segmento sg on\n" +
+                    "		sg.nrosegmento = 1\n" +
+                    "	left join tb_familia pf on\n" +
+                    "		p.seqfamilia = pf.seqfamilia\n" +
+                    "	left join tb_prodcodigo ean on\n" +
+                    "		ean.seqproduto = p.seqproduto\n" +
+                    "	left join tb_famdivisao ds on\n" +
+                    "		pf.seqfamilia = ds.seqfamilia\n" +
+                    "		and ds.nrodivisao = dv.nrodivisao\n" +
+                    "	left join tb_tributacaouf trib on\n" +
+                    "		trib.nrotributacao = ds.nrotributacao\n" +
+                    "		and trib.uforigem = 'SP'\n" +
+                    "		and trib.ufdestino = 'SP'\n" +
+                    "		and trib.tipotributacao = 'SN'\n" +
+                    "		and trib.nroregtributacao = 1\n" +
+                    "	left join tb_prodempresa pe on\n" +
+                    "		p.seqproduto = pe.seqproduto\n" +
+                    "	left join tb_prodpreco preco on\n" +
+                    "		p.seqproduto = preco.seqproduto\n" +
+                    "		and preco.qtdembalagem = ean.qtdembalagem \n" +
+                    "		and preco.nrosegmento = sg.nrosegmento \n" +
+                    "	left join tb_famembalagem emb on\n" +
+                    "		emb.seqfamilia = pf.seqfamilia\n" +
+                    "		and emb.qtdembalagem = preco.qtdembalagem\n" +
+                    "order by\n" +
+                    "	p.seqproduto"
+            )) {
+                while (rs.next()) {
+                   ProdutoIMP imp = new ProdutoIMP();
+                   
+                   imp.setImportSistema(getSistema());
+                   imp.setImportLoja(getLojaOrigem());
+                   imp.setImportId(rs.getString("id"));
+                   imp.setEan(rs.getString("ean"));
+                   imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                   imp.setTipoEmbalagem(rs.getString("unidade"));
+                   imp.seteBalanca("S".equals(rs.getString("pesavel")));
+                   imp.setAceitaMultiplicacaoPDV("S".equals(rs.getString("permitemultiplicacao")));
+                   imp.setValidade(rs.getInt("validade"));
+                   
+                   imp.setCodMercadologico1(merc.get(imp.getImportId()));
+                   
+                   imp.setVendaControlada("S".equals(rs.getString("bebidaalcoolica")));
+                   imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                   imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                   imp.setDescricaoGondola(rs.getString("descricaogondola"));
+                   imp.setPesoBruto(rs.getDouble("pesobruto"));
+                   imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                   imp.setEstoque(rs.getDouble("estoque"));
+                   imp.setPrecovenda(rs.getDouble("preco"));
+                   imp.setSituacaoCadastro("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                   imp.setNcm(rs.getString("ncm"));
+                   imp.setCest(rs.getString("cest"));
+                   imp.setPiscofinsCstDebito(rs.getString("piscofins_debito"));
+                   String trib = getCodigoTributacao(
+                            rs.getString("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getString("cst_simples")                                        
+                    );
+                   imp.setIcmsDebitoId(trib);
+                   imp.setIcmsDebitoForaEstadoId(trib);
+                   imp.setIcmsDebitoForaEstadoNfId(trib);
+                   imp.setIcmsConsumidorId(trib);
+                   imp.setIcmsCreditoId(trib);
+                   imp.setIcmsCreditoForaEstadoId(trib);
+                   
+                   result.add(imp);
                 }
             }
         }
@@ -190,7 +342,29 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.VENDA_CONTROLADA,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.ICMS
         ));
     }
     
