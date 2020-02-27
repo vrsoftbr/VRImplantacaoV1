@@ -762,7 +762,8 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	tr.DFcod_empresa = " + getLojaOrigem() + " and\n"
                     + "	tr.DFcod_tipo_documento = " + codigoDocumentoRotativo + " and\n"
                     + "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber) and\n"
-                    + "   tr.DFcliente_fornecedor_empresa = 'C'\n"
+                    + " tr.DFid_titulo_receber not in (select DFid_titulo_cancelado_receber from TBtitulo_cancelado_receber) and\n"
+                    + " tr.DFcliente_fornecedor_empresa = 'C'\n"
                     + "order by\n"
                     + "	tr.DFdata_vencimento")) {
                 while (rs.next()) {
