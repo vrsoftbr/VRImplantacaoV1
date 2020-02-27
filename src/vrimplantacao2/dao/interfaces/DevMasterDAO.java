@@ -158,12 +158,12 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                       " select \n"
                     + "     cr.dm_id id,\n"
-                    + "     to_char(abg_emissao,'yyyy-MM-dd') dataEmissao,\n"
+                    + "     abg_emissao dataEmissao,\n"
                     + "     abg_numero numeroCupom,\n"
-                    + "     abg_prefixo ecf,\n"
+                  //+ "     abg_prefixo ecf,\n"
                     + "     abg_valor valor,\n"
                     + "     abg_cliente idCliente,\n"
-                    + "     to_char(abg_vencimento,'yyyy-MM-dd') dataVencimento,\n"
+                    + "     abg_vencimento dataVencimento,\n"
                     + "     abg_parcela parcela,\n"
                     + "     abg_juros juros,\n"
                     + "     abg_multa multa,\n"
@@ -174,6 +174,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		on abg_cliente = aam_codigo\n"
                     + " where\n"
                     + "     abg_situacao <> 'B'"
+                    + "     and cr.dm_deletado = 0"
+                    + "     and aam_codigo not in ('000000','000001')\n"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -181,7 +183,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
-                    imp.setEcf(rs.getString("ecf"));
+                  //imp.setEcf("1");
                     imp.setValor(rs.getDouble("valor"));
                     imp.setIdCliente(rs.getString("idCliente"));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
