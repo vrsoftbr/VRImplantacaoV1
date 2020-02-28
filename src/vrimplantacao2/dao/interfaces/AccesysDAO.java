@@ -52,7 +52,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
