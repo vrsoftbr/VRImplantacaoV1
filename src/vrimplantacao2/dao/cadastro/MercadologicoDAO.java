@@ -82,14 +82,13 @@ public class MercadologicoDAO {
     public void salvar(List<MercadologicoIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {
         //Organizaria o mercadologico informado, deixando pronto para incluir;       
         MultiMap<String, MercadologicoAuxiliar> organizados = organizarMercadologico(mercadologicos);
-
+        
         Conexao.begin();
         try {
             //Cria a tabela;
             createTable();
 
             int nivelMax = gravarCodigosAnteriores(organizados, opt);
-
             try (Statement stm = Conexao.createStatement()) {
                 ProgressBar.setStatus("Gravando os mercadológicos...");
                 ProgressBar.setMaximum(getCodigoAnterior().size());
