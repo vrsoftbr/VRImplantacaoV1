@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.planilha;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -100,6 +101,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkFornProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContaPagar = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoForn = new javax.swing.JCheckBox();
+        chkFornSpec = new vrframework.bean.checkBox.VRCheckBox();
         tabFornUnificacao = new vrframework.bean.panel.VRPanel();
         chkFornUnificar = new vrframework.bean.checkBox.VRCheckBox();
         chkFornUnificarProd = new vrframework.bean.checkBox.VRCheckBox();
@@ -144,6 +146,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliEspec = new vrframework.bean.checkBox.VRCheckBox();
         pnlClienteEspeciais = new vrframework.bean.panel.VRPanel();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         btnDelPrefContatos = new vrframework.bean.button.VRButton();
@@ -392,6 +395,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkTipoForn, "Tipo de Empresa");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkFornSpec, "Especial");
+
         javax.swing.GroupLayout tabFornImportacaoLayout = new javax.swing.GroupLayout(tabFornImportacao);
         tabFornImportacao.setLayout(tabFornImportacaoLayout);
         tabFornImportacaoLayout.setHorizontalGroup(
@@ -406,8 +411,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                             .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(66, 66, 66)
                         .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkTipoForn))
-                .addContainerGap(332, Short.MAX_VALUE))
+                    .addComponent(chkTipoForn)
+                    .addComponent(chkFornSpec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(359, Short.MAX_VALUE))
         );
         tabFornImportacaoLayout.setVerticalGroup(
             tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -422,7 +428,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(135, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chkFornSpec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         tabsForn.addTab("Importação", tabFornImportacao);
@@ -673,7 +681,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addComponent(chkCNPJCli)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkLimiteRotativo)))
-                .addContainerGap(135, Short.MAX_VALUE))
+                .addContainerGap(139, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -714,6 +722,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             .addComponent(chkCliEvenContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCliEspec, "Especial");
+
         javax.swing.GroupLayout pnlClienteNormalLayout = new javax.swing.GroupLayout(pnlClienteNormal);
         pnlClienteNormal.setLayout(pnlClienteNormalLayout);
         pnlClienteNormalLayout.setHorizontalGroup(
@@ -721,6 +731,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             .addGroup(pnlClienteNormalLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlClienteNormalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlClienteNormalLayout.createSequentialGroup()
+                        .addComponent(chkCliEspec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(vRPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -732,7 +745,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(164, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chkCliEspec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(134, Short.MAX_VALUE))
         );
 
         tabsCliente.addTab("Importação", pnlClienteNormal);
@@ -1269,6 +1284,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JCheckBox chkCNPJCli;
     private vrframework.bean.checkBox.VRCheckBox chkCliCheques;
+    private vrframework.bean.checkBox.VRCheckBox chkCliEspec;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenDados;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefContatos;
@@ -1286,6 +1302,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornDados;
     private vrframework.bean.checkBox.VRCheckBox chkFornProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornSpec;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificarProd;
     private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
@@ -1411,6 +1428,21 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     if (chkFornContatos.isSelected()) {
                                         opcoes.add(OpcaoFornecedor.CONTATOS);
                                     }
+                                    if (chkFornSpec.isSelected()) {
+                                        opcoes.addAll(Arrays.asList(
+                                                OpcaoFornecedor.ENDERECO,
+                                                OpcaoFornecedor.NUMERO,
+                                                OpcaoFornecedor.COMPLEMENTO,
+                                                OpcaoFornecedor.BAIRRO,
+                                                OpcaoFornecedor.MUNICIPIO,
+                                                OpcaoFornecedor.UF,
+                                                OpcaoFornecedor.CEP,
+                                                OpcaoFornecedor.EMAIL,
+                                                OpcaoFornecedor.TELEFONE,
+                                                OpcaoFornecedor.CONTATOS
+                                        ));
+                                        importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                                    }
                                     if (!opcoes.isEmpty()) {
                                         importador.importarFornecedor();
                                     }
@@ -1472,6 +1504,15 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         }
                                         if (chkLimiteRotativo.isSelected()) {
                                             opcoes.add(OpcaoCliente.VALOR_LIMITE);
+                                        }
+                                        if (chkCliEspec.isSelected()) {
+                                            opcoes.addAll(Arrays.asList(
+                                                    OpcaoCliente.ENDERECO_COMPLETO,
+                                                    OpcaoCliente.CONTATOS,
+                                                    OpcaoCliente.TELEFONE,
+                                                    OpcaoCliente.DATA_NASCIMENTO,
+                                                    OpcaoCliente.EMAIL
+                                            ));
                                         }
                                         if (!opcoes.isEmpty()) {
                                             importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));                                        

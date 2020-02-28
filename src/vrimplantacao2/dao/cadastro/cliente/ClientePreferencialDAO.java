@@ -348,7 +348,9 @@ public class ClientePreferencialDAO {
                     sql.put("datacadastro", vo.getDataCadastro());
                 }
                 sql.setWhere("id = " + vo.getId());
-                stm.execute(sql.getUpdate());
+                if (!sql.isEmpty()) {
+                    stm.execute(sql.getUpdate());
+                }
             }
         }
     }
