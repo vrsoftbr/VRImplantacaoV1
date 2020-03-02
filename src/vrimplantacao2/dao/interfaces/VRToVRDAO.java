@@ -20,6 +20,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoCancelamento;
@@ -34,6 +35,8 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -349,6 +352,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setAtacadoPreco(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
                     imp.setDescontinuado("S".equals(rs.getString("descontinuado")));
                     imp.setNcm(rs.getString("ncm"));
@@ -900,6 +904,68 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     
                     imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	*\n" +
+                    "from \n" +
+                    "	oferta o \n" +
+                    "where \n" +
+                    "	id_loja = " + getLojaOrigem() + " and \n" +
+                    "	datatermino >= now()")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+                    imp.setPrecoNormal(rs.getDouble("preconormal"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datatermino"));
+                    imp.setSituacaoOferta(rs.getInt("id_situacaooferta") == 1 ? SituacaoOferta.ATIVO : SituacaoOferta.CANCELADO);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OperadorIMP> getOperadores() throws Exception {
+        List<OperadorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	*\n" +
+                    "from 	\n" +
+                    "	pdv.operador\n" +
+                    "where 	\n" +
+                    "	id_loja = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    OperadorIMP imp = new OperadorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setId(rs.getString("id"));
+                    imp.setCodigo(rs.getString("codigo"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setImportarMatricula(rs.getString("matricula"));
+                    imp.setSenha(rs.getString("senha"));
+                    imp.setId_tiponiveloperador(rs.getString("id_tiponiveloperador"));
+                    imp.setId_situacadastro(rs.getString("id_situacaocadastro"));
                     
                     result.add(imp);
                 }

@@ -120,33 +120,27 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" pref="132" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                                          <Component id="btnMapaTribut" min="-2" pref="235" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Group type="102" attributes="0">
-                                                  <Component id="chkSomarEstoqueAoProduto" min="-2" max="-2" attributes="0"/>
-                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                  <Component id="chkManterEANsMenores" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <Component id="chkNaoTransformarEANemUN" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                  </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkManterBalanca" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkResetarCodigoBalanca" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="57" max="32767" attributes="0"/>
+                                  <EmptySpace pref="120" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkSomarEstoqueAoProduto" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="chkManterEANsMenores" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                                          <Component id="btnMapaTribut" alignment="0" max="32767" attributes="0"/>
+                                          <Component id="chkNaoTransformarEANemUN" alignment="0" max="32767" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -166,9 +160,9 @@
                                       <Component id="chkManterBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkResetarCodigoBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnMapaTribut" min="-2" pref="31" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="btnMapaTribut" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                                   <Component id="chkNaoTransformarEANemUN" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
@@ -190,14 +184,6 @@
                       <Connection code="true" type="code"/>
                     </Property>
                   </Properties>
-                </Component>
-                <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTribut">
-                  <Properties>
-                    <Property name="enabled" type="boolean" value="false"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTributActionPerformed"/>
-                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel1">
                   <Properties>
@@ -242,6 +228,8 @@
                       <Connection code="true" type="code"/>
                     </Property>
                   </Properties>
+                </Component>
+                <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTribut">
                 </Component>
               </SubComponents>
             </Container>
