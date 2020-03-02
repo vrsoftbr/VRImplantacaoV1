@@ -16,6 +16,9 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -366,6 +369,123 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.ICMS
         ));
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	tp.seqpessoa id,\n" +
+                    "	tp.cnpjcpf,\n" +
+                    "	tp.inscrestadualrg ierg,\n" +
+                    "	tp.orgexp orgaoemissor,\n" +
+                    "	tp.nomerazao razao,\n" +
+                    "	tp.nomefantasia fantasia,\n" +
+                    "	tp.ativo,\n" +
+                    "	tc.situacaocomercial bloqueado,\n" +
+                    "	tc.dtahorultrestricao databloqueado,\n" +
+                    "	tp.estadocivil,\n" +
+                    "	tp.dtanascimento,\n" +
+                    "	tp.sexo,\n" +
+                    "	case when tc.situacaocredito in ('S','B') then 0 else 1 end permitecreditorotativo,\n" +
+                    "	tc.observacao,\n" +
+                    "	tc.prazomaximo,\n" +
+                    "	tc.vlrlimiteglobal limite,\n" +
+                    "	tp.inscmunicipal,\n" +
+                    "	tp.email\n" +
+                    "from\n" +
+                    "	tb_pessoa tp\n" +
+                    "	join tb_cliente tc on\n" +
+                    "		tp.seqpessoa = tc.seqpessoa\n" +
+                    "order by\n" +
+                    "	tp.seqpessoa"
+            )) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setCnpj_cpf(rs.getString("cnpjcpf"));
+                    imp.setIe_rg(rs.getString("ierg"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo("S".equals(rs.getString("ativo")));
+                    imp.setBloqueado("B".equals(rs.getString("bloqueado")));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setPrazoEntrega(rs.getInt("prazomaximo"));
+                    imp.setInsc_municipal(rs.getString("inscmunicipal"));
+                    imp.addEmail("EMAIL", rs.getString("email"), TipoContato.COMERCIAL);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	tp.seqpessoa id,\n" +
+                    "	tp.cnpjcpf,\n" +
+                    "	tp.inscrestadualrg ierg,\n" +
+                    "	tp.orgexp orgaoemissor,\n" +
+                    "	tp.nomerazao razao,\n" +
+                    "	tp.nomefantasia fantasia,\n" +
+                    "	tp.ativo,\n" +
+                    "	tc.situacaocomercial bloqueado,\n" +
+                    "	tc.dtahorultrestricao databloqueado,\n" +
+                    "	tp.estadocivil,\n" +
+                    "	tp.dtanascimento,\n" +
+                    "	tp.sexo,\n" +
+                    "	case when tc.situacaocredito in ('S','B') then 0 else 1 end permitecreditorotativo,\n" +
+                    "	tc.observacao,\n" +
+                    "	tc.prazomaximo,\n" +
+                    "	tc.vlrlimiteglobal limite,\n" +
+                    "	tp.inscmunicipal\n" +
+                    "from\n" +
+                    "	tb_pessoa tp\n" +
+                    "	join tb_cliente tc on\n" +
+                    "		tp.seqpessoa = tc.seqpessoa\n" +
+                    "order by\n" +
+                    "	tp.seqpessoa"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpjcpf"));
+                    imp.setInscricaoestadual(rs.getString("ierg"));
+                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo("S".equals(rs.getString("ativo")));
+                    imp.setBloqueado("B".equals(rs.getString("bloqueado")));
+                    imp.setDataBloqueio(rs.getDate("databloqueado"));
+                    imp.setEstadoCivil(rs.getString("estadocivil"));
+                    imp.setDataNascimento(rs.getDate("dtanascimento"));
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setPermiteCreditoRotativo(rs.getBoolean("permitecreditorotativo"));
+                    imp.setObservacao2(rs.getString("observacao"));
+                    imp.setPrazoPagamento(rs.getInt("prazomaximo"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setInscricaoMunicipal(rs.getString("inscmunicipal"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
     
 }

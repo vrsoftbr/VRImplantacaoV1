@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -41,6 +43,55 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "Accesys";
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
+                    OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
+                }
+        ));
     }
 
     @Override
@@ -84,8 +135,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "inner join controle_estoque.dbo.CE_GRUPOS g on p.CODGRU_PRODUTOS = g.CODIGO_GRUPOS\n" +
                     "order by\n" +
                     "	1, 3")) {
-                while(rs.next())
-                {
+                while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportLoja(getLojaOrigem());
@@ -187,8 +237,8 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rs.getString("ean"));
                     
                     if(rs.getInt("pesavel") == 1) {
-                        imp.seteBalanca(true);
                         imp.setEan(imp.getImportId());
+                        imp.seteBalanca(true);
                     }
                     
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
