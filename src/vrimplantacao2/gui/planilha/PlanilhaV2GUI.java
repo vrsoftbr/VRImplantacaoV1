@@ -1511,7 +1511,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                                     OpcaoCliente.CONTATOS,
                                                     OpcaoCliente.TELEFONE,
                                                     OpcaoCliente.DATA_NASCIMENTO,
-                                                    OpcaoCliente.EMAIL
+                                                    OpcaoCliente.EMAIL,
+                                                    OpcaoCliente.SEXO
                                             ));
                                         }
                                         if (!opcoes.isEmpty()) {

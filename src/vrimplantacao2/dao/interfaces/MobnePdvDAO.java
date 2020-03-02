@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -29,6 +32,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
+    private boolean somenteEansUnitarios = false;
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
@@ -36,6 +40,10 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "".equals(complemento) ? "Mobne" : "Mobne - " + complemento;
+    }
+
+    public void setSomenteEansUnitarios(boolean somenteEansUnitarios) {
+        this.somenteEansUnitarios = somenteEansUnitarios;
     }
 
     @Override
@@ -290,49 +298,59 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join tb_famembalagem emb on\n" +
                     "		emb.seqfamilia = pf.seqfamilia\n" +
                     "		and emb.qtdembalagem = preco.qtdembalagem\n" +
+                    (somenteEansUnitarios ? "where ean.qtdembalagem = 1\n" : "") +
                     "order by\n" +
                     "	p.seqproduto"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
-                   ProdutoIMP imp = new ProdutoIMP();
-                   
-                   imp.setImportSistema(getSistema());
-                   imp.setImportLoja(getLojaOrigem());
-                   imp.setImportId(rs.getString("id"));
-                   imp.setEan(rs.getString("ean"));
-                   imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                   imp.setTipoEmbalagem(rs.getString("unidade"));
-                   imp.seteBalanca("S".equals(rs.getString("pesavel")));
-                   imp.setAceitaMultiplicacaoPDV("S".equals(rs.getString("permitemultiplicacao")));
-                   imp.setValidade(rs.getInt("validade"));
-                   
-                   imp.setCodMercadologico1(merc.get(imp.getImportId()));
-                   
-                   imp.setVendaControlada("S".equals(rs.getString("bebidaalcoolica")));
-                   imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                   imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
-                   imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                   imp.setPesoBruto(rs.getDouble("pesobruto"));
-                   imp.setPesoLiquido(rs.getDouble("pesoliquido"));
-                   imp.setEstoque(rs.getDouble("estoque"));
-                   imp.setPrecovenda(rs.getDouble("preco"));
-                   imp.setSituacaoCadastro("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                   imp.setNcm(rs.getString("ncm"));
-                   imp.setCest(rs.getString("cest"));
-                   imp.setPiscofinsCstDebito(rs.getString("piscofins_debito"));
-                   String trib = getCodigoTributacao(
-                            rs.getString("cst"),
-                            rs.getDouble("aliquota"),
-                            rs.getString("cst_simples")                                        
-                    );
-                   imp.setIcmsDebitoId(trib);
-                   imp.setIcmsDebitoForaEstadoId(trib);
-                   imp.setIcmsDebitoForaEstadoNfId(trib);
-                   imp.setIcmsConsumidorId(trib);
-                   imp.setIcmsCreditoId(trib);
-                   imp.setIcmsCreditoForaEstadoId(trib);
-                   
-                   result.add(imp);
+                    ProdutoIMP imp = new ProdutoIMP();
+
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    ProdutoBalancaVO vo = balanca.get(Utils.stringToInt(imp.getEan()));
+                    if (vo != null) {
+                        imp.setQtdEmbalagem(1);
+                        imp.setTipoEmbalagem("U".equals(vo.getPesavel()) ? "UN" : "KG");
+                        imp.seteBalanca(true);
+                        imp.setValidade(vo.getValidade());
+                    } else {
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.seteBalanca("S".equals(rs.getString("pesavel")));
+                        imp.setValidade(rs.getInt("validade"));
+                    }
+                    imp.setAceitaMultiplicacaoPDV("S".equals(rs.getString("permitemultiplicacao")));
+
+                    imp.setCodMercadologico1(merc.get(imp.getImportId()));
+
+                    imp.setVendaControlada("S".equals(rs.getString("bebidaalcoolica")));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rs.getString("descricaogondola"));
+                    imp.setPesoBruto(rs.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setPrecovenda(rs.getDouble("preco"));
+                    imp.setSituacaoCadastro("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    imp.setPiscofinsCstDebito(rs.getString("piscofins_debito"));
+                    String trib = getCodigoTributacao(
+                             rs.getString("cst"),
+                             rs.getDouble("aliquota"),
+                             rs.getString("cst_simples")                                        
+                     );
+                    imp.setIcmsDebitoId(trib);
+                    imp.setIcmsDebitoForaEstadoId(trib);
+                    imp.setIcmsDebitoForaEstadoNfId(trib);
+                    imp.setIcmsConsumidorId(trib);
+                    imp.setIcmsCreditoId(trib);
+                    imp.setIcmsCreditoForaEstadoId(trib);
+
+                    result.add(imp);
                 }
             }
         }
@@ -367,7 +385,9 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.ICMS
+                OpcaoProduto.ICMS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN
         ));
     }
 

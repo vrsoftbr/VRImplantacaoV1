@@ -34,6 +34,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
+        chkSomenteEansUnitarios.setSelected(params.getBool(SISTEMA, "SOMENTE_PRODUTOS_UNITARIOS"));
         conexaoMySQL.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -42,6 +43,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(chkSomenteEansUnitarios.isSelected(), SISTEMA, "SOMENTE_PRODUTOS_UNITARIOS");
         conexaoMySQL.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -65,6 +67,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
         
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.tabParametros.add(pnlOutros);
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
@@ -95,7 +98,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
         conexaoMySQL.database = "consinco";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "vrsoftware";
+        conexaoMySQL.pass = "consinco";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -169,7 +172,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
                     importador.setLojaVR(idLojaVR);
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
-
+                        dao.setSomenteEansUnitarios(chkSomenteEansUnitarios.isSelected());
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
                         
@@ -213,6 +216,8 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
 
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
         txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
+        pnlOutros = new vrframework.bean.panel.VRPanel();
+        chkSomenteEansUnitarios = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
@@ -225,12 +230,32 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new javax.swing.JTabbedPane();
         conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
+
+        chkSomenteEansUnitarios.setText("Somente EANs unitários");
+
+        javax.swing.GroupLayout pnlOutrosLayout = new javax.swing.GroupLayout(pnlOutros);
+        pnlOutros.setLayout(pnlOutrosLayout);
+        pnlOutrosLayout.setHorizontalGroup(
+            pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOutrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlOutrosLayout.setVerticalGroup(
+            pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOutrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         setTitle("Importação Siit");
         setToolTipText("");
@@ -296,6 +321,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
         tabImportacao.addTab("Clientes", tabClientes);
 
         tabOperacoes.addTab("Importação", tabImportacao);
+        tabOperacoes.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMigrar.setText("Migrar");
@@ -393,6 +419,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkSomenteEansUnitarios;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
@@ -400,6 +427,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrframework.bean.panel.VRPanel pnlOutros;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
@@ -407,6 +435,7 @@ public class MobnePdvGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTabbedPane tabs;
     private org.jdesktop.swingx.JXDatePicker txtDataFimOferta;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
 
