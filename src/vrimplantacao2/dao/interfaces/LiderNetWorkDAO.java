@@ -36,10 +36,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String arquivo;
+    private String arquivoLojaCliente;
+    private String arquivoMapaTributacao;
     private Map<String, String> opcoes = new LinkedHashMap<>();
     private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
     private SimpleDateFormat formatDataCompleta = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
-    
+
     public String getArquivo() {
         return arquivo;
     }
@@ -48,10 +50,26 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
         this.arquivo = arquivo;
     }
 
+    public String getArquivoLojaCliente() {
+        return arquivoLojaCliente;
+    }
+
+    public void setArquivoLojaCliente(String arquivoLojaCliente) {
+        this.arquivoLojaCliente = arquivoLojaCliente;
+    }
+
+    public String getArquivoMapaTributacao() {
+        return arquivoMapaTributacao;
+    }
+
+    public void setArquivoMapaTributacao(String arquivoMapaTributacao) {
+        this.arquivoMapaTributacao = arquivoMapaTributacao;
+    }
+    
     public Map<String, String> getOpcoes() {
         return opcoes;
     }
-    
+
     @Override
     public String getSistema() {
         return "LiderNetWork";
@@ -93,14 +111,10 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
 
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select e.cod_emp as id, e.razao_emp as razao from empresa e"
-            )) {
-                while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("razao")));
-                }
-            }
+        Arquivo lojas = ArquivoFactory.getArquivo(this.arquivoLojaCliente, null);
+
+        for (LinhaArquivo rs : lojas) {
+            result.add(new Estabelecimento(rs.getString("id"), rs.getString("razao")));
         }
         return result;
     }
@@ -108,44 +122,10 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select distinct\n"
-                    + "    cod_grp as id,\n"
-                    + "    nome_grp as descricao,\n"
-                    + "    cst as cst,\n"
-                    + "    aliquota_grp as aliquota\n"
-                    + "from grupo_icms\n"
-                    + "where cod_grp in (select icms_cont_est from produto)\n"
-                    + "union all\n"
-                    + "select\n"
-                    + "    cod_grp as id,\n"
-                    + "    nome_grp as descricao,\n"
-                    + "    cst as cst,\n"
-                    + "    aliquota_grp as aliquota\n"
-                    + "from grupo_icms\n"
-                    + "where cod_grp in (select icms_cont_fora from produto)\n"
-                    + "union all\n"
-                    + "select\n"
-                    + "    cod_grp as id,\n"
-                    + "    nome_grp as descricao,\n"
-                    + "    cst as cst,\n"
-                    + "    aliquota_grp as aliquota\n"
-                    + "from grupo_icms\n"
-                    + "where cod_grp in (select icms_cf_est from produto)\n"
-                    + "union all\n"
-                    + "select\n"
-                    + "    cod_grp as id,\n"
-                    + "    nome_grp as descricao,\n"
-                    + "    cst as cst,\n"
-                    + "    aliquota_grp as aliquota\n"
-                    + "from grupo_icms\n"
-                    + "where cod_grp in (select icms_cf_fora from produto)"
-            )) {
-                while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
-                }
-            }
+        Arquivo mapaTrib = ArquivoFactory.getArquivo(this.arquivoMapaTributacao, null);
+
+        for (LinhaArquivo rs : mapaTrib) {
+            result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
         }
         return result;
     }
@@ -156,16 +136,12 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
         Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, null);
         ProgressBar.setStatus("Carregando produtos...");
 
-        int cont = 0;
-        int cont1 = 0;
-        int cont2 = 0;
-
         for (LinhaArquivo rst : produtos) {
             String id = rst.getString("id");
 
             if (id != null && !"".equals(id.trim())) {
                 ProdutoIMP imp = new ProdutoIMP();
-                
+
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
                 imp.setImportId(id);
@@ -196,8 +172,6 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setIcmsCreditoId(rst.getString("icms_cod_est"));
                 imp.setIcmsCreditoForaEstadoId(rst.getString("icms_cod_fora"));
                 result.add(imp);
-
-                cont++;
             }
         }
         return result;
@@ -206,59 +180,38 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
+        Arquivo fornecedores = ArquivoFactory.getArquivo(this.arquivo, null);
+        ProgressBar.setStatus("Carregando fornecedores...");
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    f.cod_for as id,\n"
-                    + "    f.razao_for as razao,\n"
-                    + "    f.end_for as endereco,\n"
-                    + "    f.num_for as numero,\n"
-                    + "    f.bai_for as bairro,\n"
-                    + "    f.cid_for as cidade,\n"
-                    + "    f.codigo_ibge as cidade_ibge,\n"
-                    + "    f.cep_for as cep,\n"
-                    + "    f.est_for as estado,\n"
-                    + "    f.cnpj_for as cnpj,\n"
-                    + "    f.insc_for as ie_rg,\n"
-                    + "    f.tel_for as telefone,\n"
-                    + "    f.fax_for as fax,\n"
-                    + "    f.email_for as email,\n"
-                    + "    f.contato_for as contato\n"
-                    + "from fornecedor f\n"
-                    + "order by f.cod_for"
-            )) {
-                while (rst.next()) {
-                    FornecedorIMP imp = new FornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setRazao(rst.getString("razao"));
-                    imp.setFantasia(imp.getRazao());
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
-                    imp.setIe_rg(rst.getString("ie_rg"));
-                    imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero(rst.getString("numero"));
-                    imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("cidade"));
-                    imp.setUf(rst.getString("estado"));
-                    imp.setCep(rst.getString("cep"));
-                    imp.setIbge_municipio(rst.getInt("cidade_ibge"));
-                    imp.setTel_principal(rst.getString("telefone"));
+        for (LinhaArquivo rst : fornecedores) {
+            FornecedorIMP imp = new FornecedorIMP();
+            imp.setImportLoja(getLojaOrigem());
+            imp.setImportSistema(getSistema());
+            imp.setImportId(rst.getString("id"));
+            imp.setRazao(rst.getString("razao"));
+            imp.setFantasia(imp.getRazao());
+            imp.setCnpj_cpf(rst.getString("cnpj"));
+            imp.setIe_rg(rst.getString("ie_rg"));
+            imp.setEndereco(rst.getString("endereco"));
+            imp.setNumero(rst.getString("numero"));
+            imp.setBairro(rst.getString("bairro"));
+            imp.setMunicipio(rst.getString("cidade"));
+            imp.setUf(rst.getString("estado"));
+            imp.setCep(rst.getString("cep"));
+            imp.setIbge_municipio(rst.getInt("cidade_ibge"));
+            imp.setTel_principal(rst.getString("telefone"));
 
-                    if ((rst.getString("fax") != null)
-                            && (!rst.getString("fax").trim().isEmpty())) {
-                        imp.addTelefone("FAX", rst.getString("fax"));
-                    }
-
-                    if ((rst.getString("email") != null)
-                            && (!rst.getString("email").trim().isEmpty())) {
-                        imp.addEmail("EMAIL", rst.getString("email"), TipoContato.NFE);
-                    }
-
-                    result.add(imp);
-                }
+            if ((rst.getString("fax") != null)
+                    && (!rst.getString("fax").trim().isEmpty())) {
+                imp.addTelefone("FAX", rst.getString("fax"));
             }
+
+            if ((rst.getString("email") != null)
+                    && (!rst.getString("email").trim().isEmpty())) {
+                imp.addEmail("EMAIL", rst.getString("email"), TipoContato.NFE);
+            }
+
+            result.add(imp);
         }
         return result;
     }
