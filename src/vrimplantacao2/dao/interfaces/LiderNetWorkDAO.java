@@ -7,15 +7,23 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.utils.arquivo.Arquivo;
+import vrimplantacao2.utils.arquivo.ArquivoFactory;
+import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -27,6 +35,23 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String arquivo;
+    private Map<String, String> opcoes = new LinkedHashMap<>();
+    private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
+    private SimpleDateFormat formatDataCompleta = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
+    
+    public String getArquivo() {
+        return arquivo;
+    }
+
+    public void setArquivo(String arquivo) {
+        this.arquivo = arquivo;
+    }
+
+    public Map<String, String> getOpcoes() {
+        return opcoes;
+    }
+    
     @Override
     public String getSistema() {
         return "LiderNetWork";
@@ -128,105 +153,52 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        ProdutoIMP imp = null;
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, null);
+        ProgressBar.setStatus("Carregando produtos...");
+
         int cont = 0;
-        try {
+        int cont1 = 0;
+        int cont2 = 0;
 
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select\n"
-                        + "  p.cod_pro,\n"
-                        + "  p.codigo_barra_pro as codigobarras,\n"
-                        + "  case p.produto_pesado_pro when 'N' then 0 else 1 end balanca,\n"
-                        + "  us.descricao as tipoembalagem,\n"
-                        + "  p.dias_validade_pro as validade,\n"
-                        + "  p.nome_pro as descricaocompleta,\n"
-                        + "  p.desc_cupom as descricaoreduzida,\n"
-                        + "  ue.descricao as tipoembalagem_cotacao,\n"
-                        + "  p.quant_unidade_entrada as qtdembalagem_cotacao,\n"
-                        + "  p.cst_pis,\n"
-                        + "  p.cst_cofins,\n"
-                        + "  p.natureza_operacao as naturezareceita,\n"
-                        + "  p.cod_ncm as ncm,\n"
-                        + "  p.cest as cest,\n"
-                        + "  p.valor_pro as precovenda,\n"
-                        + "  p.valor_atacado as precoatacado,\n"
-                        + "  p.preco_custo as custo,\n"
-                        + "  est.estoque,\n"
-                        + "  p.estoque_minimo_pro as estoqueminimo,\n"
-                        + "  case p.ativo_pro when 'S' then 1 else 0 end ativo,\n"
-                        + "  p.margem_lucro_pro as margem,\n"
-                        + "  icms_est.cod_grp as icms_cod_est,\n"
-                        + "  icms_est.nome_grp as icms_nome_est,\n"
-                        + "  icms_est.cst as icms_cst_est,\n"
-                        + "  icms_est.aliquota_grp as icms_aliq_est,\n"
-                        + "  icms_fora.cod_grp as icms_cod_fora,\n"
-                        + "  icms_fora.nome_grp as icms_nome_fora,\n"
-                        + "  icms_fora.aliquota_grp as icms_aliq_fora,\n"
-                        + "  icms_cf_est.cod_grp as icms_cod_cf_est,\n"
-                        + "  icms_cf_est.nome_grp as icms_nome_cf_est,\n"
-                        + "  icms_cf_est.aliquota_grp as icms_aliq_cf_est,\n"
-                        + "  icms_cf_fora.cod_grp as icms_cod_cf_fora,\n"
-                        + "  icms_cf_fora.nome_grp as icms_nome_cf_fora,\n"
-                        + "  icms_cf_fora.aliquota_grp as icms_aliq_cf_fora,\n"
-                        + "  p.icms as icms\n"
-                        + "from produto p\n"
-                        + "left join unidade_medida us on us.codigo = p.codigo_unidade_saida\n"
-                        + "left join unidade_medida ue on ue.codigo = p.codigo_unidade_entrada\n"
-                        + "left join grupo_icms icms_est on icms_est.cod_grp = p.icms_cont_est\n"
-                        + "left join grupo_icms icms_fora on icms_fora.cod_grp = p.icms_cont_fora\n"
-                        + "left join grupo_icms icms_cf_est on icms_cf_est.cod_grp = p.icms_cf_est\n"
-                        + "left join grupo_icms icms_cf_fora on icms_cf_fora.cod_grp = p.icms_cf_fora\n"
-                        + "left join estoque est on est.cod_pro = p.cod_produto_estoque\n"
-                        + "    and est.cod_emp = " + getLojaOrigem() + "\n"
-                        + "order by p.cod_pro"
-                )) {
-                    while (rst.next()) {
-                        imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("cod_pro"));
-                        
-                        if ("231".equals(imp.getImportId())) {
-                            System.out.println("Aqui");
-                        }
-                        
-                        imp.setEan(rst.getString("codigobarras"));
-                        imp.seteBalanca(rst.getInt("balanca") == 1);
-                        imp.setValidade(rst.getInt("validade"));
-                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                        imp.setTipoEmbalagemCotacao(rst.getString("qtdembalagem_cotacao"));
-                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_cotacao"));
-                        imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                        imp.setSituacaoCadastro(rst.getInt("ativo"));
-                        imp.setMargem(rst.getDouble("margem"));
-                        imp.setCustoComImposto(rst.getDouble("custo"));
-                        imp.setCustoSemImposto(rst.getDouble("custo"));
-                        imp.setPrecovenda(rst.getDouble("precovenda"));
-                        imp.setEstoque(rst.getDouble("estoque"));
-                        imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                        imp.setNcm(rst.getString("ncm"));
-                        imp.setCest(rst.getString("cest"));
-                        imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
-                        imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
-                        imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
-                        imp.setIcmsDebitoId(rst.getString("icms_cod_cf_est"));
-                        imp.setIcmsDebitoForaEstadoId(rst.getString("icms_cod_cf_fora"));
-                        imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_cod_cf_fora"));
-                        imp.setIcmsCreditoId(rst.getString("icms_cod_est"));
-                        imp.setIcmsCreditoForaEstadoId(rst.getString("icms_cod_fora"));
-                        result.add(imp);
+        for (LinhaArquivo rst : produtos) {
+            String id = rst.getString("id");
 
-                        cont++;
-                    }
-                }
+            if (id != null && !"".equals(id.trim())) {
+                ProdutoIMP imp = new ProdutoIMP();
+                
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(id);
+                imp.setEan(rst.getString("codigobarras"));
+                imp.seteBalanca(rst.getInt("balanca") == 1);
+                imp.setValidade(rst.getInt("validade"));
+                imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                imp.setTipoEmbalagemCotacao(rst.getString("qtdembalagem_cotacao"));
+                imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_cotacao"));
+                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                imp.setSituacaoCadastro(rst.getInt("ativo"));
+                imp.setMargem(Double.parseDouble(rst.getString("margem").replace(",", ".")));
+                imp.setCustoComImposto(Double.parseDouble(rst.getString("custo").replace(",", ".")));
+                imp.setCustoSemImposto(Double.parseDouble(rst.getString("custo").replace(",", ".")));
+                imp.setPrecovenda(Double.parseDouble(rst.getString("precovenda").replace(",", ".")));
+                imp.setEstoque(Double.parseDouble(rst.getString("estoque").replace(",", ".")));
+                imp.setEstoqueMinimo(Double.parseDouble(rst.getString("estoqueminimo").replace(",", ".")));
+                imp.setNcm(rst.getString("ncm"));
+                imp.setCest(rst.getString("cest"));
+                imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
+                imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                imp.setIcmsDebitoId(rst.getString("icms_cod_cf_est"));
+                imp.setIcmsDebitoForaEstadoId(rst.getString("icms_cod_cf_fora"));
+                imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_cod_cf_fora"));
+                imp.setIcmsCreditoId(rst.getString("icms_cod_est"));
+                imp.setIcmsCreditoForaEstadoId(rst.getString("icms_cod_fora"));
+                result.add(imp);
+
+                cont++;
             }
-        } catch (Exception ex) {
-            System.out.println(cont);
-            ex.printStackTrace();
-
         }
         return result;
     }
