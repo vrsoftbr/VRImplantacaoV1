@@ -229,6 +229,7 @@ import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.VCashGUI;
+import vrimplantacao2.gui.interfaces.VRToVRGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
@@ -701,6 +702,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMrs2 = new javax.swing.JMenuItem();
         mnuG10 = new javax.swing.JMenuItem();
         mnuDevMaster = new javax.swing.JMenuItem();
+        mnuVRToVR = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2103,6 +2105,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuDevMaster);
+
+        mnuVRToVR.setText("VR para VR");
+        mnuVRToVR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVRToVRActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuVRToVR);
 
         mnuDatabase.add(jMenu8);
 
@@ -4431,6 +4441,10 @@ public final class MenuGUI extends VRMdiFrame {
         LiderNetWorkGUI.exibir(this);
     }//GEN-LAST:event_mnuLiderNetWorkActionPerformed
 
+    private void mnuVRToVRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVRToVRActionPerformed
+        VRToVRGUI.exibir(this);
+    }//GEN-LAST:event_mnuVRToVRActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4675,6 +4689,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuUniplus;
     private javax.swing.JMenuItem mnuUpForti;
     private javax.swing.JMenuItem mnuVCash;
+    private javax.swing.JMenuItem mnuVRToVR;
     private javax.swing.JMenuItem mnuViaSoft;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;

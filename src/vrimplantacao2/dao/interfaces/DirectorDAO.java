@@ -716,7 +716,37 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setFax(rs.getString("fax"));
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setPermiteCheque(true);
+                    
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select\n"
+                                + "	tbc.DFcod_cliente,\n"
+                                + "	tbc.DFcod_bloqueio_cliente,\n"
+                                + "	tc.DFdescricao,\n"
+                                + "	tc.DFlibera_pedido_venda,\n"
+                                + "	tc.DFlibera_venda_boleta,\n"
+                                + "	tc.DFlibera_venda_prazo \n"
+                                + "from TBcliente_bloqueio_cliente tbc \n"
+                                + "inner join TBbloqueio_cliente tc \n"
+                                + "  on tc.DFcod_bloqueio_cliente = tbc.DFcod_bloqueio_cliente\n"
+                                + "where tbc.DFcod_cliente = " + imp.getId()
+                        )) {
+                            while (rst2.next()) {                                
+                                if ((rst2.getInt("DFlibera_pedido_venda") > 0)
+                                        || (rst2.getInt("DFlibera_venda_boleta") > 0)
+                                        || (rst2.getInt("DFlibera_venda_prazo") > 0)) {
 
+                                    imp.setBloqueado(false);
+                                    imp.setObservacao2(rst2.getString("DFdescricao"));
+                                } else {
+                                    imp.setBloqueado(true);
+                                    imp.setObservacao2(rst2.getString("DFdescricao"));
+                                }                                
+                            }
+                        }
+                    }
                     result.add(imp);
                 }
             }
