@@ -63,16 +63,18 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select \n"
-                    + "     i.id cod,\n"
-                    + "     i.descricao dsc,\n"
-                    + "     aliquotaicms aliq,\n"
-                    + "     c.codigo csticms,\n"
-                    + "     percentbasecalcicms reducao\n"
-                    + " from tabelaimpostos i\n"
-                    + "     left join cst c\n"
-                    + "     on i.cstid = c.id\n"
-                    + " order by 1")) {
+                      " select distinct \n"
+                    + "     t.dm_id cod,\n"
+                    + "     abc_descricao dsc,\n"
+                    + "     abc_aliqicms aliq,\n"
+                    + "     abc_sittrib csticms,\n"
+                    + "     abc_reducicms reducao\n"
+                    + " from\n"
+                    + "     dmabc01 t\n"
+                    + "     left join dmaaa01 p\n"
+                    + "		on t.abc_codigo = aaa_tessaida\n"
+                    + " order by 1"
+            )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("cod"),
                             String.format(
@@ -131,7 +133,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " from produtofornecedor pf\n"
                     + "     left join produto p\n"
                     + "		on p.id = pf.produtoid\n"
-                    + " order by 1")) {
+                    + " order by 1"
+            )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -156,11 +159,11 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select \n"
+                    " select \n"
                     + "     cr.dm_id id,\n"
                     + "     abg_emissao dataEmissao,\n"
                     + "     abg_numero numeroCupom,\n"
-                  //+ "     abg_prefixo ecf,\n"
+                    //+ "     abg_prefixo ecf,\n"
                     + "     abg_valor valor,\n"
                     + "     abg_cliente idCliente,\n"
                     + "     abg_vencimento dataVencimento,\n"
@@ -183,7 +186,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
-                  //imp.setEcf("1");
+                    //imp.setEcf("1");
                     imp.setValor(rs.getDouble("valor"));
                     imp.setIdCliente(rs.getString("idCliente"));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
@@ -453,7 +456,6 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		e.cidade::integer = cd.id\n"
                     + " order by 1"
             )) {
-
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
