@@ -118,10 +118,10 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
-                            rs.getString("descricao")
-                            + rs.getString("csticms") + " "
-                            + rs.getString("aliqicms") + " "
-                            + rs.getString("reducaoicms")));
+                            rs.getString("descricao"),
+                            rs.getInt("csticms"),
+                            rs.getDouble("aliqicms"),
+                            rs.getDouble("reducaoicms")));
                 }
             }
         }
@@ -187,7 +187,7 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.pr_percaplic as margem,\n"
                     + "    e.pf_minimo as estoqueminimo,\n"
                     + "    e.pf_maximo as estoquemaximo,\n"
-                    + "    e.pf_atual as estoque\n"
+                    + "    e.pf_atual as estoque,\n"
                     + "    p.pr_dtcadastro as datacadastro,\n"
                     + "    p.pr_tribut as tributacao, \n"
                     + "    t.tr_codigo as id_tributacao,\n"
@@ -210,7 +210,12 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setValidade(rst.getInt("validade"));
+                    
+                    if ((rst.getString("validade") != null)
+                            && (!rst.getString("validade").trim().isEmpty())) {
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -427,7 +432,7 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.cl_natural as naturalidade,\n"
                     + "    c.cl_filiacao as filiacao,\n"
                     + "    c.cl_conjuge as nomeconjuge,\n"
-                    + "    c.cl_empresa as emprsa,\n"
+                    + "    c.cl_empresa as empresa,\n"
                     + "    c.cl_emprfone as telefoneempresa,\n"
                     + "    c.cl_empradm as dataadmissao,\n"
                     + "    c.cl_emprende as empresaendereco,\n"
