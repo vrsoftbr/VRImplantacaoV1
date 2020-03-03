@@ -87,7 +87,6 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
                     OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
                 }
