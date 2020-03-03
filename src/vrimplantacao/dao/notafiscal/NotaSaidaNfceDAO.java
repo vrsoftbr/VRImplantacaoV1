@@ -49,11 +49,14 @@ import vrimplantacao.vo.venda.VendaFinalizadoraVO;
 import vrimplantacao.vo.venda.VendaItemVO;
 import vrimplantacao.vo.venda.VendaVO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.venda.PdvVendaDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 
 public class NotaSaidaNfceDAO {
 
     private ArrayList<DivergenciaVO> vDivergencia = null;
+    
+    public boolean incluirEcfInexistente = false;
 
     public void eliminarVenda(long idVenda) throws Exception{
         try (Statement stm = Conexao.createStatement()) {
@@ -63,6 +66,23 @@ public class NotaSaidaNfceDAO {
             stm.execute("delete from pdv.venda where id = " + idVenda);
         } catch (Exception ex) {
             throw ex;
+        }
+    }
+
+    public void incluirModeloEcfPadrao() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "do $$\n" +
+                    "begin\n" +
+                    "	if (not exists(select id from pdv.tipomodelo where id = 999)) then\n" +
+                    "		insert into pdv.tipomodelo values (999, 22, 'GENERICA', 1, false);\n" +
+                    "	end if;\n" +
+                    "	if (not exists(select id from pdv.tipomarca where id = 999)) then\n" +
+                    "		insert into pdv.tipomarca values (999, 'GENERICA', 'GG');\n" +
+                    "	end if;\n" +
+                    "end\n" +
+                    "$$"
+            );
         }
     }
 
@@ -439,7 +459,11 @@ public class NotaSaidaNfceDAO {
         return writer.toString();
     }
     
+    PdvVendaDAO pdvVendaDAO = null;
     public void salvarVenda(VendaVO i_oVenda) throws Exception {
+        if (pdvVendaDAO == null) {
+            pdvVendaDAO = new PdvVendaDAO();
+        }
         Statement stm = null;
         StringBuilder sql = null;
         ResultSet rst = null;
@@ -500,6 +524,7 @@ public class NotaSaidaNfceDAO {
             rst.next();
 
             long idVenda = rst.getLong("id");
+            pdvVendaDAO.logarVendaImportadas(idVenda);
 
             for (VendaItemVO oItem : i_oVenda.vItem) {
                 sql = new StringBuilder();
@@ -645,24 +670,20 @@ public class NotaSaidaNfceDAO {
         }
     }
 
-    private int getIdModelo(int i_ecf, int i_idLoja) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
-        StringBuilder sql = null;
-
-        stm = Conexao.createStatement();
-
-        sql = new StringBuilder();
-        sql.append("SELECT id_tipomodelo FROM pdv.ecf");
-        sql.append(" WHERE ecf = " + i_ecf + " AND id_loja = " + i_idLoja);
-
-        rst = stm.executeQuery(sql.toString());
-
-        if (!rst.next()) {
-            throw new VRException("Tipo modelo não encontrado!");
+    private int getIdModelo(int ecf, int idLoja) throws Exception {        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id_tipomodelo FROM pdv.ecf WHERE ecf = " + ecf + " AND id_loja = " + idLoja
+            )) {
+                if (!rst.next()) {
+                    if (!incluirEcfInexistente) {
+                        throw new VRException("Tipo modelo não encontrado!");
+                    }
+                    return 999;
+                }
+                return rst.getInt("id_tipomodelo");
+            }
         }
-
-        return rst.getInt("id_tipomodelo");
     }
 
     private boolean isVendaCadastrada(VendaVO i_oVenda) throws Exception {
@@ -734,7 +755,10 @@ public class NotaSaidaNfceDAO {
         rst = stm.executeQuery(sql.toString());
 
         if (!rst.next()) {
-            throw new VRException("Modelo ecf não encontrado!");
+            if (!incluirEcfInexistente) {
+                throw new VRException("Modelo ecf não encontrado!");
+            }
+            return "GENERICA";
         }
 
         return Util.substring(rst.getString("descricao"), 0, 19);
@@ -754,7 +778,10 @@ public class NotaSaidaNfceDAO {
         rst = stm.executeQuery(sql.toString());
 
         if (!rst.next()) {
-            throw new VRException("ECF não encontrado!");
+            if (!incluirEcfInexistente) {
+                throw new VRException("ECF não encontrado!");
+            }
+            return String.valueOf(i_ecf);
         }
 
         return Util.substring(rst.getString("numeroserie"), 0, 20);
