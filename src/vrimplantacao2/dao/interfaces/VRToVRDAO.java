@@ -53,7 +53,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "VR";
+        return "VR MASTER";
     }
 
     @Override
@@ -107,7 +107,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                      "select\n"
                     + "	l.id,\n"
                     + "	l.descricao,\n"
                     + "	f.nomefantasia,\n"
@@ -115,7 +115,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from \n"
                     + "	loja l \n"
                     + "inner join fornecedor f on l.id_fornecedor = f.id\n"
-                    + "order by 	\n"
+                    + "order by\n"
                     + "	l.id")) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("descricao")));
@@ -131,7 +131,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                      "select \n"
                     + "	id,\n"
                     + "	descricao,\n"
                     + "	situacaotributaria,\n"
@@ -161,7 +161,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                      "select\n"
                     + "	id,\n"
                     + "	descricao,\n"
                     + "	id_situacaocadastro\n"
@@ -575,13 +575,13 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                      "select\n"
                     + "	pf.id_fornecedor,\n"
                     + "	pf.id_produto,\n"
-                    + "	pf.codigoexterno cod_produto_fornecedor,\n"
+                    + "	pf.codigoexterno,\n"
                     + "	pf.qtdembalagem,\n"
-                    + "	to_char(pf.dataalteracao, 'DD/MM/YYYY') dataalteracao,\n"
-                    + "	to_char(pf.pesoembalagem, '999999990D0000') pesoembalagem\n"
+                    + "	pf.dataalteracao,\n"
+                    + "	pf.pesoembalagem,\n"
                     + "from\n"
                     + "	produtofornecedor pf\n"
                     + "order by\n"
@@ -595,7 +595,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setCodigoExterno(rs.getString("cod_produto_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
@@ -610,10 +610,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private void getContatoFornecedor(FornecedorIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "   fc.id,\n"
+                      "select \n"
+                    + " fc.id,\n"
                     + "	telefone,\n"
-                    + "   nome,\n"
+                    + " nome,\n"
                     + "	celular,\n"
                     + "	email,\n"
                     + "	tp.id tipo\n"
@@ -813,7 +813,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private void getContatoCliente(ClienteIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                      "select \n"
                     + "	cp.id,\n"
                     + "	nome,\n"
                     + "	telefone,\n"
@@ -840,8 +840,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	r.id,\n"
                     + "	c.cnpj,\n"
-                    + "	to_char(r.dataemissao, 'DD/MM/YYYY') emissao,\n"
-                    + "	to_char(r.datavencimento, 'DD/MM/YYYY') vencimento,\n"
+                    + "	r.dataemissao,\n"
+                    + "	r.datavencimento,\n"
                     + "	r.ecf,\n"
                     + "	r.id_clientepreferencial idcliente,\n"
                     + "	r.valorjuros juros,\n"
@@ -853,7 +853,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	recebercreditorotativo r\n"
                     + "	join clientepreferencial c on\n"
-                    + "		r.id_clientepreferencial = c.id\n"
+                    + "     r.id_clientepreferencial = c.id\n"
                     + "where\n"
                     + "	id_situacaocadastro = 0 and\n"
                     + "	id_loja = " + getLojaOrigem() + "\n"
@@ -892,10 +892,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.id,\n"
                     + "	p.id_fornecedor,\n"
                     + "	p.numerodocumento,\n"
-                    + "   p.id_tipoentrada,\n"
+                    + " p.id_tipoentrada,\n"
                     + "	p.dataentrada,\n"
                     + "	p.dataemissao,\n"
-                    + "   pp.datahoraalteracao,\n"
+                    + " pp.datahoraalteracao,\n"
                     + "	p.valor,\n"
                     + "	pp.numeroparcela,\n"
                     + "	pp.datavencimento,\n"
@@ -963,11 +963,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    "select\n"
                     + "	*\n"
-                    + "from 	\n"
+                    + "from\n"
                     + "	pdv.operador\n"
-                    + "where 	\n"
+                    + "where\n"
                     + "	id_loja = " + getLojaOrigem())) {
                 while (rs.next()) {
                     OperadorIMP imp = new OperadorIMP();
@@ -1099,7 +1099,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	id,\n"
                     + "	numerocupom,\n"
                     + "	ecf,\n"
-                    + "	to_char(data, 'DD/MM/YYYY') as data,\n"
+                    + "	data,\n"
                     + "	id_clientepreferencial clientepreferencial,\n"
                     + "	to_char(horainicio, 'HH:MM:SS') as horainicio,\n"
                     + "	to_char(horatermino, 'HH:MM:SS') as horatermino,\n"
