@@ -17,6 +17,8 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -179,6 +181,9 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.pr_precocust as custo,\n"
                     + "    p.pr_precovend as precovenda,\n"
                     + "    p.pr_percaplic as margem,\n"
+                    + "    e.pf_minimo as estoqueminimo,\n"
+                    + "    e.pf_maximo as estoquemaximo,\n"
+                    + "    e.pf_atual as estoque\n"
                     + "    p.pr_dtcadastro as datacadastro,\n"
                     + "    p.pr_tribut as tributacao, \n"
                     + "    t.tr_codigo as id_tributacao,\n"
@@ -189,6 +194,8 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    coalesce(tr.dt_reduicm, 0) as reducaoicms,\n"
                     + "    coalesce(tr.dt_cod_beneficio_fiscal, '') as codigobeneficio\n"
                     + "from produtos p\n"
+                    + "left join prodfilial e on e.pf_produto = p.pr_codigo\n"
+                    + "     and e.pf_filial = " + getLojaOrigem() + "\n"
                     + "left join tributacao t on t.tr_codigo = p.pr_tribut\n"
                     + "inner join detltrib tr on tr.dt_tributacao = t.tr_codigo\n"
                     + "order by p.pr_codigo"
@@ -213,11 +220,120 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCodigoGIA(rst.getString("gia"));
                     imp.setCest(rst.getString("cest"));
                     imp.setIcmsDebitoId(rst.getString("id_tributacao"));
                     imp.setIcmsCreditoId(rst.getString("id_tributacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    ean.pb_produto as id,\n"
+                    + "    ean.pb_codbarra as ean,\n"
+                    + "    ean.pb_quantidade as qtdembalagem\n"
+                    + "from prodbarr ean"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    c.cl_codigo as id,\n"
+                    + "    c.cl_filial as idloja,\n"
+                    + "    c.cl_nome as razao,\n"
+                    + "    c.cl_nomfan as fantasia,\n"
+                    + "    c.cl_endereco as endereco,\n"
+                    + "    c.cl_nro as numero,\n"
+                    + "    c.cl_compl as complemento,\n"
+                    + "    c.cl_bairro as bairro,\n"
+                    + "    c.cl_cidade as municipio,\n"
+                    + "    c.cl_uf as uf,\n"
+                    + "    c.cl_cep as cep,\n"
+                    + "    c.cl_fone as telefone,\n"
+                    + "    c.cl_fax as fax,\n"
+                    + "    c.cl_contato as contato,\n"
+                    + "    c.cl_cgc as cnpj,\n"
+                    + "    c.cl_inscricao as ie_rg,\n"
+                    + "    c.cl_cpf as cpf,\n"
+                    + "    c.cl_situacao as situacao,\n"
+                    + "    case c.cl_inativo when 'N' then 1 else 0 end ativo,\n"
+                    + "    c.cl_email as email,\n"
+                    + "    c.cl_emailnfe as email_nfe,\n"
+                    + "    c.cl_site as site,\n"
+                    + "    c.cl_obsgeral as observacao,\n"
+                    + "    c.cl_celular as celular\n"
+                    + "from clientes c\n"
+                    + "where c.cl_tipo = 'F'\n"
+                    + "order by c.cl_codigo"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+
+                    if ((rst.getString("cnpj") != null)
+                            && (!rst.getString("cnpj").trim().isEmpty())) {
+                        imp.setCnpj_cpf(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj_cpf(rst.getString("cpf"));
+                    }
+
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setTel_principal(rst.getString("telefone"));
+
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+
+                        imp.addContato(
+                                rst.getString("contato"),
+                                rst.getString("fax"),
+                                rst.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                rst.getString("email")
+                        );
+                    }
                     result.add(imp);
                 }
             }
