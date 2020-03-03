@@ -183,6 +183,7 @@ import vrimplantacao2.gui.interfaces.ProtonGUI;
 import vrimplantacao2.gui.interfaces.PwGestorGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
+import vrimplantacao2.gui.interfaces.RKSoftwareGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RensoftwareGUI;
@@ -613,6 +614,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuiSophyx = new javax.swing.JMenuItem();
         mnuiSircom = new javax.swing.JMenuItem();
         mnuLiderNetWork = new javax.swing.JMenuItem();
+        mnuRKSoftware = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1407,6 +1409,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuLiderNetWork);
+
+        mnuRKSoftware.setText("RK Software");
+        mnuRKSoftware.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRKSoftwareActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuRKSoftware);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4445,6 +4455,11 @@ public final class MenuGUI extends VRMdiFrame {
         VRToVRGUI.exibir(this);
     }//GEN-LAST:event_mnuVRToVRActionPerformed
 
+    private void mnuRKSoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRKSoftwareActionPerformed
+        // TODO add your handling code here:
+        RKSoftwareGUI.exibir(this);
+    }//GEN-LAST:event_mnuRKSoftwareActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4649,6 +4664,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;
     private javax.swing.JMenuItem mnuRCNet;
+    private javax.swing.JMenuItem mnuRKSoftware;
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMS_3;
     private javax.swing.JMenuItem mnuRPInfo;
