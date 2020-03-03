@@ -50,12 +50,12 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
-    
+
     @Override
     public String getSistema() {
-        return "VR";
+        return "VR MASTER";
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -63,7 +63,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
@@ -97,28 +97,27 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
-    
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	l.id,\n" +
-                    "	l.descricao,\n" +
-                    "	f.nomefantasia,\n" +
-                    "	f.razaosocial \n" +
-                    "from \n" +
-                    "	loja l \n" +
-                    "inner join fornecedor f on l.id_fornecedor = f.id\n" +
-                    "order by 	\n" +
-                    "	l.id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                      "select\n"
+                    + "	l.id,\n"
+                    + "	l.descricao,\n"
+                    + "	f.nomefantasia,\n"
+                    + "	f.razaosocial \n"
+                    + "from \n"
+                    + "	loja l \n"
+                    + "inner join fornecedor f on l.id_fornecedor = f.id\n"
+                    + "order by\n"
+                    + "	l.id")) {
+                while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("descricao")));
                 }
             }
@@ -129,26 +128,26 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	id,\n" +
-                    "	descricao,\n" +
-                    "	situacaotributaria,\n" +
-                    "	porcentagem,\n" +
-                    "	reduzido\n" +
-                    "from 	\n" +
-                    "	aliquota\n" +
-                    "where \n" +
-                    "	id_situacaocadastro = 1\n" +
-                    "order by\n" +
-                    "	descricao")) {
-                while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), 
-                            rs.getString("descricao"), 
-                            rs.getInt("situacaotributaria"), 
-                            rs.getDouble("porcentagem"), 
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                      "select \n"
+                    + "	id,\n"
+                    + "	descricao,\n"
+                    + "	situacaotributaria,\n"
+                    + "	porcentagem,\n"
+                    + "	reduzido\n"
+                    + "from 	\n"
+                    + "	aliquota\n"
+                    + "where \n"
+                    + "	id_situacaocadastro = 1\n"
+                    + "order by\n"
+                    + "	descricao")) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"),
+                            rs.getString("descricao"),
+                            rs.getInt("situacaotributaria"),
+                            rs.getDouble("porcentagem"),
                             rs.getDouble("reduzido")));
                 }
             }
@@ -159,26 +158,26 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	id,\n" +
-                    "	descricao,\n" +
-                    "	id_situacaocadastro\n" +
-                    "from\n" +
-                    "	familiaproduto\n" +
-                    "order by\n" +
-                    "	1")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                      "select\n"
+                    + "	id,\n"
+                    + "	descricao,\n"
+                    + "	id_situacaocadastro\n"
+                    + "from\n"
+                    + "	familiaproduto\n"
+                    + "order by\n"
+                    + "	1")) {
+                while (rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setDescricao(rs.getString("descricao"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    
+
                     result.add(imp);
                 }
             }
@@ -189,29 +188,29 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	m.mercadologico1 cod_mercadologico1,\n" +
-                    "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and nivel = 1) mercadologico1,\n" +
-                    "	m.mercadologico2 cod_mercadologico2,\n" +
-                    "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and nivel = 2) mercadologico2,\n" +
-                    "	m.mercadologico3 cod_mercadologico3,\n" +
-                    "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and nivel = 3) mercadologico3,\n" +
-                    "	m.mercadologico4 cod_mercadologico4,\n" +
-                    "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and nivel = 4) mercadologico4,\n" +
-                    "	m.mercadologico5 cod_mercadologico5,\n" +
-                    "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and mercadologico5 = m.mercadologico5 and nivel = 5) mercadologico5\n" +
-                    "from\n" +
-                    "	mercadologico m\n" +
-                    "where \n" +
-                    "	nivel = (select valor::integer from public.parametrovalor where id_loja = " + getLojaOrigem() + " and id_parametro = 1)\n" +
-                    "order by\n" +
-                    "	1,3,5,7,9")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	m.mercadologico1 cod_mercadologico1,\n"
+                    + "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and nivel = 1) mercadologico1,\n"
+                    + "	m.mercadologico2 cod_mercadologico2,\n"
+                    + "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and nivel = 2) mercadologico2,\n"
+                    + "	m.mercadologico3 cod_mercadologico3,\n"
+                    + "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and nivel = 3) mercadologico3,\n"
+                    + "	m.mercadologico4 cod_mercadologico4,\n"
+                    + "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and nivel = 4) mercadologico4,\n"
+                    + "	m.mercadologico5 cod_mercadologico5,\n"
+                    + "	(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and mercadologico5 = m.mercadologico5 and nivel = 5) mercadologico5\n"
+                    + "from\n"
+                    + "	mercadologico m\n"
+                    + "where \n"
+                    + "	nivel = (select valor::integer from public.parametrovalor where id_loja = " + getLojaOrigem() + " and id_parametro = 1)\n"
+                    + "order by\n"
+                    + "	1,3,5,7,9")) {
+                while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("cod_mercadologico1"));
@@ -224,7 +223,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc4Descricao(rs.getString("mercadologico4"));
                     imp.setMerc5ID(rs.getString("cod_mercadologico5"));
                     imp.setMerc5Descricao(rs.getString("mercadologico5"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -235,96 +234,100 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "with \n" +
-                    "	lj as (select loja.id, f.id_estado from loja join fornecedor f on loja.id_fornecedor = f.id where loja.id = " + getLojaOrigem() + "),\n" +
-                    "	merc as (\n" +
-                    "	select\n" +
-                    "		m.mercadologico1 cod_mercadologico1,\n" +
-                    "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and nivel = 1) mercadologico1,\n" +
-                    "		m.mercadologico2 cod_mercadologico2,\n" +
-                    "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and nivel = 2) mercadologico2,\n" +
-                    "		m.mercadologico3 cod_mercadologico3,\n" +
-                    "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and nivel = 3) mercadologico3,\n" +
-                    "		m.mercadologico4 cod_mercadologico4,\n" +
-                    "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and nivel = 4) mercadologico4,\n" +
-                    "		m.mercadologico5 cod_mercadologico5,\n" +
-                    "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and mercadologico5 = m.mercadologico5 and nivel = 5) mercadologico5\n" +
-                    "	from\n" +
-                    "		mercadologico m\n" +
-                    "	where \n" +
-                    "		nivel = (select valor::integer from public.parametrovalor where id_loja = " + getLojaOrigem() + " and id_parametro = 1)\n" +
-                    "	)\n" +
-                    "select\n" +
-                    "	p.id,\n" +
-                    "	to_char(p.datacadastro, 'DD/MM/YYYY') datacadastro,\n" +
-                    "	ean.codigobarras,\n" +
-                    "	p.qtdembalagem qtdembalagemcotacao,\n" +
-                    "	ean.qtdembalagem,\n" +
-                    "	ean_un.descricao unidade,\n" +
-                    "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n" +
-                    "	p.validade,\n" +
-                    "	p.descricaocompleta,\n" +
-                    "	p.descricaoreduzida,\n" +
-                    "	p.descricaogondola,\n" +
-                    "	merc.*,\n" +
-                    "	p.id_familiaproduto,\n" +
-                    "	fam.descricao familiaproduto,\n" +
-                    "	to_char(p.pesobruto, '999999990D00') pesobruto,\n" +
-                    "	to_char(p.pesoliquido, '999999990D00') pesoliquido,\n" +
-                    "	to_char(vend.estoquemaximo, '999999990D00') estoquemaximo,\n" +
-                    "	to_char(vend.estoqueminimo, '999999990D00') estoqueminimo,\n" +
-                    "	to_char(vend.estoque, '999999990D00') estoque,\n" +
-                    "	to_char(vend.custosemimposto, '999999990D00') custosemimposto,\n" +
-                    "	to_char(vend.custocomimposto, '999999990D00') custocomimposto,\n" +
-                    "	to_char(vend.precovenda, '999999990D00') precovenda,\n" +
-                    "	vend.id_situacaocadastro,\n" +
-                    "	case when vend.descontinuado then 'S' else 'N' end as descontinuado,\n" +
-                    "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n" +
-                    "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n" +
-                    "	piscofdeb.cst piscofins_cst_debito,\n" +
-                    "	piscofcred.cst piscofins_cst_credito,\n" +
-                    "	p.tiponaturezareceita piscofins_natureza_receita,\n" +
-                    "	icms.situacaotributaria icms_cst,\n" +
-                    "	to_char(icms.porcentagem, '999999990D00') icms_aliquota,\n" +
-                    "	to_char(icms.reduzido, '999999990D00') icms_reduzido,\n" +
-                    "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n" +
-                    "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n" +
-                    "	pad.desconto atacadodesconto,\n" +
-                    "	pf.id id_pautafiscal\n" +
-                    "from\n" +
-                    "	produto p\n" +
-                    "	join lj on true\n" +
-                    "	left join produtoautomacao ean on ean.id_produto = p.id\n" +
-                    "	left join tipoembalagem ean_un on ean_un.id = ean.id_tipoembalagem\n" +
-                    "	left join merc on\n" +
-                    "		merc.cod_mercadologico1 = p.mercadologico1 and\n" +
-                    "		merc.cod_mercadologico2 = p.mercadologico2 and\n" +
-                    "		merc.cod_mercadologico3 = p.mercadologico3 and\n" +
-                    "		merc.cod_mercadologico4 = p.mercadologico4 and\n" +
-                    "		merc.cod_mercadologico5 = p.mercadologico5\n" +
-                    "	left join familiaproduto fam on p.id_familiaproduto = fam.id\n" +
-                    "	join produtocomplemento vend on p.id = vend.id_produto and vend.id_loja = lj.id\n" +
-                    "	left join cest on cest.id = p.id_cest\n" +
-                    "	left join tipopiscofins piscofcred on \n" +
-                    "		p.id_tipopiscofinscredito = piscofcred.id\n" +
-                    "	left join tipopiscofins piscofdeb on \n" +
-                    "		p.id_tipopiscofins = piscofdeb.id\n" +
-                    "	join produtoaliquota aliq on p.id = aliq.id_produto and aliq.id_estado = lj.id_estado\n" +
-                    "	join aliquota icms on icms.id = aliq.id_aliquotadebito\n" +
-                    "	left join produtoautomacaodesconto pad on pad.codigobarras = ean.codigobarras and pad.id_loja = lj.id\n" +
-                    "	left join pautafiscal pf on\n" +
-                    "		p.ncm1 = pf.ncm1 and\n" +
-                    "		p.ncm2 = pf.ncm2 and\n" +
-                    "		p.ncm3 = pf.ncm3 and\n" +
-                    "		p.excecao = pf.excecao\n" +
-                    "order by\n" +
-                    "	p.id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "with \n"
+                    + "	lj as (select loja.id, f.id_estado from loja join fornecedor f on loja.id_fornecedor = f.id where loja.id = " + getLojaOrigem() + "),\n"
+                    + "	merc as (\n"
+                    + "	select\n"
+                    + "		m.mercadologico1 cod_mercadologico1,\n"
+                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and nivel = 1) mercadologico1,\n"
+                    + "		m.mercadologico2 cod_mercadologico2,\n"
+                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and nivel = 2) mercadologico2,\n"
+                    + "		m.mercadologico3 cod_mercadologico3,\n"
+                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and nivel = 3) mercadologico3,\n"
+                    + "		m.mercadologico4 cod_mercadologico4,\n"
+                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and nivel = 4) mercadologico4,\n"
+                    + "		m.mercadologico5 cod_mercadologico5,\n"
+                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and mercadologico5 = m.mercadologico5 and nivel = 5) mercadologico5\n"
+                    + "	from\n"
+                    + "		mercadologico m\n"
+                    + "	where \n"
+                    + "		nivel = (select valor::integer from public.parametrovalor where id_loja = " + getLojaOrigem() + " and id_parametro = 1)\n"
+                    + "	)\n"
+                    + "select\n"
+                    + "	p.id,\n"
+                    + "	p.datacadastro,\n"
+                    + "	ean.codigobarras,\n"
+                    + "	p.qtdembalagem qtdembalagemcotacao,\n"
+                    + "	ean.qtdembalagem,\n"
+                    + "	ean_un.descricao unidade,\n"
+                    + "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n"
+                    + "	p.validade,\n"
+                    + "	p.descricaocompleta,\n"
+                    + "	p.descricaoreduzida,\n"
+                    + "	p.descricaogondola,\n"
+                    + "	merc.*,\n"
+                    + "	p.id_familiaproduto,\n"
+                    + "	fam.descricao familiaproduto,\n"
+                    + "	p.pesobruto,\n"
+                    + "	p.pesoliquido,\n"
+                    + "	vend.estoquemaximo,\n"
+                    + "	vend.estoqueminimo,\n"
+                    + "	vend.estoque,\n"
+                    + "	vend.custosemimposto,\n"
+                    + "	vend.custocomimposto,\n"
+                    + "	vend.precovenda,\n"
+                    + "	vend.id_situacaocadastro,\n"
+                    + "	case when vend.descontinuado then 'S' else 'N' end as descontinuado,\n"
+                    + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
+                    + "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n"
+                    + "	piscofdeb.cst piscofins_cst_debito,\n"
+                    + "	piscofcred.cst piscofins_cst_credito,\n"
+                    + "	p.tiponaturezareceita piscofins_natureza_receita,\n"
+                    + "	icms.situacaotributaria icms_cst,\n"
+                    + "	icms.porcentagem icms_aliquota,\n"
+                    + "	icms.reduzido icms_reduzido,\n"
+                    + "	icms_cred.situacaotributaria icms_cst_credito,\n"
+                    + "	icms_cred.porcentagem icms_aliquota_credito,\n"
+                    + "	icms_cred.reduzido icms_reduzido_credito,\n"
+                    + "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n"
+                    + "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n"
+                    + "	pad.desconto atacadodesconto,\n"
+                    + "	pf.id id_pautafiscal\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	join lj on true\n"
+                    + "	left join produtoautomacao ean on ean.id_produto = p.id\n"
+                    + "	left join tipoembalagem ean_un on ean_un.id = ean.id_tipoembalagem\n"
+                    + "	left join merc on\n"
+                    + "		merc.cod_mercadologico1 = p.mercadologico1 and\n"
+                    + "		merc.cod_mercadologico2 = p.mercadologico2 and\n"
+                    + "		merc.cod_mercadologico3 = p.mercadologico3 and\n"
+                    + "		merc.cod_mercadologico4 = p.mercadologico4 and\n"
+                    + "		merc.cod_mercadologico5 = p.mercadologico5\n"
+                    + "	left join familiaproduto fam on p.id_familiaproduto = fam.id\n"
+                    + "	join produtocomplemento vend on p.id = vend.id_produto and vend.id_loja = lj.id\n"
+                    + "	left join cest on cest.id = p.id_cest\n"
+                    + "	left join tipopiscofins piscofcred on \n"
+                    + "		p.id_tipopiscofinscredito = piscofcred.id\n"
+                    + "	left join tipopiscofins piscofdeb on \n"
+                    + "		p.id_tipopiscofins = piscofdeb.id\n"
+                    + "	join produtoaliquota aliq on p.id = aliq.id_produto and aliq.id_estado = lj.id_estado\n"
+                    + "	join aliquota icms on icms.id = aliq.id_aliquotadebito\n"
+                    + "	join aliquota icms_cred on icms_cred.id = aliq.id_aliquotacredito\n"
+                    + "	left join produtoautomacaodesconto pad on pad.codigobarras = ean.codigobarras and pad.id_loja = lj.id\n"
+                    + "	left join pautafiscal pf on\n"
+                    + "		p.ncm1 = pf.ncm1 and\n"
+                    + "		p.ncm2 = pf.ncm2 and\n"
+                    + "		p.ncm3 = pf.ncm3 and\n"
+                    + "		aliq.excecao = pf.excecao\n"
+                    + "order by\n"
+                    + "	p.id")) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
@@ -363,7 +366,17 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSugestaoCotacao("S".equals(rs.getString("sugestaocotacao")));
                     imp.setSugestaoPedido("S".equals(rs.getString("sugestaopedido")));
                     imp.setPautaFiscalId(rs.getString("id_pautafiscal"));
-                    
+
+                    //Aliquota Debito
+                    imp.setIcmsAliqSaida(rs.getDouble("icms_aliquota"));
+                    imp.setIcmsCstSaida(rs.getInt("icms_cst"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icms_reduzido"));
+
+                    //Aliquota Credito
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_aliquota_credito"));
+                    imp.setIcmsCstEntrada(rs.getInt("icms_cst_credito"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_reduzido_credito"));
+
                     result.add(imp);
                 }
             }
@@ -374,28 +387,28 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	p.id,\n" +
-                    "	id_produto,\n" +
-                    "	codigobarras,\n" +
-                    "	qtdembalagem,\n" +
-                    "	t.descricao unidade\n" +
-                    "from \n" +
-                    "	produtoautomacao p \n" +
-                    "join tipoembalagem t on p.id_tipoembalagem = t.id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	p.id,\n"
+                    + "	id_produto,\n"
+                    + "	codigobarras,\n"
+                    + "	qtdembalagem,\n"
+                    + "	t.descricao unidade\n"
+                    + "from \n"
+                    + "	produtoautomacao p \n"
+                    + "join tipoembalagem t on p.id_tipoembalagem = t.id")) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id_produto"));
                     imp.setEan(rs.getString("codigobarras"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -406,52 +419,52 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	f.id,\n" +
-                    "	f.razaosocial razao,\n" +
-                    "	f.nomefantasia fantasia,\n" +
-                    "	f.cnpj cnpj_cpf,\n" +
-                    "	f.inscricaoestadual ie_rg,\n" +
-                    "	f.inscricaomunicipal insc_municipal,\n" +
-                    "	f.inscricaosuframa suframa,\n" +
-                    "	case f.bloqueado when true then 0 else 1 end ativo,\n" +
-                    "	f.endereco,\n" +
-                    "	f.numero,\n" +
-                    "	f.complemento,\n" +
-                    "	f.bairro,\n" +
-                    "	f.id_municipio ibge_municipio,\n" +
-                    "	m.descricao municipio,\n" +
-                    "	f.id_estado ibge_uf,\n" +
-                    "	e.sigla uf,\n" +
-                    "	f.cep,\n" +
-                    "	f.enderecocobranca cob_endereco,\n" +
-                    "	f.numerocobranca cob_numero,\n" +
-                    "	f.complementocobranca cob_complemento,\n" +
-                    "	f.bairrocobranca cob_bairro,\n" +
-                    "	f.id_municipiocobranca cob_ibge_municipio,\n" +
-                    "	cm.descricao cob_municipio,\n" +
-                    "	f.id_estadocobranca cob_ibge_uf,\n" +
-                    "	ce.sigla cob_uf,\n" +
-                    "	f.cepcobranca cob_cep,		\n" +
-                    "	f.telefone tel_principal,\n" +
-                    "	to_char(f.pedidominimoqtd, '999999990D00') qtd_minima_pedido,\n" +
-                    "	to_char(f.pedidominimovalor, '999999990D00') valor_minimo_pedido,\n" +
-                    "	to_char(f.datacadastro, 'DD/MM/YYYY') datacadastro,\n" +
-                    "	f.observacao\n" +
-                    "from \n" +
-                    "	fornecedor f\n" +
-                    "	left join municipio m on f.id_municipio = m.id\n" +
-                    "	left join estado e on f.id_estado = e.id\n" +
-                    "	left join municipio cm on f.id_municipiocobranca = cm.id\n" +
-                    "	left join estado ce on f.id_estadocobranca = ce.id\n" +
-                    "order by \n" +
-                    "	id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	f.id,\n"
+                    + "	f.razaosocial razao,\n"
+                    + "	f.nomefantasia fantasia,\n"
+                    + "	f.cnpj cnpj_cpf,\n"
+                    + "	f.inscricaoestadual ie_rg,\n"
+                    + "	f.inscricaomunicipal insc_municipal,\n"
+                    + "	f.inscricaosuframa suframa,\n"
+                    + "	case f.bloqueado when true then 0 else 1 end ativo,\n"
+                    + "	f.endereco,\n"
+                    + "	f.numero,\n"
+                    + "	f.complemento,\n"
+                    + "	f.bairro,\n"
+                    + "	f.id_municipio ibge_municipio,\n"
+                    + "	m.descricao municipio,\n"
+                    + "	f.id_estado ibge_uf,\n"
+                    + "	e.sigla uf,\n"
+                    + "	f.cep,\n"
+                    + "	f.enderecocobranca cob_endereco,\n"
+                    + "	f.numerocobranca cob_numero,\n"
+                    + "	f.complementocobranca cob_complemento,\n"
+                    + "	f.bairrocobranca cob_bairro,\n"
+                    + "	f.id_municipiocobranca cob_ibge_municipio,\n"
+                    + "	cm.descricao cob_municipio,\n"
+                    + "	f.id_estadocobranca cob_ibge_uf,\n"
+                    + "	ce.sigla cob_uf,\n"
+                    + "	f.cepcobranca cob_cep,		\n"
+                    + "	f.telefone tel_principal,\n"
+                    + "	f.pedidominimoqtd qtd_minima_pedido,\n"
+                    + "	f.pedidominimovalor valor_minimo_pedido,\n"
+                    + "	f.datacadastro,\n"
+                    + "	f.observacao\n"
+                    + "from \n"
+                    + "	fornecedor f\n"
+                    + "	left join municipio m on f.id_municipio = m.id\n"
+                    + "	left join estado e on f.id_estado = e.id\n"
+                    + "	left join municipio cm on f.id_municipiocobranca = cm.id\n"
+                    + "	left join estado ce on f.id_estadocobranca = ce.id\n"
+                    + "order by \n"
+                    + "	id")) {
+                while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -483,10 +496,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtd_minima_pedido(rs.getInt("qtd_minima_pedido"));
                     imp.setValor_minimo_pedido(rs.getDouble("valor_minimo_pedido"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-                    
+
                     getContatoFornecedor(imp);
                     getDivisaoFornecedor(imp);
-                    
+
                     result.add(imp);
                 }
             }
@@ -497,47 +510,47 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	pf.id,\n" +
-                    "	lpad(pf.ncm1::varchar, 4, '0') || lpad(pf.ncm2::varchar, 2, '0') || lpad(pf.ncm3::varchar, 2, '0') ncm,\n" +
-                    "	pf.excecao,\n" +
-                    "	uf.sigla uf,\n" +
-                    "	pf.iva,\n" +
-                    "	pf.tipoiva,\n" +
-                    "	pf.ivaajustado,\n" +
-                    "	pf.icmsrecolhidoantecipadamente,\n" +
-                    "	ac.situacaotributaria credito_cst,\n" +
-                    "	ac.porcentagem credito_aliquota,\n" +
-                    "	ac.reduzido credito_reduzido,\n" +
-                    "	ad.situacaotributaria debito_cst,\n" +
-                    "	ad.porcentagem debito_aliquota,\n" +
-                    "	ad.reduzido debito_reduzido,\n" +
-                    "	adfe.situacaotributaria debito_foraest_cst,\n" +
-                    "	adfe.porcentagem debito_foraest_aliquota,\n" +
-                    "	adfe.reduzido debito_foraest_reduzido,\n" +
-                    "	acfe.situacaotributaria credito_foraest_cst,\n" +
-                    "	acfe.porcentagem credito_foraest_aliquota,\n" +
-                    "	acfe.reduzido credito_foraest_reduzido\n" +
-                    "from\n" +
-                    "	pautafiscal pf\n" +
-                    "	join estado uf on\n" +
-                    "		pf.id_estado = uf.id\n" +
-                    "	left join aliquota ac on\n" +
-                    "		pf.id_aliquotacredito = ac.id\n" +
-                    "	left join aliquota ad on\n" +
-                    "		pf.id_aliquotadebito = ad.id\n" +
-                    "	left join aliquota adfe on\n" +
-                    "		pf.id_aliquotadebitoforaestado = adfe.id\n" +
-                    "	left join aliquota acfe on\n" +
-                    "		pf.id_aliquotacreditoforaestado = acfe.id\n" +
-                    "order by\n" +
-                    "	pf.id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	pf.id,\n"
+                    + "	lpad(pf.ncm1::varchar, 4, '0') || lpad(pf.ncm2::varchar, 2, '0') || lpad(pf.ncm3::varchar, 2, '0') ncm,\n"
+                    + "	pf.excecao,\n"
+                    + "	uf.sigla uf,\n"
+                    + "	pf.iva,\n"
+                    + "	pf.tipoiva,\n"
+                    + "	pf.ivaajustado,\n"
+                    + "	pf.icmsrecolhidoantecipadamente,\n"
+                    + "	ac.situacaotributaria credito_cst,\n"
+                    + "	ac.porcentagem credito_aliquota,\n"
+                    + "	ac.reduzido credito_reduzido,\n"
+                    + "	ad.situacaotributaria debito_cst,\n"
+                    + "	ad.porcentagem debito_aliquota,\n"
+                    + "	ad.reduzido debito_reduzido,\n"
+                    + "	adfe.situacaotributaria debito_foraest_cst,\n"
+                    + "	adfe.porcentagem debito_foraest_aliquota,\n"
+                    + "	adfe.reduzido debito_foraest_reduzido,\n"
+                    + "	acfe.situacaotributaria credito_foraest_cst,\n"
+                    + "	acfe.porcentagem credito_foraest_aliquota,\n"
+                    + "	acfe.reduzido credito_foraest_reduzido\n"
+                    + "from\n"
+                    + "	pautafiscal pf\n"
+                    + "	join estado uf on\n"
+                    + "		pf.id_estado = uf.id\n"
+                    + "	left join aliquota ac on\n"
+                    + "		pf.id_aliquotacredito = ac.id\n"
+                    + "	left join aliquota ad on\n"
+                    + "		pf.id_aliquotadebito = ad.id\n"
+                    + "	left join aliquota adfe on\n"
+                    + "		pf.id_aliquotadebitoforaestado = adfe.id\n"
+                    + "	left join aliquota acfe on\n"
+                    + "		pf.id_aliquotacreditoforaestado = acfe.id\n"
+                    + "order by\n"
+                    + "	pf.id")) {
+                while (rs.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setIva(rs.getDouble("iva"));
@@ -548,7 +561,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAliquotaDebito(rs.getInt("debito_cst"), rs.getDouble("debito_aliquota"), rs.getDouble("debito_reduzido"));
                     imp.setAliquotaCreditoForaEstado(rs.getInt("credito_foraest_cst"), rs.getDouble("credito_foraest_aliquota"), rs.getDouble("debito_foraest_reduzido"));
                     imp.setAliquotaDebitoForaEstado(rs.getInt("debito_foraest_cst"), rs.getDouble("debito_foraest_aliquota"), rs.getDouble("credito_foraest_reduzido"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -559,87 +572,87 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	pf.id_fornecedor,\n" +
-                    "	pf.id_produto,\n" +
-                    "	pf.codigoexterno cod_produto_fornecedor,\n" +
-                    "	pf.qtdembalagem,\n" +
-                    "	to_char(pf.dataalteracao, 'DD/MM/YYYY') dataalteracao,\n" +
-                    "	to_char(pf.pesoembalagem, '999999990D0000') pesoembalagem\n" +
-                    "from\n" +
-                    "	produtofornecedor pf\n" +
-                    "order by\n" +
-                    "	id_fornecedor,\n" +
-                    "	id_produto,\n" +
-                    "	codigoexterno")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                      "select\n"
+                    + "	pf.id_fornecedor,\n"
+                    + "	pf.id_produto,\n"
+                    + "	pf.codigoexterno,\n"
+                    + "	pf.qtdembalagem,\n"
+                    + "	pf.dataalteracao,\n"
+                    + "	pf.pesoembalagem,\n"
+                    + "from\n"
+                    + "	produtofornecedor pf\n"
+                    + "order by\n"
+                    + "	id_fornecedor,\n"
+                    + "	id_produto,\n"
+                    + "	codigoexterno")) {
+                while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setIdProduto(rs.getString("id_produto"));
-                    imp.setCodigoExterno(rs.getString("cod_produto_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private void getContatoFornecedor(FornecedorIMP imp) throws SQLException {
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "   id,\n" +        
-                    "	telefone,\n" +
-                    "   nome,\n" +        
-                    "	celular,\n" +
-                    "	email,\n" +
-                    "	tp.id tipo\n" +
-                    "from \n" +
-                    "	fornecedorcontato fc\n" +
-                    "join tipocontato tp on fc.id_tipocontato = tp.id\n" +
-                    "where 	\n" +
-                    "	id_fornecedor = " + imp.getImportId())) {
-                while(rs.next()) {
-                    
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                      "select \n"
+                    + " fc.id,\n"
+                    + "	telefone,\n"
+                    + " nome,\n"
+                    + "	celular,\n"
+                    + "	email,\n"
+                    + "	tp.id tipo\n"
+                    + "from \n"
+                    + "	fornecedorcontato fc\n"
+                    + "join tipocontato tp on fc.id_tipocontato = tp.id\n"
+                    + "where 	\n"
+                    + "	fc.id_fornecedor = " + imp.getImportId())) {
+                while (rs.next()) {
+
                     int id = rs.getInt("tipo");
-                    imp.addContato(rs.getString("id"), 
-                                rs.getString("nome"),
-                                rs.getString("telefone"), 
-                                rs.getString("celular"), 
-                                id == 0 ? TipoContato.COMERCIAL : 
-                                        id == 1 ? TipoContato.FINANCEIRO : 
-                                                id == 2 ? TipoContato.FISCAL : TipoContato.NFE,
-                                rs.getString("email"));
+                    imp.addContato(rs.getString("id"),
+                            rs.getString("nome"),
+                            rs.getString("telefone"),
+                            rs.getString("celular"),
+                            id == 0 ? TipoContato.COMERCIAL
+                                    : id == 1 ? TipoContato.FINANCEIRO
+                                            : id == 2 ? TipoContato.FISCAL : TipoContato.NFE,
+                            rs.getString("email"));
                 }
             }
         }
     }
-    
+
     private void getDivisaoFornecedor(FornecedorIMP imp) throws SQLException {
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	id,\n" +
-                    "	id_divisaofornecedor,\n" +
-                    "	prazoentrega,\n" +
-                    "	prazovisita,\n" +
-                    "	prazoseguranca\n" +
-                    "from \n" +
-                    "	fornecedorprazo\n" +
-                    "where 	\n" +
-                    "	id_fornecedor = " + imp.getImportId() + "\n" +
-                    "	id_loja = " + getLojaOrigem())) {
-                while(rs.next()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	id,\n"
+                    + "	id_divisaofornecedor,\n"
+                    + "	prazoentrega,\n"
+                    + "	prazovisita,\n"
+                    + "	prazoseguranca\n"
+                    + "from \n"
+                    + "	fornecedorprazo\n"
+                    + "where 	\n"
+                    + "	id_fornecedor = " + imp.getImportId() + " and\n"
+                    + "	id_loja = " + getLojaOrigem())) {
+                while (rs.next()) {
                     imp.addDivisao(rs.getString("id"), rs.getInt("prazovisita"), rs.getInt("prazoentrega"), rs.getInt("prazoseguranca"));
                 }
             }
@@ -649,167 +662,169 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	c.id id,\n" +
-                    "	c.cnpj,\n" +
-                    "	c.inscricaoestadual,\n" +
-                    "	c.orgaoemissor,\n" +
-                    "	c.nome razao,\n" +
-                    "	c.nome fantasia,\n" +
-                    "	c.id_situacaocadastro,\n" +
-                    "	case when c.bloqueado then 'S' else 'N' end bloqueado,\n" +
-                    "	to_char(c.datarestricao, 'DD/MM/YYYY') databloqueio,\n" +
-                    "	c.endereco,\n" +
-                    "	c.numero,\n" +
-                    "	c.complemento,\n" +
-                    "	c.bairro,\n" +
-                    "	c.id_municipio municipioIBGE,\n" +
-                    "	mun.descricao municipio,\n" +
-                    "	c.id_estado ufIBGE,\n" +
-                    "	est.sigla uf,\n" +
-                    "	c.cep,\n" +
-                    "   civil.id id_estadocivil,\n" +        
-                    "	coalesce(substring(civil.descricao,1,3), 'NAO') estadocivil,\n" +
-                    "	to_char(c.datanascimento, 'DD/MM/YYYY') datanascimento,\n" +
-                    "	to_char(c.datacadastro, 'DD/MM/YYYY') datacadastro,\n" +
-                    "	case c.sexo when 0 then 'F' else 'M' end sexo,\n" +
-                    "	c.empresa,\n" +
-                    "	c.enderecoempresa empresaendereco,\n" +
-                    "	c.numeroempresa empresanumero,\n" +
-                    "	c.complementoempresa empresacomplemento,\n" +
-                    "	c.bairroempresa empresabairro,\n" +
-                    "	c.id_municipioempresa empresamunicipioIBGE,\n" +
-                    "	mun_emp.descricao empresamunicipio,\n" +
-                    "	c.id_estadoempresa empresaufIBGE,\n" +
-                    "	est_emp.sigla empresauf,\n" +
-                    "	c.cepempresa empresacep,\n" +
-                    "	c.telefoneempresa empresatelefone,\n" +
-                    "	to_char(c.dataadmissao, 'DD/MM/YYYY') dataadmissao,\n" +
-                    "	c.cargo,\n" +
-                    "	to_char(c.salario, '999999990D00') salario,\n" +
-                    "	to_char(c.valorlimite, '999999990D00') valorlimite,\n" +
-                    "	c.nomeconjuge,\n" +
-                    "	c.nomepai,\n" +
-                    "	c.nomemae,\n" +
-                    "	regexp_replace(c.observacao2,'[\\\\n\\\\r]+',' ','g') observacao,\n" +
-                    "	c.vencimentocreditorotativo diavencimento,\n" +
-                    "	case when c.permitecreditorotativo then 'S' else 'N' end permitecreditorotativo,\n" +
-                    "	case when c.permitecheque then 'S' else 'N' end permitecheque,\n" +
-                    "	c.telefone,\n" +
-                    "	c.celular,\n" +
-                    "	c.email,\n" +
-                    "	c.telefone cobrancaTelefone,\n" +
-                    "	0 prazopagamento,\n" +
-                    "	c.endereco cobrancaendereco,\n" +
-                    "	c.numero cobrancanumero,\n" +
-                    "	c.complemento cobrancacomplemento,\n" +
-                    "	c.bairro cobrancabairro,\n" +
-                    "	c.id_municipio cobrancamunicipioibge,\n" +
-                    "	mun.descricao cobrancamunicipio,\n" +
-                    "	c.id_estado cobrancaufibge,\n" +
-                    "	est.sigla cobrancauf,\n" +
-                    "	c.cep cobrancacep,\n" +
-                    "	'NENHUM'::varchar tipoorgaopublico,\n" +
-                    "	0 limitecompra,\n" +
-                    "	''::varchar inscricaomunicipal,\n" +
-                    "	'NAO CONTRIBUINTE'::varchar tipoindicadorie\n" +
-                    "from \n" +
-                    "	clientepreferencial c\n" +
-                    "	left join municipio mun on\n" +
-                    "		c.id_municipio = mun.id\n" +
-                    "	left join estado est on\n" +
-                    "		c.id_estado = est.id\n" +
-                    "	left join municipio mun_emp on\n" +
-                    "		c.id_municipioempresa = mun_emp.id\n" +
-                    "	left join estado est_emp on\n" +
-                    "		c.id_estadoempresa = est_emp.id\n" +
-                    "	left join tipoestadocivil civil on\n" +
-                    "		c.id_tipoestadocivil = civil.id\n" +
-                    "order by\n" +
-                    "	c.id")) {
-                ClienteIMP imp = new ClienteIMP();
-                
-                imp.setId(rs.getString("id"));
-                imp.setCnpj(rs.getString("cnpj"));
-                imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
-                imp.setOrgaoemissor(rs.getString("orgaoemissor"));
-                imp.setRazao(rs.getString("razao"));
-                imp.setFantasia(rs.getString("fantasia"));
-                imp.setAtivo(rs.getInt("id_situacaocadastro") == 1);
-                imp.setBloqueado("S".equals(rs.getString("bloqueado")));
-                imp.setDataBloqueio(rs.getDate("databloqueio"));
-                imp.setEndereco(rs.getString("endereco"));
-                imp.setNumero(rs.getString("numero"));
-                imp.setComplemento(rs.getString("complemento"));
-                imp.setBairro(rs.getString("bairro"));
-                imp.setMunicipioIBGE(rs.getString("municipioibge"));
-                imp.setMunicipio(rs.getString("municipio"));
-                imp.setUfIBGE(rs.getInt("ufibge"));
-                imp.setUf(rs.getString("uf"));
-                imp.setCep(rs.getString("cep"));
-                imp.setEstadoCivil(rs.getInt("id_estadocivil"));
-                imp.setDataNascimento(rs.getDate("datanascimento"));
-                imp.setDataCadastro(rs.getDate("datacadastro"));
-                imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                imp.setEmpresa(rs.getString("empresa"));
-                imp.setEmpresaEndereco(rs.getString("empresaendereco"));
-                imp.setEmpresaNumero(rs.getString("empresanumero"));
-                imp.setEmpresaComplemento(rs.getString("empresacomplemento"));
-                imp.setEmpresaBairro(rs.getString("empresabairro"));
-                imp.setEmpresaMunicipioIBGE(rs.getInt("empresamunicipioibge"));
-                imp.setEmpresaMunicipio(rs.getString("empresamunicipio"));
-                imp.setEmpresaUfIBGE(rs.getInt("empresaufibge"));
-                imp.setEmpresaUf(rs.getString("empresauf"));
-                imp.setEmpresaCep(rs.getString("empresacep"));
-                imp.setEmpresaTelefone(rs.getString("empresatelefone"));
-                imp.setDataAdmissao(rs.getDate("dataadmissao"));
-                imp.setCargo(rs.getString("cargo"));
-                imp.setSalario(rs.getDouble("salario"));
-                imp.setValorLimite(rs.getDouble("valorlimite"));
-                imp.setNomeConjuge(rs.getString("nomeconjuge"));
-                imp.setNomePai(rs.getString("nomepai"));
-                imp.setNomeMae(rs.getString("nomemae"));
-                imp.setEmail(rs.getString("email"));
-                imp.setCobrancaTelefone(rs.getString("cobrancatelefone"));
-                imp.setPrazoPagamento(rs.getInt("prazopagamento"));
-                imp.setCobrancaEndereco(rs.getString("cobrancaendereco"));
-                imp.setCobrancaNumero(rs.getString("cobrancanumero"));
-                imp.setCobrancaComplemento(rs.getString("cobrancacomplemento"));
-                imp.setCobrancaBairro(rs.getString("cobrancaobairro"));
-                imp.setCobrancaMunicipioIBGE(rs.getInt("cobrancamunicipioibge"));
-                imp.setCobrancaMunicipio(rs.getString("cobrancamunicipio"));
-                imp.setCobrancaUfIBGE(rs.getInt("cobrancaufibge"));
-                imp.setCobrancaUf(rs.getString("cobrancauf"));
-                imp.setCobrancaCep(rs.getString("cobrancacep"));
-                imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
-                imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
-                
-                getContatoCliente(imp);
-                
-                result.add(imp);
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	c.id id,\n"
+                    + "	c.cnpj,\n"
+                    + "	c.inscricaoestadual,\n"
+                    + "	c.orgaoemissor,\n"
+                    + "	c.nome razao,\n"
+                    + "	c.nome fantasia,\n"
+                    + "	c.id_situacaocadastro,\n"
+                    + "	case when c.bloqueado then 'S' else 'N' end bloqueado,\n"
+                    + "	c.datarestricao databloqueio,\n"
+                    + "	c.endereco,\n"
+                    + "	c.numero,\n"
+                    + "	c.complemento,\n"
+                    + "	c.bairro,\n"
+                    + "	c.id_municipio municipioIBGE,\n"
+                    + "	mun.descricao municipio,\n"
+                    + "	c.id_estado ufIBGE,\n"
+                    + "	est.sigla uf,\n"
+                    + "	c.cep,\n"
+                    + " civil.id id_estadocivil,\n"
+                    + "	coalesce(substring(civil.descricao,1,3), 'NAO') estadocivil,\n"
+                    + "	c.datanascimento,\n"
+                    + "	c.datacadastro,\n"
+                    + "	case c.sexo when 0 then 'F' else 'M' end sexo,\n"
+                    + "	c.empresa,\n"
+                    + "	c.enderecoempresa empresaendereco,\n"
+                    + "	c.numeroempresa empresanumero,\n"
+                    + "	c.complementoempresa empresacomplemento,\n"
+                    + "	c.bairroempresa empresabairro,\n"
+                    + "	c.id_municipioempresa empresamunicipioIBGE,\n"
+                    + "	mun_emp.descricao empresamunicipio,\n"
+                    + "	c.id_estadoempresa empresaufIBGE,\n"
+                    + "	est_emp.sigla empresauf,\n"
+                    + "	c.cepempresa empresacep,\n"
+                    + "	c.telefoneempresa empresatelefone,\n"
+                    + "	c.dataadmissao,\n"
+                    + "	c.cargo,\n"
+                    + "	c.salario,\n"
+                    + "	c.valorlimite,\n"
+                    + "	c.nomeconjuge,\n"
+                    + "	c.nomepai,\n"
+                    + "	c.nomemae,\n"
+                    + "	regexp_replace(c.observacao2,'[\\\\n\\\\r]+',' ','g') observacao,\n"
+                    + "	c.vencimentocreditorotativo diavencimento,\n"
+                    + "	case when c.permitecreditorotativo then 'S' else 'N' end permitecreditorotativo,\n"
+                    + "	case when c.permitecheque then 'S' else 'N' end permitecheque,\n"
+                    + "	c.telefone,\n"
+                    + "	c.celular,\n"
+                    + "	c.email,\n"
+                    + "	c.telefone cobrancaTelefone,\n"
+                    + "	0 prazopagamento,\n"
+                    + "	c.endereco cobrancaendereco,\n"
+                    + "	c.numero cobrancanumero,\n"
+                    + "	c.complemento cobrancacomplemento,\n"
+                    + "	c.bairro cobrancabairro,\n"
+                    + "	c.id_municipio cobrancamunicipioibge,\n"
+                    + "	mun.descricao cobrancamunicipio,\n"
+                    + "	c.id_estado cobrancaufibge,\n"
+                    + "	est.sigla cobrancauf,\n"
+                    + "	c.cep cobrancacep,\n"
+                    + "	'NENHUM'::varchar tipoorgaopublico,\n"
+                    + "	0 limitecompra,\n"
+                    + "	''::varchar inscricaomunicipal,\n"
+                    + "	'NAO CONTRIBUINTE'::varchar tipoindicadorie\n"
+                    + "from \n"
+                    + "	clientepreferencial c\n"
+                    + "	left join municipio mun on\n"
+                    + "		c.id_municipio = mun.id\n"
+                    + "	left join estado est on\n"
+                    + "		c.id_estado = est.id\n"
+                    + "	left join municipio mun_emp on\n"
+                    + "		c.id_municipioempresa = mun_emp.id\n"
+                    + "	left join estado est_emp on\n"
+                    + "		c.id_estadoempresa = est_emp.id\n"
+                    + "	left join tipoestadocivil civil on\n"
+                    + "		c.id_tipoestadocivil = civil.id\n"
+                    + "order by\n"
+                    + "	c.id")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo(rs.getInt("id_situacaocadastro") == 1);
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
+                    imp.setDataBloqueio(rs.getDate("databloqueio"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioIBGE(rs.getString("municipioibge"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUfIBGE(rs.getInt("ufibge"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEstadoCivil(rs.getInt("id_estadocivil"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setEmpresaEndereco(rs.getString("empresaendereco"));
+                    imp.setEmpresaNumero(rs.getString("empresanumero"));
+                    imp.setEmpresaComplemento(rs.getString("empresacomplemento"));
+                    imp.setEmpresaBairro(rs.getString("empresabairro"));
+                    imp.setEmpresaMunicipioIBGE(rs.getInt("empresamunicipioibge"));
+                    imp.setEmpresaMunicipio(rs.getString("empresamunicipio"));
+                    imp.setEmpresaUfIBGE(rs.getInt("empresaufibge"));
+                    imp.setEmpresaUf(rs.getString("empresauf"));
+                    imp.setEmpresaCep(rs.getString("empresacep"));
+                    imp.setEmpresaTelefone(rs.getString("empresatelefone"));
+                    imp.setDataAdmissao(rs.getDate("dataadmissao"));
+                    imp.setCargo(rs.getString("cargo"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setValorLimite(rs.getDouble("valorlimite"));
+                    imp.setNomeConjuge(rs.getString("nomeconjuge"));
+                    imp.setNomePai(rs.getString("nomepai"));
+                    imp.setNomeMae(rs.getString("nomemae"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setCobrancaTelefone(rs.getString("cobrancatelefone"));
+                    imp.setPrazoPagamento(rs.getInt("prazopagamento"));
+                    imp.setCobrancaEndereco(rs.getString("cobrancaendereco"));
+                    imp.setCobrancaNumero(rs.getString("cobrancanumero"));
+                    imp.setCobrancaComplemento(rs.getString("cobrancacomplemento"));
+                    imp.setCobrancaBairro(rs.getString("cobrancabairro"));
+                    imp.setCobrancaMunicipioIBGE(rs.getInt("cobrancamunicipioibge"));
+                    imp.setCobrancaMunicipio(rs.getString("cobrancamunicipio"));
+                    imp.setCobrancaUfIBGE(rs.getInt("cobrancaufibge"));
+                    imp.setCobrancaUf(rs.getString("cobrancauf"));
+                    imp.setCobrancaCep(rs.getString("cobrancacep"));
+                    imp.setInscricaoMunicipal(rs.getString("inscricaomunicipal"));
+                    imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+
+                    getContatoCliente(imp);
+
+                    result.add(imp);
+                }
             }
         }
         return result;
     }
-    
+
     private void getContatoCliente(ClienteIMP imp) throws SQLException {
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	id,\n" +
-                    "	nome,\n" +
-                    "	telefone,\n" +
-                    "	celular,\n" +
-                    "	tc.descricao contato\n" +
-                    "from \n" +
-                    "	clientepreferencialcontato cp\n" +
-                    "join tipocontato tc on cp.id_tipocontato = tc.id \n" +
-                    "where 	\n" +
-                    "	id_clientepreferencial = " + imp.getId())) {
-                while(rs.next()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                      "select \n"
+                    + "	cp.id,\n"
+                    + "	nome,\n"
+                    + "	telefone,\n"
+                    + "	celular,\n"
+                    + "	tc.descricao contato\n"
+                    + "from \n"
+                    + "	clientepreferencialcontato cp\n"
+                    + "join tipocontato tc on cp.id_tipocontato = tc.id \n"
+                    + "where 	\n"
+                    + "	cp.id_clientepreferencial = " + imp.getId())) {
+                while (rs.next()) {
                     imp.addContato(rs.getString("id"), rs.getString("nome"), rs.getString("telefone"), rs.getString("celular"), null);
                 }
             }
@@ -819,34 +834,34 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	r.id,\n" +
-                    "	c.cnpj,\n" +
-                    "	to_char(r.dataemissao, 'DD/MM/YYYY') emissao,\n" +
-                    "	to_char(r.datavencimento, 'DD/MM/YYYY') vencimento,\n" +
-                    "	r.ecf,\n" +
-                    "	r.id_clientepreferencial idcliente,\n" +
-                    "	r.valorjuros juros,\n" +
-                    "	r.valormulta multa,\n" +
-                    "	r.numerocupom cupom,\n" +
-                    "	r.observacao,\n" +
-                    "	r.parcela,\n" +
-                    "	r.valor\n" +
-                    "from\n" +
-                    "	recebercreditorotativo r\n" +
-                    "	join clientepreferencial c on\n" +
-                    "		r.id_clientepreferencial = c.id\n" +
-                    "where\n" +
-                    "	id_situacaocadastro = 0 and\n" +
-                    "	id_loja = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "	r.id")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	r.id,\n"
+                    + "	c.cnpj,\n"
+                    + "	r.dataemissao,\n"
+                    + "	r.datavencimento,\n"
+                    + "	r.ecf,\n"
+                    + "	r.id_clientepreferencial idcliente,\n"
+                    + "	r.valorjuros juros,\n"
+                    + "	r.valormulta multa,\n"
+                    + "	r.numerocupom cupom,\n"
+                    + "	r.observacao,\n"
+                    + "	r.parcela,\n"
+                    + "	r.valor\n"
+                    + "from\n"
+                    + "	recebercreditorotativo r\n"
+                    + "	join clientepreferencial c on\n"
+                    + "     r.id_clientepreferencial = c.id\n"
+                    + "where\n"
+                    + "	id_situacaocadastro = 0 and\n"
+                    + "	id_loja = " + getLojaOrigem() + "\n"
+                    + "order by\n"
+                    + "	r.id")) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setCnpjCliente(rs.getString("cnpj"));
                     imp.setDataEmissao(rs.getDate("emissao"));
@@ -859,7 +874,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valor"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -870,30 +885,30 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	p.id,\n" +
-                    "	p.id_fornecedor,\n" +
-                    "	p.numerodocumento,\n" +
-                    "   p.id_tipoentrada,\n" +        
-                    "	p.dataentrada,\n" +
-                    "	p.dataemissao,\n" +
-                    "   pp.datahoraalteracao,\n" +        
-                    "	p.valor,\n" +
-                    "	pp.numeroparcela,\n" +
-                    "	pp.datavencimento,\n" +
-                    "	pp.observacao\n" +
-                    "from \n" +
-                    "	pagarfornecedor p \n" +
-                    "join pagarfornecedorparcela pp on p.id = pp.id_pagarfornecedor \n" +
-                    "where\n" +
-                    "	pp.id_situacaopagarfornecedorparcela = 0 and \n" +
-                    "	p.id_loja = " + getLojaOrigem())) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	p.id,\n"
+                    + "	p.id_fornecedor,\n"
+                    + "	p.numerodocumento,\n"
+                    + " p.id_tipoentrada,\n"
+                    + "	p.dataentrada,\n"
+                    + "	p.dataemissao,\n"
+                    + " pp.datahoraalteracao,\n"
+                    + "	p.valor,\n"
+                    + "	pp.numeroparcela,\n"
+                    + "	pp.datavencimento,\n"
+                    + "	pp.observacao\n"
+                    + "from \n"
+                    + "	pagarfornecedor p \n"
+                    + "join pagarfornecedorparcela pp on p.id = pp.id_pagarfornecedor \n"
+                    + "where\n"
+                    + "	pp.id_situacaopagarfornecedorparcela = 0 and \n"
+                    + "	p.id_loja = " + getLojaOrigem())) {
+                while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
@@ -902,9 +917,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdTipoEntradaVR(rs.getInt("id_tipoentrada"));
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setObservacao(rs.getString("observacao"));
-                    
+
                     imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -915,26 +930,26 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	*\n" +
-                    "from \n" +
-                    "	oferta o \n" +
-                    "where \n" +
-                    "	id_loja = " + getLojaOrigem() + " and \n" +
-                    "	datatermino >= now()")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	*\n"
+                    + "from \n"
+                    + "	oferta o \n"
+                    + "where \n"
+                    + "	id_loja = " + getLojaOrigem() + " and \n"
+                    + "	datatermino >= now()")) {
+                while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    
+
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setDataInicio(rs.getDate("datainicio"));
                     imp.setDataFim(rs.getDate("datatermino"));
                     imp.setSituacaoOferta(rs.getInt("id_situacaooferta") == 1 ? SituacaoOferta.ATIVO : SituacaoOferta.CANCELADO);
-                    
+
                     result.add(imp);
                 }
             }
@@ -945,18 +960,18 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OperadorIMP> getOperadores() throws Exception {
         List<OperadorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	*\n" +
-                    "from 	\n" +
-                    "	pdv.operador\n" +
-                    "where 	\n" +
-                    "	id_loja = " + getLojaOrigem())) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	*\n"
+                    + "from\n"
+                    + "	pdv.operador\n"
+                    + "where\n"
+                    + "	id_loja = " + getLojaOrigem())) {
+                while (rs.next()) {
                     OperadorIMP imp = new OperadorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setId(rs.getString("id"));
@@ -966,14 +981,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSenha(rs.getString("senha"));
                     imp.setId_tiponiveloperador(rs.getString("id_tiponiveloperador"));
                     imp.setId_situacadastro(rs.getString("id_situacaocadastro"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
@@ -994,7 +1009,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VRToVRDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-    
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -1033,30 +1048,38 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEnderecoCliente(rst.getString("enderecocliente"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCanceladoEmVenda(rst.getBoolean("canceladoemvenda"));
-                        
+
                         int tipoCancelamento = rst.getInt("tipocancelamento");
                         TipoCancelamento tc = null;
-                        if(tipoCancelamento != 0) {
-                            switch(tipoCancelamento) {
-                                case 1 : tc = TipoCancelamento.DEVOLUCAO_DE_MERCADORIA;
+                        if (tipoCancelamento != 0) {
+                            switch (tipoCancelamento) {
+                                case 1:
+                                    tc = TipoCancelamento.DEVOLUCAO_DE_MERCADORIA;
                                     break;
-                                case 2 : tc = TipoCancelamento.ERRO_DE_REGISTRO;
+                                case 2:
+                                    tc = TipoCancelamento.ERRO_DE_REGISTRO;
                                     break;
-                                case 3 : tc = TipoCancelamento.DINHEIRO_DO_CLIENTE_INSUFICIENTE;
+                                case 3:
+                                    tc = TipoCancelamento.DINHEIRO_DO_CLIENTE_INSUFICIENTE;
                                     break;
-                                case 4 : tc = TipoCancelamento.PRODUTO_COM_PRECO_ERRADO;
+                                case 4:
+                                    tc = TipoCancelamento.PRODUTO_COM_PRECO_ERRADO;
                                     break;
-                                case 5 : tc = TipoCancelamento.TESTE_DE_EQUIPAMENTO;
-                                    break;    
-                                case 6 : tc = TipoCancelamento.CHEQUE_DO_CLIENTE_RECUSADO;
-                                    break;    
-                                case 7 : tc = TipoCancelamento.CARTAO_RECUSADO_OU_SEM_SALDO;
-                                    break; 
-                                default : tc = TipoCancelamento.PROBLEMA_NO_EQUIPAMENTO;
+                                case 5:
+                                    tc = TipoCancelamento.TESTE_DE_EQUIPAMENTO;
+                                    break;
+                                case 6:
+                                    tc = TipoCancelamento.CHEQUE_DO_CLIENTE_RECUSADO;
+                                    break;
+                                case 7:
+                                    tc = TipoCancelamento.CARTAO_RECUSADO_OU_SEM_SALDO;
+                                    break;
+                                default:
+                                    tc = TipoCancelamento.PROBLEMA_NO_EQUIPAMENTO;
                                     break;
                             }
                         }
-                         
+
                         next.setTipoCancelamento(tc);
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modeloimpressora"));
@@ -1072,39 +1095,38 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = 
-                    "select\n" +
-                    "	id,\n" +
-                    "	numerocupom,\n" +
-                    "	ecf,\n" +
-                    "	to_char(data, 'DD/MM/YYYY') as data,\n" +
-                    "	id_clientepreferencial clientepreferencial,\n" +
-                    "	to_char(horainicio, 'HH:MM:SS') as horainicio,\n" +
-                    "	to_char(horatermino, 'HH:MM:SS') as horatermino,\n" +
-                    "	cancelado,\n" +
-                    "	subtotalimpressora,\n" +
-                    "	id_tipocancelamento tipocancelamento,\n" +
-                    "	cpf,\n" +
-                    "	valordesconto,\n" +
-                    "	valoracrescimo,\n" +
-                    "	canceladoemvenda,\n" +
-                    "	numeroserie,\n" +
-                    "	modeloimpressora,\n" +
-                    "	nomecliente,\n" +
-                    "	enderecocliente,\n" +
-                    "	id_clienteeventual clienteeventual,\n" +
-                    "	chavecfe,\n" +
-                    "	chavenfce,\n" +
-                    "	id_tipodesconto tipodesconto\n" +
-                    "	--,chavenfcecontingencia\n" +
-                    "from\n" +
-                    "	pdv.venda v \n" +
-                    "where \n" +
-                    "	id_loja = " + idLojaCliente + "\n" +
-                    "	and data >= '" + FORMAT.format(dataInicio) + "'\n" +
-                    "	and data <= '" + FORMAT.format(dataTermino) + "'\n" +
-                    "order by\n" +
-                    "	id";
+                    = "select\n"
+                    + "	id,\n"
+                    + "	numerocupom,\n"
+                    + "	ecf,\n"
+                    + "	data,\n"
+                    + "	id_clientepreferencial clientepreferencial,\n"
+                    + "	to_char(horainicio, 'HH:MM:SS') as horainicio,\n"
+                    + "	to_char(horatermino, 'HH:MM:SS') as horatermino,\n"
+                    + "	cancelado,\n"
+                    + "	subtotalimpressora,\n"
+                    + "	id_tipocancelamento tipocancelamento,\n"
+                    + "	cpf,\n"
+                    + "	valordesconto,\n"
+                    + "	valoracrescimo,\n"
+                    + "	canceladoemvenda,\n"
+                    + "	numeroserie,\n"
+                    + "	modeloimpressora,\n"
+                    + "	nomecliente,\n"
+                    + "	enderecocliente,\n"
+                    + "	id_clienteeventual clienteeventual,\n"
+                    + "	chavecfe,\n"
+                    + "	chavenfce,\n"
+                    + "	id_tipodesconto tipodesconto\n"
+                    + "	--,chavenfcecontingencia\n"
+                    + "from\n"
+                    + "	pdv.venda v \n"
+                    + "where \n"
+                    + "	id_loja = " + idLojaCliente + "\n"
+                    + "	and data >= '" + FORMAT.format(dataInicio) + "'\n"
+                    + "	and data <= '" + FORMAT.format(dataTermino) + "'\n"
+                    + "order by\n"
+                    + "	id";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1128,7 +1150,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-    
+
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
@@ -1166,40 +1188,39 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = 
-                    "select\n" +
-                    "	vi.id,\n" +
-                    "	vi.sequencia,\n" +
-                    "	vi.id_venda cod_venda,\n" +
-                    "	vi.id_produto cod_produto,\n" +
-                    "	p.descricaoreduzida,\n" +
-                    "	vi.quantidade,\n" +
-                    "	vi.precovenda,\n" +
-                    "	vi.cancelado,\n" +
-                    "	vi.valorcancelado,\n" +
-                    "	vi.id_tipocancelamento tipocancelamento,\n" +
-                    "	vi.valordescontopromocao + vi.valordesconto valordesconto,\n" +
-                    "	vi.valoracrescimo,\n" +
-                    "	vi.codigobarras,\n" +
-                    "	vi.unidademedida,\n" +
-                    "	vi.id_tipodesconto tipodesconto,\n" +
-                    "	aliq.situacaotributaria icms_cst,\n" +
-                    "	aliq.porcentagem icms_aliq,\n" +
-                    "	aliq.reduzido icms_red,\n" +
-                    "	vi.contadordoc\n" +
-                    "from\n" +
-                    "	pdv.vendaitem vi\n" +
-                    "	join produto p on vi.id_produto = p.id\n" +
-                    "	join aliquota aliq on vi.id_aliquota = aliq.id\n" +
-                    "where\n" +
-                    "	id_venda in (select id from pdv.venda \n" +
-                    "	where\n" +
-                    "		id_loja = " + idLojaCliente + "\n" +
-                    "		and data >= '" + VendaIterator.FORMAT.format(dataInicio) + "' \n" +
-                    "		and data <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n" +
-                    "	order by id)\n" +
-                    "order by\n" +
-                    "	vi.id_venda, vi.sequencia";
+                    = "select\n"
+                    + "	vi.id,\n"
+                    + "	vi.sequencia,\n"
+                    + "	vi.id_venda cod_venda,\n"
+                    + "	vi.id_produto cod_produto,\n"
+                    + "	p.descricaoreduzida,\n"
+                    + "	vi.quantidade,\n"
+                    + "	vi.precovenda,\n"
+                    + "	vi.cancelado,\n"
+                    + "	vi.valorcancelado,\n"
+                    + "	vi.id_tipocancelamento tipocancelamento,\n"
+                    + "	vi.valordescontopromocao + vi.valordesconto valordesconto,\n"
+                    + "	vi.valoracrescimo,\n"
+                    + "	vi.codigobarras,\n"
+                    + "	vi.unidademedida,\n"
+                    + "	vi.id_tipodesconto tipodesconto,\n"
+                    + "	aliq.situacaotributaria icms_cst,\n"
+                    + "	aliq.porcentagem icms_aliq,\n"
+                    + "	aliq.reduzido icms_red,\n"
+                    + "	vi.contadordoc\n"
+                    + "from\n"
+                    + "	pdv.vendaitem vi\n"
+                    + "	join produto p on vi.id_produto = p.id\n"
+                    + "	join aliquota aliq on vi.id_aliquota = aliq.id\n"
+                    + "where\n"
+                    + "	id_venda in (select id from pdv.venda \n"
+                    + "	where\n"
+                    + "		id_loja = " + idLojaCliente + "\n"
+                    + "		and data >= '" + VendaIterator.FORMAT.format(dataInicio) + "' \n"
+                    + "		and data <= '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	order by id)\n"
+                    + "order by\n"
+                    + "	vi.id_venda, vi.sequencia";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

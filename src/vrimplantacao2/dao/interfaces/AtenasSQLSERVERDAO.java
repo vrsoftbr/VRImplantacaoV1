@@ -11,9 +11,10 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+//import vrimplantacao2.vo.importacao.ClienteIMP;
+//import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -22,7 +23,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
- * @author Importacao
+ * @author Alan
  */
 public class AtenasSQLSERVERDAO extends InterfaceDAO {
 
@@ -30,7 +31,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "Atenas";
+        return "Atenas" + v_lojaMesmoId;
     }
 
     public List<Estabelecimento> getLojas() throws SQLException {
@@ -113,7 +114,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "       classificacaofiscal ncm,\n"
                     + "       c.cest cest,\n"
                     + "       cst_pis piscofinscstdebito,\n"
-                    + "       cst_pis_entrada piscofinscstcredito,\n"
+                    + "       coalesce(cst_pis_entrada, 99) piscofinscstcredito,\n"
                     + "       p.cod_nat_receita piscofinsnaturezareceita,\n"
                     + "       replace(ali.cst,',','.') icmscstsaida,\n"
                     + "       replace(ali.porcentagem,',','.') icmsaliqsaida,\n"
@@ -130,6 +131,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "  		on p.icms_cest = c.codigo\n"
                     + "		left join cad_cod_nat_receita cnr\n"
                     + "                 on p.cod_nat_receita = cnr.cod_nat_receita and p.tabela_nat_receita = cnr.tabela\n"
+                    + "       where oculto = 'NAO'\n"
                     + "order by p.codigo")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -181,7 +183,8 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCustoAnteriorComImposto(rs.getDouble("custoAnteriorComImposto"));
-                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
+                    //imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
+                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinscstdebito"));
@@ -276,7 +279,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     + "     numero,\n"
                     + "     complementoendereco,\n"
                     + "     bairro,\n"
-                    + "     codigo_municipio ibge_municipio,\n"
+                    //+ "     coalesce(codigo_municipio,0) ibge_municipio,\n"
                     + "     cidade municipio,\n"
                     + "     uf,\n"
                     + "     cep,\n"
@@ -306,7 +309,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setComplemento(rs.getString("complementoendereco"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("municipio"));
-                    imp.setIbge_municipio(rs.getInt("ibge_municipio"));
+                    //imp.setIbge_municipio(rs.getInt("ibge_municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(rs.getString("tel_principal"));
@@ -325,7 +328,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -373,10 +376,10 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setCnpj(rs.getString("cpf"));
                     imp.setValorLimite(rs.getDouble("limite"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    /*String data = rs.getString("nascimento").trim();
-                     if(data.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
-                     imp.setDataNascimento(rs.getDate("nascimento"));
-                     }*/
+                    // String data = rs.getString("nascimento").trim();
+                    // if(data.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
+                    // imp.setDataNascimento(rs.getDate("nascimento"));
+                    // }
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
@@ -395,9 +398,9 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
             }
         }
         return result;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -434,5 +437,5 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
             }
         }
         return result;
-    }
+    }*/
 }

@@ -87,7 +87,6 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
                     OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
                 }
@@ -539,7 +538,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("numerocupom") + rst.getString("data") + rst.getString("NumeroCaixa");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -656,7 +655,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                         next = new VendaItemIMP();
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(rst.getString("coo"));
+                        next.setVenda(rst.getString("coo") + rst.getString("emissao") + rst.getString("ecf"));
                         next.setProduto(rst.getString("idproduto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("qtd"));
@@ -722,7 +721,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n" +
                     "	dbo.CE_MOVIMENTACAO.cod_mov id,\n" +
-                    "	dbo.CE_MOVIMENTACAO.data_mov emissao,\n" +
+                    "	convert(datetime, convert(varchar(10), dbo.CE_MOVIMENTACAO.data_mov, 103), 103) emissao,\n" +
                     "	dbo.CE_MOVIMENTACAO.custo_mov custototal,\n" +
                     "	dbo.CE_MOVIMENTACAO.qtd_mov qtd,\n" +
                     "	(dbo.CE_MOVIMENTACAO.venda_mov + dbo.CE_MOVIMENTACAO.VLACRDESC) subtotalimpressora,\n" +
