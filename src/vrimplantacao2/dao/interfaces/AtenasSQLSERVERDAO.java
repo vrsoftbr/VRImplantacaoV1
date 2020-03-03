@@ -31,7 +31,7 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "Atenas";
+        return "Atenas" + v_lojaMesmoId;
     }
 
     public List<Estabelecimento> getLojas() throws SQLException {
