@@ -21,6 +21,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -331,9 +332,57 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rst.getString("fax"),
                                 rst.getString("celular"),
                                 TipoContato.COMERCIAL,
-                                rst.getString("email")
+                                rst.getString("email") != null ? rst.getString("email").toLowerCase() : null
+                        );
+                    } else {
+
+                        imp.addContato(
+                                "CONTATO",
+                                rst.getString("fax"),
+                                rst.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                rst.getString("email") != null ? rst.getString("email").toLowerCase() : null
                         );
                     }
+
+                    if ((rst.getString("email_nfe") != null)
+                            && (!rst.getString("email_nfe").trim().isEmpty())) {
+
+                        imp.addEmail(
+                                "EMAIL NFE",
+                                rst.getString("email_nfe").toLowerCase(),
+                                TipoContato.NFE
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    pf_produto as idproduto,\n"
+                    + "    pf_fornec as idofornecedor,\n"
+                    + "    pf_refforn as codigoexterno,\n"
+                    + "    coalesce(pf_quantidade, 1) as qtdembalagem,\n"
+                    + "    pf_dtatlz as dataalteracao\n"
+                    + "from prodforn"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idofornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
                     result.add(imp);
                 }
             }
