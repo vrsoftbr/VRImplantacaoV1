@@ -224,25 +224,60 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
         );
     }
 
+    private static class MercadologicoMobne {
+        
+        final String merc1;
+        final String merc2;
+        final String merc3;
+        final String merc4;
+
+        public MercadologicoMobne(String merc1, String merc2, String merc3, String merc4) {
+            this.merc1 = merc1;
+            this.merc2 = merc2;
+            this.merc3 = merc3;
+            this.merc4 = merc4;
+        }
+        
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
-            Map<String, String> merc = new HashMap<>();
+            Map<String, MercadologicoMobne> mercadologico = new HashMap<>();
             try (ResultSet rs = st.executeQuery(
                     "select\n" +
-                    "	p.seqproduto ,\n" +
-                    "	tf.seqcategoria\n" +
+                    "	p.seqproduto id_produto,\n" +
+                    "	merc1.seqcategoria merc1,\n" +
+                    "	merc2.seqcategoria merc2,\n" +
+                    "	merc3.seqcategoria merc3,\n" +
+                    "	merc4.seqcategoria merc4\n" +
                     "from\n" +
                     "	tb_famdivisaocategoria tf\n" +
                     "	join tb_produto p on\n" +
                     "		tf.seqfamilia = p.seqfamilia \n" +
+                    "	join tb_categoria merc4 on\n" +
+                    "		merc4.seqcategoria = tf.seqcategoria \n" +
+                    "	join tb_categoria merc3 on\n" +
+                    "		merc3.seqcategoria = merc4.seqcategoriapai\n" +
+                    "	join tb_categoria merc2 on\n" +
+                    "		merc2.seqcategoria = merc3.seqcategoriapai\n" +
+                    "	join tb_categoria merc1 on\n" +
+                    "		merc1.seqcategoria = merc2.seqcategoriapai\n" +
                     "where\n" +
                     "	tf.nrodivisao = 1"
             )) {
                 while (rs.next()) {
-                    merc.put(rs.getString("seqproduto"), rs.getString("seqcategoria"));
+                    mercadologico.put(
+                            rs.getString("id_produto"), 
+                            new MercadologicoMobne(
+                                    rs.getString("merc1"),
+                                    rs.getString("merc2"),
+                                    rs.getString("merc3"),
+                                    rs.getString("merc4")
+                            )
+                    );
                 }
             }
             try (ResultSet rs = st.executeQuery(
@@ -324,7 +359,13 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setAceitaMultiplicacaoPDV("S".equals(rs.getString("permitemultiplicacao")));
 
-                    imp.setCodMercadologico1(merc.get(imp.getImportId()));
+                    MercadologicoMobne merc = mercadologico.get(imp.getImportId());
+                    if (merc != null) {
+                        imp.setCodMercadologico1(merc.merc1);
+                        imp.setCodMercadologico2(merc.merc2);
+                        imp.setCodMercadologico3(merc.merc3);
+                        imp.setCodMercadologico4(merc.merc4);
+                    }
 
                     imp.setVendaControlada("S".equals(rs.getString("bebidaalcoolica")));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
