@@ -24,6 +24,7 @@ import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -62,7 +63,7 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
     public void setArquivoMapaTributacao(String arquivoMapaTributacao) {
         this.arquivoMapaTributacao = arquivoMapaTributacao;
     }
-    
+
     public Map<String, String> getOpcoes() {
         return opcoes;
     }
@@ -208,6 +209,26 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.addEmail("EMAIL", rst.getString("email"), TipoContato.NFE);
             }
 
+            result.add(imp);
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        Arquivo prodForn = ArquivoFactory.getArquivo(this.arquivo, null);
+        ProgressBar.setStatus("Carregando produtos fornecedores...");
+
+        for (LinhaArquivo rst : prodForn) {
+            ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+            imp.setImportLoja(getLojaOrigem());
+            imp.setImportSistema(getSistema());
+            imp.setIdProduto(rst.getString("idproduto").replace(".", ""));
+            imp.setIdFornecedor(rst.getString("idfornecedor"));
+            imp.setCodigoExterno(rst.getString("codigoexterno"));
+            imp.setQtdEmbalagem(Double.parseDouble(rst.getString("qtdembalagem").replace(".", "").replace(",", ".")));
             result.add(imp);
         }
         return result;
