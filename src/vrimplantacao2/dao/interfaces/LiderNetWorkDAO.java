@@ -5,8 +5,6 @@
  */
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -144,7 +141,7 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
 
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
-                imp.setImportId(id);
+                imp.setImportId(id.replace(".", ""));
                 imp.setEan(rst.getString("codigobarras"));
                 imp.seteBalanca(rst.getInt("balanca") == 1);
                 imp.setValidade(rst.getInt("validade"));
@@ -155,12 +152,12 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_cotacao"));
                 imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                 imp.setSituacaoCadastro(rst.getInt("ativo"));
-                imp.setMargem(Double.parseDouble(rst.getString("margem").replace(",", ".")));
-                imp.setCustoComImposto(Double.parseDouble(rst.getString("custo").replace(",", ".")));
-                imp.setCustoSemImposto(Double.parseDouble(rst.getString("custo").replace(",", ".")));
-                imp.setPrecovenda(Double.parseDouble(rst.getString("precovenda").replace(",", ".")));
-                imp.setEstoque(Double.parseDouble(rst.getString("estoque").replace(",", ".")));
-                imp.setEstoqueMinimo(Double.parseDouble(rst.getString("estoqueminimo").replace(",", ".")));
+                imp.setMargem(Double.parseDouble(rst.getString("margem").replace(".", "").replace(",", ".")));
+                imp.setCustoComImposto(Double.parseDouble(rst.getString("custo").replace(".", "").replace(",", ".")));
+                imp.setCustoSemImposto(Double.parseDouble(rst.getString("custo").replace(".", "").replace(",", ".")));
+                imp.setPrecovenda(Double.parseDouble(rst.getString("precovenda").replace(".", "").replace(",", ".")));
+                imp.setEstoque(Double.parseDouble(rst.getString("estoque").replace(".", "").replace(",", ".")));
+                imp.setEstoqueMinimo(Double.parseDouble(rst.getString("estoqueminimo").replace(".", "").replace(",", ".")));
                 imp.setNcm(rst.getString("ncm"));
                 imp.setCest(rst.getString("cest"));
                 imp.setPiscofinsCstDebito(rst.getString("cst_pis"));

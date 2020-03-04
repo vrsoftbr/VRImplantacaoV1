@@ -8,6 +8,342 @@ import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 public class ProdutoAnteriorVO {
+
+    /**
+     * @return the icmsDebitoId
+     */
+    public String getIcmsDebitoId() {
+        return icmsDebitoId;
+    }
+
+    /**
+     * @param icmsDebitoId the icmsDebitoId to set
+     */
+    public void setIcmsDebitoId(String icmsDebitoId) {
+        this.icmsDebitoId = icmsDebitoId;
+    }
+
+    /**
+     * @return the icmsDebitoForaEstadoId
+     */
+    public String getIcmsDebitoForaEstadoId() {
+        return icmsDebitoForaEstadoId;
+    }
+
+    /**
+     * @param icmsDebitoForaEstadoId the icmsDebitoForaEstadoId to set
+     */
+    public void setIcmsDebitoForaEstadoId(String icmsDebitoForaEstadoId) {
+        this.icmsDebitoForaEstadoId = icmsDebitoForaEstadoId;
+    }
+
+    /**
+     * @return the icmsDebitoForaEstadoIdNf
+     */
+    public String getIcmsDebitoForaEstadoIdNf() {
+        return icmsDebitoForaEstadoIdNf;
+    }
+
+    /**
+     * @param icmsDebitoForaEstadoIdNf the icmsDebitoForaEstadoIdNf to set
+     */
+    public void setIcmsDebitoForaEstadoIdNf(String icmsDebitoForaEstadoIdNf) {
+        this.icmsDebitoForaEstadoIdNf = icmsDebitoForaEstadoIdNf;
+    }
+
+    /**
+     * @return the icmsCreditoId
+     */
+    public String getIcmsCreditoId() {
+        return icmsCreditoId;
+    }
+
+    /**
+     * @param icmsCreditoId the icmsCreditoId to set
+     */
+    public void setIcmsCreditoId(String icmsCreditoId) {
+        this.icmsCreditoId = icmsCreditoId;
+    }
+
+    /**
+     * @return the icmsCreditoForaEstadoId
+     */
+    public String getIcmsCreditoForaEstadoId() {
+        return icmsCreditoForaEstadoId;
+    }
+
+    /**
+     * @param icmsCreditoForaEstadoId the icmsCreditoForaEstadoId to set
+     */
+    public void setIcmsCreditoForaEstadoId(String icmsCreditoForaEstadoId) {
+        this.icmsCreditoForaEstadoId = icmsCreditoForaEstadoId;
+    }
+
+    /**
+     * @return the icmsConsumidorId
+     */
+    public String getIcmsConsumidorId() {
+        return icmsConsumidorId;
+    }
+
+    /**
+     * @param icmsConsumidorId the icmsConsumidorId to set
+     */
+    public void setIcmsConsumidorId(String icmsConsumidorId) {
+        this.icmsConsumidorId = icmsConsumidorId;
+    }
+
+    /**
+     * @return the icmsCstSaida
+     */
+    public int getIcmsCstSaida() {
+        return icmsCstSaida;
+    }
+
+    /**
+     * @param icmsCstSaida the icmsCstSaida to set
+     */
+    public void setIcmsCstSaida(int icmsCstSaida) {
+        this.icmsCstSaida = icmsCstSaida;
+    }
+
+    /**
+     * @return the icmsAliqSaida
+     */
+    public double getIcmsAliqSaida() {
+        return icmsAliqSaida;
+    }
+
+    /**
+     * @param icmsAliqSaida the icmsAliqSaida to set
+     */
+    public void setIcmsAliqSaida(double icmsAliqSaida) {
+        this.icmsAliqSaida = icmsAliqSaida;
+    }
+
+    /**
+     * @return the icmsReducaoSaida
+     */
+    public double getIcmsReducaoSaida() {
+        return icmsReducaoSaida;
+    }
+
+    /**
+     * @param icmsReducaoSaida the icmsReducaoSaida to set
+     */
+    public void setIcmsReducaoSaida(double icmsReducaoSaida) {
+        this.icmsReducaoSaida = icmsReducaoSaida;
+    }
+
+    /**
+     * @return the icmsCstSaidaForaEstado
+     */
+    public int getIcmsCstSaidaForaEstado() {
+        return icmsCstSaidaForaEstado;
+    }
+
+    /**
+     * @param icmsCstSaidaForaEstado the icmsCstSaidaForaEstado to set
+     */
+    public void setIcmsCstSaidaForaEstado(int icmsCstSaidaForaEstado) {
+        this.icmsCstSaidaForaEstado = icmsCstSaidaForaEstado;
+    }
+
+    /**
+     * @return the icmsAliqSaidaForaEstado
+     */
+    public double getIcmsAliqSaidaForaEstado() {
+        return icmsAliqSaidaForaEstado;
+    }
+
+    /**
+     * @param icmsAliqSaidaForaEstado the icmsAliqSaidaForaEstado to set
+     */
+    public void setIcmsAliqSaidaForaEstado(double icmsAliqSaidaForaEstado) {
+        this.icmsAliqSaidaForaEstado = icmsAliqSaidaForaEstado;
+    }
+
+    /**
+     * @return the icmsReducaoSaidaEstado
+     */
+    public double getIcmsReducaoSaidaForaEstado() {
+        return icmsReducaoSaidaForaEstado;
+    }
+
+    /**
+     * @param icmsReducaoSaidaForaEstado the icmsReducaoSaidaEstado to set
+     */
+    public void setIcmsReducaoSaidaForaEstado(double icmsReducaoSaidaForaEstado) {
+        this.icmsReducaoSaidaForaEstado = icmsReducaoSaidaForaEstado;
+    }
+
+    /**
+     * @return the icmsCstSaidaForaEstadoNf
+     */
+    public int getIcmsCstSaidaForaEstadoNf() {
+        return icmsCstSaidaForaEstadoNf;
+    }
+
+    /**
+     * @param icmsCstSaidaForaEstadoNf the icmsCstSaidaForaEstadoNf to set
+     */
+    public void setIcmsCstSaidaForaEstadoNf(int icmsCstSaidaForaEstadoNf) {
+        this.icmsCstSaidaForaEstadoNf = icmsCstSaidaForaEstadoNf;
+    }
+
+    /**
+     * @return the icmsAliqSaidaForaEstadoNf
+     */
+    public double getIcmsAliqSaidaForaEstadoNf() {
+        return icmsAliqSaidaForaEstadoNf;
+    }
+
+    /**
+     * @param icmsAliqSaidaForaEstadoNf the icmsAliqSaidaForaEstadoNf to set
+     */
+    public void setIcmsAliqSaidaForaEstadoNf(double icmsAliqSaidaForaEstadoNf) {
+        this.icmsAliqSaidaForaEstadoNf = icmsAliqSaidaForaEstadoNf;
+    }
+
+    /**
+     * @return the icmsReducaoSaidaForaEstadoNf
+     */
+    public double getIcmsReducaoSaidaForaEstadoNf() {
+        return icmsReducaoSaidaForaEstadoNf;
+    }
+
+    /**
+     * @param icmsReducaoSaidaForaEstadoNf the icmsReducaoSaidaForaEstadoNf to set
+     */
+    public void setIcmsReducaoSaidaForaEstadoNf(double icmsReducaoSaidaForaEstadoNf) {
+        this.icmsReducaoSaidaForaEstadoNf = icmsReducaoSaidaForaEstadoNf;
+    }
+
+    /**
+     * @return the icmsCstConsumidor
+     */
+    public int getIcmsCstConsumidor() {
+        return icmsCstConsumidor;
+    }
+
+    /**
+     * @param icmsCstConsumidor the icmsCstConsumidor to set
+     */
+    public void setIcmsCstConsumidor(int icmsCstConsumidor) {
+        this.icmsCstConsumidor = icmsCstConsumidor;
+    }
+
+    /**
+     * @return the icmsAliqConsumidor
+     */
+    public double getIcmsAliqConsumidor() {
+        return icmsAliqConsumidor;
+    }
+
+    /**
+     * @param icmsAliqConsumidor the icmsAliqConsumidor to set
+     */
+    public void setIcmsAliqConsumidor(double icmsAliqConsumidor) {
+        this.icmsAliqConsumidor = icmsAliqConsumidor;
+    }
+
+    /**
+     * @return the icmsReducaoConsumidor
+     */
+    public double getIcmsReducaoConsumidor() {
+        return icmsReducaoConsumidor;
+    }
+
+    /**
+     * @param icmsReducaoConsumidor the icmsReducaoConsumidor to set
+     */
+    public void setIcmsReducaoConsumidor(double icmsReducaoConsumidor) {
+        this.icmsReducaoConsumidor = icmsReducaoConsumidor;
+    }
+
+    /**
+     * @return the icmsCstEntrada
+     */
+    public int getIcmsCstEntrada() {
+        return icmsCstEntrada;
+    }
+
+    /**
+     * @param icmsCstEntrada the icmsCstEntrada to set
+     */
+    public void setIcmsCstEntrada(int icmsCstEntrada) {
+        this.icmsCstEntrada = icmsCstEntrada;
+    }
+
+    /**
+     * @return the icmsAliqEntrada
+     */
+    public double getIcmsAliqEntrada() {
+        return icmsAliqEntrada;
+    }
+
+    /**
+     * @param icmsAliqEntrada the icmsAliqEntrada to set
+     */
+    public void setIcmsAliqEntrada(double icmsAliqEntrada) {
+        this.icmsAliqEntrada = icmsAliqEntrada;
+    }
+
+    /**
+     * @return the icmsReducaoEntrada
+     */
+    public double getIcmsReducaoEntrada() {
+        return icmsReducaoEntrada;
+    }
+
+    /**
+     * @param icmsReducaoEntrada the icmsReducaoEntrada to set
+     */
+    public void setIcmsReducaoEntrada(double icmsReducaoEntrada) {
+        this.icmsReducaoEntrada = icmsReducaoEntrada;
+    }
+
+    /**
+     * @return the icmsCstEntradaForaEstado
+     */
+    public int getIcmsCstEntradaForaEstado() {
+        return icmsCstEntradaForaEstado;
+    }
+
+    /**
+     * @param icmsCstEntradaForaEstado the icmsCstEntradaForaEstado to set
+     */
+    public void setIcmsCstEntradaForaEstado(int icmsCstEntradaForaEstado) {
+        this.icmsCstEntradaForaEstado = icmsCstEntradaForaEstado;
+    }
+
+    /**
+     * @return the icmsAliqEntradaForaEstado
+     */
+    public double getIcmsAliqEntradaForaEstado() {
+        return icmsAliqEntradaForaEstado;
+    }
+
+    /**
+     * @param icmsAliqEntradaForaEstado the icmsAliqEntradaForaEstado to set
+     */
+    public void setIcmsAliqEntradaForaEstado(double icmsAliqEntradaForaEstado) {
+        this.icmsAliqEntradaForaEstado = icmsAliqEntradaForaEstado;
+    }
+
+    /**
+     * @return the icmsReducaoEntradaEstado
+     */
+    public double getIcmsReducaoEntradaForaEstado() {
+        return icmsReducaoEntradaForaEstado;
+    }
+
+    /**
+     * @param icmsReducaoEntradaForaEstado the icmsReducaoEntradaEstado to set
+     */
+    public void setIcmsReducaoEntradaForaEstado(double icmsReducaoEntradaForaEstado) {
+        this.icmsReducaoEntradaForaEstado = icmsReducaoEntradaForaEstado;
+    }
     private String importSistema;
     private String importLoja;
     private String importId;
@@ -33,6 +369,35 @@ public class ProdutoAnteriorVO {
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private Date dataHora;
     private String obsImportacao = "";
+    
+    private String icmsDebitoId = "";
+    private String icmsDebitoForaEstadoId = "";
+    private String icmsDebitoForaEstadoIdNf = "";
+    private String icmsCreditoId = "";
+    private String icmsCreditoForaEstadoId = "";
+    private String icmsConsumidorId = "";
+    
+    private int icmsCstSaida = -1;
+    private double icmsAliqSaida = -1;
+    private double icmsReducaoSaida = -1;
+    private int icmsCstSaidaForaEstado = -1;
+    private double icmsAliqSaidaForaEstado = -1;
+    private double icmsReducaoSaidaForaEstado = -1;
+    private int icmsCstSaidaForaEstadoNf = -1;
+    private double icmsAliqSaidaForaEstadoNf = -1;
+    private double icmsReducaoSaidaForaEstadoNf = -1;
+
+    private int icmsCstConsumidor = -1;
+    private double icmsAliqConsumidor = -1;
+    private double icmsReducaoConsumidor = -1;
+    
+    private int icmsCstEntrada = -1;
+    private double icmsAliqEntrada = -1;
+    private double icmsReducaoEntrada = -1;
+    private int icmsCstEntradaForaEstado = -1;
+    private double icmsAliqEntradaForaEstado = -1;
+    private double icmsReducaoEntradaForaEstado = -1;
+    
     
     private final MultiMap<String, ProdutoAnteriorEanVO> eans = new MultiMap<>(
         new Factory<ProdutoAnteriorEanVO>() {
