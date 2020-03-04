@@ -2,12 +2,10 @@ package vrimplantacao2.dao.cadastro.produto;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -188,84 +186,6 @@ public class ProdutoComplementoDAO {
         }
     }
 
-    public void atualizar(Collection<ProdutoComplementoVO> complementos, OpcaoProduto... opcoes) throws Exception {
-        Set<OpcaoProduto> opt = new LinkedHashSet<>(Arrays.asList(opcoes));
-        String oft = "";
-        try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoComplementoVO vo: complementos) {
-                SQLBuilder sql = new SQLBuilder();
-                sql.setTableName("produtocomplemento");
-                if (opt.contains(OpcaoProduto.PRECO)) {
-                    OfertaVO oferta = getOfertas().get(vo.getIdLoja(), vo.getProduto().getId());
-                    if (oferta == null) {
-                        sql.put("precovenda", vo.getPrecoVenda());
-                        sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
-                    } else {
-                        sql.put("precovenda", oferta.getPrecoOferta());
-                        if (oferta.getDataTermino().getTime() > new Date().getTime()) {
-                            sql.put("precodiaseguinte", oferta.getPrecoOferta());
-                        } else {
-                            sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
-                        }                        
-                        oft = "update oferta set preconormal = " + MathUtils.round(vo.getPrecoVenda(), 2) + " where id = " + oferta.getId();
-                    }
-                }
-                if (opt.contains(OpcaoProduto.TIPO_PRODUTO)) {
-                    sql.put("id_tipoproduto", vo.getTipoProduto().getId());
-                }
-                if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
-                    sql.put("fabricacaopropria", vo.isFabricacaoPropria());
-                }                
-                if (opt.contains(OpcaoProduto.EMITE_ETIQUETA)) {
-                    sql.put("emiteetiqueta", vo.isEmiteEtiqueta());
-                }
-                if (opt.contains(OpcaoProduto.CUSTO)) {
-                    sql.put("custocomimposto", vo.getCustoComImposto());
-                    sql.put("custosemimposto", vo.getCustoSemImposto());
-                }
-                if (opt.contains(OpcaoProduto.ESTOQUE)) {
-                    sql.put("estoque", vo.getEstoque());
-                }
-                if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
-                    sql.put("estoqueminimo", vo.getEstoqueMinimo());
-                }
-                if (opt.contains(OpcaoProduto.ESTOQUE_MAXIMO)) {
-                    sql.put("estoquemaximo", vo.getEstoqueMaximo());
-                }
-                if (opt.contains(OpcaoProduto.TROCA)) {
-                    sql.put("troca", vo.getTroca());
-                }
-                if (opt.contains(OpcaoProduto.ATIVO)) {
-                    sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
-                }
-                if (opt.contains(OpcaoProduto.ICMS)) {
-                    sql.put("id_aliquotacredito", vo.getIdAliquotaCredito());
-                }
-                if (opt.contains(OpcaoProduto.NORMA_REPOSICAO)) {
-                    sql.put("id_normareposicao", vo.getNormaReposicao().getId());
-                }
-                if (opt.contains(OpcaoProduto.CUSTO)) {
-                    sql.setWhere(
-                            "id_produto = " + vo.getProduto().getId() + " and "
-                            + "id_loja = " + vo.getIdLoja() + " and "
-                            + "dataultimaentrada is null"
-                    );
-                } else {
-                    sql.setWhere(
-                            "id_produto = " + vo.getProduto().getId() + " and "
-                            + "id_loja = " + vo.getIdLoja()
-                    );
-                }
-                if (!sql.isEmpty()) {
-                    stm.execute(sql.getUpdate());
-                    if (!"".equals(oft)) {
-                        stm.execute(oft);
-                    }                    
-                }
-            }
-        }
-    }
-    
     Set<Integer> custoAjustadoPeloUsuario = null;
     public void atualizar(ProdutoComplementoVO complemento, Set<OpcaoProduto> opt) throws Exception {
         try (Statement stm = Conexao.createStatement()) {

@@ -65,23 +65,24 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="cboLojaV2" alignment="0" max="32767" attributes="0"/>
+                      <Component id="flcArquivo" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkIncluirEcfsInexistentes" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBaixaEstoque" min="-2" max="-2" attributes="0"/>
                               <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                               <Component id="vRLabel35" alignment="0" min="-2" max="-2" attributes="1"/>
-                              <Component id="flcArquivo" alignment="0" min="-2" pref="344" max="-2" attributes="0"/>
                               <Component id="chkVerificarCodigoBarras" min="-2" max="-2" attributes="0"/>
                               <Component id="chkVerificarCodigoAnterior" min="-2" max="-2" attributes="0"/>
                               <Component id="chkExibirDivergencias" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="btnMapDivergencias" alignment="0" min="-2" pref="344" max="-2" attributes="0"/>
                               <Component id="chkEliminarVendaExistente" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="4" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -95,7 +96,9 @@
                   <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="flcArquivo" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="chkIncluirEcfsInexistentes" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="45" max="32767" attributes="0"/>
                   <Component id="chkExibirDivergencias" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkBaixaEstoque" min="-2" max="-2" attributes="0"/>
@@ -189,6 +192,11 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkEliminarVendaExistenteActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIncluirEcfsInexistentes">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Incluir ECFs inexistentes"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>

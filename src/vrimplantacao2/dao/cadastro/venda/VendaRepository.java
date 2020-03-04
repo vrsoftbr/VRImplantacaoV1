@@ -15,7 +15,6 @@ import vrframework.classe.Conexao;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao.vo.vrimplantacao.ProdutoVO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStack;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStackProvider;
