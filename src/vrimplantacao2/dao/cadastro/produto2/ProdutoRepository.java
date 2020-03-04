@@ -1343,9 +1343,40 @@ public class ProdutoRepository {
         destino.setPisCofinsCredito(imp.getPiscofinsCstCredito());
         destino.setPisCofinsDebito(imp.getPiscofinsCstDebito());
         destino.setPisCofinsNaturezaReceita(imp.getPiscofinsNaturezaReceita());
+        
         destino.setIcmsCst(imp.getIcmsCst());
         destino.setIcmsAliq(imp.getIcmsAliq());
         destino.setIcmsReducao(imp.getIcmsReducao());
+        
+        destino.setIcmsCstSaida(imp.getIcmsCstSaida());
+        destino.setIcmsAliqSaida(imp.getIcmsAliqSaida());
+        destino.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
+        
+        destino.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaidaForaEstado());
+        destino.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaidaForaEstado());
+        destino.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaidaForaEstado());
+        
+        destino.setIcmsCstSaidaForaEstadoNf(imp.getIcmsCstSaidaForaEstadoNF());
+        destino.setIcmsAliqSaidaForaEstadoNf(imp.getIcmsAliqSaidaForaEstadoNF());
+        destino.setIcmsReducaoSaidaForaEstadoNf(imp.getIcmsReducaoSaidaForaEstadoNF());
+        
+        destino.setIcmsCstEntrada(imp.getIcmsCstEntrada());
+        destino.setIcmsAliqEntrada(imp.getIcmsAliqEntrada());
+        destino.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
+        
+        destino.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntradaForaEstado());
+        destino.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntradaForaEstado());
+        destino.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
+        
+        destino.setIcmsDebitoId(imp.getIcmsDebitoId());
+        destino.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoForaEstadoId());
+        destino.setIcmsDebitoForaEstadoIdNf(imp.getIcmsDebitoForaEstadoId());
+        
+        destino.setIcmsCreditoId(imp.getIcmsCreditoId());
+        destino.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoForaEstadoId());
+        
+        destino.setIcmsConsumidorId(imp.getIcmsConsumidorId());
+        
         destino.setEstoque(imp.getEstoque());
         destino.seteBalanca(imp.isBalanca());
         destino.setCustosemimposto(imp.getCustoSemImposto());

@@ -98,6 +98,30 @@ public class ProdutoAnteriorDAO {
                     + "                      situacaocadastro integer,\n"
                     + "                      dataimportacao timestamp,\n"
                     + "                      obsimportacao character varying,\n"
+                    + "                      icmscstsaida integer,\n"
+                    + "                      icmsaliqsaida numeric(14,4),\n"
+                    + "                      icmsreducaosaida numeric(14,4),\n"
+                    + "                      icmscstsaidaforaestado integer,\n"
+                    + "                      icmsaliqsaidaforaestado numeric(14,4),\n"
+                    + "                      icmsreducaosaidaforaestado numeric(14,4),\n"
+                    + "                      icmscstsaidaforaestadonf integer,\n"
+                    + "                      icmsaliqsaidaforaestadonf numeric(14,4),\n"
+                    + "                      icmsreducaosaidaforaestadonf numeric(14,4),\n"
+                    + "                      icmscstentrada integer,\n"
+                    + "                      icmsaliqentrada numeric(14,4),\n"
+                    + "                      icmsreducaoentrada numeric(14,4),\n"
+                    + "                      icmscstentradaforaestado integer,\n"
+                    + "                      icmsaliqentradaforaestado numeric(14,4),\n"
+                    + "                      icmsreducaoentradaforaestado numeric(14,4),\n"
+                    + "                      icmscstconsumidor integer,\n"
+                    + "                      icmsaliqconsumidor numeric(14,4),\n"
+                    + "                      icmsreducaoconsumidor numeric(14,4),\n"
+                    + "                      icmsdebitoid character varying,\n"
+                    + "                      icmsdebitoforaestadoid character varying,\n"
+                    + "                      icmsdebitoforaestadonfid character varying,\n"
+                    + "                      icmscreditoid character varying,\n"
+                    + "                      icmscreditoforaestadoid character varying,\n"
+                    + "                      icmsconsumidorid character varying,\n"                            
                     + "                      primary key (impsistema, imploja, impid),\n"
                     + "                      unique (impsistema, imploja, codigosped)\n"
                     + "                );\n"
@@ -509,7 +533,44 @@ public class ProdutoAnteriorDAO {
                         obtemContador();
                     }
                     sql.put("contadorimportacao", contador);
+                    
+                    sql.put("situacaocadastro", vo.getSituacaoCadastro().getId());
+                    sql.put("dataimportacao", vo.getDataHora());
+                    sql.put("obsimportacao", vo.getObsImportacao());                    
 
+                    sql.put("icmscstsaida", vo.getIcmsCstSaida());
+                    sql.put("icmsaliqsaida", vo.getIcmsAliqSaida());
+                    sql.put("icmsreducaosaida", vo.getIcmsReducaoSaida());
+
+                    sql.put("icmscstsaidaforaestado", vo.getIcmsCstSaidaForaEstado());
+                    sql.put("icmsaliqsaidaforaestado", vo.getIcmsAliqSaidaForaEstado());
+                    sql.put("icmsreducaosaidaforaestado", vo.getIcmsReducaoSaidaForaEstado());
+
+                    sql.put("icmscstsaidaforaestadonf", vo.getIcmsCstSaidaForaEstadoNf());
+                    sql.put("icmsaliqsaidaforaestadonf", vo.getIcmsAliqSaidaForaEstadoNf());
+                    sql.put("icmsreducaosaidaforaestadonf", vo.getIcmsReducaoSaidaForaEstadoNf());
+
+                    sql.put("icmscstentrada", vo.getIcmsCstEntrada());
+                    sql.put("icmsaliqentrada", vo.getIcmsAliqEntrada());
+                    sql.put("icmsreducaoentrada", vo.getIcmsReducaoEntrada());
+
+                    sql.put("icmscstentradaforaestado", vo.getIcmsCstEntradaForaEstado());
+                    sql.put("icmsaliqentradaforaestado", vo.getIcmsAliqEntradaForaEstado());
+                    sql.put("icmsreducaoentradaforaestado", vo.getIcmsReducaoEntradaForaEstado());
+
+                    sql.put("icmscstconsumidor", vo.getIcmsCstConsumidor());
+                    sql.put("icmsaliqconsumidor", vo.getIcmsAliqConsumidor());
+                    sql.put("icmsreducaoconsumidor", vo.getIcmsReducaoConsumidor());
+
+                    sql.put("icmsdebitoid", vo.getIcmsDebitoId());
+                    sql.put("icmsdebitoforaestadoid", vo.getIcmsDebitoForaEstadoId());
+                    sql.put("icmsdebitoforaestadonfid", vo.getIcmsDebitoForaEstadoIdNf());
+
+                    sql.put("icmscreditoid", vo.getIcmsCreditoId());
+                    sql.put("icmscreditoforaestadoid", vo.getIcmsCreditoForaEstadoId());
+
+                    sql.put("icmsconsumidorid", vo.getIcmsConsumidorId());
+                    
                     try {
                         stm.execute(sql.getInsert());
                     } catch (Exception e) {
@@ -563,6 +624,39 @@ public class ProdutoAnteriorDAO {
             sql.put("situacaocadastro", anterior.getSituacaoCadastro().getId());
             sql.put("dataimportacao", anterior.getDataHora());
             sql.put("obsimportacao", anterior.getObsImportacao());
+            
+            sql.put("icmscstsaida", anterior.getIcmsCstSaida());
+            sql.put("icmsaliqsaida", anterior.getIcmsAliqSaida());
+            sql.put("icmsreducaosaida", anterior.getIcmsReducaoSaida());
+            
+            sql.put("icmscstsaidaforaestado", anterior.getIcmsCstSaidaForaEstado());
+            sql.put("icmsaliqsaidaforaestado", anterior.getIcmsAliqSaidaForaEstado());
+            sql.put("icmsreducaosaidaforaestado", anterior.getIcmsReducaoSaidaForaEstado());
+            
+            sql.put("icmscstsaidaforaestadonf", anterior.getIcmsCstSaidaForaEstadoNf());
+            sql.put("icmsaliqsaidaforaestadonf", anterior.getIcmsAliqSaidaForaEstadoNf());
+            sql.put("icmsreducaosaidaforaestadonf", anterior.getIcmsReducaoSaidaForaEstadoNf());
+            
+            sql.put("icmscstentrada", anterior.getIcmsCstEntrada());
+            sql.put("icmsaliqentrada", anterior.getIcmsAliqEntrada());
+            sql.put("icmsreducaoentrada", anterior.getIcmsReducaoEntrada());
+            
+            sql.put("icmscstentradaforaestado", anterior.getIcmsCstEntradaForaEstado());
+            sql.put("icmsaliqentradaforaestado", anterior.getIcmsAliqEntradaForaEstado());
+            sql.put("icmsreducaoentradaforaestado", anterior.getIcmsReducaoEntradaForaEstado());
+            
+            sql.put("icmscstconsumidor", anterior.getIcmsCstConsumidor());
+            sql.put("icmsaliqconsumidor", anterior.getIcmsAliqConsumidor());
+            sql.put("icmsreducaoconsumidor", anterior.getIcmsReducaoConsumidor());
+            
+            sql.put("icmsdebitoid", anterior.getIcmsDebitoId());
+            sql.put("icmsdebitoforaestadoid", anterior.getIcmsDebitoForaEstadoId());
+            sql.put("icmsdebitoforaestadonfid", anterior.getIcmsDebitoForaEstadoIdNf());
+            
+            sql.put("icmscreditoid", anterior.getIcmsCreditoId());
+            sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
+            
+            sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
 
             try {
                 stm.execute(sql.getInsert());
