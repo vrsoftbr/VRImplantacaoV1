@@ -180,6 +180,7 @@ public class ProdutoRepository {
                         }
                         
                         ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+                        int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
 
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
@@ -197,6 +198,13 @@ public class ProdutoRepository {
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
+                        
+                        aliquota.setBeneficio(idBeneficio);
+                        
+                        if(idBeneficio != 0) {
+                            provider.aliquota().salvarAliquotaBeneficio(aliquota);
+                        }
+                        
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");

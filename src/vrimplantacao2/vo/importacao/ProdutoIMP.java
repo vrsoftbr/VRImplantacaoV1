@@ -129,6 +129,7 @@ public class ProdutoIMP {
     @DatabaseField private boolean vendaControlada = false;
     @DatabaseField private String setor = "";
     @DatabaseField private String prateleira = "";
+    @DatabaseField private String beneficio = "";
     
     public String getImportSistema() {
         return importSistema;
@@ -972,6 +973,14 @@ public class ProdutoIMP {
      */
     public void setProdutoControlado(String produtoControlado) {
         this.vendaControlada = Utils.stringToBool(produtoControlado != null ? produtoControlado.toUpperCase() : "F");
+    }
+
+    public String getBeneficio() {
+        return beneficio;
+    }
+
+    public void setBeneficio(String beneficio) {
+        this.beneficio = beneficio;
     }
     
 }

@@ -301,6 +301,10 @@ public class ProdutoRepositoryProvider {
         public void salvar(ProdutoAliquotaVO aliquota) throws Exception {
             dao.salvar(aliquota);
         }
+        
+        public void salvarAliquotaBeneficio(ProdutoAliquotaVO aliquota) throws Exception {
+            dao.salvarAliquotaBeneficio(aliquota);
+        }
 
         public void atualizar(ProdutoAliquotaVO aliquota, Set<OpcaoProduto> opt) throws Exception {
             dao.atualizar(aliquota, opt);
@@ -308,6 +312,10 @@ public class ProdutoRepositoryProvider {
 
         public MultiMap<Integer, Void> getAliquotas() throws Exception {
             return dao.getAliquotas();
+        }
+        
+        public int getBeneficio(String beneficio) throws Exception {
+            return dao.getBeneficio(beneficio);
         }
 
     }
