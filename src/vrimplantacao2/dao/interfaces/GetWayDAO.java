@@ -43,6 +43,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -83,7 +84,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean apenasProdutoAtivo = false;
     private boolean copiarIcmsDebitoNaEntrada = false;
     public boolean utilizaMetodoAjustaAliquota = false;
-        
+            
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
     }
@@ -265,7 +266,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	case when prod.codsetor is null then 0 else 1 end balanca,\n" +
                     "	prod.validade,\n" +
                     "	prod.descricao descricaocompleta,\n" +
-                    "	prod.descricao descricaogondola,\n" +
+                    "	prod.desc_pdv descricaogondola,\n" +
                     "	prod.desc_pdv descricaoreduzida,\n" +
                     "	coalesce(prod.codcreceita, 1) as cod_mercadologico1,\n" +
                     "	coalesce(prod.codgrupo, 1) as cod_mercadologico2,\n" +
@@ -294,13 +295,15 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prod.cst_pisentrada piscofins_cst_credito,\n" +
                     "	prod.cst_pissaida piscofins_cst_debito,\n" +
                     "	prod.nat_rec piscofins_natureza_receita,\n" +
-                    "	prod.codaliq icms_debito_id,\n" +
+                    "	ltrim(rtrim(prod.codaliq)) icms_debito_id,\n" +
                     "	prod.CODTRIB icms_cst_saida,\n" +
                     "	al.ALIQUOTA icms_aliquota_saida,\n" +
                     "	prod.PER_REDUC icms_reduzido_saida,\n" +
                     "	prod.CODTRIB_ENT icms_cst_entrada,\n" +
                     "	prod.ulticmscred icms_aliquota_entrada,\n" +
                     "	prod.PER_REDUC_ENT icms_reduzido_entrada,\n" +
+                    "   refativoimob tipo_ativo,\n" +
+                    "   refusoconsumo tipo_usoconsumo,\n" +
                     "	prod.desativacompra\n" +
                     "from\n" +
                     "	produtos prod\n" +
@@ -352,6 +355,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setMargem(rst.getDouble("margem_param"));
                     }
+
+                    imp.setTipoProduto(("S".equals(rst.getString("tipo_ativo").trim()) ? TipoProduto.ATIVO_IMOBILIZADO : TipoProduto.MERCADORIA_REVENDA));
+                    imp.setTipoProduto(("S".equals(rst.getString("tipo_usoconsumo").trim()) ? TipoProduto.MATERIAL_USO_E_CONSUMO : TipoProduto.MERCADORIA_REVENDA));
+                                        
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ativo").trim()) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setDescontinuado("S".equals(rst.getString("desativacompra")) || rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
@@ -1702,7 +1709,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select replace(codaliq,'\\','\\\\') codaliq, descricao from aliquota_icms"
+                    "select ltrim(rtrim(replace(codaliq,'\\','\\\\'))) codaliq, descricao from aliquota_icms"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
