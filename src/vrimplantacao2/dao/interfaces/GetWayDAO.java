@@ -41,6 +41,7 @@ import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
@@ -82,7 +83,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean apenasProdutoAtivo = false;
     private boolean copiarIcmsDebitoNaEntrada = false;
     public boolean utilizaMetodoAjustaAliquota = false;
-
+        
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
     }
@@ -879,7 +880,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    when codtipofornec = 6 then 6 \n"
                     + "    when codtipofornec = 7 then 7 \n"
                     + "    when codtipofornec = 8 then 8 \n"
-                    + "    end, 2) as codtipofornec \n"
+                    + "    end, 2) as codtipofornec, \n"
+                    + "    simples \n"
                     + "    from \n"
                     + "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n"
                     + "    order by codfornec"
@@ -900,7 +902,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("CEP"));
                     imp.setCnpj_cpf(rst.getString("CNPJ_CPF"));
                     imp.setIe_rg(rst.getString("IE"));
-                    imp.setTel_principal(rst.getString("TELEFONE"));
+                    imp.setTel_principal(Utils.stringLong(rst.getString("TELEFONE")));
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
 
                     imp.setObservacao(rst.getString("OBS"));
@@ -924,7 +926,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     //imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
                     imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
-
+                    
+                    /*if ((rst.getString("simples").equals("S"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    }*/
+                    
                     imp.addTelefone("FAX", rst.getString("FAX"));
                     if ((rst.getString("CONTATO") != null)
                             && (!rst.getString("CONTATO").trim().isEmpty())) {
@@ -1192,7 +1200,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    FROM \n"
                     + "    CLIENTES \n"
                     + "    where \n"
-                    + "    CODCLIE >= 1"
+                    + "    CODCLIE >= 1 \n"
+                    + "    and codTIPOCLIE in (2,4)"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -1225,7 +1234,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rst.getDate("DTANIVER"));
                     imp.setValorLimite(rst.getDouble("LIMITECRED"));
                     imp.setEmpresa(rst.getString("EMPRESA"));
-                    imp.setEmpresaTelefone(rst.getString("FONE_EMP"));
+                    imp.setEmpresaTelefone(Utils.stringLong(rst.getString("FONE_EMP")));
                     imp.setCargo(rst.getString("CARGO"));
                     imp.setSalario(rst.getDouble("RENDA"));
                     imp.setObservacao(rst.getString("OBS"));
@@ -1282,7 +1291,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato(
                                 "1",
                                 "FONE 1",
-                                rst.getString("FONE1"),
+                                Utils.stringLong(rst.getString("FONE1")),
                                 null,
                                 null
                         );
@@ -1292,7 +1301,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato(
                                 "1",
                                 "FONE 2",
-                                rst.getString("FONE2"),
+                                Utils.stringLong(rst.getString("FONE2")),
                                 null,
                                 null
                         );
