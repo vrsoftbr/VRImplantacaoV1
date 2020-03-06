@@ -2932,19 +2932,6 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItemMilenioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMilenioActionPerformed
 
-        try {
-            this.setWaitCursor();
-            if (formImportarMilenio == null || formImportarMilenio.isClosed()) {
-                formImportarMilenio = new MilenioGUI(this);
-            }
-
-            formImportarMilenio.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
 
     }//GEN-LAST:event_jMenuItemMilenioActionPerformed
 
