@@ -4,14 +4,19 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
@@ -171,7 +176,138 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
         }        
         return result;
     }
-    
-    
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            Map<String, List<FornecedorContatoIMP>> contatos = new HashMap<>();
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.AGECOD id_fornecedor,\n" +
+                    "	c.CNTNOM nome,\n" +
+                    "	c.CNTTEL telefone,\n" +
+                    "	c.CNTCEL celular,\n" +
+                    "	c.CNTMAIL email\n" +
+                    "from\n" +
+                    "	contato c\n" +
+                    "	join agente a on\n" +
+                    "		c.AGECOD = a.AGECOD\n" +
+                    "	join FORNECEDOR F on\n" +
+                    "		f.AGECOD = a.AGECOD\n" +
+                    "order by\n" +
+                    "   id_fornecedor"
+            )) {
+                while (rs.next()) {
+                    List<FornecedorContatoIMP> list = contatos.get(rs.getString("id_fornecedor"));
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        contatos.put(rs.getString("id_fornecedor"), list);
+                    }
+                    FornecedorContatoIMP imp = new FornecedorContatoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId("CONT" + (list.size() + 1));                    
+                    imp.setImportFornecedorId(rs.getString("id_fornecedor")); 
+                    imp.setNome(rs.getString("nome"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setTipoContato(TipoContato.COMERCIAL);
+                    imp.setEmail(rs.getString("email"));
+                    
+                    list.add(imp);
+                }
+            }
+            
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT\n" +
+                    "	f.FORCOD id,\n" +
+                    "	a.AGECOD,\n" +
+                    "	a.AGEDES razao,\n" +
+                    "	a.AGEFAN fantasia,\n" +
+                    "	a.AGECGCCPF cnpj,\n" +
+                    "	a.AGECGFRG ierg,\n" +
+                    "	a.AGETEL1 fone,\n" +
+                    "	a.AGEEND endereco,\n" +
+                    "	a.AGENUM numero,\n" +
+                    "	a.AGECPL complemento,\n" +
+                    "	a.AGEBAI bairro,\n" +
+                    "	a.AGECID municipio,\n" +
+                    "	a.AGEEST uf,\n" +
+                    "	a.AGECEP cep,\n" +
+                    "	a.AGETEL1 tel1,\n" +
+                    "	a.AGETEL2 tel2,\n" +
+                    "	a.AGEFAX fax,\n" +
+                    "	a.AGEATA atacado,\n" +
+                    "	a.AGEDATCAD datacadastro,\n" +
+                    "	a.AGEDATBLO databloqueio,\n" +
+                    "	a.AGEDATALT dataalteracao,\n" +
+                    "	a.AGEINSMUN inscricaomunicipal,\n" +
+                    "	a.AGECTRICMS tributadoicms,\n" +
+                    "	a.AGEOBS observacoes,\n" +
+                    "	f.FORPRZENT prazoentrega,\n" +
+                    "	f.FORPRZ prazopagamento,\n" +
+                    "	(SELECT TOP (1) CNTMAIL FROM dbo.CONTATO AS C WHERE (C.AGECOD = F.AGECOD) AND CNTMAIL IS NOT NULL) AS EMAIL\n" +
+                    "from\n" +
+                    "	FORNECEDOR F\n" +
+                    "INNER JOIN AGENTE A ON\n" +
+                    "	A.AGECOD = F.AGECOD\n" +
+                    "where\n" +
+                    "	AGECGCCPF is not null\n" +
+                    "order by\n" +
+                    "	FORCOD"
+            )) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ierg"));
+                    imp.setTel_principal(rs.getString("fone"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.addTelefone("TEL 1", rs.getString("tel1"));
+                    imp.addTelefone("TEL 2", rs.getString("tel2"));
+                    imp.addTelefone("FAX", rs.getString("fax"));
+                    //imp.setTipoFornecedor("S".equals(rs.getString("atacado")) ? TipoFornecedor.ATACADO);
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
+                    //imp.set(rs.getString("databloqueio"));
+                    //imp.set(rs.getString("dataalteracao"));
+                    imp.setInsc_municipal(rs.getString("inscricaomunicipal"));
+                    //imp.set(rs.getString("tributadoicms"));
+                    imp.setObservacao(rs.getString("observacoes"));
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    imp.setPrazoPedido(rs.getInt("prazopagamento"));
+                    
+                    List<FornecedorContatoIMP> get = contatos.get(rs.getString("agecod"));
+                    if (get != null) {                    
+                        for (FornecedorContatoIMP cont: get) {
+                            imp.addContato(
+                                    cont.getNome(),
+                                    cont.getTelefone(),
+                                    cont.getCelular(),
+                                    cont.getTipoContato(),
+                                    cont.getEmail()
+                            );
+                        }
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }

@@ -163,7 +163,10 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkFornecedor.isSelected()) {
-                            importador.importarFornecedor();
+                            importador.importarFornecedor(
+                                    OpcaoFornecedor.DADOS,
+                                    OpcaoFornecedor.CONTATOS
+                            );
                         }
 
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
