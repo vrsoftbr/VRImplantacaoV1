@@ -11,6 +11,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
@@ -61,7 +62,8 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<OpcaoProduto>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA_PRODUTO
         ));
     }
     
@@ -110,6 +112,44 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	PROCOD id,\n" +
+                    "	prodes descricao\n" +
+                    "from\n" +
+                    "	produto\n" +
+                    "where\n" +
+                    "	procod in (\n" +
+                    "	select\n" +
+                    "		procod\n" +
+                    "	from\n" +
+                    "		referencia\n" +
+                    "	group by\n" +
+                    "		PROCOD\n" +
+                    "	having\n" +
+                    "		COUNT(*) > 1)\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }        
+        return result;
+    }
+
+    @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
@@ -128,8 +168,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     );
                 }
             }
-        }
-        
+        }        
         return result;
     }
     
