@@ -414,7 +414,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.proalcoolico,\n" +
                     "	p.profinalidade,\n" +
                     "	p.profabterc,\n" +
-                    "	prc.prlcodbenef\n" +
+                    "	prc.prlcodbenef beneficio\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -517,6 +517,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSugestaoCotacao("S".equals(rst.getString("sugestaocotacao")));
                     imp.setIdComprador(rst.getString("id_comprador"));
                     imp.setProdutoControlado(rst.getString("proalcoolico"));
+                    imp.setBeneficio(rst.getString("beneficio"));
                     
                     result.add(imp);
                 }

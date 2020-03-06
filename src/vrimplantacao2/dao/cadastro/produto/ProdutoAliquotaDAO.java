@@ -78,6 +78,26 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
+    
+    public void salvarAliquotaBeneficio(ProdutoAliquotaVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtoaliquotabeneficio");
+            sql.put("id_produtoaliquota", vo.getId());
+            sql.put("id_aliquota", vo.getAliquotaDebito().getId());
+            sql.put("id_beneficio", vo.getBeneficio());
+
+            sql.getReturning().add("id");
+
+            try (ResultSet rst = stm.executeQuery(
+                    sql.getInsert()
+            )) {
+                if (rst.next()) {
+                    vo.setId(rst.getInt("id"));
+                }
+            }
+        }
+    }
 
     public void atualizar(Collection<ProdutoAliquotaVO> aliquotas, OpcaoProduto... opcoes) throws Exception {
         Set<OpcaoProduto> opt = new LinkedHashSet<>(Arrays.asList(opcoes));
@@ -209,6 +229,20 @@ public class ProdutoAliquotaDAO {
         }
 
         return result;
+    }
+    
+    public int getBeneficio(String beneficio) throws Exception {
+        int idBeneficio = 0;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id from public.codigobeneficiocst where codigo = '" + beneficio + "'"
+            )) {
+                if(rst.next()) 
+                    idBeneficio = rst.getInt("id");
+                
+            }
+        }
+        return idBeneficio;
     }
 
 }
