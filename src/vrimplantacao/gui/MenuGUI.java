@@ -59,7 +59,6 @@ import vrimplantacao.gui.interfaces.InteragemGUI_2;
 import vrimplantacao.gui.interfaces.JMasterGUI;
 import vrimplantacao.gui.interfaces.LogusGUI;
 import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
-import vrimplantacao.gui.interfaces.MilenioGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
@@ -167,6 +166,7 @@ import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
+import vrimplantacao2.gui.interfaces.MilenioGUI;
 import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao2.gui.interfaces.MobnePdvGUI;
 import vrimplantacao2.gui.interfaces.MrsGUI;
@@ -2926,26 +2926,11 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSistemaLoginActionPerformed
 
     private void jMenuItemCGAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCGAActionPerformed
-
         CgaGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemCGAActionPerformed
 
     private void jMenuItemMilenioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMilenioActionPerformed
-
-        try {
-            this.setWaitCursor();
-            if (formImportarMilenio == null || formImportarMilenio.isClosed()) {
-                formImportarMilenio = new MilenioGUI(this);
-            }
-
-            formImportarMilenio.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
+        MilenioGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemMilenioActionPerformed
 
 
