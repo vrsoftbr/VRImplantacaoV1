@@ -936,8 +936,11 @@ public class ProdutoRepository {
 
             if (consumidor == null) {
                 if (icmsCstSaida == 20) {
-                    double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);
-                    consumidor = provider.tributo().getIcms(0, aliq, 0);
+                    /*
+                    Comentado o calculo da alíquota consumidor por questão de impressora NFC-e
+                    */
+                    //double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);
+                    consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
                 } else {
                     consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
                 }
@@ -990,8 +993,12 @@ public class ProdutoRepository {
 
             if (consumidor == null) {
                 if (icmsCstSaida == 20) {
-                    double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
-                    consumidor = provider.tributo().getIcms(0, aliq, 0);
+                    /*
+                        Comentado o calculo da alíquota consumidor 
+                        por questão de impressora NFC-e
+                    */
+                    //double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
+                    consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
                 } else {
                     consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
                 }
