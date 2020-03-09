@@ -912,5 +912,86 @@ public class ProdutoAnteriorDAO {
 
         return null;
     }
+
+    public ProdutoAnteriorVO getProdutoAnteriorSemUltimoDigito(String sistema, String loja, String id) throws Exception {
+        createTable();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	substring(ant.impid, 1, char_length(ant.impid) -1) as impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on ant.codigoatual = p.id\n"
+                    + "where \n"
+                    + "       ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "       ant.imploja = " + SQLUtils.stringSQL(loja) + " and\n"
+                    + "       ant.impid = " + SQLUtils.stringSQL(id) + "\n"
+                    + "order by\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid"
+            )) {
+                if (rst.next()) {
+                    ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
+
+                    vo.setImportSistema(rst.getString("impsistema"));
+                    vo.setImportLoja(rst.getString("imploja"));
+                    vo.setImportId(rst.getString("impid"));
+                    vo.setDescricao(rst.getString("descricao"));
+                    ProdutoVO produto = null;
+                    if (rst.getString("codigoatual") != null) {
+                        produto = new ProdutoVO();
+                        produto.setId(rst.getInt("codigoatual"));
+                        produto.setDescricaoCompleta("descricaocompleta");
+                        produto.setDescricaoCompleta("descricaogondola");
+                        produto.setDescricaoCompleta("descricaoreduzida");
+                    }
+                    vo.setCodigoAtual(produto);
+                    vo.setPisCofinsCredito(rst.getInt("piscofinscredito"));
+                    vo.setPisCofinsDebito(rst.getInt("piscofinsdebito"));
+                    vo.setPisCofinsNaturezaReceita(rst.getInt("piscofinsnaturezareceita"));
+                    vo.setIcmsCst(rst.getInt("icmscst"));
+                    vo.setIcmsAliq(rst.getDouble("icmsaliq"));
+                    vo.setIcmsReducao(rst.getDouble("icmsreducao"));
+                    vo.setEstoque(rst.getDouble("estoque"));
+                    vo.seteBalanca(rst.getBoolean("e_balanca"));
+                    vo.setCustosemimposto(rst.getDouble("custosemimposto"));
+                    vo.setCustocomimposto(rst.getDouble("custocomimposto"));
+                    vo.setPrecovenda(rst.getDouble("precovenda"));
+                    vo.setNcm(rst.getString("ncm"));
+                    vo.setCest(rst.getString("cest"));
+                    vo.setNovo(rst.getBoolean("novo"));
+                    vo.setContadorImportacao(rst.getInt("contadorimportacao"));
+
+                    return vo;
+                }
+            }
+        }
+
+        return null;
+    }
     
 }

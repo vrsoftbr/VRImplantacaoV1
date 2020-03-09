@@ -52,7 +52,8 @@ public class VendaRepository {
     private ProdutoIDStack produtoIDStack;
     private ProdutoRepositoryProvider providerProduto;
     private ProdutoAnteriorDAO produtoAnteriorDAO;
-
+    public boolean idProdutoSemUltimoDigito = false;
+    
     public VendaRepository(VendaRepositoryProvider provider) {
         this.provider = provider;
     }
@@ -171,8 +172,12 @@ public class VendaRepository {
 
                     Integer produto = provider.getProdutoPorMapeamento(impItem.getProduto());
 
-                    if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) ) {    
-                        produto = provider.getProdutoPorCodigoAnterior(impItem.getProduto());
+                    if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) ) {
+                        if (!idProdutoSemUltimoDigito) {
+                            produto = provider.getProdutoPorCodigoAnterior(impItem.getProduto());
+                        } else {
+                            produto = provider.getProdutoPorCodigoAnteriorSemUltimoDigito(impItem.getProduto());
+                        }
                     }
                     if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR) ) {
                         produto = provider.getProdutoPorEANAnterior(impItem.getCodigoBarras());

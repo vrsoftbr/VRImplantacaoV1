@@ -138,6 +138,33 @@ public class PdvVendaItemDAO {
         return produtosPorCodigoAnterior.get(produto);
     }
 
+    private Map<String, Integer> produtosPorCodigoAnteriorSemUltimoDigito;
+    public Integer getProdutoPorCodigoAnteriorSemUltimoDigito(String produto) throws Exception {
+        if (produtosPorCodigoAnteriorSemUltimoDigito == null) {
+            LOG.info("Carregando produtos pelo codigo anterior");
+            produtosPorCodigoAnteriorSemUltimoDigito = new HashMap<>();
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n" +
+                        "	substring(ant.impid, 1, char_length(ant.impid) -1) as impid,\n" +
+                        "	ant.codigoatual\n" +
+                        "from \n" +
+                        "	implantacao.codant_produto ant\n" +
+                        "	join produto p on ant.codigoatual = p.id\n" +
+                        "where\n" +
+                        "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
+                        "	ant.imploja = " + SQLUtils.stringSQL(loja)
+                )) {
+                    while (rst.next()) {
+                        produtosPorCodigoAnteriorSemUltimoDigito.put(rst.getString("impid"), rst.getInt("codigoatual"));
+                    }
+                }
+            }
+            LOG.info("Produtos pelo código anterior carregados");
+        }
+        return produtosPorCodigoAnteriorSemUltimoDigito.get(produto);
+    }
+    
     private Map<String, Integer> produtosPorEanAnterior;
     public Integer getProdutoPorEANAnterior(String ean) throws Exception {
         if (produtosPorEanAnterior == null) {

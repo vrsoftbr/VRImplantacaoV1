@@ -136,6 +136,10 @@ public class VendaRepositoryProvider {
         return vendaItemDAO.getProdutoPorCodigoAnterior(produto);
     }
 
+    public Integer getProdutoPorCodigoAnteriorSemUltimoDigito(String produto) throws Exception {
+        return vendaItemDAO.getProdutoPorCodigoAnteriorSemUltimoDigito(produto);
+    }
+    
     public Integer getProdutoPorEANAnterior(String ean) throws Exception {
         return vendaItemDAO.getProdutoPorEANAnterior(ean);
     }

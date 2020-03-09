@@ -124,6 +124,7 @@ public class Importador {
     private InterfaceDAO interfaceDAO;
     private int lojaVR = 1;
     private boolean importarIndividualLoja = false;
+    public boolean idProdutoSemUltimoDigito = false;
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
@@ -937,7 +938,7 @@ public class Importador {
                     getLojaVR()
             );
             VendaRepository rep = new VendaRepository(provider);
-
+            rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
             rep.importar(opt);
         }
     }

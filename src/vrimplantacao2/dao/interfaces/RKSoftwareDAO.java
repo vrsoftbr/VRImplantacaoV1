@@ -235,6 +235,7 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCodigoGIA(rst.getString("gia"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setBeneficio(rst.getString("codigobeneficio"));
                     imp.setIcmsDebitoId(rst.getString("id_tributacao"));
                     imp.setIcmsCreditoId(rst.getString("id_tributacao"));
                     result.add(imp);

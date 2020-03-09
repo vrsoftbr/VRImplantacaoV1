@@ -844,10 +844,16 @@ public class GCFDAO extends InterfaceDAO {
 
     private Date getData(String data) throws ParseException {
         if (data.length() == 8) {
-            String ano = data.substring(0, 4);
-            String mes = data.substring(4, 6);
-            String dia = data.substring(6, 8);
-            return (FORMAT.parse(ano + "-" + mes + "-" + dia));
+            String dia = data.substring(0, 2);
+            String mes = data.substring(2, 4);
+            String ano = data.substring(4, 8);
+            return (FORMAT.parse(dia + "/" + mes + "/" + ano));
+        } 
+        if (data.length() == 7) {
+            String dia = data.substring(0, 1);
+            String mes = data.substring(1, 3);
+            String ano = data.substring(3, 7);
+            return (FORMAT.parse(dia + "/" + mes + "/" + ano));
         } else {
             return new Date();
         }
@@ -952,7 +958,6 @@ public class GCFDAO extends InterfaceDAO {
                     + "and pdvcc_dta between '" + dataInicio + "' and '" + dataTermino + "'\n"
                     + "and pdvcc_est = '" + Parametros.get().getUfPadraoV2().getSigla() + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
-            System.out.println(sql);
             rst = stm.executeQuery(sql);            
         }
 
@@ -998,7 +1003,7 @@ public class GCFDAO extends InterfaceDAO {
                             next.setProduto(rst.getString("idproduto"));
                             next.setSequencia(rst.getInt("sequencia"));
                             next.setDescricaoReduzida(rst.getString("descricaoproduto"));
-                            next.setUnidadeMedida(rst.getString("tipoembalagem"));
+                            next.setUnidadeMedida("UN");
                             next.setPrecoVenda(rst.getDouble("precovenda"));
                             next.setQuantidade(rst.getDouble("quantidade"));
                             next.setTotalBruto(rst.getDouble("valortotal"));
@@ -1084,9 +1089,7 @@ public class GCFDAO extends InterfaceDAO {
             this.sql = "select  \n"
                     + "    ite.pdvci_id as idvenda,\n"
                     + "    ite.pdvci_seq as sequencia,\n"
-                    + "    ite.pdvci_ite as idprodutovenda,\n"
-                    + "    p.DBA_GIT_PRODUTO as idproduto,\n"
-                    + "    P.DBA_GIT_TPO_EMB_VENDA as tipoembalagem,\n"
+                    + "    ite.pdvci_ite as idproduto,\n"
                     + "    ite.pdvci_ean as codigobarras,\n"
                     + "    ite.pdvci_dcr as descricaoproduto,\n"
                     + "    ite.pdvci_qtd_uni as quantidade,\n"
@@ -1094,8 +1097,6 @@ public class GCFDAO extends InterfaceDAO {
                     + "    ite.pdvci_mer_val as valortotal,\n"
                     + "    ite.pdvci_icm_trb as tributacao\n"
                     + "from A_INTPDVCI ite \n"
-                    + "inner join A_CADCITEM p \n"
-                    + "    on to_number(to_char(substr(DBA_GIT_PRODUTO, 1, length(to_char(DBA_GIT_PRODUTO)) -1))) = to_number(ite.pdvci_ite)\n"
                     + "where ite.pdvci_id in (select \n"
                     + "                              pdvcc_id\n"
                     + "                         from A_INTPDVCC\n"
@@ -1105,7 +1106,6 @@ public class GCFDAO extends InterfaceDAO {
                     + "                      )";
                         
             LOG.log(Level.FINE, "SQL da venda: " + sql);
-            System.out.println(sql);
             rst = stm.executeQuery(sql);            
         }
         

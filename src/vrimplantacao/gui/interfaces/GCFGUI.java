@@ -222,6 +222,7 @@ public class GCFGUI extends VRInternalFrame {
                             
                             dao.setDataInicioVenda(txtDataInicioVendas.getText());
                             dao.setDataTerminoVenda(txtDataTerminoVendas.getText());
+                            importador.idProdutoSemUltimoDigito = chkIgnorarUltimoDigito.isSelected();
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
@@ -300,6 +301,7 @@ public class GCFGUI extends VRInternalFrame {
         vRLabel3 = new vrframework.bean.label.VRLabel();
         vRLabel4 = new vrframework.bean.label.VRLabel();
         txtDataTerminoVendas = new vrframework.bean.textField.VRTextField();
+        chkIgnorarUltimoDigito = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -625,6 +627,8 @@ public class GCFGUI extends VRInternalFrame {
 
         vRLabel4.setText("Data Término");
 
+        chkIgnorarUltimoDigito.setText("Ignorar Último Dígito Código Produto");
+
         javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
         vRPanel4.setLayout(vRPanel4Layout);
         vRPanel4Layout.setHorizontalGroup(
@@ -632,7 +636,10 @@ public class GCFGUI extends VRInternalFrame {
             .addGroup(vRPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkVendasPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel4Layout.createSequentialGroup()
+                        .addComponent(chkVendasPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vRPanel4Layout.createSequentialGroup()
                         .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDataInicioVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -641,7 +648,7 @@ public class GCFGUI extends VRInternalFrame {
                         .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDataTerminoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(458, Short.MAX_VALUE))
+                .addContainerGap(344, Short.MAX_VALUE))
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -653,7 +660,9 @@ public class GCFGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDataTerminoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vRPanel4Layout.createSequentialGroup()
-                        .addComponent(chkVendasPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkVendasPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(7, 7, 7)
                         .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -847,6 +856,7 @@ public class GCFGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCliEventuais;
     private vrframework.bean.checkBox.VRCheckBox chkCliPreferenciais;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkIgnorarUltimoDigito;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;

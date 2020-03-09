@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -144,7 +145,7 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setImportSistema(getSistema());
                 imp.setImportId(id.replace(".", ""));
                 imp.setEan(rst.getString("codigobarras"));
-                imp.seteBalanca(rst.getInt("balanca") == 1);
+                imp.seteBalanca(Integer.parseInt(Utils.formataNumero(rst.getString("balanca"))) == 1);
                 imp.setValidade(rst.getInt("validade"));
                 imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                 imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -161,8 +162,8 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setEstoqueMinimo(Double.parseDouble(rst.getString("estoqueminimo").replace(".", "").replace(",", ".")));
                 imp.setNcm(rst.getString("ncm"));
                 imp.setCest(rst.getString("cest"));
-                imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
-                imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
                 imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                 imp.setIcmsDebitoId(rst.getString("icms_cod_cf_est"));
                 imp.setIcmsDebitoForaEstadoId(rst.getString("icms_cod_cf_fora"));
