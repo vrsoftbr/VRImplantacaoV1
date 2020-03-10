@@ -332,7 +332,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(1);
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
