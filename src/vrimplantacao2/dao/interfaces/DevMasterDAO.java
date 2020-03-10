@@ -63,7 +63,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select distinct \n"
+                    " select distinct \n"
                     + "     t.dm_id cod,\n"
                     + "     abc_descricao dsc,\n"
                     + "     abc_aliqicms aliq,\n"
@@ -118,7 +118,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -152,7 +152,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
@@ -231,79 +231,32 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"select * from fechamentomensalestoquemestre loja01\n" +
-                     "    (\n" +
-                     "		select\n" +
-                     "			saldoatual\n" +
-                     "		from\n" +
-                     "			fechamentomensalestoqueloja01\n" +
-                     "		 where\n" +
-                     "			mestreid = (select max(mestreid)from fechamentomensalestoqueloja01) and produtoid::bigint = p.id::bigint \n" +
-                     "	) as estoque,\n" +*/
-                    "WITH ean AS (\n"
-                    + "	select\n"
-                    + "		id produtoid,\n"
-                    + "		codigobarrasbuscapreco ean\n"
-                    + "	from\n"
-                    + "		produto p\n"
-                    + "	union\n"
-                    + "	select\n"
-                    + "		produtoid,\n"
-                    + "		codigobarras ean\n"
-                    + "	from\n"
-                    + "		produtovinculovenda pvv\n"
-                    + ")\n"
-                    + "select \n"
-                    + "	p.codigo id,\n"
-                    + "	p.cadastro dataCadastro,\n"
-                    + "	p.ultimaalteracao dataAlteracao,\n"
-                    + "	ean.ean,\n"
-                    + "	1 qtdembalagem,\n"
-                    + "	un.descricao tipoEmbalagem,\n"
-                    + "	case \n"
-                    + "		when balanca = '1' then 1 else 0 \n"
-                    + "	end eBalanca,\n"
-                    + "	p.descricao descricaoCompleta,\n"
-                    + "	p.descricaofiscal descricaoReduzida,\n"
-                    + "	p.descricao descricaoGondola,\n"
-                    + "	p.familiaprodutoid mercadologico1,\n"
-                    + "	p.pesobruto,\n"
-                    + "	p.pesoliquido,\n"
-                    + "	p.estoqueMaximo,\n"
-                    + "	p.estoqueMinimo,\n"
-                    + "	p.margemlucro margem,\n"
-                    + "	p.margemlucrominima margemMinima,\n"
-                    + "	p.valorcompra custoSemImposto,\n"
-                    + "	p.valorcompra custoComImposto,\n"
-                    + "	p.custoanterior custoAnteriorSemImposto,\n"
-                    + "	p.valor precovenda,\n"
-                    + "	pa.preco precoatacado,\n"
-                    + "	case \n"
-                    + "		when statusid = 29 then 1 else 0 \n"
-                    + "	end situacaoCadastro ,\n"
-                    + "	ncmsh ncm,\n"
-                    + "	p.cest,\n"
-                    + "	piscste.codigo piscofinsCstCredito,\n"
-                    + "	piscsts.codigo piscofinsCstDebito,\n"
-                    + "	p.cod_natureza_receita piscofinsNaturezaReceita,\n"
-                    + "	icms.tabelaimpostosid\n"
-                    + "from \n"
-                    + "	produto p\n"
-                    + "	JOIN ean ON\n"
-                    + "		ean.produtoid = p.id\n"
-                    + "	join unidade un on \n"
-                    + "		un.id = p.unidadeid\n"
-                    + "	left join produtoprecoauxiliar pa on\n"
-                    + "		p.id = pa.produtoid	\n"
-                    + "	join impostosproduto icms on\n"
-                    + "		icms.produtoid = p.id and\n"
-                    + "		icms.pessoaemitente = 1428\n"
-                    + "	join tabelaimpostos imp ON \n"
-                    + "	 	imp.id = icms.tabelaimpostosid\n"
-                    + "   join cstpis piscste ON\n"
-                    + "		piscste.id = imp.cstpisentradaid\n"
-                    + "	join cstpis piscsts ON\n"
-                    + "		piscsts.id = imp.cstpissaidaid\n"
+                    "select	\n"
+                    + "	aaa_codigo importId,\n"
+                    + "	aaa_datacadastro dataCadastro,\n"
+                    + "	p.dm_alterado dataAlteracao,\n"
+                    + "	aaa_codbarras ean,\n"
+                    + "	aaa_um tipoEmbalagem,\n"
+                    //+ "	--case when aaa_um = 'KG' then eBalanca = 'T' end ebalanca,\n"
+                    + "	aaa_diasvencimento validade,\n"
+                    + "	aaa_descricao descricaoCompleta,\n"
+                    + "	aaa_descricao descricaoReduzida,\n"
+                    + "	aaa_descricao descricaoGondola,\n"
+                    + "	aaa_grupo codMercadologico1,\n"
+                    + "	aaa_peso pesoBruto,\n"
+                    + "	aaa_margemlucro margem,\n"
+                    + " aaa_precovenda precovenda,\n"
+                    + "	case when aaa_status = 'A' then 1 else 0 end situacaoCadastro,\n"
+                    + "	aaa_posipi ncm,\n"
+                    + "	aaa_cest cest,\n"
+                    + "	abc_cstpis piscofinsCstDebito,\n"
+                    + "	aaa_csticms icmsCstSaida,\n"
+                    + "	aaa_aliqicms icmsAliqSaida,\n"
+                    + "	aaa_redicmsai icmsReducaoSaida\n"
+                    + "    from \n"
+                    + "	dmaaa01 p\n"
+                    + "		left join dmabc01 t\n"
+                    + "			on t.abc_codigo = aaa_tessaida\n"
                     + "order by 1"
             )) {
 
@@ -313,53 +266,30 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rs.getString("id"));
+                    imp.setImportId(rs.getString("importId"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataAlteracao"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-
-                    //imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setValidade(rs.getInt("validade"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaoGondola"));
-                    imp.setCodMercadologico1(rs.getString("mercadologico1"));
-
-                    //imp.setCodMercadologico1(rs.getString("codMercadologico1"));
-                    //imp.setCodMercadologico2(rs.getString("codMercadologico2"));
-                    //imp.setIdFamiliaProduto(rs.getString("idFamiliaProduto"));
+                    imp.setCodMercadologico1(rs.getString("codMercadologico1"));
                     imp.setPesoBruto(rs.getInt("pesobruto"));
-                    imp.setPesoLiquido(rs.getInt("pesoliquido"));
-                    //imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setMargemMinima(rs.getDouble("margemMinima"));
-                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rs.getDouble("custoComImposto"));
-                    imp.setCustoAnteriorSemImposto(rs.getDouble("custoAnteriorSemImposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-
-                    imp.setPiscofinsCstCredito(rs.getString("piscofinsCstCredito"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsNaturezaReceita"));
-
-                    imp.setIcmsDebitoId(rs.getString("tabelaimpostosid"));
-                    imp.setIcmsDebitoForaEstadoId(rs.getString("tabelaimpostosid"));
-                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("tabelaimpostosid"));
-                    imp.setIcmsCreditoId(rs.getString("tabelaimpostosid"));
-                    imp.setIcmsCreditoForaEstadoId(rs.getString("tabelaimpostosid"));
-                    imp.setIcmsConsumidorId(rs.getString("tabelaimpostosid"));
-
-                    imp.setAtacadoPreco(rs.getDouble("precoatacado"));
-                    //imp.setCodigoSped(rs.getString("codigoSped"));
-
-                    //imp.setValidade(rs.getInt("validade"));
-                    if (("1".equals(rs.getString("ebalanca").trim()))) {
+                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
+                    imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
+                    
+                    //imp.setEstoque(rs.getDouble("estoque"));
+                    
+                    /*if (("1".equals(rs.getString("ebalanca").trim()))) {
                         if (v_usar_arquivoBalanca) {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
@@ -377,7 +307,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                                 imp.seteBalanca(false);
                             }
                         }
-                    }
+                    }*/
                     result.add(imp);
                 }
             }
@@ -385,7 +315,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public List<OfertaIMP> getOfertas() throws Exception {
+    /*public List<OfertaIMP> getOfertas() throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -415,9 +345,9 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -484,7 +414,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
