@@ -154,7 +154,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "  val.validade,  \n"
                     + "  p.nome descricaocompleta,\n"
                     + "  p.nome2 descricaoreduzida,\n"
-                    + "  p.nome descricaogondola,\n"
+                    + "  p.nome1 descricaogondola,\n"
                     + "  case p.inativo when 'S' then 0 else 1 end as id_situacaocadastro,\n"
                     + "  p.flaginc datacadastro,\n"
                     + "  p.setor mercadologico1,\n"

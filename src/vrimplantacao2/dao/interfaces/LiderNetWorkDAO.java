@@ -144,8 +144,15 @@ public class LiderNetWorkDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
                 imp.setImportId(id.replace(".", ""));
-                imp.setEan(rst.getString("codigobarras"));
-                imp.seteBalanca(Integer.parseInt(Utils.formataNumero(rst.getString("balanca"))) == 1);
+                imp.setEan("0" + rst.getString("codigobarras"));
+                
+                if (Utils.formataNumero(imp.getEan()).trim().length() <= 6) {
+                    imp.seteBalanca(true);
+                } else {
+                    imp.seteBalanca(false);
+                }
+                
+                //imp.seteBalanca(Integer.parseInt(Utils.formataNumero(rst.getString("balanca"))) == 1);
                 imp.setValidade(rst.getInt("validade"));
                 imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                 imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
