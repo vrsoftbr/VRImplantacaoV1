@@ -958,7 +958,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                     "EMAIL",
                                     null,
                                     null,
-                                    TipoContato.COMERCIAL,
+                                    TipoContato.NFE,
                                     rst.getString("EMAIL").toLowerCase()
                             );
                         }
@@ -1208,7 +1208,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    CLIENTES \n"
                     + "    where \n"
                     + "    CODCLIE >= 1 \n"
-                    + "    and codTIPOCLIE in (2,4)"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
