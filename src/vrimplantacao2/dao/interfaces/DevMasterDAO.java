@@ -249,10 +249,10 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when aaa_status = 'A' then 1 else 0 end situacaoCadastro,\n"
                     + "	aaa_posipi ncm,\n"
                     + "	aaa_cest cest,\n"
-                    + "	abc_cstpis piscofinsCstDebito,\n"
-                    + "	aaa_csticms icmsCstSaida,\n"
-                    + "	aaa_aliqicms icmsAliqSaida,\n"
-                    + "	aaa_redicmsai icmsReducaoSaida\n"
+                    + "	abc_cstpis piscofinsCstDebito\n"
+                    //+ "	aaa_csticms::varchar icmsCstSaida,\n"
+                    //+ "	aaa_aliqicms icmsAliqSaida,\n"
+                    //+ "	aaa_redicmsai icmsReducaoSaida\n"
                     + "    from \n"
                     + "	dmaaa01 p\n"
                     + "		left join dmabc01 t\n"
@@ -283,9 +283,9 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));
-                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
+                    //imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
+                    //imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
+                    //imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
                     
                     //imp.setEstoque(rs.getDouble("estoque"));
                     
