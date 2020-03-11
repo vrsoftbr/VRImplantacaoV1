@@ -135,7 +135,7 @@ public class ProdutoDAO {
             sql.put("descricaogondola", vo.getDescricaoGondola());
             sql.put("dataalteracao", new Date());
             sql.putNull("id_produtovasilhame");
-            if (Versao.menorQue(3, 19,1, 65)) {
+            if (Versao.menorQue(3, 19,1, 64)) {
                 sql.put("excecao", vo.getExcecao());
             }
             sql.put("id_tipomercadoria", 99);
