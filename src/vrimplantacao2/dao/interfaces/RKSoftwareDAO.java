@@ -17,6 +17,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -24,6 +25,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -196,12 +198,15 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    tr.dt_codstrib as csticms,\n"
                     + "    coalesce(tr.dt_percicm, 0) as aliqicms,\n"
                     + "    coalesce(tr.dt_reduicm, 0) as reducaoicms,\n"
-                    + "    coalesce(tr.dt_cod_beneficio_fiscal, '') as codigobeneficio\n"
-                    + "from produtos p\n"
-                    + "left join prodfilial e on e.pf_produto = p.pr_codigo\n"
+                    + "    coalesce(tr.dt_cod_beneficio_fiscal, '') as codigobeneficio,\n"
+                    + "    pis.pc_ecst as pis_entrada,\n"
+                    + "    pis.pc_scst as pis_saida,\n"
+                    + "    pis.pc_snatrec as naturezareceita\n"
+                    + "from produtos p\n" + "left join prodfilial e on e.pf_produto = p.pr_codigo\n"
                     + "     and e.pf_filial = " + getLojaOrigem() + "\n"
                     + "left join tributacao t on t.tr_codigo = p.pr_tribut\n"
                     + "inner join detltrib tr on tr.dt_tributacao = t.tr_codigo\n"
+                    + "left join SPEDPISC pis on pis.pc_codigo = p.pr_spedpiscofins\n"
                     + "order by p.pr_codigo"
             )) {
                 while (rst.next()) {
@@ -210,12 +215,19 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    
+
+                    if ((rst.getString("ean") != null)
+                            && (!rst.getString("ean").trim().isEmpty())) {
+                        imp.seteBalanca(false);
+                    } else {
+                        imp.seteBalanca(true);
+                    }
+
                     if ((rst.getString("validade") != null)
                             && (!rst.getString("validade").trim().isEmpty())) {
                         imp.setValidade(rst.getInt("validade"));
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -235,6 +247,9 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCodigoGIA(rst.getString("gia"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_saida"));
+                    imp.setPiscofinsCstCredito(rst.getString("pis_entrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                     imp.setBeneficio(rst.getString("codigobeneficio"));
                     imp.setIcmsDebitoId(rst.getString("id_tributacao"));
                     imp.setIcmsCreditoId(rst.getString("id_tributacao"));
@@ -528,12 +543,14 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.cr_dtnota as emissao,\n"
                     + "    r.cr_vencto as vencimento,\n"
                     + "    r.cr_valor as valor,\n"
+                    + "    r.cr_vlsaldo as saldo,\n"
                     + "    r.cr_cliente as idcliente,\n"
                     + "    r.cr_observ as observacao,\n"
                     + "    r.cr_vljuros as juros,\n"
                     + "    r.cr_vldesc as desconto\n"
                     + "from ctareceb r\n"
-                    + "where r.cr_dtpagto is null\n"
+                    + "where r.cr_vlsaldo <= r.cr_valor\n"
+                    + "and r.cr_vlsaldo > 0\n"
                     + "and r.cr_filial = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
@@ -543,9 +560,38 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
-                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValor(rst.getDouble("saldo"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<OfertaIMP> getOfertas() throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    p.pr_codigo as idproduto,\n"
+                    + "    coalesce(p.pr_inipromo, current_date + 1) as datainicio,\n"
+                    + "    p.pr_valpromo as datatermino,\n"
+                    + "    p.pr_precovend as precovenda,\n"
+                    + "    p.pr_precopromo as precooferta\n"
+                    + "from produtos p\n"
+                    + "where p.pr_valpromo > current_date"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datatermino"));
+                    imp.setPrecoNormal(rst.getDouble("precovenda"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
                     result.add(imp);
                 }
             }
