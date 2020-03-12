@@ -33,6 +33,9 @@ public class ProdutoAliquotaDAO {
             if (!Versao.menorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
             }
+            if (Versao.maiorQue(3, 19,1, 64)) {
+                    sql.put("excecao", vo.getExcecao());
+            }
 
             sql.getReturning().add("id");
 
