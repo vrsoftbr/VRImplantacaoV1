@@ -250,18 +250,6 @@ public class W2AGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         
-                        if (chkConvEmpresa.isSelected()) {
-                            importador.importarConvenioEmpresa();
-                        }
-                        
-                        if (chkConvConveniado.isSelected()) {
-                            importador.importarConvenioConveniado();
-                        }
-                        
-                        if (chkConvRecebimento.isSelected()) {
-                            importador.importarConvenioTransacao();
-                        }
-                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -324,10 +312,6 @@ public class W2AGUI extends VRInternalFrame {
         chkContaPagar = new javax.swing.JCheckBox();
         chkRazaoSocial = new vrframework.bean.checkBox.VRCheckBox();
         chkNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
-        tabConvenio = new javax.swing.JPanel();
-        chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
-        chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
-        chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -514,41 +498,6 @@ public class W2AGUI extends VRInternalFrame {
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
-
-        chkConvEmpresa.setText("Empresas");
-        chkConvEmpresa.setEnabled(true);
-
-        chkConvConveniado.setText("Conveniados");
-        chkConvConveniado.setEnabled(true);
-
-        chkConvRecebimento.setText("Recebimentos em aberto");
-        chkConvRecebimento.setEnabled(true);
-
-        javax.swing.GroupLayout tabConvenioLayout = new javax.swing.GroupLayout(tabConvenio);
-        tabConvenio.setLayout(tabConvenioLayout);
-        tabConvenioLayout.setHorizontalGroup(
-            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabConvenioLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(393, Short.MAX_VALUE))
-        );
-        tabConvenioLayout.setVerticalGroup(
-            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabConvenioLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(148, Short.MAX_VALUE))
-        );
-
-        vRTabbedPane2.addTab("Convênio", tabConvenio);
 
         tabs.addTab("Importação", vRTabbedPane2);
 
@@ -780,9 +729,6 @@ public class W2AGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCodAntProduto;
     private javax.swing.JCheckBox chkContaPagar;
-    private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
-    private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
-    private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
@@ -802,7 +748,6 @@ public class W2AGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel tabConvenio;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
