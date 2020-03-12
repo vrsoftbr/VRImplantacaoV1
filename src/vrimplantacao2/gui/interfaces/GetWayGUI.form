@@ -622,6 +622,11 @@
                     <Property name="text" type="java.lang.String" value="Margem Sobre Venda"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Produto"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">
