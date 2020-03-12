@@ -5,7 +5,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoAccess;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -24,7 +23,59 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    " codigo_do_icms as id,\n" +
+                    " descricao_do_icms as descricao,\n" +
+                    " aliquota,\n" +
+                    " situacao_tributaria_tab_b as cst,\n" +
+                    " percentual_base as reducao,\n" +
+                    " percentual_base_st,\n" +
+                    " aliquota_st \n" +
+                    "from \n" +
+                    " icms \n" +
+                    "where \n" +
+                    " codigo_do_icms in \n" +
+                    "    (select codigo_do_icms from produtos)")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"), 
+                            rs.getInt("cst"), 
+                            rs.getDouble("aliquota"), 
+                            rs.getDouble("reducao")));
+                }
+            }
+            
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    " codigo_do_icms as id,\n" +
+                    " descricao_do_icms as descricao,\n" +
+                    " aliquota,\n" +
+                    " situacao_tributaria_tab_b as cst,\n" +
+                    " percentual_base as reducao,\n" +
+                    " percentual_base_st,\n" +
+                    " aliquota_st \n" +
+                    "from \n" +
+                    " icms \n" +
+                    "where \n" +
+                    " codigo_do_icms in \n" +
+                    "    (select codigo_icms_compra from produtos)")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            rs.getString("descricao"), 
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao")));
+                }
+            }
+        }
+        
+        return result;
     }
   
     public List<Estabelecimento> getLojaCliente() throws Exception {
