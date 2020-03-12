@@ -30,6 +30,7 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoProduto;
 
 public class GetWayGUI extends VRInternalFrame {
 
@@ -381,7 +382,11 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkUsaMargemLiquida.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
-
+                            
+                            if (chkTipoProduto.isSelected()) {
+                                opcoes.add(OpcaoProduto.TIPO_PRODUTO);
+                            }
+                            
                             if (chkDtAlteracao.isSelected()) {
                                 opcoes.add(OpcaoProduto.DATA_ALTERACAO);
                             }
@@ -613,6 +618,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkProdutoAtivo = new vrframework.bean.checkBox.VRCheckBox();
         chkUsaMargemLiquida = new vrframework.bean.checkBox.VRCheckBox();
         chkMargemSobreVenda = new javax.swing.JCheckBox();
+        chkTipoProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -1003,6 +1009,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkMargemSobreVenda.setText("Margem Sobre Venda");
         vRPanel7.add(chkMargemSobreVenda);
+
+        chkTipoProduto.setText("Tipo Produto");
+        vRPanel7.add(chkTipoProduto);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1782,6 +1791,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTemFicha;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemProduto;
+    private vrframework.bean.checkBox.VRCheckBox chkTipoProduto;
     private javax.swing.JCheckBox chkTrocaEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
