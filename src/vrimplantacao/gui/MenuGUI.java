@@ -206,6 +206,7 @@ import vrimplantacao2.gui.interfaces.SigmaGUI;
 import vrimplantacao2.gui.interfaces.SiitGUI;
 import vrimplantacao2.gui.interfaces.SircomGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
+import vrimplantacao2.gui.interfaces.SnSistemaGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
@@ -668,6 +669,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuRensoftware = new javax.swing.JMenuItem();
         mnuAtenasSQLServer = new javax.swing.JMenuItem();
         mnuAccesys = new javax.swing.JMenuItem();
+        mnuAccesys1 = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1828,6 +1830,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuAccesys);
+
+        mnuAccesys1.setText("SN Sistemas");
+        mnuAccesys1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAccesys1ActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuAccesys1);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4459,6 +4469,10 @@ public final class MenuGUI extends VRMdiFrame {
         W2AGUI.exibir(this);
     }//GEN-LAST:event_mnuW2AActionPerformed
 
+    private void mnuAccesys1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAccesys1ActionPerformed
+        SnSistemaGUI.exibir(this);
+    }//GEN-LAST:event_mnuAccesys1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4547,6 +4561,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuADT;
     private javax.swing.JMenuItem mnuASoft;
     private javax.swing.JMenuItem mnuAccesys;
+    private javax.swing.JMenuItem mnuAccesys1;
     private javax.swing.JMenuItem mnuAcertarIdsProdutos;
     private javax.swing.JMenuItem mnuAcom;
     private javax.swing.JMenuItem mnuAdmRioPreto;
