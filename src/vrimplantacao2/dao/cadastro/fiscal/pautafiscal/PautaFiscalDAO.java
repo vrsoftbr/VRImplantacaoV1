@@ -62,7 +62,11 @@ public class PautaFiscalDAO {
             sql.put("ncm1", vo.getNcm1());
             sql.put("ncm2", vo.getNcm2());
             sql.put("ncm3", vo.getNcm3());
-            sql.putSql("excecao", "(select coalesce(max(excecao) + 1, 1) from pautafiscal where ncm1 = " + vo.getNcm1() + " and ncm2 = " + vo.getNcm2() + " and ncm3 = " + vo.getNcm3() + ")");
+            if (vo.getExcecao() < 0) {
+                sql.putSql("excecao", "(select coalesce(max(excecao) + 1, 1) from pautafiscal where ncm1 = " + vo.getNcm1() + " and ncm2 = " + vo.getNcm2() + " and ncm3 = " + vo.getNcm3() + ")");
+            } else {
+                sql.put("excecao", vo.getExcecao());
+            }
             sql.put("id_estado", vo.getId_estado());
             sql.put("iva", vo.getIva());
             sql.put("tipoIva", vo.getTipoIva().getId());
@@ -71,7 +75,7 @@ public class PautaFiscalDAO {
             sql.put("id_aliquotaDebitoForaEstado", vo.getId_aliquotaDebitoForaEstado());
             sql.put("ivaAjustado", vo.getIvaAjustado());
             sql.put("icmsRecolhidoAntecipadamente", vo.isIcmsRecolhidoAntecipadamente());
-            sql.put("id_aliquotaCreditoForaEstado", vo.getId_aliquotaCreditoForaEstado());
+            //sql.put("id_aliquotaCreditoForaEstado", vo.getId_aliquotaCreditoForaEstado());
             
             try (ResultSet rst = stm.executeQuery(
                     sql.getInsert()

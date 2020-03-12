@@ -233,6 +233,7 @@ import vrimplantacao2.gui.interfaces.VCashGUI;
 import vrimplantacao2.gui.interfaces.VRToVRGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
+import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
@@ -758,6 +759,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem25 = new javax.swing.JMenuItem();
         mnuBase = new javax.swing.JMenuItem();
         mnuOryon = new javax.swing.JMenuItem();
+        mnuW2A = new javax.swing.JMenuItem();
         jMenu13 = new javax.swing.JMenu();
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
@@ -2523,6 +2525,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu12.add(mnuOryon);
+
+        mnuW2A.setText("W2A Brasil");
+        mnuW2A.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuW2AActionPerformed(evt);
+            }
+        });
+        jMenu12.add(mnuW2A);
 
         mnuDatabase.add(jMenu12);
 
@@ -4445,6 +4455,10 @@ public final class MenuGUI extends VRMdiFrame {
         RKSoftwareGUI.exibir(this);
     }//GEN-LAST:event_mnuRKSoftwareActionPerformed
 
+    private void mnuW2AActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuW2AActionPerformed
+        W2AGUI.exibir(this);
+    }//GEN-LAST:event_mnuW2AActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4693,6 +4707,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuVRToVR;
     private javax.swing.JMenuItem mnuViaSoft;
     private javax.swing.JMenuItem mnuVisualComercio;
+    private javax.swing.JMenuItem mnuW2A;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWinNexus;
     private javax.swing.JMenuItem mnuWmByFile;

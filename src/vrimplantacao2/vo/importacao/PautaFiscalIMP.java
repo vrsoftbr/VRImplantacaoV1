@@ -10,6 +10,7 @@ public class PautaFiscalIMP {
     private String uf;
     private double iva = 0;
     private TipoIva tipoIva = TipoIva.PERCENTUAL;
+    private int excecao = -1;
     private AliquotaVO aliquotaCredito = AliquotaVO.OUTRAS;
     private AliquotaVO aliquotaDebito = AliquotaVO.OUTRAS;
     private AliquotaVO aliquotaDebitoForaEstado = AliquotaVO.OUTRAS;
@@ -59,6 +60,14 @@ public class PautaFiscalIMP {
 
     public void setTipoIva(TipoIva tipoIva) {
         this.tipoIva = tipoIva != null ? tipoIva : TipoIva.PERCENTUAL;
+    }
+
+    public int getExcecao() {
+        return excecao;
+    }
+
+    public void setExcecao(int excecao) {
+        this.excecao = excecao;
     }
 
     public AliquotaVO getAliquotaCredito() {

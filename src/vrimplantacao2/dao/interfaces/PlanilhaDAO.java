@@ -39,6 +39,7 @@ import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -1014,8 +1015,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setNcm(linha.getString("ncm"));
             imp.setIva(linha.getDouble("iva"));
             imp.setIvaAjustado(linha.getDouble("ivaajustado"));
-
+            imp.setTipoIva(TipoIva.getByTipo(linha.getString("tipoiva")));
             imp.setIcmsRecolhidoAntecipadamente(linha.getBoolean("recolhidoantecipado"));
+            imp.setExcecao(linha.getInt("excecao"));
             if (linha.existsColumn("pauta_debito_id")) {
                 imp.setAliquotaDebitoId(linha.getString("pauta_debito_id"));
             } else {

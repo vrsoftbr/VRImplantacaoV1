@@ -14,6 +14,7 @@ import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 
 public class ProdutoAliquotaDAO {
 
+    @Deprecated
     public void salvar(int idLojaVR, Collection<ProdutoAliquotaVO> values) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             for (ProdutoAliquotaVO vo : values) {
@@ -65,6 +66,9 @@ public class ProdutoAliquotaDAO {
             sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             if (!Versao.menorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+            }
+            if (Versao.maiorQue(3, 19,1, 64)) {
+                    sql.put("excecao", vo.getExcecao());
             }
 
             sql.getReturning().add("id");

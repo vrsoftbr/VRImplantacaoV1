@@ -322,6 +322,7 @@ public class PautaFiscalRepository {
         vo.setNcm2(ncm.getNcm2());
         vo.setNcm3(ncm.getNcm3());
         vo.setTipoIva(imp.getTipoIva());
+        vo.setExcecao(imp.getExcecao());
         
         return vo;        
     }
