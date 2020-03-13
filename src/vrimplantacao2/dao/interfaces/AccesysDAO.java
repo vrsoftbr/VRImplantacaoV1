@@ -573,7 +573,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n" +
                     "	dbo.CE_VendasCaixa.CodVenda id,\n" +
-                    "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) as data,\n" +
+                    "	dbo.CE_VendasCaixa.Data,\n" +
                     "	dbo.CE_VendasCaixa.Data as DATAHORA,\n" +
                     "   RIGHT(CONVERT(VARCHAR, dbo.CE_VendasCaixa.Data, 108),7) hora,\n" +
                     "	dbo.CE_VendasCaixa.ValorItens,\n" +
@@ -616,7 +616,8 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_VendasCaixa.CodCliente = CONTROLE_CLIENTES.dbo.CC_Clientes.Carteira\n" +
                     "where\n" +
                     "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n" +
-                    "	dbo.CE_VendasCaixa.CodEmpresa = " + idLojaCliente;
+                    "	dbo.CE_VendasCaixa.CodEmpresa = " + idLojaCliente + " and\n" +
+                    "   dbo.CE_VendasCaixa.COO is not null";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -721,7 +722,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n" +
                     "	dbo.CE_MOVIMENTACAO.cod_mov id,\n" +
-                    "	convert(datetime, convert(varchar(10), dbo.CE_MOVIMENTACAO.data_mov, 103), 103) emissao,\n" +
+                    "	dbo.CE_MOVIMENTACAO.data_mov emissao,\n" +
                     "	dbo.CE_MOVIMENTACAO.custo_mov custototal,\n" +
                     "	dbo.CE_MOVIMENTACAO.qtd_mov qtd,\n" +
                     "	(dbo.CE_MOVIMENTACAO.venda_mov + dbo.CE_MOVIMENTACAO.VLACRDESC) subtotalimpressora,\n" +
@@ -744,6 +745,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_MOVIMENTACAO.caixa_mov = dbo.CE_VendasCaixa.NumeroCaixa\n" +
                     "	and dbo.CE_MOVIMENTACAO.numimpfiscal = dbo.CE_VendasCaixa.NumImpFiscal\n" +
                     "	and dbo.CE_MOVIMENTACAO.coo = dbo.CE_VendasCaixa.COO\n" +
+                    "   and dbo.CE_MOVIMENTACAO.data_mov = dbo.CE_VendasCaixa.Data\n" +
                     "where\n" +
                     "	dbo.CE_VendasCaixa.CodEmpresa = " + idLojaCliente + " and\n" +
                     "	convert(datetime, convert(varchar(10), dbo.CE_MOVIMENTACAO.data_mov, 103), 103) "
