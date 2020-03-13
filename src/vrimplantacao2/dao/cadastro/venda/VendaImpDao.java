@@ -83,6 +83,7 @@ public class VendaImpDao {
         @Override
         public Void call() throws Exception {
             VendaIMP imp = null;
+            VendaIMP vimp = null;
             try {        
                 
                 ProgressBar.setStatus("Vendas...gravando vendas no banco temporário...");
@@ -92,7 +93,8 @@ public class VendaImpDao {
                 if (iterator != null) {
                     int cont = 0, cont2 = 0;
                     while (iterator.hasNext()) {
-                        dao.create(iterator.next());
+                        vimp = iterator.next();
+                        dao.create(vimp);
                         cont++;
                         cont2++;
                         if (cont2 == 10000) {
@@ -115,6 +117,9 @@ public class VendaImpDao {
 
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() + " - " + imp.getId() : "") + e.getMessage(), e);
+                System.out.println(
+                        "COO: " + vimp.getNumeroCupom() + " Data: " + vimp.getData() + 
+                                " ECF: " + vimp.getEcf());
                 if (e.getCause() != null) {                    
                     throw (Exception) e.getCause();
                 } else {
