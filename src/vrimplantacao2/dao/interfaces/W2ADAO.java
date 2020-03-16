@@ -3,14 +3,17 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoAccess;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
-import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -28,6 +31,47 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "W2A";
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.OFERTA
+        ));
     }
 
     @Override
@@ -156,7 +200,7 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    " p.codigo_do_produto as id,\n" +
+                    " CInt(p.codigo_do_produto) as id,\n" +
                     " p.codigo_de_barras as ean,\n" +
                     " p.descricao_do_produto as descricaocompleta,\n" +
                     " p.descricao_abreviada as descricaoreduzida,\n" +
@@ -197,11 +241,11 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
+                    imp.setImportId(String.valueOf(rs.getInt("id")));
+                    imp.setEan(String.valueOf(rs.getLong("ean")));
                     imp.seteBalanca(rs.getBoolean("balanca"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
@@ -225,6 +269,8 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("pis_debito"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPautaFiscalId(imp.getImportId());
+                    
+                    result.add(imp);
                 }
             }
         }
@@ -305,8 +351,8 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setFantasia(rs.getString("nome_fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("nome")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("nome_fantasia")));
                     imp.setTel_principal(rs.getString("fone"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));

@@ -66,6 +66,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.ATACADO,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
                     OpcaoProduto.DATA_CADASTRO,
@@ -581,7 +582,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pf.codigoexterno,\n"
                     + "	pf.qtdembalagem,\n"
                     + "	pf.dataalteracao,\n"
-                    + "	pf.pesoembalagem,\n"
+                    + "	pf.pesoembalagem\n"
                     + "from\n"
                     + "	produtofornecedor pf\n"
                     + "order by\n"
