@@ -13,6 +13,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -69,6 +70,8 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.DATA_ALTERACAO,
                 OpcaoProduto.EAN,
@@ -102,7 +105,8 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS_SAIDA_NF,
                 OpcaoProduto.ICMS_ENTRADA,
                 OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
-                OpcaoProduto.ICMS_CONSUMIDOR
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS
         ));
     }
 
@@ -142,12 +146,53 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT\n" +
+                    "	f.CODIGO id,\n" +
+                    "	f.NOME descricao,\n" +
+                    "	count(*)\n" +
+                    "from\n" +
+                    "	PRODUTO p\n" +
+                    "	join produto f on\n" +
+                    "		p.CODPRODPRINC = f.CODIGO\n" +
+                    "WHERE \n" +
+                    "	p.CODPRODPRINC != p.CODIGO\n" +
+                    "group by\n" +
+                    "	f.CODIGO, f.NOME\n" +
+                    "having\n" +
+                    "	count(*) > 1\n" +
+                    "order BY\n" +
+                    "	f.CODIGO "
+            )) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
+
+    @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "select\n" +
+                    "select distinct\n" +
                     "	t.GRUPOICMS,\n" +
                     "	case cfop.OPERACAO when 'S' then 1 else 0 end operacao,\n" +
                     "	case t.TIPOCALCULO when 2 then 1 else 0 end contribicms,\n" +
@@ -173,8 +218,6 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		t.CFOP = cfop.CODOPERACAO\n" +
                     "	join GRUPOICMS g on\n" +
                     "		t.GRUPOICMS = g.ID \n" +
-                    "where\n" +
-                    "	cfop.CODOPERACAO in (1102, 2102,5102)\n" +
                     "order by\n" +
                     "	1"
             )) {
@@ -251,11 +294,7 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.TIPO,\n" +
                     "	p.DEPARTAMENTO merc1,\n" +
                     "	p.SECAO merc2,\n" +
-                    "	case \n" +
-                    "		when p.CODPRODPRINC != p.CODIGO\n" +
-                    "		then p.CODPRODPRINC\n" +
-                    "		else null\n" +
-                    "	end id_familia,\n" +
+                    "	p.CODPRODPRINC id_familia,\n" +
                     "	p.PESOBRUTO ,\n" +
                     "	p.PESOLIQUIDO,\n" +
                     "	pe.QTESTOQUEMINIMO estoqueminimo,\n" +
@@ -326,7 +365,7 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rs.getDouble("custocomimpostomedio"));
+                    imp.setCustoSemImposto(rs.getDouble("custocomimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rs.getBoolean("ATIVO") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rs.getString("ncm"));
