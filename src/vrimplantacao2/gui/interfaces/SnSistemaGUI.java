@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -19,11 +20,13 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SnSistemaDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "Milenio";
+    private static final String SISTEMA = "Sn Sistemas";
     private static SnSistemaGUI instance;
 
     public static String getSISTEMA() {
@@ -75,6 +78,29 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
         tabProdutos.setOpcoesDisponiveis(dao);
+        
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {                
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
 
         conexao.setOnConectar(this);
 
@@ -169,13 +195,12 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                             );
                         }
 
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkCondicaoPagamento.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
-                        }
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
 
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            }
                         }
                         
                         if (chkProdutoFornecedor.isSelected()) {
@@ -252,7 +277,6 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -290,9 +314,6 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkFornecedor.setText("Fornecedor");
         tabFornecedor.add(chkFornecedor);
-
-        chkCondicaoPagamento.setText("Condiçao Pagamento");
-        tabFornecedor.add(chkCondicaoPagamento);
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
@@ -504,7 +525,6 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClienteBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
-    private vrframework.bean.checkBox.VRCheckBox chkCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkIcmsForaEstado;

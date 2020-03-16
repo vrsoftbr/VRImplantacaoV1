@@ -356,7 +356,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setAtacadoPreco(rs.getDouble("atacadodesconto"));
+                    imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
                     imp.setDescontinuado("S".equals(rs.getString("descontinuado")));
                     imp.setNcm(rs.getString("ncm"));
