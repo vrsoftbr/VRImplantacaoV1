@@ -593,6 +593,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setNomePai(linha.getString("nomePai"));
                 imp.setNomeMae(linha.getString("nomeMae"));
                 imp.setObservacao(linha.getString("observacao"));
+                imp.setObservacao2(linha.getString("observacao2"));
                 imp.setDiaVencimento(linha.getInt("diaVencimento"));
                 imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
                 imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
