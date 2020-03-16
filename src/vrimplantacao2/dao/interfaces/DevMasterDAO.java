@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -237,7 +238,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dm_alterado dataAlteracao,\n"
                     + "	aaa_codbarras ean,\n"
                     + "	aaa_um tipoEmbalagem,\n"
-                    //+ "	--case when aaa_um = 'KG' then eBalanca = 'T' end ebalanca,\n"
+                    + "	case when aaa_um = 'KG' then 1 else 0 end ebalanca,\n"
                     + "	aaa_diasvencimento validade,\n"
                     + "	aaa_descricao descricaoCompleta,\n"
                     + "	aaa_descricao descricaoReduzida,\n"
@@ -250,9 +251,9 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	aaa_posipi ncm,\n"
                     + "	aaa_cest cest,\n"
                     + "	abc_cstpis piscofinsCstDebito\n"
-                    //+ "	aaa_csticms::varchar icmsCstSaida,\n"
-                    //+ "	aaa_aliqicms icmsAliqSaida,\n"
-                    //+ "	aaa_redicmsai icmsReducaoSaida\n"
+                    //+ " aaa_csticms::varchar icmsCstSaida,\n"
+                    //+ " aaa_aliqicms icmsAliqSaida,\n"
+                    //+ " aaa_redicmsai icmsReducaoSaida\n"
                     + "    from \n"
                     + "	dmaaa01 p\n"
                     + "		left join dmabc01 t\n"
@@ -269,9 +270,35 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("importId"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataAlteracao"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-                    imp.setValidade(rs.getInt("validade"));
+                    
+                    //imp.setEan(rs.getString("ean"));
+                    //imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
+                    //imp.setValidade(rs.getInt("validade"));
+                    
+                    long longEAN = Utils.stringToLong(imp.getEan(), -2);
+                    String strEAN = String.valueOf(longEAN);
+
+                    if (strEAN.startsWith("2") && strEAN.length() == 6) {
+                        final String eanBal = strEAN.substring(1);
+                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(eanBal, -2));
+                        if (bal != null) {
+                            imp.setEan(String.valueOf(bal.getCodigo()));
+                            imp.seteBalanca(true);
+                            imp.setValidade(bal.getValidade());
+                            imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                            imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                            imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                            imp.setValidade(rs.getInt("validade"));
+                        }
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                        imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                        imp.setValidade(rs.getInt("validade"));
+                    }
+                    
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaoGondola"));
@@ -289,25 +316,6 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     //imp.setEstoque(rs.getDouble("estoque"));
                     
-                    /*if (("1".equals(rs.getString("ebalanca").trim()))) {
-                        if (v_usar_arquivoBalanca) {
-                            ProdutoBalancaVO produtoBalanca;
-                            long codigoProduto;
-                            codigoProduto = Long.parseLong(imp.getImportId().trim());
-                            if (codigoProduto <= Integer.MAX_VALUE) {
-                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                            } else {
-                                produtoBalanca = null;
-                            }
-                            if (produtoBalanca != null) {
-                                imp.seteBalanca(true);
-                                //imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
-                            } else {
-                                imp.setValidade(0);
-                                imp.seteBalanca(false);
-                            }
-                        }
-                    }*/
                     result.add(imp);
                 }
             }
@@ -464,7 +472,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
-                    imp.setId(rs.getString("id"));
+                    imp.setId(Utils.stringLong(rs.getString("id")));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
                     imp.setRazao(rs.getString("razao"));
@@ -490,8 +498,8 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomePai(rs.getString("nomePai"));
                     imp.setNomeMae(rs.getString("nomeMae"));
                     imp.setObservacao(rs.getString("observacao"));
-                    imp.setObservacao2(rs.getString("observacao"));
-                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setObservacao2(rs.getString("observacao2"));
+                    //imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email").toLowerCase());
                     imp.setFax(rs.getString("fax"));
