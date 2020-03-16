@@ -195,13 +195,12 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                             );
                         }
 
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkCondicaoPagamento.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
-                        }
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
 
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            }
                         }
                         
                         if (chkProdutoFornecedor.isSelected()) {
@@ -278,7 +277,6 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -316,9 +314,6 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkFornecedor.setText("Fornecedor");
         tabFornecedor.add(chkFornecedor);
-
-        chkCondicaoPagamento.setText("Condiçao Pagamento");
-        tabFornecedor.add(chkCondicaoPagamento);
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
@@ -530,7 +525,6 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClienteBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
-    private vrframework.bean.checkBox.VRCheckBox chkCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkIcmsForaEstado;

@@ -15,9 +15,11 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -298,6 +300,7 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.DEPARTAMENTO merc1,\n" +
                     "	p.SECAO merc2,\n" +
                     "	p.CODPRODPRINC id_familia,\n" +
+                    "	p.FORNECEDOR id_fornecedor,\n" +
                     "	p.PESOBRUTO ,\n" +
                     "	p.PESOLIQUIDO,\n" +
                     "	pe.QTESTOQUEMINIMO estoqueminimo,\n" +
@@ -362,6 +365,7 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setIdFamiliaProduto(rs.getString("id_familia"));
+                    imp.setFornecedorFabricante(rs.getString("id_fornecedor"));
                     imp.setPesoBruto(rs.getDouble("PESOBRUTO"));
                     imp.setPesoLiquido(rs.getDouble("PESOLIQUIDO"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
@@ -455,6 +459,112 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataInicio(new Date());
                     imp.setDataFim(rs.getDate("datatermino"));
                     imp.setPrecoOferta(rs.getDouble("PRECOOFERTA"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	p.CODIGO id,\n" +
+                    "	p.NOME razao,\n" +
+                    "	p.FANTASIA,\n" +
+                    "	p.CNPJ,\n" +
+                    "	p.IE,\n" +
+                    "	p.ATIVO,\n" +
+                    "	p.BLOQUEADO,\n" +
+                    "	p.DTBLOQUEIO,\n" +
+                    "	p.ENDERECO,\n" +
+                    "	p.NUMERO,\n" +
+                    "	p.COMPLEMENTO,\n" +
+                    "	p.BAIRRO,\n" +
+                    "	p.CODCIDADE,\n" +
+                    "	p.CEP,\n" +
+                    "	p.ENDCOBRANCA,\n" +
+                    "	p.NUMCOBRANCA,\n" +
+                    "	p.COMPCOBRANCA,\n" +
+                    "	p.BAIRROCOBRANCA,\n" +
+                    "	p.CODCIDADECOBRANCA,\n" +
+                    "	p.CEPCOBRANCA,\n" +
+                    "	p.TELEFONE tel_principal,\n" +
+                    "	p.DTCADASTRO datacadastro,\n" +
+                    "	p.PRAZOENTREGA\n" +
+                    "from\n" +
+                    "	PESSOA p\n" +
+                    "where\n" +
+                    "	p.ISFORNECEDOR = 1"
+            )) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("FANTASIA"));
+                    imp.setCnpj_cpf(rs.getString("CNPJ"));
+                    imp.setIe_rg(rs.getString("IE"));
+                    imp.setAtivo(rs.getBoolean("ATIVO"));
+                    imp.setBloqueado(rs.getBoolean("BLOQUEADO"));
+                    imp.setEndereco(rs.getString("ENDERECO"));
+                    imp.setNumero(rs.getString("NUMERO"));
+                    imp.setComplemento(rs.getString("COMPLEMENTO"));
+                    imp.setBairro(rs.getString("BAIRRO"));
+                    imp.setIbge_municipio(rs.getInt("CODCIDADE"));
+                    imp.setCep(rs.getString("CEP"));
+                    imp.setCob_endereco(rs.getString("ENDCOBRANCA"));
+                    imp.setCob_numero(rs.getString("NUMCOBRANCA"));
+                    imp.setCob_complemento(rs.getString("COMPCOBRANCA"));
+                    imp.setCob_bairro(rs.getString("BAIRROCOBRANCA"));
+                    imp.setCob_ibge_municipio(rs.getInt("CODCIDADECOBRANCA"));
+                    imp.setCob_cep(rs.getString("CEPCOBRANCA"));
+                    imp.setTel_principal(rs.getString("tel_principal"));
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
+                    imp.setPrazoEntrega(rs.getInt("PRAZOENTREGA"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select DISTINCT\n" +
+                    "	pf.CODIGOFORNECEDOR id_fornecedor,\n" +
+                    "	pf.CODIGOPRODUTO id_produto,\n" +
+                    "	pf.CODIGOPRODFORNECEDOR codigoexterno,\n" +
+                    "	pf.FATORCONVERSAO qtdembalagem\n" +
+                    "from\n" +
+                    "	PRODUTO_FORNECEDOR pf\n" +
+                    "order by\n" +
+                    "	pf.CODIGOFORNECEDOR,\n" +
+                    "	pf.CODIGOPRODUTO"
+            )) {
+                while (rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     
                     result.add(imp);
                 }
