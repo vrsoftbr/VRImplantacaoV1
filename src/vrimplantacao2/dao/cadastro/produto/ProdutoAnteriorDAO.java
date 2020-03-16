@@ -920,7 +920,7 @@ public class ProdutoAnteriorDAO {
                     "SELECT \n"
                     + "	ant.impsistema, \n"
                     + "	ant.imploja, \n"
-                    + "	substring(ant.impid, 1, char_length(ant.impid) -1) as impid, \n"
+                    + "	ant.impid, \n"
                     + "	ant.descricao, \n"
                     + "	p.descricaocompleta, \n"
                     + "	p.descricaoreduzida, \n"
@@ -948,7 +948,7 @@ public class ProdutoAnteriorDAO {
                     + "where \n"
                     + "       ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
                     + "       ant.imploja = " + SQLUtils.stringSQL(loja) + " and\n"
-                    + "       ant.impid = " + SQLUtils.stringSQL(id) + "\n"
+                    + "       substring(ant.impid, 1, char_length(ant.impid) -1) = " + SQLUtils.stringSQL(id) + "\n"
                     + "order by\n"
                     + "	ant.impsistema, \n"
                     + "	ant.imploja, \n"
@@ -985,6 +985,43 @@ public class ProdutoAnteriorDAO {
                     vo.setCest(rst.getString("cest"));
                     vo.setNovo(rst.getBoolean("novo"));
                     vo.setContadorImportacao(rst.getInt("contadorimportacao"));
+
+                    return vo;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public ProdutoAnteriorVO getProdutoAnteriorUnificado(String sistema, String id) throws Exception {
+        createTable();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT distinct\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.codigoatual \n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "where \n"
+                    + "       ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "       ant.impid = " + SQLUtils.stringSQL(id) + "\n and\n"
+                    + "       ant.codigoatual is not null\n"        
+                    + "order by\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.impid"
+            )) {
+                if (rst.next()) {
+                    ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
+                    vo.setImportSistema(rst.getString("impsistema"));
+                    vo.setImportId(rst.getString("impid"));
+                    ProdutoVO produto = null;
+                    if (rst.getString("codigoatual") != null) {
+                        produto = new ProdutoVO();
+                        produto.setId(rst.getInt("codigoatual"));
+                    }
+                    vo.setCodigoAtual(produto);
 
                     return vo;
                 }

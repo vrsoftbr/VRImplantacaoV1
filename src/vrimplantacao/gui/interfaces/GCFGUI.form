@@ -26,7 +26,10 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="pnlArquivoBalanca" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="pnlArquivoBalanca" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="93" max="-2" attributes="0"/>
+                  </Group>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
                   <Component id="tabs" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
@@ -48,7 +51,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlArquivoBalanca" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="252" max="32767" attributes="0"/>
+              <Component id="tabs" pref="256" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -593,6 +596,8 @@
                                   <Component id="chkVendasPdv" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkIgnorarUltimoDigito" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkBancoUnificado" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -606,7 +611,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="344" max="32767" attributes="0"/>
+                          <EmptySpace pref="211" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -624,6 +629,7 @@
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkVendasPdv" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkIgnorarUltimoDigito" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkBancoUnificado" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                                   <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
@@ -659,6 +665,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIgnorarUltimoDigito">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Ignorar &#xda;ltimo D&#xed;gito C&#xf3;digo Produto"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBancoUnificado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Banco GCF &#xe9; Unificado"/>
                   </Properties>
                 </Component>
               </SubComponents>
