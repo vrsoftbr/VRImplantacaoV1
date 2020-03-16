@@ -14,6 +14,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -565,6 +567,144 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.CODIGO id,\n" +
+                    "	c.CNPJ,\n" +
+                    "	c.IE,\n" +
+                    "	c.NOME razao,\n" +
+                    "	c.FANTASIA,\n" +
+                    "	c.ATIVO,\n" +
+                    "	c.BLOQUEADO,\n" +
+                    "	c.DTBLOQUEIO,\n" +
+                    "	c.ENDERECO,\n" +
+                    "	c.NUMERO,\n" +
+                    "	c.COMPLEMENTO,\n" +
+                    "	c.BAIRRO,\n" +
+                    "	c.CODCIDADE,\n" +
+                    "	c.CEP,\n" +
+                    "	c.DTNASCIMENTO,\n" +
+                    "	c.DTCADASTRO,\n" +
+                    "	c.DTADMISSAO,\n" +
+                    "	c.VLLIMITECRED,\n" +
+                    "	c.DTVENCIMENTO,\n" +
+                    "	c.SENHA,\n" +
+                    "	c.TELEFONE,\n" +
+                    "	c.CELULAR,\n" +
+                    "	c.EMAIL,\n" +
+                    "	c.ENDCOBRANCA,\n" +
+                    "	c.NUMCOBRANCA,\n" +
+                    "	c.COMPCOBRANCA,\n" +
+                    "	c.BAIRROCOBRANCA,\n" +
+                    "	c.CODCIDADECOBRANCA,\n" +
+                    "	c.CEPCOBRANCA,\n" +
+                    "	c.TELCOBRANCA\n" +
+                    "from\n" +
+                    "	PESSOA c \n" +
+                    "where\n" +
+                    "	c.ISCLIENTE = 1\n" +
+                    "order by\n" +
+                    "	c.CODIGO "
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("CNPJ"));
+                    imp.setInscricaoestadual(rs.getString("IE"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("FANTASIA"));
+                    imp.setAtivo(rs.getBoolean("ATIVO"));
+                    imp.setBloqueado(rs.getBoolean("BLOQUEADO"));
+                    imp.setDataBloqueio(rs.getDate("DTBLOQUEIO"));
+                    imp.setEndereco(rs.getString("ENDERECO"));
+                    imp.setNumero(rs.getString("NUMERO"));
+                    imp.setComplemento(rs.getString("COMPLEMENTO"));
+                    imp.setBairro(rs.getString("BAIRRO"));
+                    imp.setMunicipioIBGE(rs.getString("CODCIDADE"));
+                    imp.setCep(rs.getString("CEP"));
+                    imp.setDataNascimento(rs.getDate("DTNASCIMENTO"));
+                    imp.setDataCadastro(rs.getDate("DTCADASTRO"));
+                    imp.setDataAdmissao(rs.getDate("DTADMISSAO"));
+                    imp.setValorLimite(rs.getDouble("VLLIMITECRED"));
+                    imp.setTelefone(rs.getString("TELEFONE"));
+                    imp.setCelular(rs.getString("CELULAR"));
+                    imp.setEmail(rs.getString("EMAIL"));
+                    imp.setCobrancaEndereco(rs.getString("ENDCOBRANCA"));
+                    imp.setCobrancaNumero(rs.getString("NUMCOBRANCA"));
+                    imp.setCobrancaComplemento(rs.getString("COMPCOBRANCA"));
+                    imp.setCobrancaBairro(rs.getString("BAIRROCOBRANCA"));
+                    imp.setCobrancaMunicipioIBGE(rs.getInt("CODCIDADECOBRANCA"));
+                    imp.setCobrancaCep(rs.getString("CEPCOBRANCA"));
+                    imp.setCobrancaTelefone(rs.getString("TELCOBRANCA"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.NUMLANCAMENTO id,\n" +
+                    "	c.DTLANCAMENTO emissao,\n" +
+                    "	c.NUMNOTA numerocupom,\n" +
+                    "	pdv.SERIENFCE ecf,\n" +
+                    "	c.VALOR,\n" +
+                    "	c.VLJURO,\n" +
+                    "	c.OBSERVACAO,\n" +
+                    "	c.CODCLIENTE,\n" +
+                    "	c.DTVENCIMENTO,\n" +
+                    "	c.NUMPARCELA,\n" +
+                    "	p.CNPJ\n" +
+                    "FROM \n" +
+                    "	CONTASARECEBER c\n" +
+                    "	left join CXPDV pdv on\n" +
+                    "		c.CODCXPDV = pdv.CODIGO\n" +
+                    "	left join PESSOA p ON\n" +
+                    "		c.CODCLIENTE = p.CODIGO \n" +
+                    "where\n" +
+                    "	c.STATUS in ('A') and\n" +
+                    "	c.CODCOBRANCA in ('C') and\n" +
+                    "	c.CODEMPRESA = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	c.DTVENCIMENTO "
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("VALOR"));
+                    imp.setJuros(rs.getDouble("VLJURO"));
+                    imp.setObservacao(rs.getString("OBSERVACAO"));
+                    imp.setIdCliente(rs.getString("CODCLIENTE"));
+                    imp.setDataVencimento(rs.getDate("DTVENCIMENTO"));
+                    imp.setParcela(rs.getInt("NUMPARCELA"));
+                    imp.setCnpjCliente(rs.getString("CNPJ"));
                     
                     result.add(imp);
                 }
