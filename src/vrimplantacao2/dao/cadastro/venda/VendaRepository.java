@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import vrframework.classe.Conexao;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -239,59 +238,86 @@ public class VendaRepository {
                                     
                                     vrimplantacao2.vo.cadastro.ProdutoVO vo = new vrimplantacao2.vo.cadastro.ProdutoVO();
 
-                                    int codigoAtual = produtoIDStack.obterID(impItem.getProduto(), false);
-                                    MercadologicoVO merc = providerProduto.getMercadologico("-1", "-1", "-1", "0", "0");
+                                    if (eBancoUnificado) {
 
-                                    vo.setId(codigoAtual);
-                                    vo.setDescricaoCompleta(impItem.getDescricaoReduzida());
-                                    vo.setDescricaoReduzida(vo.getDescricaoCompleta());
-                                    vo.setDescricaoGondola(vo.getDescricaoCompleta());
-                                    vo.setMercadologico(merc);
-                                    vo.setIdFornecedorFabricante(1);
+                                        ProdutoAnteriorVO ant2 = produtoAnteriorDAO.getProdutoAnteriorUnificado(provider.getSistema(), impItem.getProduto());
 
-                                    providerProduto.salvar(vo);
+                                        if (ant2 == null) {
 
-                                    for (LojaVO lj : lojas) {
-                                        ProdutoComplementoVO compl = vo.getComplementos().make(lj.getId());
-                                        compl.setIdLoja(lj.getId());
-                                        compl.setDescontinuado(true);
-                                        compl.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
-                                        compl.setPrecoVenda(impItem.getPrecoVenda());
-                                        providerProduto.complemento().salvar(compl, false);
+                                            int codigoAtual = produtoIDStack.obterID(impItem.getProduto(), false);
+                                            MercadologicoVO merc = providerProduto.getMercadologico("-1", "-1", "-1", "0", "0");
+
+                                            vo.setId(codigoAtual);
+                                            vo.setDescricaoCompleta(impItem.getDescricaoReduzida());
+                                            vo.setDescricaoReduzida(vo.getDescricaoCompleta());
+                                            vo.setDescricaoGondola(vo.getDescricaoCompleta());
+                                            vo.setMercadologico(merc);
+                                            vo.setIdFornecedorFabricante(1);
+
+                                            providerProduto.salvar(vo);
+
+                                            for (LojaVO lj : lojas) {
+                                                ProdutoComplementoVO compl = vo.getComplementos().make(lj.getId());
+                                                compl.setIdLoja(lj.getId());
+                                                compl.setDescontinuado(true);
+                                                compl.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                                                compl.setPrecoVenda(impItem.getPrecoVenda());
+                                                providerProduto.complemento().salvar(compl, false);
+                                            }
+
+                                            ProdutoAliquotaVO aliq = vo.getAliquotas().make(Parametros.get().getUfPadrao().getId(), 1);
+                                            aliq.setEstado(Parametros.get().getUfPadrao());
+                                            aliq.setAliquotaCredito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                            aliq.setAliquotaConsumidor(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                            aliq.setAliquotaCreditoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                            aliq.setAliquotaDebito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                            aliq.setAliquotaDebitoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                            aliq.setAliquotaDebitoForaEstadoNf(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                            providerProduto.aliquota().salvar(aliq);
+
+                                            ProdutoAutomacaoVO ean = vo.getEans().make(Long.parseLong(impItem.getCodigoBarras()));
+                                            ean.setCodigoBarras(Long.parseLong(impItem.getCodigoBarras()));
+                                            ean.setTipoEmbalagem("KG".equals(impItem.getUnidadeMedida().trim()) ? TipoEmbalagem.KG : TipoEmbalagem.UN);
+                                            ean.setProduto(vo);
+                                            providerProduto.automacao().salvar(ean);
+
+                                            try (Statement stm = Conexao.createStatement()) {
+                                                SQLBuilder sql = new SQLBuilder();
+
+                                                sql.setSchema("implantacao");
+                                                sql.setTableName("codant_produto");
+                                                sql.put("impsistema", provider.getSistema());
+                                                sql.put("imploja", provider.getLoja());
+                                                sql.put("impid", impItem.getProduto());
+                                                sql.put("descricao", impItem.getDescricaoReduzida());
+                                                sql.put("codigoatual", codigoAtual);
+                                                sql.put("obsimportacao", "PRODUTO IMPORTADO DA VENDA");
+                                                sql.put("novo", true);
+                                                stm.execute(sql.getInsert());
+                                            }
+
+                                            item.setId_produto(codigoAtual);
+
+                                        } else {
+
+                                            try (Statement stm = Conexao.createStatement()) {
+                                                SQLBuilder sql = new SQLBuilder();
+
+                                                sql.setSchema("implantacao");
+                                                sql.setTableName("codant_produto");
+                                                sql.put("impsistema", provider.getSistema());
+                                                sql.put("imploja", provider.getLoja());
+                                                sql.put("impid", impItem.getProduto());
+                                                sql.put("descricao", impItem.getDescricaoReduzida());
+                                                sql.put("codigoatual", ant2.getCodigoAtual().getId());
+                                                sql.put("obsimportacao", "PRODUTO IMPORTADO DA VENDA");
+                                                sql.put("novo", true);
+                                                stm.execute(sql.getInsert());
+                                            }
+
+                                            item.setId_produto(ant2.getCodigoAtual().getId());
+                                        }
                                     }
-
-                                    ProdutoAliquotaVO aliq = vo.getAliquotas().make(Parametros.get().getUfPadrao().getId(), 1);
-                                    aliq.setEstado(Parametros.get().getUfPadrao());
-                                    aliq.setAliquotaCredito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
-                                    aliq.setAliquotaConsumidor(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
-                                    aliq.setAliquotaCreditoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
-                                    aliq.setAliquotaDebito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
-                                    aliq.setAliquotaDebitoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
-                                    aliq.setAliquotaDebitoForaEstadoNf(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
-                                    providerProduto.aliquota().salvar(aliq);
-
-                                    ProdutoAutomacaoVO ean = vo.getEans().make(Long.parseLong(impItem.getCodigoBarras()));
-                                    ean.setCodigoBarras(Long.parseLong(impItem.getCodigoBarras()));
-                                    ean.setTipoEmbalagem("KG".equals(impItem.getUnidadeMedida().trim()) ? TipoEmbalagem.KG : TipoEmbalagem.UN);
-                                    ean.setProduto(vo);
-                                    providerProduto.automacao().salvar(ean);
-
-                                    try (Statement stm = Conexao.createStatement()) {
-                                        SQLBuilder sql = new SQLBuilder();
-
-                                        sql.setSchema("implantacao");
-                                        sql.setTableName("codant_produto");
-                                        sql.put("impsistema", provider.getSistema());
-                                        sql.put("imploja", provider.getLoja());
-                                        sql.put("impid", impItem.getProduto());
-                                        sql.put("descricao", impItem.getDescricaoReduzida());
-                                        sql.put("codigoatual", codigoAtual);
-                                        sql.put("novo", true);
-                                        stm.execute(sql.getInsert());
-                                    }
-
-                                    item.setId_produto(codigoAtual);
-
                                 } else {
                                     
                                     ProdutoAnteriorVO anterior = null;

@@ -529,12 +529,16 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="lblMesVenda2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="edtVendaDtFim" min="-2" pref="99" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="edtVendaDtFim" min="-2" pref="99" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="chkBancoUnificado" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                               <Component id="vRPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="235" max="32767" attributes="0"/>
+                          <EmptySpace pref="185" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -550,6 +554,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="edtVendaDtIni" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="edtVendaDtFim" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkBancoUnificado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkHistoricoVendas" min="-2" max="-2" attributes="0"/>
@@ -694,6 +699,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBancoUnificado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Banco RMS &#xe9; Unificado"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tabOutros">

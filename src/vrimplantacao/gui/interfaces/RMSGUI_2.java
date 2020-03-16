@@ -305,6 +305,8 @@ public class RMSGUI_2 extends VRInternalFrame {
                                 dao.setVersaoDaVenda(3);
                             }
                             
+                            importador.eBancoUnificado = chkBancoUnificado.isSelected();
+                            
                             /*if (rdbVendasV1.equals(groupVendasPdv.getSelection())) {
                                 dao.setVersaoDaVenda(1);
                             } else if (rdbVendasV2.equals(groupVendasPdv.getSelection())) {
@@ -423,6 +425,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         rdbVendasV1 = new vrframework.bean.radioButton.VRRadioButton();
         rdbVendasV2 = new vrframework.bean.radioButton.VRRadioButton();
         rdbVendasV3 = new vrframework.bean.radioButton.VRRadioButton();
+        chkBancoUnificado = new vrframework.bean.checkBox.VRCheckBox();
         tabOutros = new javax.swing.JPanel();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkNotasFiscais = new vrframework.bean.checkBox.VRCheckBox();
@@ -837,6 +840,8 @@ public class RMSGUI_2 extends VRInternalFrame {
                 .addGap(51, 51, 51))
         );
 
+        chkBancoUnificado.setText("Banco RMS é Unificado");
+
         javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
         tabVendas.setLayout(tabVendasLayout);
         tabVendasLayout.setHorizontalGroup(
@@ -852,9 +857,12 @@ public class RMSGUI_2 extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblMesVenda2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(tabVendasLayout.createSequentialGroup()
+                                .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkBancoUnificado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(235, Short.MAX_VALUE))
+                .addContainerGap(185, Short.MAX_VALUE))
         );
         tabVendasLayout.setVerticalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -866,7 +874,8 @@ public class RMSGUI_2 extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(edtVendaDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkBancoUnificado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkHistoricoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1316,6 +1325,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkBancoUnificado;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
