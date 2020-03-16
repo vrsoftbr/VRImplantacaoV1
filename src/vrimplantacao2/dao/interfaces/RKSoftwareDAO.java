@@ -228,6 +228,9 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(rst.getInt("validade"));
                     }
 
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagemVolume(imp.getTipoEmbalagem());
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -543,7 +546,7 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.cr_dtnota as emissao,\n"
                     + "    r.cr_vencto as vencimento,\n"
                     + "    r.cr_valor as valor,\n"
-                    + "    r.cr_vlsaldo as saldo,\n"
+                    + "    r.cr_vlsaldo as saldo,\n"        
                     + "    r.cr_cliente as idcliente,\n"
                     + "    r.cr_observ as observacao,\n"
                     + "    r.cr_vljuros as juros,\n"
@@ -569,7 +572,7 @@ public class RKSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     public List<OfertaIMP> getOfertas() throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
 

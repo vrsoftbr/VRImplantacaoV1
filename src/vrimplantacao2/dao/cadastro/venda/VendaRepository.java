@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import vrframework.classe.Conexao;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -53,6 +54,7 @@ public class VendaRepository {
     private ProdutoRepositoryProvider providerProduto;
     private ProdutoAnteriorDAO produtoAnteriorDAO;
     public boolean idProdutoSemUltimoDigito = false;
+    public boolean eBancoUnificado = false;
     
     public VendaRepository(VendaRepositoryProvider provider) {
         this.provider = provider;
@@ -63,7 +65,10 @@ public class VendaRepository {
         try {
             provider.begin();
             
-            boolean haDivergencia = false;              
+            boolean haDivergencia = false;  
+
+            System.out.println(idProdutoSemUltimoDigito);
+            System.out.println(eBancoUnificado);
    
             LOG.info("Iniciando o processo de importação das vendas");        
             LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));   
@@ -194,6 +199,7 @@ public class VendaRepository {
                     if ( produto == null ) {
                         
                         if (!forcarCadastroProdutoNaoExistente) {
+                            
                             haDivergencia = true;
                             LOG.warning(
                                     String.format(
@@ -203,12 +209,31 @@ public class VendaRepository {
                                             impItem.getDescricaoReduzida()
                                     )
                             );
+                            
                             divergentes.add(impItem);
+                            
                         } else {
+
+                            LOG.warning(
+                                    String.format(
+                                            "Produto não encontrado - código:%s ean:%s descricao:%s",
+                                            impItem.getProduto(),
+                                            impItem.getCodigoBarras(),
+                                            impItem.getDescricaoReduzida()
+                                    )
+                            );
                             
                             try {
+
+                                divergentes.add(impItem);
                                 
-                                ProdutoAnteriorVO ant = produtoAnteriorDAO.getProdutoAnterior(provider.getSistema(), provider.getLoja(), impItem.getProduto());
+                                ProdutoAnteriorVO ant = null;
+                                
+                                if (!idProdutoSemUltimoDigito) {
+                                    ant = produtoAnteriorDAO.getProdutoAnterior(provider.getSistema(), provider.getLoja(), impItem.getProduto());
+                                } else {
+                                    ant = produtoAnteriorDAO.getProdutoAnteriorSemUltimoDigito(provider.getSistema(), provider.getLoja(), impItem.getProduto());
+                                }
 
                                 if (ant == null) {
                                     
@@ -268,7 +293,96 @@ public class VendaRepository {
                                     item.setId_produto(codigoAtual);
 
                                 } else {
-                                    item.setId_produto(ant.getCodigoAtual().getId());
+                                    
+                                    ProdutoAnteriorVO anterior = null;
+                                    
+                                    if (eBancoUnificado) {
+                                        
+                                        if (ant.getCodigoAtual() == null) {
+                                                                                    
+                                            anterior = produtoAnteriorDAO.getProdutoAnteriorUnificado(provider.getSistema(), ant.getImportId());
+                                            
+                                            if (anterior == null) {
+                                                
+                                                vrimplantacao2.vo.cadastro.ProdutoVO vo = new vrimplantacao2.vo.cadastro.ProdutoVO();
+
+                                                int codigoAtual = produtoIDStack.obterID(impItem.getProduto(), false);
+                                                MercadologicoVO merc = providerProduto.getMercadologico("-1", "-1", "-1", "0", "0");
+
+                                                vo.setId(codigoAtual);
+                                                vo.setDescricaoCompleta(impItem.getDescricaoReduzida());
+                                                vo.setDescricaoReduzida(vo.getDescricaoCompleta());
+                                                vo.setDescricaoGondola(vo.getDescricaoCompleta());
+                                                vo.setMercadologico(merc);
+                                                vo.setIdFornecedorFabricante(1);
+
+                                                providerProduto.salvar(vo);
+
+                                                for (LojaVO lj : lojas) {
+                                                    ProdutoComplementoVO compl = vo.getComplementos().make(lj.getId());
+                                                    compl.setIdLoja(lj.getId());
+                                                    compl.setDescontinuado(true);
+                                                    compl.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                                                    compl.setPrecoVenda(impItem.getPrecoVenda());
+                                                    providerProduto.complemento().salvar(compl, false);
+                                                }
+
+                                                ProdutoAliquotaVO aliq = vo.getAliquotas().make(Parametros.get().getUfPadrao().getId(), 1);
+                                                aliq.setEstado(Parametros.get().getUfPadrao());
+                                                aliq.setAliquotaCredito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                                aliq.setAliquotaConsumidor(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                                aliq.setAliquotaCreditoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                                aliq.setAliquotaDebito(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                                aliq.setAliquotaDebitoForaEstado(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                                aliq.setAliquotaDebitoForaEstadoNf(Icms.getIcms(impItem.getIcmsCst(), impItem.getIcmsAliq(), 0));
+                                                providerProduto.aliquota().salvar(aliq);
+
+                                                ProdutoAutomacaoVO ean = vo.getEans().make(Long.parseLong(impItem.getCodigoBarras()));
+                                                ean.setCodigoBarras(Long.parseLong(impItem.getCodigoBarras()));
+                                                ean.setTipoEmbalagem("KG".equals(impItem.getUnidadeMedida().trim()) ? TipoEmbalagem.KG : TipoEmbalagem.UN);
+                                                ean.setProduto(vo);
+                                                providerProduto.automacao().salvar(ean);
+
+                                                try (Statement stm = Conexao.createStatement()) {
+                                                    SQLBuilder sql = new SQLBuilder();
+
+                                                    sql.setSchema("implantacao");
+                                                    sql.setTableName("codant_produto");
+                                                    sql.setWhere("impid = " + Utils.quoteSQL(ant.getImportId())
+                                                            + " and imploja = '" + provider.getLoja() + "'"
+                                                            + " and impsistema = '" + provider.getSistema() + "'"
+                                                            + " and codigoatual is null"
+                                                    );
+                                                    
+                                                    sql.put("codigoatual", codigoAtual);
+                                                    stm.execute(sql.getUpdate());
+                                                }
+
+                                                item.setId_produto(codigoAtual);
+                                                
+                                            } else {
+
+                                                try (Statement stm = Conexao.createStatement()) {
+                                                    SQLBuilder sql = new SQLBuilder();
+
+                                                    sql.setSchema("implantacao");
+                                                    sql.setTableName("codant_produto");
+                                                    sql.setWhere("impid = " + Utils.quoteSQL(ant.getImportId())
+                                                            + " and imploja = '" + provider.getLoja() + "'"
+                                                            + " and impsistema = '" + provider.getSistema() + "'"
+                                                            + " and codigoatual is null"
+                                                    );
+                                                    
+                                                    sql.put("codigoatual", anterior.getCodigoAtual().getId());
+                                                    stm.execute(sql.getUpdate());
+                                                }
+
+                                                item.setId_produto(anterior.getCodigoAtual().getId());                                                
+                                            }
+                                        } else {
+                                            item.setId_produto(ant.getCodigoAtual().getId());
+                                        }
+                                    } 
                                 }
                             } catch (Exception ex) {
                                 throw ex;
@@ -319,6 +433,19 @@ public class VendaRepository {
 
             }
         
+            
+            if (forcarCadastroProdutoNaoExistente) {
+                if (!divergentes.isEmpty()) {
+                    for (VendaItemIMP impItem : divergentes) {
+                        provider.gravarMapa(
+                                impItem.getProduto(),
+                                impItem.getCodigoBarras(),
+                                impItem.getDescricaoReduzida()
+                        );
+                    }
+                }
+            }
+            
             if (!haDivergencia) {
                 
                 provider.gerarRegistrosGenericos();
@@ -349,7 +476,7 @@ public class VendaRepository {
                 }
 
                 return false;
-            }
+            }           
             
         } catch (Exception e) {
             provider.rollback();

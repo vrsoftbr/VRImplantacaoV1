@@ -125,6 +125,7 @@ public class Importador {
     private int lojaVR = 1;
     private boolean importarIndividualLoja = false;
     public boolean idProdutoSemUltimoDigito = false;
+    public boolean eBancoUnificado = false;
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
@@ -939,6 +940,7 @@ public class Importador {
             );
             VendaRepository rep = new VendaRepository(provider);
             rep.idProdutoSemUltimoDigito = idProdutoSemUltimoDigito;
+            rep.eBancoUnificado = eBancoUnificado;
             rep.importar(opt);
         }
     }

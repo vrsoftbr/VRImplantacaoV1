@@ -605,8 +605,8 @@ public class GCFDAO extends InterfaceDAO {
                     imp.setIdProduto(cellIdProduto.getContents().trim());
                     imp.setDataInicio(new java.sql.Date(format.parse(dataInicio).getTime()));
                     imp.setDataFim(new java.sql.Date(format.parse(dataFim).getTime()));
-                    imp.setPrecoOferta(Double.parseDouble(cellPrecoOferta.getContents().replace(",", ".")));
-                    imp.setPrecoNormal(Double.parseDouble(cellPrecoVenda.getContents().replace(",", ".")));
+                    imp.setPrecoOferta(Double.parseDouble(cellPrecoOferta.getContents().replace(".", "").replace(",", ".")));
+                    imp.setPrecoNormal(Double.parseDouble(cellPrecoVenda.getContents().replace(".", "").replace(",", ".")));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);
 
@@ -1100,13 +1100,13 @@ public class GCFDAO extends InterfaceDAO {
                     + "where ite.pdvci_id in (select \n"
                     + "                              pdvcc_id\n"
                     + "                         from A_INTPDVCC\n"
-                    + "                        where pdvcc_loj = 1\n"
+                    + "                        where pdvcc_loj = " + idLojaCliente + "\n"
                     + "                          and pdvcc_dta between '" + dataInicio + "' and '" + dataTermino + "'\n"
                     + "                          and pdvcc_est = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
                     + "                      )";
-                        
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
-            rst = stm.executeQuery(sql);            
+            rst = stm.executeQuery(sql);
         }
         
         @Override
