@@ -355,10 +355,15 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setMargem(rst.getDouble("margem_param"));
                     }
-
-                    imp.setTipoProduto(("S".equals(rst.getString("tipo_ativo").trim()) ? TipoProduto.ATIVO_IMOBILIZADO : TipoProduto.MERCADORIA_REVENDA));
-                    imp.setTipoProduto(("S".equals(rst.getString("tipo_usoconsumo").trim()) ? TipoProduto.MATERIAL_USO_E_CONSUMO : TipoProduto.MERCADORIA_REVENDA));
-                                        
+                    
+                    if ("S".equals(rst.getString("tipo_ativo"))){
+                        imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO);
+                    } else {
+                        if ("S".equals(rst.getString("tipo_usoconsumo"))){
+                        imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO);
+                        }
+                    }
+                                                            
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ativo").trim()) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setDescontinuado("S".equals(rst.getString("desativacompra")) || rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
@@ -958,7 +963,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                     "EMAIL",
                                     null,
                                     null,
-                                    TipoContato.COMERCIAL,
+                                    TipoContato.NFE,
                                     rst.getString("EMAIL").toLowerCase()
                             );
                         }
@@ -1208,7 +1213,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    CLIENTES \n"
                     + "    where \n"
                     + "    CODCLIE >= 1 \n"
-                    + "    and codTIPOCLIE in (2,4)"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -1232,8 +1236,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setInscricaoestadual("ISENTO");
                     }
-                    imp.setTelefone(rst.getString("TELEFONE"));
-                    imp.setCelular(rst.getString("CELULAR"));
+                    imp.setTelefone(Utils.stringLong(rst.getString("TELEFONE")));
+                    imp.setCelular(Utils.stringLong(rst.getString("CELULAR")));
                     imp.setEmail(rst.getString("EMAIL"));
                     imp.setNomePai(rst.getString("NOMEPAI"));
                     imp.setNomeMae(rst.getString("NOMEMAE"));

@@ -19,6 +19,7 @@ import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  * DAO de importação do Milênio.
@@ -174,6 +175,23 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    ""
+            )) {
+                while (rs.next()) {
+                
+                }
+            }
+        }
+        
         return result;
     }
 

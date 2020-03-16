@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -561,6 +562,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
+                        next.setChaveCfe(rst.getString("ChaveCFe"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -572,10 +574,13 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n" +
+                    "	distinct\n" +
                     "	dbo.CE_VendasCaixa.CodVenda id,\n" +
                     "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) as data,\n" +
-                    "	dbo.CE_VendasCaixa.Data as DATAHORA,\n" +
-                    "   RIGHT(CONVERT(VARCHAR, dbo.CE_VendasCaixa.Data, 108),7) hora,\n" +
+                    "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) as datahora,\n" +
+                    "	--dbo.CE_VendasCaixa.Data as DATAHORA,\n" +
+                    "    --RIGHT(CONVERT(VARCHAR, dbo.CE_VendasCaixa.Data, 108),7) hora,\n" +
+                    "    '00:00:00.0000' hora,\n" +
                     "	dbo.CE_VendasCaixa.ValorItens,\n" +
                     "	dbo.CE_VendasCaixa.DescAcr,\n" +
                     "	dbo.CE_VendasCaixa.ValorTotal,\n" +
@@ -598,8 +603,8 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_VendasCaixa.CodEmpresa,\n" +
                     "	dbo.CE_VendasCaixa.CodCliente,\n" +
                     "	CONTROLE_CLIENTES.dbo.CC_Clientes.NomeCliente,\n" +
-                    "   CONTROLE_CLIENTES.dbo.CC_Clientes.CpfCliente cpf,\n" +
-                    "   CONTROLE_CLIENTES.dbo.CC_Clientes.EnderecoCliente endereco,\n" +
+                    "    CONTROLE_CLIENTES.dbo.CC_Clientes.CpfCliente cpf,\n" +
+                    "    CONTROLE_CLIENTES.dbo.CC_Clientes.EnderecoCliente endereco,\n" +
                     "	CONTROLE_CLIENTES.dbo.CC_Clientes.NUMERO,\n" +
                     "	CONTROLE_CLIENTES.dbo.CC_Clientes.BairroCliente bairro,\n" +
                     "	CONTROLE_CLIENTES.dbo.CC_Clientes.CepCliente cep,\n" +
@@ -608,15 +613,20 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_VendasCaixa.DescAcrItens,\n" +
                     "	ISNULL(dbo.CE_VendasCaixa.DescAcr, 0) + ISNULL(dbo.CE_VendasCaixa.DescAcrItens, 0) as TotalDescontoAcrescimo,\n" +
                     "	dbo.CE_VendasCaixa.ValorItens + ISNULL(dbo.CE_VendasCaixa.DescAcrItens, 0) as ValorItensDesconto,\n" +
-                    "	dbo.CE_VendasCaixa.ChaveVenda,\n" +
+                    "	dbo.CE_VendasCaixa.ChaveCFe,\n" +
                     "	dbo.CE_VendasCaixa.DescAcrVenda\n" +
                     "from\n" +
                     "	dbo.CE_VendasCaixa\n" +
                     "left outer join CONTROLE_CLIENTES.dbo.CC_Clientes on\n" +
                     "	dbo.CE_VendasCaixa.CodCliente = CONTROLE_CLIENTES.dbo.CC_Clientes.Carteira\n" +
                     "where\n" +
-                    "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n" +
-                    "	dbo.CE_VendasCaixa.CodEmpresa = " + idLojaCliente;
+                    "	convert(datetime, convert(varchar(10), dbo.CE_VendasCaixa.Data, 103), 103) \n" +
+                    "		between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n" +
+                    "	dbo.CE_VendasCaixa.CodEmpresa = " + idLojaCliente + " and\n" +
+                    "	dbo.CE_VendasCaixa.COO is not null and\n" +
+                    "	dbo.CE_VendasCaixa.ValorPago > 0\n" +
+                    "order by \n" +
+                    "	cast(dbo.CE_VendasCaixa.CodVenda as integer)";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -721,7 +731,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n" +
                     "	dbo.CE_MOVIMENTACAO.cod_mov id,\n" +
-                    "	convert(datetime, convert(varchar(10), dbo.CE_MOVIMENTACAO.data_mov, 103), 103) emissao,\n" +
+                    "	convert(datetime, convert(varchar(10), dbo.CE_MOVIMENTACAO.data_mov , 103), 103) emissao,\n" +
                     "	dbo.CE_MOVIMENTACAO.custo_mov custototal,\n" +
                     "	dbo.CE_MOVIMENTACAO.qtd_mov qtd,\n" +
                     "	(dbo.CE_MOVIMENTACAO.venda_mov + dbo.CE_MOVIMENTACAO.VLACRDESC) subtotalimpressora,\n" +
@@ -744,6 +754,7 @@ public class AccesysDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dbo.CE_MOVIMENTACAO.caixa_mov = dbo.CE_VendasCaixa.NumeroCaixa\n" +
                     "	and dbo.CE_MOVIMENTACAO.numimpfiscal = dbo.CE_VendasCaixa.NumImpFiscal\n" +
                     "	and dbo.CE_MOVIMENTACAO.coo = dbo.CE_VendasCaixa.COO\n" +
+                    "   and dbo.CE_MOVIMENTACAO.data_mov = dbo.CE_VendasCaixa.Data\n" +
                     "where\n" +
                     "	dbo.CE_VendasCaixa.CodEmpresa = " + idLojaCliente + " and\n" +
                     "	convert(datetime, convert(varchar(10), dbo.CE_MOVIMENTACAO.data_mov, 103), 103) "

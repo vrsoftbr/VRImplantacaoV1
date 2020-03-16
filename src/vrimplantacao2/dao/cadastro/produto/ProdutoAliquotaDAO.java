@@ -14,39 +14,6 @@ import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 
 public class ProdutoAliquotaDAO {
 
-    public void salvar(int idLojaVR, Collection<ProdutoAliquotaVO> values) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoAliquotaVO vo : values) {
-                SQLBuilder sql = new SQLBuilder();
-                sql.setTableName("produtoaliquota");
-                sql.put("id_produto", vo.getProduto().getId());
-                sql.put("id_estado", vo.getEstado().getId());
-                sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
-                sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
-                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
-                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
-                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
-                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
-                if (Versao.maiorQue(3, 19,1, 64)) {
-                    sql.put("excecao", vo.getExcecao());
-                }
-                if (!Versao.menorQue(3, 18, 3)) {
-                    sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
-                }
-
-                sql.getReturning().add("id");
-
-                try (ResultSet rst = stm.executeQuery(
-                        sql.getInsert()
-                )) {
-                    if (rst.next()) {
-                        vo.setId(rst.getInt("id"));
-                    }
-                }
-            }
-        }
-    }
-
     public void salvar(ProdutoAliquotaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -65,6 +32,9 @@ public class ProdutoAliquotaDAO {
             sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             if (!Versao.menorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+            }
+            if (Versao.maiorQue(3, 19,1, 64)) {
+                    sql.put("excecao", vo.getExcecao());
             }
 
             sql.getReturning().add("id");

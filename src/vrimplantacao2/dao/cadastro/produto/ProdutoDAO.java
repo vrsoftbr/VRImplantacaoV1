@@ -1,28 +1,14 @@
 package vrimplantacao2.dao.cadastro.produto;
 
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoRepository;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
-import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
-import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
-import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
-import vrimplantacao2.vo.cadastro.ProdutoVO;
-import vrimplantacao2.vo.enums.NaturezaReceitaVO;
-import vrimplantacao2.vo.enums.NcmVO;
-import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -81,178 +67,12 @@ public class ProdutoDAO {
     private MultiMap<String, ProdutoAnteriorVO> getCodigoAnterior() throws Exception {
         return anteriorDAO.getCodigoAnterior();
     }
-    
-    public void salvar(List<ProdutoIMP> produtos) throws Exception {
-
-        System.gc();
-        MultiMap<String, ProdutoVO> tratados;
-        {
-            //Organiza a lista de ProdutoIMP e transforma em MultiMap.
-            MultiMap<String, ProdutoIMP> organizados = 
-                    new OrganizadorIMP(this)
-                            .organizarListagem(produtos);
-            //Converte a listagem de ProdutoIMP em ProdutoVO.
-            MultiMap<String, ProdutoVO> convertidos = 
-                    new ConversorProduto(this)
-                            .converterListagem(organizados);
-            //Faz tratamento de id e eans na listagem de ProdutoVO.
-            tratados = new TratadorProduto(this)
-                    .tratarListagem(convertidos);
-        }
-                
-        ProgressBar.setStatus("Produtos - Gravando...");
-        ProgressBar.setMaximum(tratados.size());
-        try {
-            Conexao.begin(); 
-            
-            for (KeyList<String> keys: tratados.keySet()) {
-                String[] chave = new String[] {
-                    keys.get(0),
-                    keys.get(1),
-                    keys.get(2)
-                };
-                ProdutoVO vo = tratados.get(chave);
-                
-                if (!getCodigoAnterior().containsKey(chave)) {
-                    gravarProduto(vo);
-                    complementoDAO.salvar(vo.getComplementos().values(), false);
-                    aliquotaDAO.salvar(idLojaVR, vo.getAliquotas().values());
-                    anteriorDAO.salvar(vo.getCodigosAnteriores().values());
-                } else {                        
-                    vo.setId(getCodigoAnterior().get(chave).getCodigoAtual().getId());
-                }
-
-                for (ProdutoAutomacaoVO ean: vo.getEans().values()) {
-                    if (!automacaoDAO.getEansCadastrados().containsKey(ean.getCodigoBarras())) {
-                        automacaoDAO.salvar(ean);
-                    }
-                }
-                   
-                ProgressBar.next();
-            }
-
-            Conexao.commit();
-        } catch (Exception e) {
-            Conexao.rollback();
-            throw e;
-        }
-    }
-
-    private void gravarProduto(ProdutoVO vo) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            SQLBuilder sql = new SQLBuilder();
-            sql.setTableName("produto");
-            
-            
-            sql.put("id", vo.getId());
-            sql.put("descricaocompleta", vo.getDescricaoCompleta());
-            sql.put("qtdembalagem", 1);
-            sql.put("id_tipoembalagem", vo.getTipoEmbalagem().getId());
-            sql.put("mercadologico1", vo.getMercadologico().getMercadologico1());
-            sql.put("mercadologico2", vo.getMercadologico().getMercadologico2());
-            sql.put("mercadologico3", vo.getMercadologico().getMercadologico3());
-            sql.put("mercadologico4", vo.getMercadologico().getMercadologico4());
-            sql.put("mercadologico5", vo.getMercadologico().getMercadologico5());
-            sql.put("id_comprador", 1);
-            sql.put("custofinal", 0.0);
-            sql.put("id_familiaproduto", vo.getFamiliaProduto() != null ? vo.getFamiliaProduto().getId() : -1, -1);
-            sql.put("descricaoreduzida", vo.getDescricaoReduzida());
-            sql.put("pesoliquido", vo.getPesoLiquido());
-            sql.put("datacadastro", vo.getDatacadastro());
-            sql.put("validade", vo.getValidade());
-            sql.put("pesobruto", vo.getPesoBruto());
-            sql.put("comprimentoembalagem", 0);
-            sql.put("larguraembalagem", 0);
-            sql.put("alturaembalagem", 0);
-            sql.put("perda", 0.0);
-            sql.put("margem", vo.getMargem());
-            sql.put("verificacustotabela", false);
-            sql.put("percentualipi", 0.0);
-            sql.put("percentualfrete", 0.0);
-            sql.put("percentualencargo", 0.0);
-            sql.put("percentualperda", 0.0);
-            sql.put("percentualsubstituicao", 0.0);
-            sql.put("descricaogondola", vo.getDescricaoGondola());
-            sql.put("dataalteracao", new Date());
-            sql.putNull("id_produtovasilhame");
-            sql.put("excecao", 0);
-            sql.put("id_tipomercadoria", 99);
-            sql.put("sugestaopedido", true);
-            sql.put("aceitamultiplicacaopdv", true);
-            sql.put("id_fornecedorfabricante", 1);
-            sql.put("id_divisaofornecedor", 0);
-            sql.put("id_tipoproduto", 0);
-            sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
-            sql.put("sazonal", false);
-            sql.put("fabricacaopropria", false);
-            sql.put("consignado", false);
-            {
-                NcmVO ncm = vo.getNcm();
-                if (ncm == null) {
-                    ncm = new NcmVO();
-                }
-                sql.put("ncm1", ncm.getNcm1());
-                sql.put("ncm2", ncm.getNcm2());
-                sql.put("ncm3", ncm.getNcm3());
-            }
-            sql.put("ddv", 0);
-            sql.put("permitetroca", true);
-            sql.put("temperatura", 0);
-            sql.put("id_tipoorigemmercadoria", 0);
-            sql.put("ipi", 0);
-            sql.put("pesavel", vo.isPesavel());
-            sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
-            sql.put("vendacontrolada", false);
-            sql.put("tiponaturezareceita", vo.getPisCofinsNaturezaReceita() != null ? vo.getPisCofinsNaturezaReceita().getCodigo() : null);
-            sql.put("vendapdv", true);
-            sql.put("conferido", false);
-            sql.put("permitequebra", true);
-            sql.put("permiteperda", true);
-            sql.put("codigoanp", "");
-            sql.put("impostomedionacional", 0);
-            sql.put("impostomedioimportado", 0);
-            sql.put("sugestaocotacao", false);
-            sql.put("tara", 0.0);
-            sql.put("utilizatabelasubstituicaotributaria", false);
-            sql.put("id_tipolocaltroca", 0);
-            sql.put("qtddiasminimovalidade", 0);
-            sql.put("utilizavalidadeentrada", false);
-            sql.put("impostomedioestadual", 0);
-            sql.put("id_tipocompra", 0);
-            sql.put("numeroparcela", 0);
-            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagem().getId());
-            sql.put("volume", 1.0);
-            sql.put("id_normacompra", vo.getNormaCompra().getId());
-            sql.putNull("lastro");
-            sql.putNull("camadas");
-            sql.put("promocaoauditada", false);
-            sql.putNull("substituicaoestadual");
-            sql.putNull("substituicaoestadualoutros");
-            sql.putNull("substituicaoestadualexterior");
-            sql.put("id_cest", vo.getCest() != null ? vo.getCest().getId() : null);
-            sql.put("id_normareposicao", vo.getNormaReposicao().getId());
-            sql.putNull("lastroreposicao");
-            sql.putNull("camadasreposicao");
-            sql.putNull("margemminima");
-            sql.putNull("margemmaxima");
-            sql.put("permitedescontopdv", true);
-            sql.put("verificapesopdv", false);
-            
-            try {
-                stm.execute(sql.getInsert());
-            } catch (Exception e) {
-                throw e;
-            }
-        }
-    }
 
     public void setManterCodigoDeBalanca(boolean manterCodigoDeBalanca) {
         this.manterCodigoDeBalanca = manterCodigoDeBalanca;
     }
     
-    private final ProdutoComplementoDAO complementoDAO = new ProdutoComplementoDAO();
     final ProdutoAutomacaoDAO automacaoDAO = new ProdutoAutomacaoDAO();
-    private final ProdutoAliquotaDAO aliquotaDAO = new ProdutoAliquotaDAO();
 
     public void salvarEAN(List<ProdutoIMP> produtos, Set<OpcaoProduto> opcoes) throws Exception {
         try {
