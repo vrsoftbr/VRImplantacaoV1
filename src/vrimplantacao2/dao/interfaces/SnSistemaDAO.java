@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -106,7 +108,8 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS_ENTRADA,
                 OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                 OpcaoProduto.ICMS_CONSUMIDOR,
-                OpcaoProduto.ICMS
+                OpcaoProduto.ICMS,
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -416,6 +419,49 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	p.CODIGO id_produto,\n" +
+                    "	pr.DTVALIDADEPRECOOFERTA datatermino,\n" +
+                    "	pr.PRECOOFERTA,\n" +
+                    "	pr.PRECOOFERTAATIVO\n" +
+                    "from\n" +
+                    "	PRODUTO p\n" +
+                    "	join EMPRESA e on\n" +
+                    "		e.CODIGO = " + getLojaOrigem() + "\n" +
+                    "	left join PRECO_ESTOQUE pe on \n" +
+                    "		pe.CODEMPRESA = e.CODIGO and\n" +
+                    "		pe.CODPRODUTO = p.CODIGO\n" +
+                    "	left join PRECOTABELA pr on\n" +
+                    "		pr.CODEMPRESAPRECO = pe.CODEMPRESA and\n" +
+                    "		pr.CODPRODUTOPRECO = pe.CODPRODUTO and\n" +
+                    "		pr.CODTABELA = 1\n" +
+                    "where \n" +
+                    "	pr.PRECOOFERTAATIVO = 1 and\n" +
+                    "	pr.DTVALIDADEPRECOOFERTA >= convert(date, getDate())\n" +
+                    "order by\n" +
+                    "	p.CODIGO  "
+            )) {
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setDataInicio(new Date());
+                    imp.setDataFim(rs.getDate("datatermino"));
+                    imp.setPrecoOferta(rs.getDouble("PRECOOFERTA"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
