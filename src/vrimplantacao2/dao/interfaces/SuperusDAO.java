@@ -433,7 +433,8 @@ public class SuperusDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "  p.codigo id,\n"
-                    + "  p.NOME nome,\n"
+                  /*+ "  p.NOME nome,\n"    alterado para LOBAO*/
+                    + "  p.RAZAO nome,\n"
                     + "  p.ENDERECO res_endereco,\n"
                     + "  p.NRO res_numero,\n"
                     + "  p.COMPLEMENTO res_complemento,\n"
@@ -467,6 +468,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  PESSOAS p\n"
                     + "  left join CLIENTES c on p.codigo = c.codigo\n"
+                    + "  where cliente = 'S'\n"
                  // + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv+ ")\n") 
                     + "order by p.codigo"
             )) {
