@@ -280,6 +280,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
                     + "	vend.precovenda,\n"
+                    + " p.margem,\n"        
                     + "	vend.id_situacaocadastro,\n"
                     + "	case when vend.descontinuado then 'S' else 'N' end as descontinuado,\n"
                     + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
@@ -356,6 +357,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
                     imp.setDescontinuado("S".equals(rs.getString("descontinuado")));

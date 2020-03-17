@@ -27,11 +27,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Alan
  */
 public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
-
+    
     public boolean v_usar_arquivoBalanca;
     public String lojaMesmoID;
     public boolean situacaoOferta;
-
+    
     @Override
     public String getSistema() {
         if (lojaMesmoID == null) {
@@ -39,7 +39,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return "DevMaster Sistemas" + lojaMesmoID;
     }
-
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -58,7 +58,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -93,7 +93,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -111,7 +111,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("Merc1ID"));
                     imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-
+                    
                     result.add(imp);
                 }
             }
@@ -120,41 +120,40 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     /*@Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    " select\n"
-                    + "     fornecedorid idFornecedor,\n"
-                    + "     p.codigo idProduto,\n"
-                    + "     codprodfornecedor codigoExterno,\n"
-                    + "     p.qtdeembalagem::varchar qtdEmbalagem,\n"
-                    + "     data dataAlteracao,\n"
-                    + "     pf.aliquotaipi ipi\n"
-                    + " from produtofornecedor pf\n"
-                    + "     left join produto p\n"
-                    + "		on p.id = pf.produtoid\n"
-                    + " order by 1"
-            )) {
-                while (rs.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
+     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+     List<ProdutoFornecedorIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+     try (ResultSet rs = stm.executeQuery(
+     " select\n"
+     + "     fornecedorid idFornecedor,\n"
+     + "     p.codigo idProduto,\n"
+     + "     codprodfornecedor codigoExterno,\n"
+     + "     p.qtdeembalagem::varchar qtdEmbalagem,\n"
+     + "     data dataAlteracao,\n"
+     + "     pf.aliquotaipi ipi\n"
+     + " from produtofornecedor pf\n"
+     + "     left join produto p\n"
+     + "		on p.id = pf.produtoid\n"
+     + " order by 1"
+     )) {
+     while (rs.next()) {
+     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+     imp.setImportLoja(getLojaOrigem());
+     imp.setImportSistema(getSistema());
 
-                    imp.setIdFornecedor(rs.getString("idFornecedor"));
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setCodigoExterno(rs.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setIpi(rs.getDouble("ipi"));
+     imp.setIdFornecedor(rs.getString("idFornecedor"));
+     imp.setIdProduto(rs.getString("idproduto"));
+     imp.setCodigoExterno(rs.getString("codigoexterno"));
+     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+     imp.setDataAlteracao(rs.getDate("dataalteracao"));
+     imp.setIpi(rs.getDouble("ipi"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
@@ -179,23 +178,23 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " where\n"
                     + "     abg_situacao <> 'B'"
                     + "     and cr.dm_deletado = 0"
-                    + "     and aam_codigo not in ('000000','000001')\n"
+            //+ "     and aam_codigo not in ('000000','000001')\n"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
+                    
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
                     //imp.setEcf("1");
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setIdCliente(rs.getString("idCliente"));
+                    imp.setIdCliente(Utils.stringLong(rs.getString("idCliente")));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setJuros(rs.getDouble("juros"));
                     imp.setMulta(rs.getDouble("multa"));
                     imp.setCnpjCliente(rs.getString("cnpjCliente"));
-
+                    
                     result.add(imp);
                 }
             }
@@ -238,7 +237,11 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dm_alterado dataAlteracao,\n"
                     + "	aaa_codbarras ean,\n"
                     + "	aaa_um tipoEmbalagem,\n"
-                    + "	case when aaa_um = 'KG' then 1 else 0 end ebalanca,\n"
+                    + "	case aaa_tipobarras\n"
+                    + " when 'BLC' then 1\n"
+                    + " when 'BLU' then 1\n"
+                    + " when ''    then 0 \n"
+                    + " else 0 end ebalanca,\n"
                     + "	aaa_diasvencimento validade,\n"
                     + "	aaa_descricao descricaoCompleta,\n"
                     + "	aaa_descricao descricaoReduzida,\n"
@@ -247,7 +250,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	aaa_peso pesoBruto,\n"
                     + "	aaa_margemlucro margem,\n"
                     + " aaa_precovenda precovenda,\n"
-                    + "	case when aaa_status = 'A' then 1 else 0 end situacaoCadastro,\n"
+                    //+ " case when aaa_status = 'A' then 1 else 0 end situacaoCadastro,\n"
                     + "	aaa_posipi ncm,\n"
                     + "	aaa_cest cest,\n"
                     + "	abc_cstpis piscofinsCstDebito\n"
@@ -256,48 +259,29 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     //+ " aaa_redicmsai icmsReducaoSaida\n"
                     + "    from \n"
                     + "	dmaaa01 p\n"
-                    + "		left join dmabc01 t\n"
-                    + "			on t.abc_codigo = aaa_tessaida\n"
+                    + "	  left join dmabc01 t\n"
+                    + "	    on t.abc_codigo = aaa_tessaida\n"
+                    + " where aaa_status = 'A'\n"
+                    + " and p.dm_deletado <> p.dm_id\n"
                     + "order by 1"
             )) {
-
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
+                    
                     imp.setImportId(rs.getString("importId"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataAlteracao"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
+                    imp.setValidade(rs.getInt("validade"));
                     
-                    //imp.setEan(rs.getString("ean"));
-                    //imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
-                    //imp.setValidade(rs.getInt("validade"));
-                    
-                    long longEAN = Utils.stringToLong(imp.getEan(), -2);
-                    String strEAN = String.valueOf(longEAN);
-
-                    if (strEAN.startsWith("2") && strEAN.length() == 6) {
-                        final String eanBal = strEAN.substring(1);
-                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(eanBal, -2));
-                        if (bal != null) {
-                            imp.setEan(String.valueOf(bal.getCodigo()));
-                            imp.seteBalanca(true);
-                            imp.setValidade(bal.getValidade());
-                            imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
-                        } else {
-                            imp.setEan(rs.getString("ean"));
-                            imp.seteBalanca(rs.getInt("ebalanca") == 1);
-                            imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
-                            imp.setValidade(rs.getInt("validade"));
-                        }
-                    } else {
-                        imp.setEan(rs.getString("ean"));
-                        imp.seteBalanca(rs.getInt("ebalanca") == 1);
-                        imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
-                        imp.setValidade(rs.getInt("validade"));
-                    }
+                    if (rs.getInt("ebalanca") == 1 && rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
+                        String strEAN = rs.getString("ean").substring(1, rs.getString("ean").length());
+                        imp.seteBalanca(true);
+                        imp.setEan(strEAN);
+                    }                    
                     
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
@@ -306,16 +290,14 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getInt("pesobruto"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
+                    //imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));
                     //imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
                     //imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
                     //imp.setIcmsReducaoSaida(rs.getDouble("icmsReducaoSaida"));
-                    
-                    //imp.setEstoque(rs.getDouble("estoque"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -324,106 +306,105 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     /*public List<OfertaIMP> getOfertas() throws Exception {
-        List<OfertaIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    " select     \n"
-                    + "     pp.produtoid idProduto,\n"
-                    + "     p.inicio dataInicio,\n"
-                    + "     p.fim dataFim,\n"
-                    + "     pp.precoatual precoNormal,\n"
-                    + "     pp.precopromocional precoOferta,\n"
-                    + "     case when p.statusid = 29 then 1 else 0 end situacaoOferta\n"
-                    + " from promocao p\n"
-                    + "     left join promocaoproduto pp on p.id = pp.promocaoid\n"
-                    + "         where p.statusid = 29\n"
-                    + "	order by pp.produtoid"
-            )) {
-                while (rs.next()) {
-                    OfertaIMP imp = new OfertaIMP();
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setDataInicio(rs.getDate("dataInicio"));
-                    imp.setDataFim(rs.getDate("dataFim"));
-                    imp.setPrecoNormal(rs.getDouble("precoNormal"));
-                    imp.setPrecoOferta(rs.getDouble("precoOferta"));
-                    //imp.setSituacaoOferta(rs.getBoolean("situacaoOferta"));
+     List<OfertaIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+     try (ResultSet rs = stm.executeQuery(
+     " select     \n"
+     + "     pp.produtoid idProduto,\n"
+     + "     p.inicio dataInicio,\n"
+     + "     p.fim dataFim,\n"
+     + "     pp.precoatual precoNormal,\n"
+     + "     pp.precopromocional precoOferta,\n"
+     + "     case when p.statusid = 29 then 1 else 0 end situacaoOferta\n"
+     + " from promocao p\n"
+     + "     left join promocaoproduto pp on p.id = pp.promocaoid\n"
+     + "         where p.statusid = 29\n"
+     + "	order by pp.produtoid"
+     )) {
+     while (rs.next()) {
+     OfertaIMP imp = new OfertaIMP();
+     imp.setIdProduto(rs.getString("idproduto"));
+     imp.setDataInicio(rs.getDate("dataInicio"));
+     imp.setDataFim(rs.getDate("dataFim"));
+     imp.setPrecoNormal(rs.getDouble("precoNormal"));
+     imp.setPrecoOferta(rs.getDouble("precoOferta"));
+     //imp.setSituacaoOferta(rs.getBoolean("situacaoOferta"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
 
     /*@Override
-    public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    " select\n"
-                    + "	d.id importId,\n"
-                    + "	coalesce(pj.razaosocial, pf.nome) razao,\n"
-                    + "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n"
-                    + "	d.identificador cnpj_cpf,\n"
-                    + "	coalesce(pf.inscricaoestadual, pf.rg) ie_rg,\n"
-                    + "	pj.inscricaomunicipal insc_municipal,\n"
-                    + "	pj.suframa suframa,\n"
-                    + "	case when coalesce(pj.statusid, pf.statusid) = 18 then 1 else 0 end ativo,\n"
-                    + "	case when coalesce(pj.statusid, pf.statusid) = 20 then 1 else 0 end bloqueado,\n"
-                    + "	e.logradouro endereco,\n"
-                    + "	e.numero,\n"
-                    + "	complemento,\n"
-                    + "	bairro,\n"
-                    + "	e.cidade ibge_municipio,\n"
-                    + "	cd.descricao municipio,\n"
-                    + "	cd.estadoid uf,\n"
-                    + "	e.cep,\n"
-                    + "	d.datacadastro datacadastro,\n"
-                    + "	pj.obs observacao\n"
-                    + " from \n"
-                    + "	dados d\n"
-                    + "	join fornecedor f on\n"
-                    + "		d.id = f.id\n"
-                    + "	left join dadospessoafisica pf on\n"
-                    + "		d.id = pf.id\n"
-                    + "	left join dadospessoajuridica pj on\n"
-                    + "		d.id = pj.id\n"
-                    + "	left join endereco e on\n"
-                    + "		e.dadosid = d.id\n"
-                    + "	left join cidade cd on\n"
-                    + "		e.cidade::integer = cd.id\n"
-                    + " order by 1"
-            )) {
-                while (rs.next()) {
-                    FornecedorIMP imp = new FornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
+     public List<FornecedorIMP> getFornecedores() throws Exception {
+     List<FornecedorIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+     try (ResultSet rs = stm.executeQuery(
+     " select\n"
+     + "	d.id importId,\n"
+     + "	coalesce(pj.razaosocial, pf.nome) razao,\n"
+     + "	coalesce(pj.nomefantasia, pf.nome) fantasia,\n"
+     + "	d.identificador cnpj_cpf,\n"
+     + "	coalesce(pf.inscricaoestadual, pf.rg) ie_rg,\n"
+     + "	pj.inscricaomunicipal insc_municipal,\n"
+     + "	pj.suframa suframa,\n"
+     + "	case when coalesce(pj.statusid, pf.statusid) = 18 then 1 else 0 end ativo,\n"
+     + "	case when coalesce(pj.statusid, pf.statusid) = 20 then 1 else 0 end bloqueado,\n"
+     + "	e.logradouro endereco,\n"
+     + "	e.numero,\n"
+     + "	complemento,\n"
+     + "	bairro,\n"
+     + "	e.cidade ibge_municipio,\n"
+     + "	cd.descricao municipio,\n"
+     + "	cd.estadoid uf,\n"
+     + "	e.cep,\n"
+     + "	d.datacadastro datacadastro,\n"
+     + "	pj.obs observacao\n"
+     + " from \n"
+     + "	dados d\n"
+     + "	join fornecedor f on\n"
+     + "		d.id = f.id\n"
+     + "	left join dadospessoafisica pf on\n"
+     + "		d.id = pf.id\n"
+     + "	left join dadospessoajuridica pj on\n"
+     + "		d.id = pj.id\n"
+     + "	left join endereco e on\n"
+     + "		e.dadosid = d.id\n"
+     + "	left join cidade cd on\n"
+     + "		e.cidade::integer = cd.id\n"
+     + " order by 1"
+     )) {
+     while (rs.next()) {
+     FornecedorIMP imp = new FornecedorIMP();
+     imp.setImportLoja(getLojaOrigem());
+     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rs.getString("importId"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
-                    imp.setIe_rg(rs.getString("ie_rg"));
-                    imp.setInsc_municipal(rs.getString("insc_municipal"));
-                    imp.setAtivo(rs.getBoolean("ativo"));
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setComplemento(rs.getString("complemento"));
-                    imp.setIbge_municipio(rs.getInt("ibge_municipio"));
-                    imp.setMunicipio(rs.getString("municipio"));
-                    imp.setUf(rs.getString("uf"));
-                    imp.setCep(rs.getString("cep"));
-                    imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setObservacao(rs.getString("observacao"));
+     imp.setImportId(rs.getString("importId"));
+     imp.setRazao(rs.getString("razao"));
+     imp.setFantasia(rs.getString("fantasia"));
+     imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
+     imp.setIe_rg(rs.getString("ie_rg"));
+     imp.setInsc_municipal(rs.getString("insc_municipal"));
+     imp.setAtivo(rs.getBoolean("ativo"));
+     imp.setEndereco(rs.getString("endereco"));
+     imp.setNumero(rs.getString("numero"));
+     imp.setBairro(rs.getString("bairro"));
+     imp.setComplemento(rs.getString("complemento"));
+     imp.setIbge_municipio(rs.getInt("ibge_municipio"));
+     imp.setMunicipio(rs.getString("municipio"));
+     imp.setUf(rs.getString("uf"));
+     imp.setCep(rs.getString("cep"));
+     imp.setDatacadastro(rs.getDate("datacadastro"));
+     imp.setObservacao(rs.getString("observacao"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -471,7 +452,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-
+                    
                     imp.setId(Utils.stringLong(rs.getString("id")));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
@@ -479,7 +460,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
-
+                    
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
@@ -488,7 +469,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-
+                    
                     imp.setEstadoCivil(rs.getString("estadoCivil"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
@@ -511,7 +492,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.addContato("","","",rs.getString("telefone2"),"");
 
                     result.add(imp);
-
+                    
                 }
             }
         }

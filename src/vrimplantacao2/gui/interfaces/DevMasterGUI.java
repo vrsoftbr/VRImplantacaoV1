@@ -44,10 +44,10 @@ public class DevMasterGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHostPostgres.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
-        txtBancoDadosPostgres.setText(params.getWithNull("DevMaster", NOME_SISTEMA, "DATABASE"));
-        txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
-        txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
-        txtSenhaPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "SENHA"));
+        txtBancoDadosPostgres.setText(params.getWithNull("devmaster", NOME_SISTEMA, "DATABASE"));
+        txtPortaPostgres.setText(params.getWithNull("2815", NOME_SISTEMA, "PORTA"));
+        txtUsuarioPostgres.setText(params.getWithNull("devmaster", NOME_SISTEMA, "USUARIO"));
+        txtSenhaPostgres.setText(params.getWithNull("devmaster", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");

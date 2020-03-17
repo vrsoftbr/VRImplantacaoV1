@@ -426,7 +426,7 @@ public class ClienteRepository {
             try {
                 long id = Long.parseLong(imp.getId());
                 
-                if (id <= 999999) {
+                if (id > 0 && id <= 999999) {
                     validos.put(imp.getId(), imp);
                 } else {
                     invalidos.put(imp.getId(), imp);
