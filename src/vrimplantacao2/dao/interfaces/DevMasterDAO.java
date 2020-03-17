@@ -179,7 +179,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " where\n"
                     + "     abg_situacao <> 'B'"
                     + "     and cr.dm_deletado = 0"
-                    + "     and aam_codigo not in ('000000','000001')\n"
+                    //+ "     and aam_codigo not in ('000000','000001')\n"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -189,7 +189,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
                     //imp.setEcf("1");
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setIdCliente(rs.getString("idCliente"));
+                    imp.setIdCliente(Utils.stringLong(rs.getString("idCliente")));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setJuros(rs.getDouble("juros"));
@@ -238,7 +238,11 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dm_alterado dataAlteracao,\n"
                     + "	aaa_codbarras ean,\n"
                     + "	aaa_um tipoEmbalagem,\n"
-                    + "	case when aaa_um = 'KG' then 1 else 0 end ebalanca,\n"
+                    + "	case aaa_tipobarras\n"
+                    + " when 'BLC' then 1\n"
+                    + " when 'BLU' then 1\n"
+                    + " when ''    then 0 \n"
+                    + " else 0 end ebalanca,\n"
                     + "	aaa_diasvencimento validade,\n"
                     + "	aaa_descricao descricaoCompleta,\n"
                     + "	aaa_descricao descricaoReduzida,\n"
@@ -247,7 +251,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	aaa_peso pesoBruto,\n"
                     + "	aaa_margemlucro margem,\n"
                     + " aaa_precovenda precovenda,\n"
-                    + "	case when aaa_status = 'A' then 1 else 0 end situacaoCadastro,\n"
+                    //+ " case when aaa_status = 'A' then 1 else 0 end situacaoCadastro,\n"
                     + "	aaa_posipi ncm,\n"
                     + "	aaa_cest cest,\n"
                     + "	abc_cstpis piscofinsCstDebito\n"
@@ -256,8 +260,10 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     //+ " aaa_redicmsai icmsReducaoSaida\n"
                     + "    from \n"
                     + "	dmaaa01 p\n"
-                    + "		left join dmabc01 t\n"
-                    + "			on t.abc_codigo = aaa_tessaida\n"
+                    + "	  left join dmabc01 t\n"
+                    + "	    on t.abc_codigo = aaa_tessaida\n"
+                    + " where aaa_status = 'A'\n"
+                    + " and p.dm_deletado <> p.dm_id\n"
                     + "order by 1"
             )) {
 
@@ -306,7 +312,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getInt("pesobruto"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
+                    //imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));
