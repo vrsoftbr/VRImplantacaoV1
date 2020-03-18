@@ -365,10 +365,79 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "from pes_pessoa p\n"
                     + "left join cad_situacao sit on sit.id_situacao = p.id_situacao\n"
                     + "left join pes_endereco ende on ende.id_pessoa = p.id_pessoa\n"
+                    + "where p.tipo = 'F'\n"        
                     + "order by codigo"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo("A".equals(rst.getString("ativo")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setBloqueado("N".equals(rst.getString("bloqueado")));
                     
+                    try (Statement stmDoc = ConexaoPostgres.getConexao().createStatement()) {
+                        try (ResultSet rstDoc = stmDoc.executeQuery(
+                                "select \n"
+                                + "	doc.id_pessoa,\n"
+                                + "	tdoc.sql_tip_doc,\n"
+                                + "	doc.num_doc,\n"
+                                + "	doc.orgao,\n"
+                                + "	doc.emissao,\n"
+                                + "	doc.uf\n"
+                                + "from pes_documento doc\n"
+                                + "inner join tab_tipo_documento tdoc on tdoc.id_tip_documento = doc.id_tip_documento\n"
+                                + "	and sql_tip_doc in ('CPF', 'RG', 'CNPJ', 'IE', 'IM')\n"
+                                + "where doc.id_pessoa = " + rst.getString("id")
+                                + "order by id_pessoa"
+                        )) {
+                            while (rstDoc.next()) {
+
+                                if ("CPF".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setCnpj_cpf(rst.getString("num_doc"));
+                                } else if ("CNPJ".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setCnpj_cpf(rst.getString("num_doc"));
+                                } else if ("IE".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setIe_rg(rst.getString("num_doc"));
+                                } else if ("RG".equals(rst.getString("sql_tip_doc"))) {
+                                    imp.setIe_rg(rst.getString("num_doc"));
+                                } else if ("IM".equals(rst.getString("sql_tip_doc"))) {
+                                    imp.setInsc_municipal(rst.getString("num_doc"));
+                                }
+                            }
+                        }
+                    }
+                    
+                    try (Statement stmTel = ConexaoPostgres.getConexao().createStatement()) {
+                        try (ResultSet rstTel = stmTel.executeQuery(
+                                "select \n"
+                                + "	tel.id_pessoa,\n"
+                                + "	tel.num_tel as telefone,\n"
+                                + "	tpTel.nom_tip_tel as tipo\n"
+                                + "from pes_telefone tel\n"
+                                + "inner join tab_tipo_telefone tpTel on tpTel.id_tip_telefone = tel.id_tip_telefone\n"
+                                + "where tel.id_pessoa = " + rst.getString("id")
+                        )) {
+                            while (rstTel.next()) {
+                                
+                                if ("RESIDENCIAL".equals(rstTel.getString("tipo"))) {
+                                    imp.setTel_principal(rst.getString("telefone"));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
