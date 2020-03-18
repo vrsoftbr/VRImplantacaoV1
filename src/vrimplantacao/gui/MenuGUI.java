@@ -105,6 +105,7 @@ import vrimplantacao2.gui.interfaces.AutomaqGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.BaseGUI;
 import vrimplantacao2.gui.interfaces.BrainSoftGUI;
+import vrimplantacao2.gui.interfaces.BrajanGestoresGUI;
 import vrimplantacao2.gui.interfaces.CFSoftSiaECFGUI;
 import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
@@ -708,6 +709,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuG10 = new javax.swing.JMenuItem();
         mnuDevMaster = new javax.swing.JMenuItem();
         mnuVRToVR = new javax.swing.JMenuItem();
+        mnuBrajanGestores = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2135,6 +2137,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuVRToVR);
+
+        mnuBrajanGestores.setText("Brajan/Gestores");
+        mnuBrajanGestores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuBrajanGestoresActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuBrajanGestores);
 
         mnuDatabase.add(jMenu8);
 
@@ -4473,6 +4483,11 @@ public final class MenuGUI extends VRMdiFrame {
         SnSistemaGUI.exibir(this);
     }//GEN-LAST:event_mnuAccesys1ActionPerformed
 
+    private void mnuBrajanGestoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuBrajanGestoresActionPerformed
+        // TODO add your handling code here:
+        BrajanGestoresGUI.exibir(this);
+    }//GEN-LAST:event_mnuBrajanGestoresActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4582,6 +4597,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuBase;
     private javax.swing.JMenuItem mnuBrainSoft;
+    private javax.swing.JMenuItem mnuBrajanGestores;
     private javax.swing.JMenuItem mnuCFSoftSiaECF;
     private javax.swing.JMenuItem mnuCPGestor;
     private javax.swing.JMenu mnuCache;

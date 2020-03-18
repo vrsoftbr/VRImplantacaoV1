@@ -14,12 +14,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -37,7 +39,7 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
         return "BrajanGestores";
     }
 
-    public List<Estabelecimento> getLojasCliente() throws Exception {
+    public List<Estabelecimento> getLojas() throws Exception {
         Map<String, Estabelecimento> result = new LinkedHashMap<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -51,7 +53,26 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
         }
         return new ArrayList<>(result.values());
     }
-    
+
+    public List<ItemComboVO> getLocalEstoque() throws Exception {
+        List<ItemComboVO> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	id_local, \n"
+                    + "	desc_local \n"
+                    + "from est_local_estoque"
+            )) {
+                while (rst.next()) {
+                    result.add(new ItemComboVO(rst.getInt("id_local"),
+                            rst.getString("id_local") + " - "
+                            + rst.getString("desc_local")));
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -66,8 +87,6 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "from cal_icms icm\n"
                     + "inner join cal_icms_uf icmuf \n"
                     + "	on icmuf.id_calc_icms = icm.id_calc_icms\n"
-                    + "		and icm.cod_filial = " + getLojaOrigem() + "\n"
-                    + "		and icmuf.cod_filial = " + getLojaOrigem() + "\n"
                     + "		and icmuf.uf_origem = '" + Parametros.get().getUfPadraoV2().getSigla() + "' and icmuf.uf_destino = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
             )) {
                 while (rs.next()) {
@@ -82,7 +101,7 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
         }
         return result;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -120,7 +139,7 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                 }
         ));
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -170,8 +189,8 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "	p.desc_pdv as descricaoreduzida,\n"
                     + "	p.id_grupo as mercadologico1,\n"
                     + "	p.id_subgrupo as mercadologico2,\n"
-                    + "	tp.desc_tipo_produto as tipoproduto,\n"
-                    + " tp.id_tipo_produto as idtipo"        
+                    + "	tp.desc_tipo_produto as desctipoproduto,\n"
+                    + " tp.id_tipo_produto as tipoproduto,"
                     + "	p.data_cadastro as datacadastro,\n"
                     + "	p.preco_custo as custo,\n"
                     + "	pr.preco_custo,\n"
@@ -206,11 +225,8 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "left join fis_figura fi on fi.id_figura = p.id_figura\n"
                     + "	and fi.cod_filial = " + getLojaOrigem() + "\n"
                     + "left join cal_icms icm on icm.id_calc_icms = p.id_calc_icms\n"
-                    + "	and icm.cod_filial = " + getLojaOrigem() + "\n"
                     + "inner join cal_icms_uf icmuf \n"
                     + "	on icmuf.id_calc_icms = icm.id_calc_icms\n"
-                    + "		and icm.cod_filial = " + getLojaOrigem() + "\n"
-                    + "		and icmuf.cod_filial = " + getLojaOrigem() + "\n"
                     + "		and icmuf.uf_origem = '" + Parametros.get().getUfPadraoV2().getSigla() + "' and icmuf.uf_destino = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "order by p.id_produto		"
             )) {
@@ -229,47 +245,47 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setDescricaoGondola(imp.getDescricaoGondola());
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("1"));
+                    imp.setCodMercadologico3("1");
                     imp.setDataCadastro(rst.getDate("datacadastro"));
 
-                    if (null == rst.getString("tipoproduto")) {
+                    if (rst.getInt("tipoproduto") == 0) {
                         imp.setTipoProduto(TipoProduto.MERCADORIA_REVENDA);
                     } else {
-                        switch (rst.getString("tipoproduto")) {
-                            case "MERCADORIA PARA REVENDA":
+                        switch (rst.getInt("tipoproduto")) {
+                            case 1:
                                 imp.setTipoProduto(TipoProduto.MERCADORIA_REVENDA);
                                 break;
-                            case "MATÉRIA-PRIMA":
+                            case 2:
                                 imp.setTipoProduto(TipoProduto.MATERIA_PRIMA);
                                 break;
-                            case "EMBALAGEM":
+                            case 3:
                                 imp.setTipoProduto(TipoProduto.EMBALAGEM);
                                 break;
-                            case "PRODUTO EM PROCESSO":
+                            case 4:
                                 imp.setTipoProduto(TipoProduto.PRODUTO_EM_PROCESSO);
                                 break;
-                            case "PRODUTO ACABADO":
+                            case 5:
                                 imp.setTipoProduto(TipoProduto.PRODUTO_ACABADO);
                                 break;
-                            case "SUBPRODUTO":
+                            case 6:
                                 imp.setTipoProduto(TipoProduto.SUBPRODUTO);
                                 break;
-                            case "PRODUTO INTERMEDIÁRIO":
+                            case 7:
                                 imp.setTipoProduto(TipoProduto.PRODUTO_INTERMEDIARIO);
                                 break;
-                            case "MATERIAL DE USO E CONSUMO":
+                            case 8:
                                 imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO);
                                 break;
-                            case "SERVIÇOS":
+                            case 10:
                                 imp.setTipoProduto(TipoProduto.SERVICOS);
                                 break;
-                            case "OUTROS INSUMOS":
+                            case 11:
                                 imp.setTipoProduto(TipoProduto.OUTROS_INSUMOS);
                                 break;
-                            case "OUTRAS":
+                            case 12:
                                 imp.setTipoProduto(TipoProduto.OUTROS);
                                 break;
-                            case "ATIVO IMOBILIZADO":
+                            case 9:
                                 imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO);
                                 break;
                             default:
@@ -299,5 +315,63 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
             }
         }
         return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p.id_pessoa as id,\n"
+                    + "	p.cod_pessoa as codigo,\n"
+                    + "	p.razao_social as razao,\n"
+                    + "	p.fantasia as fantasia,\n"
+                    + "	p.data_cadastro as datacadastro,\n"
+                    + "	p.pessoa as tipoinscricao,\n"
+                    + "	p.sit as ativo,\n"
+                    + "	ende.endereco,\n"
+                    + "	ende.numero,\n"
+                    + "	ende.complemento,\n"
+                    + "	ende.bairro,\n"
+                    + "	ende.cep,\n"
+                    + "	ende.cidade as municipio,\n"
+                    + "	ende.ibge as municipioibge,\n"
+                    + "	ende.uf,\n"
+                    + "	p.email,\n"
+                    + "	p.sexo,\n"
+                    + "	p.estado_civil as estadocivil,\n"
+                    + "	p.nascimento as datanascimento,\n"
+                    + "	p.conj_nome as conjuge,\n"
+                    + "	p.conj_cpf as conjugecpf,\n"
+                    + "	p.fil_pai as nomepai,\n"
+                    + "	p.fil_mae as nomemae,\n"
+                    + "	p.emp_empresa as empresa,\n"
+                    + "	p.emp_admissao as dataadmissao,\n"
+                    + "	p.emp_telefone as telefoneempresa,\n"
+                    + "	p.emp_salario as salario,\n"
+                    + "	p.emp_endereco as enderecoempresa,\n"
+                    + "	p.emp_bairro as bairroempresa,\n"
+                    + "	p.emp_cep as cepempresa,\n"
+                    + "	p.emp_cidade as municipioempresa,\n"
+                    + "	p.emp_uf as ufempresa,\n"
+                    + "	p.emp_complemento as complementoempresa,\n"
+                    + "	p.emp_numero as numeroempresa,\n"
+                    + "	p.limite as valorlimite,\n"
+                    + "	p.observacao,\n"
+                    + "	sit.desc_situacao as situacao,\n"
+                    + "	sit.bloquear as bloqueado\n"
+                    + "from pes_pessoa p\n"
+                    + "left join cad_situacao sit on sit.id_situacao = p.id_situacao\n"
+                    + "left join pes_endereco ende on ende.id_pessoa = p.id_pessoa\n"
+                    + "order by codigo"
+            )) {
+                while (rst.next()) {
+                    
+                }
+            }
+        }
+        return null;
     }
 }
