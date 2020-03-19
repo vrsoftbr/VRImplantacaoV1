@@ -27,11 +27,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Alan
  */
 public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     public boolean v_usar_arquivoBalanca;
     public String lojaMesmoID;
     public boolean situacaoOferta;
-    
+
     @Override
     public String getSistema() {
         if (lojaMesmoID == null) {
@@ -39,7 +39,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return "DevMaster Sistemas" + lojaMesmoID;
     }
-    
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -58,7 +58,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -93,7 +93,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -111,7 +111,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("Merc1ID"));
                     imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -163,7 +163,6 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     cr.dm_id id,\n"
                     + "     abg_emissao dataEmissao,\n"
                     + "     abg_numero numeroCupom,\n"
-                    //+ "     abg_prefixo ecf,\n"
                     + "     abg_valor valor,\n"
                     + "     abg_cliente idCliente,\n"
                     + "     abg_vencimento dataVencimento,\n"
@@ -176,17 +175,15 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     left join dmaam01\n"
                     + "		on abg_cliente = aam_codigo\n"
                     + " where\n"
-                    + "     abg_situacao <> 'B'"
+                    + "     abg_situacao = 'A'"
                     + "     and cr.dm_deletado = 0"
-            //+ "     and aam_codigo not in ('000000','000001')\n"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataEmissao"));
                     imp.setNumeroCupom(rs.getString("numeroCupom"));
-                    //imp.setEcf("1");
                     imp.setValor(rs.getDouble("valor"));
                     imp.setIdCliente(Utils.stringLong(rs.getString("idCliente")));
                     imp.setDataVencimento(rs.getDate("dataVencimento"));
@@ -194,7 +191,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setJuros(rs.getDouble("juros"));
                     imp.setMulta(rs.getDouble("multa"));
                     imp.setCnpjCliente(rs.getString("cnpjCliente"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -269,20 +266,20 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rs.getString("importId"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataAlteracao"));
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
                     imp.setValidade(rs.getInt("validade"));
-                    
+
                     if (rs.getInt("ebalanca") == 1 && rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
                         String strEAN = rs.getString("ean").substring(1, rs.getString("ean").length());
                         imp.seteBalanca(true);
                         imp.setEan(strEAN);
-                    }                    
-                    
+                    }
+
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaoGondola"));
@@ -452,7 +449,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(Utils.stringLong(rs.getString("id")));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
@@ -460,7 +457,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    
+
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
@@ -469,7 +466,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    
+
                     imp.setEstadoCivil(rs.getString("estadoCivil"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
@@ -492,7 +489,7 @@ public class DevMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.addContato("","","",rs.getString("telefone2"),"");
 
                     result.add(imp);
-                    
+
                 }
             }
         }
