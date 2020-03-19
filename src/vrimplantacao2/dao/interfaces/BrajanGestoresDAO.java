@@ -24,6 +24,7 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -493,6 +494,166 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setCustoTabela(rst.getDouble("custo"));
                     imp.setDataAlteracao(rst.getDate("datalteracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p.id_pessoa as id,\n"
+                    + "	p.cod_pessoa as codigo,\n"
+                    + "	p.razao_social as razao,\n"
+                    + "	p.fantasia as fantasia,\n"
+                    + "	p.data_cadastro as datacadastro,\n"
+                    + "	p.pessoa as tipoinscricao,\n"
+                    + "	p.sit as ativo,\n"
+                    + "	ende.endereco,\n"
+                    + "	ende.numero,\n"
+                    + "	ende.complemento,\n"
+                    + "	ende.bairro,\n"
+                    + "	ende.cep,\n"
+                    + "	ende.cidade as municipio,\n"
+                    + "	ende.ibge as municipioibge,\n"
+                    + "	ende.uf,\n"
+                    + "	p.email,\n"
+                    + "	p.sexo,\n"
+                    + "	p.estado_civil as estadocivil,\n"
+                    + "	p.nascimento as datanascimento,\n"
+                    + "	p.conj_nome as conjuge,\n"
+                    + "	p.conj_cpf as conjugecpf,\n"
+                    + "	p.fil_pai as nomepai,\n"
+                    + "	p.fil_mae as nomemae,\n"
+                    + "	p.emp_empresa as empresa,\n"
+                    + "	p.emp_admissao as dataadmissao,\n"
+                    + "	p.emp_telefone as telefoneempresa,\n"
+                    + "	p.emp_salario as salario,\n"
+                    + "	p.emp_endereco as enderecoempresa,\n"
+                    + "	p.emp_bairro as bairroempresa,\n"
+                    + "	p.emp_cep as cepempresa,\n"
+                    + "	p.emp_cidade as municipioempresa,\n"
+                    + "	p.emp_uf as ufempresa,\n"
+                    + "	p.emp_complemento as complementoempresa,\n"
+                    + "	p.emp_numero as numeroempresa,\n"
+                    + "	p.limite as valorlimite,\n"
+                    + "	p.observacao,\n"
+                    + "	sit.desc_situacao as situacao,\n"
+                    + "	sit.bloquear as bloqueado\n"
+                    + "from pes_pessoa p\n"
+                    + "left join cad_situacao sit on sit.id_situacao = p.id_situacao\n"
+                    + "left join pes_endereco ende on ende.id_pessoa = p.id_pessoa\n"
+                    + "where p.tipo = 'C'\n"
+                    + "order by codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo("A".equals(rst.getString("ativo")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getString("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    imp.setEmpresaTelefone(rst.getString("telefoneempresa"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setEmpresaEndereco(rst.getString("enderecoempresa"));
+                    imp.setEmpresaBairro(rst.getString("bairroempresa"));
+                    imp.setEmpresaCep(rst.getString("cepempresa"));
+                    imp.setEmpresaMunicipio(rst.getString("municipioempresa"));
+                    imp.setEmpresaUf(rst.getString("ufempresa"));
+                    imp.setEmpresaComplemento(rst.getString("complementoempresa"));
+                    imp.setEmpresaNumero(rst.getString("numeroempresa"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setBloqueado(!"N".equals(rst.getString("bloqueado")));
+
+                    try (Statement stmDoc = ConexaoPostgres.getConexao().createStatement()) {
+                        try (ResultSet rstDoc = stmDoc.executeQuery(
+                                "select \n"
+                                + "	doc.id_pessoa,\n"
+                                + "	tdoc.sql_tip_doc,\n"
+                                + "	doc.num_doc,\n"
+                                + "	doc.orgao,\n"
+                                + "	doc.emissao,\n"
+                                + "	doc.uf\n"
+                                + "from pes_documento doc\n"
+                                + "inner join tab_tipo_documento tdoc on tdoc.id_tip_documento = doc.id_tip_documento\n"
+                                + "	and sql_tip_doc in ('CPF', 'RG', 'CNPJ', 'IE', 'IM')\n"
+                                + "where doc.id_pessoa = " + rst.getString("id")
+                                + "order by id_pessoa"
+                        )) {
+                            while (rstDoc.next()) {
+
+                                if ("CPF".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setCnpj(rstDoc.getString("num_doc"));
+                                } else if ("CNPJ".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setCnpj(rstDoc.getString("num_doc"));
+                                } else if ("IE".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setInscricaoestadual(rstDoc.getString("num_doc"));
+                                } else if ("RG".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setInscricaoestadual(rstDoc.getString("num_doc"));
+                                } else if ("IM".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setInscricaoMunicipal(rstDoc.getString("num_doc"));
+                                }
+                            }
+                        }
+                    }
+
+                    try (Statement stmTel = ConexaoPostgres.getConexao().createStatement()) {
+                        try (ResultSet rstTel = stmTel.executeQuery(
+                                "select \n"
+                                + "	tel.id_pessoa,\n"
+                                + "	tel.num_tel as telefone,\n"
+                                + "	tpTel.nom_tip_tel as tipo\n"
+                                + "from pes_telefone tel\n"
+                                + "inner join tab_tipo_telefone tpTel on tpTel.id_tip_telefone = tel.id_tip_telefone\n"
+                                + "where tel.id_pessoa = " + rst.getString("id")
+                        )) {
+                            while (rstTel.next()) {
+
+                                if (("RESIDENCIAL".equals(rstTel.getString("tipo")))
+                                        || ("COMERCIAL".equals(rstTel.getString("tipo")))) {
+                                    imp.setTelefone(rstTel.getString("telefone"));
+
+                                    imp.addTelefone(rstTel.getString("tipo"), rstTel.getString("telefone"));
+
+                                }
+                                if ("CELULAR".equals(rstTel.getString("tipo"))) {
+                                    imp.setCelular(rstTel.getString("telefone"));
+                                }
+                                if ("FAX".equals(rstTel.getString("tipo"))) {
+                                    imp.setFax(rstTel.getString("telefone"));
+                                }
+
+                                if ("RECADO".equals(rstTel.getString("tipo"))) {
+                                    imp.addTelefone(rstTel.getString("tipo"), rstTel.getString("telefone"));
+                                }
+
+                                if ("0800".equals(rstTel.getString("tipo"))) {
+                                    imp.addTelefone(rstTel.getString("tipo"), rstTel.getString("telefone"));
+                                }
+                            }
+                        }
+                    }
                     result.add(imp);
                 }
             }
