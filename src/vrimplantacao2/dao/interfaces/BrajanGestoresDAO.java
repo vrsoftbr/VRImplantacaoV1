@@ -28,6 +28,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -433,10 +434,6 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                         }
                     }
 
-                    if (rst.getInt("id") == 151) {
-                        System.out.println("aqui");
-                    }
-
                     try (Statement stmTel = ConexaoPostgres.getConexao().createStatement()) {
                         try (ResultSet rstTel = stmTel.executeQuery(
                                 "select \n"
@@ -470,7 +467,39 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
         }
         return result;
     }
-    
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	pro.cod_produto as idproduto,\n"
+                    + "	fo.cod_pessoa as idfornecedor,\n"
+                    + "	pf.cod_estfornecedor as codigoexterno,\n"
+                    + "	pf.valor_unitario as custo,\n"
+                    + "	pf.data as datalteracao\n"
+                    + "from est_fornecedor pf\n"
+                    + "inner join est_produto pro on pro.id_produto = pf.id_produto\n"
+                    + "inner join pes_pessoa fo on fo.id_pessoa = pf.id_pessoa"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setCustoTabela(rst.getDouble("custo"));
+                    imp.setDataAlteracao(rst.getDate("datalteracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
