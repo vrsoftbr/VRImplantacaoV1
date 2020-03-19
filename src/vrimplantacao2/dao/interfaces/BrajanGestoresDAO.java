@@ -324,6 +324,37 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	p.cod_produto as idproduto,\n"
+                    + "	ean.cod_barra as codigobarras,\n"
+                    + "	ean.embalagem as qtdembalagem,\n"
+                    + "	u.sigla_un as tipoembalagem\n"
+                    + "from est_produto_mult_unid ean\n"
+                    + "inner join est_produto p on p.id_produto = ean.id_produto\n"
+                    + "inner join cad_unidade u on u.id_unidade = p.id_unidade \n"
+                    + "	and u.cod_filial = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
