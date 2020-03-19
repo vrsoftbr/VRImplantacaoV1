@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,11 +21,13 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -366,7 +369,7 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     + "from pes_pessoa p\n"
                     + "left join cad_situacao sit on sit.id_situacao = p.id_situacao\n"
                     + "left join pes_endereco ende on ende.id_pessoa = p.id_pessoa\n"
-                    + "where p.tipo = 'F'\n"        
+                    + "where p.tipo = 'F'\n"
                     + "order by codigo"
             )) {
                 while (rst.next()) {
@@ -388,7 +391,7 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCep(rst.getString("cep"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setBloqueado("N".equals(rst.getString("bloqueado")));
-                    
+
                     if ((rst.getString("email") != null)
                             && (!rst.getString("email").trim().isEmpty())) {
                         imp.addEmail(
@@ -397,7 +400,7 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                                 TipoContato.NFE
                         );
                     }
-                    
+
                     try (Statement stmDoc = ConexaoPostgres.getConexao().createStatement()) {
                         try (ResultSet rstDoc = stmDoc.executeQuery(
                                 "select \n"
@@ -429,11 +432,11 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                             }
                         }
                     }
-                    
+
                     if (rst.getInt("id") == 151) {
                         System.out.println("aqui");
                     }
-                    
+
                     try (Statement stmTel = ConexaoPostgres.getConexao().createStatement()) {
                         try (ResultSet rstTel = stmTel.executeQuery(
                                 "select \n"
@@ -445,17 +448,17 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                                 + "where tel.id_pessoa = " + rst.getString("id")
                         )) {
                             while (rstTel.next()) {
-                                
+
                                 if (("RESIDENCIAL".equals(rstTel.getString("tipo")))
                                         || ("COMERCIAL".equals(rstTel.getString("tipo")))) {
                                     imp.setTel_principal(rstTel.getString("telefone"));
                                 }
-                                
+
                                 imp.addContato(
-                                        rstTel.getString("tipo"), 
+                                        rstTel.getString("tipo"),
                                         !"CELULAR".equals(rstTel.getString("tipo")) ? rstTel.getString("telefone") : null,
                                         "CELULAR".equals(rstTel.getString("tipo")) ? rstTel.getString("telefone") : null,
-                                        TipoContato.COMERCIAL, 
+                                        TipoContato.COMERCIAL,
                                         null
                                 );
                             }
@@ -467,4 +470,40 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
         }
         return result;
     }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	a.data_inicial, \n"
+                    + "	a.data_final,\n"
+                    + "	p.cod_produto,\n"
+                    + "	pr.preco_venda,\n"
+                    + "	b.preco_promocao\n"
+                    + "from est_promocao a\n"
+                    + "inner join est_promocao_produtos b on b.id_pro = b.id_pro\n"
+                    + "inner join est_produto p on p.id_produto = b.id_produto\n"
+                    + "inner join est_produto_preco pr on pr.id_produto = p.id_produto	\n"
+                    + "	and pr.cod_filial = " + getLojaOrigem() + "\n"
+                    + "	and a.cod_filial = " + getLojaOrigem() + "\n"
+                    + "	and b.cod_filial = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("cod_produto"));
+                    imp.setDataInicio(rst.getDate("data_inicial"));
+                    imp.setDataFim(rst.getDate("data_final"));
+                    imp.setPrecoNormal(rst.getDouble("preco_venda"));
+                    imp.setPrecoOferta(rst.getDouble("preco_promocao"));
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
 }
