@@ -102,7 +102,11 @@ public class ProdutoAutomacaoDAO {
 
     public void salvar(ProdutoIMP imp, ProdutoAnteriorVO anterior) throws Exception {              
         ProdutoVO produto = anterior.getCodigoAtual(); 
-        long ean = Utils.stringToLong(imp.getEan());       
+        long ean = Utils.stringToLong(imp.getEan());
+        
+        if(produto == null) {
+            System.out.println("IMPID: " + anterior.getImportId() + " NAO ENCONTRADO!");
+        }
                     
         ProdutoAutomacaoVO automacao = produto.getEans().make(ean);
 
