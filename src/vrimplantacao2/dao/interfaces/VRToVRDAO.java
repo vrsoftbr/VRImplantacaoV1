@@ -50,6 +50,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
+    public boolean eanAtacado = false;
 
     @Override
     public String getSistema() {
@@ -108,7 +109,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	l.id,\n"
                     + "	l.descricao,\n"
                     + "	f.nomefantasia,\n"
@@ -132,7 +133,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select \n"
+                    "select \n"
                     + "	id,\n"
                     + "	descricao,\n"
                     + "	situacaotributaria,\n"
@@ -162,7 +163,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	id,\n"
                     + "	descricao,\n"
                     + "	id_situacaocadastro\n"
@@ -233,6 +234,127 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (eanAtacado) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "	pad.codigobarras,\n"
+                        + "	pad.desconto,\n"
+                        + "	pad.descontodiaanterior,\n"
+                        + "	pad.descontodiaseguinte,\n"
+                        + "	pad.dataultimodesconto,\n"
+                        + "	pa.id_produto,\n"
+                        + "     pa.qtdembalagem\n"
+                        + "from\n"
+                        + "	produtoautomacaodesconto pad\n"
+                        + "join produtoautomacao pa on pad.codigobarras = pa.codigobarras\n"
+                        + "where pad.id_loja = " + getLojaOrigem() + "\n"        
+                        + "order by\n"
+                        + "	pa.id_produto"
+                )) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("id_produto"));
+                        imp.setEan(rs.getString("codigobarras"));
+
+                        if (imp.getEan().length() < 7) {
+                            imp.setEan("99999" + imp.getEan());
+                        }
+
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+        } else {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	p.id,\n"
+                        + "	id_produto,\n"
+                        + "	codigobarras,\n"
+                        + "	qtdembalagem,\n"
+                        + "	t.descricao unidade\n"
+                        + "from \n"
+                        + "	produtoautomacao p \n"
+                        + "join tipoembalagem t on p.id_tipoembalagem = t.id")) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("id_produto"));
+                        imp.setEan(rs.getString("codigobarras"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n" +
+                        "	pad.codigobarras,\n" +
+                        "	pad.desconto,\n" +
+                        "	pad.descontodiaanterior,\n" +
+                        "	pad.descontodiaseguinte,\n" +
+                        "	pad.dataultimodesconto,\n" +
+                        "	pa.id_produto,\n" +
+                        "	pa.qtdembalagem,\n" +
+                        "	pc.precovenda\n" +
+                        "from\n" +
+                        "	produtoautomacaodesconto pad\n" +
+                        "join produtoautomacao pa on pad.codigobarras = pa.codigobarras\n" +
+                        "join produtocomplemento pc on pa.id_produto = pc.id_produto and\n" +
+                        "	pc.id_loja = pad.id_loja\n" +
+                        "where\n" +
+                        "	pc.id_loja = " + getLojaOrigem() + "\n" +
+                        "order by\n" +
+                        "	pa.id_produto"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setEan(rst.getString("codigobarras"));
+                        
+                        if (imp.getEan().length() < 7) {
+                            imp.setEan("99999" + imp.getEan());
+                        }
+                        
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setAtacadoPorcentagem(rst.getDouble("desconto"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -280,7 +402,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.custosemimposto,\n"
                     + "	vend.custocomimposto,\n"
                     + "	vend.precovenda,\n"
-                    + " p.margem,\n"        
+                    + " p.margem,\n"
                     + "	vend.id_situacaocadastro,\n"
                     + "	case when vend.descontinuado then 'S' else 'N' end as descontinuado,\n"
                     + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
@@ -288,11 +410,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	piscofdeb.cst piscofins_cst_debito,\n"
                     + "	piscofcred.cst piscofins_cst_credito,\n"
                     + "	p.tiponaturezareceita piscofins_natureza_receita,\n"
-                    + " icms.id idicms_debito,\n"        
+                    + " icms.id idicms_debito,\n"
                     + "	icms.situacaotributaria icms_cst,\n"
                     + "	icms.porcentagem icms_aliquota,\n"
                     + "	icms.reduzido icms_reduzido,\n"
-                    + " icms_cred.id idicms_credito,\n"        
+                    + " icms_cred.id idicms_credito,\n"
                     + "	icms_cred.situacaotributaria icms_cst_credito,\n"
                     + "	icms_cred.porcentagem icms_aliquota_credito,\n"
                     + "	icms_cred.reduzido icms_reduzido_credito,\n"
@@ -381,38 +503,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_aliquota_credito"));
                     imp.setIcmsCstEntrada(rs.getInt("icms_cst_credito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_reduzido_credito"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	p.id,\n"
-                    + "	id_produto,\n"
-                    + "	codigobarras,\n"
-                    + "	qtdembalagem,\n"
-                    + "	t.descricao unidade\n"
-                    + "from \n"
-                    + "	produtoautomacao p \n"
-                    + "join tipoembalagem t on p.id_tipoembalagem = t.id")) {
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("id_produto"));
-                    imp.setEan(rs.getString("codigobarras"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
 
                     result.add(imp);
                 }
@@ -580,7 +670,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	pf.id_fornecedor,\n"
                     + "	pf.id_produto,\n"
                     + "	pf.codigoexterno,\n"
@@ -615,7 +705,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private void getContatoFornecedor(FornecedorIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select \n"
+                    "select \n"
                     + " fc.id,\n"
                     + "	telefone,\n"
                     + " nome,\n"
@@ -818,7 +908,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private void getContatoCliente(ClienteIMP imp) throws SQLException {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select \n"
+                    "select \n"
                     + "	cp.id,\n"
                     + "	nome,\n"
                     + "	telefone,\n"
