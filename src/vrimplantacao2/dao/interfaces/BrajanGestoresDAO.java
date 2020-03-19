@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -388,6 +389,15 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setBloqueado("N".equals(rst.getString("bloqueado")));
                     
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addEmail(
+                                "EMAIL",
+                                rst.getString("email").toLowerCase(),
+                                TipoContato.NFE
+                        );
+                    }
+                    
                     try (Statement stmDoc = ConexaoPostgres.getConexao().createStatement()) {
                         try (ResultSet rstDoc = stmDoc.executeQuery(
                                 "select \n"
@@ -406,18 +416,22 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                             while (rstDoc.next()) {
 
                                 if ("CPF".equals(rstDoc.getString("sql_tip_doc"))) {
-                                    imp.setCnpj_cpf(rst.getString("num_doc"));
+                                    imp.setCnpj_cpf(rstDoc.getString("num_doc"));
                                 } else if ("CNPJ".equals(rstDoc.getString("sql_tip_doc"))) {
-                                    imp.setCnpj_cpf(rst.getString("num_doc"));
+                                    imp.setCnpj_cpf(rstDoc.getString("num_doc"));
                                 } else if ("IE".equals(rstDoc.getString("sql_tip_doc"))) {
-                                    imp.setIe_rg(rst.getString("num_doc"));
-                                } else if ("RG".equals(rst.getString("sql_tip_doc"))) {
-                                    imp.setIe_rg(rst.getString("num_doc"));
-                                } else if ("IM".equals(rst.getString("sql_tip_doc"))) {
-                                    imp.setInsc_municipal(rst.getString("num_doc"));
+                                    imp.setIe_rg(rstDoc.getString("num_doc"));
+                                } else if ("RG".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setIe_rg(rstDoc.getString("num_doc"));
+                                } else if ("IM".equals(rstDoc.getString("sql_tip_doc"))) {
+                                    imp.setInsc_municipal(rstDoc.getString("num_doc"));
                                 }
                             }
                         }
+                    }
+                    
+                    if (rst.getInt("id") == 151) {
+                        System.out.println("aqui");
                     }
                     
                     try (Statement stmTel = ConexaoPostgres.getConexao().createStatement()) {
@@ -432,15 +446,25 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                         )) {
                             while (rstTel.next()) {
                                 
-                                if ("RESIDENCIAL".equals(rstTel.getString("tipo"))) {
-                                    imp.setTel_principal(rst.getString("telefone"));
+                                if (("RESIDENCIAL".equals(rstTel.getString("tipo")))
+                                        || ("COMERCIAL".equals(rstTel.getString("tipo")))) {
+                                    imp.setTel_principal(rstTel.getString("telefone"));
                                 }
+                                
+                                imp.addContato(
+                                        rstTel.getString("tipo"), 
+                                        !"CELULAR".equals(rstTel.getString("tipo")) ? rstTel.getString("telefone") : null,
+                                        "CELULAR".equals(rstTel.getString("tipo")) ? rstTel.getString("telefone") : null,
+                                        TipoContato.COMERCIAL, 
+                                        null
+                                );
                             }
                         }
                     }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
