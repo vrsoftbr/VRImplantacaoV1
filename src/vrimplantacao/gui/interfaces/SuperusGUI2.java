@@ -303,6 +303,10 @@ public class SuperusGUI2 extends VRInternalFrame {
                             importador.atualizarClientePreferencial(OpcaoCliente.ESTADO_CIVIL);
                         }
                         
+                        if (chkRazao.isSelected()){
+                            importador.atualizarClientePreferencial(OpcaoCliente.RAZAO);
+                        }
+                        
                         if (chkConvConveniado.isSelected()) {
                             importador.importarConvenioConveniado();
                         }
@@ -398,6 +402,7 @@ public class SuperusGUI2 extends VRInternalFrame {
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkEstadoCivil = new javax.swing.JCheckBox();
+        chkRazao = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
@@ -719,6 +724,8 @@ public class SuperusGUI2 extends VRInternalFrame {
             }
         });
 
+        chkRazao.setText("Atualiza Razão");
+
         javax.swing.GroupLayout vRPanel9Layout = new javax.swing.GroupLayout(vRPanel9);
         vRPanel9.setLayout(vRPanel9Layout);
         vRPanel9Layout.setHorizontalGroup(
@@ -734,7 +741,8 @@ public class SuperusGUI2 extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkEstadoCivil)
-                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(chkRazao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(316, Short.MAX_VALUE))
         );
         vRPanel9Layout.setVerticalGroup(
@@ -751,7 +759,9 @@ public class SuperusGUI2 extends VRInternalFrame {
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(88, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chkRazao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(63, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -1172,6 +1182,7 @@ public class SuperusGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkOferta;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkRazao;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
