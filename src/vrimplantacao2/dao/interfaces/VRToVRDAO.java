@@ -246,10 +246,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pad.descontodiaseguinte,\n"
                         + "	pad.dataultimodesconto,\n"
                         + "	pa.id_produto,\n"
-                        + "     pa.qtdembalagem\n"
+                        + "     pa.qtdembalagem,\n"
+                        + "	t.descricao unidade\n"        
                         + "from\n"
                         + "	produtoautomacaodesconto pad\n"
                         + "join produtoautomacao pa on pad.codigobarras = pa.codigobarras\n"
+                        + "join tipoembalagem t on pa.id_tipoembalagem = t.id\n"        
                         + "where pad.id_loja = " + getLojaOrigem() + "\n"        
                         + "order by\n"
                         + "	pa.id_produto"
@@ -266,6 +268,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setEan("99999" + imp.getEan());
                         }
 
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
                         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
 
                         result.add(imp);
