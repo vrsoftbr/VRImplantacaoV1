@@ -20,6 +20,7 @@ import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -554,6 +555,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPiscofinsCstCredito(m.pisCofinsCredito);
                         imp.setPiscofinsCstDebito(m.pisCofinsDebito);
                         imp.setPiscofinsNaturezaReceita(m.naturezaReceita);
+                        imp.setEstoque(m.estoque);
                     }
                     
                     imp.setDataCadastro(rs.getDate("datacadastro"));
@@ -725,6 +727,47 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                             );
                         }
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT distinct\n" +
+                    "	r.REFPLU,\n" +
+                    "	r.REFPLUDV,\n" +
+                    "	cf.FORCOD id_fornecedor,\n" +
+                    "	cf.REFFOR codigoexterno,\n" +
+                    "	cf.CATQTDUND qtdembalagem,\n" +
+                    "	cf.CATPESLIQ pesoembalagem\n" +
+                    "FROM \n" +
+                    "	[CATALOGO_FORNECEDOR]  cf \n" +
+                    "	inner join [REFERENCIA] R\n" +
+                    "		on R.REFPLU = cf.REFPLU             \n" +
+                    "	inner join [V_FORNECEDOR] f \n" +
+                    "		on f.FORCOD = cf.FORCOD \n" +
+                    "ORDER BY\n" +
+                    "	r.REFPLU"
+            )) {
+                while (rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setIdProduto(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
                     
                     result.add(imp);
                 }
