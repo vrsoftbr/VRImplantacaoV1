@@ -1283,6 +1283,7 @@ public class ProdutoRepository {
         }
         vo.setVolume(imp.getVolume());
         vo.setVendaControlada(imp.isVendaControlada());
+        vo.setProdutoecommerce(imp.isProdutoECommerce());
 
         return vo;
     }

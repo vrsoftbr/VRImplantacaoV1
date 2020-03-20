@@ -51,6 +51,7 @@ public class ProdutoVO {
     private TipoEmbalagem tipoEmbalagemVolume = TipoEmbalagem.UN;
     private double volume = 1.0;
     private boolean vendaControlada = false;
+    private boolean produtoecommerce = false;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -421,4 +422,12 @@ public class ProdutoVO {
     public void setVendaControlada(boolean vendaControlada) {
         this.vendaControlada = vendaControlada;
     }   
+
+    public boolean isProdutoecommerce() {
+        return produtoecommerce;
+    }
+
+    public void setProdutoecommerce(boolean produtoecommerce) {
+        this.produtoecommerce = produtoecommerce;
+    }
 }

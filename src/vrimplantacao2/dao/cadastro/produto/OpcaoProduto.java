@@ -351,6 +351,12 @@ public enum OpcaoProduto {
             return "Divisão dos produtos.";
         }        
     },
+    PRODUTO_ECOMMERCE {
+        @Override
+        public String toString() {
+            return "Produto E-Commerce";
+        }
+    },
     DIVISAO,
     /**
         Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.

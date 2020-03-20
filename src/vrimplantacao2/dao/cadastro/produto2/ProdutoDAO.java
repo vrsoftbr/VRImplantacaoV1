@@ -198,6 +198,7 @@ public class ProdutoDAO {
             sql.putNull("margemmaxima");
             sql.put("permitedescontopdv", true);
             sql.put("verificapesopdv", false);
+            sql.put("produtoecommerce", vo.isProdutoecommerce());
             sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
             if (Versao.menorQue(3, 17, 10)) {
                 sql.put("id_tipoproduto", 0);
@@ -335,6 +336,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.VENDA_CONTROLADA)) {
             sql.put("vendacontrolada", vo.isVendaControlada());
+        }
+        if (opt.contains(OpcaoProduto.PRODUTO_ECOMMERCE)) {
+            sql.put("produtoecommerce", vo.isProdutoecommerce());
         }
 
         sql.setWhere("id = " + vo.getId());

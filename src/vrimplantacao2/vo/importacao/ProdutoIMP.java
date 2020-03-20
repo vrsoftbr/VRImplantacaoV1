@@ -130,6 +130,7 @@ public class ProdutoIMP {
     @DatabaseField private String setor = "";
     @DatabaseField private String prateleira = "";
     @DatabaseField private String beneficio = "";
+    @DatabaseField private boolean produtoECommerce = false;
     
     public String getImportSistema() {
         return importSistema;
@@ -981,6 +982,14 @@ public class ProdutoIMP {
 
     public void setBeneficio(String beneficio) {
         this.beneficio = beneficio;
+    }
+
+    public boolean isProdutoECommerce() {
+        return produtoECommerce;
+    }
+
+    public void setProdutoECommerce(boolean produtoECommerce) {
+        this.produtoECommerce = produtoECommerce;
     }
     
 }
