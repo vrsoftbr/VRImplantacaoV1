@@ -502,6 +502,30 @@ public class GCFDAO extends InterfaceDAO {
                 throw ex;
             }
         }
+        
+        if (opt == OpcaoProduto.ESTOQUE) {
+
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "DBA_CADCESTQ_COD_PRODUTO as idproduto,\n"
+                        + "DBA_CADCESTQ_ESTOQUE as estoque \n"
+                        + "from A_CADCESTQ \n"
+                        + "where DBA_CADCESTQ_COD_LOCAL = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEstoque(rst.getDouble("estoque"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+
+        }
         return null;
     }
 
@@ -861,6 +885,7 @@ public class GCFDAO extends InterfaceDAO {
 
     private String dataInicioVenda;
     private String dataTerminoVenda;
+    private int versaoDaVenda;
 
     public void setDataInicioVenda(String dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
@@ -868,6 +893,10 @@ public class GCFDAO extends InterfaceDAO {
     
     public void setDataTerminoVenda(String dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    public void setVersaoDaVenda(int versaoDaVenda) {
+        this.versaoDaVenda = versaoDaVenda;
     }
     
     @Override
@@ -877,7 +906,7 @@ public class GCFDAO extends InterfaceDAO {
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem().substring(0, getLojaOrigem().length() - 1), dataInicioVenda, dataTerminoVenda);
+        return new VendaItemIterator(getLojaOrigem(), getLojaOrigem().substring(0, getLojaOrigem().length() - 1), dataInicioVenda, dataTerminoVenda);
     }
     
     private class VendaIterator implements Iterator<VendaIMP> {
@@ -1003,14 +1032,49 @@ public class GCFDAO extends InterfaceDAO {
                             next.setProduto(rst.getString("idproduto"));
                             next.setSequencia(rst.getInt("sequencia"));
                             next.setDescricaoReduzida(rst.getString("descricaoproduto"));
-                            next.setUnidadeMedida("UN");
+                            next.setUnidadeMedida(rst.getString("tipoembalagem") == null ? "UN" : rst.getString("tipoembalagem"));
                             next.setPrecoVenda(rst.getDouble("precovenda"));
                             next.setQuantidade(rst.getDouble("quantidade"));
                             next.setTotalBruto(rst.getDouble("valortotal"));
                             next.setCancelado(false);
                             next.setCodigoBarras(rst.getString("codigobarras"));
-                            String trib = rst.getString("tributacao").trim();
-
+                            
+                            String trib = null;
+                            
+                            if (versaoDaVenda == 2) {
+                                
+                                if (rst.getInt("cst") == 40) {
+                                    trib = "F";
+                                } else if (rst.getInt("cst") == 41) {
+                                    trib = "N";
+                                } else if (rst.getInt("cst") == 60) {
+                                    trib = "F";
+                                } else if (rst.getInt("cst") == 0) {
+                                    
+                                    if ("7".equals(rst.getString("aliquota"))) {
+                                        trib = "0700";
+                                    } else if ("18".equals(rst.getString("aliquota"))) {
+                                        trib = "1800";
+                                    } else if ("25".equals(rst.getString("aliquota"))) {
+                                        trib = "2500";
+                                    } else if ("27".equals(rst.getString("aliquota"))) {
+                                        trib = "2700";
+                                    } else if ("17".equals(rst.getString("aliquota"))) {
+                                        trib = "1700";
+                                    } else if ("11".equals(rst.getString("aliquota"))) {
+                                        trib = "1100";
+                                    } else if (("4,5".equals(rst.getString("aliquota"))) ||
+                                            ("4,50".equals(rst.getString("aliquota")))) {
+                                        trib = "0450";
+                                    } else {
+                                        trib = "0";
+                                    }
+                                }                                
+                                
+                            } else {
+                                trib = rst.getString("tributacao").trim();
+                            }
+                            
                             obterAliquota(next, trib);
                         }
                 }
@@ -1085,25 +1149,67 @@ public class GCFDAO extends InterfaceDAO {
             item.setIcmsAliq(aliq);
         }
 
-        public VendaItemIterator(String idLojaCliente, String dataInicio, String dataTermino) throws Exception {
-            this.sql = "select  \n"
-                    + "    ite.pdvci_id as idvenda,\n"
-                    + "    ite.pdvci_seq as sequencia,\n"
-                    + "    ite.pdvci_ite as idproduto,\n"
-                    + "    ite.pdvci_ean as codigobarras,\n"
-                    + "    ite.pdvci_dcr as descricaoproduto,\n"
-                    + "    ite.pdvci_qtd_uni as quantidade,\n"
-                    + "    ite.pdvci_vlr_uni as precovenda,\n"
-                    + "    ite.pdvci_mer_val as valortotal,\n"
-                    + "    ite.pdvci_icm_trb as tributacao\n"
-                    + "from A_INTPDVCI ite \n"
-                    + "where ite.pdvci_id in (select \n"
-                    + "                              pdvcc_id\n"
-                    + "                         from A_INTPDVCC\n"
-                    + "                        where pdvcc_loj = " + idLojaCliente + "\n"
-                    + "                          and pdvcc_dta between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    + "                          and pdvcc_est = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
-                    + "                      )";
+        public VendaItemIterator(String idLojaClienteCompleto, String idLojaCliente, String dataInicio, String dataTermino) throws Exception {
+            if (versaoDaVenda == 1) {
+                this.sql = "select  \n"
+                        + "    ite.pdvci_id as idvenda,\n"
+                        + "    ite.pdvci_seq as sequencia,\n"
+                        + "    ite.pdvci_ite as idproduto,\n"
+                        + "    ite.pdvci_ean as codigobarras,\n"
+                        + "    ite.pdvci_dcr as descricaoproduto,\n"
+                        + "    ite.pdvci_qtd_uni as quantidade,\n"
+                        + "    ite.pdvci_vlr_uni as precovenda,\n"
+                        + "    ite.pdvci_mer_val as valortotal,\n"
+                        + "    ite.pdvci_icm_trb as tributacao\n"
+                        + "from A_INTPDVCI ite \n"
+                        + "where ite.pdvci_id in (select \n"
+                        + "                              pdvcc_id\n"
+                        + "                         from A_INTPDVCC\n"
+                        + "                        where pdvcc_loj = " + idLojaCliente + "\n"
+                        + "                          and pdvcc_dta between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                        + "                          and pdvcc_est = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+                        + "                      )";
+            } else if (versaoDaVenda == 2) {
+                this.sql = "select \n"
+                        + "    ven.pdvcc_id as idvenda,\n"
+                        + "    1 as sequencia,\n"
+                        + "    ite.dba_esit_codigo_x as idproduto,\n"
+                        + "    p.DBA_GIT_DESC_REDUZ_COMPL as descricaoproduto,\n"
+                        + "    p.dba_git_codigo_ean13 as codigobarras,\n"
+                        + "    ite.dba_entsai_tpo_emb as tipoembalagem,\n"
+                        + "    ite.dba_entsai_prc_un as precovenda,\n"
+                        + "    ite.dba_entsai_prc_emb as valortotal,\n"
+                        + "    ite.dba_entsai_quanti_un as quantidade,\n"
+                        + "    ICMS.CST,\n"
+                        + "    ICMS.ALIQUOTA,\n"
+                        + "    ICMS.REDUCAO\n"
+                        + "from A_MOVCINTS ite\n"
+                        + "inner join A_CADCITEM p on p.DBA_GIT_PRODUTO = ite.dba_esit_codigo_x\n"
+                        + "inner join A_INTPDVCC ven \n"
+                        + "     on ven.pdvcc_nta = ite.dba_esch_nro_nota\n"
+                        + "    and ven.pdvcc_dta = ite.dba_esch_data\n"
+                        + "    and ven.pdvcc_cxa = ite.dba_esch_caixa\n"
+                        + "LEFT JOIN (\n"
+                        + "    select DISTINCT \n"
+                        + "			a.DBA_GIT_PRODUTO PRODUTO, \n"
+                        + "			B.DBA_TFIS_CODIGO_FIS_DEST AS TRIBUTACAO, \n"
+                        + "			NVL(b.dba_tfis_aliq_icm,0) AS ALIQUOTA, \n"
+                        + "			b.DBA_TFIS_BASE_REDUZ as REDUCAO \n"
+                        + "		FROM \n"
+                        + "			A_CADCITEM A, \n"
+                        + "			A_CADCTFIS B \n"
+                        + "		WHERE \n"
+                        + "			A.DBA_GIT_NAT_FISCAL = B.DBA_TFIS_FIGURA \n"
+                        + "			AND B.DBA_TFIS_ORIGEM = '" + Parametros.get().getUfPadraoV2().getSigla() + "' \n"
+                        + "			AND B.DBA_TFIS_DESTINO = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                        + "			AND B.DBA_TFIS_AUTOMACAO = 'S' \n"
+                        + "			AND B.dba_tfis_cfop_fiscal IN (5102, 5405) \n"
+                        + "			and b.dba_tfis_codigo = 512 \n"
+                        + ") ICMS ON ICMS.PRODUTO = P.DBA_GIT_PRODUTO\n"
+                        + "where ite.dba_esch_loja = " + idLojaClienteCompleto + "\n"
+                        + "  and ven.pdvcc_loj = " + idLojaCliente + "\n"
+                        + "  and dba_esch_data between '" + dataInicio + "' and '" + dataTermino + "'";
+            }
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
