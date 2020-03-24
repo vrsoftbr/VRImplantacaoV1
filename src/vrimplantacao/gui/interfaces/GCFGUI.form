@@ -589,9 +589,14 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="rdbA_INTPDVCI" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="rdbA_MOVCINTS" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Group type="102" attributes="0">
                                   <Component id="chkVendasPdv" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -637,7 +642,12 @@
                                   <Component id="txtDataInicioVendas" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="118" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="rdbA_INTPDVCI" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="rdbA_MOVCINTS" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="92" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -670,6 +680,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBancoUnificado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Banco GCF &#xe9; Unificado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbA_INTPDVCI">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="A_INTPDVCI"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbA_MOVCINTS">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="A_MOVCINTS"/>
                   </Properties>
                 </Component>
               </SubComponents>
