@@ -15,6 +15,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteContatoIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -768,6 +770,149 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            Map<String, List<ClienteContatoIMP>> contatos = new HashMap<>();
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.AGECOD id_cliente,\n" +
+                    "	c.CNTNOM nome,\n" +
+                    "	c.CNTTEL telefone,\n" +
+                    "	c.CNTCEL celular,\n" +
+                    "	c.CNTMAIL email\n" +
+                    "from\n" +
+                    "	contato c\n" +
+                    "	join agente a on\n" +
+                    "		c.AGECOD = a.AGECOD\n" +
+                    "	join CLIENTE cl on\n" +
+                    "		cl.AGECOD = a.AGECOD\n" +
+                    "order by\n" +
+                    "   id_cliente"
+            )) {
+                while (rs.next()) {
+                    List<ClienteContatoIMP> list = contatos.get(rs.getString("id_cliente"));
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        contatos.put(rs.getString("id_cliente"), list);
+                    }
+                    ClienteContatoIMP imp = new ClienteContatoIMP();
+                    
+                    imp.setId("CONT" + (list.size() + 1));                    
+                    imp.setCliente(null); 
+                    imp.setNome(rs.getString("nome"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email"));
+                    
+                    list.add(imp);
+                }
+            }
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	ag.AGECOD id,\n" +
+                    "	ag.AGECGCCPF cnpj,\n" +
+                    "	ag.AGECGFRG ierg,\n" +
+                    "	ag.AGEORGEXP orgaoemissor,\n" +
+                    "	ag.AGEDES razao,\n" +
+                    "	ag.AGEFAN fantasia,\n" +
+                    "	ag.AGEINSMUN inscmun,\n" +
+                    "	1 ativo,\n" +
+                    "	case when ag.STACOD = '002' then 1 else 0 end bloqueado,\n" +
+                    "	ag.AGEDATBLO databloqueio,\n" +
+                    "	ag.AGEEND endereco,\n" +
+                    "	ag.AGENUM numero,\n" +
+                    "	ag.AGECPL complemento,\n" +
+                    "	ag.AGEBAI bairro,\n" +
+                    "	ag.AGECID cidade,\n" +
+                    "	ag.AGEEST estado,\n" +
+                    "	ag.AGECEP cep,\n" +
+                    "	c.CLIESTCIV estadocivil,\n" +
+                    "	c.CLIDATNAS datanascimento,\n" +
+                    "	ag.AGEDATCAD datacadastro,\n" +
+                    "	ag.AGEDATALT dataalteracao,\n" +
+                    "	c.CLISEX sexo,\n" +
+                    "	c.CLIEMP empresa,\n" +
+                    "	c.CLIEMPEND enderecoempresa,\n" +
+                    "	c.CLIEMPTEL telempresa,\n" +
+                    "	c.CLIDATFUN dataadmissao,\n" +
+                    "	c.CLIREN salario,\n" +
+                    "	c.CLILIMCRE limitecredito,\n" +
+                    "	c.CLICONJG conjuge,\n" +
+                    "	c.CLICONJGCPF conjugecpf,\n" +
+                    "	c.CLIMAE mae,\n" +
+                    "	c.CLIPAI pai,\n" +
+                    "	c.CLISITOBS observacoes,\n" +
+                    "	c.CLIDIAFECH diavencimento,\n" +
+                    "	ag.AGETEL1,\n" +
+                    "	ag.AGETEL2,\n" +
+                    "	ag.AGEFAX \n" +
+                    "from\n" +
+                    "	CLIENTE c\n" +
+                    "	join AGENTE ag on\n" +
+                    "		c.AGECOD = ag.AGECOD\n" +
+                    "order by\n" +
+                    "	ag.AGECOD"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ierg"));
+                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setInscricaoMunicipal(rs.getString("inscmun"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setDataBloqueio(rs.getDate("databloqueio"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEstadoCivil(rs.getString("estadocivil"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    //imp.set(rs.getString("dataalteracao"));
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setEmpresaEndereco(rs.getString("enderecoempresa"));
+                    imp.setEmpresaTelefone(rs.getString("telempresa"));
+                    imp.setDataAdmissao(rs.getDate("dataadmissao"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setValorLimite(rs.getDouble("limitecredito"));
+                    imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setCpfConjuge(rs.getString("conjugecpf"));
+                    imp.setNomeMae(rs.getString("mae"));
+                    imp.setNomePai(rs.getString("pai"));
+                    imp.setObservacao2(rs.getString("observacoes"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    imp.setTelefone(rs.getString("AGETEL1"));
+                    imp.addTelefone("TELEFONE 2", rs.getString("AGETEL2"));
+                    imp.setFax(rs.getString("AGEFAX"));
+                    
+                    List<ClienteContatoIMP> cont = contatos.get(rs.getString("id"));
+                    if (cont != null) {
+                        for (ClienteContatoIMP c: cont) {
+                            c.setCliente(imp);
+                            imp.getContatos().add(c);
+                        }
+                    }
                     
                     result.add(imp);
                 }
