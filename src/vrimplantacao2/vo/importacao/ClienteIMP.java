@@ -57,6 +57,7 @@ public class ClienteIMP {
     private double salario = 0;
     private double valorLimite = 0;
     private String nomeConjuge;
+    private String cpfConjuge;
     private String nomePai;
     private String nomeMae;
     private String observacao;
@@ -432,6 +433,14 @@ public class ClienteIMP {
 
     public void setNomeConjuge(String nomeConjuge) {
         this.nomeConjuge = nomeConjuge;
+    }
+
+    public String getCpfConjuge() {
+        return cpfConjuge;
+    }
+
+    public void setCpfConjuge(String cpfConjuge) {
+        this.cpfConjuge = cpfConjuge;
     }
 
     public String getNomePai() {
