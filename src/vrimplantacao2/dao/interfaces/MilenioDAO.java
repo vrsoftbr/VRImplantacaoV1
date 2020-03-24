@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,9 +16,11 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -227,6 +231,57 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }        
+        return result;
+    }
+    
+    public static class TipoDocumento {
+        public String id;
+        public String descricao;
+        public boolean selecionado;
+        public TipoDocumento(String id, String descricao, boolean selecionado) {
+            this.id = id;
+            this.descricao = descricao;
+            this.selecionado = selecionado;
+        }
+        @Override
+        public String toString() {
+            return id + " - " + descricao;
+        }
+    }
+
+    public List<TipoDocumento> getTiposDocumentos() throws Exception {
+        List<TipoDocumento> result = new ArrayList<>();
+        
+        if (ConexaoSqlServer.getConexao() != null && !ConexaoSqlServer.getConexao().isClosed()) {
+            String text = Parametros.get().getWithNull("", "Milenio", "ROTATIVOS");        
+            Set<String> selecteds = new LinkedHashSet<>(
+                    !"".equals(text) ?
+                    Arrays.asList(text.split(",")) :
+                    new HashSet()
+                     
+            );
+
+            try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	TIPDOCCOD id,\n" +
+                        "	TIPDOCDES descricao\n" +
+                        "FROM\n" +
+                        "	TIPO_DOCUMENTO td\n" +
+                        "order by\n" +
+                        "	TIPDOCCOD"
+                )) {
+                    while (rs.next()) {
+                        result.add(new TipoDocumento(
+                                rs.getString("id"),
+                                rs.getString("descricao"),
+                                selecteds.contains(rs.getString("id"))
+                        ));
+                    }
+                }
+            }
+        }
+        
         return result;
     }
     
@@ -921,5 +976,81 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+    
+    private List<TipoDocumento> tipoDocumento = new ArrayList<>();
+    public void setTipoDocumento(List<TipoDocumento> tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+    private String getTipoDocumento() {
+        StringBuilder builder = new StringBuilder();
+        for (Iterator<TipoDocumento> iterator = tipoDocumento.iterator(); iterator.hasNext(); ) {
+            TipoDocumento str = iterator.next();
+            builder.append("'").append(str.id).append("'");
+            if (iterator.hasNext())
+                builder.append(",");
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            String sql = "SELECT\n" +
+                    "	concat(tr.LOJCOD,'-',tr.TIFCOD) id,\n" +
+                    "	tr.TIFDATEMI dataemissao,\n" +
+                    "	tr.TIFNUMDOC numerocupom,\n" +
+                    "	tr.TIFVLRNOM valor,\n" +
+                    "	tr.TIFOBS observacoes,\n" +
+                    "	tr.AGECOD id_clientepreferencial,\n" +
+                    "	tr.TIFDATVNC vencimento,\n" +
+                    "	tr.TIFPARATU parcela,\n" +
+                    "	tr.TIFVLRJUR juros,\n" +
+                    "	COALESCE(TIFVLRPAG,0) valorpago,\n" +
+                    "	tr.TIPDOCCOD\n" +
+                    "FROM\n" +
+                    "	V_TITULO_RECEBER tr\n" +
+                    "	JOIN AGENTE c ON\n" +
+                    "		tr.AGECOD = c.AGECOD\n" +
+                    "WHERE\n" +
+                    "	COALESCE(TIFVLRPAG,0) < COALESCE(TIFVLRNOM,0)\n" +
+                    "	AND TR.TIFSTA = 'N'\n" +
+                    "	AND TR.TIFSIT in ('A','P')\n" +
+                    "	AND tr.LOJCOD = '" + getLojaOrigem() + "'\n" +
+                    "	and tr.TIPDOCCOD in (" + getTipoDocumento() + ")\n" +
+                    "ORDER BY\n" +
+                    "	TIFDATEMI";
+            try (ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacoes"));
+                    imp.setIdCliente(rs.getString("id_clientepreferencial"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    if (rs.getDouble("valorpago") > 0) {
+                        imp.addPagamento(
+                                imp.getId(),
+                                rs.getDouble("valorpago"),
+                                0,
+                                0,
+                                rs.getDate(""),
+                                ""
+                        );
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }    
     
 }

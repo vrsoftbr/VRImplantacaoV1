@@ -2,8 +2,10 @@ package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.table.AbstractTableModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -19,6 +21,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.MilenioDAO;
+import vrimplantacao2.dao.interfaces.MilenioDAO.TipoDocumento;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -35,6 +38,91 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
+    
+    
+    private List<TipoDocumento> tiposDocumento;
+    
+    private void carregarTipoDocumento() throws Exception {
+        
+        tiposDocumento = dao.getTiposDocumentos();
+        preencheTxtRotativo();
+        
+        tblRotativo.setModel(new AbstractTableModel() {
+            @Override
+            public int getRowCount() {
+                return tiposDocumento.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 3;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                switch (columnIndex) {
+                    case 0: return tiposDocumento.get(rowIndex).selecionado;
+                    case 1: return tiposDocumento.get(rowIndex).id;
+                    case 2: return tiposDocumento.get(rowIndex).descricao;
+                }
+                return "";
+            }
+
+            @Override
+            public String getColumnName(int column) {
+                switch (column) {
+                    case 0: return "-";
+                    case 1: return "Código";
+                    case 2: return "Descrição";
+                }
+                return "";
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                if (columnIndex == 0) {
+                    tiposDocumento.get(rowIndex).selecionado = (boolean) aValue;
+                    preencheTxtRotativo();
+                }
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return columnIndex == 0;
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                if (columnIndex == 0)
+                    return Boolean.class;
+                return String.class;
+            }
+            
+        });
+    }
+
+    private List<TipoDocumento> buildSelecteds() {
+        List<TipoDocumento> selecteds = new ArrayList<>();
+        for (TipoDocumento doc: tiposDocumento) {
+            if (doc.selecionado) {
+                selecteds.add(doc);
+            }
+        }
+        return selecteds;
+    }
+
+    private void preencheTxtRotativo() {
+        StringBuilder builder = new StringBuilder();
+        for (Iterator<TipoDocumento> iterator = buildSelecteds().iterator(); iterator.hasNext();) {
+            TipoDocumento next = iterator.next();
+            if (next.selecionado) {
+                builder.append(next.id);
+                if (iterator.hasNext())
+                    builder.append(",");
+            }
+        }
+        txtRotativos.setText(builder.toString());
+    }
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -42,6 +130,8 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        
+        carregarTipoDocumento();
     }
 
     private void gravarParametros() throws Exception {
@@ -58,6 +148,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
+        params.put(txtRotativos.getText(), SISTEMA, "ROTATIVOS");
         params.salvar();
     }
 
@@ -171,6 +262,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
+                    dao.setTipoDocumento(MilenioGUI.this.buildSelecteds());
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
@@ -280,10 +372,13 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
         chkCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
+        scrollRotativo = new javax.swing.JScrollPane();
+        tblRotativo = new javax.swing.JTable();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteValorLimite = new vrframework.bean.checkBox.VRCheckBox();
+        txtRotativos = new javax.swing.JTextField();
         tabParametro = new javax.swing.JPanel();
         chkIcmsForaEstado = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -302,6 +397,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
 
         setTitle("Importação SysERP");
         setToolTipText("");
+        setPreferredSize(new java.awt.Dimension(50, 50));
 
         conexao.setSistema("JM2Online");
 
@@ -324,6 +420,20 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
 
+        tblRotativo.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblRotativo.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        scrollRotativo.setViewportView(tblRotativo);
+
         chkClientePreferencial.setText("Cliente Preferencial");
 
         chkCreditoRotativo.setText("Crédito Rotativo");
@@ -332,6 +442,8 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkClienteValorLimite.setText("Valor Limite");
 
+        txtRotativos.setEditable(false);
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -339,14 +451,19 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtRotativos)
                     .addGroup(tabClientesLayout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(231, Short.MAX_VALUE))
+                        .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabClientesLayout.createSequentialGroup()
+                                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE))
+                .addContainerGap())
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -358,7 +475,11 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(186, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtRotativos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -379,7 +500,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabParametroLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkIcmsForaEstado)
-                .addContainerGap(209, Short.MAX_VALUE))
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Ajuste", tabParametro);
@@ -423,7 +544,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(147, Short.MAX_VALUE))
+                .addContainerGap(103, Short.MAX_VALUE))
         );
 
         tabOperacoes.addTab("Unificação", vRPanel2);
@@ -500,7 +621,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(lblCompLoja)
                     .addComponent(txtCompLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -546,13 +667,16 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JLabel lblCompLoja;
     private vrframework.bean.label.VRLabel lblLojaCliente;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private javax.swing.JScrollPane scrollRotativo;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private javax.swing.JPanel tabParametro;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private javax.swing.JTable tblRotativo;
     private javax.swing.JTextField txtCompLoja;
+    private javax.swing.JTextField txtRotativos;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
@@ -564,6 +688,7 @@ public class MilenioGUI extends VRInternalFrame implements ConexaoEvent {
         gravarParametros();
         carregarLojaVR();
         carregarLojaCliente();
+        carregarTipoDocumento();
     }
 
 }
