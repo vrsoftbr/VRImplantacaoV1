@@ -400,18 +400,19 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    //if("S".equals(rst.getString("balanca"))){
-                    //imp.setEan(rst.getString("id").substring(0, rst.getString("id").length() - 1));
-
-                    //} else {
-                    imp.setEan(rst.getString("codigobarras"));
-                    //}
+                    if("S".equals(rst.getString("balanca").trim())){
+                        if(rst.getString("codigobarras").length() > 6 && rst.getString("codigobarras").length() < 9) {
+                            imp.setEan(rst.getString("codigobarras").substring(1, rst.getString("codigobarras").length()));
+                        } else {
+                            imp.setEan(rst.getString("codigobarras"));
+                        }
+                    } else {
+                        imp.setEan(rst.getString("codigobarras"));
+                    }
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
-                    
-                    
-                    String tipoembalagem =  rst.getString("UNIDADE_VENDA");
-                    
+
+                    String tipoembalagem =  rst.getString("UNIDADE_VENDA");                    
                     
                     if (tipoembalagem.contains("KG")) {
 
