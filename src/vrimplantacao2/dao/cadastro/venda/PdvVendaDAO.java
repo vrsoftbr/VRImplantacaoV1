@@ -424,5 +424,30 @@ public class PdvVendaDAO {
             );
         }
     }
+
+    public void gerarConsistencia(int lojaVR) throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            st.execute(
+                    "insert into pdv.consistencia (data, id_loja)\n" +
+                    "select\n" +
+                    "	distinct data,\n" +
+                    "	id_loja\n" +
+                    "from\n" +
+                    "	pdv.venda v\n" +
+                    "	join implantacao.vendasimportadas imp on\n" +
+                    "		imp.id_venda = v.id\n" +
+                    "where\n" +
+                    "	v.id_loja = " + lojaVR + "\n" +
+                    "except\n" +
+                    "select\n" +
+                    "	data,\n" +
+                    "	id_loja\n" +
+                    "from\n" +
+                    "	pdv.consistencia c\n" +
+                    "order by\n" +
+                    "	1"
+            );
+        }
+    }
     
 }

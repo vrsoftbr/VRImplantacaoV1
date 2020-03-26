@@ -203,5 +203,9 @@ public class VendaRepositoryProvider {
     public void vincularMapaDivergenciaComAnteriores() throws Exception {
         vendaDAO.vincularMapaDivergenciaComAnteriores(getSistema(), getLoja());
     }
+
+    public void gerarConsistencia() throws Exception {
+        vendaDAO.gerarConsistencia(getLojaVR());
+    }
     
 }
