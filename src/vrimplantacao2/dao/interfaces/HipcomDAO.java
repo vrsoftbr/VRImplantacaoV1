@@ -1250,7 +1250,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        //return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
         return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
 
