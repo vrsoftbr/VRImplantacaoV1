@@ -909,8 +909,9 @@
                                   <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNUtilizaPlanoConta" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="175" max="32767" attributes="0"/>
+                          <EmptySpace pref="258" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -926,9 +927,11 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkNUtilizaPlanoConta" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="vRPanel1" pref="295" max="32767" attributes="0"/>
+                              <Component id="vRPanel1" pref="307" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -1006,6 +1009,11 @@
                     <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="true" type="code"/>
                     </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNUtilizaPlanoConta">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xe3;o Utiliza Plano de Conta Rotativo"/>
                   </Properties>
                 </Component>
               </SubComponents>
