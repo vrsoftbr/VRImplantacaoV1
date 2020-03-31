@@ -954,6 +954,8 @@
                                           <Component id="chkNcm" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCest" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkCodigoBeneficio" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -982,6 +984,7 @@
                               <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsCreditoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsConsumidor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCodigoBeneficio" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
@@ -1045,6 +1048,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsConsumidor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ICMS Consumidor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCodigoBeneficio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="C&#xf3;digo de Benef&#xed;cio"/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -357,7 +357,18 @@ public enum OpcaoProduto {
             return "Produto E-Commerce";
         }
     },
-    DIVISAO,
+    DIVISAO {
+        @Override
+        public String toString() {
+            return "Divisão";
+        }
+    },
+    CODIGO_BENEFICIO {
+        @Override
+        public String toString() {
+            return "Código de Benefício";
+        }
+    },
     /**
         Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.
         Isso para o VR pode causar problemas, por essa razão o VRImplantação trata esse
