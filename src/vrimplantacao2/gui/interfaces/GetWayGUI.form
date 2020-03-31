@@ -627,6 +627,16 @@
                     <Property name="text" type="java.lang.String" value="Tipo Produto"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPauta">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pauta Fiscal"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pauta Fiscal x Produto"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">
