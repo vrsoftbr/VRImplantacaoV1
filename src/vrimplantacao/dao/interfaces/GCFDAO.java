@@ -421,7 +421,6 @@ public class GCFDAO extends InterfaceDAO {
                     }
                     imp.setPesoBruto(rst.getDouble("PESO"));
                     imp.setPesoLiquido(rst.getDouble("PESO"));
-                    imp.setEstoque(rst.getDouble("ESTOQUE"));
                     imp.setMargem(rst.getDouble("MARGEM_NIVEL_1"));
                     imp.setCustoComImposto(rst.getDouble("CUSTOCOMIMPOSTO"));
                     imp.setCustoSemImposto(rst.getDouble("CUSTOMSEMIMPOSTO"));
@@ -1016,6 +1015,7 @@ public class GCFDAO extends InterfaceDAO {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
+        int sequencia = 1;
 
         private void obterNext() {
             try {
@@ -1023,16 +1023,31 @@ public class GCFDAO extends InterfaceDAO {
                     if (rst.next()) {
                         
                             next = new VendaItemIMP();
+                            String id = null;
 
-                            String id = rst.getString("idvenda") + "-" + rst.getString("idproduto") + "-" + rst.getString("sequencia");
+                            if (versaoDaVenda == 1) {
+                                id = rst.getString("idvenda") + "-" + rst.getString("idproduto") + "-" + rst.getString("sequencia");
+                                next.setSequencia(rst.getInt("sequencia"));                                
+                            } else {
+                                id = rst.getString("idvenda") + "-" + rst.getString("idproduto") + "-" + String.valueOf(sequencia);
+                                next.setSequencia(sequencia);                                
+                            }
+                            
                             String idvenda = rst.getString("idvenda");
 
                             next.setId(id);
                             next.setVenda(idvenda);
                             next.setProduto(rst.getString("idproduto"));
-                            next.setSequencia(rst.getInt("sequencia"));
+                            
+                            
                             next.setDescricaoReduzida(rst.getString("descricaoproduto"));
-                            next.setUnidadeMedida(rst.getString("tipoembalagem") == null ? "UN" : rst.getString("tipoembalagem"));
+                            
+                            if (versaoDaVenda == 2) {
+                                next.setUnidadeMedida(rst.getString("tipoembalagem") == null ? "UN" : rst.getString("tipoembalagem"));
+                            } else {
+                                next.setUnidadeMedida("UN");
+                            }
+                            
                             next.setPrecoVenda(rst.getDouble("precovenda"));
                             next.setQuantidade(rst.getDouble("quantidade"));
                             next.setTotalBruto(rst.getDouble("valortotal"));
@@ -1074,6 +1089,8 @@ public class GCFDAO extends InterfaceDAO {
                             } else {
                                 trib = rst.getString("tributacao").trim();
                             }
+                            
+                            sequencia ++;
                             
                             obterAliquota(next, trib);
                         }
@@ -1172,7 +1189,6 @@ public class GCFDAO extends InterfaceDAO {
             } else if (versaoDaVenda == 2) {
                 this.sql = "select \n"
                         + "    ven.pdvcc_id as idvenda,\n"
-                        + "    1 as sequencia,\n"
                         + "    ite.dba_esit_codigo_x as idproduto,\n"
                         + "    p.DBA_GIT_DESC_REDUZ_COMPL as descricaoproduto,\n"
                         + "    p.dba_git_codigo_ean13 as codigobarras,\n"
@@ -1180,7 +1196,7 @@ public class GCFDAO extends InterfaceDAO {
                         + "    ite.dba_entsai_prc_un as precovenda,\n"
                         + "    ite.dba_entsai_prc_emb as valortotal,\n"
                         + "    ite.dba_entsai_quanti_un as quantidade,\n"
-                        + "    ICMS.CST,\n"
+                        + "    ICMS.TRIBUTACAO AS CST,\n"
                         + "    ICMS.ALIQUOTA,\n"
                         + "    ICMS.REDUCAO\n"
                         + "from A_MOVCINTS ite\n"
