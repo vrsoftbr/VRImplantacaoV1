@@ -77,7 +77,7 @@ public class ClientePreferencialDAO {
             sql.put("conta", "");
             sql.put("praca", "");
             sql.put("outrarenda", 0);
-            sql.put("cpfconjuge", 0);
+            sql.put("cpfconjuge", cliente.getCpfConjuge());
             sql.put("rgconjuge", "");
             sql.put("orgaoemissorconjuge", "");
             sql.put("empresaconjuge", "");

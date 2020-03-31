@@ -87,6 +87,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date notasDataTermino = null;
     public boolean i_notaEntrada = false;
     public boolean i_notaSaida = false;
+    public boolean naoUtilizaPlanoConta = false;
 
     public void setNotasDataInicio(Date notasDataInicio) {
         this.notasDataInicio = notasDataInicio;
@@ -400,18 +401,19 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    //if("S".equals(rst.getString("balanca"))){
-                    //imp.setEan(rst.getString("id").substring(0, rst.getString("id").length() - 1));
-
-                    //} else {
-                    imp.setEan(rst.getString("codigobarras"));
-                    //}
+                    if("S".equals(rst.getString("balanca").trim())){
+                        if(rst.getString("codigobarras").length() > 6 && rst.getString("codigobarras").length() < 9) {
+                            imp.setEan(rst.getString("codigobarras").substring(1, rst.getString("codigobarras").length()));
+                        } else {
+                            imp.setEan(rst.getString("codigobarras"));
+                        }
+                    } else {
+                        imp.setEan(rst.getString("codigobarras"));
+                    }
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
-                    
-                    
-                    String tipoembalagem =  rst.getString("UNIDADE_VENDA");
-                    
+
+                    String tipoembalagem =  rst.getString("UNIDADE_VENDA");                    
                     
                     if (tipoembalagem.contains("KG")) {
 
@@ -1901,7 +1903,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and pagamento is null\n"
                     + "	and not tipo_cadastro is null\n"
                     + " and cl.id is not null\n"
-                    + "	and plano_conta in (" + getPlanosContaStr() + ")\n"
+                    + (naoUtilizaPlanoConta == true ? "\n" : " and plano_conta in (" + getPlanosContaStr() + ")\n") 
                     + "order by id";
             LOG.fine("SQL a ser executado:\n" + sql);
             try (ResultSet rst = stm.executeQuery(sql)) {

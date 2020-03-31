@@ -43,6 +43,7 @@ public class ClientePreferencialVO {
     private double salario = 0;// numeric(11,2) NOT NULL,    
     private double valorLimite = 0;// numeric(11,2) NOT NULL,
     private String nomeConjuge;// character varying(35) NOT NULL,
+    private int cpfConjuge;
     private TipoInscricao tipoInscricao = TipoInscricao.FISICA;
     private int vencimentoCreditoRotativo = 0;// integer NOT NULL,
     private String observacao2 = "";// character varying(2500) NOT NULL,
@@ -430,5 +431,17 @@ public class ClientePreferencialVO {
 
     public void setGrupo(int grupo) {
         this.grupo = grupo;
+    }
+
+    public int getCpfConjuge() {
+        return cpfConjuge;
+    }
+
+    public void setCpfConjuge(int cpfConjuge) {
+        this.cpfConjuge = cpfConjuge;
+    }
+
+    public void setCpfConjuge(String cpfConjuge) {
+        this.cpfConjuge = Utils.stringToInt(cpfConjuge);
     }
 }

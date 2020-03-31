@@ -524,6 +524,7 @@ public class ClienteRepository {
         vo.setSalario(imp.getSalario());
         vo.setValorLimite(imp.getValorLimite());
         vo.setNomeConjuge(imp.getNomeConjuge());
+        vo.setCpfConjuge(imp.getCpfConjuge());
         vo.setNomePai(imp.getNomePai());
         vo.setNomeMae(imp.getNomeMae());
         vo.setObservacao("IMPORTACAO VR" + imp.getObservacao() == null ? "" : " - " + imp.getObservacao());

@@ -18,13 +18,6 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
     
     private static final Logger LOG = Logger.getLogger(HipcomVendaIterator.class.getName());
-    
-    private static final SimpleDateFormat TIMESTAMP_DATE = new SimpleDateFormat("yyyy-MM-dd");
-    private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-    
-    public static String makeId(String idLoja, Date data, String ecf, String numeroCupom) {
-        return idLoja + "-" + TIMESTAMP_DATE.format(data) + "-" + ecf + "-" + numeroCupom;
-    }
 
      public HipcomVendaIterator(String idLojas, Date dataInicial, Date dataTermino) throws Exception {
         super(
@@ -41,63 +34,53 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
             this.addStatement(statement);
         }
     }
-    
-    private String getSQL(String idLojaCliente, String tableName) {  
-
-        return 
-            "select\n" +
-            "	v.loja id_loja,\n" +
-            "	v.numero_cupom_fiscal numerocupom,\n" +
-            "	v.codigo_terminal ecf,\n" +
-            "	v.data,\n" +
-            "	min(v.hora) horainicio,\n" +
-            "	max(v.hora) horatermino,	\n" +
-            "	min(v.cupom_cancelado) cancelado,\n" +
-            "	sum(v.valor_total) subtotalimpressora\n" +
-            "from\n" +
-            "	" + tableName + " v\n" +
-            "where\n" +
-            "	v.loja = " + idLojaCliente + " and\n" +
-            "	v.data >= '{DATA_INICIO}' and\n" +
-            "	v.data <= '{DATA_TERMINO}'\n" +
-            "group by\n" +
-            "	id_loja,\n" +
-            "	numerocupom,\n" +
-            "	ecf,\n" +
-            "	data\n";
-    }
 
     private String getFullSQL(String idLojaCliente) throws Exception {
 
-        StringBuilder str = new StringBuilder();
-
-        str.append(getSQL(idLojaCliente, "hip_cupom_ultimos_meses2"));
-        str.append("union\n");
-        str.append(getSQL(idLojaCliente, "hip_cupom_item_semcript_2017"));
-        str.append("union\n");
-        str.append(getSQL(idLojaCliente, "hip_cupom_item_semcript_2016"));
-        str.append("union\n");
-        str.append(getSQL(idLojaCliente, "hip_cupom_item_semcript_2015"));
-
-        return str.toString();
+        return 
+            "select\n" +
+            "	v.id,\n" +
+            "	v.numero,\n" +
+            "	v.caixa,\n" +
+            "	v.data_cupom,\n" +
+            "	concat(c.cliloja,'-',c.clicod) id_cliente,\n" +
+            "	cast(v.data_cupom as time) horainicio,\n" +
+            "	cast(v.data_cupom as time) horafim,\n" +
+            "	case when v.cancelado = 'S' then 1 else 0 end cancelado,\n" +
+            "	v.cpf_cnpj,\n" +
+            "	v.serie numeroserie,\n" +
+            "	v.modelo_documento_fiscal,\n" +
+            "	c.clinome nomecliente\n" +
+            "from\n" +
+            "	hip_cupom v\n" +
+            "	left join clicli c on\n" +
+            "		c.clicpfcnpj = nullif(v.cpf_cnpj,1) \n" +
+            "where	\n" +
+            "	v.loja = " + idLojaCliente + " and\n" +
+            "	cast(v.data_cupom as date) >= '{DATA_INICIO}' and\n" +
+            "	cast(v.data_cupom as date) <= '{DATA_TERMINO}'\n" +
+            "order by\n" +
+            "	v.id";
 
     }
     
     private static class CustomNextBuilder implements NextBuilder<VendaIMP> {
         @Override
-        public VendaIMP makeNext(ResultSet rst) throws Exception {
+        public VendaIMP makeNext(ResultSet rs) throws Exception {
             VendaIMP next = new VendaIMP();
-            String id = makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("numerocupom"));
-            next.setId(id);
-            next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-            next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-            next.setData(rst.getDate("data"));
-            String horaInicio = TIMESTAMP_DATE.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-            String horaTermino = TIMESTAMP_DATE.format(rst.getDate("data")) + " " + rst.getString("horatermino");
-            next.setHoraInicio(TIMESTAMP.parse(horaInicio));
-            next.setHoraTermino(TIMESTAMP.parse(horaTermino));
-            next.setCancelado("S".equals(rst.getString("cancelado")));
-            next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+            
+            next.setId(rs.getString("id"));
+            next.setNumeroCupom(Utils.stringToInt(rs.getString("numero")));
+            next.setEcf(Utils.stringToInt(rs.getString("caixa")));
+            next.setData(rs.getDate("data_cupom"));
+            next.setIdClientePreferencial(rs.getString("id_cliente"));
+            next.setHoraInicio(rs.getTime("horainicio"));
+            next.setHoraTermino(rs.getTime("horafim"));
+            next.setCancelado(rs.getBoolean("cancelado"));
+            next.setCpf(rs.getString("cpf_cnpj"));
+            next.setNumeroSerie(rs.getString("numeroserie"));
+            next.setNomeCliente(rs.getString("nomecliente"));
+            
             return next;
         }
     }

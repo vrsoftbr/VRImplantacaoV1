@@ -480,6 +480,8 @@ public class VendaRepository {
                 
                 provider.gerarECFs();
                 
+                provider.gerarConsistencia();
+                
                 provider.commit();
                 return true;
             } else {

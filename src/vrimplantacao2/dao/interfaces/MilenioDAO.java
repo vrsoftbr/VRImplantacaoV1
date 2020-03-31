@@ -6,15 +6,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
+import vrimplantacao2.vo.importacao.ClienteContatoIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -225,6 +233,57 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }        
+        return result;
+    }
+    
+    public static class TipoDocumento {
+        public String id;
+        public String descricao;
+        public boolean selecionado;
+        public TipoDocumento(String id, String descricao, boolean selecionado) {
+            this.id = id;
+            this.descricao = descricao;
+            this.selecionado = selecionado;
+        }
+        @Override
+        public String toString() {
+            return id + " - " + descricao;
+        }
+    }
+
+    public List<TipoDocumento> getTiposDocumentos() throws Exception {
+        List<TipoDocumento> result = new ArrayList<>();
+        
+        if (ConexaoSqlServer.getConexao() != null && !ConexaoSqlServer.getConexao().isClosed()) {
+            String text = Parametros.get().getWithNull("", "Milenio", "ROTATIVOS");        
+            Set<String> selecteds = new LinkedHashSet<>(
+                    !"".equals(text) ?
+                    Arrays.asList(text.split(",")) :
+                    new HashSet()
+                     
+            );
+
+            try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	TIPDOCCOD id,\n" +
+                        "	TIPDOCDES descricao\n" +
+                        "FROM\n" +
+                        "	TIPO_DOCUMENTO td\n" +
+                        "order by\n" +
+                        "	TIPDOCCOD"
+                )) {
+                    while (rs.next()) {
+                        result.add(new TipoDocumento(
+                                rs.getString("id"),
+                                rs.getString("descricao"),
+                                selecteds.contains(rs.getString("id"))
+                        ));
+                    }
+                }
+            }
+        }
+        
         return result;
     }
     
@@ -536,59 +595,12 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 int cont1 = 0, cont2 = 0;
                 while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();                    
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
                     
                     ProdutoMilenio m = estoque.get(rs.getString("REFPLU"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    if (m != null) {
-                        imp.setCustoSemImposto(m.custoSemImposto);
-                        imp.setCustoComImposto(m.custoComImposto);
-                        imp.setPrecovenda(m.precoVenda);
-                        if (m.atacado > 0 && m.qtdAtacado > 1) {
-                            imp.setAtacadoPreco(m.atacado);
-                            imp.setQtdEmbalagem(m.qtdAtacado);
-                        }
-                        imp.setPiscofinsCstCredito(m.pisCofinsCredito);
-                        imp.setPiscofinsCstDebito(m.pisCofinsDebito);
-                        imp.setPiscofinsNaturezaReceita(m.naturezaReceita);
-                        imp.setEstoque(m.estoque);
+                    result.add(converterProdutoIMP(rs, m, false));
+                    if (m.atacado > 0 && m.qtdAtacado > 1) {
+                        result.add(converterProdutoIMP(rs, m, true));
                     }
-                    
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdunidadecotacao"));
-                    imp.setTipoEmbalagemCotacao(rs.getString("unidadecotacao"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.seteBalanca(rs.getBoolean("pesavel"));
-                    imp.setValidade(rs.getInt("validade"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(rs.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setIdFamiliaProduto(rs.getString("id_familia"));
-                    imp.setPesoBruto(rs.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
-                    imp.setSituacaoCadastro(rs.getInt("ativo"));
-                    imp.setDescontinuado(rs.getBoolean("descontinuado"));
-                    imp.setNcm(rs.getString("ncm"));
-                    imp.setCest(rs.getString("cest"));
-                    imp.setFornecedorFabricante(rs.getString("fabricante"));
-                    imp.setMargem(rs.getDouble("margem"));
-                    imp.setProdutoECommerce(rs.getBoolean("enviaweb"));
-                    imp.setIcmsDebitoId(rs.getString("id_icms"));
-                    imp.setIcmsDebitoForaEstadoId(rs.getString("id_icms"));
-                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms"));
-                    imp.setIcmsCreditoId(rs.getString("id_icms"));
-                    imp.setIcmsCreditoForaEstadoId(rs.getString("id_icms"));
-                    
-                    result.add(imp);
                     
                     cont1++;
                     cont2++;
@@ -601,6 +613,63 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    private ProdutoIMP converterProdutoIMP(ResultSet rs, ProdutoMilenio m, boolean isAtacado) throws Exception {
+        ProdutoIMP imp = new ProdutoIMP();
+                    
+        imp.setImportSistema(getSistema());
+        imp.setImportLoja(getLojaOrigem());
+        imp.setImportId(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
+        
+        imp.setEan(rs.getString("ean"));
+        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));  
+        if (m != null) {
+            imp.setCustoSemImposto(m.custoSemImposto);
+            imp.setCustoComImposto(m.custoComImposto);
+            imp.setPrecovenda(m.precoVenda);
+            imp.setPiscofinsCstCredito(m.pisCofinsCredito);
+            imp.setPiscofinsCstDebito(m.pisCofinsDebito);
+            imp.setPiscofinsNaturezaReceita(m.naturezaReceita);
+            imp.setEstoque(m.estoque);
+            if (isAtacado) {
+                imp.setEan("999999" + imp.getImportId());
+                imp.setQtdEmbalagem(m.qtdAtacado);
+                imp.setAtacadoPreco(m.atacado);
+            }
+        }
+
+        
+        imp.setDataCadastro(rs.getDate("datacadastro"));
+        imp.setDataAlteracao(rs.getDate("dataalteracao"));
+        imp.setQtdEmbalagemCotacao(rs.getInt("qtdunidadecotacao"));
+        imp.setTipoEmbalagemCotacao(rs.getString("unidadecotacao"));
+        imp.setTipoEmbalagem(rs.getString("unidade"));
+        imp.seteBalanca(rs.getBoolean("pesavel"));
+        imp.setValidade(rs.getInt("validade"));
+        imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+        imp.setDescricaoGondola(rs.getString("descricaocompleta"));
+        imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+        imp.setCodMercadologico1(rs.getString("merc1"));
+        imp.setCodMercadologico2(rs.getString("merc2"));
+        imp.setCodMercadologico3(rs.getString("merc3"));
+        imp.setIdFamiliaProduto(rs.getString("id_familia"));
+        imp.setPesoBruto(rs.getDouble("pesobruto"));
+        imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+        imp.setSituacaoCadastro(rs.getInt("ativo"));
+        imp.setDescontinuado(rs.getBoolean("descontinuado"));
+        imp.setNcm(rs.getString("ncm"));
+        imp.setCest(rs.getString("cest"));
+        imp.setFornecedorFabricante(rs.getString("fabricante"));
+        imp.setMargem(rs.getDouble("margem"));
+        imp.setProdutoECommerce(rs.getBoolean("enviaweb"));
+        imp.setIcmsDebitoId(rs.getString("id_icms"));
+        imp.setIcmsDebitoForaEstadoId(rs.getString("id_icms"));
+        imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms"));
+        imp.setIcmsCreditoId(rs.getString("id_icms"));
+        imp.setIcmsCreditoForaEstadoId(rs.getString("id_icms"));
+        
+        return imp;
     }
 
     @Override
@@ -768,6 +837,285 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            Map<String, List<ClienteContatoIMP>> contatos = new HashMap<>();
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.AGECOD id_cliente,\n" +
+                    "	c.CNTNOM nome,\n" +
+                    "	c.CNTTEL telefone,\n" +
+                    "	c.CNTCEL celular,\n" +
+                    "	c.CNTMAIL email\n" +
+                    "from\n" +
+                    "	contato c\n" +
+                    "	join agente a on\n" +
+                    "		c.AGECOD = a.AGECOD\n" +
+                    "	join CLIENTE cl on\n" +
+                    "		cl.AGECOD = a.AGECOD\n" +
+                    "order by\n" +
+                    "   id_cliente"
+            )) {
+                while (rs.next()) {
+                    List<ClienteContatoIMP> list = contatos.get(rs.getString("id_cliente"));
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        contatos.put(rs.getString("id_cliente"), list);
+                    }
+                    ClienteContatoIMP imp = new ClienteContatoIMP();
+                    
+                    imp.setId("CONT" + (list.size() + 1));                    
+                    imp.setCliente(null); 
+                    imp.setNome(rs.getString("nome"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email"));
+                    
+                    list.add(imp);
+                }
+            }
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	ag.AGECOD id,\n" +
+                    "	ag.AGECGCCPF cnpj,\n" +
+                    "	ag.AGECGFRG ierg,\n" +
+                    "	ag.AGEORGEXP orgaoemissor,\n" +
+                    "	ag.AGEDES razao,\n" +
+                    "	ag.AGEFAN fantasia,\n" +
+                    "	ag.AGEINSMUN inscmun,\n" +
+                    "	1 ativo,\n" +
+                    "	case when ag.STACOD = '002' then 1 else 0 end bloqueado,\n" +
+                    "	ag.AGEDATBLO databloqueio,\n" +
+                    "	ag.AGEEND endereco,\n" +
+                    "	ag.AGENUM numero,\n" +
+                    "	ag.AGECPL complemento,\n" +
+                    "	ag.AGEBAI bairro,\n" +
+                    "	ag.AGECID cidade,\n" +
+                    "	ag.AGEEST estado,\n" +
+                    "	ag.AGECEP cep,\n" +
+                    "	c.CLIESTCIV estadocivil,\n" +
+                    "	c.CLIDATNAS datanascimento,\n" +
+                    "	ag.AGEDATCAD datacadastro,\n" +
+                    "	ag.AGEDATALT dataalteracao,\n" +
+                    "	c.CLISEX sexo,\n" +
+                    "	c.CLIEMP empresa,\n" +
+                    "	c.CLIEMPEND enderecoempresa,\n" +
+                    "	c.CLIEMPTEL telempresa,\n" +
+                    "	c.CLIDATFUN dataadmissao,\n" +
+                    "	c.CLIREN salario,\n" +
+                    "	c.CLILIMCRE limitecredito,\n" +
+                    "	c.CLICONJG conjuge,\n" +
+                    "	c.CLICONJGCPF conjugecpf,\n" +
+                    "	c.CLIMAE mae,\n" +
+                    "	c.CLIPAI pai,\n" +
+                    "	c.CLISITOBS observacoes,\n" +
+                    "	c.CLIDIAFECH diavencimento,\n" +
+                    "	ag.AGETEL1,\n" +
+                    "	ag.AGETEL2,\n" +
+                    "	ag.AGEFAX \n" +
+                    "from\n" +
+                    "	CLIENTE c\n" +
+                    "	join AGENTE ag on\n" +
+                    "		c.AGECOD = ag.AGECOD\n" +
+                    "order by\n" +
+                    "	ag.AGECOD"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ierg"));
+                    imp.setOrgaoemissor(rs.getString("orgaoemissor"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setInscricaoMunicipal(rs.getString("inscmun"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setDataBloqueio(rs.getDate("databloqueio"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEstadoCivil(rs.getString("estadocivil"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    //imp.set(rs.getString("dataalteracao"));
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setEmpresaEndereco(rs.getString("enderecoempresa"));
+                    imp.setEmpresaTelefone(rs.getString("telempresa"));
+                    imp.setDataAdmissao(rs.getDate("dataadmissao"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setValorLimite(rs.getDouble("limitecredito"));
+                    imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setCpfConjuge(rs.getString("conjugecpf"));
+                    imp.setNomeMae(rs.getString("mae"));
+                    imp.setNomePai(rs.getString("pai"));
+                    imp.setObservacao2(rs.getString("observacoes"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    imp.setTelefone(rs.getString("AGETEL1"));
+                    imp.addTelefone("TELEFONE 2", rs.getString("AGETEL2"));
+                    imp.setFax(rs.getString("AGEFAX"));
+                    
+                    List<ClienteContatoIMP> cont = contatos.get(rs.getString("id"));
+                    if (cont != null) {
+                        for (ClienteContatoIMP c: cont) {
+                            c.setCliente(imp);
+                            imp.getContatos().add(c);
+                        }
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private List<TipoDocumento> tipoDocumento = new ArrayList<>();
+    public void setTipoDocumento(List<TipoDocumento> tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+    private String getTipoDocumento() {
+        StringBuilder builder = new StringBuilder();
+        for (Iterator<TipoDocumento> iterator = tipoDocumento.iterator(); iterator.hasNext(); ) {
+            TipoDocumento str = iterator.next();
+            builder.append("'").append(str.id).append("'");
+            if (iterator.hasNext())
+                builder.append(",");
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            String sql = "SELECT\n" +
+                    "	concat(tr.LOJCOD,'-',tr.TIFCOD) id,\n" +
+                    "	tr.TIFDATEMI dataemissao,\n" +
+                    "	tr.TIFNUMDOC numerocupom,\n" +
+                    "	tr.TIFVLRNOM valor,\n" +
+                    "	tr.TIFOBS observacoes,\n" +
+                    "	tr.AGECOD id_clientepreferencial,\n" +
+                    "	tr.TIFDATVNC vencimento,\n" +
+                    "	tr.TIFPARATU parcela,\n" +
+                    "	tr.TIFVLRJUR juros,\n" +
+                    "	COALESCE(TIFVLRPAG,0) valorpago,\n" +
+                    "	tr.TIPDOCCOD\n" +
+                    "FROM\n" +
+                    "	V_TITULO_RECEBER tr\n" +
+                    "	JOIN AGENTE c ON\n" +
+                    "		tr.AGECOD = c.AGECOD\n" +
+                    "	join CLIENTE cl on\n" +
+                    "		cl.AGECOD = c.AGECOD\n" +
+                    "WHERE\n" +
+                    "	COALESCE(TIFVLRPAG,0) < COALESCE(TIFVLRNOM,0)\n" +
+                    "	AND TR.TIFSTA = 'N'\n" +
+                    "	AND TR.TIFSIT in ('A','P')\n" +
+                    "	AND tr.LOJCOD = '" + getLojaOrigem() + "'\n" +
+                    "	and tr.TIPDOCCOD in (" + getTipoDocumento() + ")\n" +
+                    "ORDER BY\n" +
+                    "	TIFDATEMI";
+            try (ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacoes"));
+                    imp.setIdCliente(rs.getString("id_clientepreferencial"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    if (rs.getDouble("valorpago") > 0) {
+                        imp.addPagamento(
+                                imp.getId(),
+                                rs.getDouble("valorpago"),
+                                0,
+                                0,
+                                rs.getDate("dataemissao"),
+                                ""
+                        );
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT\n" +
+                    "	concat(ch.LOJCOD,'-',ch.TIFCOD) id,\n" +
+                    "	ch.CHRCHQNUM numerocheque,\n" +
+                    "	ch.CHRNUMBCO banco,\n" +
+                    "	ch.CHRNUMAGE agencia,\n" +
+                    "	ch.CHRNUMCTA conta,\n" +
+                    "	ch.TIFDATEMI emissao,\n" +
+                    "	ch.TIFDATVNC vencimento,\n" +
+                    "	ch.TIFNUMDOC numerocupom,\n" +
+                    "	ch.TIFVLRNOM valor,\n" +
+                    "	ag.AGECGFRG rg,\n" +
+                    "	coalesce(ch.CHREMICPF, ag.AGECGCCPF) cpf,\n" +
+                    "	ag.AGETEL1 telefone,\n" +
+                    "	ch.TIFOBS observacao,\n" +
+                    "	ch.TIFVLRJUR juros,\n" +
+                    "	ch.TIFVLRACR acrescimo\n" +
+                    "FROM\n" +
+                    "	V_CHEQUE_RECEBER ch\n" +
+                    "	LEFT JOIN AGENTE ag ON\n" +
+                    "		ch.AGECOD = ag.AGECOD\n" +
+                    "WHERE\n" +
+                    "	ch.TIFDATPGT IS NULL\n" +
+                    "	AND ch.LOJCOD = '" + getLojaOrigem() + "'\n" +
+                    "order by\n" +
+                    "	ch.TIFDATVNC"
+            )) {
+                while (rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();                    
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCheque(rs.getString("numerocheque"));
+                    imp.setBanco(Utils.stringToInt(rs.getString("banco")));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setConta(rs.getString("conta"));
+                    imp.setDataDeposito(rs.getDate("emissao"));
+                    imp.setDate(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setValorJuros(rs.getDouble("juros"));
+                    imp.setValorAcrescimo(rs.getDouble("acrescimo"));
                     
                     result.add(imp);
                 }

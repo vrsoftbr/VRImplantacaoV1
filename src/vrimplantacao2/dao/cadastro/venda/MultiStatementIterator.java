@@ -72,12 +72,12 @@ public class MultiStatementIterator<T> implements Iterator<T> {
 
     private void callNext() throws Exception {
         try {
-            if (!nextExecutado) {
+            if (!nextExecutado) {                
                 if (activeStatement == null) {
                     nextStatement();
                 }
                 hasNext = activeRst.next();            
-                if (!hasNext) {
+                while (!hasNext && !statements.isEmpty()) {
                     nextStatement();
                     if (!rstFechado) {
                         hasNext = activeRst.next();
