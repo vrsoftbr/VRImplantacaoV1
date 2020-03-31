@@ -1557,7 +1557,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "DTENTRADA "
                   + "FROM PAGAR "
                   + "where CODLOJA = " + getLojaOrigem() + " "
-                    + "and DTPAGTO IS NULL "
+                    + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL "
                   + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {
