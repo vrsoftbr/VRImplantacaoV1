@@ -634,6 +634,7 @@ public class VendaRepository {
         item.setUnidadeMedida(imp.getUnidadeMedida());
         item.setSequencia(imp.getSequencia());
         item.setTipoDesconto(imp.getTipoDesconto());
+        item.setOferta(imp.isOferta());
  
         return item;
     
