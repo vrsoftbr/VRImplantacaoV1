@@ -30,6 +30,7 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoProduto;
 
 public class GetWayGUI extends VRInternalFrame {
@@ -280,6 +281,14 @@ public class GetWayGUI extends VRInternalFrame {
                         if (chkMercadologico.isSelected()) {
                             importador.importarMercadologico();
                         }
+                        if (chkPauta.isSelected()) {
+                            List<OpcaoFiscal> opcoes = new ArrayList<>();
+                            
+                            opcoes.add(OpcaoFiscal.NOVOS);
+                            opcoes.add(OpcaoFiscal.USAR_IDPRODUTO);
+                            
+                            importador.importarPautaFiscal(opcoes.toArray(new OpcaoFiscal[]{}));
+                        }
                         if (chkProdutos.isSelected()) {
                             getWayDAO.setDesconsiderarSetorBalanca(chkDesconsiderarSetorBalanca.isSelected());
                             getWayDAO.setPesquisarKGnaDescricao(chkPesquisarKG.isSelected());
@@ -382,13 +391,17 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkUsaMargemLiquida.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
-                            
+
                             if (chkTipoProduto.isSelected()) {
                                 opcoes.add(OpcaoProduto.TIPO_PRODUTO);
                             }
-                            
+
                             if (chkDtAlteracao.isSelected()) {
                                 opcoes.add(OpcaoProduto.DATA_ALTERACAO);
+                            }
+
+                            if (chkPautaProduto.isSelected()) {
+                                opcoes.add(OpcaoProduto.EXCECAO);
                             }
 
                             if (!opcoes.isEmpty()) {
@@ -619,6 +632,8 @@ public class GetWayGUI extends VRInternalFrame {
         chkUsaMargemLiquida = new vrframework.bean.checkBox.VRCheckBox();
         chkMargemSobreVenda = new javax.swing.JCheckBox();
         chkTipoProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkPauta = new vrframework.bean.checkBox.VRCheckBox();
+        chkPautaProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -1012,6 +1027,12 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkTipoProduto.setText("Tipo Produto");
         vRPanel7.add(chkTipoProduto);
+
+        chkPauta.setText("Pauta Fiscal");
+        vRPanel7.add(chkPauta);
+
+        chkPautaProduto.setText("Pauta Fiscal x Produto");
+        vRPanel7.add(chkPautaProduto);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1759,6 +1780,8 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     private vrframework.bean.checkBox.VRCheckBox chkOfertas;
     private vrframework.bean.checkBox.VRCheckBox chkPagamentoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkPauta;
+    private vrframework.bean.checkBox.VRCheckBox chkPautaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPermiteRotativoCheque;
     private vrframework.bean.checkBox.VRCheckBox chkPesquisarKG;

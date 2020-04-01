@@ -38,10 +38,12 @@ import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
@@ -54,6 +56,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -464,6 +467,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (utilizaMetodoAjustaAliquota) {
                         acertaAliquota(imp);
                     }
+                    
+                    imp.setPautaFiscalId(imp.getImportId());
 
                     vResult.add(imp);
                 }
@@ -471,6 +476,90 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             LOG.fine("Produtos de balança: " + qtdBalanca + " normais: " + qtdNormal);
         }
         return vResult;
+    }
+    
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	CODPROD id,\n" +
+                    "	p.descricao,\n" +
+                    "	p.barra ean,\n" +
+                    "	coalesce(p.codncm, 0) ncm,\n" +
+                    "	p.CODALIQ icms_consumidor_id,\n" +
+                    "	aliq_s_c.VALORTRIB icms_consumidor,\n" +
+                    "	CODALIQ_NF icms_debito_nf_id,\n" +
+                    "	codtrib cst_debito_nf,\n" +
+                    "	aliq_s_nf.VALORTRIB icms_debito_nf,\n" +
+                    "	PER_REDUC icms_debito_red_nf,\n" +
+                    "	coalesce(PER_REDUC_ENT, 0) icms_credito_red,\n" +
+                    "	coalesce(CODTRIB_ENT, 0) cst_credito,\n" +
+                    "	coalesce(ULTICMSCRED, 0) icms_credito,\n" +
+                    "	p.PERMVA mva\n" +
+                    "from\n" +
+                    "	PRODUTOS p\n" +
+                    "left join ALIQUOTA_ICMS aliq_s_nf on p.CODALIQ_NF = aliq_s_nf.CODALIQ\n" +
+                    "left join ALIQUOTA_ICMS aliq_s_c on p.CODALIQ = aliq_s_c.CODALIQ\n" +
+                    "where\n" +
+                    "	p.PERMVA > 0\n" +
+                    "order by\n" +
+                    "	p.DESCRICAO")) {
+                while (rs.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                    imp.setIva(rs.getDouble("mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    
+                    double icms = rs.getDouble("icms_credito"),
+                            reducao = rs.getDouble("icms_credito_red"); 
+                    String cst = rs.getString("cst_credito");
+                    
+                    //Verificação de ICMS tributado
+                    if(icms > 0.0 && reducao == 0.0) {
+                        System.out.println("ICMS T: " + icms + " RED: " + reducao + " CST: " + cst);
+                        imp.setAliquotaCredito(0, icms, reducao);
+                        imp.setAliquotaCreditoForaEstado(0, icms, reducao);
+                        imp.setAliquotaDebito(0, icms, reducao);
+                        imp.setAliquotaDebitoForaEstado(0, icms, reducao);
+                    }
+                    
+                    //Verificação de ICMS Substítuido
+                    if(icms == 0.0 && reducao == 0.0) {
+                        System.out.println("ICMS S: " + icms + " RED: " + reducao + " CST: " + cst);
+                        imp.setAliquotaCredito(60, icms, reducao);
+                        imp.setAliquotaCreditoForaEstado(60, icms, reducao);
+                        imp.setAliquotaDebito(60, icms, reducao);
+                        imp.setAliquotaDebitoForaEstado(60, icms, reducao);
+                    }
+                    
+                    //Verificação de ICMS com redução na BC
+                    if(icms > 0.0 && reducao > 0.0) {
+                        System.out.println("ICMS RED: " + icms + " RED: " + reducao + " CST: " + cst);
+                        imp.setAliquotaCredito(20, icms, reducao);
+                        imp.setAliquotaCreditoForaEstado(20, icms, reducao);
+                        imp.setAliquotaDebito(20, icms, reducao);
+                        imp.setAliquotaDebitoForaEstado(20, icms, reducao);
+                    }
+                    
+                    //Verificação de Isenção de ICMS
+                    if(icms == 0.0 && reducao == 0.0 && "040".equals(cst)) {
+                        System.out.println("ICMS IS: " + icms + " RED: " + reducao + " CST: " + cst);
+                        imp.setAliquotaCredito(40, icms, reducao);
+                        imp.setAliquotaCreditoForaEstado(40, icms, reducao);
+                        imp.setAliquotaDebito(40, icms, reducao);
+                        imp.setAliquotaDebitoForaEstado(40, icms, reducao);
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     /*
@@ -1468,7 +1557,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "DTENTRADA "
                   + "FROM PAGAR "
                   + "where CODLOJA = " + getLojaOrigem() + " "
-                    + "and DTPAGTO IS NULL "
+                    + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL "
                   + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {
