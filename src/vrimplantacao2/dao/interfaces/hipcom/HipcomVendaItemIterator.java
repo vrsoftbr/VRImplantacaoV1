@@ -135,7 +135,7 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 next.setUnidadeMedida(prod.embalagem);
                 next.setCodigoBarras(prod.ean);
             } else {
-                next.setProduto("");
+                next.setProduto(ean);
                 next.setDescricaoReduzida("SEM DESCRICAO");
                 next.setUnidadeMedida("UN");
                 next.setCodigoBarras(ean);
