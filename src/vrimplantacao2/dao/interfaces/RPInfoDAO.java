@@ -553,43 +553,43 @@ public class RPInfoDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	f.forn_codigo id,\n" +
-                    "	f.forn_nome nomefantasia,\n" +
-                    "	f.forn_razaosocial razaosocial,\n" +
-                    "	f.forn_cnpjcpf cnpjcpf,\n" +
-                    "	f.forn_inscricaoestadual ierg,\n" +
-                    "	f.forn_inscricaomunicipal inscmun,\n" +
-                    "	f.forn_status,\n" +
-                    "	f.forn_endereco endereco,\n" +
-                    "	f.forn_endereconumero numero,\n" +
-                    "	f.forn_enderecocompl complemento,\n" +
-                    "	f.forn_enderecoind,\n" +
-                    "	f.forn_bairro bairro,\n" +
-                    "	m.muni_codigoibge municipioIBGE,\n" +
-                    "	m.muni_nome municipio,\n" +
-                    "	m.muni_uf uf,\n" +
-                    "	f.forn_cep cep,\n" +
-                    "	f.forn_fone,\n" +
-                    "	f.forn_foneindustria,\n" +
-                    "	f.forn_fax,\n" +
-                    "	f.forn_faxindustria,\n" +
-                    "	f.forn_email email,\n" +
-                    "	f.forn_datacad datacadastro,\n" +
-                    "	f.forn_obspedidos,\n" +
-                    "	f.forn_obstrocas,\n" +
-                    "	f.forn_caractrib tipofornecedor,\n" +
-                    "	fc.rfor_pzentrega prazo_entrega,\n" +
-                    "	fc.rfor_pzrecebimento prazo_recebimento,\n" +
-                    "	fp.fpgt_prazos forma_pagamento\n" +
-                    "from\n" +
-                    "	fornecedores f\n" +
-                    "	left join municipios m on\n" +
-                    "		f.forn_muni_codigo = m.muni_codigo\n" +
-                    "	left join regforn fc on f.forn_codigo = fc.rfor_forn_codigo\n" +
-                    "	left join fpgto fp on fc.rfor_fpgt_codigo = fp.fpgt_codigo\n" +
-                    "order by\n" +
-                    "	id"
+                    "select\n"
+                    + "	f.forn_codigo id,\n"
+                    + "	f.forn_nome nomefantasia,\n"
+                    + "	f.forn_razaosocial razaosocial,\n"
+                    + "	f.forn_cnpjcpf cnpjcpf,\n"
+                    + "	f.forn_inscricaoestadual ierg,\n"
+                    + "	f.forn_inscricaomunicipal inscmun,\n"
+                    + "	f.forn_status,\n"
+                    + "	f.forn_endereco endereco,\n"
+                    + "	f.forn_endereconumero numero,\n"
+                    + "	f.forn_enderecocompl complemento,\n"
+                    + "	f.forn_enderecoind,\n"
+                    + "	f.forn_bairro bairro,\n"
+                    + "	m.muni_codigoibge municipioIBGE,\n"
+                    + "	m.muni_nome municipio,\n"
+                    + "	m.muni_uf uf,\n"
+                    + "	f.forn_cep cep,\n"
+                    + "	f.forn_fone,\n"
+                    + "	f.forn_foneindustria,\n"
+                    + "	f.forn_fax,\n"
+                    + "	f.forn_faxindustria,\n"
+                    + "	f.forn_email email,\n"
+                    + "	f.forn_datacad datacadastro,\n"
+                    + "	f.forn_obspedidos,\n"
+                    + "	f.forn_obstrocas,\n"
+                    + "	f.forn_caractrib tipofornecedor,\n"
+                    + "	fc.rfor_pzentrega prazo_entrega,\n"
+                    + "	fc.rfor_pzrecebimento prazo_recebimento,\n"
+                    + "	fp.fpgt_prazos forma_pagamento\n"
+                    + "from\n"
+                    + "	fornecedores f\n"
+                    + "	left join municipios m on\n"
+                    + "		f.forn_muni_codigo = m.muni_codigo\n"
+                    + "	left join regforn fc on f.forn_codigo = fc.rfor_forn_codigo\n"
+                    + "	left join fpgto fp on fc.rfor_fpgt_codigo = fp.fpgt_codigo\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -653,14 +653,14 @@ public class RPInfoDAO extends InterfaceDAO {
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                     }
-                    
+
                     imp.setPrazoEntrega(rst.getInt("prazo_entrega"));
                     imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("forma_pagamento")));
-                    
+
                     addContatoFornecedor(imp);
-                    
+
                     imp.addDivisao(imp.getImportId(), 0, imp.getPrazoEntrega(), 0);
-                    
+
                     result.add(imp);
                 }
             }
@@ -685,11 +685,11 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "where \n"
                     + "	cfor_forn_codigo = " + imp.getImportId())) {
                 while (rs.next()) {
-                    imp.addContato(rs.getString("id"), 
+                    imp.addContato(rs.getString("id"),
                             rs.getString("contato"),
-                            rs.getString("telefone"), 
-                            rs.getString("celular"), 
-                            TipoContato.NFE, 
+                            rs.getString("telefone"),
+                            rs.getString("celular"),
+                            TipoContato.NFE,
                             rs.getString("email"));
                 }
             }
@@ -721,7 +721,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	c.clie_cepres cep,\n"
                     + "	c.clie_estadocivil estadocivil,\n"
                     + "	c.clie_dtcad datacadastro,\n"
-                    + "   c.clie_dtnasc datanascimento,\n"
+                    + " c.clie_dtnasc datanascimento,\n"
                     + "	c.clie_sexo sexo,\n"
                     + "	c.clie_empresa empresa,\n"
                     + "	c.clie_endcom com_endereco,\n"
@@ -742,7 +742,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	c.clie_funcao cargo,\n"
                     + "	c.clie_rendacomprovada renda,\n"
                     + "	c.clie_limiteconv,\n"
-                    + "c.clie_limitecheque,\n"
+                    + " c.clie_limitecheque,\n"
                     + "	c.clie_obs observacao,\n"
                     + "	c.clie_diavenc diavencimento,\n"
                     + "	c.clie_sitconv permitecreditorotativo,\n"
@@ -811,73 +811,159 @@ public class RPInfoDAO extends InterfaceDAO {
             if (importarFuncionario) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "	f.func_codigo id,\n"
-                        + "	f.func_cpf cnpj,\n"
-                        + "	f.func_rg ierg,\n"
-                        + "	f.func_nome nome,\n"
-                        + "	f.func_nome fantasia,\n"
-                        + "	f.func_situacao,\n"
+                        + "	cast(c.clie_codigo as varchar) id,\n"
+                        + "	c.clie_cnpjcpf cnpjcpf,\n"
+                        + "	c.clie_rgie inscricaoestadual,\n"
+                        + "	c.clie_orgexprg orgaoemissor,\n"
+                        + "	c.clie_razaosocial razaosocial,\n"
+                        + "	c.clie_nome nomefantasia,\n"
+                        + "	c.clie_status,\n"
+                        + "	c.clie_situacao,\n"
+                        + "	c.clie_endres endereco,\n"
+                        + "	c.clie_endresnumero numero,\n"
+                        + "	c.clie_endrescompl complemento,\n"
+                        + "	c.clie_bairrores bairro,\n"
+                        + "	mr.muni_codigoibge municipioIBGE,\n"
+                        + "	mr.muni_nome municipio,\n"
+                        + "	mr.muni_uf uf,\n"
+                        + "	c.clie_cepres cep,\n"
+                        + "	c.clie_estadocivil estadocivil,\n"
+                        + "	c.clie_dtcad datacadastro,\n"
+                        + "   	c.clie_dtnasc datanascimento,\n"
+                        + "	c.clie_sexo sexo,\n"
+                        + "	c.clie_empresa empresa,\n"
+                        + "	c.clie_endcom com_endereco,\n"
+                        + "	c.clie_endcomnumero com_numero,\n"
+                        + "	c.clie_endcomcompl com_compl,\n"
+                        + "	c.clie_bairrocom com_bairro,\n"
+                        + "	mc.muni_codigoibge com_municipioIBGE,\n"
+                        + "	mc.muni_nome com_municipio,\n"
+                        + "	mc.muni_uf com_uf,\n"
+                        + "	c.clie_cepcom com_cep,\n"
+                        + "	c.clie_foneres,\n"
+                        + "	c.clie_fonecel,\n"
+                        + "	c.clie_fonecom,\n"
+                        + "	c.clie_fonecelcom,\n"
+                        + "	c.clie_email,\n"
+                        + "	c.clie_emailnfe,\n"
+                        + "	c.clie_dtadmissao dataadmissao,\n"
+                        + "	c.clie_funcao cargo,\n"
+                        + "	c.clie_rendacomprovada renda,\n"
+                        + "	c.clie_limiteconv,\n"
+                        + "	c.clie_limitecheque,\n"
+                        + "	c.clie_obs observacao,\n"
+                        + "	c.clie_diavenc diavencimento,\n"
+                        + "	c.clie_sitconv permitecreditorotativo,\n"
+                        + "	c.clie_sitcheque permitecheque,\n"
+                        + "	c.clie_senhapdv senhapdv\n"
+                        + "from\n"
+                        + "	clientes c\n"
+                        + "	left join municipios mr on\n"
+                        + "		c.clie_muni_codigo_res = mr.muni_codigo\n"
+                        + "	left join municipios mc on\n"
+                        + "		c.clie_muni_codigo_com = mc.muni_codigo\n"
+                        + "union all\n"
+                        + "select \n"
+                        + "	'FUN' || '' || cast(f.func_codigo as varchar) as id,\n"
+                        + "	f.func_cpf cnpjcpf,\n"
+                        + "	f.func_rg inscricaoestadual,\n"
+                        + "	f.func_rgexp orgaoemissor,\n"
+                        + "	f.func_nome razaosocial,\n"
+                        + "	'' nomefantasia,\n"
+                        + "	'N' clie_status,\n"
+                        + "	'N' clie_situacao,\n"
                         + "	f.func_endereco endereco,\n"
                         + "	f.func_endereconumero numero,\n"
                         + "	f.func_enderecocompl complemento,\n"
                         + "	f.func_bairro bairro,\n"
-                        + "	m.muni_codigoibge ibge_municipio,\n"
-                        + "	m.muni_nome municipio,\n"
-                        + "	m.muni_uf estado,\n"
+                        + "	mr.muni_codigoibge municipioIBGE,\n"
+                        + "	mr.muni_nome municipio,\n"
+                        + "	mr.muni_uf uf,\n"
                         + "	f.func_cep cep,\n"
-                        + "	f.func_estcivil,\n"
+                        + "	f.func_estcivil estadocivil,\n"
                         + "	f.func_dtcad datacadastro,\n"
                         + "	f.func_nasci datanascimento,\n"
                         + "	f.func_sexo sexo,\n"
+                        + "	'' empresa,\n"
+                        + "	'' com_endereco,\n"
+                        + "	'' com_numero,\n"
+                        + "	'' com_compl,\n"
+                        + "	'' com_bairro,\n"
+                        + "	0 com_municipioIBGE,\n"
+                        + "	'' com_municipio,\n"
+                        + "	'' com_uf,\n"
+                        + "	0::varchar com_cep,\n"
+                        + "	f.func_telefone clie_foneres,\n"
+                        + "	f.func_celular clie_fonecel,\n"
+                        + "	0::varchar clie_fonecom,\n"
+                        + "	0::varchar clie_fonecelcom,\n"
+                        + "	f.func_email clie_email,\n"
+                        + "	'' clie_emailnfe,\n"
                         + "	f.func_admissao dataadmissao,\n"
-                        + "	f.func_salbase salario,\n"
-                        + "	f.func_limiteconv limiteconvenio,\n"
-                        + "	f.func_pai pai,\n"
-                        + "	f.func_mae mae,\n"
-                        + "	f.func_observacao observacao,\n"
-                        + "	f.func_demissao is null ativo,\n"
-                        + "	f.func_senha senha,\n"
-                        + "	f.func_telefone telefone,\n"
-                        + "	f.func_celular celular,\n"
-                        + "	f.func_email email\n"
-                        + "from\n"
+                        + " 	'' cargo,\n"
+                        + " 	f.func_salbase renda,\n"
+                        + " 	f.func_limiteconv clie_limiteconv,\n"
+                        + " 	f.func_limitecheque clie_limitecheque,\n"
+                        + " 	f.func_observacao observacao,\n"
+                        + " 	0 diavencimento,\n"
+                        + " 	'N' permitecreditorotativo,\n"
+                        + " 	'N' permitecheque,\n"
+                        + " 	f.func_senha senhapdv\n"
+                        + "from \n"
                         + "	funcionarios f\n"
-                        + "	left join municipios m on\n"
-                        + "		f.func_muni_codigo = m.muni_codigo\n"
+                        + "left join municipios mr on\n"
+                        + "		f.func_muni_codigo = mr.muni_codigo\n"
+                        + "where f.func_unid_codigo = '" + getLojaOrigem() + "'\n"
                         + "order by\n"
-                        + "	f.func_codigo"
+                        + "	1"
                 )) {
                     while (rst.next()) {
                         ClienteIMP imp = new ClienteIMP();
 
                         imp.setId(rst.getString("id"));
-                        imp.setCnpj(rst.getString("cnpj"));
-                        imp.setInscricaoestadual(rst.getString("ierg"));
-                        imp.setRazao(rst.getString("nome"));
-                        imp.setFantasia(rst.getString("fantasia"));
+                        imp.setCnpj(rst.getString("cnpjcpf"));
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                        imp.setOrgaoemissor(rst.getString("orgaoemissor"));
+                        imp.setRazao(rst.getString("razaosocial"));
+                        imp.setFantasia(rst.getString("nomefantasia"));
+                        imp.setAtivo(!"S".equals(rst.getString("clie_status")));
                         imp.setEndereco(rst.getString("endereco"));
                         imp.setNumero(rst.getString("numero"));
                         imp.setComplemento(rst.getString("complemento"));
                         imp.setBairro(rst.getString("bairro"));
-                        imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                        imp.setMunicipioIBGE(rst.getInt("municipioIBGE"));
                         imp.setMunicipio(rst.getString("municipio"));
-                        imp.setUf(rst.getString("estado"));
+                        imp.setUf(rst.getString("uf"));
                         imp.setCep(rst.getString("cep"));
+                        imp.setEstadoCivil(rst.getString("estadocivil"));
                         imp.setDataCadastro(rst.getDate("datacadastro"));
                         imp.setDataNascimento(rst.getDate("datanascimento"));
                         imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                        imp.setEmpresa(rst.getString("empresa"));
+                        imp.setEmpresaEndereco(rst.getString("com_endereco"));
+                        imp.setEmpresaNumero(rst.getString("com_numero"));
+                        imp.setEmpresaComplemento(rst.getString("com_compl"));
+                        imp.setEmpresaBairro(rst.getString("com_bairro"));
+                        imp.setEmpresaMunicipioIBGE(rst.getInt("com_municipioIBGE"));
+                        imp.setEmpresaMunicipio(rst.getString("com_municipio"));
+                        imp.setEmpresaUf(rst.getString("com_uf"));
+                        imp.setEmpresaCep(rst.getString("com_cep"));
+                        imp.setTelefone(rst.getString("clie_foneres"));
+                        imp.setCelular(rst.getString("clie_fonecel"));
+                        imp.setEmpresaTelefone(rst.getString("clie_fonecom"));
+                        imp.addCelular("CEL COMERCIAL", rst.getString("clie_fonecelcom"));
+                        imp.addEmail(rst.getString("clie_email"), TipoContato.COMERCIAL);
+                        imp.addEmail(rst.getString("clie_emailnfe"), TipoContato.NFE);
                         imp.setDataAdmissao(rst.getDate("dataadmissao"));
-                        imp.setSalario(rst.getDouble("salario"));
-                        imp.setValorLimite(rst.getDouble("limiteconvenio"));
-                        imp.setNomePai(rst.getString("pai"));
-                        imp.setNomeMae(rst.getString("mae"));
+                        imp.setCargo(rst.getString("cargo"));
+                        imp.setSalario(rst.getDouble("renda"));
+                        imp.setValorLimite(rst.getDouble("clie_limiteconv") == 0 ? rst.getDouble("clie_limitecheque") : rst.getDouble("clie_limiteconv"));
                         imp.setObservacao2(rst.getString("observacao"));
-                        imp.setAtivo(rst.getBoolean("ativo"));
-                        imp.setSenha(rst.getInt("senha"));
-                        imp.setTelefone(rst.getString("telefone"));
-                        imp.setCelular(rst.getString("celular"));
-                        imp.setEmail(rst.getString("email"));
-                        imp.setObservacao("FUNCIONARIO");
+                        imp.setDiaVencimento(rst.getInt("diavencimento"));
+                        imp.setPermiteCreditoRotativo("S".equals(rst.getString("permitecreditorotativo")));
+                        imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
+                        imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
+                        imp.setBloqueado("I".equals(rst.getString("clie_situacao")));
 
                         result.add(imp);
                     }
@@ -894,7 +980,7 @@ public class RPInfoDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                      "select\n"
                     + "	pf.pfor_forn_codigo id_fornecedor,\n"
                     + "	pf.pfor_prod_codigo id_produto,\n"
                     + "	pf.pfor_codigo codigoexterno,\n"
@@ -952,7 +1038,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	pfin_dataemissao emissao,\n"
                     + "	pfin_datavcto vencimento,\n"
                     + "	pfin_pdvs_codigo ecf,\n"
-                    + "	pfin_codentidade idcliente,\n"
+                    + "	pfin_codentidade::varchar idcliente,\n"
                     + "	c.clie_razaosocial razao,\n"
                     + "	c.clie_cnpjcpf cnpj,\n"
                     + "	pfin_complemento observacao,\n"
@@ -973,7 +1059,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	pfin_dataemissao emissao,\n"
                     + "	pfin_datavcto vencimento,\n"
                     + "	pfin_pdvs_codigo ecf,\n"
-                    + "	pfin_codentidade idcliente,\n"
+                    + "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n"
                     + "	f.func_nome razao,\n"
                     + "	f.func_cpf cnpj,\n"
                     + "	pfin_complemento observacao,\n"
