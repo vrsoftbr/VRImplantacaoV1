@@ -463,7 +463,16 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                             imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                             imp.setDataCadastro(rst.getDate("datacadastro"));
-                            imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                            
+                            String qtdEmb = rst.getString("qtdembalagem");
+                            
+                            if(qtdEmb != null && !"".equals(qtdEmb)) {
+                                if(qtdEmb.length() > 6) {
+                                    imp.setQtdEmbalagemCotacao(0);
+                                } else {
+                                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                                }
+                            }
                             
                             if (rst.getDouble("margem2") > 99999999) {
                                 imp.setMargem(0);

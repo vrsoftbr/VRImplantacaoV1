@@ -212,7 +212,7 @@ public class VendaRepository {
                             divergentes.add(impItem);
                             
                         } else {
-
+                            haDivergencia = true;
                             LOG.warning(
                                     String.format(
                                             "Produto não encontrado - código:%s ean:%s descricao:%s",
@@ -221,10 +221,9 @@ public class VendaRepository {
                                             impItem.getDescricaoReduzida()
                                     )
                             );
+                            divergentes.add(impItem);
                             
-                            try {
-
-                                divergentes.add(impItem);
+                            try {                                
                                 
                                 ProdutoAnteriorVO ant = null;
                                 
@@ -412,7 +411,7 @@ public class VendaRepository {
                                 }
                             } catch (Exception ex) {
                                 throw ex;
-                            }
+                            }                            
                         }
                         
                     } else {                        
@@ -501,6 +500,7 @@ public class VendaRepository {
                 } catch (Exception ex) {
                     provider.rollback();
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                    throw ex;
                 }
 
                 return false;
@@ -634,6 +634,7 @@ public class VendaRepository {
         item.setUnidadeMedida(imp.getUnidadeMedida());
         item.setSequencia(imp.getSequencia());
         item.setTipoDesconto(imp.getTipoDesconto());
+        item.setOferta(imp.isOferta());
  
         return item;
     

@@ -377,6 +377,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (linha.existsColumn("icms_consumidor_id")) {
                     produto.setIcmsConsumidorId(linha.getString("icms_consumidor_id"));
                 }
+                produto.setBeneficio("cbeneficio");
+                produto.setCodigoGIA("cbeneficio");
                 
 
                 //ID PAUTA FISCAL                
