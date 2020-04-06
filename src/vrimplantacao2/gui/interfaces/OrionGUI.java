@@ -16,6 +16,7 @@ import vrimplantacao2.dao.interfaces.OrionDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
 
@@ -147,6 +148,15 @@ public class OrionGUI extends VRInternalFrame {
                             if (chkRotativo.isSelected()) {
                                 importador.importarCreditoRotativo();
                             }
+                        } else if (tabsImportacao.getSelectedIndex() == 3) {
+                            if ((chkVendasPdv.isSelected())
+                                    && (!txtDataInicioVendas.getText().isEmpty())
+                                    && (!txtDataTerminoVendas.getText().isEmpty())) {
+
+                                orionDAO.setDataInicioVenda(txtDataInicioVendas.getText());
+                                orionDAO.setDataTerminoVenda(txtDataTerminoVendas.getText());                                
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            }
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -201,6 +211,13 @@ public class OrionGUI extends VRInternalFrame {
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        vRPanel4 = new vrframework.bean.panel.VRPanel();
+        chkVendasPdv = new vrframework.bean.checkBox.VRCheckBox();
+        txtDataInicioVendas = new vrframework.bean.textField.VRTextField();
+        vRLabel3 = new vrframework.bean.label.VRLabel();
+        vRLabel4 = new vrframework.bean.label.VRLabel();
+        txtDataTerminoVendas = new vrframework.bean.textField.VRTextField();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -361,6 +378,71 @@ public class OrionGUI extends VRInternalFrame {
         );
 
         tabsImportacao.addTab("Clientes", vRPanel9);
+
+        chkVendasPdv.setText("Vendas Pdv");
+
+        vRLabel3.setText("Data Início");
+
+        vRLabel4.setText("Data Término");
+
+        javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
+        vRPanel4.setLayout(vRPanel4Layout);
+        vRPanel4Layout.setHorizontalGroup(
+            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkVendasPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel4Layout.createSequentialGroup()
+                        .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDataInicioVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDataTerminoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(458, Short.MAX_VALUE))
+        );
+        vRPanel4Layout.setVerticalGroup(
+            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(vRPanel4Layout.createSequentialGroup()
+                        .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDataTerminoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel4Layout.createSequentialGroup()
+                        .addComponent(chkVendasPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7)
+                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDataInicioVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(122, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 640, Short.MAX_VALUE)
+            .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(vRPanel1Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 235, Short.MAX_VALUE)
+            .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(vRPanel1Layout.createSequentialGroup()
+                    .addGap(0, 0, Short.MAX_VALUE)
+                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
+        );
+
+        tabsImportacao.addTab("Vendas", vRPanel1);
 
         tabs.addTab("Importação", tabsImportacao);
 
@@ -571,6 +653,7 @@ public class OrionGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkVendasPdv;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -580,12 +663,18 @@ public class OrionGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.tabbedPane.VRTabbedPane tabsImportacao;
+    private vrframework.bean.textField.VRTextField txtDataInicioVendas;
+    private vrframework.bean.textField.VRTextField txtDataTerminoVendas;
     private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtLojaCliente;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel25;
+    private vrframework.bean.label.VRLabel vRLabel3;
+    private vrframework.bean.label.VRLabel vRLabel4;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
+    private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.panel.VRPanel vRPanel9;

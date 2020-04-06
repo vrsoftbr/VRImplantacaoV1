@@ -548,25 +548,25 @@ public class OrionDAO extends InterfaceDAO {
         return result;
     }
 
-    private Date dataInicioVenda;
-    private Date dataTerminoVenda;
+    private String dataInicioVenda;
+    private String dataTerminoVenda;
 
-    public void setDataInicioVenda(Date dataInicioVenda) {
+    public void setDataInicioVenda(String dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
 
-    public void setDataTerminoVenda(Date dataTerminoVenda) {
+    public void setDataTerminoVenda(String dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new VendaIterator(dataInicioVenda, dataTerminoVenda);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new VendaItemIterator(dataInicioVenda, dataTerminoVenda);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -586,79 +586,27 @@ public class OrionDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("id") + rst.getString("ecf") + rst.getString("datavenda");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
+
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
+                        next.setData(rst.getDate("datavenda"));
+                        next.setIdClientePreferencial(rst.getString("idcliente"));
 
-                        String endereco;
-
-                        if ((rst.getString("vc_clientepreferencial") != null)
-                                && (!rst.getString("vc_clientepreferencial").trim().isEmpty())) {
-
-                            if (!"0".equals(rst.getString("vc_clientepreferencial").trim())) {
-
-                                next.setCpf(rst.getString("cli_cpf"));
-                                next.setNomeCliente(rst.getString("cli_nomecliente"));
-                                next.setIdClientePreferencial(rst.getString("vc_clientepreferencial"));
-
-                                endereco
-                                        = Utils.acertarTexto(rst.getString("cli_endereco")) + ","
-                                        + Utils.acertarTexto(rst.getString("cli_numero")) + ","
-                                        + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                        + Utils.acertarTexto(rst.getString("cli_bairro")) + ","
-                                        + Utils.acertarTexto(rst.getString("cli_cidade")) + "-"
-                                        + Utils.acertarTexto(rst.getString("cli_estado")) + ","
-                                        + Utils.acertarTexto(rst.getString("cli_cep"));
-                                next.setEnderecoCliente(endereco);
-                            } else {
-
-                                next.setCpf(rst.getString("vc_cpf"));
-                                next.setNomeCliente(rst.getString("vc_nomecliente"));
-                                next.setIdClientePreferencial(null);
-
-                                endereco
-                                        = Utils.acertarTexto(rst.getString("vc_endereco")) + ","
-                                        + Utils.acertarTexto(rst.getString("vc_numero")) + ","
-                                        + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                        + Utils.acertarTexto(rst.getString("vc_bairro")) + ","
-                                        + Utils.acertarTexto(rst.getString("vc_cidade")) + "-"
-                                        + Utils.acertarTexto(rst.getString("vc_estado")) + ","
-                                        + Utils.acertarTexto(rst.getString("vc_cep"));
-                                next.setEnderecoCliente(endereco);
-                            }
-                        } else {
-
-                            next.setCpf(rst.getString("vc_cpf"));
-                            next.setNomeCliente(rst.getString("vc_nomecliente"));
-                            next.setIdClientePreferencial(null);
-
-                            endereco
-                                    = Utils.acertarTexto(rst.getString("vc_endereco")) + ","
-                                    + Utils.acertarTexto(rst.getString("vc_numero")) + ","
-                                    + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                    + Utils.acertarTexto(rst.getString("vc_bairro")) + ","
-                                    + Utils.acertarTexto(rst.getString("vc_cidade")) + "-"
-                                    + Utils.acertarTexto(rst.getString("vc_estado")) + ","
-                                    + Utils.acertarTexto(rst.getString("vc_cep"));
-                            next.setEnderecoCliente(endereco);
-                        }
-
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horafim");
+                        next.setCancelado("Cancelado".equals(rst.getString("status")));
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        next.setSubTotalImpressora(rst.getDouble("totalvenda"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setNumeroSerie(rst.getString("numeroserie"));
-                        next.setModeloImpressora(rst.getString("modelo"));
-                        next.setChaveCfe(rst.getString("ChaveCfe"));
+                        next.setNumeroSerie(rst.getString("seriesat"));
+                        next.setChaveCfe(rst.getString("chavesat"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -667,10 +615,9 @@ public class OrionDAO extends InterfaceDAO {
             }
         }
 
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+        public VendaIterator(String dataInicio, String dataTermino) throws Exception {
             this.sql
                     = "select \n"
-                    + "	top 100 \n"
                     + "	v.codigo as id,\n"
                     + "	v.codcli as idcliente,\n"
                     + "	v.cupom as numerocupom,\n"
@@ -731,24 +678,54 @@ public class OrionDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("id_venda");
-                        String id = rst.getString("id") + "-" + rst.getString("id_venda");
+                        String idVenda = rst.getString("idvenda") + rst.getString("ecf") + rst.getString("datavenda");
+                        String id = rst.getString("idvenda")
+                                + rst.getString("ecf")
+                                + rst.getString("datavenda")
+                                + rst.getString("idproduto")
+                                + rst.getString("sequencia");
 
                         next.setId(id);
                         next.setVenda(idVenda);
-                        next.setProduto(rst.getString("produto"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setProduto(rst.getString("idproduto"));
+                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setDescricaoReduzida(rst.getString("descricaoproduto"));
+                        next.setQuantidade(rst.getDouble("qtdembalagem"));
+                        next.setTotalBruto(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setCancelado("Cancelado".equals(rst.getString("status")));
                         next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
+                        next.setUnidadeMedida(rst.getString("tipoembalagem"));
+                        
+                        String trib = "";
+                        
+                        if (rst.getInt("cst") == 40) {
+                            trib = "F";
+                        } else if (rst.getInt("cst") == 41) {
+                            trib = "N";
+                        } else if (rst.getInt("cst") == 60) {
+                            trib = "F";
+                        } else if (rst.getInt("cst") == 0) {
 
-                        String trib = Utils.acertarTexto(rst.getString("codaliq_venda"));
-                        if (trib == null || "".equals(trib)) {
-                            trib = Utils.acertarTexto(rst.getString("codaliq_produto"));
+                            if (rst.getDouble("aliquota") == 7) {
+                                trib = "0700";
+                            } else if (rst.getDouble("aliquota") == 11) {
+                                trib = "1100";
+                            } else if (rst.getDouble("aliquota") == 4.5) {
+                                trib = "0450";
+                            } else if (rst.getDouble("aliquota") == 12) {
+                                trib = "1200";
+                            } else if (rst.getDouble("aliquota") == 18) {
+                                trib = "1800";
+                            } else if (rst.getDouble("aliquota") == 25) {
+                                trib = "2500";
+                            } else if (rst.getDouble("aliquota") == 27) {
+                                trib = "2700";
+                            } else if (rst.getDouble("aliquota") == 17) {
+                                trib = "1700";
+                            } else {
+                                trib = "0";
+                            }
                         }
 
                         obterAliquota(next, trib);
@@ -780,9 +757,17 @@ public class OrionDAO extends InterfaceDAO {
             int cst;
             double aliq;
             switch (icms) {
+                case "0450":
+                    cst = 0;
+                    aliq = 4.5;
+                    break;
                 case "0700":
                     cst = 0;
                     aliq = 7;
+                    break;
+                case "1100":
+                    cst = 0;
+                    aliq = 11;
                     break;
                 case "1200":
                     cst = 0;
@@ -795,10 +780,6 @@ public class OrionDAO extends InterfaceDAO {
                 case "2500":
                     cst = 0;
                     aliq = 25;
-                    break;
-                case "1100":
-                    cst = 0;
-                    aliq = 11;
                     break;
                 case "F":
                     cst = 60;
@@ -817,16 +798,16 @@ public class OrionDAO extends InterfaceDAO {
             item.setIcmsAliq(aliq);
         }
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+        public VendaItemIterator(String dataInicio, String dataTermino) throws Exception {
             this.sql
                     = "select \n"
                     + "	i.codvenda as idvenda,\n"
                     + "	i.terminal as ecf,\n"
                     + "	i.item as sequencia,\n"
                     + "	i.codplu as idproduto,\n"
-                    + "	i.codestoque as ean,\n"
+                    + "	i.codestoque as codigobarras,\n"
                     + "	i.descricao as descricaoproduto,\n"
-                    + "	i.unidade,\n"
+                    + "	upper(i.unidade) as tipoembalagem,\n"
                     + "	i.quantpeso as qtdembalagem,\n"
                     + "	i.custo,\n"
                     + "	i.venda as precovenda,\n"
