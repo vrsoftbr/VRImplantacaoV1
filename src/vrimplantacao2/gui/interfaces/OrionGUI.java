@@ -66,6 +66,7 @@ public class OrionGUI extends VRInternalFrame {
     }
 
     public void validarDadosAcesso() throws Exception {
+        connDBF.abrirConexao(txtDatabase.getText());
         gravarParametros();
         carregarLojaVR();
     }

@@ -12,7 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +48,7 @@ public class OrionDAO extends InterfaceDAO {
     public String getSistema() {
         return "Orion";
     }
-
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -92,7 +91,6 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -120,7 +118,7 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -156,7 +154,7 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -277,7 +275,7 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
@@ -377,7 +375,7 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
@@ -405,7 +403,7 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -519,7 +517,7 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -582,7 +580,7 @@ public class OrionDAO extends InterfaceDAO {
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -592,13 +590,26 @@ public class OrionDAO extends InterfaceDAO {
                         }
 
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        
+                        next.setNumeroCupom(rst.getString("numerocupom") == null
+                                ? Utils.stringToInt(rst.getString("id"))
+                                : Utils.stringToInt(rst.getString("numerocupom")));
+                        
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("datavenda"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
 
-                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horafim");
+                        /*String horaInicio = timestampDate.format(rst.getDate("datavenda"))
+                                + " "
+                                + rst.getString("horainicio") == null ? "00:00:00" : rst.getString("horainicio");
+
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda"))
+                                + " "
+                                + rst.getString("horafim") == null ? "00:00:00" : rst.getString("horafim");*/
+                        
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        
                         next.setCancelado("Cancelado".equals(rst.getString("status")));
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
@@ -683,7 +694,8 @@ public class OrionDAO extends InterfaceDAO {
                                 + rst.getString("ecf")
                                 + rst.getString("datavenda")
                                 + rst.getString("idproduto")
-                                + rst.getString("sequencia");
+                                + rst.getString("sequencia")
+                                + rst.getString("qtdembalagem");
 
                         next.setId(id);
                         next.setVenda(idVenda);
@@ -814,8 +826,8 @@ public class OrionDAO extends InterfaceDAO {
                     + "	i.desconto,\n"
                     + "	i.total as valortotal,\n"
                     + "	i.datavenda,\n"
-                    + "	i.icms,\n"
-                    + "	i.sittribut,\n"
+                    + "	i.icms as aliquota,\n"
+                    + "	i.sittribut as cst,\n"
                     + "	i.estado as status\n"
                     + "from detaven i\n"
                     + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'"
