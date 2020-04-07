@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -88,6 +90,22 @@ public class OrionDAO extends InterfaceDAO {
         ));
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        Map<String, Estabelecimento> result = new LinkedHashMap<>();
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select firma as nome, cgc as id from config"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id"), rst.getString("nome")));
+                }
+            }
+        }
+
+        return new ArrayList<>(result.values());
+    }
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -216,6 +234,7 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscst"));
                     imp.setPiscofinsCstCredito(rst.getString("cofinscst"));
+                    
                     imp.setIcmsCstSaida(rst.getInt("sittribut"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("reducao"));
@@ -231,6 +250,11 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setIcmsCstEntrada(rst.getInt("sittribut"));
                     imp.setIcmsAliqEntrada(rst.getDouble("icms"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("reducao"));
+                    
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("sittribut"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducao"));
+                    
                     imp.setDataCadastro(rst.getDate("inclusao"));
 
                     long codigoProduto;

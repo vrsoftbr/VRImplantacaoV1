@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 
@@ -90,19 +91,21 @@ public class MapaVendaDAO {
                     sql.put("descricao", descricaoReduzida);
 
                     stm.execute(sql.getInsert());
-                    
-                    sql = new SQLBuilder();
+                                        
+                    if (Parametros.get().isForcarCadastroProdutoNaoExistente()) {
 
-                    sql.setSchema("implantacao");
-                    sql.setTableName("codant_produto");
-                    sql.put("impsistema", sistema);
-                    sql.put("imploja", loja);
-                    sql.put("impid", produto);
-                    sql.put("descricao", descricaoReduzida);
-                    sql.put("obsimportacao", "PRODUTO IMPORTADO DA VENDA");
-                    sql.put("novo", true);
-                    stm.execute(sql.getInsert());
-            
+                        sql = new SQLBuilder();
+
+                        sql.setSchema("implantacao");
+                        sql.setTableName("codant_produto");
+                        sql.put("impsistema", sistema);
+                        sql.put("imploja", loja);
+                        sql.put("impid", produto);
+                        sql.put("descricao", descricaoReduzida);
+                        sql.put("obsimportacao", "PRODUTO IMPORTADO DA VENDA");
+                        sql.put("novo", true);
+                        stm.execute(sql.getInsert());
+                    }            
                 }
             }
         }
