@@ -198,7 +198,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "t.trbid,\n"
                     + "t.trbdes,\n"
-                    + "t.trbtabbcfe cst,\n"
+                    + "t.trbtabb cst,\n"
                     + "t.trbalq aliquota,\n"
                     + "t.trbred reducao\n"
                     + "from\n"
@@ -385,7 +385,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
                     + "    coalesce(p.provld, 0) validade,\n"
                     + "    p.trbid,\n"
-                    + "    p.procest cest,\n"
+                    //+ "    p.procest cest,\n"
                     + "    p.natcodigo piscofins_natrec\n"
                     + "FROM \n"
                     + "    produto p\n"
@@ -487,7 +487,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setIcmsCreditoId(rst.getString("trbid"));
                             imp.setIcmsDebitoId(rst.getString("trbid"));
 
-                            imp.setCest(rst.getString("cest"));
+                            //imp.setCest(rst.getString("cest"));
 
                             int[] pis = piscofins.get(rst.getString("id"));
 

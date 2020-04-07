@@ -393,9 +393,9 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("codigobarras"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("descricaocompleta")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("descricaoreduzida")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rst.getString("descricaogondola")));
                     
                     String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
                     String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
@@ -467,9 +467,6 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fe"));
                     imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao_debito_fe"));
                     */
-
-                    
-                    
                     imp.setPautaFiscalId(imp.getImportId());
                     
                     result.add(imp);
