@@ -66,9 +66,6 @@ public class VendaRepository {
             
             boolean haDivergencia = false;  
 
-            System.out.println(idProdutoSemUltimoDigito);
-            System.out.println(eBancoUnificado);
-   
             LOG.info("Iniciando o processo de importação das vendas");        
             LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));   
 

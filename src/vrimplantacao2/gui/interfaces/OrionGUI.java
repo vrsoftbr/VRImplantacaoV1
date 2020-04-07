@@ -175,7 +175,7 @@ public class OrionGUI extends VRInternalFrame {
 
                                 orionDAO.setDataInicioVenda(txtDataInicioVendas.getText());
                                 orionDAO.setDataTerminoVenda(txtDataTerminoVendas.getText());                                
-                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR);
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                             }
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
