@@ -24,7 +24,7 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
     
     public HipcomVendaItemIterator(boolean vendaUtilizaDigito, String idLoja, Date dataInicial, Date dataTermino) throws Exception {
         super(
-            new CustomNextBuilder(),
+            new CustomNextBuilder(vendaUtilizaDigito),
             new StatementBuilder() {
                 @Override
                 public Statement makeStatement() throws Exception {
@@ -33,108 +33,165 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             }
         );
         
-        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja, vendaUtilizaDigito), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
+        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
             this.addStatement(statement);
         }
         
     }
 
-    private String getFullSQL(String idLojaCliente, boolean vendaUtilizaDigito) throws Exception {
+    private String getFullSQL(String idLojaCliente) throws Exception {
 
         return
-                "SELECT\n" +
-                "	i.id,\n" +
+                "select\n" +
                 "	i.id_cupom,\n" +
                 "	i.sequencia,\n" +
-                "	prod.id_produto,\n" +
-                "	p.prodescres descricao,\n" +
+                "	i.codigo_plu_bar ean,\n" +
                 "	i.quantidade,\n" +
+                "	i.valor_unitario,\n" +
                 "	i.valor_total,\n" +
-                "	case when i.cancelado = 'S' then 1 else 0 end cancelado,\n" +
-                "	i.valor_desconto desconto,\n" +
-                "	0 as acrescimo,\n" +
-                "	i.eanfinal codigobarras,\n" +
-                "	substring(p.proembu, 1,2) unidade,\n" +
-                "	case substring(i.legenda,1,1)\n" +
-                "		when 'T' then 0\n" +
-                "		when '0' then 0\n" +
-                "		when 'F' then 60\n" +
-                "		when 'I' then 40\n" +
-                "		else 40\n" +
-                "	end as cst,\n" +
-                "	case substring(i.legenda,1,1)\n" +
-                "		when 'T' then i.aliquota_icms\n" +
-                "		when '0' then i.aliquota_icms\n" +
-                "		when 'F' then 0\n" +
-                "		when 'I' then 0\n" +
-                "		else 0\n" +
-                "	end as aliquota  \n" +
-                "FROM\n" +
-                "	(\n" +
-                "		select i.*, \n" +
-                (
-                    vendaUtilizaDigito ?
-                "               case\n" +
-                "			when i.codigo_plu_barras <= 999999 then left(i.codigo_plu_barras, LENGTH (i.codigo_plu_barras) - 1)\n" +
-                "			else i.codigo_plu_barras\n" +
-                "		end eanfinal" :
-                "               i.codigo_plu_barras eanfinal"
-                ) +
-                "		from\n" +
-                "			hip_cupom_item i\n" +
-                "	) i\n" +
-                "	join (\n" +
-                "		select\n" +
-                "			barcodplu id_produto,\n" +
-                "			barcodbar ean\n" +
-                "		from\n" +
-                "			hipbar ean\n" +
-                "		union\n" +
-                "		select\n" +
-                "			procodplu id_produto,\n" +
-                "			procodplu ean\n" +
-                "		from\n" +
-                "			hippro\n" +
-                "	) prod on\n" +
-                "		i.eanfinal = prod.ean\n" +
-                "	left join hippro p on\n" +
-                "		prod.id_produto = p.procodplu\n" +
-                "	join hip_cupom v on\n" +
-                "		v.id = i.id_cupom \n" +
+                "	i.valor_desconto_item,\n" +
+                "	i.item_cancelado, \n" +
+                "	i.promocao\n" +
+                "from\n" +
+                "	view_vendas_pdv_antiga i	\n" +
                 "where\n" +
-                "	v.loja = " + idLojaCliente + " and\n" +
-                "	cast(v.data_cupom as date) >= '{DATA_INICIO}' and\n" +
-                "	cast(v.data_cupom as date) <= '{DATA_TERMINO}'\n" +
-                "order BY\n" +
-                "	i.id_cupom,\n" +
-                "	i.sequencia";
-
+                "	i.`data` >= '{DATA_INICIO}' and\n" +
+                "	i.`data` <= '{DATA_TERMINO}' and\n" +
+                "	i.loja = " + idLojaCliente;
     }
     
     private static class CustomNextBuilder implements NextBuilder<VendaItemIMP> {
+        
+        private Map<String, HipProduto> produtos;
+        private boolean vendaUtilizaDigito;
+
+        public CustomNextBuilder(boolean vendaUtilizaDigito) throws Exception {
+            this.vendaUtilizaDigito = vendaUtilizaDigito;
+            try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	barcodbar ean,\n" +
+                        "	barcodplu id_produto,\n" +
+                        "	coalesce(nullif(trim(p.prodescres),''),p.prodescr) descricao,\n" +
+                        "	substring(p.proembu, 1,2) embalagem\n" +
+                        "from\n" +
+                        "	hipbar ean\n" +
+                        "	join hippro p on\n" +
+                        "		ean.barcodplu = p.procodplu\n" +
+                        "union\n" +
+                        "select\n" +
+                        "	procodplu ean,\n" +
+                        "	procodplu id_produto,\n" +
+                        "	coalesce(nullif(trim(p.prodescres),''),p.prodescr) descricao,\n" +
+                        "	substring(p.proembu, 1,2) embalagem\n" +
+                        "from\n" +
+                        "	hippro p"
+                )) {
+                    produtos = new HashMap<>();
+                    while (rs.next()) {
+                        HipProduto smProduto = new HipProduto(
+                                rs.getString("id_produto"),
+                                rs.getString("ean"),
+                                rs.getString("descricao"),
+                                rs.getString("embalagem")
+                        );
+                        produtos.put(smProduto.ean, smProduto);
+                    }
+                }
+            }
+        }
         
         @Override
         public VendaItemIMP makeNext(ResultSet rs) throws Exception {
 
             VendaItemIMP next = new VendaItemIMP();
 
-            next.setId(rs.getString("id"));
+            next.setId(rs.getString("id_cupom") + "-" + rs.getString("sequencia"));
             next.setVenda(rs.getString("id_cupom"));
+            
+            String ean = rs.getString("ean");
+            if (ean == null) ean = "";
+
+            if (ean.length() <= 7 && ean.length() > 1) {
+                String old = ean;
+                if (vendaUtilizaDigito) {
+                    ean = ean.substring(0, ean.length() - 1);
+                } else {
+                    ean = ean.substring(0, ean.length());
+                }
+                LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
+            }
+            
+            HipProduto prod = produtos.get(ean);
+            if (prod == null) {
+                ean = rs.getString("ean");
+                if (ean == null) ean = ""; 
+                prod = produtos.get(ean);
+            }
+            
+            if (prod != null) {
+                next.setProduto(prod.id);
+                next.setDescricaoReduzida(prod.descricao);
+                next.setUnidadeMedida(prod.embalagem);
+                next.setCodigoBarras(prod.ean);
+            } else {
+                next.setProduto(ean);
+                next.setDescricaoReduzida("SEM DESCRICAO");
+                next.setUnidadeMedida("UN");
+                next.setCodigoBarras(ean);
+            }
+            
+           
             next.setSequencia(rs.getInt("sequencia"));
-            next.setProduto(rs.getString("id_produto"));
-            next.setDescricaoReduzida(rs.getString("descricao"));
             next.setQuantidade(rs.getDouble("quantidade"));
             next.setTotalBruto(rs.getDouble("valor_total"));
-            next.setCancelado(rs.getBoolean("cancelado"));
-            next.setValorDesconto(rs.getDouble("desconto"));
-            next.setValorAcrescimo(rs.getDouble("acrescimo"));
-            next.setCodigoBarras(rs.getString("codigobarras"));
-            next.setUnidadeMedida(rs.getString("unidade"));
-            next.setIcmsCst(Utils.stringToInt(rs.getString("cst")));
-            next.setIcmsAliq(rs.getDouble("aliquota"));
+            next.setCancelado("S".equals(rs.getString("item_cancelado")));
+            next.setValorDesconto(rs.getDouble("valor_desconto_item"));
+            next.setOferta("S".equals(rs.getString("promocao")));
 
             return next;
         }
     }
     
+    private static class HipProduto {
+        public String id;
+        public String ean;
+        public String descricao;
+        public String embalagem;
+
+        public HipProduto(String id, String ean, String descricao, String embalagem) {
+            this.id = id;
+            this.ean = ean;
+            this.descricao = descricao;
+            this.embalagem = embalagem;
+        }
+        
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 31 * hash + Objects.hashCode(this.id);
+            hash = 31 * hash + Objects.hashCode(this.ean);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final HipProduto other = (HipProduto) obj;
+            if (!Objects.equals(this.id, other.id)) {
+                return false;
+            }
+            return Objects.equals(this.ean, other.ean);
+        }
+
+        @Override
+        public String toString() {
+            return "SmProduto{" + "id=" + id + ", ean=" + ean + ", descricao=" + descricao + '}';
+        }
+    }
 }

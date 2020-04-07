@@ -37,31 +37,33 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
 
     private String getFullSQL(String idLojaCliente) throws Exception {
 
-        return 
+        return
             "select\n" +
-            "	v.id,\n" +
-            "	v.numero,\n" +
+            "	v.id_cupom id,\n" +
+            "	v.numero_cupom,\n" +
             "	v.caixa,\n" +
-            "	v.data_cupom,\n" +
-            "	concat(c.cliloja,'-',c.clicod) id_cliente,\n" +
-            "	cast(v.data_cupom as time) horainicio,\n" +
-            "	cast(v.data_cupom as time) horafim,\n" +
-            "	case when v.cancelado = 'S' then 1 else 0 end cancelado,\n" +
-            "	v.cpf_cnpj,\n" +
-            "	v.serie numeroserie,\n" +
-            "	v.modelo_documento_fiscal,\n" +
-            "	c.clinome nomecliente\n" +
+            "	v.`data`,\n" +
+            "	min(v.hora) horainicio,\n" +
+            "	max(v.hora) horafim,\n" +
+            "	min(case when v.cupom_cancelado = 'S' then 1 else 0 end) cancelado,\n" +
+            "	sum(v.valor_total) subtotalimpressora,\n" +
+            "	sum(v.valor_acrescimo_cupom) valoracrescimo,\n" +
+            "	sum(v.valor_desconto_cupom) valordesconto,\n" +
+            "	v.serie_aparelho numeroserie,\n" +
+            "	v.tipo_fiscal modeloimpressora\n" +
             "from\n" +
-            "	hip_cupom v\n" +
-            "	left join clicli c on\n" +
-            "		c.clicpfcnpj = nullif(v.cpf_cnpj,1) \n" +
-            "where	\n" +
-            "	v.loja = " + idLojaCliente + " and\n" +
-            "	cast(v.data_cupom as date) >= '{DATA_INICIO}' and\n" +
-            "	cast(v.data_cupom as date) <= '{DATA_TERMINO}'\n" +
-            "order by\n" +
-            "	v.id";
-
+            "	view_vendas_pdv_antiga v\n" +
+            "where\n" +
+            "	v.`data` >= '{DATA_INICIO}' and\n" +
+            "	v.`data` <= '{DATA_TERMINO}' and\n" +
+            "	v.loja = " + idLojaCliente + "\n" +
+            "group by\n" +
+            "	v.id_cupom,\n" +
+            "	v.numero_cupom,\n" +
+            "	v.caixa,\n" +
+            "	v.`data`,\n" +
+            "	v.serie_aparelho,\n" +
+            "	v.tipo_fiscal";
     }
     
     private static class CustomNextBuilder implements NextBuilder<VendaIMP> {
@@ -70,16 +72,17 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
             VendaIMP next = new VendaIMP();
             
             next.setId(rs.getString("id"));
-            next.setNumeroCupom(Utils.stringToInt(rs.getString("numero")));
+            next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom")));
             next.setEcf(Utils.stringToInt(rs.getString("caixa")));
-            next.setData(rs.getDate("data_cupom"));
-            next.setIdClientePreferencial(rs.getString("id_cliente"));
+            next.setData(rs.getDate("data"));
             next.setHoraInicio(rs.getTime("horainicio"));
             next.setHoraTermino(rs.getTime("horafim"));
             next.setCancelado(rs.getBoolean("cancelado"));
-            next.setCpf(rs.getString("cpf_cnpj"));
+            next.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
+            next.setValorAcrescimo(rs.getDouble("valoracrescimo"));
+            next.setValorDesconto(rs.getDouble("valordesconto"));
             next.setNumeroSerie(rs.getString("numeroserie"));
-            next.setNomeCliente(rs.getString("nomecliente"));
+            next.setModeloImpressora(rs.getString("modeloimpressora"));
             
             return next;
         }
