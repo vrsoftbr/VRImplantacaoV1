@@ -19,18 +19,18 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.LyncisDAO;
+import vrimplantacao2.dao.interfaces.LogTECDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class LyncisGUI extends VRInternalFrame {    
+public class LogTECGUI extends VRInternalFrame {    
     
-    private static final String NOME_SISTEMA = "Lyncis";
+    private static final String NOME_SISTEMA = "LogTEC";
     private static final String SERVIDOR_SQL = "Postgres";
-    private static LyncisGUI instance;
+    private static LogTECGUI instance;
     
-    private final LyncisDAO lyncisDAO = new LyncisDAO();
+    private final LogTECDAO logtecDAO = new LogTECDAO();
     private final ConexaoPostgres connSQL = new ConexaoPostgres();
     
     private String vLojaCliente = "-1";
@@ -41,10 +41,10 @@ public class LyncisGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHostPostgres.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
-        txtBancoDadosPostgres.setText(params.getWithNull("lyncis", NOME_SISTEMA, "DATABASE"));
+        txtBancoDadosPostgres.setText(params.getWithNull("LOGTEC", NOME_SISTEMA, "DATABASE"));
         txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
-        txtSenhaPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "SENHA"));
+        txtSenhaPostgres.setText(params.getWithNull("36217900", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
@@ -71,7 +71,7 @@ public class LyncisGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private LyncisGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private LogTECGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -84,7 +84,7 @@ public class LyncisGUI extends VRInternalFrame {
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return lyncisDAO;
+                return logtecDAO;
             }
 
             @Override
@@ -150,7 +150,7 @@ public class LyncisGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: lyncisDAO.getLojas()) {
+        for (Estabelecimento loja: logtecDAO.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -172,9 +172,9 @@ public class LyncisGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    lyncisDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
+                    logtecDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
                     
-                    Importador importador = new Importador(lyncisDAO);
+                    Importador importador = new Importador(logtecDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
                     
@@ -347,7 +347,7 @@ public class LyncisGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new LyncisGUI(i_mdiFrame);
+                instance = new LogTECGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
