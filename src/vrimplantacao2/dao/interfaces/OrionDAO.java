@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -26,12 +27,14 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -569,7 +572,38 @@ public class OrionDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
 
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	e.plu as idproduto, \n"
+                    + "	e.proinivare as datainicio, \n"
+                    + "	e.profimvare as datatermino, \n"
+                    + "	e.vendavare as precovenda, \n"
+                    + "	e.promovare as precooferta \n"
+                    + "from estoque e\n"
+                    + "where e.profimvare > '2020-04-07'\n"
+                    + "order by e.proinivare"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datatermino"));
+                    imp.setPrecoNormal(rst.getDouble("precovenda"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     private String dataInicioVenda;
     private String dataTerminoVenda;
 
@@ -836,7 +870,7 @@ public class OrionDAO extends InterfaceDAO {
 
         public VendaItemIterator(String dataInicio, String dataTermino) throws Exception {
             this.sql
-                    = "select \n"
+                    = "select distinct\n"
                     + "	i.codvenda as idvenda,\n"
                     + "	i.terminal as ecf,\n"
                     + "	i.item as sequencia,\n"
@@ -855,6 +889,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	i.estado as status\n"
                     + "from detaven i\n"
                     + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'"
+                    + "and i.codplu is not null\n"
                     + "order by i.codvenda, i.terminal, i.item";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
