@@ -107,7 +107,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.OFERTA
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.CODIGO_BENEFICIO
         ));
     }
 
@@ -378,7 +379,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.base_icm_saida_ne as reducao_debito,\n" +
                     "    p.situacao_tributaria_icm_saida_fe as cst_debito_fe,\n" +
                     "    p.aliquota_icm_saida_ne as aliquota_debito_fe,\n" +
-                    "    p.base_icm_saida_fe as reducao_debito_fe\n" +
+                    "    p.base_icm_saida_fe as reducao_debito_fe,\n" +
+                    "    p.cod_beneficio_fiscal as beneficio\n" +        
                     "from\n" +
                     "    tabela_pro p\n" +
                     "    left join tabela_categ g on\n" +
@@ -393,9 +395,9 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("codigobarras"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rst.getString("descricaocompleta")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rst.getString("descricaoreduzida")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rst.getString("descricaogondola")));
                     
                     String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
                     String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
@@ -467,10 +469,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fe"));
                     imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao_debito_fe"));
                     */
-
-                    
-                    
                     imp.setPautaFiscalId(imp.getImportId());
+                    imp.setBeneficio(rst.getString("beneficio"));
                     
                     result.add(imp);
                 }
