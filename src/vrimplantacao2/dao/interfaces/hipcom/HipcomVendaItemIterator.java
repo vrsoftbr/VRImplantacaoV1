@@ -144,9 +144,9 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
            
             next.setSequencia(rs.getInt("sequencia"));
             next.setQuantidade(rs.getDouble("quantidade"));
-            next.setTotalBruto(rs.getDouble("valor_total"));
+            next.setTotalBruto(rs.getDouble("valor_total")/* + rs.getDouble("valor_desconto_item")*/);
             next.setCancelado("S".equals(rs.getString("item_cancelado")));
-            next.setValorDesconto(rs.getDouble("valor_desconto_item"));
+            //next.setValorDesconto(rs.getDouble("valor_desconto_item"));
             next.setOferta("S".equals(rs.getString("promocao")));
 
             return next;

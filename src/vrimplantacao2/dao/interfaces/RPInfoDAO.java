@@ -1010,25 +1010,6 @@ public class RPInfoDAO extends InterfaceDAO {
     }
 
     @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
