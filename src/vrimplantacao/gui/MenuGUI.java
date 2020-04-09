@@ -164,6 +164,7 @@ import vrimplantacao2.gui.interfaces.LiderNetWorkGUI;
 import vrimplantacao2.gui.interfaces.LinceGUI;
 import vrimplantacao2.gui.interfaces.LinnerGUI;
 import vrimplantacao2.gui.interfaces.LiteciGUI;
+import vrimplantacao2.gui.interfaces.LogTECGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
@@ -710,6 +711,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDevMaster = new javax.swing.JMenuItem();
         mnuVRToVR = new javax.swing.JMenuItem();
         mnuBrajanGestores = new javax.swing.JMenuItem();
+        mnuLogTec = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2145,6 +2147,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuBrajanGestores);
+
+        mnuLogTec.setText("LogTEC");
+        mnuLogTec.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLogTecActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuLogTec);
 
         mnuDatabase.add(jMenu8);
 
@@ -4488,6 +4498,10 @@ public final class MenuGUI extends VRMdiFrame {
         BrajanGestoresGUI.exibir(this);
     }//GEN-LAST:event_mnuBrajanGestoresActionPerformed
 
+    private void mnuLogTecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLogTecActionPerformed
+        LogTECGUI.exibir(this);
+    }//GEN-LAST:event_mnuLogTecActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4671,6 +4685,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLince;
     private javax.swing.JMenuItem mnuLinner;
     private javax.swing.JMenuItem mnuLiteci;
+    private javax.swing.JMenuItem mnuLogTec;
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
