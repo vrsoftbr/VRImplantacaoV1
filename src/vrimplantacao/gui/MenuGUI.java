@@ -173,6 +173,7 @@ import vrimplantacao2.gui.interfaces.MobnePdvGUI;
 import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.NATISistemasGUI;
+import vrimplantacao2.gui.interfaces.NCAGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao2.gui.interfaces.OrionTechGUI;
@@ -710,6 +711,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDevMaster = new javax.swing.JMenuItem();
         mnuVRToVR = new javax.swing.JMenuItem();
         mnuBrajanGestores = new javax.swing.JMenuItem();
+        mnuNCA = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2145,6 +2147,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuBrajanGestores);
+
+        mnuNCA.setLabel("NCA");
+        mnuNCA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuNCAActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuNCA);
 
         mnuDatabase.add(jMenu8);
 
@@ -4488,6 +4498,10 @@ public final class MenuGUI extends VRMdiFrame {
         BrajanGestoresGUI.exibir(this);
     }//GEN-LAST:event_mnuBrajanGestoresActionPerformed
 
+    private void mnuNCAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNCAActionPerformed
+        NCAGUI.exibir(this);
+    }//GEN-LAST:event_mnuNCAActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4681,6 +4695,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMrs1;
     private javax.swing.JMenuItem mnuMrs2;
     private javax.swing.JMenuItem mnuNATISistemas;
+    private javax.swing.JMenuItem mnuNCA;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuOryon;
