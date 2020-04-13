@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.awt.Frame;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
