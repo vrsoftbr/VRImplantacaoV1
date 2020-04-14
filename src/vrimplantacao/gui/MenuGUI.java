@@ -165,6 +165,7 @@ import vrimplantacao2.gui.interfaces.LinceGUI;
 import vrimplantacao2.gui.interfaces.LinnerGUI;
 import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LogTECGUI;
+import vrimplantacao2.gui.interfaces.LogusRetailGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
@@ -779,6 +780,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuContaPagar1 = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
+        mnuInformix = new javax.swing.JMenu();
+        mnuiLogusRetail = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem24 = new javax.swing.JMenuItem();
@@ -2149,6 +2152,7 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuBrajanGestores);
+
         mnuLogTec.setText("LogTEC");
         mnuLogTec.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2156,6 +2160,7 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuLogTec);
+
         mnuNCA.setLabel("NCA");
         mnuNCA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2645,6 +2650,18 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSQLite.add(mnuSQLiteSophyx);
 
         mnuDatabase.add(mnuSQLite);
+
+        mnuInformix.setText("Informix");
+
+        mnuiLogusRetail.setText("Logus Retail");
+        mnuiLogusRetail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiLogusRetailActionPerformed(evt);
+            }
+        });
+        mnuInformix.add(mnuiLogusRetail);
+
+        mnuDatabase.add(mnuInformix);
 
         mnuImpSistema.add(mnuDatabase);
 
@@ -4512,6 +4529,10 @@ public final class MenuGUI extends VRMdiFrame {
         NCAGUI.exibir(this);
     }//GEN-LAST:event_mnuNCAActionPerformed
 
+    private void mnuiLogusRetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiLogusRetailActionPerformed
+        LogusRetailGUI.exibir(this); 
+    }//GEN-LAST:event_mnuiLogusRetailActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4682,6 +4703,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuImportarNCM;
     private javax.swing.JMenuItem mnuImportarNfce;
     private javax.swing.JMenuItem mnuInfoMacStore;
+    private javax.swing.JMenu mnuInformix;
     private javax.swing.JMenuItem mnuIntellicon;
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
@@ -4771,6 +4793,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnuZpf;
+    private javax.swing.JMenuItem mnuiLogusRetail;
     private javax.swing.JMenuItem mnuiSircom;
     private javax.swing.JMenuItem mnuiSophyx;
     private javax.swing.JMenuItem mnuiSysERP;
