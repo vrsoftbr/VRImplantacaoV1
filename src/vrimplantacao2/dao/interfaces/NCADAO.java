@@ -9,10 +9,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -178,7 +180,7 @@ public class NCADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.peso_liquido,\n"
                     + "	p.cod_tribut_pdv idaliquota,\n"
                     + "	p.situacao,\n"
-                    + "	p.enviar_para_balanca pesavel,\n"
+                    + "	p.enviar_para_balanca balanca,\n"
                     + "	p.confere_peso_balanca,\n"
                     + "	p.cod_grupo_preco idfamilia,\n"
                     + "	pis_cre.cst_pis pis_credito,\n"
@@ -220,6 +222,7 @@ public class NCADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
                     imp.setIcmsDebitoId(rs.getString("idaliquota"));
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setSituacaoCadastro("A".equals(rs.getString("situacao")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
 
                     if ("S".equals(rs.getString("balanca"))) {
@@ -323,7 +326,35 @@ public class NCADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
-
+                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setIbge_municipio(rs.getInt("ibge_cidade"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setDatacadastro(rs.getDate("dt_cadastro"));
+                    
+                    String telefone = rs.getString("telefone") == null ? "" : rs.getString("telefone");
+                    String celular = rs.getString("celular") == null ? "" : rs.getString("celular");
+                    String email = rs.getString("email") == null ? "" : rs.getString("email");
+                    String emailXML = rs.getString("email_xml");
+                    
+                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
+                        imp.addContato("1", rs.getString("contato"), telefone, celular, TipoContato.NFE, email);
+                    }
+                    
+                    if(emailXML != null && !"".equals(emailXML)) {
+                        imp.addContato("2", "EMAIL XML", null, null, TipoContato.NFE, emailXML);
+                    }
+                    
+                    imp.setObservacao(rs.getString("observacao") == null ? "" : rs.getString("observacao"));
+                    
                     result.add(imp);
                 }
             }
