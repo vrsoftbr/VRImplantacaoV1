@@ -712,11 +712,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDevMaster = new javax.swing.JMenuItem();
         mnuVRToVR = new javax.swing.JMenuItem();
         mnuBrajanGestores = new javax.swing.JMenuItem();
-<<<<<<< HEAD
         mnuLogTec = new javax.swing.JMenuItem();
-=======
         mnuNCA = new javax.swing.JMenuItem();
->>>>>>> 2361b1c5d77f8f858311afd31d1bf7c467920fc4
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2153,7 +2150,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu8.add(mnuBrajanGestores);
 
-<<<<<<< HEAD
         mnuLogTec.setText("LogTEC");
         mnuLogTec.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2161,7 +2157,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuLogTec);
-=======
         mnuNCA.setLabel("NCA");
         mnuNCA.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2169,7 +2164,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuNCA);
->>>>>>> 2361b1c5d77f8f858311afd31d1bf7c467920fc4
 
         mnuDatabase.add(jMenu8);
 
@@ -4513,15 +4507,13 @@ public final class MenuGUI extends VRMdiFrame {
         BrajanGestoresGUI.exibir(this);
     }//GEN-LAST:event_mnuBrajanGestoresActionPerformed
 
-<<<<<<< HEAD
     private void mnuLogTecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLogTecActionPerformed
         LogTECGUI.exibir(this);
     }//GEN-LAST:event_mnuLogTecActionPerformed
-=======
+
     private void mnuNCAActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNCAActionPerformed
         NCAGUI.exibir(this);
     }//GEN-LAST:event_mnuNCAActionPerformed
->>>>>>> 2361b1c5d77f8f858311afd31d1bf7c467920fc4
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
