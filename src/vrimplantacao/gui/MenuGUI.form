@@ -1212,7 +1212,7 @@
                             <Property name="text" type="java.lang.String" value="LogTEC"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuLogTecActionPerformed"/>							
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuLogTecActionPerformed"/>
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuNCA">
@@ -1731,6 +1731,21 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSQLiteSophyxActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
+                    <Menu class="javax.swing.JMenu" name="mnuInformix">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Informix"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuiLogus">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Logus Retail"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuiLogusActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
