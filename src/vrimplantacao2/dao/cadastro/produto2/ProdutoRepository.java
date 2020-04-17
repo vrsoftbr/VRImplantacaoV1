@@ -409,6 +409,22 @@ public class ProdutoRepository {
                             aliquotas.put(null, prod.getId(), aliquota.getEstado().getId());
                         }
                         
+                        if (optSimples.contains(OpcaoProduto.CODIGO_BENEFICIO)) {
+                            int produtoAliquotaBeneficio = provider.aliquota().getProdutoAliquotaBeneficio(aliquota.getId()),
+                                    beneficio = provider.aliquota().getBeneficio(imp.getBeneficio()),
+                                    idProdutoAliquota = provider.aliquota().getProdutoAliquotaByProduto(prod.getId());
+                            
+                            if (produtoAliquotaBeneficio != 0 && beneficio != 0 && idProdutoAliquota != 0) {
+                                aliquota.setBeneficio(beneficio);
+                                aliquota.setId(idProdutoAliquota);
+                                provider.aliquota().atualizaBeneficio(aliquota);
+                            } else if(produtoAliquotaBeneficio == 0 && beneficio != 0 && idProdutoAliquota != 0) {
+                                aliquota.setBeneficio(beneficio);
+                                aliquota.setId(idProdutoAliquota);
+                                provider.aliquota().salvarAliquotaBeneficio(aliquota);
+                            }
+                        }
+                        
                         if (Versao.menorQue(3, 18, 1)) {
                             if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
                                 provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
@@ -883,11 +899,11 @@ public class ProdutoRepository {
         
         aliquota.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
         
-        int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
+        /*int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
         aliquota.setBeneficio(idBeneficio);                        
         if(idBeneficio != 0) {
             provider.aliquota().salvarAliquotaBeneficio(aliquota);
-        }
+        }*/
         
         return aliquota;
     }

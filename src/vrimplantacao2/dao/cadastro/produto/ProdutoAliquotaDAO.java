@@ -184,6 +184,24 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
+    
+    public void atualizarBeneficio(ProdutoAliquotaVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            
+            sql.setTableName("produtoaliquotabeneficio");
+            
+            sql.put("id_aliquota", vo.getAliquotaDebito().getId());
+            sql.put("id_beneficio", vo.getBeneficio());
+            
+            if (!sql.isEmpty()) {
+                sql.setWhere(
+                        "id_produtoaliquota = " + vo.getId());
+
+                stm.execute(sql.getUpdate());
+            }
+        }
+    }
 
     public MultiMap<Integer, Void> getAliquotas() throws Exception {
         MultiMap<Integer, Void> result = new MultiMap<>();
@@ -201,11 +219,27 @@ public class ProdutoAliquotaDAO {
         return result;
     }
     
+    public int getProdutoAliquotaByProduto(int idProduto) throws Exception {
+        int result = 0;
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id from produtoaliquota where id_produto = " + idProduto
+            )) {
+                while (rst.next()) {
+                    result = rst.getInt("id");
+                }
+            }
+        }
+
+        return result;
+    }
+    
     public int getBeneficio(String beneficio) throws Exception {
         int idBeneficio = 0;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select id from public.codigobeneficiocst where codigo = '" + beneficio + "'"
+                    "select id from codigobeneficiocst where codigo = '" + beneficio + "'"
             )) {
                 if(rst.next()) 
                     idBeneficio = rst.getInt("id");
@@ -213,6 +247,24 @@ public class ProdutoAliquotaDAO {
             }
         }
         return idBeneficio;
+    }
+    
+    public int getProdutoAliquotaBeneficio(int idProdutoAliquota) throws Exception {
+        int id = 0;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"+
+                    "   id\n"+        
+                    "from\n"+
+                        "produtoaliquotabeneficio\n"+
+                    "where\n"+
+                         "id_produtoaliquota = " + idProdutoAliquota
+            )) {
+                if(rst.next()) 
+                    id = rst.getInt("id");                
+            }
+        }
+        return id;
     }
 
 }
