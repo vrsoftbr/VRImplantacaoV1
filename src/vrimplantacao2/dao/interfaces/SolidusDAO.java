@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
@@ -78,6 +80,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(SolidusDAO.class.getName());
 
+    private TipoConexao tipoConexao;
     private Date vendasDataInicio = null;
     private Date vendasDataTermino = null;
     private Date notasDataInicio = null;
@@ -115,21 +118,20 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return sistema;
+        return this.tipoConexao.getSistema();
     }
 
-    public void setSistema(String sistema) {
-        this.sistema = sistema;
+    public void setTipoConexao(TipoConexao tipoConexao) {
+        this.tipoConexao = tipoConexao;
     }
-
-    public String sistema = "Solidus";
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
+        String tab_loja = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_loja" : "tab_loja";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select l.cod_loja, l.cod_loja || ' - ' || l.des_fantasia descricao from tab_loja l order by 1"
+                    "select l.cod_loja, l.cod_loja || ' - ' || l.des_fantasia descricao from " + tab_loja + " l order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("cod_loja"), rst.getString("descricao")));
@@ -143,8 +145,18 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
+        String tab_tributacao = "tab_tributacao",
+                tab_produto_loja = "tab_produto_loja",
+                tab_ncm_uf = "tab_ncm_uf";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_tributacao = "intersolid.tab_tributacao";
+            tab_produto_loja = "intersolid.tab_produto_loja";
+            tab_ncm_uf = "intersolid.tab_ncm_uf";
+
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "    t.cod_tributacao id,\n"
@@ -153,12 +165,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    t.val_icms aliquota,\n"
                     + "    t.val_reducao_base_calculo reducao\n"
                     + "from\n"
-                    + "    TAB_TRIBUTACAO t\n"
-                    + "    left join (select distinct cod_tributacao from tab_produto_loja) pl on\n"
+                    + "    " + tab_tributacao + " t\n"
+                    + "    left join (select distinct cod_tributacao from " + tab_produto_loja + ") pl on\n"
                     + "        pl.cod_tributacao = t.cod_tributacao\n"
-                    + "    left join (select distinct cod_tributacao from tab_ncm_uf) nuf on\n"
+                    + "    left join (select distinct cod_tributacao from " + tab_ncm_uf + ") nuf on\n"
                     + "        nuf.cod_tributacao = t.cod_tributacao\n"
-                    + "    left join (select distinct cod_trib_entrada from tab_ncm_uf) nuf2 on\n"
+                    + "    left join (select distinct cod_trib_entrada from " + tab_ncm_uf + ") nuf2 on\n"
                     + "        nuf2.cod_trib_entrada = t.cod_tributacao\n"
                     + "where\n"
                     + "    not pl.cod_tributacao is null or\n"
@@ -233,8 +245,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        String tab_cliente = "tab_cliente",
+                tab_cidade = "tab_cidade";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_cliente = "intersolid.tab_cliente";
+            tab_cidade = "intersolid.tab_cidade";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    c.cod_cliente id,\n"
@@ -257,11 +276,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    case when c.dta_inicio_bloqueio < '01.01.2000' then null else c.dta_inicio_bloqueio end databloqueio,\n"
                     + "    c.des_observacao observacao\n"
                     + "from\n"
-                    + "    tab_cliente c\n"
-                    + "    left join tab_cidade cd on\n"
+                    + "    " + tab_cliente + " c\n"
+                    + "    left join " + tab_cidade + " cd on\n"
                     + "        c.cod_cidade = cd.cod_cidade\n"
                     + "where\n"
-                    + "    c.cod_cliente in (select distinct cod_convenio from tab_cliente)\n"
+                    + "    c.cod_cliente in (select distinct cod_convenio from " + tab_cliente + ")\n"
                     + "order by\n"
                     + "    1"
             )) {
@@ -298,8 +317,19 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
+        String tab_cliente = "tab_cliente",
+                tab_cidade = "tab_cidade",
+                tab_cliente_status_pdv = "tab_cliente_status_pdv",
+                tab_loja_cliente = "tab_loja_cliente";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_cliente = "intersolid.tab_cliente";
+            tab_cidade = "intersolid.tab_cidade";
+            tab_cliente_status_pdv = "intersolid.tab_cliente_status_pdv";
+            tab_loja_cliente = "intersolid.tab_loja_cliente";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    c.cod_cliente id,\n"
@@ -316,12 +346,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.val_desconto desconto,\n"
                     + "    case lc.inativo when 'S' then 0 else 1 end ativo\n"
                     + "from\n"
-                    + "    tab_cliente c\n"
-                    + "    left join tab_cidade cd on\n"
+                    + "    " + tab_cliente + " c\n"
+                    + "    left join " + tab_cidade + " cd on\n"
                     + "        c.cod_cidade = cd.cod_cidade\n"
-                    + "    left join tab_cliente_status_pdv s on\n"
+                    + "    left join " + tab_cliente_status_pdv + " s on\n"
                     + "        c.cod_status_pdv = s.cod_status_pdv\n"
-                    + "    left join tab_loja_cliente lc on\n"
+                    + "    left join " + tab_loja_cliente + " lc on\n"
                     + "        lc.cod_cliente = c.cod_cliente and\n"
                     + "        lc.cod_loja = " + getLojaOrigem() + "\n"
                     + "where\n"
@@ -359,8 +389,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        String tab_fluxo = "tab_fluxo",
+                tab_entidade = "tab_entidade";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_fluxo = "intersolid.tab_fluxo";
+            tab_entidade = "intersolid.tab_entidade";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "    t.cod_loja,\n"
@@ -376,8 +413,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    t.dta_emissao datamovimento,\n"
                     + "    t.des_observacao observacao\n"
                     + "from\n"
-                    + "    tab_fluxo t\n"
-                    + "    left join tab_entidade e on t.cod_entidade = e.cod_entidade\n"
+                    + "    " + tab_fluxo + " t\n"
+                    + "    left join " + tab_entidade + " e on t.cod_entidade = e.cod_entidade\n"
                     + "where\n"
                     + "    t.cod_loja = " + getLojaOrigem() + "\n"
                     + "    and t.tipo_conta = 1\n"
@@ -418,10 +455,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
+        String tab_produto_similar = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_produto_similar" : "tab_produto_similar";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select cod_produto_similar, des_produto_similar from tab_produto_similar order by 1"
+                    "select cod_produto_similar, des_produto_similar from " + tab_produto_similar + " order by 1"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -442,8 +480,17 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
+        String tab_secao = "tab_secao",
+                tab_grupo = "tab_grupo",
+                tab_subgrupo = "tab_subgrupo";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_secao = "intersolid.tab_secao";
+            tab_grupo = "intersolid.tab_grupo";
+            tab_subgrupo = "intersolid.tab_subgrupo";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    s.cod_secao merc1,\n"
@@ -453,9 +500,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    sg.cod_sub_grupo merc3,\n"
                     + "    sg.des_sub_grupo merc3_desc\n"
                     + "from\n"
-                    + "    tab_secao s\n"
-                    + "    left join tab_grupo g on g.cod_secao = s.cod_secao\n"
-                    + "    left join tab_subgrupo sg on sg.cod_secao = g.cod_secao and sg.cod_grupo = g.cod_grupo\n"
+                    + "    " + tab_secao + " s\n"
+                    + "    left join " + tab_grupo + " g on g.cod_secao = s.cod_secao\n"
+                    + "    left join " + tab_subgrupo + " sg on sg.cod_secao = g.cod_secao and sg.cod_grupo = g.cod_grupo\n"
                     + "order by\n"
                     + "    merc1, merc2, merc3"
             )) {
@@ -482,8 +529,29 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        String tab_produto_fornecedor = "tab_produto_fornecedor",
+                tab_produto = "tab_produto",
+                tab_loja = "tab_loja",
+                tab_codigo_barra = "tab_codigo_barra",
+                tab_divisao_fornecedor = "tab_divisao_fornecedor",
+                tab_produto_loja = "tab_produto_loja",
+                tab_ncm = "tab_ncm",
+                tab_cest = "tab_cest",
+                tab_tributacao = "tab_tributacao";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_produto_fornecedor = "intersolid.tab_produto_fornecedor";
+            tab_produto = "intersolid.tab_produto";
+            tab_loja = "intersolid.tab_loja";
+            tab_codigo_barra = "intersolid.tab_codigo_barra";
+            tab_divisao_fornecedor = "intersolid.tab_divisao_fornecedor";
+            tab_produto_loja = "intersolid.tab_produto_loja";
+            tab_ncm = "intersolid.tab_ncm";
+            tab_cest = "intersolid.tab_cest";
+            tab_tributacao = "intersolid.tab_tributacao";
+        }
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    p.cod_produto id,\n"
@@ -496,14 +564,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.dias_validade validade,\n"
                     + "    p.des_produto decricaocompleta,\n"
                     + "    coalesce(p.des_reduzida, p.des_produto) descricaoreduzida,\n"
-                    + "    (select first 1\n"
+                    + "    (select " + (tipoConexao == TipoConexao.FIREBIRD ? "first 1 " : "") +"\n"
                     + "        cod_fornecedor\n"
                     + "    from\n"
-                    + "        tab_produto_fornecedor\n"
+                    + "        " + tab_produto_fornecedor + "\n"
                     + "    where\n"
                     + "        flg_preferencial = 'S'\n"
                     + "        and cod_produto = p.cod_produto\n"
-                    + "        and cod_loja = loja.cod_loja) fabricante,\n"
+                    + "        and cod_loja = loja.cod_loja " + (tipoConexao == TipoConexao.ORACLE ? "and rownum = 1 " : "") + ") fabricante,\n"
                     + "    p.cod_secao,\n"
                     + "    p.cod_grupo, \n"
                     + "    p.cod_sub_grupo,\n"
@@ -535,31 +603,31 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pl.val_pauta_iva,\n"
                     + "    div.cod_divisao divisao\n"
                     + "from\n"
-                    + "    tab_produto p\n"
-                    + "    join tab_loja loja on loja.cod_loja = " + getLojaOrigem() + "\n"
+                    + "    " + tab_produto + " p\n"
+                    + "    join " + tab_loja + " loja on loja.cod_loja = " + getLojaOrigem() + "\n"
                     + "    left join (\n"
                     + "        select\n"
                     + "            cod_produto,\n"
                     + "            cod_barra_principal ean\n"
                     + "        from\n"
-                    + "            tab_produto\n"
+                    + "            " + tab_produto + "\n"
                     + "        union\n"
                     + "        select\n"
                     + "            cod_produto,\n"
                     + "            cod_ean\n"
                     + "        from\n"
-                    + "            tab_codigo_barra\n"
+                    + "            " + tab_codigo_barra + "\n"
                     + "    ) ean on p.cod_produto = ean.cod_produto\n"
                     + "    left join (select distinct\n"
                     + "        pf.cod_produto,\n"
                     + "        max(df.cod_divisao) cod_divisao\n"
                     + "    from\n"
-                    + "        tab_divisao_fornecedor df\n"
-                    + "        join tab_produto_fornecedor pf on\n"
+                    + "        " + tab_divisao_fornecedor + " df\n"
+                    + "        join " + tab_produto_fornecedor + " pf on\n"
                     + "            df.cod_fornecedor = pf.cod_fornecedor\n"
                     + "    group by\n"
-                    + "        1) div on p.cod_produto = div.cod_produto\n"
-                    + "    left join tab_produto_loja pl on\n"
+                    + "        pf.cod_produto) div on p.cod_produto = div.cod_produto\n"
+                    + "    left join " + tab_produto_loja + " pl on\n"
                     + "        p.cod_produto = pl.cod_produto and\n"
                     + "        pl.cod_loja = loja.cod_loja\n"
                     + "    left join (\n"
@@ -572,17 +640,17 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "                cod_produto,\n"
                     + "                min(COD_NCM) cod_ncm\n"
                     + "            from\n"
-                    + "                tab_produto_loja\n"
+                    + "                " + tab_produto_loja + "\n"
                     + "            group by\n"
                     + "                cod_produto) pl\n"
-                    + "            left join tab_ncm ncm on\n"
+                    + "            left join " + tab_ncm + " ncm on\n"
                     + "                pl.cod_ncm = ncm.cod_ncm\n"
-                    + "            left join tab_cest cest on\n"
+                    + "            left join " + tab_cest + " cest on\n"
                     + "                ncm.cod_cest = cest.cod_cest\n"
                     + "    ) ncmcest on p.cod_produto = ncmcest.cod_produto\n"
-                    + "    left join tab_tributacao trib on\n"
+                    + "    left join " + tab_tributacao + " trib on\n"
                     + "        pl.cod_tributacao = trib.cod_tributacao\n"
-                    + "    left join tab_tributacao tribent on\n"
+                    + "    left join " + tab_tributacao + " tribent on\n"
                     + "        pl.cod_trib_entrada = tribent.cod_tributacao\n"
                     + "order by\n"
                     + "    id"
@@ -648,8 +716,19 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
+        String tab_fornecedor = "tab_fornecedor",
+                tab_cidade = "tab_cidade",
+                tab_fornecedor_bloqueio = "tab_fornecedor_bloqueio",
+                tab_loja_fornecedor = "tab_loja_fornecedor";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_fornecedor = "intersolid.tab_fornecedor";
+            tab_cidade = "intersolid.tab_cidade";
+            tab_fornecedor_bloqueio = "intersolid.tab_fornecedor_bloqueio";
+            tab_loja_fornecedor = "intersolid.tab_loja_fornecedor";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    f.cod_fornecedor id,\n"
@@ -683,12 +762,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.num_med_cpgto condicaopagamento,\n"
                     + "    case lf.inativo when 'S' then 1 else 0 end ativo\n"
                     + "from\n"
-                    + "    tab_fornecedor f\n"
-                    + "    left join tab_cidade cd on\n"
+                    + "    " + tab_fornecedor + " f\n"
+                    + "    left join " + tab_cidade + " cd on\n"
                     + "        f.cod_cidade = cd.cod_cidade \n"
-                    + "    left join tab_fornecedor_bloqueio bloq on\n"
+                    + "    left join " + tab_fornecedor_bloqueio + " bloq on\n"
                     + "        f.cod_fornecedor = bloq.cod_fornecedor\n"
-                    + "    left join tab_loja_fornecedor lf on\n"
+                    + "    left join " + tab_loja_fornecedor + " lf on\n"
                     + "        lf.cod_fornecedor = f.cod_fornecedor and\n"
                     + "        lf.cod_loja = " + getLojaOrigem() + "\n"
                     + "order by\n"
@@ -721,15 +800,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setObservacao(
                             new StringBuilder()
-                            .append("CONTATO ").append(rst.getString("des_contato"))
-                            .append(" FONE.: ").append(rst.getString("tel_principal"))
-                            .append(" CEL.: ").append(rst.getString("celular"))
-                            .append(" FAX.: ").append(rst.getString("num_fax"))
-                            .append(" EMAIL VEND.: ").append(rst.getString("email_vendedor"))
-                            .append(" OUTROS EMAIL: ").append(rst.getString("des_email"))
-                            .append(" BLOQ.: ").append(rst.getString("des_motivo_bloq"))
-                            .append(" OBS.: ").append(rst.getString("observacao"))
-                            .toString()
+                                    .append("CONTATO ").append(rst.getString("des_contato"))
+                                    .append(" FONE.: ").append(rst.getString("tel_principal"))
+                                    .append(" CEL.: ").append(rst.getString("celular"))
+                                    .append(" FAX.: ").append(rst.getString("num_fax"))
+                                    .append(" EMAIL VEND.: ").append(rst.getString("email_vendedor"))
+                                    .append(" OUTROS EMAIL: ").append(rst.getString("des_email"))
+                                    .append(" BLOQ.: ").append(rst.getString("des_motivo_bloq"))
+                                    .append(" OBS.: ").append(rst.getString("observacao"))
+                                    .toString()
                     );
 
                     if (!"".equals(Utils.acertarTexto(rst.getString("des_contato")))
@@ -746,9 +825,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.addEmail("E-MAIL COMERCIAL", email, TipoContato.COMERCIAL);
                         }
                     }
-                    for (String email : rst.getString("des_email").split(";")) {
-                        if (email != null && !email.equals("")) {
-                            imp.addEmail("NFE", email, TipoContato.NFE);
+                    
+                    if ((rst.getString("des_email") != null)
+                            && (!rst.getString("des_email").trim().isEmpty())) {
+
+                        for (String email : rst.getString("des_email").split(";")) {
+                            if (email != null && !email.equals("")) {
+                                imp.addEmail("NFE", email, TipoContato.NFE);
+                            }
                         }
                     }
 
@@ -775,16 +859,26 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
+        String tab_produto_historico = "tab_produto_historico",
+                tab_produto_loja = "tab_produto_loja";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_produto_historico = "intersolid.tab_produto_historico";
+            tab_produto_loja = "intersolid.tab_produto_loja";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "    pl.cod_produto,\n"
-                    + "    (select dta_ult_alt_preco_venda from tab_produto_historico where cod_loja = pl.cod_loja and cod_produto = pl.cod_produto) dtinicio,\n"
+                    + "    (select dta_ult_alt_preco_venda "
+                    + "       from " + tab_produto_historico + " "
+                    + "      where cod_loja = pl.cod_loja "
+                    + "        and cod_produto = pl.cod_produto) dtinicio,\n"
                     + "    pl.dta_valida_oferta,\n"
                     + "    pl.val_oferta\n"
                     + "from\n"
-                    + "    tab_produto_loja pl\n"
+                    + "    " + tab_produto_loja + " pl\n"
                     + "where\n"
                     + "    pl.cod_loja = " + getLojaOrigem() + "\n"
                     + "    and not pl.dta_valida_oferta is null\n"
@@ -811,8 +905,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        String tab_produto_fornecedor = "tab_produto_fornecedor",
+                tab_divisao_fornecedor = "tab_divisao_fornecedor";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_produto_fornecedor = "intersolid.tab_produto_fornecedor";
+            tab_divisao_fornecedor = "intersolid.tab_divisao_fornecedor";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    pf.cod_fornecedor,\n"
@@ -823,10 +924,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    coalesce(nullif(max(pf.qtd_embalagem_compra),0), 1) qtd_embalagem_compra,\n"
                     + "    max(pf.val_custo_embalagem) / coalesce(nullif(max(pf.qtd_embalagem_compra),0), 1) val_custo_embalagem\n"
                     + "from\n"
-                    + "    tab_produto_fornecedor pf\n"
-                    + "    left join tab_divisao_fornecedor div on\n"
+                    + "    " + tab_produto_fornecedor + " pf\n"
+                    + "    left join " + tab_divisao_fornecedor + " div on\n"
                     + "        div.cod_fornecedor = pf.cod_fornecedor\n"
-                    + "where trim(pf.des_referencia) != ''\n"
+                    //+ "where trim(pf.des_referencia) != ''\n"
                     + "group by\n"
                     + "    pf.cod_fornecedor,\n"
                     + "    pf.cod_produto,\n"
@@ -858,8 +959,19 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
+        String tab_cliente = "tab_cliente",
+                tab_cidade = "tab_cidade",
+                tab_cliente_status_pdv = "tab_cliente_status_pdv",
+                tab_loja_cliente = "tab_loja_cliente";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_cliente = "intersolid.tab_cliente";
+            tab_cidade = "intersolid.tab_cidade";
+            tab_cliente_status_pdv = "intersolid.tab_cliente_status_pdv";
+            tab_loja_cliente = "intersolid.tab_loja_cliente";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    c.cod_cliente id,\n"
@@ -899,12 +1011,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    sta.des_status_pdv observacao1,\n"
                     + "    case lc.inativo when 'S' then 0 else 1 end ativo\n"
                     + "from\n"
-                    + "    tab_cliente c\n"
-                    + "    left join tab_cidade cd on\n"
+                    + "    " + tab_cliente + " c\n"
+                    + "    left join " + tab_cidade + " cd on\n"
                     + "        c.cod_cidade = cd.cod_cidade\n"
-                    + "    left join tab_cliente_status_pdv sta on\n"
+                    + "    left join " + tab_cliente_status_pdv + " sta on\n"
                     + "        c.cod_status_pdv = sta.cod_status_pdv\n"
-                    + "    left join tab_loja_cliente lc on\n"
+                    + "    left join " + tab_loja_cliente + " lc on\n"
                     + "        lc.cod_cliente = c.cod_cliente and\n"
                     + "        lc.cod_loja = " + getLojaOrigem() + "\n"
                     + "where\n"
@@ -951,12 +1063,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setObservacao2(
                             new StringBuilder()
-                            .append(" FONE.: ").append(rst.getString("num_fone"))
-                            .append(" CEL.: ").append(rst.getString("num_celular"))
-                            .append(" FAX.: ").append(rst.getString("num_fax"))
-                            .append(" EMAIL.: ").append(rst.getString("des_email"))
-                            .append(" OBS.: ").append(rst.getString("observacao2"))
-                            .toString()
+                                    .append(" FONE.: ").append(rst.getString("num_fone"))
+                                    .append(" CEL.: ").append(rst.getString("num_celular"))
+                                    .append(" FAX.: ").append(rst.getString("num_fax"))
+                                    .append(" EMAIL.: ").append(rst.getString("des_email"))
+                                    .append(" OBS.: ").append(rst.getString("observacao2"))
+                                    .toString()
                     );
 
                     result.add(imp);
@@ -1007,8 +1119,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
+        String tab_fluxo = "tab_fluxo",
+                tab_entidade = "tab_entidade";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_fluxo = "intersolid.tab_fluxo";
+            tab_entidade = "intersolid.tab_entidade";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    f.cod_loja,\n"
@@ -1028,8 +1147,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.num_cgc_cpf cpf,\n"
                     + "    f.cod_entidade || ' - ' || e.des_entidade pagamento\n"
                     + "from\n"
-                    + "    tab_fluxo f\n"
-                    + "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n"
+                    + "    " + tab_fluxo + " f\n"
+                    + "    left join " + tab_entidade + " e on f.cod_entidade = e.cod_entidade\n"
                     + "where\n"
                     + "    f.cod_loja = " + getLojaOrigem() + "\n"
                     + "    and f.tipo_conta = 1\n"
@@ -1073,8 +1192,17 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
+        String tab_fluxo = "tab_fluxo",
+                tab_entidade = "tab_entidade",
+                tab_cliente = "tab_cliente";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_fluxo = "intersolid.tab_fluxo";
+            tab_entidade = "intersolid.tab_entidade";
+            tab_cliente = "intersolid.tab_cliente";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n"
@@ -1090,9 +1218,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.des_cliente nome,\n"
                     + "    f.des_observacao\n"
                     + "from\n"
-                    + "    tab_fluxo f\n"
-                    + "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n"
-                    + "    left join tab_cliente c on f.cod_parceiro = c.cod_cliente\n"
+                    + "    " + tab_fluxo + " f\n"
+                    + "    left join " + tab_entidade + " e on f.cod_entidade = e.cod_entidade\n"
+                    + "    left join " + tab_cliente + " c on f.cod_parceiro = c.cod_cliente\n"
                     + "where\n"
                     + "    f.cod_loja = " + getLojaOrigem() + "\n"
                     + "    and f.tipo_conta = 1\n"
@@ -1127,8 +1255,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
+        String tab_fluxo = "tab_fluxo",
+                tab_entidade = "tab_entidade";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_fluxo = "intersolid.tab_fluxo";
+            tab_entidade = "intersolid.tab_entidade";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n"
@@ -1145,8 +1280,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.num_cgc_cpf cpf,\n"
                     + "    f.cod_entidade\n"
                     + "from\n"
-                    + "    tab_fluxo f\n"
-                    + "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n"
+                    + "    " + tab_fluxo + " f\n"
+                    + "    left join " + tab_entidade + " e on f.cod_entidade = e.cod_entidade\n"
                     + "where\n"
                     + "    f.cod_loja = " + getLojaOrigem() + "\n"
                     + "    and f.tipo_conta = 0\n"
@@ -1271,10 +1406,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Entidade> getEntidades() throws SQLException {
         List<Entidade> result = new ArrayList<>();
+        String tabela = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_entidade" : "tab_entidade";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select cod_entidade, des_entidade from tab_entidade order by cod_entidade"
+                    "select "
+                    + "cod_entidade, "
+                    + "des_entidade "
+                    + "from " + tabela + "\n"
+                    + "order by cod_entidade"
             )) {
                 while (rst.next()) {
                     result.add(new Entidade(rst.getInt("cod_entidade"), rst.getString("des_entidade")));
@@ -1559,8 +1699,17 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
+        String tab_ncm_uf = "tab_ncm_uf",
+                tab_loja = "tab_loja",
+                tab_ncm = "tab_ncm";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_ncm_uf = "intersolid.tab_ncm_uf";
+            tab_loja = "intersolid.tab_loja";
+            tab_ncm = "intersolid.tab_ncm";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    nuf.cod_ncm,\n"
@@ -1569,13 +1718,13 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    nuf.per_iva,\n"
                     + "    nuf.cod_trib_entrada,\n"
                     + "    nuf.cod_tributacao,\n"
-                    + "    coalesce((select first 1 cod_trib_entrada from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla = uf.uf), nuf.cod_trib_entrada) cod_tributacao_entrada_foraestado,\n"
-                    + "    coalesce((select first 1 cod_tributacao from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla = uf.uf), nuf.cod_tributacao) cod_tributacao_foraestado\n"
+                    + "    coalesce((select first 1 cod_trib_entrada from " + tab_ncm_uf + " where cod_ncm = nuf.cod_ncm and des_sigla = uf.uf), nuf.cod_trib_entrada) cod_tributacao_entrada_foraestado,\n"
+                    + "    coalesce((select first 1 cod_tributacao from " + tab_ncm_uf + " where cod_ncm = nuf.cod_ncm and des_sigla = uf.uf), nuf.cod_tributacao) cod_tributacao_foraestado\n"
                     + "from\n"
                     + "    tab_ncm_uf nuf\n"
-                    + "    join tab_loja lj on lj.cod_loja = " + getLojaOrigem() + "\n"
+                    + "    join " + tab_loja + " lj on lj.cod_loja = " + getLojaOrigem() + "\n"
                     + "    join (select '" + siglaEstadoPauta + "' uf from rdb$database) uf on 1 = 1\n"
-                    + "    join tab_ncm ncm on ncm.cod_ncm = nuf.cod_ncm\n"
+                    + "    join " + tab_ncm + " ncm on ncm.cod_ncm = nuf.cod_ncm\n"
                     + "where\n"
                     + "    nuf.des_sigla = lj.des_sigla\n"
                     + "order by\n"
@@ -1606,8 +1755,13 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
         List<NotaFiscalIMP> result = new ArrayList<>();
+        String tab_nf = "tab_nf";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_nf = "intersolid.tab_nf";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    nf.cod_parceiro,\n"
@@ -1636,12 +1790,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    nf.num_chave_acesso,\n"
                     + "    nf.dta_alteracao\n"
                     + "from\n"
-                    + "    tab_nf nf\n"
+                    + "    " + tab_nf + " nf\n"
                     + "where\n"
                     + "    nf.cod_loja = " + getLojaOrigem() + " and\n"
                     + "    nf.tipo_operacao in (0, 1) and\n"
-                    + "    nf.tipo_nf in (0, 1) and\n" +
-                    //"    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
+                    + "    nf.tipo_nf in (0, 1) and\n"
+                    + //"    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
                     "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " and\n"
                     + "    nf.dta_emissao <= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "order by\n"
@@ -1693,7 +1847,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setChaveNfe(rst.getString("num_chave_acesso"));
                     imp.setDataHoraAlteracao(rst.getDate("dta_alteracao"));
-                    
+
                     getNotasItem(
                             rst.getString("cod_parceiro"),
                             //"2347".equals(imp.getIdDestinatario()) ? "1" : imp.getIdDestinatario(),
@@ -1713,61 +1867,62 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private void getNotasItem(String codParceiro, String tipoParceiro, String numNf, String numSerieNf, String tipoIdent, NotaFiscalIMP imp) throws Exception {
+        String tab_nf_item = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_nf_item" : "tab_nf_item";
         String sql = "select\n"
-                        + "    nfi.cod_parceiro,\n"
-                        + "    nfi.tipo_parceiro,\n"
-                        + "    nfi.num_nf,\n"
-                        + "    nfi.num_serie_nf,\n"
-                        + "    nfi.tipo_ident,\n"
-                        + "    nfi.cfop,\n"
-                        + "    nfi.cod_tributacao,\n"
-                        + "    nfi.num_item,\n"
-                        + "    nfi.cod_item id_produto,\n"
-                        + "    nfi.num_ncm ncm,\n"
-                        + "    nfi.num_cest cest,\n"
-                        + "    nfi.cfop,\n"
-                        + "    nfi.des_item descricao,\n"
-                        + "    nfi.des_unidade unidade,\n"
-                        + "    --incluir codigo de barras,\n"
-                        + "    nfi.qtd_embalagem qtdembalagem,\n"
-                        + "    nfi.qtd_total quantidade,\n"
-                        + "    nfi.val_total valor,\n"
-                        + "    nfi.val_desconto valor_desconto,\n"
-                        + "    nfi.val_frete valor_frete,\n"
-                        + "    nfi.val_isento valor_isento,\n"
-                        + "    --nfi.val_outras valor_outras,\n"
-                        + "    nfi.cod_sit_tributaria icms_cst,\n"
-                        + "    nfi.per_aliq_icms icms_aliq,\n"
-                        + "    nfi.per_red_bc_icms icms_red,\n"
-                        + "    nfi.val_icms icms_valor,\n"
-                        + "    nfi.val_bc_icms icms_bc,\n"
-                        + "    nfi.val_bc_st icms_bc_st,\n"
-                        + "    nfi.val_icms_st icms_st,\n"
-                        + "    nfi.val_base_ipi ipi_base,\n"
-                        + "    nfi.val_ipi ipi_valor,\n"
-                        + "    nfi.cst_pis pis_cst,\n"
-                        + "    nfi.per_iva iva_porcentagem,\n"
-                        + "    nfi.val_pauta_iva iva_pauta\n"
-                        + "from\n"
-                        + "    tab_nf_item nfi\n"
-                        + "where\n"
-                        + "    nfi.cod_parceiro = " + codParceiro + " and\n"
-                        + "    nfi.tipo_parceiro = " + tipoParceiro + " and\n"
-                        + "    nfi.num_nf = " + numNf + " and\n"
-                        + "    nfi.num_serie_nf = " + numSerieNf + " and\n"
-                        + "    nfi.tipo_ident = " + tipoIdent + "\n"
-                        + "order by\n"
-                        + "    nfi.cod_parceiro,\n"
-                        + "    nfi.tipo_parceiro,\n"
-                        + "    nfi.num_nf,\n"
-                        + "    nfi.num_serie_nf,\n"
-                        + "    nfi.tipo_ident,\n"
-                        + "    nfi.cfop,\n"
-                        + "    nfi.cod_tributacao,\n"
-                        + "    nfi.num_item,\n"
-                        + "    nfi.cod_item";
+                + "    nfi.cod_parceiro,\n"
+                + "    nfi.tipo_parceiro,\n"
+                + "    nfi.num_nf,\n"
+                + "    nfi.num_serie_nf,\n"
+                + "    nfi.tipo_ident,\n"
+                + "    nfi.cfop,\n"
+                + "    nfi.cod_tributacao,\n"
+                + "    nfi.num_item,\n"
+                + "    nfi.cod_item id_produto,\n"
+                + "    nfi.num_ncm ncm,\n"
+                + "    nfi.num_cest cest,\n"
+                + "    nfi.cfop,\n"
+                + "    nfi.des_item descricao,\n"
+                + "    nfi.des_unidade unidade,\n"
+                + "    --incluir codigo de barras,\n"
+                + "    nfi.qtd_embalagem qtdembalagem,\n"
+                + "    nfi.qtd_total quantidade,\n"
+                + "    nfi.val_total valor,\n"
+                + "    nfi.val_desconto valor_desconto,\n"
+                + "    nfi.val_frete valor_frete,\n"
+                + "    nfi.val_isento valor_isento,\n"
+                + "    --nfi.val_outras valor_outras,\n"
+                + "    nfi.cod_sit_tributaria icms_cst,\n"
+                + "    nfi.per_aliq_icms icms_aliq,\n"
+                + "    nfi.per_red_bc_icms icms_red,\n"
+                + "    nfi.val_icms icms_valor,\n"
+                + "    nfi.val_bc_icms icms_bc,\n"
+                + "    nfi.val_bc_st icms_bc_st,\n"
+                + "    nfi.val_icms_st icms_st,\n"
+                + "    nfi.val_base_ipi ipi_base,\n"
+                + "    nfi.val_ipi ipi_valor,\n"
+                + "    nfi.cst_pis pis_cst,\n"
+                + "    nfi.per_iva iva_porcentagem,\n"
+                + "    nfi.val_pauta_iva iva_pauta\n"
+                + "from\n"
+                + "    " + tab_nf_item + " nfi\n"
+                + "where\n"
+                + "    nfi.cod_parceiro = " + codParceiro + " and\n"
+                + "    nfi.tipo_parceiro = " + tipoParceiro + " and\n"
+                + "    nfi.num_nf = " + numNf + " and\n"
+                + "    nfi.num_serie_nf = " + numSerieNf + " and\n"
+                + "    nfi.tipo_ident = " + tipoIdent + "\n"
+                + "order by\n"
+                + "    nfi.cod_parceiro,\n"
+                + "    nfi.tipo_parceiro,\n"
+                + "    nfi.num_nf,\n"
+                + "    nfi.num_serie_nf,\n"
+                + "    nfi.tipo_ident,\n"
+                + "    nfi.cfop,\n"
+                + "    nfi.cod_tributacao,\n"
+                + "    nfi.num_item,\n"
+                + "    nfi.cod_item";
         try {
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (Statement stm = tipoConexao.getConnection().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
                         + "    nfi.cod_parceiro,\n"
@@ -1805,7 +1960,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    nfi.per_iva iva_porcentagem,\n"
                         + "    nfi.val_pauta_iva iva_pauta\n"
                         + "from\n"
-                        + "    tab_nf_item nfi\n"
+                        + "    " + tab_nf_item + " nfi\n"
                         + "where\n"
                         + "    nfi.cod_parceiro = " + codParceiro + " and\n"
                         + "    nfi.tipo_parceiro = " + tipoParceiro + " and\n"
@@ -1876,8 +2031,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
         List<NutricionalIMP> result = new ArrayList<>();
+        String tab_info_nutricional = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_info_nutricional" : "tab_info_nutricional";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    n.cod_info_nutricional id,\n"
@@ -1907,7 +2063,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    n.unidade_porcao,\n"
                     + "    n.porcao\n"
                     + "from\n"
-                    + "    tab_info_nutricional n\n"
+                    + "    " + tab_info_nutricional + " n\n"
                     + "order by\n"
                     + "    1"
             )) {
@@ -1948,12 +2104,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private void incluirProdutoNutricional(NutricionalIMP imp) throws Exception {
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        String tab_produto = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_produto" : "tab_produto";
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    cod_produto\n"
                     + "from\n"
-                    + "    tab_produto\n"
+                    + "    " + tab_produto + "\n"
                     + "where\n"
                     + "    cod_info_nutricional = " + imp.getId()
             )) {
@@ -1965,12 +2123,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private void incluirProdutoReceitaBalanca(ReceitaBalancaIMP imp) throws Exception {
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        String tab_produto = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_produto" : "tab_produto";
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    cod_produto\n"
                     + "from\n"
-                    + "    tab_produto\n"
+                    + "    " + tab_produto + "\n"
                     + "where\n"
                     + "    cod_info_receita = " + imp.getId()
             )) {
@@ -1984,15 +2144,16 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
         List<ReceitaBalancaIMP> result = new ArrayList<>();
+        String tab_info_receita = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_info_receita" : "tab_info_receita";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    r.cod_info_receita id,\n"
                     + "    r.des_info_receita descricao,\n"
                     + "    r.detalhamento receita\n"
                     + "from\n"
-                    + "    tab_info_receita r"
+                    + "    " + tab_info_receita + " r"
             )) {
                 while (rst.next()) {
                     ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
@@ -2014,8 +2175,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
+        String tab_produto_producao = "tab_produto_producao",
+                tab_produto = "tab_produto";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        if (tipoConexao == TipoConexao.ORACLE) {
+            tab_produto_producao = "intersolid.tab_produto_producao";
+            tab_produto = "intersolid.tab_produto";
+        }
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    pp.cod_produto id,\n"
@@ -2027,8 +2195,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pp.qtd_producao,\n"
                     + "    pp.qtd_receita + pp.qtd_producao qtd_total\n"
                     + "from\n"
-                    + "    tab_produto_producao pp\n"
-                    + "    join tab_produto p on\n"
+                    + "    " + tab_produto_producao + " pp\n"
+                    + "    join " + tab_produto + " p on\n"
                     + "        pp.cod_produto = p.cod_produto\n"
                     + "where\n"
                     + "    pp.cod_loja = " + getLojaOrigem() + "\n"
@@ -2060,14 +2228,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<DivisaoIMP> getDivisoes() throws Exception {
         List<DivisaoIMP> result = new ArrayList<>();
+        String tab_divisao_fornecedor = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_divisao_fornecedor" : "tab_divisao_fornecedor";
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "   df.cod_divisao id,\n"
                     + "   df.des_divisao descricao\n"
                     + "from\n"
-                    + "    tab_divisao_fornecedor df\n"
+                    + "    " + tab_divisao_fornecedor + " df\n"
                     + "order by\n"
                     + "    1"
             )) {
@@ -2085,4 +2254,39 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    public static enum TipoConexao {
+
+        FIREBIRD {
+            @Override
+            public Connection getConnection() {
+                return ConexaoFirebird.getConexao();
+            }
+
+            @Override
+            public String getSistema() {
+                return "Solidus(FIREBIRD)";
+            }
+        },
+        ORACLE {
+            @Override
+            public Connection getConnection() {
+                return ConexaoOracle.getConexao();
+            }
+
+            @Override
+            public String getSistema() {
+                return "Solidus(ORACLE)";
+            }
+        };
+
+        public abstract Connection getConnection();
+
+        public abstract String getSistema();
+
+        public String getLojasClienteSQL() {
+            return "";
+        }
+
+    }
+    
 }
