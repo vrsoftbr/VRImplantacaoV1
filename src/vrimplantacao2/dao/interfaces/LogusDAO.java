@@ -13,10 +13,12 @@ import vrimplantacao.classe.ConexaoInformix;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -26,11 +28,46 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class LogusDAO extends InterfaceDAO {
+public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
         return "Logus";
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoInformix.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	distinct\n" +
+                    "	icms.cdg_icms id,\n" +
+                    "	icms.dcr_icms descricao,\n" +
+                    "	cst.cdg_situacaotributariaicms cst,\n" +
+                    "	icms.pct_aliq_icms aliquota,\n" +
+                    "	icms.pct_reducao_bc reducao\n" +
+                    "from \n" +
+                    "	informix.cadicms icms  \n" +
+                    "join informix.cadsituacoestributariasicms cst \n" +
+                    "	on icms.idcadsituacaotributariaicms = cst.idcadsituacaotributariaicms\n" +
+                    "where \n" +
+                    " 	icms.cdg_icms in \n" +
+                    " 		(select cdg_icms from cadassoc)\n" +
+                    "order by\n" +
+                    "	1")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"),
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao")));
+                }
+            }
+        }
+        return result;
     }
     
     @Override
@@ -160,20 +197,23 @@ public class LogusDAO extends InterfaceDAO {
                     "select \n" +
                     "	p.cdg_produto id,\n" +
                     "	p.cdg_interno id_interno,\n" +
-                    "	pa.dcr_produto || ' ' || pa.dcr_variedade descricaocompleta,\n" +
                     "	p.dcr_etiq_gondola descricaogondola,\n" +
                     "	p.dcr_reduzida descricaoreduzida,\n" +
+                    "	pa.dcr_produto || ' ' || pa.dcr_variedade descricaologus,\n" +
                     "	p.cdg_barra ean,\n" +
-                    "   nullif(pa.flb_tipo_peso, 'F') pesavel,\n" +        
-                    "	est.val_custo_coml custosemimposto,\n" +
+                    "	nullif (pa.flb_tipo_peso, 'F') pesavel,\n" +
+                    "	pa.flb_habilita_checagem_peso_pdv pesopdv,\n" +
+                    "	est.val_custo custosemimposto,\n" +
                     "	est.val_custo_tot custocomimposto,\n" +
+                    "	pa.pct_mg_lucro margem,\n" +
                     "	est.val_preco precovenda,\n" +
                     "	est.qtd_estoque estoque,\n" +
                     "	p.dat_cadastro cadastro,\n" +
                     "	p.dat_desativacao desativacao,\n" +
                     "	un.sgl_unidade_medida unidade,\n" +
                     "	p.qtd_por_emb qtdembalagem,\n" +
-                    "	pa.cdg_ncm ncm,\n" +
+                    "	ncm.cdg_ncm ncm,\n" +
+                    "	st.cdg_especificador_st cest,\n" +
                     "	se.cdg_depto merc1,\n" +
                     "	se.cdg_secao merc2,\n" +
                     "	gr.cdg_grupo merc3,\n" +
@@ -194,42 +234,65 @@ public class LogusDAO extends InterfaceDAO {
                     "left join informix.caddepto dp on se.cdg_depto = dp.cdg_depto\n" +
                     "left join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n" +
                     "	and pis.dat_ini_vigencia = (select\n" +
-                                                    "    max(x.dat_ini_vigencia)\n" +
-                                                    "from\n" +
-                                                    "    cadassocpiscofins x\n" +
-                                                    "where\n" +
-                                                        "x.cdg_interno = pis.cdg_interno and \n" +
-                                                        "x.dat_ini_vigencia <= current year to fraction(3))\n" +
+                    "                                   max(x.dat_ini_vigencia)\n" +
+                    "                               from\n" +
+                    "                                   cadassocpiscofins x\n" +
+                    "                               where\n" +
+                    "                                   x.cdg_interno = pis.cdg_interno and \n" +
+                    "                                   x.dat_ini_vigencia <= current year to fraction(3))\n" +
+                    "left join cadcodigosespecificstproduto cest on pa.cdg_interno = cest.cdg_interno and \n" +
+                    "	cest.dat_inicio_vigencia = (select \n" +
+                    "					min(x.dat_inicio_vigencia)\n" +
+                    "                               from\n" +
+                    "					cadcodigosespecificstproduto x\n" +
+                    "                               where \n" +
+                    "					x.cdg_interno = cest.cdg_interno)\n" +
+                    "left join cadcodigosespecificadoresst st on cest.idcadcodigoespecificadorst = st.idcadcodigoespecificadorst\n" +
+                    "left join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and \n" +
+                    "	ncm.dat_ini_vigencia = (select \n" +
+                    "					max(x.dat_ini_vigencia)\n" +
+                    "				from \n" +
+                    "					cadncmproduto x \n" +
+                    "				where \n" +
+                    "					x.cdg_interno = ncm.cdg_interno and \n" +
+                    "					x.dat_ini_vigencia <= current year to fraction(3))\n" +
                     "where \n" +
-                    "	est.cdg_filial = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "	p.dat_cadastro")) {
+                    "	est.cdg_filial = " + getLojaOrigem())) {
                 while(rs.next()) {
                    ProdutoIMP imp = new ProdutoIMP();
                    
                    imp.setImportLoja(getLojaOrigem());
                    imp.setImportSistema(getSistema());
                    imp.setImportId(rs.getString("id_interno"));
-                   imp.setDescricaoCompleta(rs.getString("descricaogondola"));
+                   imp.setDescricaoCompleta(rs.getString("descricaogondola") == null ? rs.getString("descricaoreduzida")
+                           :rs.getString("descricaogondola"));
                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                   if(rs.getString("pesavel") != null && "V".equals(rs.getString("pesavel").trim())) {
+                   if(rs.getString("pesavel") != null && "V".equals(rs.getString("pesavel").trim().toUpperCase())) {
                        imp.seteBalanca(true);
+                   }
+                   if(rs.getString("desativacao") != null) {
+                       imp.setSituacaoCadastro(0);
                    }
                    imp.setEan(rs.getString("ean"));
                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                   imp.setMargem(rs.getDouble("margem"));
                    imp.setEstoque(rs.getDouble("estoque"));
                    imp.setDataCadastro(rs.getDate("cadastro"));
                    imp.setTipoEmbalagem(rs.getString("unidade"));
                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                    imp.setNcm(rs.getString("ncm"));
+                   imp.setCest(rs.getString("cest"));
                    imp.setCodMercadologico1(rs.getString("merc1"));
                    imp.setCodMercadologico2(rs.getString("merc2"));
                    imp.setCodMercadologico3(rs.getString("merc3"));
                    imp.setCodMercadologico4(rs.getString("merc4"));
                    imp.setIcmsDebitoId(rs.getString("idicms"));
+                   imp.setIcmsCstEntrada(00);
+                   imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
+                   imp.setIcmsReducaoEntrada(0.0);
                    imp.setPiscofinsCstCredito(rs.getString("pis_credito"));
                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                    
