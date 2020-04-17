@@ -15,6 +15,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -371,6 +372,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
+                    imp.setCnpj_cpf(imp.getImportId());
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setIe_rg(rs.getString("ie"));
@@ -440,7 +442,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.nmr_celular celular,\n" +
                     "	c.dcr_funcao funcao,\n" +
                     "	c.dat_bloqueio bloqueio,\n" +
-                    "	c.cdg_status,\n" +
+                    "	c.cdg_status situacao,\n" +
                     "	c.dat_cadastro cadastro,\n" +
                     "	c.dat_nascto nascimento,\n" +
                     "	c.nmr_fone_emp fonempresa,\n" +
@@ -456,6 +458,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
+                    imp.setCnpj(rs.getString("codigo"));
                     if(rs.getString("ie") != null && "ISENTO".equals(rs.getString("ie"))) {
                         imp.setInscricaoestadual(rs.getString("rg"));
                     } else {
@@ -469,11 +472,22 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setBairro(rs.getString("bairro"));
                     imp.setUf(rs.getString("uf"));
                     imp.setTelefone(rs.getString("fone"));
+                    
+                    if(rs.getString("fone2") != null && !"".equals(rs.getString("fone2"))) {
+                        imp.addContato("1", 
+                                rs.getString("funcao") == null ? "" : rs.getString("funcao"), 
+                                rs.getString("fone2"), "", "");
+                    }
+                    
+                    imp.setAtivo(rs.getInt("situacao") == 0 ? true : false);
+                    
                     imp.setCelular(rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setEmail(rs.getString("email"));
                     imp.setValorLimite(rs.getDouble("limite"));
+                    if(rs.getString("sexo") != null)
+                        imp.setSexo("M".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     
                     result.add(imp);
                 }
