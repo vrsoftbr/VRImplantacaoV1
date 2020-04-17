@@ -1207,21 +1207,20 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuBrajanGestoresActionPerformed"/>
                           </Events>
                         </MenuItem>
-<<<<<<< HEAD
                         <MenuItem class="javax.swing.JMenuItem" name="mnuLogTec">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="LogTEC"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuLogTecActionPerformed"/>
-=======
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuNCA">
                           <Properties>
                             <Property name="label" type="java.lang.String" value="NCA"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuNCAActionPerformed"/>
->>>>>>> 2361b1c5d77f8f858311afd31d1bf7c467920fc4
                           </Events>
                         </MenuItem>
                       </SubComponents>
@@ -1732,6 +1731,21 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSQLiteSophyxActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
+                    <Menu class="javax.swing.JMenu" name="mnuInformix">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Informix"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuiLogus">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Logus Retail"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuiLogusActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

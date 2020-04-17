@@ -518,24 +518,18 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "   codigo,\n" +
-                    "   fornecedor,\n" +
-                    "   codigo_forn \n" +
+                    "  codpro as produto,\n" +
+                    "  codfor as fornecedor,\n" +
+                    "  codigo_forn as referencia\n" +
                     "from\n" +
-                    "   tabela_pro\n" +
-                    "where\n" +
-                    "   fornecedor is not null and \n" +
-                    "   fornecedor <> -1 and\n" +
-                    "   codigo_forn is not null\n" +
-                    "order by\n" +
-                    "   1")) {
+                    "   tabela_profor")) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setIdProduto(rs.getString("codigo"));
+                    imp.setIdProduto(rs.getString("produto"));
                     imp.setIdFornecedor(rs.getString("fornecedor"));
-                    imp.setCodigoExterno(rs.getString("codigo_forn"));
+                    imp.setCodigoExterno(rs.getString("referencia"));
                     
                     result.add(imp);
                 }

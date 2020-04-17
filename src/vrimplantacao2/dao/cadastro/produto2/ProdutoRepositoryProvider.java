@@ -309,13 +309,25 @@ public class ProdutoRepositoryProvider {
         public void atualizar(ProdutoAliquotaVO aliquota, Set<OpcaoProduto> opt) throws Exception {
             dao.atualizar(aliquota, opt);
         }
+        
+        public void atualizaBeneficio(ProdutoAliquotaVO aliquota) throws Exception {
+            dao.atualizarBeneficio(aliquota);
+        }
 
         public MultiMap<Integer, Void> getAliquotas() throws Exception {
             return dao.getAliquotas();
         }
         
+        public int getProdutoAliquotaByProduto(int idProduto) throws Exception {
+            return dao.getProdutoAliquotaByProduto(idProduto);
+        }
+        
         public int getBeneficio(String beneficio) throws Exception {
             return dao.getBeneficio(beneficio);
+        }
+        
+        public int getProdutoAliquotaBeneficio(int produtoAliquota) throws Exception {
+            return dao.getProdutoAliquotaBeneficio(produtoAliquota);
         }
 
     }

@@ -57,7 +57,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select\n"
+                    " select\n"
                     + "     cod_empresa id,\n"
                     + "     cgc_empresa cnpj,\n"
                     + "     fan_empresa fantasia\n"
@@ -75,7 +75,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select \n"
+                    " select \n"
                     + "     m1.cod_grupo m1,\n"
                     + "     m1.des_grupo m1_desc,\n"
                     + "     m2.cod_subgrupo m2,\n"
@@ -255,7 +255,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      " select\n"
+                    " select\n"
                     + "     pf.cod_fornece fornecedor,\n"
                     + "     pf.cod_produto produto,\n"
                     + "     p.cod_referencia referencia\n"
@@ -265,6 +265,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     on p.cod_produto = pf.cod_produto\n"
                     + "     and p.cod_empresa = pf.cod_empresa\n"
                     + " where pf.cod_empresa = " + getLojaOrigem() + "\n"
+                    + " and p.cod_referencia is not null\n"
                     + " order by 1,2")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -331,7 +332,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rs.getString("tel_principal"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setObservacao(rs.getString("observacao"));
-                    imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
+                    imp.setPrazoEntrega(rs.getInt("prazoEntrega"));
 
                     result.add(imp);
                 }
@@ -387,7 +388,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from cliente cli\n"
                     + "	 left join cidade cid\n"
                     + "	   on cid.cod_cidade = cli.cod_cidade\n"
-                    + "where cod_empresa = 1\n"
+                    + "where cod_empresa = " + getLojaOrigem() + "\n"
                     + "order by cod_cliente")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -461,34 +462,26 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "	c.id, \n"
-                    + "	c.idreferencia,\n"
-                    + "	cf.cpf,\n"
-                    + "	cj.cnpj,\n"
-                    + "	c.emissao, \n"
-                    + "	c.cadid idcliente, \n"
-                    + "	c.vencimento, \n"
-                    + "	c.valor, \n"
-                    + "	c.parcela, \n"
-                    + "	c.ecf \n"
-                    + "from \n"
-                    + "	contasr c \n"
-                    + "left join\n"
-                    + "	clientef cf on c.cadid = cf.id\n"
-                    + "left join\n"
-                    + "	clientej cj on c.cadid = cj.id\n"
-                    + "where \n"
-                    + "	c.pagamento is null\n"
-                    + "order by \n"
-                    + "	c.emissao")) {
+                    + "	  distinct on (cod_receber)\n"
+                    + "	  cod_receber id,\n"
+                    + "	  dat_emissao dataEmissao,\n"
+                    + "	  num_doc numeroCupom,\n"
+                    + "	  vlr_doc valor,\n"
+                    + "	  desc_doc observacao,\n"
+                    + "	  r.cod_cliente idCliente,\n"
+                    + "	  dat_vencto dataVencimento,\n"
+                    + "	  vlr_juros juros,\n"
+                    + "	  c.cpf_cgc cnpjCliente\n"
+                    + "from receber r\n"
+                    + "	  left join cliente c\n"
+                    + "		on r.cod_cliente = c.cod_cliente\n"
+                    + "	  where flg_aberto = 'S'\n"
+                    + "		and r.cod_empresa = " + getLojaOrigem() + "\n"
+                    + "	order by 1,2")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
-                    if (rs.getString("cnpj") == null) {
-                        imp.setCnpjCliente(rs.getString("cpf"));
-                    } else {
-                        imp.setCnpjCliente(rs.getString("cnpj"));
-                    }
+
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setIdCliente(rs.getString("idcliente"));
