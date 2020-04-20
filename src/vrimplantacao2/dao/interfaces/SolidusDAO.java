@@ -334,7 +334,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "    c.cod_cliente id,\n"
                     + "    c.des_cliente nome,\n"
-                    + "    coalesce(c.cod_convenio, '999') idempresa,\n"
+                    + (tipoConexao == TipoConexao.FIREBIRD
+                            ? "    coalesce(c.cod_convenio, '999') idempresa,\n"
+                            : "    coalesce(c.cod_convenio, 999) idempresa,\n")
                     + "    case s.negativar when 'S' then 1 else 0 end bloqueado,\n"
                     + "    c.num_cgc cnpj,\n"
                     + "    c.des_senha senha,\n"
@@ -365,7 +367,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setNome(rst.getString("nome"));
                     imp.setIdEmpresa(rst.getString("idempresa"));
-                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setCnpj(rst.getString("cnpj") == null ? imp.getId() : rst.getString("cnpj"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setValidadeCartao(rst.getDate("validadecartao"));
                     imp.setVisualizaSaldo(rst.getBoolean("visualizasaldo"));
@@ -550,7 +552,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             tab_cest = "intersolid.tab_cest";
             tab_tributacao = "intersolid.tab_tributacao";
         }
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -564,7 +566,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.dias_validade validade,\n"
                     + "    p.des_produto decricaocompleta,\n"
                     + "    coalesce(p.des_reduzida, p.des_produto) descricaoreduzida,\n"
-                    + "    (select " + (tipoConexao == TipoConexao.FIREBIRD ? "first 1 " : "") +"\n"
+                    + "    (select " + (tipoConexao == TipoConexao.FIREBIRD ? "first 1 " : "") + "\n"
                     + "        cod_fornecedor\n"
                     + "    from\n"
                     + "        " + tab_produto_fornecedor + "\n"
@@ -668,12 +670,20 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setValidade(rst.getInt("validade"));
+
                     long ean = Utils.stringToLong(imp.getEan());
                     if (imp.isBalanca() && (ean <= 999999) && removerDigitoProdutoBalanca) {
                         String eanAux = String.valueOf(ean);
                         eanAux = eanAux.substring(0, eanAux.length() - 1);
                         imp.setEan(eanAux);
                     }
+
+                    if (imp.isBalanca() && (String.valueOf(ean).length() == 7)) {
+                        String eanAux = String.valueOf(ean);
+                        eanAux = eanAux.substring(1, 7);
+                        imp.setEan(eanAux);
+                    }
+
                     imp.setDescricaoCompleta(rst.getString("decricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("decricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -696,12 +706,27 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getInt("cst_pis_cof_entrada"));
                     imp.setPiscofinsCstDebito(rst.getInt("cst_pis_cof_saida"));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("natreceita")));
+
                     imp.setIcmsCstSaida(rst.getInt("icms_saida_cst"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms_saida_aliq"));
                     imp.setIcmsReducaoSaida(rst.getDouble("icms_saida_reducao"));
+
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_saida_cst"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_saida_aliq"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_saida_reducao"));
+
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_saida_cst"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_saida_aliq"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_saida_reducao"));
+
                     imp.setIcmsCstEntrada(rst.getInt("icms_entrada_cst"));
                     imp.setIcmsAliqEntrada(rst.getDouble("icms_entrada_aliq"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("icms_entrada_reducao"));
+
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_entrada_cst"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_entrada_aliq"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_entrada_reducao"));
+
                     imp.setPautaFiscalId(rst.getString("ncm"));
                     imp.setDivisao(rst.getString("divisao"));
 
@@ -825,7 +850,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.addEmail("E-MAIL COMERCIAL", email, TipoContato.COMERCIAL);
                         }
                     }
-                    
+
                     if ((rst.getString("des_email") != null)
                             && (!rst.getString("des_email").trim().isEmpty())) {
 
@@ -995,7 +1020,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.des_cargo cargo,\n"
                     + "    cast(c.val_renda as numeric(11,2)) salario,\n"
                     + "    case when\n"
-                    + "        char_length(cast(cast(c.val_limite_conv as bigint) as varchar(15))) = 10\n"
+                    + (tipoConexao == TipoConexao.FIREBIRD
+                            ? " char_length(cast(cast(c.val_limite_conv as bigint) as varchar(15))) = 10\n"
+                            : " length(cast(cast(c.val_limite_conv as number) as varchar(15))) = 10\n")
                     + "    then 0 else c.val_limite_conv end limitecredito,\n"
                     + "    c.des_conjuge nomeconjuge,\n"
                     + "    c.des_pai nomepai,\n"
@@ -1463,10 +1490,21 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         private Statement stm;
         private ResultSet rst;
         private VendaIMP next;
+        private SolidusDAO dao = new SolidusDAO();
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) {
+            String tab_produto_pdv = "tab_produto_pdv",
+                    tab_pdv = "tab_pdv",
+                    tab_cliente = "tab_cliente";
+
+            if (dao.tipoConexao == TipoConexao.ORACLE) {
+                tab_produto_pdv = "intersolid.tab_produto_pdv";
+                tab_pdv = "intersolid.tab_pdv";
+                tab_cliente = "intersolid.tab_cliente";
+            }
+
             try {
-                this.stm = ConexaoFirebird.getConexao().createStatement();
+                this.stm = dao.tipoConexao.getConnection().createStatement();
                 this.rst = stm.executeQuery(
                         "select\n"
                         + "    v.num_ident id,\n"
@@ -1485,9 +1523,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    c.num_cgc cpf,\n"
                         + "    c.des_cliente nomecliente\n"
                         + "from\n"
-                        + "    tab_produto_pdv v\n"
-                        + "    left join tab_pdv pdv on v.num_pdv = pdv.cod_pdvint and v.cod_loja = pdv.cod_loja\n"
-                        + "    left join tab_cliente c on v.cod_cliente = c.cod_cliente\n"
+                        + "    " + tab_produto_pdv + " v\n"
+                        + "    left join " + tab_pdv + " pdv on v.num_pdv = pdv.cod_pdvint and v.cod_loja = pdv.cod_loja\n"
+                        + "    left join " + tab_cliente + " c on v.cod_cliente = c.cod_cliente\n"
                         + "where\n"
                         + "    v.cod_loja = " + idLojaCliente + "\n"
                         + "    and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 00:00:00'\n"
@@ -1581,8 +1619,19 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         private ResultSet rst;
         private VendaItemIMP next;
         private Map<Integer, Tributacao> tributacao = new HashMap<>();
+        private SolidusDAO dao = new SolidusDAO();
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) {
+            String tab_tributacao = "tab_tributacao",
+                    tab_produto_pdv = "tab_produto_pdv",
+                    tab_produto = "tab_produto";
+
+            if (dao.tipoConexao == TipoConexao.ORACLE) {
+                tab_tributacao = "intersolid.tab_tributacao";
+                tab_produto_pdv = "intersolid.tab_produto_pdv";
+                tab_produto = "intersolid.tab_produto";
+            }
+
             try {
                 try (Statement st = ConexaoFirebird.getConexao().createStatement()) {
                     try (ResultSet rs = st.executeQuery(
@@ -1592,7 +1641,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                             + "    t.val_icms aliq,\n"
                             + "    t.val_reducao_base_calculo reducao\n"
                             + "from\n"
-                            + "    tab_tributacao t\n"
+                            + "    " + tab_tributacao + " t\n"
                             + "order by\n"
                             + "    1"
                     )) {
@@ -1609,7 +1658,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
 
-                stm = ConexaoFirebird.getConexao().createStatement();
+                stm = dao.tipoConexao.getConnection().createStatement();
                 rst = stm.executeQuery(
                         "select\n"
                         + "    v.num_registro id,\n"
@@ -1626,8 +1675,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    p.des_unidade_venda unidade,\n"
                         + "    v.cod_tributacao\n"
                         + "from\n"
-                        + "    tab_produto_pdv v\n"
-                        + "    join tab_produto p on v.cod_produto = p.cod_produto\n"
+                        + "    " + tab_produto_pdv + " v\n"
+                        + "    join " + tab_produto + " p on v.cod_produto = p.cod_produto\n"
                         + "where\n"
                         + "    v.cod_loja = " + idLojaCliente + "\n"
                         + "    and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 00:00:00'\n"
@@ -2105,7 +2154,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private void incluirProdutoNutricional(NutricionalIMP imp) throws Exception {
         String tab_produto = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_produto" : "tab_produto";
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -2124,7 +2173,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private void incluirProdutoReceitaBalanca(ReceitaBalancaIMP imp) throws Exception {
         String tab_produto = tipoConexao == TipoConexao.ORACLE ? "intersolid.tab_produto" : "tab_produto";
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -2288,5 +2337,5 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
     }
-    
+
 }

@@ -52,6 +52,7 @@ public class SolidusGUI extends VRInternalFrame {
     private SolidusGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);        
         initComponents();
+        carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
@@ -115,7 +116,7 @@ public class SolidusGUI extends VRInternalFrame {
                 tabProdutos.btnMapaTribut.setEnabled(true);
             }
         });
-        carregarParametros();
+        
         centralizarForm();
         this.setMaximum(false);
     }
