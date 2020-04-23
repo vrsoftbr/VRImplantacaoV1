@@ -596,11 +596,11 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 } else if (
                         val(sh, 0, i).equals("") &&
-                        !val(sh, 17, i).equals("") &&
-                        !val(sh, 20, i).equals("")
+                        !val(sh, 18, i).equals("") &&
+                        !val(sh, 21, i).equals("")
                 ) {
-                    imp.setBairro(val(sh, 17, i));
-                    imp.setMunicipio(val(sh, 20, i));
+                    imp.setBairro(val(sh, 18, i));
+                    imp.setMunicipio(val(sh, 21, i));
                 } else if (
                         val(sh, 0, i).equals("Fantasia:") &&
                         val(sh, 9, i).equals("Endereço:")
@@ -609,15 +609,15 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (imp.getFantasia().equals("")) {
                         imp.setFantasia(imp.getRazao());
                     }
-                    imp.setEndereco(val(sh, 9, i));
+                    imp.setEndereco(val(sh, 10, i));
                     imp.setComplemento(val(sh, 12, i));
 
                     if (
-                        !val(sh, 17, i).equals("") &&
+                        !val(sh, 18, i).equals("") &&
                         !val(sh, 20, i).equals("")
                     ) {
-                        imp.setBairro(val(sh, 17, i));
-                        imp.setMunicipio(val(sh, 20, i));
+                        imp.setBairro(val(sh, 18, i));
+                        imp.setMunicipio(val(sh, 21, i));
                     }
                     imp.setUf(val(sh, 25, i));
                     
@@ -655,19 +655,31 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
         Workbook planilha = Workbook.getWorkbook(new File(this.planilhaClientes), settings);            
         Sheet sh = planilha.getSheet(0);
 
-        ProgressBar.setStatus("Analisando Planilha de Fornecedores");
+        ProgressBar.setStatus("Analisando Planilha de Clientes");
         ProgressBar.setMaximum(sh.getRows());
 
         int linha = 0;
 
         try {
             ClienteIMP imp = null;
-            for (int i = 1; i < sh.getRows(); i++) {
+            for (int i = 0; i < sh.getRows(); i++) {
+                
+
                 //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
-                if (
+                /*if (
                         val(sh, 0, i).equals("Cód.") &&
-                        val(sh, 1, i).equals("Razão Social:")                             
-                ) {
+                        val(sh, 1, i).contains("Razão Social / Nome")                             
+                )*/ 
+                
+                linha++;
+                
+                if (linha == 1) {
+                    continue;
+                }
+                
+                if ((i > 1) && (val(sh, 0, i) != null) && (!val(sh, 0, i).trim().isEmpty())) {
+                    
+                    
                     if (imp != null) {
                         result.add(imp);
                     }
@@ -676,16 +688,82 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setAtivo(false);
                     }
                     imp.setId(val(sh, 0, i));
-                    imp.setRazao(val(sh, 8, i));
-                    imp.setCnpj(val(sh, 12, i));
-                    imp.setInscricaoestadual(val(sh, 7, i));
-                    if (!val(sh, 10, i).equals("")) {
-                        imp.addContato(val(sh, 10, i), val(sh, 1018, i), val(sh, 24, i), "", "");
+                    imp.setRazao(val(sh, 1, i));
+                    imp.setFantasia(imp.getRazao());
+                    imp.setCnpj(val(sh, 2, i));
+                    imp.setInscricaoestadual(val(sh, 3, i));
+
+                    if (!val(sh, 4, i).equals("")) {
+                        imp.setTelefone(val(sh, 4, i));
                     }
-                    if (!val(sh, 8, i).equals("")) {
-                        imp.setTelefone(val(sh, 8, i));
-                    imp.setObservacao(val(sh, 11, i));
+                    
+                    if (!val(sh, 5, i).equals("")) {
+                        imp.setObservacao2("CONTATO " + val(sh, 5, i));
+                    }
+
+                    
+                    if (
+                            (val(sh, 6, i) != null) && 
+                            (!val(sh, 6, i).trim().isEmpty()) && 
+                            (!", --/  ".equals(val(sh, 6, i))) && 
+                            (!", --/".equals(val(sh, 6, i)))
+                        ) {
+                    
+                        String enderecoCompleto = val(sh, 6, i);
+                        String ende[] = enderecoCompleto.split(",");
+                        
+                        imp.setObservacao2(imp.getObservacao2() + " == " + "ENDERCO " + enderecoCompleto);
+                        
+                        for (int j = 0; j < ende.length; j++) {
+                            
+                            switch(j) {
+                                case 0:
+                                    imp.setEndereco(ende[j]);
+                                    break;
+                                case 1:
+                                    if (ende[j].contains("-")) {
+                                        imp.setNumero(ende[j].substring(0, ende[j].indexOf("-")).trim());
+                                    } else {
+                                        imp.setNumero(ende[j].trim());
+                                    }
+                                    break;
+                            }
+                        }
+                        
+                        String enderecoCompletoReverse = new StringBuilder(enderecoCompleto).reverse().toString();
+                        String endeReverse[] = enderecoCompletoReverse.split("-");
+                        
+                        for (int k = 0; k < endeReverse.length; k++) {
+                            
+                            switch(k) {
+                                case 0:
+                
+                                    String municipio = new StringBuilder(endeReverse[k].substring(3, endeReverse[k].length()).trim()).reverse().toString().replace(".", "");
+                                    String uf = new StringBuilder(endeReverse[k].substring(0, endeReverse[k].indexOf("/")).trim()).reverse().toString();
+                                    
+                                    imp.setMunicipio(municipio);
+                                    imp.setUf(uf);
+                                    break;
+                                case 1:
+                                    String bairro = new StringBuilder(endeReverse[k]).reverse().toString().trim();
+                                    imp.setBairro(bairro);
+                                    break;
+                            }
+                        }
+                    }
+                    
+                    /*if (!val(sh, 5, i).equals("")) {
+                        /*imp.addContato(val(sh, 10, i), val(sh, 10, i), val(sh, 24, i), "", "");*/
+                    /*}*/
+                    
+                    
+                    //imp.setObservacao(val(sh, 11, i));
+                    
+                    
                     /*}
+                    
+                    
+                    
                 } else if (
                         val(sh, 0, i).equals("") //&&
                         //!val(sh, 19, i).equals("") &&
@@ -709,8 +787,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                         !val(sh, 25, i).equals("")
                     ) {                        
-                        imp.setUf(val(sh, 25, i));*/
-                    }
+                        imp.setUf(val(sh, 25, i));
+                    }*/
                 }
                 if (imp != null) {
                     result.add(imp);
