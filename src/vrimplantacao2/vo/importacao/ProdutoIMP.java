@@ -131,6 +131,7 @@ public class ProdutoIMP {
     @DatabaseField private String prateleira = "";
     @DatabaseField private String beneficio = "";
     @DatabaseField private boolean produtoECommerce = false;
+    @DatabaseField private String codigoAnp = "";
     
     public String getImportSistema() {
         return importSistema;
@@ -991,5 +992,12 @@ public class ProdutoIMP {
     public void setProdutoECommerce(boolean produtoECommerce) {
         this.produtoECommerce = produtoECommerce;
     }
-    
+
+    public String getCodigoAnp() {
+        return codigoAnp;
+    }
+
+    public void setCodigoAnp(String codigoAnp) {
+        this.codigoAnp = codigoAnp;
+    }
 }

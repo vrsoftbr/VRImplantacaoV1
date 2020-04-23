@@ -1310,6 +1310,7 @@ public class ProdutoRepository {
         vo.setVolume(imp.getVolume());
         vo.setVendaControlada(imp.isVendaControlada());
         vo.setProdutoecommerce(imp.isProdutoECommerce());
+        vo.setCodigoAnp(imp.getCodigoAnp());
 
         return vo;
     }

@@ -52,6 +52,7 @@ public class ProdutoVO {
     private double volume = 1.0;
     private boolean vendaControlada = false;
     private boolean produtoecommerce = false;
+    private String codigoAnp = "";
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -294,24 +295,15 @@ public class ProdutoVO {
 
     public NormaReposicao getNormaReposicao() {
         return normaReposicao;
-    }    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    }
+
+    public String getCodigoAnp() {
+        return codigoAnp;
+    }
+
+    public void setCodigoAnp(String codigoAnp) {
+        this.codigoAnp = codigoAnp;
+    }
     
     public MultiMap<String, ProdutoAnteriorVO> getCodigosAnteriores() {
         return codigosAnteriorVOs;

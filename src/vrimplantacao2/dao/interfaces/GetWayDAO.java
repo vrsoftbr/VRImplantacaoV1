@@ -306,7 +306,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	prod.PER_REDUC_ENT icms_reduzido_entrada,\n"
                     + "   refativoimob tipo_ativo,\n"
                     + "   refusoconsumo tipo_usoconsumo,\n"
-                    + "	prod.desativacompra\n"
+                    + "	prod.desativacompra,\n"
+                    + " prod.CODANP codigoanp\n"        
                     + "from\n"
                     + "	produtos prod\n"
                     + "left outer join prod_familia fam on\n"
@@ -469,6 +470,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setPautaFiscalId(imp.getImportId());
+                    imp.setCodigoAnp(rst.getString("codigoanp"));
 
                     vResult.add(imp);
                 }
@@ -647,6 +649,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id_produto"));
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setManterEAN(true);
 
                     result.add(imp);
                 }

@@ -171,7 +171,7 @@ public class ProdutoDAO {
             sql.put("conferido", false);
             sql.put("permitequebra", true);
             sql.put("permiteperda", true);
-            sql.put("codigoanp", "");
+            sql.put("codigoanp", vo.getCodigoAnp());
             sql.put("impostomedionacional", 0);
             sql.put("impostomedioimportado", 0);
             sql.put("sugestaocotacao", true);
