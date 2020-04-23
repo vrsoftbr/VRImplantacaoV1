@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.cadastro;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.NormaCompra;
@@ -31,6 +32,8 @@ public class ProdutoComplementoVO {
     private NormaCompra normaReposicao = NormaCompra.CAIXA;
     private String setor = "";
     private String prateleira = "";
+    private Date dataMovimento;
+    private Timestamp dataHora;
 
     public void setId(int id) {
         this.id = id;
@@ -215,4 +218,20 @@ public class ProdutoComplementoVO {
     public void setSetor(String setor) {
         this.setor = setor;
     }   
+
+    public Date getDataMovimento() {
+        return dataMovimento;
+    }
+
+    public void setDataMovimento(Date dataMovimento) {
+        this.dataMovimento = dataMovimento;
+    }
+
+    public Timestamp getDataHora() {
+        return dataHora;
+    }
+
+    public void setDataHora(Timestamp dataHora) {
+        this.dataHora = dataHora;
+    }
 }
