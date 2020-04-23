@@ -15,6 +15,7 @@ import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.LogProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
@@ -183,6 +184,36 @@ public class ProdutoComplementoDAO {
                 }
                 getComplementos().put(vo.getId(), vo.getIdLoja(), vo.getProduto().getId());
             }
+        }
+    }
+    
+    public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+                SQLBuilder sql = new SQLBuilder();
+                
+                sql.setTableName("logcusto");
+                
+                sql.put("id_loja", vo.getIdLoja());
+                sql.put("id_produto", vo.getProduto().getId());
+                sql.put("custosemimposto", vo.getCustoSemImposto());
+                sql.put("custocomimposto", vo.getCustoComImposto());
+                sql.put("custosemimpostoanterior", vo.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", vo.getCustoAnteriorSemImposto());
+
+                sql.put("datahora", vo.getDataHora());
+                sql.put("datamovimento", vo.getDataMovimento());
+                sql.put("custosemperdasemimposto", 0);
+                sql.put("custosemperdasemimpostoanterior", 0);
+                sql.put("customediocomimposto", 0);
+                sql.put("customediosemimposto", 0);
+
+                try (ResultSet rst = stm.executeQuery(
+                        sql.getInsert()
+                )) {
+                    if (rst.next()) {
+                        vo.setId(rst.getInt("id"));
+                    }
+                }
         }
     }
 
