@@ -298,7 +298,7 @@ public class ProdutoRepositoryProvider {
         }
         
         public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
-            produtoComplementoDAO.gerarLogCusto(vo);
+            produtoComplementoDAO.salvarLogCusto(vo);
         }
     }
     

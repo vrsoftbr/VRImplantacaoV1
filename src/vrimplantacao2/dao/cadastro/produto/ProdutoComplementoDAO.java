@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -191,7 +193,7 @@ public class ProdutoComplementoDAO {
         }
     }
 
-    public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
+    public void salvarLogCusto(LogProdutoComplementoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
 
@@ -377,8 +379,8 @@ public class ProdutoComplementoDAO {
             logCusto.setObservacao("ALTERADO VRIMPLANTACAO");
             logCusto.setDataMovimento(custoAnt.getDataMovimento());
             logCusto.setDataHora(custoAnt.getDataHora());
-
-            gerarLogCusto(logCusto);
+            
+            salvarLogCusto(logCusto);
     }
 
     private MultiMap<Integer, OfertaVO> ofertas;
