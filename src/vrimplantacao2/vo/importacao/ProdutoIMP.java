@@ -118,6 +118,7 @@ public class ProdutoIMP {
     @DatabaseField private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
     @DatabaseField private boolean fabricacaoPropria = false;
     @DatabaseField private boolean manterEAN = false;
+    @DatabaseField private boolean importarEANUnitarioMenor7 = false;
     @DatabaseField private boolean emiteEtiqueta = true;
     @DatabaseField private boolean aceitaMultiplicacaoPDV = true;
     
@@ -1000,4 +1001,13 @@ public class ProdutoIMP {
     public void setCodigoAnp(String codigoAnp) {
         this.codigoAnp = codigoAnp;
     }
+
+    public boolean isImportarEANUnitarioMenor7() {
+        return importarEANUnitarioMenor7;
+    }
+
+    public void setImportarEANUnitarioMenor7(boolean importarEANUnitarioMenor7) {
+        this.importarEANUnitarioMenor7 = importarEANUnitarioMenor7;
+    }
+    
 }

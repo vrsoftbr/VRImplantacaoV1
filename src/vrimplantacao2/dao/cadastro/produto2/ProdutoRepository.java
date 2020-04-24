@@ -123,6 +123,8 @@ public class ProdutoRepository {
                     String strID;
                     boolean eBalanca;
                     TipoEmbalagem unidade;
+                    boolean manterEAN;
+                    
                     {
                         SetUpVariaveisTO to = setUpVariaveis(imp);
                         ean = to.ean;
@@ -198,10 +200,7 @@ public class ProdutoRepository {
                         provider.salvar(prod);
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
-                        provider.aliquota().salvar(aliquota);
-                        
-                        
-                        
+                        provider.aliquota().salvar(aliquota); 
                         
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
