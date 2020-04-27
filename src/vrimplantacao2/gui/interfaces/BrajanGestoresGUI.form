@@ -295,11 +295,19 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkValorLimte" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkSituacaoCadastroCliente" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkBloqueadoCliente" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="367" max="32767" attributes="0"/>
+                              <EmptySpace pref="100" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -307,7 +315,12 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkValorLimte" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkSituacaoCadastroCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkBloqueadoCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -350,6 +363,21 @@
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkCreditoRotativoActionPerformed"/>
                       </Events>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValorLimte">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Valor Limite"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSituacaoCadastroCliente">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueadoCliente">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                      </Properties>
                     </Component>
                   </SubComponents>
                 </Container>
