@@ -12,6 +12,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
@@ -25,6 +26,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -33,7 +35,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class WinthorDAO extends InterfaceDAO {
+public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -143,6 +145,34 @@ public class WinthorDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT  \n" +
+                    "    codst id,\n" +
+                    "    mensagem descricao,\n" +
+                    "    codicm icms,\n" +
+                    "    sittribut cst,\n" +
+                    "    percbasered reducao\n" +
+                    "from\n" +
+                    "    PCTRIBUT\n" +
+                    "order by 1")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"), 
+                            rs.getInt("cst"), 
+                            rs.getDouble("icms"), 
+                            rs.getDouble("reducao")));
+                }
+            }
+        }
+        return result;
+    }
+
     private class Trib {
         public int icmsCst;
         public double icmsAliq;
@@ -214,8 +244,8 @@ public class WinthorDAO extends InterfaceDAO {
                     "    p.codcategoria merc3,\n" +
                     "    p.codsubcategoria merc4,\n" +
                     "    CASE WHEN p.codprodprinc != p.codprod then p.codprodprinc else null END id_familiaproduto,\n" +
-                    "    coalesce(p.pesobruto,0) pesobruto,\n" +
-                    "    coalesce(p.pesoliq,0) pesoliquido,\n" +
+                    "    round(coalesce(p.pesobruto, 0),2) pesobruto,\n" +
+                    "    round(coalesce(p.pesoliq, 0),2) pesoliquido,\n" +
                     "    coalesce(est.estmin, 0) estoqueminimo,\n" +
                     "    coalesce(est.estmax, 0) estoquemaximo,    \n" +
                     "    coalesce(est.qtest,0) estoque,\n" +
@@ -225,10 +255,12 @@ public class WinthorDAO extends InterfaceDAO {
                     "    coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) precovenda,\n" +
                     "    CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n" +
                     "    p.nbm ncm,\n" +
-                    "    coalesce(est.codcest,p.codcest) cest,\n" +
+                    "    coalesce(est.codcest, p.codcest) cest,\n" +
                     "    piscofins.sittribut piscofins_debito,\n" +
                     "    piscofins.descricaotribpiscofins,\n" +
+                    "    p.codsittribpiscofins piscofins,\n" +
                     "    t.codnatrec piscofins_natrec,\n" +
+                    "    tabst.codst idtributacao,\n" +
                     "    icms.sittribut icmscst,\n" +
                     "    icms.codicm icmsaliq,\n" +
                     "    icms.codicmtab icmsred,\n" +
@@ -282,14 +314,23 @@ public class WinthorDAO extends InterfaceDAO {
                     "        AND ((T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n" +
                     "        OR  (T.DATAINIESCR <= current_date AND T.DATAFINESCR IS NULL)\n" +
                     "        OR  (current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR AND T.DATAINIESCR IS NOT NULL AND T.DATAFINESCR IS NOT NULL))\n" +
-                    "    JOIN PCTABTRIB ic ON\n" +
+                    "    LEFT JOIN PCTABTRIB ic ON\n" +
                     "        ic.codprod = p.codprod\n" +
                     "        AND ic.codfilialnf = emp.codigo\n" +
                     "        AND ic.ufdestino = emp.uf\n" +
-                    "    JOIN PCTRIBUT icms ON\n" +
+                    "    LEFT JOIN PCTRIBUT icms ON\n" +
                     "        ic.codst = icms.codst\n" +
-                    "    JOIN pctribpiscofins piscofins ON\n" +
+                    "    LEFT JOIN pctribpiscofins piscofins ON\n" +
                     "        piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
+                    "    LEFT JOIN (select \n" +
+                    "                    icm.codprod,\n" +
+                    "                    icm.codst,\n" +
+                    "                    reg.codfilial\n" +
+                    "                from \n" +
+                    "                    pctabpr icm \n" +
+                    "                left join pcregiao reg on icm.numregiao = reg.numregiao\n" +
+                    "                left join PCTRIBUT trb on icm.codst = trb.codst) tabst on tabst.codprod = p.codprod and\n" +
+                    "                tabst.codfilial = emp.codigo\n" +
                     "ORDER BY id, ean"
             )) {
                 int cont = 0, cont2 = 0;
@@ -303,7 +344,11 @@ public class WinthorDAO extends InterfaceDAO {
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    if(rst.getString("e_balanca") != null && !"".equals(rst.getString("e_balanca"))) {
+                        imp.seteBalanca("S".equals(rst.getString("e_balanca").trim()) ? true : false);
+                    } else {
+                        imp.seteBalanca(false);
+                    }
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
@@ -313,8 +358,8 @@ public class WinthorDAO extends InterfaceDAO {
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
                     imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
                     imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
-                    imp.setPesoBruto(rst.getDouble("pesoliquido"));
-                    imp.setPesoLiquido(rst.getDouble("pesobruto"));                    
+                    imp.setPesoBruto(Utils.stringToDouble(rst.getString("pesoliquido")));
+                    imp.setPesoLiquido(Utils.stringToDouble(rst.getString("pesobruto")));                    
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -325,12 +370,15 @@ public class WinthorDAO extends InterfaceDAO {
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
-                    imp.setPiscofinsCstCredito(0);
+                    //imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                    //imp.setPiscofinsCstCredito(0);
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
-                    imp.setIcmsCst(rst.getInt("icmscst"));
-                    imp.setIcmsAliq(rst.getDouble("icmsaliq"));
+                    //imp.setIcmsCst(rst.getInt("icmscst"));
+                    //imp.setIcmsAliq(rst.getDouble("icmsaliq"));
                     //imp.setIcmsReducao(rst.getDouble("icmsred"));
+                    imp.setIcmsDebitoId(rst.getString("idtributacao"));
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
 
                     Trib trib = tribs.get(rst.getString("codncmex"));
                     if (trib != null) {

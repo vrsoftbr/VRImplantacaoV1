@@ -1,7 +1,11 @@
 package vrimplantacao2.dao.cadastro.produto;
 
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -22,27 +27,28 @@ import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 
 public class ProdutoComplementoDAO {
-    
+
     private static final Logger LOG = Logger.getLogger(ProdutoComplementoDAO.class.getName());
-    
+
     private MultiMap<Integer, Integer> complementos;
+
     public MultiMap<Integer, Integer> getComplementos() throws Exception {
         if (complementos == null) {
             atualizarComplementos();
         }
         return complementos;
     }
-    
+
     public void atualizarComplementos() throws Exception {
         complementos = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	pc.id,\n" +
-                    "	pc.id_loja,\n" +
-                    "	pc.id_produto\n" +
-                    "from\n" +
-                    "	produtocomplemento pc"
+                    "select\n"
+                    + "	pc.id,\n"
+                    + "	pc.id_loja,\n"
+                    + "	pc.id_produto\n"
+                    + "from\n"
+                    + "	produtocomplemento pc"
             )) {
                 while (rst.next()) {
                     complementos.put(rst.getInt("id"), rst.getInt("id_loja"), rst.getInt("id_produto"));
@@ -53,7 +59,7 @@ public class ProdutoComplementoDAO {
 
     public void salvar(Collection<ProdutoComplementoVO> values, boolean unificacao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoComplementoVO vo: values) {
+            for (ProdutoComplementoVO vo : values) {
                 if (!getComplementos().containsKey(vo.getIdLoja(), vo.getProduto().getId())) {
                     SQLBuilder sql = new SQLBuilder();
                     sql.setTableName("produtocomplemento");
@@ -100,7 +106,7 @@ public class ProdutoComplementoDAO {
                     sql.put("customediosemimpostoanterior", 0);
                     sql.put("id_tipopiscofinscredito", vo.getProduto().getPisCofinsCredito().getId());
                     sql.put("valoroutrassubstituicao", 0);
-                    if (Versao.maiorQue(3,17,9)) {
+                    if (Versao.maiorQue(3, 17, 9)) {
                         sql.put("id_tipoproduto", vo.getTipoProduto().getId());
                         sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                     }
@@ -119,7 +125,7 @@ public class ProdutoComplementoDAO {
             }
         }
     }
-    
+
     public void salvar(ProdutoComplementoVO vo, boolean unificacao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             if (!getComplementos().containsKey(vo.getIdLoja(), vo.getProduto().getId())) {
@@ -168,7 +174,7 @@ public class ProdutoComplementoDAO {
                 sql.put("customediosemimpostoanterior", 0);
                 sql.put("id_tipopiscofinscredito", vo.getProduto().getPisCofinsCredito().getId());
                 sql.put("valoroutrassubstituicao", 0);
-                if (Versao.maiorQue(3,17,9)) {
+                if (Versao.maiorQue(3, 17, 9)) {
                     sql.put("id_tipoproduto", vo.getTipoProduto().getId());
                     sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                 }
@@ -186,54 +192,66 @@ public class ProdutoComplementoDAO {
             }
         }
     }
-    
-    public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
+
+    public void salvarLogCusto(LogProdutoComplementoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-                SQLBuilder sql = new SQLBuilder();
-                
-                sql.setTableName("logcusto");
-                
-                sql.put("id_loja", vo.getIdLoja());
-                sql.put("id_produto", vo.getProduto().getId());
-                sql.put("custosemimposto", vo.getCustoSemImposto());
-                sql.put("custocomimposto", vo.getCustoComImposto());
-                sql.put("custosemimpostoanterior", vo.getCustoAnteriorSemImposto());
-                sql.put("custocomimpostoanterior", vo.getCustoAnteriorSemImposto());
+            SQLBuilder sql = new SQLBuilder();
 
-                sql.put("datahora", vo.getDataHora());
-                sql.put("datamovimento", vo.getDataMovimento());
-                sql.put("custosemperdasemimposto", 0);
-                sql.put("custosemperdasemimpostoanterior", 0);
-                sql.put("customediocomimposto", 0);
-                sql.put("customediosemimposto", 0);
+            sql.setTableName("logcusto");
 
-                try (ResultSet rst = stm.executeQuery(
-                        sql.getInsert()
-                )) {
-                    if (rst.next()) {
-                        vo.setId(rst.getInt("id"));
-                    }
-                }
+            sql.put("id_loja", vo.getIdLoja());
+            sql.put("id_produto", vo.getProduto().getId());
+            sql.put("custosemimposto", vo.getCustoSemImposto());
+            sql.put("custosemimpostoanterior", vo.getCustoAnteriorSemImposto());
+            sql.put("custocomimposto", vo.getCustoComImposto());
+            sql.put("custocomimpostoanterior", vo.getCustoAnteriorSemImposto());
+            sql.put("datahora", vo.getDataHora());
+            sql.put("datamovimento", vo.getDataMovimento());
+            sql.put("customediosemimposto", 0);
+            sql.put("customediosemimpostoanterior", 0);
+            sql.put("customediocomimposto", 0);
+            sql.put("customediocomimpostoanterior", 0);
+            sql.put("id_usuario", 0);
+            sql.put("observacao", vo.getObservacao());
+            sql.put("valoripi", 0);
+            sql.put("valoricmssubstituicao", 0);
+            sql.put("valoricms", 0);
+            sql.put("valorpiscofins", 0);
+            sql.put("valoracrescimo", 0);
+            sql.put("valoracrescimoimposto", 0);
+            sql.put("custonota", 0);
+            sql.put("percentualperda", 0);
+            sql.put("valordesconto", 0);
+            sql.put("valordescontoimposto", 0);
+            sql.put("valorbonificacao", 0);
+            sql.put("valorverba", 0);
+            sql.put("valoroutrassubstituicao", 0);
+            sql.put("valordespesafrete", 0);
+            sql.put("valorfcp", 0);
+            sql.put("valorfcpsubstituicao", 0);
+
+            stm.execute(sql.getInsert());
         }
     }
 
     Set<Integer> custoAjustadoPeloUsuario = null;
+
     public void atualizar(ProdutoComplementoVO complemento, Set<OpcaoProduto> opt) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            
+
             if (custoAjustadoPeloUsuario == null) {
                 custoAjustadoPeloUsuario = new HashSet<>();
                 try (ResultSet rst = stm.executeQuery(
-                        "select distinct id_produto from logcusto where id_loja = " + complemento.getIdLoja() + "\n" +
-                        "union\n" +
-                        "select distinct id_produto from notaentradaitem join notaentrada on id_notaentrada = notaentrada.id where id_loja = " + complemento.getIdLoja()
+                        "select distinct id_produto from logcusto where id_loja = " + complemento.getIdLoja() + " and observacao not like '%VRIMPLANTACAO%'\n"
+                        + "union\n"
+                        + "select distinct id_produto from notaentradaitem join notaentrada on id_notaentrada = notaentrada.id where id_loja = " + complemento.getIdLoja()
                 )) {
                     while (rst.next()) {
                         custoAjustadoPeloUsuario.add(rst.getInt("id_produto"));
                     }
                 }
             }
-            
+
             SQLBuilder sql = new SQLBuilder();
             String oft = "";
             sql.setTableName("produtocomplemento");
@@ -241,20 +259,20 @@ public class ProdutoComplementoDAO {
                 OfertaVO oferta = getOfertas().get(complemento.getIdLoja(), complemento.getProduto().getId());
                 if (oferta == null) {
                     sql.put("precovenda", complemento.getPrecoVenda());
-                    sql.put("precodiaseguinte", complemento.getPrecoDiaSeguinte());                    
+                    sql.put("precodiaseguinte", complemento.getPrecoDiaSeguinte());
                 } else {
                     sql.put("precovenda", oferta.getPrecoOferta());
                     if (oferta.getDataTermino().getTime() > new Date().getTime()) {
                         sql.put("precodiaseguinte", oferta.getPrecoOferta());
                     } else {
                         sql.put("precodiaseguinte", complemento.getPrecoDiaSeguinte());
-                    }                    
+                    }
                     oft = "update oferta set preconormal = " + MathUtils.round(complemento.getPrecoVenda(), 2) + " where id = " + oferta.getId();
                 }
             }
-            boolean atualizar = 
-                    !custoAjustadoPeloUsuario.contains(complemento.getProduto().getId()) ||
-                    opt.contains(OpcaoProduto.FORCAR_ATUALIZACAO);
+            boolean atualizar
+                    = !custoAjustadoPeloUsuario.contains(complemento.getProduto().getId())
+                    || opt.contains(OpcaoProduto.FORCAR_ATUALIZACAO);
             if (!atualizar) {
                 log("PRODUTO ATUALIZADO PELO USUARIO", "ID:" + complemento.getProduto().getId());
             }
@@ -263,14 +281,20 @@ public class ProdutoComplementoDAO {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
+                
+                gerarLogCusto(complemento);
             }
             if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) && atualizar) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
+                
+                gerarLogCusto(complemento);
             }
             if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) && atualizar) {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
+                
+                gerarLogCusto(complemento);
             }
-            if(opt.contains(OpcaoProduto.CUSTO_ANTERIOR) && atualizar) {
+            if (opt.contains(OpcaoProduto.CUSTO_ANTERIOR) && atualizar) {
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
@@ -340,44 +364,61 @@ public class ProdutoComplementoDAO {
             }
         }
     }
-    
-    
-    
+
+    private void gerarLogCusto(ProdutoComplementoVO complemento) throws Exception {
+            ProdutoComplementoVO custoAnt = 
+                    getCustoProduto(complemento.getIdLoja(), complemento.getProduto().getId());
+            LogProdutoComplementoVO logCusto = new LogProdutoComplementoVO();
+
+            logCusto.setIdLoja(complemento.getIdLoja());
+            logCusto.setProduto(complemento.getProduto());
+            logCusto.setCustoAnteriorComImposto(custoAnt.getCustoComImposto());
+            logCusto.setCustoAnteriorSemImposto(custoAnt.getCustoSemImposto());
+            logCusto.setCustoComImposto(complemento.getCustoComImposto());
+            logCusto.setCustoSemImposto(complemento.getCustoSemImposto());
+            logCusto.setObservacao("ALTERADO VRIMPLANTACAO");
+            logCusto.setDataMovimento(custoAnt.getDataMovimento());
+            logCusto.setDataHora(custoAnt.getDataHora());
+            
+            salvarLogCusto(logCusto);
+    }
+
     private MultiMap<Integer, OfertaVO> ofertas;
+
     private MultiMap<Integer, OfertaVO> getOfertas() throws Exception {
         if (ofertas == null) {
             atualizaOfertas();
         }
         return ofertas;
     }
-    
+
     private void atualizaOfertas() throws Exception {
         ofertas = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                "select \n" +
-                "	o.id, \n" +
-                "	o.id_loja, \n" +
-                "	o.id_produto, \n" +
-                "	o.datainicio, \n" +
-                "	o.datatermino, \n" +
-                "	o.precooferta, \n" +
-                "	o.preconormal, \n" +
-                "	o.id_situacaooferta,\n" +
-                "	p.descricaocompleta,\n" +
-                "	p.descricaoreduzida,\n" +
-                "	p.descricaogondola,\n" +
-                "	o.id_situacaooferta\n" +
-                "from \n" +
-                "	oferta o\n" +
-                "	join produto p on o.id_produto = p.id\n" +
-                "where\n" +
-                "	o.datainicio <= now()::date and\n" +
-                "	o.datatermino >= now()::date and\n" +
-                "	o.id_situacaooferta = 1\n" +
-                "order by\n" +
-                "	o.id_loja,\n" +
-                "	o.id_produto"
+                    "select \n"
+                    + "	o.id, \n"
+                    + "	o.id_loja, \n"
+                    + "	o.id_produto, \n"
+                    + "	o.datainicio, \n"
+                    + "	o.datatermino, \n"
+                    + "	o.precooferta, \n"
+                    + "	o.preconormal, \n"
+                    + "	o.id_situacaooferta,\n"
+                    + "	p.descricaocompleta,\n"
+                    + "	p.descricaoreduzida,\n"
+                    + "	p.descricaogondola,\n"
+                    + "	o.id_situacaooferta\n"
+                    + "from \n"
+                    + "	oferta o\n"
+                    + "	join produto p on o.id_produto = p.id\n"
+                    + "where\n"
+                    + "	o.datainicio <= now()::date and\n"
+                    + "	o.datatermino >= now()::date and\n"
+                    + "	o.id_situacaooferta = 1\n"
+                    + "order by\n"
+                    + "	o.id_loja,\n"
+                    + "	o.id_produto"
             )) {
                 while (rst.next()) {
                     OfertaVO oferta = new OfertaVO();
@@ -400,91 +441,91 @@ public class ProdutoComplementoDAO {
             }
         }
     }
-    
+
     public void copiarProdutoComplemento(int lojaModelo, int lojaNova) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                "insert into produtocomplemento (\n" +
-                "	id_produto, \n" +
-                "	prateleira, \n" +
-                "	secao, \n" +
-                "	estoqueminimo, \n" +
-                "	estoquemaximo, \n" +
-                "	valoripi, \n" +
-                "	dataultimopreco, \n" +
-                "	dataultimaentrada, \n" +
-                "	custosemimposto, \n" +
-                "	custocomimposto, \n" +
-                "	custosemimpostoanterior, \n" +
-                "	custocomimpostoanterior, \n" +
-                "	precovenda, \n" +
-                "	precovendaanterior, \n" +
-                "	precodiaseguinte, estoque, troca, \n" +
-                "	emiteetiqueta, \n" +
-                "	custosemperdasemimposto, \n" +
-                "	custosemperdasemimpostoanterior, \n" +
-                "	customediocomimposto, \n" +
-                "	customediosemimposto, \n" +
-                "	id_aliquotacredito, \n" +
-                "	dataultimavenda, \n" +
-                "	teclaassociada, \n" +
-                "	id_situacaocadastro, \n" +
-                "	id_loja,\n" +
-                "	descontinuado, \n" +
-                "	quantidadeultimaentrada, \n" +
-                "	centralizado, \n" +
-                "	operacional, \n" +
-                "	valoricmssubstituicao, \n" +
-                "	dataultimaentradaanterior, \n" +
-                "	cestabasica, \n" +
-                "	customediocomimpostoanterior, \n" +
-                "	customediosemimpostoanterior, \n" +
-                "	id_tipopiscofinscredito, \n" +
-                "	valoroutrassubstituicao,\n" +
-                "	id_normareposicao)\n" +
-                "SELECT\n" +
-                "	id_produto, \n" +
-                "	prateleira, \n" +
-                "	secao, \n" +
-                "	estoqueminimo, \n" +
-                "	estoquemaximo, \n" +
-                "	valoripi, \n" +
-                "	dataultimopreco, \n" +
-                "	dataultimaentrada, \n" +
-                "	custosemimposto, \n" +
-                "	custocomimposto, \n" +
-                "	custosemimpostoanterior, \n" +
-                "	custocomimpostoanterior, \n" +
-                "	precovenda, \n" +
-                "	precovendaanterior, \n" +
-                "	precodiaseguinte, 0 estoque, troca, \n" +
-                "	emiteetiqueta, \n" +
-                "	custosemperdasemimposto, \n" +
-                "	custosemperdasemimpostoanterior, \n" +
-                "	customediocomimposto, \n" +
-                "	customediosemimposto, \n" +
-                "	id_aliquotacredito, \n" +
-                "	dataultimavenda, \n" +
-                "	teclaassociada, \n" +
-                "	id_situacaocadastro, \n" +
-                "	" + lojaNova + " id_loja,\n" +
-                "	descontinuado, \n" +
-                "	quantidadeultimaentrada, \n" +
-                "	centralizado, \n" +
-                "	operacional, \n" +
-                "	valoricmssubstituicao, \n" +
-                "	dataultimaentradaanterior, \n" +
-                "	cestabasica, \n" +
-                "	customediocomimpostoanterior, \n" +
-                "	customediosemimpostoanterior, \n" +
-                "	id_tipopiscofinscredito, \n" +
-                "	valoroutrassubstituicao,\n" +
-                "	id_normareposicao\n" + 
-                "FROM 	\n" +
-                "	produtocomplemento pc\n" +
-                "where\n" +
-                "	id_loja = " + lojaModelo + " and\n" +
-                "	not id_produto in (select id_produto from produtocomplemento where id_loja = " + lojaNova + ");"
+                    "insert into produtocomplemento (\n"
+                    + "	id_produto, \n"
+                    + "	prateleira, \n"
+                    + "	secao, \n"
+                    + "	estoqueminimo, \n"
+                    + "	estoquemaximo, \n"
+                    + "	valoripi, \n"
+                    + "	dataultimopreco, \n"
+                    + "	dataultimaentrada, \n"
+                    + "	custosemimposto, \n"
+                    + "	custocomimposto, \n"
+                    + "	custosemimpostoanterior, \n"
+                    + "	custocomimpostoanterior, \n"
+                    + "	precovenda, \n"
+                    + "	precovendaanterior, \n"
+                    + "	precodiaseguinte, estoque, troca, \n"
+                    + "	emiteetiqueta, \n"
+                    + "	custosemperdasemimposto, \n"
+                    + "	custosemperdasemimpostoanterior, \n"
+                    + "	customediocomimposto, \n"
+                    + "	customediosemimposto, \n"
+                    + "	id_aliquotacredito, \n"
+                    + "	dataultimavenda, \n"
+                    + "	teclaassociada, \n"
+                    + "	id_situacaocadastro, \n"
+                    + "	id_loja,\n"
+                    + "	descontinuado, \n"
+                    + "	quantidadeultimaentrada, \n"
+                    + "	centralizado, \n"
+                    + "	operacional, \n"
+                    + "	valoricmssubstituicao, \n"
+                    + "	dataultimaentradaanterior, \n"
+                    + "	cestabasica, \n"
+                    + "	customediocomimpostoanterior, \n"
+                    + "	customediosemimpostoanterior, \n"
+                    + "	id_tipopiscofinscredito, \n"
+                    + "	valoroutrassubstituicao,\n"
+                    + "	id_normareposicao)\n"
+                    + "SELECT\n"
+                    + "	id_produto, \n"
+                    + "	prateleira, \n"
+                    + "	secao, \n"
+                    + "	estoqueminimo, \n"
+                    + "	estoquemaximo, \n"
+                    + "	valoripi, \n"
+                    + "	dataultimopreco, \n"
+                    + "	dataultimaentrada, \n"
+                    + "	custosemimposto, \n"
+                    + "	custocomimposto, \n"
+                    + "	custosemimpostoanterior, \n"
+                    + "	custocomimpostoanterior, \n"
+                    + "	precovenda, \n"
+                    + "	precovendaanterior, \n"
+                    + "	precodiaseguinte, 0 estoque, troca, \n"
+                    + "	emiteetiqueta, \n"
+                    + "	custosemperdasemimposto, \n"
+                    + "	custosemperdasemimpostoanterior, \n"
+                    + "	customediocomimposto, \n"
+                    + "	customediosemimposto, \n"
+                    + "	id_aliquotacredito, \n"
+                    + "	dataultimavenda, \n"
+                    + "	teclaassociada, \n"
+                    + "	id_situacaocadastro, \n"
+                    + "	" + lojaNova + " id_loja,\n"
+                    + "	descontinuado, \n"
+                    + "	quantidadeultimaentrada, \n"
+                    + "	centralizado, \n"
+                    + "	operacional, \n"
+                    + "	valoricmssubstituicao, \n"
+                    + "	dataultimaentradaanterior, \n"
+                    + "	cestabasica, \n"
+                    + "	customediocomimpostoanterior, \n"
+                    + "	customediosemimpostoanterior, \n"
+                    + "	id_tipopiscofinscredito, \n"
+                    + "	valoroutrassubstituicao,\n"
+                    + "	id_normareposicao\n"
+                    + "FROM 	\n"
+                    + "	produtocomplemento pc\n"
+                    + "where\n"
+                    + "	id_loja = " + lojaModelo + " and\n"
+                    + "	not id_produto in (select id_produto from produtocomplemento where id_loja = " + lojaNova + ");"
             );
         }
     }
@@ -492,19 +533,19 @@ public class ProdutoComplementoDAO {
     public void criarEstoqueAnteriorTemporario(int lojaVR) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "create temp table tmp_estoque \n" +
-                    "on commit drop \n" +
-                    "as \n" +
-                    "select \n" +
-                    "	id, \n" +
-                    "	id_produto, \n" +
-                    "	estoque \n" +
-                    "from\n" +
-                    "	produtocomplemento\n" +
-                    "where\n" +
-                    "	id_loja = " + lojaVR + "\n" +
-                    "order by\n" +
-                    "	id"
+                    "create temp table tmp_estoque \n"
+                    + "on commit drop \n"
+                    + "as \n"
+                    + "select \n"
+                    + "	id, \n"
+                    + "	id_produto, \n"
+                    + "	estoque \n"
+                    + "from\n"
+                    + "	produtocomplemento\n"
+                    + "where\n"
+                    + "	id_loja = " + lojaVR + "\n"
+                    + "order by\n"
+                    + "	id"
             );
         }
     }
@@ -512,57 +553,57 @@ public class ProdutoComplementoDAO {
     public void gerarLogDeEstoqueViaTMP_ESTOQUE(int lojaVR) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "insert into logestoque (\n" +
-                    "	id_loja, \n" +
-                    "	id_produto, \n" +
-                    "	quantidade, \n" +
-                    "	id_tipomovimentacao, \n" +
-                    "	datahora, \n" +
-                    "	id_usuario, \n" +
-                    "	observacao, \n" +
-                    "	estoqueanterior,\n" +
-                    "	estoqueatual, \n" +
-                    "	id_tipoentradasaida, \n" +
-                    "	custosemimposto, \n" +
-                    "	custocomimposto, \n" +
-                    "	datamovimento, \n" +
-                    "	customediocomimposto, \n" +
-                    "	customediosemimposto\n" +
-                    ")\n" +                    
-                    "select\n" +
-                    "	pc.id_loja,\n" +
-                    "	pc.id_produto,\n" +
-                    "	(pc.estoque - coalesce(l.estoque, pc.estoque)) * (case when coalesce(l.estoque,pc.estoque) > pc.estoque then -1 else 1 end) quantidade,\n" +
-                    "	1 id_tipomovimentacao,\n" +
-                    "	current_timestamp datahora, \n" +
-                    "	0 id_usuario, \n" +
-                    "	'IMPORTACAO (VRIMPLANTACAO)' observacao,\n" +
-                    "	coalesce(l.estoque, pc.estoque) estoqueanterior,\n" +
-                    "	pc.estoque estoqueatual, \n" +
-                    "	case \n" +
-                    "	when coalesce(l.estoque, pc.estoque) < pc.estoque then 0 \n" +
-                    "	when coalesce(l.estoque, pc.estoque) = pc.estoque then 2\n" +
-                    "	else 1 end id_tipoentradasaida, \n" +
-                    "	pc.custosemimposto, \n" +
-                    "	pc.custocomimposto, \n" +
-                    "	current_timestamp datamovimento, \n" +
-                    "	pc.customediocomimposto, \n" +
-                    "	pc.customediosemimposto \n" +
-                    "from\n" +
-                    "	produtocomplemento pc\n" +
-                    "	left join tmp_estoque l on\n" +
-                    "		pc.id_produto = l.id_produto\n" +
-                    "where\n" +
-                    "	pc.id_loja = " + lojaVR + "\n" +
-                    "order by\n" +
-                    "	id_produto"
+                    "insert into logestoque (\n"
+                    + "	id_loja, \n"
+                    + "	id_produto, \n"
+                    + "	quantidade, \n"
+                    + "	id_tipomovimentacao, \n"
+                    + "	datahora, \n"
+                    + "	id_usuario, \n"
+                    + "	observacao, \n"
+                    + "	estoqueanterior,\n"
+                    + "	estoqueatual, \n"
+                    + "	id_tipoentradasaida, \n"
+                    + "	custosemimposto, \n"
+                    + "	custocomimposto, \n"
+                    + "	datamovimento, \n"
+                    + "	customediocomimposto, \n"
+                    + "	customediosemimposto\n"
+                    + ")\n"
+                    + "select\n"
+                    + "	pc.id_loja,\n"
+                    + "	pc.id_produto,\n"
+                    + "	(pc.estoque - coalesce(l.estoque, pc.estoque)) * (case when coalesce(l.estoque,pc.estoque) > pc.estoque then -1 else 1 end) quantidade,\n"
+                    + "	1 id_tipomovimentacao,\n"
+                    + "	current_timestamp datahora, \n"
+                    + "	0 id_usuario, \n"
+                    + "	'IMPORTACAO (VRIMPLANTACAO)' observacao,\n"
+                    + "	coalesce(l.estoque, pc.estoque) estoqueanterior,\n"
+                    + "	pc.estoque estoqueatual, \n"
+                    + "	case \n"
+                    + "	when coalesce(l.estoque, pc.estoque) < pc.estoque then 0 \n"
+                    + "	when coalesce(l.estoque, pc.estoque) = pc.estoque then 2\n"
+                    + "	else 1 end id_tipoentradasaida, \n"
+                    + "	pc.custosemimposto, \n"
+                    + "	pc.custocomimposto, \n"
+                    + "	current_timestamp datamovimento, \n"
+                    + "	pc.customediocomimposto, \n"
+                    + "	pc.customediosemimposto \n"
+                    + "from\n"
+                    + "	produtocomplemento pc\n"
+                    + "	left join tmp_estoque l on\n"
+                    + "		pc.id_produto = l.id_produto\n"
+                    + "where\n"
+                    + "	pc.id_loja = " + lojaVR + "\n"
+                    + "order by\n"
+                    + "	id_produto"
             );
         }
     }
 
     public Map<Integer, Double> getCustoProduto(int idLojaVR) throws Exception {
         Map<Integer, Double> result = new HashMap<>();
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select id_produto, custocomimposto from produtocomplemento where id_loja = " + idLojaVR
@@ -572,21 +613,57 @@ public class ProdutoComplementoDAO {
                 }
             }
         }
-        
+
         return result;
     }
 
+    public ProdutoComplementoVO getCustoProduto(int idLojaVR, int idProduto) throws Exception {
+        ProdutoComplementoVO vo = null;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	id_produto,\n"
+                    + "	id_loja,\n"
+                    + "	custosemimposto,\n"
+                    + "	custocomimposto,\n"
+                    + " current_date datamovimento,\n"
+                    + " current_timestamp datahora\n"        
+                    + "from\n"
+                    + "	produtocomplemento p\n"
+                    + "where\n"
+                    + "	id_loja = " + idLojaVR + " and \n"
+                    + "	id_produto = " + idProduto
+            )) {
+                while (rst.next()) {
+                    vo = new ProdutoComplementoVO();
+                    ProdutoVO prod = new ProdutoVO();
+
+                    prod.setId(rst.getInt("id_produto"));
+                    vo.setProduto(prod);
+                    vo.setIdLoja(rst.getInt("id_loja"));
+                    vo.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    vo.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    vo.setDataMovimento(rst.getDate("datamovimento"));
+                    vo.setDataHora(rst.getTimestamp("datahora"));
+                }
+            }
+        }
+
+        return vo;
+    }
+
     boolean logCriado = false;
+
     private void log(String titulo, String info) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             if (!logCriado) {
                 stm.execute(
-                        "create table if not exists implantacao.log_produtocomplemento (\n" +
-                        "   id serial not null primary key,\n" +
-                        "   data timestamp not null default current_timestamp,\n" +
-                        "   titulo varchar not null,\n" +
-                        "   info varchar\n" +
-                        ");"
+                        "create table if not exists implantacao.log_produtocomplemento (\n"
+                        + "   id serial not null primary key,\n"
+                        + "   data timestamp not null default current_timestamp,\n"
+                        + "   titulo varchar not null,\n"
+                        + "   info varchar\n"
+                        + ");"
                 );
                 logCriado = true;
             }
@@ -596,6 +673,6 @@ public class ProdutoComplementoDAO {
             sql.put("titulo", titulo);
             sql.put("info", info);
             stm.execute(sql.getInsert());
-        }        
+        }
     }
 }

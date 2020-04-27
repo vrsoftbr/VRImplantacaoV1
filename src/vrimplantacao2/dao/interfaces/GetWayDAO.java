@@ -86,6 +86,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean apenasProdutoAtivo = false;
     private boolean copiarIcmsDebitoNaEntrada = false;
     public boolean utilizaMetodoAjustaAliquota = false;
+    public boolean copiarDescricaoCompletaParaGondola = false;
+    public boolean manterEAN = false;
+    public boolean removerCodigoCliente = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -306,7 +309,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	prod.PER_REDUC_ENT icms_reduzido_entrada,\n"
                     + "   refativoimob tipo_ativo,\n"
                     + "   refusoconsumo tipo_usoconsumo,\n"
-                    + "	prod.desativacompra\n"
+                    + "	prod.desativacompra,\n"
+                    + " prod.CODANP codigoanp\n"        
                     + "from\n"
                     + "	produtos prod\n"
                     + "left outer join prod_familia fam on\n"
@@ -335,6 +339,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    
+                    if(copiarDescricaoCompletaParaGondola) {
+                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    }
+                    
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
@@ -469,7 +478,12 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setPautaFiscalId(imp.getImportId());
+                    imp.setCodigoAnp(rst.getString("codigoanp"));
 
+                    if(manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() <= 8) {
+                        imp.setManterEAN(true);
+                    }
+                    
                     vResult.add(imp);
                 }
             }
@@ -1302,7 +1316,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rst.getString("CODCLIE"));
+                    if(removerCodigoCliente) {
+                        String idCliente = "";
+                        idCliente = rst.getString("CODCLIE").substring(3, rst.getString("CODCLIE").length());
+                        imp.setId(idCliente);
+                    }
+                    
                     imp.setRazao(rst.getString("RAZAO"));
                     imp.setEndereco(rst.getString("ENDERECO"));
                     imp.setComplemento(rst.getString("COMPLEMENTO"));
@@ -1439,6 +1460,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("ID"));
                     imp.setIdCliente(rst.getString("CODCLIE"));
+                    if(removerCodigoCliente) {
+                        String idCliente = "";
+                        idCliente = rst.getString("CODCLIE").substring(3, rst.getString("CODCLIE").length());
+                        imp.setIdCliente(idCliente);
+                    }
                     imp.setDataEmissao(rst.getDate("DTEMISSAO"));
                     imp.setDataVencimento(rst.getDate("DTVENCTO"));
                     imp.setValor(rst.getDouble("VALOR"));
@@ -1557,7 +1583,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "DTENTRADA "
                   + "FROM PAGAR "
                   + "where CODLOJA = " + getLojaOrigem() + " "
-                    + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL "
+                    + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL AND\n"
+                    + " SITUACAO != 'CA'\n"
                   + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {

@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -20,6 +21,7 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
+import vrimplantacao2.vo.cadastro.LogProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
@@ -121,6 +123,8 @@ public class ProdutoRepository {
                     String strID;
                     boolean eBalanca;
                     TipoEmbalagem unidade;
+                    boolean manterEAN;
+                    
                     {
                         SetUpVariaveisTO to = setUpVariaveis(imp);
                         ean = to.ean;
@@ -196,10 +200,7 @@ public class ProdutoRepository {
                         provider.salvar(prod);
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
-                        provider.aliquota().salvar(aliquota);
-                        
-                        
-                        
+                        provider.aliquota().salvar(aliquota); 
                         
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
@@ -1308,6 +1309,7 @@ public class ProdutoRepository {
         vo.setVolume(imp.getVolume());
         vo.setVendaControlada(imp.isVendaControlada());
         vo.setProdutoecommerce(imp.isProdutoECommerce());
+        vo.setCodigoAnp(imp.getCodigoAnp());
 
         return vo;
     }

@@ -38,6 +38,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
+import vrimplantacao2.vo.cadastro.LogProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
@@ -292,6 +293,13 @@ public class ProdutoRepositoryProvider {
             produtoComplementoDAO.gerarLogDeEstoqueViaTMP_ESTOQUE(getLojaVR());
         }
         
+        public ProdutoComplementoVO getCustoProduto(int idLojaVR, int produto) throws Exception {
+            return produtoComplementoDAO.getCustoProduto(idLojaVR, produto);
+        }
+        
+        public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
+            produtoComplementoDAO.salvarLogCusto(vo);
+        }
     }
     
     public class Aliquota {

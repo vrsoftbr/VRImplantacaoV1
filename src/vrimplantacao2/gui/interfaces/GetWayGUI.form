@@ -62,7 +62,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel6" min="-2" pref="152" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" max="32767" attributes="0"/>
+              <Component id="tabs" pref="342" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -158,38 +158,35 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="chkInverterAssociado" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="chkAssociadoSomenteAtivos" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUsarMargemBruta" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUsarQtdCotacaoProdFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkCopiaDescComplGondola" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkDesconsiderarSetorBalanca" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUsarMargemBruta" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUsarQtdCotacaoProdFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkSomarEstoque" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkForcarUnidade" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUtilizarIdIcmsNaEntrada" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkPesquisarKG" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUtilizarEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkSomarEstoque" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkForcarUnidade" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUtilizarIdIcmsNaEntrada" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPesquisarKG" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUtilizarEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkDesconsiderarSetorBalanca" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkManterEAN" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
                           </Group>
@@ -210,42 +207,46 @@
                           <Component id="chkDesconsiderarSetorBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkManterBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkPesquisarKG" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkPesquisarKG" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkUtilizarIdIcmsNaEntrada" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkForcarUnidade" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkUtilizarEmbalagemCompra" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="chkSomarEstoque" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkManterBalanca" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkUsarMargemBruta" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkUsarQtdCotacaoProdFornecedor" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="chkCopiaDescComplGondola" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkUsarMargemBruta" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkUtilizarIdIcmsNaEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkUsarQtdCotacaoProdFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkForcarUnidade" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkUtilizarEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkCopiarIcmsDebitoNaEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <EmptySpace pref="17" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+                              <EmptySpace pref="12" max="32767" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="chkSomarEstoque" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
                               <Component id="chkMetodoAliquota" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="chkManterEAN" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -358,6 +359,16 @@
             <Component class="javax.swing.JCheckBox" name="chkSomarEstoque">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Somar Estoque na Atualiza&#xe7;&#xe3;o"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCopiaDescComplGondola">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Copiar Descri&#xe7;&#xe3;o Completa para G&#xf4;ndola"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterEAN">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Manter EAN"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -672,16 +683,17 @@
                                       <Component id="cmbTipoDocCheque" min="-2" pref="159" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPagamentoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkRemoverIDCliente" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkReceberVerba" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" attributes="0">
                                           <Component id="chkTemFicha" min="-2" max="-2" attributes="0"/>
@@ -719,7 +731,10 @@
                               <Component id="chkReceberVerba" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkRemoverIDCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -732,7 +747,7 @@
                               <Component id="cmbTipoDocRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="cmbTipoDocCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="69" max="32767" attributes="0"/>
+                          <EmptySpace pref="112" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -826,6 +841,11 @@
                     <Property name="text" type="java.lang.String" value="Verba"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRemoverIDCliente">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Remover C&#xf3;digo Extra do ID do Cliente"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel8">
@@ -892,7 +912,7 @@
                           <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkSituacaoCadastroForn" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="128" max="32767" attributes="0"/>
+                          <EmptySpace pref="159" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1002,7 +1022,7 @@
                           <Component id="chkConvConveniado" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="167" max="32767" attributes="0"/>
+                          <EmptySpace pref="210" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1072,7 +1092,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="168" max="32767" attributes="0"/>
+                          <EmptySpace pref="203" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1207,7 +1227,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="144" max="32767" attributes="0"/>
+                      <EmptySpace pref="187" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
