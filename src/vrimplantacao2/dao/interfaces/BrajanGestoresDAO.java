@@ -65,13 +65,13 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	id_local, \n"
+                    + "	id_local as id, \n"
                     + "	desc_local \n"
                     + "from est_local_estoque"
             )) {
                 while (rst.next()) {
-                    result.add(new ItemComboVO(rst.getInt("id_local"),
-                            rst.getString("id_local") + " - "
+                    result.add(new ItemComboVO(rst.getInt("id"),
+                            rst.getString("id") + " - "
                             + rst.getString("desc_local")));
                 }
             }
