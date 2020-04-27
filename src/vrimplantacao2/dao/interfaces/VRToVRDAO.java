@@ -8,9 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +33,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -934,6 +937,49 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            Map<String, List<CreditoRotativoItemIMP>> pagamentos = new HashMap<>();
+            try (ResultSet rs = stm.executeQuery(
+                "select\n" +
+                "	id,\n" +
+                "	id_recebercreditorotativo,\n" +
+                "	valor,\n" +
+                "	valordesconto,\n" +
+                "	valormulta,\n" +
+                "	databaixa,\n" +
+                "	observacao,\n" +
+                "	id_banco,\n" +
+                "	agencia,\n" +
+                "	conta,\n" +
+                "	id_tiporecebimento\n" +
+                "from\n" +
+                "	recebercreditorotativoitem\n" +
+                "order by\n" +
+                "	id"
+            )) {
+                while (rs.next()) {
+                    
+                    List<CreditoRotativoItemIMP> list = pagamentos.get(rs.getString("id_recebercreditorotativo"));
+                    if (list == null) {
+                        list = new ArrayList<>();
+                        pagamentos.put(rs.getString("id_recebercreditorotativo"), list);
+                    }                    
+                    
+                    CreditoRotativoItemIMP i = new CreditoRotativoItemIMP();
+                    
+                    i.setId(rs.getString("id"));
+                    i.setDataPagamento(rs.getDate("databaixa"));
+                    i.setDesconto(rs.getDouble("valordesconto"));
+                    i.setMulta(rs.getDouble("valormulta"));
+                    i.setObservacao(rs.getString("observacao"));
+                    i.setValor(rs.getDouble("valor"));
+                    i.setId_banco(rs.getInt("id_banco"));
+                    i.setAgencia(rs.getString("agencia"));
+                    i.setConta(rs.getString("conta"));
+                    i.setId_tiporecebimento(rs.getInt("id_tiporecebimento"));
+                    
+                    list.add(i);
+                }
+            }
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	r.id,\n"
@@ -953,7 +999,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join clientepreferencial c on\n"
                     + "     r.id_clientepreferencial = c.id\n"
                     + "where\n"
-                    + "	id_situacaocadastro = 0 and\n"
                     + "	id_loja = " + getLojaOrigem() + "\n"
                     + "order by\n"
                     + "	r.id")) {
@@ -962,8 +1007,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rs.getString("id"));
                     imp.setCnpjCliente(rs.getString("cnpj"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataVencimento(rs.getDate("datavencimento"));
                     imp.setEcf(rs.getString("ecf"));
                     imp.setIdCliente(rs.getString("idcliente"));
                     imp.setJuros(rs.getDouble("juros"));
@@ -972,6 +1017,14 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valor"));
+                    
+                    List<CreditoRotativoItemIMP> pags = pagamentos.get(imp.getId());
+                    if (pags != null) {
+                        for (CreditoRotativoItemIMP pg: pags) {
+                            pg.setCreditoRotativo(imp);
+                            imp.getPagamentos().add(pg);
+                        }
+                    }
 
                     result.add(imp);
                 }

@@ -262,6 +262,10 @@ public class CreditoRotativoRepository {
         vo.setValorDesconto(impParc.getDesconto());
         vo.setValorMulta(impParc.getMulta());
         vo.setValorTotal(impParc.getTotal());
+        vo.setId_banco(impParc.getId_banco());
+        vo.setAgencia(impParc.getAgencia());
+        vo.setConta(impParc.getConta());
+        vo.setId_tipoRecebimento(impParc.getId_tiporecebimento());
         
         return vo;
     }
