@@ -545,4 +545,7 @@ public class ProdutoRepositoryProvider {
         return oferta;
     }
     
+    public Map<String, Integer> getCodigoAnp() throws Exception {
+        return produtoDAO.getCodigoANP();
+    }
 }

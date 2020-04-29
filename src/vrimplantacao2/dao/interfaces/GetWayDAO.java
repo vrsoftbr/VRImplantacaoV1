@@ -478,7 +478,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setPautaFiscalId(imp.getImportId());
-                    imp.setCodigoAnp(rst.getString("codigoanp"));
+                    imp.setCodigoAnp(rst.getString("codigoanp") != null ? rst.getString("codigoanp").trim()
+                            : "");
 
                     if(manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() <= 8) {
                         imp.setManterEAN(true);

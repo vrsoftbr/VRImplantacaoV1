@@ -1139,6 +1139,7 @@ public class ProdutoRepository {
 
     private Map<String, Integer> fabricantes = null;
     private Map<String, Integer> compradores = null;
+    private Map<String, Integer> codigosAnp = null;
 
     private String fillNull(String value) {
         return value != null ? value : "";
@@ -1163,6 +1164,9 @@ public class ProdutoRepository {
         }
         if (compradores == null) {
             compradores = provider.getCompradores();
+        }
+        if (codigosAnp == null) {
+            codigosAnp = provider.getCodigoAnp();
         }
 
         ProdutoVO vo = new ProdutoVO();
@@ -1309,8 +1313,11 @@ public class ProdutoRepository {
         vo.setVolume(imp.getVolume());
         vo.setVendaControlada(imp.isVendaControlada());
         vo.setProdutoecommerce(imp.isProdutoECommerce());
-        vo.setCodigoAnp(imp.getCodigoAnp());
-
+        Integer codigoANP = codigosAnp.get(imp.getCodigoAnp());
+        if(codigoANP != null) {
+            vo.setCodigoAnp(codigoANP);
+        }
+        
         return vo;
     }
 

@@ -52,7 +52,7 @@ public class ProdutoVO {
     private double volume = 1.0;
     private boolean vendaControlada = false;
     private boolean produtoecommerce = false;
-    private String codigoAnp = "";
+    private int codigoAnp = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -297,11 +297,11 @@ public class ProdutoVO {
         return normaReposicao;
     }
 
-    public String getCodigoAnp() {
+    public int getCodigoAnp() {
         return codigoAnp;
     }
 
-    public void setCodigoAnp(String codigoAnp) {
+    public void setCodigoAnp(int codigoAnp) {
         this.codigoAnp = codigoAnp;
     }
     

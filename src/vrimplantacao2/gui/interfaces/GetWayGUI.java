@@ -406,6 +406,10 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkPautaProduto.isSelected()) {
                                 opcoes.add(OpcaoProduto.EXCECAO);
                             }
+                            
+                            if (chkCodigoANP.isSelected()) {
+                                opcoes.add(OpcaoProduto.CODIGO_ANP);
+                            }
 
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
@@ -639,6 +643,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkTipoProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkPauta = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkCodigoANP = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -1047,6 +1052,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkPautaProduto.setText("Pauta Fiscal x Produto");
         vRPanel7.add(chkPautaProduto);
+
+        chkCodigoANP.setText("Código ANP");
+        vRPanel7.add(chkCodigoANP);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1768,6 +1776,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkCodigoANP;
     private vrframework.bean.checkBox.VRCheckBox chkComplemento;
     private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
