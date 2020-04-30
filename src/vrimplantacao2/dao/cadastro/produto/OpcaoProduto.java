@@ -278,6 +278,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Fabricação Própria";
         }
+    }, CODIGO_ANP {
+        @Override
+        public String toString() {
+            return "Código ANP";
+        }
     },
     /**
      * Soma o estoque do produto.

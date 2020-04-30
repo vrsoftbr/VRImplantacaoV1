@@ -203,6 +203,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pa.dcr_produto || ' ' || pa.dcr_variedade descricaologus,\n" +
                     "	p.cdg_barra ean,\n" +
                     "	nullif (pa.flb_tipo_peso, 'F') pesavel,\n" +
+                    "   pa.flb_balanca unitarioPesavel,\n" +  
                     "	pa.flb_habilita_checagem_peso_pdv pesopdv,\n" +
                     "	est.val_custo custosemimposto,\n" +
                     "	est.val_custo_tot custocomimposto,\n" +
@@ -258,7 +259,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "					x.cdg_interno = ncm.cdg_interno and \n" +
                     "					x.dat_ini_vigencia <= current year to fraction(3))\n" +
                     "where \n" +
-                    "	est.cdg_filial = " + getLojaOrigem())) {
+                    "	est.cdg_filial = " + getLojaOrigem() + "\n" +
+                    "   and p.qtd_por_emb = 1")) {
                 while(rs.next()) {
                    ProdutoIMP imp = new ProdutoIMP();
                    
@@ -269,7 +271,9 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                            :rs.getString("descricaogondola"));
                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                   if(rs.getString("pesavel") != null && "V".equals(rs.getString("pesavel").trim().toUpperCase())) {
+                   if((rs.getString("pesavel") != null && 
+                           "V".equals(rs.getString("pesavel").trim().toUpperCase())) ||
+                           rs.getInt("unitarioPesavel") == 1) {
                        imp.seteBalanca(true);
                    }
                    if(rs.getString("desativacao") != null) {
@@ -303,6 +307,51 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     } 
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoInformix.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	p.cdg_produto id,\n" +
+                    "	p.cdg_interno id_interno,\n" +
+                    "	p.cdg_barra ean,\n" +
+                    "	un.sgl_unidade_medida unidade,\n" +
+                    "	p.qtd_por_emb qtdembalagem\n" +
+                    "from \n" +
+                    "	informix.cadprod p\n" +
+                    "left join informix.cadunidadesmedida un on p.idcadunidademedida = un.idcadunidademedida\n" +
+                    "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n" +
+                    "	pa.cdg_estoque = p.cdg_produto\n" +
+                    "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n" +
+                    "where \n" +
+                    "	est.cdg_filial = " + getLojaOrigem() + " and\n" +
+                    "	p.qtd_por_emb > 1\n" +
+                    "order by \n" +
+                    "	p.cdg_produto")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id_interno"));
+                    imp.setEan(rs.getString("ean"));
+                    
+                    if(imp.getEan() != null && imp.getEan().length() < 7) {
+                        imp.setEan("999999" + imp.getEan());
+                    }
+                    
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {

@@ -707,7 +707,13 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.PERMITE_NF_SEM_PEDIDO)) {
                     sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());
                 }
-                sql.setWhere("id = " + vo.getId());
+                
+                if (opt.contains(OpcaoFornecedor.NUMERO)) {
+                    sql.setWhere("id = " + vo.getId() + " and numero = '0' ");
+                } else {
+                    sql.setWhere("id = " + vo.getId());
+                }
+                
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
                 }

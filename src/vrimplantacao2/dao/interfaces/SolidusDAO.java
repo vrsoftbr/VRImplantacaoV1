@@ -1421,14 +1421,27 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    public static final SimpleDateFormat DATE_FORMAT_ORACLE = new SimpleDateFormat("dd/MM/yy");
+    private String dataInicioVenda;
+    private String dataTerminoVenda;
+    
+    public void setDataVendaInicio(Date dataVendaIncio) {
+        this.dataInicioVenda = tipoConexao == TipoConexao.FIREBIRD ? DATE_FORMAT.format(dataVendaIncio) : DATE_FORMAT_ORACLE.format(dataVendaIncio);
+    }
+    
+    public void setDataVendaTermino(Date dataVendaTermino) {
+        this.dataTerminoVenda = tipoConexao == TipoConexao.FIREBIRD ? DATE_FORMAT.format(dataVendaTermino) : DATE_FORMAT_ORACLE.format(dataVendaTermino);
+    }
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), getVendasDataInicio(), getVendasDataTermino(), tipoConexao);
+        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, tipoConexao);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), getVendasDataInicio(), getVendasDataTermino(), tipoConexao);
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, tipoConexao);
     }
 
     public List<Entidade> getEntidades() throws SQLException {
@@ -1490,19 +1503,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         private Statement stm;
         private ResultSet rst;
         private VendaIMP next;
-        private SolidusDAO dao = new SolidusDAO();
 
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, TipoConexao conexao) {
-            String tab_produto_pdv = "tab_produto_pdv",
-                    tab_pdv = "tab_pdv",
-                    tab_cliente = "tab_cliente";
-
-            if (conexao == TipoConexao.ORACLE) {
-                tab_produto_pdv = "intersolid.tab_produto_pdv";
-                tab_pdv = "intersolid.tab_pdv";
-                tab_cliente = "intersolid.tab_cliente";
-            }
-
+        public VendaIterator(String idLojaCliente, String dataInicio, String dataTermino, TipoConexao conexao) {
             try {
                 this.stm = conexao.getConnection().createStatement();
                 this.rst = stm.executeQuery(
@@ -1510,11 +1512,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    v.num_ident id,\n"
                         + "    v.num_cupom_fiscal cupomfiscal,\n"
                         + "    v.num_pdv ecf,\n"
-                        + "    min(cast(v.dta_saida as date)) data,\n"
+                        + "    to_char(v.dta_saida, 'dd/MM/yyyy') data,\n"
                         + "    v.cod_cliente id_cliente,\n"
                         + (conexao == TipoConexao.FIREBIRD
-                                ? "    min(v.dta_saida) horaInicio, max(v.dta_saida) horaTermino,\n"
-                                : "    min(substr(des_hora, 1, 2)||':'||substr(des_hora, 3, 4)||':00') horaInicio, max(substr(des_hora, 1, 2)||':'||substr(des_hora, 3, 4)||':00') horaTermino, \n")
+                                ? " min(v.dta_saida) horaInicio, max(v.dta_saida) horaTermino,\n"
+                                : " min(substr(des_hora, 1, 2)||':'||substr(des_hora, 3, 4)||':00') horaInicio, max(substr(des_hora, 1, 2)||':'||substr(des_hora, 3, 4)||':00') horaTermino,\n")
                         + "    min(case when v.flg_cupom_cancelado = 'N' then 0 else 1 end) cancelado,\n"
                         + "    sum(coalesce(v.val_total_produto, 0) + coalesce(v.val_desconto, 0)) subtotalimpressora,\n"
                         + "    sum(v.val_desconto) desconto,\n"
@@ -1524,14 +1526,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    c.num_cgc cpf,\n"
                         + "    c.des_cliente nomecliente\n"
                         + "from\n"
-                        + "    " + tab_produto_pdv + " v\n"
-                        + "    left join " + tab_pdv + " pdv on v.num_pdv = pdv.cod_pdvint and v.cod_loja = pdv.cod_loja\n"
-                        + "    left join " + tab_cliente + " c on v.cod_cliente = c.cod_cliente\n"
+                        + (conexao == TipoConexao.FIREBIRD ? "tab_produto_pdv v \n" : "intersolid.tab_produto_pdv v \n")
+                        + " left join " + (conexao == TipoConexao.FIREBIRD ? "tab_pdv pdv " : "intersolid.tab_pdv pdv ") + "on v.num_pdv = pdv.cod_pdvint and v.cod_loja = pdv.cod_loja\n"
+                        + " left join " + (conexao == TipoConexao.FIREBIRD ? "tab_cliente c " : "intersolid.tab_cliente c ") + "on v.cod_cliente = c.cod_cliente\n"
                         + "where\n"
                         + "    v.cod_loja = " + idLojaCliente + "\n"
                         + (conexao == TipoConexao.FIREBIRD
-                                ? " and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 00:00:00' and v.dta_saida <= '" + DATE_FORMAT.format(dataTermino) + " 23:59:59'\n"
-                                : " and v.dta_saida >= '" + DATE_FORMAT_ORACLE.format(dataInicio) + "' and v.dta_saida <= '" + DATE_FORMAT_ORACLE.format(dataTermino) + "'\n")
+                                ? " and v.dta_saida >= '" + dataInicio + " 00:00:00' and v.dta_saida <= '" + dataTermino + " 23:59:59'\n"
+                                : " and v.dta_saida >= to_date('" + dataInicio + "', 'DD/MM/YYYY') and v.dta_saida <= to_date('" + dataTermino + "', 'DD/MM/YYYY')\n")
                         + "    and v.num_ident != 0\n"
                         + "    and v.tipo_ind = 0\n"
                         + "group by\n"
@@ -1542,7 +1544,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    pdv.num_serie_fabr,\n"
                         + "    pdv.des_modelo,\n"
                         + "    c.num_cgc,\n"
-                        + "    c.des_cliente"
+                        + "    c.des_cliente,"
+                        + "    to_char(v.dta_saida, 'dd/MM/yyyy')"
                 );
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Erro ao obter a venda", ex);
@@ -1600,9 +1603,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     }
 
-    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-    public static final SimpleDateFormat DATE_FORMAT_ORACLE = new SimpleDateFormat("dd/MM/yyyy");
-
     private static class Tributacao {
 
         int cst;
@@ -1624,19 +1624,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         private VendaItemIMP next;
         private Map<Integer, Tributacao> tributacao = new HashMap<>();
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, TipoConexao conexao) {
-            String tab_tributacao = "tab_tributacao",
-                    tab_produto_pdv = "tab_produto_pdv",
-                    tab_produto = "tab_produto";
-
-            if (conexao == TipoConexao.ORACLE) {
-                tab_tributacao = "intersolid.tab_tributacao";
-                tab_produto_pdv = "intersolid.tab_produto_pdv";
-                tab_produto = "intersolid.tab_produto";
-            }
-
+        public VendaItemIterator(String idLojaCliente, String dataInicio, String dataTermino, TipoConexao conexao) {
             try {
-                try (Statement st = ConexaoFirebird.getConexao().createStatement()) {
+                try (Statement st = conexao.getConnection().createStatement()) {
                     try (ResultSet rs = st.executeQuery(
                             "select\n"
                             + "    t.cod_tributacao,\n"
@@ -1644,7 +1634,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                             + "    t.val_icms aliq,\n"
                             + "    t.val_reducao_base_calculo reducao\n"
                             + "from\n"
-                            + "    " + tab_tributacao + " t\n"
+                            + (conexao == TipoConexao.FIREBIRD ? "tab_tributacao t\n" : "intersolid.tab_tributacao t\n")
                             + "order by\n"
                             + "    1"
                     )) {
@@ -1678,13 +1668,13 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    p.des_unidade_venda unidade,\n"
                         + "    v.cod_tributacao\n"
                         + "from\n"
-                        + "    " + tab_produto_pdv + " v\n"
-                        + "    join " + tab_produto + " p on v.cod_produto = p.cod_produto\n"
+                        + (conexao == TipoConexao.FIREBIRD ? "tab_produto_pdv v\n" : "intersolid.tab_produto_pdv v\n")
+                        + "join " +(conexao == TipoConexao.FIREBIRD ? "tab_produto p " : "intersolid.tab_produto p ") + "on v.cod_produto = p.cod_produto\n"
                         + "where\n"
                         + "    v.cod_loja = " + idLojaCliente + "\n"
-                        + (conexao == TipoConexao.FIREBIRD
-                                ? " and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 00:00:00' and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 23:59:59'\n"
-                                : " and v.dta_saida >= '" + DATE_FORMAT_ORACLE.format(dataInicio) + "' and v.dta_saida <= '" + DATE_FORMAT_ORACLE.format(dataTermino) + "'\n")
+                        + (conexao == TipoConexao.FIREBIRD 
+                                ? " and v.dta_saida >= '" + dataInicio + " 00:00:00' and v.dta_saida >= '" + dataTermino + " 23:59:59'\n"
+                                : " and v.dta_saida >= to_date('" + dataInicio + "', 'DD/MM/YYYY') and v.dta_saida >= to_date('" + dataTermino + "', 'DD/MM/YYYY') \n")
                         + "    and v.num_ident != 0\n"
                         + "    and v.tipo_ind = 0\n"
                         + "order by\n"

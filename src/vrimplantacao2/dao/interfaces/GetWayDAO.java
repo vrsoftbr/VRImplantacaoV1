@@ -325,7 +325,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
-
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
@@ -478,9 +477,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setPautaFiscalId(imp.getImportId());
-                    imp.setCodigoAnp(rst.getString("codigoanp"));
+                    imp.setCodigoAnp(rst.getString("codigoanp") != null ? rst.getString("codigoanp").trim()
+                            : "");
 
-                    if(manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() <= 8) {
+                    if(manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() < 7) {
                         imp.setManterEAN(true);
                     }
                     
