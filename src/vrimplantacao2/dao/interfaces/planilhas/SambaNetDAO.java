@@ -592,7 +592,11 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato(val(sh, 20, i), val(sh, 20, i), "", TipoContato.COMERCIAL, "");
                     }
                     if (!val(sh, 23, i).equals("")) {
-                        imp.setTel_principal(val(sh, 23, i));
+                        imp.setTel_principal(Utils.formataNumero(val(sh, 23, i).trim()));
+                        
+                        if (imp.getTel_principal().startsWith("0")) {
+                            imp.setTel_principal(Utils.formataNumero(imp.getTel_principal().substring(1)));
+                        }
                     }
                 } else if (
                         val(sh, 0, i).equals("") &&
@@ -609,7 +613,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (imp.getFantasia().equals("")) {
                         imp.setFantasia(imp.getRazao());
                     }
-                    imp.setEndereco(val(sh, 10, i));
+                    imp.setEndereco(val(sh, 10, i).trim());
                     imp.setComplemento(val(sh, 12, i));
 
                     if (
@@ -624,7 +628,31 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                         val(sh, 9, i).equals("Endereço:")) {
                         imp.setObservacao(val(sh, 10, i));
-}
+                    }
+                    
+                    if ((imp.getEndereco() != null)
+                            && (!imp.getEndereco().trim().isEmpty())
+                            && (imp.getEndereco().contains(","))) {
+
+                        
+                        imp.setEndereco(imp.getEndereco() + "COMPLEMENTO");
+                        
+                        String endereco[] = imp.getEndereco().split(",");
+                        
+                        System.out.println(imp.getEndereco());
+                        
+                        for (int j = 0; j < imp.getEndereco().length(); j++) {
+                            
+                            switch(j) {
+                                case 0:
+                                    imp.setEndereco(endereco[j].replace("COMPLEMENTO", "").trim());
+                                    break;
+                                case 1:
+                                    imp.setNumero(endereco[j].replace("COMPLEMENTO", "").trim());
+                                    break;
+                            }
+                        }
+                    }
                     
                     // imp.setObservacao(val(sh, 10, i));
                 }

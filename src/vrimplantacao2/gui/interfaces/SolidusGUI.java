@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -117,6 +118,8 @@ public class SolidusGUI extends VRInternalFrame {
             }
         });
         
+        edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
+        edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         centralizarForm();
         this.setMaximum(false);
     }
@@ -380,8 +383,8 @@ public class SolidusGUI extends VRInternalFrame {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
                         if (chkPdvVendas.isSelected()) {
-                            dao.setVendasDataInicio(edtDtVendaIni.getDate());
-                            dao.setVendasDataTermino(edtDtVendaFim.getDate());
+                            dao.setDataVendaInicio(edtDtVendaIni.getDate());
+                            dao.setDataVendaTermino(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         if (chkNotasFiscais.isSelected()) {

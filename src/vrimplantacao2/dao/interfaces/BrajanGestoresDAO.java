@@ -247,8 +247,16 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setValidade(rst.getInt("validade"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoGondola());
+                    
+                    if ((rst.getString("descricaoreduzida") != null)
+                            && (!rst.getString("descricaoreduzida").trim().isEmpty())) {
+
+                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    } else {
+                        imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    }
+                    
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3("1");
@@ -302,7 +310,8 @@ public class BrajanGestoresDAO extends InterfaceDAO implements MapaTributoProvid
 
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    //imp.setMargem(rst.getDouble("margem"));
+                    imp.setMargem(0);
                     imp.setPrecovenda(rst.getDouble("preco_venda"));
                     imp.setCustoComImposto(rst.getDouble("preco_custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
