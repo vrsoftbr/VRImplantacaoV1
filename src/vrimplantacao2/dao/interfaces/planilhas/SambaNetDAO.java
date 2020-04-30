@@ -383,9 +383,9 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescricaoGondola(sheet.getCell(7, i).getContents());
                         imp.setQtdEmbalagemCotacao(Utils.stringToInt(sheet.getCell(10, i).getContents(), 1));
                         imp.setEstoque(Utils.stringToDouble(sheet.getCell(13, i).getContents()));
-                        imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(15, i).getContents()));
-                        imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(15, i).getContents()));
-                        imp.setPrecovenda(Utils.stringToDouble(sheet.getCell(18, i).getContents()));
+                        imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
+                        imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
+                        imp.setPrecovenda(Utils.stringToDouble(sheet.getCell(16, i).getContents()));
                         imp.setCodMercadologico1(centroReceita);
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);

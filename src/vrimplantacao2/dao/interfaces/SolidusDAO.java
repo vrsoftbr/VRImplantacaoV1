@@ -1422,7 +1422,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-    public static final SimpleDateFormat DATE_FORMAT_ORACLE = new SimpleDateFormat("dd/MM/yy");
+    public static final SimpleDateFormat DATE_FORMAT_ORACLE = new SimpleDateFormat("dd/MM/yyyy");
     private String dataInicioVenda;
     private String dataTerminoVenda;
     
@@ -1512,7 +1512,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    v.num_ident id,\n"
                         + "    v.num_cupom_fiscal cupomfiscal,\n"
                         + "    v.num_pdv ecf,\n"
-                        + "    to_char(v.dta_saida, 'dd/MM/yyyy') data,\n"
+                        + "    to_char(v.dta_saida, 'yyyy-MM-dd') data,\n"
                         + "    v.cod_cliente id_cliente,\n"
                         + (conexao == TipoConexao.FIREBIRD
                                 ? " min(v.dta_saida) horaInicio, max(v.dta_saida) horaTermino,\n"
@@ -1544,8 +1544,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    pdv.num_serie_fabr,\n"
                         + "    pdv.des_modelo,\n"
                         + "    c.num_cgc,\n"
-                        + "    c.des_cliente,"
-                        + "    to_char(v.dta_saida, 'dd/MM/yyyy')"
+                        + "    c.des_cliente,\n"
+                        + "    to_char(v.dta_saida, 'yyyy-MM-dd')"
                 );
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Erro ao obter a venda", ex);
@@ -1573,9 +1573,17 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         private void processarNext() {
+            SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             try {
                 if (next == null) {
                     if (rst.next()) {
+                        
+                        String horaInicio = rst.getString("data") + " " + rst.getString("horaInicio");
+                        String horaTermino = rst.getString("data") + " " + rst.getString("horaTermino");
+                        
+                        
                         next = new VendaIMP();
 
                         next.setId(rst.getInt("ecf") + "-" + rst.getString("id"));
@@ -1583,8 +1591,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(rst.getInt("ecf"));
                         next.setData(rst.getDate("data"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setHoraInicio(rst.getTimestamp("horaInicio"));
-                        next.setHoraTermino(rst.getTimestamp("horaTermino"));
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setValorDesconto(rst.getDouble("desconto"));
@@ -1673,8 +1681,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "where\n"
                         + "    v.cod_loja = " + idLojaCliente + "\n"
                         + (conexao == TipoConexao.FIREBIRD 
-                                ? " and v.dta_saida >= '" + dataInicio + " 00:00:00' and v.dta_saida >= '" + dataTermino + " 23:59:59'\n"
-                                : " and v.dta_saida >= to_date('" + dataInicio + "', 'DD/MM/YYYY') and v.dta_saida >= to_date('" + dataTermino + "', 'DD/MM/YYYY') \n")
+                                ? " and v.dta_saida >= '" + dataInicio + " 00:00:00' and v.dta_saida <= '" + dataTermino + " 23:59:59'\n"
+                                : " and v.dta_saida >= to_date('" + dataInicio + "', 'DD/MM/YYYY') and v.dta_saida <= to_date('" + dataTermino + "', 'DD/MM/YYYY') \n")
                         + "    and v.num_ident != 0\n"
                         + "    and v.tipo_ind = 0\n"
                         + "order by\n"
