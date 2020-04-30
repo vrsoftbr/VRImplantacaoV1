@@ -12,6 +12,12 @@ public class CreditoRotativoItemIMP {
     private double valor = 0D;
     private double desconto = 0D;
     private double multa = 0D;
+    
+    private int id_banco = -1;
+    private String agencia;
+    private String conta;
+    private int id_tiporecebimento = -1;
+    
     private Date dataPagamento;
     private String observacao;
 
@@ -73,6 +79,38 @@ public class CreditoRotativoItemIMP {
 
     public void setObservacao(String observacao) {
         this.observacao = observacao;
+    }
+
+    public int getId_banco() {
+        return id_banco;
+    }
+
+    public void setId_banco(int id_banco) {
+        this.id_banco = id_banco;
+    }
+
+    public String getAgencia() {
+        return agencia;
+    }
+
+    public void setAgencia(String agencia) {
+        this.agencia = agencia;
+    }
+
+    public String getConta() {
+        return conta;
+    }
+
+    public void setConta(String conta) {
+        this.conta = conta;
+    }
+
+    public int getId_tiporecebimento() {
+        return id_tiporecebimento;
+    }
+
+    public void setId_tiporecebimento(int id_tiporecebimento) {
+        this.id_tiporecebimento = id_tiporecebimento;
     }
     
 }

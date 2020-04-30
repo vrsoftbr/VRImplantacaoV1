@@ -454,6 +454,7 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     aliquota = rst.getDouble("aliquota_debito");
                     reducao = rst.getDouble("reducao_debito");                    
                     imp.setIcmsDebitoId(formataIdTributacao(cst, aliquota, reducao));
+                    imp.setIcmsConsumidorId(formataIdTributacao(cst, aliquota, reducao));
                     
                     cst = rst.getInt("cst_debito_fe");
                     aliquota = rst.getDouble("aliquota_debito_fe");

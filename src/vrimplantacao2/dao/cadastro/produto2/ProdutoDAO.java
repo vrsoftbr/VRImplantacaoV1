@@ -171,7 +171,7 @@ public class ProdutoDAO {
             sql.put("conferido", false);
             sql.put("permitequebra", true);
             sql.put("permiteperda", true);
-            sql.put("codigoanp", vo.getCodigoAnp());
+            sql.put("id_codigoanp", vo.getCodigoAnp() != 0 ? vo.getCodigoAnp() : null);
             sql.put("impostomedionacional", 0);
             sql.put("impostomedioimportado", 0);
             sql.put("sugestaocotacao", true);
@@ -340,6 +340,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.PRODUTO_ECOMMERCE)) {
             sql.put("produtoecommerce", vo.isProdutoecommerce());
         }
+        if (opt.contains(OpcaoProduto.CODIGO_ANP) && vo.getCodigoAnp() != 0) {
+            sql.put("id_codigoanp", vo.getCodigoAnp());
+        }
 
         sql.setWhere("id = " + vo.getId());
         String strSql = sql.getUpdate();
@@ -368,6 +371,22 @@ public class ProdutoDAO {
                     ProdutoVO vo = new ProdutoVO();
                     vo.setId(rst.getInt("id"));
                     result.put(rst.getInt("id"), vo);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public Map<String, Integer> getCodigoANP() throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id, codigo "
+                    + "from codigoanp"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("codigo"), rst.getInt("id"));
                 }
             }
         }
