@@ -77,7 +77,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    p.itgrupo merc1,\n" +
                     "    p.itqtd estoque,\n" +
                     "    p.peso,\n" +
-                    "    p.itmargem margem,\n" +
+                    "    p.itpor margem,\n" +
                     "    coalesce((\n" +
                     "        select first 1\n" +
                     "            i.entvlruni\n" +
@@ -139,7 +139,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setMargem(Utils.stringToDouble(rst.getString("margem"), 0));
                     imp.setCustoSemImposto(MathUtils.round(rst.getDouble("custosemimposto"),2));
                     imp.setCustoComImposto(MathUtils.round(rst.getDouble("custocomimposto"),2));
                     imp.setPrecovenda(rst.getDouble("preco"));

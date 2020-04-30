@@ -338,6 +338,11 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id_interno"));
                     imp.setEan(rs.getString("ean"));
+                    
+                    if(imp.getEan() != null && imp.getEan().length() < 7) {
+                        imp.setEan("999999" + imp.getEan());
+                    }
+                    
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     
