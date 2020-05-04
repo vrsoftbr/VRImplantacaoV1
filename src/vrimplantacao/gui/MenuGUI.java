@@ -4820,7 +4820,7 @@ public final class MenuGUI extends VRMdiFrame {
             ParametroGUI.Exibir(this);
         }
     }
-
+ 
     public void verificarLite() {
         String param = Parametros.lite;
         if (param != null && !"".equals(param)) {
@@ -4831,6 +4831,9 @@ public final class MenuGUI extends VRMdiFrame {
             }
             if ("g3".equals(param)) {
                 G3GUI.exibir(this, true);
+            }
+            if("winthor".equals(param)) {
+                WinthorGUI.exibir(this, true);
             }
         }
     }
