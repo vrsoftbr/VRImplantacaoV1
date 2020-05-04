@@ -310,7 +310,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "   refativoimob tipo_ativo,\n"
                     + "   refusoconsumo tipo_usoconsumo,\n"
                     + "	prod.desativacompra,\n"
-                    + " prod.CODANP codigoanp\n"        
+                    + " prod.CODANP codigoanp,\n"        
+                    + " prod.corredor\n"        
                     + "from\n"
                     + "	produtos prod\n"
                     + "left outer join prod_familia fam on\n"
@@ -483,6 +484,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     if(manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() < 7) {
                         imp.setManterEAN(true);
                     }
+                    imp.setPrateleira(String.valueOf(Utils.stringToInt(rst.getString("corredor"))));
                     
                     vResult.add(imp);
                 }

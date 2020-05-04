@@ -1,11 +1,13 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import org.netbeans.lib.awtextra.AbsoluteLayout;
 import org.openide.util.Exceptions;
 import vrframework.bean.checkBox.VRCheckBox;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -225,11 +227,14 @@ public class WinthorGUI extends VRInternalFrame {
                 instance.chkT1DescCompleta.setVisible(true);
                 instance.chkT1DescReduzida.setVisible(true);
                 instance.chkT1DescGondola.setVisible(true);
+                instance.chkManterBalanca.setVisible(true);
                 instance.btnMapaTrib.setVisible(false);
                 
                 instance.chkFContatos.setVisible(false);
                 instance.chkFPrazoFornecedor.setVisible(false);
                 instance.chkFCondicaoPagamento.setVisible(false);
+                
+                instance.vRPanel7.setLayout(new FlowLayout());
             }
             instance.setVisible(true);
             
