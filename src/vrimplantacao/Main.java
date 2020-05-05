@@ -30,7 +30,6 @@ public class Main {
                 params.put(st[0], st[1]);
             }
         }
-
         
         try {
             String OSName = System.getProperty("os.name");

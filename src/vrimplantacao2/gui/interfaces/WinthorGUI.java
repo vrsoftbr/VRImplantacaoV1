@@ -1,11 +1,15 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import org.netbeans.lib.awtextra.AbsoluteLayout;
 import org.openide.util.Exceptions;
+import vrframework.bean.checkBox.VRCheckBox;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -184,6 +188,56 @@ public class WinthorGUI extends VRInternalFrame {
             }
 
             instance.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Erro ao abrir");
+        } finally {
+            i_mdiFrame.setDefaultCursor();
+        }
+    }
+    
+    public static void exibir(VRMdiFrame i_mdiFrame, boolean lite) {
+        try {
+            i_mdiFrame.setWaitCursor();
+            
+            if (instance == null || instance.isClosed()) {
+                instance = new WinthorGUI(i_mdiFrame);
+            }
+           
+            if (lite) {
+                instance.cmbLojaOrigem.setEnabled(false);
+                instance.cmbLojaVR.setEnabled(false);
+                instance.vRImportaArquivBalancaPanel1.setVisible(false);
+                instance.tabs.remove(instance.vRPanel2);
+                instance.vRTabbedPane2.remove(instance.vRPanel9);
+                instance.vRTabbedPane2.remove(instance.tabConvenio);
+                
+                Component[] comp = instance.vRPanel7.getComponents();
+                
+                for(Component c : comp) {
+                    if(c instanceof VRCheckBox) {
+                       VRCheckBox chks = (VRCheckBox) c;
+                       chks.setVisible(false);
+                    }
+                }
+                
+                instance.chkProdutos.setVisible(true);
+                instance.chkT1AtivoInativo.setVisible(true);
+                instance.chkT1Custo.setVisible(true);
+                instance.chkT1Preco.setVisible(true);
+                instance.chkT1DescCompleta.setVisible(true);
+                instance.chkT1DescReduzida.setVisible(true);
+                instance.chkT1DescGondola.setVisible(true);
+                instance.chkManterBalanca.setVisible(true);
+                instance.btnMapaTrib.setVisible(false);
+                
+                instance.chkFContatos.setVisible(false);
+                instance.chkFPrazoFornecedor.setVisible(false);
+                instance.chkFCondicaoPagamento.setVisible(false);
+                
+                instance.vRPanel7.setLayout(new FlowLayout());
+            }
+            instance.setVisible(true);
+            
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         } finally {
