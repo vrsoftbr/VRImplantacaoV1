@@ -70,7 +70,7 @@ public class SambaNetV2GUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexao.host = "localhost";
-        conexao.database = "sa";
+        conexao.database = "GWPDV02";
         conexao.port = "1433";
         conexao.user = "sa";
         conexao.pass = "vrsoftw@re";
@@ -176,17 +176,6 @@ public class SambaNetV2GUI extends VRInternalFrame implements ConexaoEvent {
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
                         tabProdutos.executarImportacao();
-                        
-                        List<OpcaoProduto> opcoesProduto = new ArrayList<>();
-                        
-                        if (chkIcmsForaEstado.isSelected()) {
-                            opcoesProduto.add(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO);
-                            opcoesProduto.add(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO);
-                        }
-                        
-                        if (!opcoesProduto.isEmpty()) {
-                            importador.atualizarProdutos(opcoesProduto);
-                        }
                         
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor(
