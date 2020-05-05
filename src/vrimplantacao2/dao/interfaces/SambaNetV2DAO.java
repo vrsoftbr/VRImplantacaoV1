@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -22,11 +23,43 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public String complemento;
+    
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
+    
     @Override
     public String getSistema() {
-        return "SambaNet";
+        if ((complemento != null) && (!complemento.trim().isEmpty())) {
+            return "SambaNet" + " - " + complemento;
+        } else {
+            return "SambaNet";
+        }
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	CODLOJA id,\n"
+                    + "	descricao\n"
+                  + "from\n"
+                    + "	LOJA\n"
+                  + "order by\n"
+                    + "	id"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                }
+            }
+        }
+
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
