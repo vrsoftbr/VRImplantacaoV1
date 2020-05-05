@@ -504,12 +504,12 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemGetWayActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="jMenuItem12">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSambaNet">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="GetWay (Cloud)"/>
+                            <Property name="text" type="java.lang.String" value="SambaNet V2"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem12ActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSambaNetActionPerformed"/>
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemSysPDVSQLServer">

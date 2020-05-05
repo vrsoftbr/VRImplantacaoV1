@@ -196,6 +196,7 @@ import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
 import vrimplantacao2.gui.interfaces.SabTechGUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
+import vrimplantacao2.gui.interfaces.SambaNetV2GUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.SavGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
@@ -625,7 +626,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
         jMenuItemGetWay = new javax.swing.JMenuItem();
-        jMenuItem12 = new javax.swing.JMenuItem();
+        mnuSambaNet = new javax.swing.JMenuItem();
         jMenuItemSysPDVSQLServer = new javax.swing.JMenuItem();
         jMenuItemGuiaSistemas = new javax.swing.JMenuItem();
         jMenuItemBoechatSoft = new javax.swing.JMenuItem();
@@ -1459,13 +1460,13 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(jMenuItemGetWay);
 
-        jMenuItem12.setText("GetWay (Cloud)");
-        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+        mnuSambaNet.setText("SambaNet V2");
+        mnuSambaNet.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem12ActionPerformed(evt);
+                mnuSambaNetActionPerformed(evt);
             }
         });
-        jMenu6.add(jMenuItem12);
+        jMenu6.add(mnuSambaNet);
 
         jMenuItemSysPDVSQLServer.setText("SysPDV");
         jMenuItemSysPDVSQLServer.addActionListener(new java.awt.event.ActionListener() {
@@ -3450,23 +3451,9 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItemSBOMarketActionPerformed
 
-    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
-        // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarGetWayCloud == null || formImportarGetWayCloud.isClosed()) {
-                formImportarGetWayCloud = new GetWayCloudGUI(this);
-            }
-
-            formImportarGetWayCloud.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
-    }//GEN-LAST:event_jMenuItem12ActionPerformed
+    private void mnuSambaNetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSambaNetActionPerformed
+        SambaNetV2GUI.exibir(this);
+    }//GEN-LAST:event_mnuSambaNetActionPerformed
 
     private void jMenuItemSicsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSicsActionPerformed
         try {
@@ -4550,7 +4537,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem11;
-    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem19;
@@ -4755,6 +4741,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSQLiteSophyx;
     private javax.swing.JMenuItem mnuSTI3;
     private javax.swing.JMenuItem mnuSaac;
+    private javax.swing.JMenuItem mnuSambaNet;
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuSav;
     private javax.swing.JMenuItem mnuScef;
