@@ -89,6 +89,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean copiarDescricaoCompletaParaGondola = false;
     public boolean manterEAN = false;
     public boolean removerCodigoCliente = false;
+    public boolean utilizaAliquotaFCP = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -111,9 +112,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	CODLOJA id,\n"
                     + "	descricao\n"
-                  + "from\n"
+                    + "from\n"
                     + "	LOJA\n"
-                  + "order by\n"
+                    + "order by\n"
                     + "	id"
             )) {
                 while (rst.next()) {
@@ -131,7 +132,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select p.codprod, "
+                    "select p.codprod, "
                     + "     cast(p.dataini as date) as dataini, "
                     + "     cast(p.datafim as date) as datafim, "
                     + "     p.preco_unit precooferta, "
@@ -163,7 +164,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select "
                     + "CODFAMILIA, "
                     + "descricao "
-                  + "from "
+                    + "from "
                     + "FAMILIA"
             )) {
                 while (rst.next()) {
@@ -184,7 +185,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	p.CODCRECEITA m1,\n"
                     + "	coalesce(m1.DESCRICAO, 'PADRAO') m1_desc,\n"
                     + "	p.CODGRUPO m2,\n"
@@ -237,7 +238,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             MultiMap<Comparable, Void> icms = new MultiMap<>();
             try (Statement st = Conexao.createStatement()) {
                 try (ResultSet rs = st.executeQuery(
-                          "select \n"
+                        "select \n"
                         + "	situacaotributaria cst, \n"
                         + "	porcentagem aliq, \n"
                         + "	reduzido \n"
@@ -300,7 +301,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	prod.cst_pisentrada piscofins_cst_credito,\n"
                     + "	prod.cst_pissaida piscofins_cst_debito,\n"
                     + "	prod.nat_rec piscofins_natureza_receita,\n"
-                    + "	ltrim(rtrim(prod.codaliq)) icms_debito_id,\n"
+                    //+ " ltrim(rtrim(prod.codaliq)) icms_debito_id,\n")
+                    + " ltrim(rtrim(prod.codaliq)) + coalesce(cast(fcp.VALORTRIB as varchar), '') icms_debito_id,\n"        
                     + "	prod.CODTRIB icms_cst_saida,\n"
                     + "	al.ALIQUOTA icms_aliquota_saida,\n"
                     + "	prod.PER_REDUC icms_reduzido_saida,\n"
@@ -310,8 +312,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "   refativoimob tipo_ativo,\n"
                     + "   refusoconsumo tipo_usoconsumo,\n"
                     + "	prod.desativacompra,\n"
-                    + " prod.CODANP codigoanp,\n"        
-                    + " prod.corredor\n"        
+                    + " prod.CODANP codigoanp,\n"
+                    + " prod.corredor\n"
                     + "from\n"
                     + "	produtos prod\n"
                     + "left outer join prod_familia fam on\n"
@@ -320,6 +322,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join aliquota_icms al on\n"
                     + "		al.CODALIQ = prod.codaliq_nf\n"
                     + "left join TROCACOMPRA trc on prod.CODPROD = trc.CODPROD\n"
+                    + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
                     + (apenasProdutoAtivo == true ? " where upper(ltrim(rtrim(prod.ativo))) = 'S' " : "")
                     + "order by\n"
                     + "	id"
@@ -339,11 +342,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
-                    
-                    if(copiarDescricaoCompletaParaGondola) {
+
+                    if (copiarDescricaoCompletaParaGondola) {
                         imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     }
-                    
+
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
@@ -476,16 +479,17 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (utilizaMetodoAjustaAliquota) {
                         acertaAliquota(imp);
                     }
-                    
+
                     imp.setPautaFiscalId(imp.getImportId());
                     imp.setCodigoAnp(rst.getString("codigoanp") != null ? rst.getString("codigoanp").trim()
                             : "");
 
-                    if(manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() < 7) {
+                    if (manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() < 7) {
                         imp.setManterEAN(true);
                     }
+
                     imp.setPrateleira(String.valueOf(Utils.stringToInt(rst.getString("corredor"))));
-                    
+
                     vResult.add(imp);
                 }
             }
@@ -493,77 +497,77 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return vResult;
     }
-    
+
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	CODPROD id,\n" +
-                    "	p.descricao,\n" +
-                    "	p.barra ean,\n" +
-                    "	coalesce(p.codncm, 0) ncm,\n" +
-                    "	p.CODALIQ icms_consumidor_id,\n" +
-                    "	aliq_s_c.VALORTRIB icms_consumidor,\n" +
-                    "	CODALIQ_NF icms_debito_nf_id,\n" +
-                    "	codtrib cst_debito_nf,\n" +
-                    "	aliq_s_nf.VALORTRIB icms_debito_nf,\n" +
-                    "	PER_REDUC icms_debito_red_nf,\n" +
-                    "	coalesce(PER_REDUC_ENT, 0) icms_credito_red,\n" +
-                    "	coalesce(CODTRIB_ENT, 0) cst_credito,\n" +
-                    "	coalesce(ULTICMSCRED, 0) icms_credito,\n" +
-                    "	p.PERMVA mva\n" +
-                    "from\n" +
-                    "	PRODUTOS p\n" +
-                    "left join ALIQUOTA_ICMS aliq_s_nf on p.CODALIQ_NF = aliq_s_nf.CODALIQ\n" +
-                    "left join ALIQUOTA_ICMS aliq_s_c on p.CODALIQ = aliq_s_c.CODALIQ\n" +
-                    "where\n" +
-                    "	p.PERMVA > 0\n" +
-                    "order by\n" +
-                    "	p.DESCRICAO")) {
+                    "select \n"
+                    + "	CODPROD id,\n"
+                    + "	p.descricao,\n"
+                    + "	p.barra ean,\n"
+                    + "	coalesce(p.codncm, 0) ncm,\n"
+                    + "	p.CODALIQ icms_consumidor_id,\n"
+                    + "	aliq_s_c.VALORTRIB icms_consumidor,\n"
+                    + "	CODALIQ_NF icms_debito_nf_id,\n"
+                    + "	codtrib cst_debito_nf,\n"
+                    + "	aliq_s_nf.VALORTRIB icms_debito_nf,\n"
+                    + "	PER_REDUC icms_debito_red_nf,\n"
+                    + "	coalesce(PER_REDUC_ENT, 0) icms_credito_red,\n"
+                    + "	coalesce(CODTRIB_ENT, 0) cst_credito,\n"
+                    + "	coalesce(ULTICMSCRED, 0) icms_credito,\n"
+                    + "	p.PERMVA mva\n"
+                    + "from\n"
+                    + "	PRODUTOS p\n"
+                    + "left join ALIQUOTA_ICMS aliq_s_nf on p.CODALIQ_NF = aliq_s_nf.CODALIQ\n"
+                    + "left join ALIQUOTA_ICMS aliq_s_c on p.CODALIQ = aliq_s_c.CODALIQ\n"
+                    + "where\n"
+                    + "	p.PERMVA > 0\n"
+                    + "order by\n"
+                    + "	p.DESCRICAO")) {
                 while (rs.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setTipoIva(TipoIva.PERCENTUAL);
                     imp.setIva(rs.getDouble("mva"));
                     imp.setIvaAjustado(imp.getIva());
-                    
+
                     double icms = rs.getDouble("icms_credito"),
-                            reducao = rs.getDouble("icms_credito_red"); 
+                            reducao = rs.getDouble("icms_credito_red");
                     String cst = rs.getString("cst_credito");
-                    
+
                     //Verificação de ICMS tributado
-                    if(icms > 0.0 && reducao == 0.0) {
+                    if (icms > 0.0 && reducao == 0.0) {
                         System.out.println("ICMS T: " + icms + " RED: " + reducao + " CST: " + cst);
                         imp.setAliquotaCredito(0, icms, reducao);
                         imp.setAliquotaCreditoForaEstado(0, icms, reducao);
                         imp.setAliquotaDebito(0, icms, reducao);
                         imp.setAliquotaDebitoForaEstado(0, icms, reducao);
                     }
-                    
+
                     //Verificação de ICMS Substítuido
-                    if(icms == 0.0 && reducao == 0.0) {
+                    if (icms == 0.0 && reducao == 0.0) {
                         System.out.println("ICMS S: " + icms + " RED: " + reducao + " CST: " + cst);
                         imp.setAliquotaCredito(60, icms, reducao);
                         imp.setAliquotaCreditoForaEstado(60, icms, reducao);
                         imp.setAliquotaDebito(60, icms, reducao);
                         imp.setAliquotaDebitoForaEstado(60, icms, reducao);
                     }
-                    
+
                     //Verificação de ICMS com redução na BC
-                    if(icms > 0.0 && reducao > 0.0) {
+                    if (icms > 0.0 && reducao > 0.0) {
                         System.out.println("ICMS RED: " + icms + " RED: " + reducao + " CST: " + cst);
                         imp.setAliquotaCredito(20, icms, reducao);
                         imp.setAliquotaCreditoForaEstado(20, icms, reducao);
                         imp.setAliquotaDebito(20, icms, reducao);
                         imp.setAliquotaDebitoForaEstado(20, icms, reducao);
                     }
-                    
+
                     //Verificação de Isenção de ICMS
-                    if(icms == 0.0 && reducao == 0.0 && "040".equals(cst)) {
+                    if (icms == 0.0 && reducao == 0.0 && "040".equals(cst)) {
                         System.out.println("ICMS IS: " + icms + " RED: " + reducao + " CST: " + cst);
                         imp.setAliquotaCredito(40, icms, reducao);
                         imp.setAliquotaCreditoForaEstado(40, icms, reducao);
@@ -627,7 +631,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	codprod id_produto,\n"
                     + "	barra ean,\n"
                     + "	1 qtdembalagem,\n"
@@ -936,7 +940,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                          "select  \n"
+                        "select  \n"
                         + "	e.codprod id_produto, \n"
                         + "	rtrim(e.barra_emb) ean, \n"
                         + "	e.qtd qtdembalagem,\n"
@@ -977,7 +981,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select \n"
+                    "select \n"
                     + "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, f.complemento, \n"
                     + "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n"
                     + "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n"
@@ -1099,10 +1103,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "cp.CODCONDPAGTO, "
                                 + "replace(cp.DESCRICAO,'-','/') descricao, "
                                 + "cp.NPARCELAS\n"
-                               +"from FORNECEDORES f\n"
-                               +"inner join CONDPAGTO cp on cp.CODCONDPAGTO = f.CODCONDPAGTO \n"
-                               +"where f.CODFORNEC = " + imp.getImportId()
-                               +"order by f.CODFORNEC, cp.CODCONDPAGTO"
+                                + "from FORNECEDORES f\n"
+                                + "inner join CONDPAGTO cp on cp.CODCONDPAGTO = f.CODCONDPAGTO \n"
+                                + "where f.CODFORNEC = " + imp.getImportId()
+                                + "order by f.CODFORNEC, cp.CODCONDPAGTO"
                         )) {
                             int contador = 1;
                             if (rst2.next()) {
@@ -1221,7 +1225,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	pf.CODFORNEC id_fornecedor,\n"
                     + "	pf.CODPROD id_produto,\n"
                     + "	pf.CODREF codigoexterno,\n"
@@ -1318,14 +1322,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("CODCLIE"));
-                    if(removerCodigoCliente) {
+                    if (removerCodigoCliente) {
                         String idCliente = "";
                         idCliente = rst.getString("CODCLIE").substring(3, rst.getString("CODCLIE").length());
                         imp.setId(idCliente);
                     }
-                    
+
                     imp.setRazao(rst.getString("RAZAO"));
                     imp.setEndereco(rst.getString("ENDERECO"));
                     imp.setComplemento(rst.getString("COMPLEMENTO"));
@@ -1450,19 +1454,19 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(VALOR,0) VALOR, "
                     + "coalesce(VALORJUROS,0) VALORJUROS, "
                     + "OBS "
-                  + "FROM "
+                    + "FROM "
                     + "RECEBER "
-                  + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                  + "where UPPER(SITUACAO) = 'AB' "
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
+                    + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODTIPODOCUMENTO = " + v_tipoDocumento + " "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                  + "order by DTEMISSAO"
+                    + "order by DTEMISSAO"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("ID"));
                     imp.setIdCliente(rst.getString("CODCLIE"));
-                    if(removerCodigoCliente) {
+                    if (removerCodigoCliente) {
                         String idCliente = "";
                         idCliente = rst.getString("CODCLIE").substring(3, rst.getString("CODCLIE").length());
                         imp.setIdCliente(idCliente);
@@ -1505,13 +1509,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "RECEBER.CODBANCO, "
                     + "RECEBER.AGENCIA, "
                     + "RECEBER.CONTACORR "
-                  + "FROM RECEBER "
-                  + "INNER JOIN CLIENTES ON "
+                    + "FROM RECEBER "
+                    + "INNER JOIN CLIENTES ON "
                     + "CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                  + "where UPPER(SITUACAO) = 'AB' "
+                    + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
                     + "and RECEBER.CODTIPODOCUMENTO IN (" + v_tipoDocumentoCheque + ") "
-                  + "order by DTEMISSAO "
+                    + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {
                     int idBanco = new BancoDAO().getId(rst.getInt("CODBANCO"));
@@ -1583,11 +1587,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "VALORPAGO, "
                     + "DTPAGTO, "
                     + "DTENTRADA "
-                  + "FROM PAGAR "
-                  + "where CODLOJA = " + getLojaOrigem() + " "
+                    + "FROM PAGAR "
+                    + "where CODLOJA = " + getLojaOrigem() + " "
                     + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL AND\n"
                     + " SITUACAO != 'CA'\n"
-                  + "order by DTEMISSAO "
+                    + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -1638,13 +1642,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(VALOR,0) VALOR, "
                     + "coalesce(VALORJUROS,0) VALORJUROS, "
                     + "OBS "
-                  + "FROM "
+                    + "FROM "
                     + "RECEBER "
-                  + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                  + "where UPPER(SITUACAO) = 'AB' "
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
+                    + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODTIPODOCUMENTO = " + v_tipoDocumento + " "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                  + "order by DTEMISSAO"
+                    + "order by DTEMISSAO"
             )) {
                 while (rst.next()) {
                     String obs = "";
@@ -1713,13 +1717,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(VALORJUROS,0) VALORJUROS, "
                     + "OBS, "
                     + "CLIENTES.TELEFONE "
-                  + "FROM "
+                    + "FROM "
                     + "RECEBER "
-                  + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                  + "where UPPER(SITUACAO) = 'AB' "
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
+                    + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODTIPODOCUMENTO = " + v_tipoDocumento + " "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                  + "order by DTEMISSAO"
+                    + "order by DTEMISSAO"
             )) {
                 while (rst.next()) {
                     if ((rst.getString("CNPJ_CPF") != null)
@@ -1822,13 +1826,42 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
 
-    @Override
+    /*@Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList();
 
         try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
                     "select ltrim(rtrim(replace(codaliq,'\\','\\\\'))) codaliq, descricao from aliquota_icms"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
+    }*/
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList();
+
+        try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stmt.executeQuery(
+                    "select \n" +
+                    "	distinct\n" +
+                    "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\'))) + \n" +
+                    "	case when cast(fcp.VALORTRIB as varchar) = '0.00' then \n" +
+                    "		'' else \n" +
+                    "			cast(fcp.VALORTRIB as varchar) end as codaliq, \n" +
+                    "	icms.descricao + ' ' + cast(fcp.VALORTRIB as varchar) + '% FCP' descricao\n" +
+                    "from \n" +
+                    "	aliquota_icms icms\n" +
+                    "join\n" +
+                    "	PRODUTOS p on icms.CODALIQ = p.CODALIQ\n" +
+                    "left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n" +
+                    "where\n" +
+                    "	icms.descricao + ' ' + cast(fcp.VALORTRIB as varchar) is not null"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
