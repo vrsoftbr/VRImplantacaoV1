@@ -236,6 +236,8 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    ean.ean,\n" +
                     "    ean.qtunit qtdembalagem,\n" +
                     "    ean.unidade tipoembalagem,\n" +
+                    "    p.qtunitcx qtdembalagemcompra,\n" +
+                    "    p.unidademaster tipoembalagemcompra,\n" +        
                     "    p.aceitavendafracao e_balanca,\n" +
                     "    ean.prazoval validade,\n" +
                     "    p.descricao descricaocompleta,\n" +
@@ -264,7 +266,8 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    icms.sittribut icmscst,\n" +
                     "    icms.codicm icmsaliq,\n" +
                     "    icms.codicmtab icmsred,\n" +
-                    "    p.codncmex\n" +
+                    "    p.codncmex,\n" +
+                    "    p.codfornec fabricante\n" +        
                     "FROM\n" +
                     "    pcprodut p\n" +
                     "    JOIN pcfilial emp ON emp.codigo = " + getLojaOrigem() + "\n" +
@@ -344,6 +347,8 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcompra"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcompra"));
                     if(rst.getString("e_balanca") != null && !"".equals(rst.getString("e_balanca"))) {
                         imp.seteBalanca("S".equals(rst.getString("e_balanca").trim()) ? true : false);
                     } else {
@@ -397,6 +402,8 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                             ));
                         }
                     }
+                    
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
 
                     result.add(imp);
 

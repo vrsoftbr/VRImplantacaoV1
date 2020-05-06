@@ -174,7 +174,7 @@ public class AliquotaDAO {
         }
     }
 
-    public int aliquota(int cst, double aliquota, double reduzido, String descricao, boolean gerarAliquotaPdv) throws Exception {        
+    public int aliquota(int cst, double aliquota, double reduzido, String descricao, boolean gerarAliquotaPdv, double aliquotaFCP) throws Exception {        
         int result = -1;
         
         Conexao.begin();
@@ -189,16 +189,17 @@ public class AliquotaDAO {
                         "	v_aliquotafinal numeric(11,2);\n" +
                         "\n" +
                         "	rcst integer = " + cst + ";\n" +
-                        "	raliquota numeric(11,2) = " + String.format("%.2f", aliquota).replace(",", ".") + ";\n" +
+                        "	raliquota numeric(11,2) = " + String.format("%.2f", aliquota).replace(",", ".") + ";\n" +        
                         "	rreduzido numeric(13,3) = " + String.format("%.2f", reduzido).replace(",", ".") + ";\n" +
+                        "	raliquotafcp numeric(13,3) = " + String.format("%.2f", aliquotaFCP).replace(",", ".") + ";\n" +        
                         "	rdescricao varchar(15) = '" + descricao + "';\n" +
-                        "	rgeraaliquotapdv boolean = " + gerarAliquotaPdv + ";\n" +
+                        "	rgeraaliquotapdv boolean = " + gerarAliquotaPdv + ";\n" +        
                         "begin\n" +
                         "		v_aliquotafinal = round(raliquota * ((100 - rreduzido) / 100), 2);\n" +
                         "		\n" +
                         "		select coalesce(max(id) + 1, 1) from aliquota into vid;\n" +
-                        "		insert into aliquota (id, descricao, reduzido, porcentagem, id_situacaocadastro, situacaotributaria, id_aliquotapdv, mensagemnf, csosn, porcentagemfinal) \n" +
-                        "		values (vid, rdescricao, rreduzido, raliquota, 1, rcst, null, '' , 101, v_aliquotafinal);\n" +
+                        "		insert into aliquota (id, descricao, reduzido, porcentagem, id_situacaocadastro, situacaotributaria, id_aliquotapdv, mensagemnf, csosn, porcentagemfinal, porcentagemfcp) \n" +
+                        "		values (vid, rdescricao, rreduzido, raliquota, 1, rcst, null, '' , 101, v_aliquotafinal, raliquotafcp);\n" +
                         "\n" +
                         "		if (rgeraaliquotapdv) then\n" +
                         "			select coalesce(max(id) + 1, 1) from pdv.aliquota into vidpdv;\n" +
