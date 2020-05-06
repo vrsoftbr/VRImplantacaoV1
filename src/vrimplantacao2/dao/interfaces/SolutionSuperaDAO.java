@@ -182,7 +182,6 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "p.aliquota_icms_saida_interno as aliquota_debito,\n"
                     + "p.aliquota_icms_saida_externo as aliquota_debito_fora\n"
                     + "from produtos p\n"
-                    + "where p.status = 'A'"
                     + "order by p.codigo_pro"
             )) {
                 while (rst.next()) {
