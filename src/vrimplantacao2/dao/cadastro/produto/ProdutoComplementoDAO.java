@@ -346,7 +346,7 @@ public class ProdutoComplementoDAO {
                     || (opt.contains(OpcaoProduto.CUSTO))) {
                 sql.setWhere(
                         "id_produto = " + complemento.getProduto().getId() + " and "
-                        + "id_loja = " + complemento.getIdLoja() + " and dataultimaentrada is null "
+                        + "id_loja = " + complemento.getIdLoja()
                 );
             } else {
                 sql.setWhere(
