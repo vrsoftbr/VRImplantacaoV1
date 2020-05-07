@@ -566,7 +566,7 @@ public class FornecedorDAO {
             sql.put("id_estado", vo.getEstado() == null ? Parametros.get().getUfPadrao().getId() : vo.getEstado().getId());// integer NOT NULL,
             sql.put("telefone", vo.getTelefone());// character varying(14) NOT NULL,
             sql.put("id_tipoinscricao", vo.getTipoInscricao().getId());// integer NOT NULL,
-            sql.put("inscricaoestadual", vo.getInscricaoEstadual());// character varying(20) NOT NULL,
+            sql.put("inscricaoestadual", vo.getInscricaoEstadual() == null ? "" : vo.getInscricaoEstadual());// character varying(20) NOT NULL,
             sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
             sql.put("revenda", false);// boolean NOT NULL,
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,

@@ -70,6 +70,7 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
@@ -342,7 +343,8 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	when p.prod_balanca in ('P', 'U') then 1\n"
                     + "	else 0 end e_balanca,\n"
                     + "	coalesce(un.prun_validade, 0) validade,\n"
-                    + "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompleta,\n"
+                    + "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompletacomplemento,\n"
+                    + " p.prod_descricao descricaocompleta,\n"        
                     + "	p.prod_descrpdvs descricaoreduzida,\n"
                     + "	p.prod_dpto_codigo merc1,\n"
                     + "	p.prod_grup_codigo merc2,\n"
@@ -392,7 +394,8 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "		where\n"
                     + "			nullif(trim(prod_codcaixa),'') is not null\n"
                     + "	) ean on ean.id = p.prod_codigo\n"
-                    + "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo)\n"
+                    + "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo) and\n"
+                    + " tr.trib_unidades = un.prun_unid_codigo\n"
                     + "where\n"
                     + "	un.prun_unid_codigo = '" + getLojaOrigem() + "' and\n"
                     + "	tr.trib_mvtos like '%EVP%'\n"
@@ -415,7 +418,7 @@ public class RPInfoDAO extends InterfaceDAO {
                         if (pBalanca.length() < 7) {
                             imp.seteBalanca(true);
                             imp.setEan(rst.getString("ean"));
-                            if(removeDigitoEAN) {
+                            if (removeDigitoEAN) {
                                 imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
                             }
                         } else {
@@ -600,8 +603,8 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setFantasia(rst.getString("nomefantasia"));
-                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("razaosocial"));
+                    imp.setRazao(rst.getString("nomefantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpjcpf"));
                     imp.setIe_rg(rst.getString("ierg"));
                     imp.setInsc_municipal(rst.getString("inscmun"));
@@ -801,7 +804,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("clie_limiteconv") == 0 ? rst.getDouble("clie_limitecheque") : rst.getDouble("clie_limiteconv"));
-                    if(imp.getValorLimite() > 0) {
+                    if (imp.getValorLimite() > 0) {
                         imp.setPermiteCheque(true);
                         imp.setPermiteCreditoRotativo(true);
                     }
@@ -987,7 +990,7 @@ public class RPInfoDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select\n"
+                    "select\n"
                     + "	pf.pfor_forn_codigo id_fornecedor,\n"
                     + "	pf.pfor_prod_codigo id_produto,\n"
                     + "	pf.pfor_codigo codigoexterno,\n"
@@ -1020,64 +1023,106 @@ public class RPInfoDAO extends InterfaceDAO {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	pfin_operacao id,\n"
-                    + "	pfin_dataemissao emissao,\n"
-                    + "	pfin_datavcto vencimento,\n"
-                    + "	pfin_pdvs_codigo ecf,\n"
-                    + "	pfin_codentidade::varchar idcliente,\n"
-                    + "	c.clie_razaosocial razao,\n"
-                    + "	c.clie_cnpjcpf cnpj,\n"
-                    + "	pfin_complemento observacao,\n"
-                    + "	pfin_numerodcto cupom,\n"
-                    + "	pfin_parcela parcela,\n"
-                    + "	pfin_valor valor\n"
-                    + "from \n"
-                    + "	pendfin\n"
-                    + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
-                    + "where\n"
-                    + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                    + "	pfin_pr = 'R' and\n"
-                    + "	pfin_status = 'P' and\n"
-                    + "	pfin_pger_conta in (112201, 112202, 112203, 112204, 112205, 112206, 112207, 112208, 112209) "
-                    + "union all "
-                    + "select \n"
-                    + "	pfin_operacao id,\n"
-                    + "	pfin_dataemissao emissao,\n"
-                    + "	pfin_datavcto vencimento,\n"
-                    + "	pfin_pdvs_codigo ecf,\n"
-                    + "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n"
-                    + "	f.func_nome razao,\n"
-                    + "	f.func_cpf cnpj,\n"
-                    + "	pfin_complemento observacao,\n"
-                    + "	pfin_numerodcto cupom,\n"
-                    + "	pfin_parcela parcela,\n"
-                    + "	pfin_valor valor\n"
-                    + "from \n"
-                    + "	pendfin\n"
-                    + "left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n"
-                    + "where\n"
-                    + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                    + "	pfin_pr = 'R' and\n"
-                    + "	pfin_status = 'P'")) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rs.getString("id"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setEcf(rs.getString("ecf"));
-                    imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setCnpjCliente(rs.getString("cnpj"));
-                    imp.setParcela(rs.getInt("parcela"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setNumeroCupom(rs.getString("cupom"));
+            if (importarFuncionario) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	pfin_operacao id,\n"
+                        + "	pfin_dataemissao emissao,\n"
+                        + "	pfin_datavcto vencimento,\n"
+                        + "	pfin_pdvs_codigo ecf,\n"
+                        + "	pfin_codentidade::varchar idcliente,\n"
+                        + "	c.clie_razaosocial razao,\n"
+                        + "	c.clie_cnpjcpf cnpj,\n"
+                        + "	pfin_complemento observacao,\n"
+                        + "	pfin_numerodcto cupom,\n"
+                        + "	pfin_parcela parcela,\n"
+                        + "	pfin_valor valor\n"
+                        + "from \n"
+                        + "	pendfin\n"
+                        + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                        + "where\n"
+                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                        + "	pfin_pr = 'R' and\n"
+                        + "	pfin_status = 'P' and\n"
+                        + "	pfin_pger_conta in (112201, 112202, 112203, 112204, 112205, 112206, 112207, 112208, 112209) "
+                        + "union all "
+                        + "select \n"
+                        + "	pfin_operacao id,\n"
+                        + "	pfin_dataemissao emissao,\n"
+                        + "	pfin_datavcto vencimento,\n"
+                        + "	pfin_pdvs_codigo ecf,\n"
+                        + "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n"
+                        + "	f.func_nome razao,\n"
+                        + "	f.func_cpf cnpj,\n"
+                        + "	pfin_complemento observacao,\n"
+                        + "	pfin_numerodcto cupom,\n"
+                        + "	pfin_parcela parcela,\n"
+                        + "	pfin_valor valor\n"
+                        + "from \n"
+                        + "	pendfin\n"
+                        + "left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n"
+                        + "where\n"
+                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                        + "	pfin_pr = 'R' and\n"
+                        + "	pfin_status = 'P'")) {
+                    while (rs.next()) {
+                        CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    incluirLancamentos(imp);
+                        imp.setId(rs.getString("id"));
+                        imp.setDataEmissao(rs.getDate("emissao"));
+                        imp.setDataVencimento(rs.getDate("vencimento"));
+                        imp.setEcf(rs.getString("ecf"));
+                        imp.setIdCliente(rs.getString("idcliente"));
+                        imp.setCnpjCliente(rs.getString("cnpj"));
+                        imp.setParcela(rs.getInt("parcela"));
+                        imp.setValor(rs.getDouble("valor"));
+                        imp.setNumeroCupom(rs.getString("cupom"));
 
-                    result.add(imp);
+                        incluirLancamentos(imp);
+
+                        result.add(imp);
+                    }
+                }
+            } else {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	pfin_operacao id,\n"
+                        + "	pfin_dataemissao emissao,\n"
+                        + "	pfin_datavcto vencimento,\n"
+                        + "	pfin_pdvs_codigo ecf,\n"
+                        + "	pfin_codentidade::varchar idcliente,\n"
+                        + "	c.clie_razaosocial razao,\n"
+                        + "	c.clie_cnpjcpf cnpj,\n"
+                        + "	pfin_complemento observacao,\n"
+                        + "	pfin_numerodcto cupom,\n"
+                        + "	pfin_parcela parcela,\n"
+                        + "	pfin_valor valor\n"
+                        + "from \n"
+                        + "	pendfin\n"
+                        + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                        + "where\n"
+                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                        + "	pfin_pr = 'R' and\n"
+                        + "	pfin_status = 'P' and\n"
+                        + "	pfin_pger_conta in (112101, 112201, 112202, 112203, 112204, 112205, 112206, 112207, 112208, 112209)")) {
+                    while (rs.next()) {
+                        CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                        imp.setId(rs.getString("id"));
+                        imp.setDataEmissao(rs.getDate("emissao"));
+                        imp.setDataVencimento(rs.getDate("vencimento"));
+                        imp.setEcf(rs.getString("ecf"));
+                        imp.setIdCliente(rs.getString("idcliente"));
+                        imp.setCnpjCliente(rs.getString("cnpj"));
+                        imp.setParcela(rs.getInt("parcela"));
+                        imp.setValor(rs.getDouble("valor"));
+                        imp.setNumeroCupom(rs.getString("cupom"));
+
+                        result.add(imp);
+                    }
                 }
             }
+
         }
         return result;
     }
