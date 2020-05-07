@@ -41,6 +41,7 @@ public class RPInfoDAO extends InterfaceDAO {
     public boolean importarFuncionario = false;
     public boolean gerarCodigoAtacado = true;
     public int idLojaVR = 1;
+    public boolean removeDigitoEAN = false;
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -341,7 +342,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	when p.prod_balanca in ('P', 'U') then 1\n"
                     + "	else 0 end e_balanca,\n"
                     + "	coalesce(un.prun_validade, 0) validade,\n"
-                    + "	p.prod_descricao || ' ' || p.prod_complemento descricaocompleta,\n"
+                    + "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompleta,\n"
                     + "	p.prod_descrpdvs descricaoreduzida,\n"
                     + "	p.prod_dpto_codigo merc1,\n"
                     + "	p.prod_grup_codigo merc2,\n"
@@ -413,8 +414,10 @@ public class RPInfoDAO extends InterfaceDAO {
 
                         if (pBalanca.length() < 7) {
                             imp.seteBalanca(true);
-                            //imp.setEan(rst.getString("ean"));
-                            imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                            imp.setEan(rst.getString("ean"));
+                            if(removeDigitoEAN) {
+                                imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                            }
                         } else {
                             imp.seteBalanca(false);
                             imp.setEan(rst.getString("ean"));
@@ -798,10 +801,14 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("renda"));
                     imp.setValorLimite(rst.getDouble("clie_limiteconv") == 0 ? rst.getDouble("clie_limitecheque") : rst.getDouble("clie_limiteconv"));
+                    if(imp.getValorLimite() > 0) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                    }
                     imp.setObservacao2(rst.getString("observacao"));
                     imp.setDiaVencimento(rst.getInt("diavencimento"));
-                    imp.setPermiteCreditoRotativo("S".equals(rst.getString("permitecreditorotativo")));
-                    imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
+                    //imp.setPermiteCreditoRotativo("S".equals(rst.getString("permitecreditorotativo")));
+                    //imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
                     imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
                     imp.setBloqueado("I".equals(rst.getString("clie_situacao")));
 

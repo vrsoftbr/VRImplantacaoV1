@@ -226,6 +226,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
 
+    //O select de produto mudou, foi utilizado a tabela prod_loja para lojas unificadas do Getway
+    //Caso o banco de dados não tiver com esta tabela populada, verificar antes da migração
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
@@ -282,11 +284,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	prod.peso_liq pesoliquido,\n"
                     + "	prod.estoque_max estoquemaximo,\n"
                     + "	prod.estoque_min estoqueminimo,\n"
-                    + "	prod.estoque,\n"
+                    + "	pl.estoque,\n"
                     + "	trc.QTD estoquetroca,\n"
-                    + "	prod.preco_cust custocomimposto,\n"
-                    + "	prod.preco_cust custosemimposto,\n"
-                    + "	prod.preco_unit precovenda,\n"
+                    + "	pl.preco_cust custocomimposto,\n"
+                    + "	pl.preco_cust custosemimposto,\n"
+                    + "	pl.preco_unit precovenda,\n"
                     + "	prod.margem_bruta margem_bruta,\n"
                     + "	prod.margem_param margem_param,\n"
                     + "	prod.lucroliq margemliquidapraticada,\n"
@@ -323,7 +325,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		al.CODALIQ = prod.codaliq_nf\n"
                     + "left join TROCACOMPRA trc on prod.CODPROD = trc.CODPROD\n"
                     + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
-                    + (apenasProdutoAtivo == true ? " where upper(ltrim(rtrim(prod.ativo))) = 'S' " : "")
+                    + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"      
+                    + "where pl.codloja = " + getLojaOrigem() + "\n"
+                    + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S' " : "")        
                     + "order by\n"
                     + "	id"
             )) {
@@ -1842,6 +1846,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }*/
     
+    //Utilizado este método com novo script para cliente que utiliza alíquota FCP
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList();
