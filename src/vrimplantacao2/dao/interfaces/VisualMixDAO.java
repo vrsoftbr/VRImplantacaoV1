@@ -14,8 +14,10 @@ import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -59,6 +61,31 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "f.Codigo, "
+                    + "f.Descricao "
+                    + "from dbo.Grupo_Precos f "
+                    + "order by Codigo"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("Codigo"));
+                    imp.setDescricao(rst.getString("Descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
@@ -70,21 +97,65 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "Descricao as descricao \n"
                     + "from dbo.Mercadologicos\n"
                     + "where Nivel = 1\n"
-                    + "order by Mercadologico1"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
-                    
+
                     imp.setId(rst.getString("merc1"));
                     imp.setDescricao(rst.getString("descricao"));
-                    
+
                     merc.put(imp.getId(), imp);
                 }
             }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "Mercadologico1 as merc1, \n"
+                    + "Mercadologico2 as merc2, \n"
+                    + "Descricao as descricao \n"
+                    + "from dbo.Mercadologicos\n"
+                    + "where Nivel = 2\n"
+                    + "order by 1, 2"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc2 = merc.get(rst.getString("merc1"));
+                    if (merc2 != null) {
+                        merc2.addFilho(
+                                rst.getString("merc2"),
+                                rst.getString("descricao")
+                        );
+                    }
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	Mercadologico1 as merc1,\n"
+                    + "	Mercadologico2 as merc2, \n"
+                    + "	Mercadologico3 as merc3, \n"
+                    + "	Descricao as descricao \n"
+                    + "from dbo.Mercadologicos\n"
+                    + "where Nivel = 3\n"
+                    + "order by 1, 2, 3"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    rst.getString("merc3"),
+                                    rst.getString("descricao")
+                            );
+                        }
+                    }
+                }
+            }
         }
-        return null;
+        return new ArrayList<>(merc.values());
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -111,6 +182,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.Aliquota_FCP, \n"
                     + " p.Aliquota_Interna, \n"
                     + " p.Aliquota_NF,\n"
+                    + " f.Codigo as idfamiliaproduto,\n"
                     + "	p.Mercadologico1, \n"
                     + " p.Mercadologico2, \n"
                     + " p.Mercadologico3, \n"
@@ -129,13 +201,15 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.TipoCodMercad as tipomercadoria,\n"
                     + "	p.CstPisCofinsEntrada, \n"
                     + " p.CstPisCofinsSaida, \n"
-                    + " p.NaturezaReceita\n"
+                    + " p.NaturezaReceita,\n"
+                    + " p.Fabricante as idfabricante\n"
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
                     + "left join dbo.Produtos_Estoque est on est.Produto_Id = p.Produto_Id\n"
                     + "	and est.Loja = " + getLojaOrigem() + "\n"
                     + "left join dbo.Automacao ean on ean.Produto_Id = p.Produto_Id\n"
+                    + "left join dbo.Grupo_Precos_Produtos f on f.Produto_Id = p.Produto_Id\n"
                     + "order by p.Produto_Id"
             )) {
                 while (rst.next()) {
@@ -207,5 +281,36 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	pf.Fornecedor as idfornecedor,\n"
+                    + "	pf.Produto_Id as idproduto,\n"
+                    + "	pf.Referencia as codigoexterno,\n"
+                    + "	pf.Qtde_Emb as qtdembalagem,\n"
+                    + "	pf.Preco_Tabela as custo\n"
+                    + "from dbo.Produtos_Fornecedor pf\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    imp.setCustoTabela(rst.getDouble("custo"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }
