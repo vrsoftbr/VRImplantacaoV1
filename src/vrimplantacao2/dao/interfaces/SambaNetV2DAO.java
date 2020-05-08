@@ -28,11 +28,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String complemento;
-    
+
     public void setComplemento(String complemento) {
         this.complemento = complemento;
     }
-    
+
     @Override
     public String getSistema() {
         if ((complemento != null) && (!complemento.trim().isEmpty())) {
@@ -79,7 +79,7 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
                 }
         ));
     }
-    
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -88,9 +88,9 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	CODLOJA id,\n"
                     + "	descricao\n"
-                  + "from\n"
+                    + "from\n"
                     + "	LOJA\n"
-                  + "order by\n"
+                    + "order by\n"
                     + "	id"
             )) {
                 while (rst.next()) {
@@ -101,7 +101,7 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -318,8 +318,9 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setFax(rst.getString("fax"));
                     imp.setCelular(rst.getString("celular"));
-                    imp.setEmail(rst.getString("email"));
+                    imp.setEmail(rst.getString("email") == null ? null : rst.getString("email").toLowerCase());
                     imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaTelefone(rst.getString("telefone_empresa"));
                     imp.setCargo(rst.getString("funcao"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setAtivo("S".equals(rst.getString("situacaocadastro")));
@@ -329,6 +330,19 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCpfConjuge(rst.getString("cpf_conjuge"));
                     imp.setObservacao(rst.getString("observacao1"));
                     imp.setObservacao2(rst.getString("observacao2"));
+
+                    if ((rst.getString("telefone1") != null)
+                            && (!rst.getString("telefone1").trim().isEmpty())) {
+
+                        imp.addTelefone("TELEFONE 1", rst.getString("telefone1"));
+                    }
+
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+
+                        imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
+                    }
+
                     result.add(imp);
                 }
             }
