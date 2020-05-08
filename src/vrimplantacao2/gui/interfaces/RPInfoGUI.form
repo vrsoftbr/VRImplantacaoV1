@@ -518,10 +518,13 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="349" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkGerarCodigoAtacado" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkRemoveDigitoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="350" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -530,7 +533,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="210" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkRemoveDigitoBalanca" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="188" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -539,6 +544,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarCodigoAtacado">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Gerar C&#xf3;digo de Atacado"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRemoveDigitoBalanca">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Remove Dig&#xed;to do EAN para Produto de Balan&#xe7;a"/>
               </Properties>
             </Component>
           </SubComponents>

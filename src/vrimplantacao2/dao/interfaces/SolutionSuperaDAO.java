@@ -182,7 +182,6 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "p.aliquota_icms_saida_interno as aliquota_debito,\n"
                     + "p.aliquota_icms_saida_externo as aliquota_debito_fora\n"
                     + "from produtos p\n"
-                    + "where p.status = 'A'"
                     + "order by p.codigo_pro"
             )) {
                 while (rst.next()) {
@@ -191,7 +190,17 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.seteBalanca("T".equals(rst.getString("balanca")));
+                    
+                    if ((imp.getEan() != null) && (!imp.getEan().trim().isEmpty())) {
+                        if (imp.getEan().trim().length() <= 6) {
+                            imp.seteBalanca("T".equals(rst.getString("balanca")));
+                        } else {
+                            imp.seteBalanca(false);
+                        }
+                    } else {
+                        imp.seteBalanca("T".equals(rst.getString("balanca")));
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaoproduto"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -267,7 +276,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -295,7 +304,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
