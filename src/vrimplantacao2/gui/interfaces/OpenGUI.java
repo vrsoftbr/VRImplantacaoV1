@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,11 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
         txtDtVendaFim.setFormats("dd/MM/yyyy");
 
         tabProdutos.setOpcoesDisponiveis(dao);
+        Component[] a = tabProdutos.tabParametros.getComponents();
+        tabProdutos.tabParametros.add(pnlCustom);
+        for (Component c: a) {
+            tabProdutos.tabParametros.add(c);
+        }
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
@@ -171,51 +177,50 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    
+                    dao.setImportarSomenteBalanca(chkSomenteBalanca.isSelected());
 
-                    if (tabOperacoes.getSelectedIndex() == 0) {
+                    tabProdutos.setImportador(importador);
+                    tabProdutos.executarImportacao();
 
-                        tabProdutos.setImportador(importador);
-                        tabProdutos.executarImportacao();
-                        
-                        if (chkFornecedor.isSelected()) {
-                            importador.importarFornecedor();
+                    if (chkFornecedor.isSelected()) {
+                        importador.importarFornecedor();
+                    }
+
+                    if (chkProdutoFornecedor.isSelected()) {
+                        importador.importarProdutoFornecedor();
+                    }
+
+                    {
+                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                        if (chkFContatos.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
                         }
 
-                        if (chkProdutoFornecedor.isSelected()) {
-                            importador.importarProdutoFornecedor();
+                        if (!opcoes.isEmpty()) {
+                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
+                    }
 
-                        {
-                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                            if (chkFContatos.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.CONTATOS);
-                            }
+                    if (chkClientePreferencial.isSelected()) {
+                        importador.importarClientePreferencial(OpcaoCliente.DADOS,OpcaoCliente.CONTATOS);
+                    }
+                    if (chkClienteEventual.isSelected()) {
+                        importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                    }
 
-                            if (!opcoes.isEmpty()) {
-                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
-                            }
-                        }
-                        
-                        if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS,OpcaoCliente.CONTATOS);
-                        }
-                        if (chkClienteEventual.isSelected()) {
-                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
-                        }
-                
-                        if (chkCreditoRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
-                        
-                        if(chkConvenioEmpresa.isSelected()) {
-                            importador.importarConvenioEmpresa();
-                        }
-                        
-                        if (chkVendas.isSelected()) {
-                            dao.setDataVendaInicio(txtDtVendaIni.getDate());
-                            dao.setDataVendaTermino(txtDtVendaFim.getDate());
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
+                    if (chkCreditoRotativo.isSelected()) {
+                        importador.importarCreditoRotativo();
+                    }
+
+                    if(chkConvenioEmpresa.isSelected()) {
+                        importador.importarConvenioEmpresa();
+                    }
+
+                    if (chkVendas.isSelected()) {
+                        dao.setDataVendaInicio(txtDtVendaIni.getDate());
+                        dao.setDataVendaTermino(txtDtVendaFim.getDate());
+                        importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                     }
 
                     ProgressBar.dispose();
@@ -239,11 +244,13 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
+        pnlCustom = new vrframework.bean.panel.VRPanel();
+        chkSomenteBalanca = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
+        tabBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -265,6 +272,25 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
         tabs = new javax.swing.JTabbedPane();
         conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
 
+        chkSomenteBalanca.setText("Importar SOMENTE produtos de balança");
+
+        javax.swing.GroupLayout pnlCustomLayout = new javax.swing.GroupLayout(pnlCustom);
+        pnlCustom.setLayout(pnlCustomLayout);
+        pnlCustomLayout.setHorizontalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkSomenteBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlCustomLayout.setVerticalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkSomenteBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         setTitle("Importação Open");
         setToolTipText("");
 
@@ -272,6 +298,7 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
 
+        tabImportacao.addTab("Balança", tabBalanca);
         tabImportacao.addTab("Produtos", tabProdutos);
 
         chkFornecedor.setText("Fornecedor");
@@ -474,13 +501,15 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkSomenteBalanca;
     private javax.swing.JCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
     private javax.swing.JLabel jLabel1;
-    private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
+    private vrframework.bean.panel.VRPanel pnlCustom;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
