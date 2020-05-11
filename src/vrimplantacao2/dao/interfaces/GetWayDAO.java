@@ -1446,7 +1446,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
+                   "SELECT "
                     + "CODRECEBER AS ID, "
                     + "CLIENTES.CNPJ_CPF, "
                     + "CODRECEBER, NUMTIT, "
@@ -1458,13 +1458,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(VALOR,0) VALOR, "
                     + "coalesce(VALORJUROS,0) VALORJUROS, "
                     + "OBS "
-                    + "FROM "
+                 + "FROM "
                     + "RECEBER "
-                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                    + "where UPPER(SITUACAO) = 'AB' "
+                 + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
+                 + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODTIPODOCUMENTO = " + v_tipoDocumento + " "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                    + "order by DTEMISSAO"
+                 + "order by DTEMISSAO"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
