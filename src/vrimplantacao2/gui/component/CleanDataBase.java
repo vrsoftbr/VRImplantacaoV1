@@ -138,16 +138,16 @@ public class CleanDataBase extends VRInternalFrame {
                 boolean todasLojas = chkAll.isSelected();
                 
                 FileWriter fw = null;
-                PrintWriter pw = null;
+                //PrintWriter pw = null;
                 
                 if(todasLojas) {
                     fw = new FileWriter("c:\\vr\\implantacao\\logestoque_geral.txt");
-                    pw = new PrintWriter(fw);
-                    pw.println("Tabela logestoque - Loja Geral");
+                    //pw = new PrintWriter(fw);
+                    fw.write("Tabela logestoque - Loja Geral\n");
                 } else {
                     fw = new FileWriter("c:\\vr\\implantacao\\logestoque_loja" + idLoja + ".txt");
-                    pw = new PrintWriter(fw);
-                    pw.println("Tabela logestoque - Loja ID: " + idLoja);
+                    //pw = new PrintWriter(fw);
+                    fw.write("Tabela logestoque - Loja ID: " + idLoja + "\n");
                 }
                 
                 DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -159,22 +159,23 @@ public class CleanDataBase extends VRInternalFrame {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(dt1);
 
-                for (Date dt = dt1; dt.compareTo(dt2) <= 0;) {
+                for (Date dt = dt1; dt.compareTo(dt2) <= 0; dt = cal.getTime()) {
                     System.out.println(df.format(dt));
                     try {
                         ProgressBar.setStatus("Del. logestoque na data de: " + df.format(dt) + "...");
                         
                         dao.deletaLogEstoque(dt, idLoja, todasLojas);
-                        pw.println("Dia " + df.format(dt) + " deletado da tabela;");
+                        fw.write("Dia " + df.format(dt) + " deletado da tabela;\n");
                         
                         ProgressBar.next();
                     } catch (Exception ex) {
                         Exceptions.printStackTrace(ex);
                     }
                     cal.add(Calendar.DATE, +1);
-                    dt = cal.getTime();
+                    //dt = cal.getTime();
                 }
                 fw.close();
+                //pw.close();
             } catch (ParseException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (IOException ex) {

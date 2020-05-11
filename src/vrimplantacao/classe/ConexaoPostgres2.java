@@ -84,31 +84,15 @@ public class ConexaoPostgres2 {
             testarConexao();
         }
 
-        if (contBegin == 0) {
-            con.createStatement().execute("begin");
-        }
-
-        contBegin++;
+        con.createStatement().execute("begin");
     }
 
     public static void commit() throws Exception {
-        contBegin--;
-
-        if (contBegin == 0) {
-            con.createStatement().execute("commit");
-        }
+        con.createStatement().execute("commit");
     }
 
     public static void rollback() throws Exception {
-        contBegin--;
-
-        if (contBegin <= 0) {
-            contBegin = 0;
-
-            if (con != null) {
-                con.createStatement().execute("rollback");
-            }
-        }
+        con.createStatement().execute("rollback");
     }
 
     public static void close() throws Exception {
