@@ -138,14 +138,16 @@ public class CleanDataBase extends VRInternalFrame {
                 boolean todasLojas = chkAll.isSelected();
                 
                 FileWriter fw = null;
-                PrintWriter pw = new PrintWriter(fw);
+                PrintWriter pw = null;
                 
                 if(todasLojas) {
-                    pw.println("Tabela logestoque - Loja Geral");
                     fw = new FileWriter("c:\\vr\\implantacao\\logestoque_geral.txt");
+                    pw = new PrintWriter(fw);
+                    pw.println("Tabela logestoque - Loja Geral");
                 } else {
-                    pw.println("Tabela logestoque - Loja ID: " + idLoja);
                     fw = new FileWriter("c:\\vr\\implantacao\\logestoque_loja" + idLoja + ".txt");
+                    pw = new PrintWriter(fw);
+                    pw.println("Tabela logestoque - Loja ID: " + idLoja);
                 }
                 
                 DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
