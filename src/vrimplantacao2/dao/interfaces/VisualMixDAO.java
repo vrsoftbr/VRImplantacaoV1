@@ -12,8 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -29,6 +35,24 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "VisualMix";
+    }
+
+    public List<Estabelecimento> getLojaCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	codigo, \n"
+                    + "	descricao\n"
+                    + "from dbo.Empresas_CAP\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("codigo"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -164,7 +188,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	p.Produto_Id as id,\n"
-                    + " (cast(ean.Codigo_Automacao as varchar) + cast(ean.Digito_Automacao as varchar)) as ean,\n"
+                    + "	ean.Codigo_Automacao,\n"
+                    + "	ean.Digito_Automacao,\n"
                     + " p.Peso_Variavel,\n"
                     + " p.Pre_Pesado,\n"
                     + " p.Qtd_Decimal,\n"
@@ -213,11 +238,48 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by p.Produto_Id"
             )) {
                 while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("Codigo_Automacao") + rst.getString("Digito_Automacao"));
 
+                    if ((rst.getString("Descricao_Balanca") != null)
+                            && (!rst.getString("Descricao_Balanca").trim().isEmpty())) {
+                        imp.seteBalanca(true);
+                    } else {
+                        imp.seteBalanca(false);
+                    }
+
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setIdFamiliaProduto(rst.getString("idfamiliaproduto"));
+                    imp.setCodMercadologico1(rst.getString("Mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("Mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("Mercadologico3"));
+                    imp.setFornecedorFabricante(rst.getString("idfabricante"));
+                    imp.setMargem(rst.getDouble("Margem_Teorica"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rst.getDouble("Estoque_Minimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("Estoque_Maximo"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("CstPisCofinsSaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("CstPisCofinsEntrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceita"));
+                    imp.setIcmsDebitoId(rst.getString("Aliquota_NF"));
+                    imp.setIcmsCreditoId(rst.getString("Aliquota_NF"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -227,48 +289,48 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	f.Codigo as id, "
-                    + " f.Tipo, "
-                    + " tf.Descricao as tipofornecedor, "
-                    + " f.RazaoSocial as razao, "
+                    + "	f.Codigo as id,\n"
+                    + " f.Tipo,\n"
+                    + " tf.Descricao as tipofornecedor,\n"
+                    + " f.RazaoSocial as razao,\n"
                     + " f.NomeFantasia as fantasia,\n"
-                    + "	f.TipoLogradouro, "
-                    + " f.Endereco, "
-                    + " f.NumeroEnd as numero, "
-                    + " f.Complemento, "
-                    + " f.Bairro, "
-                    + " f.Cidade as municipio, "
-                    + " f.Estado as uf, \n"
-                    + "	f.Cep, "
-                    + " f.CxPostal as caixapostal, "
-                    + " f.Telefone, "
-                    + " f.Fax, "
-                    + " f.Telex, "
-                    + " f.TeleContato, "
-                    + " f.Contato, "
-                    + " f.TeleContato, \n"
-                    + "	f.CGC as cnpj, "
-                    + " f.InscricaoEstadual as ie, "
-                    + " f.PrazoEntrega, "
-                    + " f.DataCadastro, \n"
-                    + "	f.CondicaoPagto, "
-                    + " cp.Descricao as condicaopagamento, "
-                    + " cp.Qtd_Parcelas, "
-                    + " f.Observacao,  \n"
-                    + "	f.Supervisor, "
-                    + " f.CelSupervisor, "
-                    + " f.EmailSupervisor, "
-                    + " f.TelSupervisor, "
-                    + " f.Email, "
-                    + " f.Vendedor, "
-                    + " f.TelVendedor, "
+                    + "	f.TipoLogradouro as logradouro,\n"
+                    + " f.Endereco,\n"
+                    + " f.NumeroEnd as numero,\n"
+                    + " f.Complemento,\n"
+                    + " f.Bairro,\n"
+                    + " f.Cidade as municipio,\n"
+                    + " f.Estado as uf,\n"
+                    + "	f.Cep,\n"
+                    + " f.CxPostal as caixapostal,\n"
+                    + " f.Telefone,\n"
+                    + " f.Fax,\n"
+                    + " f.Telex,\n"
+                    + " f.TeleContato,\n"
+                    + " f.Contato,\n"
+                    + "	f.CGC as cnpj,\n"
+                    + " f.InscricaoEstadual as ie,\n"
+                    + " f.InscrMunicipal as im,\n"
+                    + " f.PrazoEntrega,\n"
+                    + " f.DataCadastro,\n"
+                    + "	f.CondicaoPagto,\n"
+                    + " cp.Descricao as condicaopagamento,\n"
+                    + " cp.Qtd_Parcelas,\n"
+                    + " f.Observacao,\n"
+                    + "	f.Supervisor,\n"
+                    + " f.CelSupervisor,\n"
+                    + " f.EmailSupervisor,\n"
+                    + " f.TelSupervisor,\n"
+                    + " f.Email,\n"
+                    + " f.Vendedor,\n"
+                    + " f.TelVendedor,\n"
                     + " f.CelVendedor,\n"
-                    + "	f.EmailVendedor, "
-                    + " f.Gerente, "
-                    + " f.TelGerente, "
-                    + " f.CelGerente, "
+                    + "	f.EmailVendedor,\n"
+                    + " f.Gerente,\n"
+                    + " f.TelGerente,\n"
+                    + " f.CelGerente,\n"
                     + " f.EmailGerente,\n"
-                    + "	f.Situacao, "
+                    + "	f.Situacao,\n"
                     + " f.Status\n"
                     + "from dbo.Fornecedores f\n"
                     + "left join dbo.Condicoes_Pagto cp on cp.Codigo = f.CondicaoPagto\n"
@@ -276,11 +338,71 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by f.Codigo"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setInsc_municipal(rst.getString("im"));
 
+                    if ((rst.getString("Endereco") != null)
+                            && (!rst.getString("Endereco").trim().isEmpty())) {
+                        imp.setEndereco(rst.getString("logradouro") + " " + rst.getString("Endereco"));
+                    }
+
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("Cep"));
+                    imp.setDatacadastro(rst.getDate("DataCadastro"));
+                    imp.setTel_principal(rst.getString("Telefone"));
+                    imp.setPrazoEntrega(rst.getInt("PrazoEntrega"));
+                    imp.setCondicaoPagamento(rst.getInt("CondicaoPagto"));
+                    imp.setObservacao(rst.getString("Observacao"));
+
+                    switch (rst.getInt("tipofornecedor")) {
+                        case 1:
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            break;
+                        case 2:
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            break;
+                        case 3:
+                            imp.setTipoFornecedor(TipoFornecedor.PRODUTORRURAL);
+                            break;
+                        case 6:
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                        default:
+                            break;
+                    }
+
+                    if ((rst.getString("Email") != null)
+                            && (!rst.getString("Email").trim().isEmpty())) {
+                        imp.addEmail("EMAIL", rst.getString("Email").toLowerCase(), TipoContato.NFE);
+                    }
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addTelefone("FAX", rst.getString("fax"));
+                    }
+                    if ((rst.getString("Telex") != null)
+                            && (!rst.getString("Telex").trim().isEmpty())) {
+                        imp.addTelefone("TELEX", rst.getString("Telex"));
+                    }
+                    if ((rst.getString("TeleContato") != null)
+                            && (!rst.getString("TeleContato").trim().isEmpty())) {
+                        imp.addTelefone(rst.getString("Contato") == null ? "CONTATO" : rst.getString("Contato"), rst.getString("TeleContato"));
+                    }
+
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -307,6 +429,106 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
                     imp.setCustoTabela(rst.getDouble("custo"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	c.Codigo as id, \n"
+                    + "	c.Nome as razao, \n"
+                    + "	c.Apelido as fantasia,\n"
+                    + "	c.RG, \n"
+                    + "	c.CPF, \n"
+                    + "	c.IDSexo as sexo,\n"
+                    + "	c.DataNascimento,\n"
+                    + "	c.EstadoCivil,\n"
+                    + "	c.NomeConjuge,\n"
+                    + "	c.DataNascimentoConjuge,\n"
+                    + "	c.Endereco,\n"
+                    + "	c.Numero,\n"
+                    + "	c.Complemento,\n"
+                    + "	c.Bairro,\n"
+                    + "	c.CEP,\n"
+                    + "	c.Cidade as municipio,\n"
+                    + "	c.Estado as uf,\n"
+                    + "	c.Referencia,\n"
+                    + "	c.TipoEndereco,\n"
+                    + "	c.eMail,\n"
+                    + "	c.Empresa,\n"
+                    + "	c.DataAdmissao,\n"
+                    + "	c.CodigoProfissao,\n"
+                    + "	c.TelefoneEmpresa,\n"
+                    + "	c.RamalEmpresa,\n"
+                    + "	c.DataInclusao as datacadastro,\n"
+                    + "	c.Telefone,\n"
+                    + "	c.InscEstadual as ie_rg,\n"
+                    + "	c.Status,\n"
+                    + "	c.LimiteCredito as valorlimite,\n"
+                    + "	c.LimiteCheques,\n"
+                    + "	c.DescProfissao as cargo,\n"
+                    + "	c.Renda as salario,\n"
+                    + "	c.EnderecoEntrega,\n"
+                    + "	c.NumeroEntrega,\n"
+                    + "	c.ComplEntrega,\n"
+                    + "	c.BairroEntrega,\n"
+                    + "	c.CidadeEntrega as municipioentrega,\n"
+                    + "	c.UFEntrega as ufentrega,\n"
+                    + "	c.CEPEntrega as cepentrega,\n"
+                    + "	c.FoneEntrega as telefoneentrega\n"
+                    + "from dbo.Clientes c\n"
+                    + "where c.IDLoja = " + getLojaOrigem() + "\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("CPF"));
+                    imp.setInscricaoestadual(rst.getString("RG"));
+                    imp.setEndereco(rst.getString("Endereco"));
+                    imp.setNumero(rst.getString("Numero"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setTelefone(rst.getString("Telefone"));
+                    imp.setEmail(rst.getString("eMail") == null ? "" : rst.getString("eMail").toLowerCase());
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setDataNascimento(rst.getDate("NomeConjuge"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setNomeConjuge(rst.getString("NomeConjuge"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setEmpresaTelefone(rst.getString("TelefoneEmpresa"));
+
+                    if (rst.getInt("EstadoCivil") == 2) {
+                        imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                    }
+
+                    switch (rst.getInt("sexo")) {
+                        case 1:
+                            imp.setSexo(TipoSexo.MASCULINO);
+                            break;
+                        default:
+                            imp.setSexo(TipoSexo.FEMININO);
+                            break;
+                    }
+
                     result.add(imp);
                 }
             }
