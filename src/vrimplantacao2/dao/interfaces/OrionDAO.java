@@ -586,7 +586,6 @@ public class OrionDAO extends InterfaceDAO {
                     + "	e.vendavare as precovenda, \n"
                     + "	e.promovare as precooferta \n"
                     + "from estoque e\n"
-                    + "where e.profimvare > '2020-04-07'\n"
                     + "order by e.proinivare"
             )) {
                 while (rst.next()) {

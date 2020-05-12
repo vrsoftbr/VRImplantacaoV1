@@ -88,6 +88,7 @@ import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
 import vrimplantacao2.dao.interfaces.DevMasterDAO;
 import vrimplantacao2.dao.interfaces.SircomDAO;
+import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
 import vrimplantacao2.gui.interfaces.AccesysGUI;
@@ -814,6 +815,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
+        mnuDelRegistro = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -2887,6 +2889,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuAvancadas.add(mnuParametros1);
 
+        mnuDelRegistro.setText("Deleta Registro");
+        mnuDelRegistro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDelRegistroActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(mnuDelRegistro);
+
         mnuFerramentas.add(mnuAvancadas);
 
         mnuMenu.add(mnuFerramentas);
@@ -4522,6 +4532,10 @@ public final class MenuGUI extends VRMdiFrame {
         LogusRetailGUI.exibir(this);
     }//GEN-LAST:event_mnuiLogusActionPerformed
 
+    private void mnuDelRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDelRegistroActionPerformed
+        CleanDataBase.exibir(this);
+    }//GEN-LAST:event_mnuDelRegistroActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4649,6 +4663,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDLink;
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
+    private javax.swing.JMenuItem mnuDelRegistro;
     private javax.swing.JMenuItem mnuDelfi;
     private javax.swing.JMenuItem mnuDevMaster;
     private javax.swing.JMenuItem mnuDirector;

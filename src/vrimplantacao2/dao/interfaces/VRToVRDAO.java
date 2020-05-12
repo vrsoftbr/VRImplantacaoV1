@@ -16,7 +16,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -119,7 +123,30 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.razaosocial \n"
                     + "from \n"
                     + "	loja l \n"
-                    + "inner join fornecedor f on l.id_fornecedor = f.id\n"
+                    + "inner join fornecedor f on l.id_fornecedor = f.id where l.id_situacaocadastro = 1\n"
+                    + "order by\n"
+                    + "	l.id")) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<Estabelecimento> getLojasVR() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres2.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	l.id,\n"
+                    + "	l.descricao,\n"
+                    + "	f.nomefantasia,\n"
+                    + "	f.razaosocial \n"
+                    + "from \n"
+                    + "	loja l \n"
+                    + "inner join fornecedor f on l.id_fornecedor = f.id where l.id_situacaocadastro = 1\n"
                     + "order by\n"
                     + "	l.id")) {
                 while (rs.next()) {
@@ -250,12 +277,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pad.dataultimodesconto,\n"
                         + "	pa.id_produto,\n"
                         + "     pa.qtdembalagem,\n"
-                        + "	t.descricao unidade\n"        
+                        + "	t.descricao unidade\n"
                         + "from\n"
                         + "	produtoautomacaodesconto pad\n"
                         + "join produtoautomacao pa on pad.codigobarras = pa.codigobarras\n"
-                        + "join tipoembalagem t on pa.id_tipoembalagem = t.id\n"        
-                        + "where pad.id_loja = " + getLojaOrigem() + "\n"        
+                        + "join tipoembalagem t on pa.id_tipoembalagem = t.id\n"
+                        + "where pad.id_loja = " + getLojaOrigem() + "\n"
                         + "order by\n"
                         + "	pa.id_produto"
                 )) {
@@ -315,24 +342,24 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select \n" +
-                        "	pad.codigobarras,\n" +
-                        "	pad.desconto,\n" +
-                        "	pad.descontodiaanterior,\n" +
-                        "	pad.descontodiaseguinte,\n" +
-                        "	pad.dataultimodesconto,\n" +
-                        "	pa.id_produto,\n" +
-                        "	pa.qtdembalagem,\n" +
-                        "	pc.precovenda\n" +
-                        "from\n" +
-                        "	produtoautomacaodesconto pad\n" +
-                        "join produtoautomacao pa on pad.codigobarras = pa.codigobarras\n" +
-                        "join produtocomplemento pc on pa.id_produto = pc.id_produto and\n" +
-                        "	pc.id_loja = pad.id_loja\n" +
-                        "where\n" +
-                        "	pc.id_loja = " + getLojaOrigem() + "\n" +
-                        "order by\n" +
-                        "	pa.id_produto"
+                        "select \n"
+                        + "	pad.codigobarras,\n"
+                        + "	pad.desconto,\n"
+                        + "	pad.descontodiaanterior,\n"
+                        + "	pad.descontodiaseguinte,\n"
+                        + "	pad.dataultimodesconto,\n"
+                        + "	pa.id_produto,\n"
+                        + "	pa.qtdembalagem,\n"
+                        + "	pc.precovenda\n"
+                        + "from\n"
+                        + "	produtoautomacaodesconto pad\n"
+                        + "join produtoautomacao pa on pad.codigobarras = pa.codigobarras\n"
+                        + "join produtocomplemento pc on pa.id_produto = pc.id_produto and\n"
+                        + "	pc.id_loja = pad.id_loja\n"
+                        + "where\n"
+                        + "	pc.id_loja = " + getLojaOrigem() + "\n"
+                        + "order by\n"
+                        + "	pa.id_produto"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -341,11 +368,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_produto"));
                         imp.setEan(rst.getString("codigobarras"));
-                        
+
                         if (imp.getEan().length() < 7) {
                             imp.setEan("99999" + imp.getEan());
                         }
-                        
+
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setAtacadoPorcentagem(rst.getDouble("desconto"));
                         imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -939,33 +966,33 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             Map<String, List<CreditoRotativoItemIMP>> pagamentos = new HashMap<>();
             try (ResultSet rs = stm.executeQuery(
-                "select\n" +
-                "	id,\n" +
-                "	id_recebercreditorotativo,\n" +
-                "	valor,\n" +
-                "	valordesconto,\n" +
-                "	valormulta,\n" +
-                "	databaixa,\n" +
-                "	observacao,\n" +
-                "	id_banco,\n" +
-                "	agencia,\n" +
-                "	conta,\n" +
-                "	id_tiporecebimento\n" +
-                "from\n" +
-                "	recebercreditorotativoitem\n" +
-                "order by\n" +
-                "	id"
+                    "select\n"
+                    + "	id,\n"
+                    + "	id_recebercreditorotativo,\n"
+                    + "	valor,\n"
+                    + "	valordesconto,\n"
+                    + "	valormulta,\n"
+                    + "	databaixa,\n"
+                    + "	observacao,\n"
+                    + "	id_banco,\n"
+                    + "	agencia,\n"
+                    + "	conta,\n"
+                    + "	id_tiporecebimento\n"
+                    + "from\n"
+                    + "	recebercreditorotativoitem\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 while (rs.next()) {
-                    
+
                     List<CreditoRotativoItemIMP> list = pagamentos.get(rs.getString("id_recebercreditorotativo"));
                     if (list == null) {
                         list = new ArrayList<>();
                         pagamentos.put(rs.getString("id_recebercreditorotativo"), list);
-                    }                    
-                    
+                    }
+
                     CreditoRotativoItemIMP i = new CreditoRotativoItemIMP();
-                    
+
                     i.setId(rs.getString("id"));
                     i.setDataPagamento(rs.getDate("databaixa"));
                     i.setDesconto(rs.getDouble("valordesconto"));
@@ -976,7 +1003,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     i.setAgencia(rs.getString("agencia"));
                     i.setConta(rs.getString("conta"));
                     i.setId_tiporecebimento(rs.getInt("id_tiporecebimento"));
-                    
+
                     list.add(i);
                 }
             }
@@ -1017,10 +1044,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valor"));
-                    
+
                     List<CreditoRotativoItemIMP> pags = pagamentos.get(imp.getId());
                     if (pags != null) {
-                        for (CreditoRotativoItemIMP pg: pags) {
+                        for (CreditoRotativoItemIMP pg : pags) {
                             pg.setCreditoRotativo(imp);
                             imp.getPagamentos().add(pg);
                         }
@@ -1394,5 +1421,28 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
+    }
+
+    public void deletaLogEstoque(Date data, int idLoja, boolean todas) throws SQLException {
+        try {
+            ConexaoPostgres2.begin();
+            try (Statement stm = ConexaoPostgres2.createStatement()) {
+                if(todas) {
+                    stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data));
+                } else {
+                    stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data) 
+                        + " and id_loja = " + idLoja);
+                }
+            }
+            ConexaoPostgres2.commit();
+        } catch (Exception ex) {
+            try {
+                ConexaoPostgres2.rollback();
+                Exceptions.printStackTrace(ex);
+            } catch (Exception ex1) {
+                Exceptions.printStackTrace(ex1);
+            }
+        }
+
     }
 }
