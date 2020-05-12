@@ -24,6 +24,7 @@ import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -599,6 +600,28 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             break;
                     }
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CompradorIMP> getCompradores() throws Exception {
+        List<CompradorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	Codigo,\n"
+                    + "	Nome\n"
+                    + "from dbo.Compradores"
+            )) {
+                while (rst.next()) {
+                    CompradorIMP imp = new CompradorIMP();                    
+                    imp.setId(rst.getString("Codigo"));
+                    imp.setDescricao(rst.getString("Nome"));
                     result.add(imp);
                 }
             }
