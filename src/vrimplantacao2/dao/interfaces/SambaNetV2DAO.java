@@ -18,6 +18,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -259,7 +260,7 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.NUMERO as numero,\n"
                     + "	c.COMPLEMENTO as complemento,\n"
                     + " c.CEP as cep,\n"
-                    + "	c.END_COB as endereco_cobranca,\n" 
+                    + "	c.END_COB as endereco_cobranca,\n"
                     + "	c.BAIRRO_COB as bairro_cobranca,\n"
                     + "	c.CID_COB as municipio_cobranca,\n"
                     + "	c.EST_COB as uf_cobranca,\n"
@@ -349,6 +350,47 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CODRECEBER AS ID,\n"
+                    + "    CLIENTES.CNPJ_CPF,\n"
+                    + "    CODRECEBER, NUMTIT,\n"
+                    + "    RECEBER.CODCLIE,\n"
+                    + "    NOTAECF,\n"
+                    + "    DTVENCTO,\n"
+                    + "    DTEMISSAO,\n"
+                    + "    DTPAGTO,\n"
+                    + "    coalesce(VALOR,0) VALOR,\n"
+                    + "    coalesce(VALORJUROS,0) VALORJUROS,\n"
+                    + "    OBS\n"
+                    + "FROM\n"
+                    + "	RECEBER\n"
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE\n"
+                    + "where UPPER(SITUACAO) = 'AB'\n"
+                    + "    and RECEBER.CODLOJA = " + getLojaOrigem() + "\n"
+                    + "order by DTEMISSAO"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("ID"));
+                    imp.setIdCliente(rst.getString("CODCLIE"));
+                    imp.setDataEmissao(rst.getDate("DTEMISSAO"));
+                    imp.setDataVencimento(rst.getDate("DTVENCTO"));
+                    imp.setValor(rst.getDouble("VALOR"));
+                    imp.setNumeroCupom(rst.getString("NOTAECF"));
+                    imp.setObservacao(rst.getString("OBS"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 }
