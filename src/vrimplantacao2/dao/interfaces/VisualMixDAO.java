@@ -8,21 +8,30 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -37,7 +46,49 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         return "VisualMix";
     }
 
-    public List<Estabelecimento> getLojaCliente() throws Exception {
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MAPA_TRIBUTACAO
+                }
+        ));
+    }
+       
+    public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -280,6 +331,71 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p1.Produto_Id as produto_pai,\n"
+                    + "	p1.Descricao_Completa as descricao_pai,\n"
+                    + "	p1.EspecUnitariaQtde as qtembalagem_pai,\n"
+                    + "	p2.Produto_Id as produto_filho,\n"
+                    + "	p2.Descricao_Completa as descricao_filho,\n"
+                    + "	p2.EspecUnitariaQtde as qtdembalagem_filho\n"
+                    + "from dbo.Produtos p1 \n"
+                    + "join dbo.Produtos p2 on p2.ProdutoPai = p1.Produto_Id"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    imp.setId(rst.getString("produto_pai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtembalagem_pai"));
+                    imp.setProdutoAssociadoId(rst.getString("produto_filho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_filho"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	mx.mxf_icms_tipo_iva,\n"
+                    + "	mx.codigo_produto,\n"
+                    + "	mx.ncm,\n"
+                    + "	mx.cod_natureza_receita,\n"
+                    + "	mx.cest,\n"
+                    + "	mx.mxf_piscofins_cst_s,\n"
+                    + "	coalesce(mx.mxf_pis_alq_s, 0) mxf_pis_alq_s,\n"
+                    + "	coalesce(mx.mxf_pis_alq_s, 0) mxf_pis_alq_s,\n"
+                    + "	mx.mxf_piscofins_cst_e,\n"
+                    + "	coalesce(mx.mxf_pis_alq_e, 0) mxf_pis_alq_e,\n"
+                    + "	coalesce(mx.mxf_cofins_alq_e, 0) mxf_cofins_alq_e,\n"
+                    + "	mx.mxf_icms_cst_s,\n"
+                    + "	coalesce(mx.mxf_icms_alq_s, '0') mxf_icms_alq_s,\n"
+                    + "	coalesce(mx.mxf_icms_rbc_s, '0') mxf_icms_rbc_s,\n"
+                    + "	mx.mxf_icms_cst_e,\n"
+                    + "	coalesce(mx.mxf_icms_alq_e, '0') mxf_icms_alq_e,\n"
+                    + "	coalesce(mx.mxf_icms_rbc_e, '0') mxf_icms_rbc_e, \n"
+                    + "	coalesce(mx.mxf_icms_iva_valor, '0') mxf_icms_iva_valor\n"
+                    + "from dbo.produtosMixFiscal mx\n"
+                    + "order by mx.codigo_produto"
+            )) {
+                while (rst.next()) {
+
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -529,6 +645,28 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             break;
                     }
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CompradorIMP> getCompradores() throws Exception {
+        List<CompradorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	Codigo,\n"
+                    + "	Nome\n"
+                    + "from dbo.Compradores"
+            )) {
+                while (rst.next()) {
+                    CompradorIMP imp = new CompradorIMP();                    
+                    imp.setId(rst.getString("Codigo"));
+                    imp.setDescricao(rst.getString("Nome"));
                     result.add(imp);
                 }
             }

@@ -240,6 +240,7 @@ import vrimplantacao2.gui.interfaces.VCashGUI;
 import vrimplantacao2.gui.interfaces.VRToVRGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
+import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -676,6 +677,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAtenasSQLServer = new javax.swing.JMenuItem();
         mnuAccesys = new javax.swing.JMenuItem();
         mnuAccesys1 = new javax.swing.JMenuItem();
+        mnuVisualMix = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1850,6 +1852,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuAccesys1);
+
+        mnuVisualMix.setText("Visual Mix");
+        mnuVisualMix.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVisualMixActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuVisualMix);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4536,6 +4546,11 @@ public final class MenuGUI extends VRMdiFrame {
         CleanDataBase.exibir(this);
     }//GEN-LAST:event_mnuDelRegistroActionPerformed
 
+    private void mnuVisualMixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVisualMixActionPerformed
+        // TODO add your handling code here:
+        VisualMixGUI.exibir(this);
+    }//GEN-LAST:event_mnuVisualMixActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4790,6 +4805,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuVRToVR;
     private javax.swing.JMenuItem mnuViaSoft;
     private javax.swing.JMenuItem mnuVisualComercio;
+    private javax.swing.JMenuItem mnuVisualMix;
     private javax.swing.JMenuItem mnuW2A;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWinNexus;

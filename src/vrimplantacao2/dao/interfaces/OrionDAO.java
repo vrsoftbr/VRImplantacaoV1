@@ -78,6 +78,8 @@ public class OrionDAO extends InterfaceDAO {
                     OpcaoProduto.ESTOQUE_MINIMO,
                     OpcaoProduto.PRECO,
                     OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
                     OpcaoProduto.ESTOQUE,
                     OpcaoProduto.ATIVO,
                     OpcaoProduto.NCM,
@@ -206,6 +208,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "e.gradedois, "
                     + "e.codsub, "
                     + "e.ultprecust custosemimposto, "
+                    + "e.custobase, "        
                     + "((e.ultprecust - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto "
                     + "from estoque e "
                     + "left join ligplu l on e.plu = l.plu  "
@@ -231,7 +234,8 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("vendavare"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custobase"));
+                    //imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setEstoque(rst.getDouble("quantfisc"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -555,7 +559,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "codigocli, "
                     + "terminal "
                     + "from receber "
-                    + "where vlrpago = 0"
+                    + "where transacao is null"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
