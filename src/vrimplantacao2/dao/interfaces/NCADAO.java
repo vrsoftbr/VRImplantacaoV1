@@ -166,6 +166,7 @@ public class NCADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	un.sigla_unidade unidade,\n"
                     + "	e.custo_real custocomimposto,\n"
                     + "	e.preco_venda,\n"
+                    + " p.margem_prevista margem,\n"        
                     + "	e.qt_estoque,\n"
                     + "	e.qt_estoque_fisico,\n"
                     + "	p.qt_unit_embalagem qtdembalagem,\n"
@@ -214,6 +215,7 @@ public class NCADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rs.getDouble("preco_venda"));
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoque(rs.getDouble("qt_estoque_fisico"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setNcm(rs.getString("ncm"));
