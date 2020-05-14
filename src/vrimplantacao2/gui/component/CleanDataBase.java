@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -355,14 +356,13 @@ class DatabaseCleaner {
                 try (FileWriter fw = new FileWriter(file)) {                    
                     fw.write("Tabela logestoque - Loja ID: " + idLoja + "\n");
                     
-                    
-                    if (opcoes.contains(DatabaseCleanerOpcao.LOG_ESTOQUE)) {
-                        cal.setTime(this.dtInicio);
-                        for (Date dt = this.dtInicio; dt.compareTo(this.dtTermino) <= 0; dt = cal.getTime()) {
-                            
-                            System.out.println(DT_FORMAT.format(dt));
-                            log.write(String.format("", DT_FORMAT.format(dt)));
-                            
+                    cal.setTime(this.dtInicio);
+                    for (Date dt = this.dtInicio; dt.compareTo(this.dtTermino) <= 0; dt = cal.getTime()) {
+                        
+                        System.out.println(DT_FORMAT.format(dt));
+                        log.write(String.format("", DT_FORMAT.format(dt)));
+                        
+                        if (opcoes.contains(DatabaseCleanerOpcao.LOG_ESTOQUE)) {
                             try {
                                 ProgressBar.setStatus("Del. logestoque na data de: " + DT_FORMAT.format(dt) + "...");
 
@@ -372,10 +372,13 @@ class DatabaseCleaner {
                                 ProgressBar.next();
                             } catch (Exception ex) {
                                 Exceptions.printStackTrace(ex);
+                                log.write("\n");
+                                log.write("ERRO: " + ex.getMessage() + "\n");
+                                log.write(ExceptionUtils.getStackTrace(ex));
                             }
-                            cal.add(Calendar.DATE, +1);
-                            //dt = cal.getTime();
                         }
+                        
+                        cal.add(Calendar.DATE, +1);
                     }
                 }
             }
