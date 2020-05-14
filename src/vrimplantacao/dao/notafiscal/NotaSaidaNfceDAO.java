@@ -604,6 +604,7 @@ public class NotaSaidaNfceDAO {
             stm.close();
 
         } catch (Exception ex) {
+            System.out.println("Cupom com erro: '" + i_oVenda.chaveNfce + "'");
             Conexao.rollback();
             throw ex;
         }
