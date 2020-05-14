@@ -229,6 +229,7 @@ import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TGAGUI;
+import vrimplantacao2.gui.interfaces.TecnosoftGUI;
 import vrimplantacao2.gui.interfaces.TiTecnologiaGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI3;
@@ -624,6 +625,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuiSircom = new javax.swing.JMenuItem();
         mnuLiderNetWork = new javax.swing.JMenuItem();
         mnuRKSoftware = new javax.swing.JMenuItem();
+        mnuTecnosoft = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1435,6 +1437,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuRKSoftware);
+
+        mnuTecnosoft.setText("Tecnosoft");
+        mnuTecnosoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuTecnosoftActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuTecnosoft);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4551,6 +4561,10 @@ public final class MenuGUI extends VRMdiFrame {
         VisualMixGUI.exibir(this);
     }//GEN-LAST:event_mnuVisualMixActionPerformed
 
+    private void mnuTecnosoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTecnosoftActionPerformed
+        TecnosoftGUI.exibir(this);
+    }//GEN-LAST:event_mnuTecnosoftActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4795,6 +4809,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
+    private javax.swing.JMenuItem mnuTecnosoft;
     private javax.swing.JMenuItem mnuTga;
     private javax.swing.JMenuItem mnuThotau;
     private javax.swing.JMenuItem mnuTsti;

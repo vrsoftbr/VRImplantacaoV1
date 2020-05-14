@@ -305,7 +305,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     fon_fornece tel_principal,\n"
                     + "     dat_cadastro datacadastro,\n"
                     + "     observacao,\n"
-                    + "     prazo_medio_entrega prazoEntrega\n"
+                    + "     prazo_medio_entrega prazoentrega\n"
                     + " from fornecedor f\n"
                     + "		left join cidade cid\n"
                     + "		  on cid.cod_cidade = f.cod_cidade\n"
@@ -332,7 +332,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rs.getString("tel_principal"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setObservacao(rs.getString("observacao"));
-                    imp.setPrazoEntrega(rs.getInt("prazoEntrega"));
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
 
                     result.add(imp);
                 }
@@ -346,7 +346,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select	\n"
+                      "select	\n"
                     + "	 cod_cliente id,\n"
                     + "	 cpf_cgc cnpj,\n"
                     + "	 rg_inscr ie,\n"
@@ -366,7 +366,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 est_civil TipoEstadoCivil,\n"
                     + "	 dat_nascto dataNascimento,\n"
                     + "	 dat_cadastro dataCadastro,\n"
-                    + "	 sexo,\n"
+                    //+ "	 sexo,\n"
                     + "	 local_trab empresa,\n"
                     + "	 end_trab empresaEndereco,\n"
                     + "	 fon_trab empresaTelefone,\n"
@@ -410,7 +410,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    //imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
 
                     imp.setEmpresa(rs.getString("empresa"));
                     imp.setEmpresaEndereco(rs.getString("empresaendereco"));
@@ -464,7 +464,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "	  distinct on (cod_receber)\n"
                     + "	  cod_receber id,\n"
-                    + "	  dat_emissao dataEmissao,\n"
+                    + "	  dat_emissao dataemissao,\n"
                     + "	  num_doc numeroCupom,\n"
                     + "	  vlr_doc valor,\n"
                     + "	  desc_doc observacao,\n"
@@ -482,13 +482,15 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
 
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setParcela(rs.getInt("parcela"));
-                    imp.setEcf(rs.getString("ecf"));
-
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataVencimento(rs.getDate("datavencimento"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    imp.setCnpjCliente(rs.getString("cnpjCliente"));
+                    
                     result.add(imp);
                 }
             }
