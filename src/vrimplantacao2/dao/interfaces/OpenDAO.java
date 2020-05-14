@@ -92,6 +92,10 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
     }
     
     private boolean importarSomenteBalanca = false;
+    private String complemento = "";
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim().toUpperCase();
+    }
 
     public void setImportarSomenteBalanca(boolean importarSomenteBalanca) {
         this.importarSomenteBalanca = importarSomenteBalanca;
@@ -99,7 +103,11 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Open";
+        if (this.complemento.equals("")) {
+            return "Open";
+        } else {
+            return "Open - " + this.complemento;
+        }
     }
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
