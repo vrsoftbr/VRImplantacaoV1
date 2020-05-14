@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,8 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.TecnosoftDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class TecnosoftGUI extends VRInternalFrame {
@@ -77,12 +80,34 @@ public class TecnosoftGUI extends VRInternalFrame {
         carregarParametros();
 
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
         
         centralizarForm();
         this.setMaximum(false);
     }
 
-    public void validarDadosAcessoPostgres() throws Exception {
+    public void validarDadosAcessoFirebird() throws Exception {
         if (txtHostFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL);
         }
@@ -191,8 +216,8 @@ public class TecnosoftGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         if(chkPdvVendas.isSelected()) {
-                            //dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tab.getSelectedIndex() == 3) {
@@ -781,7 +806,7 @@ public class TecnosoftGUI extends VRInternalFrame {
                 connSQL.close();
             }
 
-            validarDadosAcessoPostgres();
+            validarDadosAcessoFirebird();
             btnConectarFirebird.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
