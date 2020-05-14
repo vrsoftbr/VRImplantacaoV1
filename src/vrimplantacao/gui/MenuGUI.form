@@ -896,6 +896,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAccesys1ActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuVisualMix">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Visual Mix"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuVisualMixActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu7">
