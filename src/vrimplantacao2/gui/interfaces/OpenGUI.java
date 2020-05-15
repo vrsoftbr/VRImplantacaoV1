@@ -182,7 +182,7 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     
-                    if (tabOperacoes.getSelectedComponent().equals(tabProdutos)) {
+                    if (tabOperacoes.getSelectedComponent().equals(tabImportacao)) {
                     
                         dao.setImportarSomenteBalanca(chkSomenteBalanca.isSelected());
 
