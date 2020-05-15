@@ -21,6 +21,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -48,16 +49,19 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
     
     public List<Estabelecimento> getLojas() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        
+        /*try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select * from FILIAL"
+                    "select '1' id, 'LOJA 01' razao"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento("1", "LOJA 01"));
+                    System.out.println("Entrou...");
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("razao")));
                 }
             }
-        }
+        }*/
+        
+        result.add(new Estabelecimento("1", "LOJA 01"));
 
         return result;
     }
@@ -239,6 +243,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setIcmsDebitoId(rs.getString("idicms"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
@@ -388,7 +393,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
                     imp.setAtivo(rs.getInt("desativar") == 1 ? false : true);
-                    imp.setObservacao(rs.getString("observacao") == null ? "" : rs.getString("observacao").trim());
+                    imp.setObservacao(rs.getString("observacoes") == null ? "" : rs.getString("observacoes").trim());
                     
                     result.add(imp);
                 }
@@ -662,6 +667,59 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
     }
 
     @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    c.id_chq,\n" +
+                    "    c.id_cli cliente,\n" +
+                    "    cl.docum1 cpf,\n" + 
+                    "    cl.docum2 rg,\n" +        
+                    "    cl.razaosocial,\n" +   
+                    "    c.lancamento,\n" +
+                    "    c.vencimento,\n" +
+                    "    c.valor,\n" +
+                    "    c.banco,\n" +
+                    "    c.agencia,\n" +
+                    "    c.conta,\n" +
+                    "    c.status,\n" +
+                    "    c.num_chq,\n" +
+                    "    c.id_caixa,\n" +
+                    "    c.observacao,\n" +
+                    "    c.data_baixa\n" +
+                    "from\n" +
+                    "    cheques c\n" +
+                    "join clientes cl on c.id_cli = cl.id_cli\n" +        
+                    "where\n" +
+                    "    c.id_loja = " + getLojaOrigem() + " and\n" +
+                    "    c.data_baixa is null\n" +
+                    "order by\n" +
+                    "    c.vencimento")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id_chq"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setNome(rs.getString("razaosocial"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setDate(rs.getDate("lancamento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setNumeroCheque(rs.getString("num_chq"));
+                    imp.setConta(rs.getString("conta"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
         
@@ -678,8 +736,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "    pa.valpago,\n" +
                     "    pa.valrestante,\n" +
                     "    pa.jur_desc,\n" +
-                    "    p.juros,\n" +
-                    "    p.observacao\n" +
+                    "    p.juros\n" +
                     "from\n" +
                     "    pagamentos p\n" +
                     "join pag_parcelas pp on p.id_pag = pp.id_pag\n" +
@@ -725,7 +782,6 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unid"));
                         

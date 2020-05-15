@@ -17,6 +17,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.TecnosoftDAO;
@@ -147,16 +148,9 @@ public class TecnosoftGUI extends VRInternalFrame {
 
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        int cont = 0;
-        int index = 0;
         for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
-            if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
-                index = cont;
-            }
-            cont++;
         }
-        cmbLojaOrigem.setSelectedIndex(index);
     }
 
     public void importarTabelas() throws Exception {
@@ -186,6 +180,9 @@ public class TecnosoftGUI extends VRInternalFrame {
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
+                        }
+                        if (chkContaPagar.isSelected()) {
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
@@ -279,6 +276,7 @@ public class TecnosoftGUI extends VRInternalFrame {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkContaPagar = new javax.swing.JCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -388,6 +386,8 @@ public class TecnosoftGUI extends VRInternalFrame {
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
 
+        chkContaPagar.setText("Conta Pagar");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -396,7 +396,8 @@ public class TecnosoftGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkContaPagar))
                 .addContainerGap(485, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
@@ -406,7 +407,9 @@ public class TecnosoftGUI extends VRInternalFrame {
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(238, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkContaPagar)
+                .addContainerGap(219, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -860,6 +863,7 @@ public class TecnosoftGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private javax.swing.JCheckBox chkContaPagar;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkIMportarCodCliente;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
