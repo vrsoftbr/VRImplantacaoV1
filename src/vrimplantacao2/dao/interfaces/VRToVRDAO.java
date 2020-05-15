@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.Exceptions;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -112,7 +113,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	l.id,\n"
@@ -1422,17 +1423,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     public void deletaLogEstoque(Date data, int idLoja) throws Exception {
-        try {
-            ConexaoPostgres2.begin();
-            try (Statement stm = ConexaoPostgres2.createStatement()) {
-                stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data) 
-                        + " and id_loja = " + idLoja);
-            }
-            ConexaoPostgres2.commit();
-        } catch (Exception ex) {
-            ConexaoPostgres2.rollback();
-            throw ex;
+        try (Statement stm = ConexaoPostgres2.createStatement()) {
+            stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data) 
+                    + " and id_loja = " + idLoja);
         }
-
     }
 }

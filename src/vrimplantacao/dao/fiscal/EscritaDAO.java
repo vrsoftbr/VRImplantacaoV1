@@ -2,6 +2,8 @@ package vrimplantacao.dao.fiscal;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import vrimplantacao.dao.LogTransacaoDAO;
 import vrimplantacao.vo.Formulario;
 import vrimplantacao.vo.TipoTransacao;
@@ -12,6 +14,8 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 
 public class EscritaDAO {
+    
+    public static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public void excluir(long i_id) throws Exception {
         Statement stm = null;
@@ -306,6 +310,56 @@ public class EscritaDAO {
         } catch (Exception ex) {
             Conexao.rollback();
             throw ex;
+        }
+    }
+
+    public void excluirData(Date dt, int idLoja) throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            st.execute(
+                    "do $$\n" +
+                    "declare\n" +
+                    "	r record;\n" +
+                    "	qtd integer = 0;\n" +
+                    "begin\n" +
+                    "	for r in \n" +
+                    "		select\n" +
+                    "			id\n" +
+                    "		from\n" +
+                    "			escrita e\n" +
+                    "		where\n" +
+                    "			e.\"data\" = '" + SQL_DATE_FORMAT.format(dt) + "' and\n" +
+                    "			e.id_loja = " + idLoja + "\n" +
+                    "		order by\n" +
+                    "			e.id\n" +
+                    "	loop\n" +
+                    "		UPDATE escritanotasaidacomplemento SET \n" +
+                    "			id_escritanotasaidacomplementada = null\n" +
+                    "		where\n" +
+                    "			id_escritanotasaidacomplementada = r.id;\n" +
+                    "		\n" +
+                    "		UPDATE escrita set\n" +
+                    "			id_escritanotasaidacomplemento = null\n" +
+                    "		where\n" +
+                    "			id_escritanotasaidacomplemento = r.id;\n" +
+                    "	\n" +
+                    "		delete from escritanotasaidacupom where id_escrita = r.id;\n" +
+                    "		delete from escritagnre where id_escrita = r.id;\n" +
+                    "		delete from escritaobservacaofiscalajuste where id_escritaobservacaofiscal in (select id from escritaobservacaofiscal where id_escrita = r.id);\n" +
+                    "		delete from escritaobservacaofiscal where id_escrita = r.id;\n" +
+                    "		delete from escritadadoscomplementaresenergiaeletrica where id_escrita = r.id;\n" +
+                    "		delete from escritacentrocusto where id_escrita = r.id;\n" +
+                    "		delete from escritaoutrosvalores where id_escrita = r.id;\n" +
+                    "		delete from escritanotasaidanotaentrada where id_escrita = r.id;\n" +
+                    "		delete from escritaitem where id_escrita = r.id; \n" +
+                    "		delete from escrita where id = r.id;\n" +
+                    "	\n" +
+                    "		qtd = qtd + 1;\n" +
+                    "	\n" +
+                    "		raise notice 'excluidos: %', qtd;\n" +
+                    "	end loop;\n" +
+                    "end;\n" +
+                    "$$"
+            );
         }
     }
 }
