@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import org.openide.util.Exceptions;
 
 public class ConexaoPostgres2 {
     
@@ -79,28 +81,41 @@ public class ConexaoPostgres2 {
         return con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     }
 
-    public static void begin() throws Exception {
-        if (con == null) {
-            testarConexao();
+    public static void begin() {
+        try {
+            if (con == null) {
+                testarConexao();
+            }
+            
+            con.createStatement().execute("begin");
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
-
-        con.createStatement().execute("begin");
     }
 
-    public static void commit() throws Exception {
-        con.createStatement().execute("commit");
+    public static void commit() {
+        try {
+            con.createStatement().execute("commit");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
     }
 
-    public static void rollback() throws Exception {
-        con.createStatement().execute("rollback");
+    public static void rollback() {
+        try {
+            con.createStatement().execute("rollback");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
     }
 
-    public static void close() throws Exception {
+    public static void close() {
         try {
             con.close();
-            con = null;
-
         } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        } finally {
+            con = null;
         }
     }
 

@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.Exceptions;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -1423,25 +1421,17 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
-    public void deletaLogEstoque(Date data, int idLoja, boolean todas) throws SQLException {
+    public void deletaLogEstoque(Date data, int idLoja) throws Exception {
         try {
             ConexaoPostgres2.begin();
             try (Statement stm = ConexaoPostgres2.createStatement()) {
-                if(todas) {
-                    stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data));
-                } else {
-                    stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data) 
+                stm.execute("delete from logestoque where datamovimento = " + Utils.dateSQL(data) 
                         + " and id_loja = " + idLoja);
-                }
             }
             ConexaoPostgres2.commit();
         } catch (Exception ex) {
-            try {
-                ConexaoPostgres2.rollback();
-                Exceptions.printStackTrace(ex);
-            } catch (Exception ex1) {
-                Exceptions.printStackTrace(ex1);
-            }
+            ConexaoPostgres2.rollback();
+            throw ex;
         }
 
     }

@@ -571,8 +571,8 @@ public class NotaSaidaNfceDAO {
                 sql.append(oFinalizadora.idFinalizadora + ", ");
                 sql.append((oFinalizadora.idTipoTef == -1 ? "NULL" : oFinalizadora.idTipoTef) + ", ");
                 sql.append((oFinalizadora.idTipoTicket == -1 ? "NULL" : oFinalizadora.idTipoTicket) + ", ");
-                sql.append(oFinalizadora.valor + ", ");
-                sql.append(oFinalizadora.troco + ")");
+                sql.append(Utils.arredondar(oFinalizadora.valor, 2) + ", ");
+                sql.append(Utils.arredondar(oFinalizadora.troco, 2) + ")");
 
                 stm.execute(sql.toString());
             }
@@ -604,6 +604,7 @@ public class NotaSaidaNfceDAO {
             stm.close();
 
         } catch (Exception ex) {
+            System.out.println("Cupom com erro: '" + i_oVenda.chaveNfce + "'");
             Conexao.rollback();
             throw ex;
         }

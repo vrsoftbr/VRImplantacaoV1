@@ -2,16 +2,17 @@ package vrimplantacao2.gui.component;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Scanner;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -32,7 +33,6 @@ public class CleanDataBase extends VRInternalFrame {
 
     private static CleanDataBase instance = null;
     private ConexaoPostgres2 connPost = new ConexaoPostgres2();
-    private VRToVRDAO dao = null;
 
     public CleanDataBase(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -40,7 +40,6 @@ public class CleanDataBase extends VRInternalFrame {
 
         this.setResizable(false);
         this.title = "Deleta Registro VR";
-        dao = new VRToVRDAO();
         addInternalFrameListener(new InternalFrameAdapter() {
             @Override
             public void internalFrameClosed(InternalFrameEvent e) {
@@ -82,7 +81,7 @@ public class CleanDataBase extends VRInternalFrame {
 
     public void carregarLojaVR() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        for (Estabelecimento loja : dao.getLojasVR()) {
+        for (Estabelecimento loja : new VRToVRDAO().getLojasVR()) {
             cmbLojaOrigem.addItem(loja);
         }
     }
@@ -111,122 +110,41 @@ public class CleanDataBase extends VRInternalFrame {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-
-                    remove();
+                    
+                    ArrayList<Integer> list = new ArrayList();                    
+                    
+                    if (chkAll.isSelected()) {
+                        DefaultComboBoxModel model = (DefaultComboBoxModel) cmbLojaOrigem.getModel();
+                        for (int i = 0; i < model.getSize(); i++) {
+                            list.add(Utils.stringToInt(((Estabelecimento) model.getElementAt(i)).cnpj));
+                        }
+                    } else {
+                        list.add(Utils.stringToInt(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj));
+                    }
+                    Set<DatabaseCleanerOpcao> opcoes = new HashSet<>();
+                    
+                    if (chkLogEstoque.isSelected()) {
+                        opcoes.add(DatabaseCleanerOpcao.LOG_ESTOQUE);
+                    }
+                    
+                    new DatabaseCleaner(
+                            DatabaseCleaner.DT_FORMAT.parse(edtDtInicio.getText()),
+                            DatabaseCleaner.DT_FORMAT.parse(edtDtTermino.getText()),
+                            list.toArray(new Integer[]{}),
+                            opcoes
+                    );
 
                     ProgressBar.dispose();
                     Util.exibirMensagem("PROCESSO DE EXCLUSÃO CONCLUÍDO", getTitle());
                 } catch (Exception ex) {
-                    try {
-                        connPost.close();
-                    } catch (Exception ex1) {
-                        Exceptions.printStackTrace(ex1);
-                    }
-                    ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
+                } finally {                    
+                    ProgressBar.dispose();
                 }
             }
         };
 
         td.start();
-    }
-
-    private void remove() {
-        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-        int idLoja = Integer.valueOf(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
-        boolean todasLojas = chkAll.isSelected();
-
-        FileWriter fw = null;
-        //PrintWriter pw = null;
-
-        Date dt1 = null,
-                dt2 = null;
-
-        try {
-            dt1 = df.parse(edtDtInicio.getText());
-            dt2 = df.parse(edtDtTermino.getText());
-        } catch (ParseException ex) {
-            ex.printStackTrace();
-            Exceptions.printStackTrace(ex);
-        }
-
-        Calendar cal = Calendar.getInstance();
-
-        if (chkLogEstoque.isSelected()) {
-            try {
-                if (todasLojas) {
-                    fw = new FileWriter("c:\\vr\\implantacao\\logestoque_geral.txt");
-                    //pw = new PrintWriter(fw);
-                    fw.write("Tabela logestoque - Loja Geral\n");
-                } else {
-                    fw = new FileWriter("c:\\vr\\implantacao\\logestoque_loja" + idLoja + ".txt");
-                    //pw = new PrintWriter(fw);
-                    fw.write("Tabela logestoque - Loja ID: " + idLoja + "\n");
-                }
-
-                System.out.println("ID LOJA VR: " + idLoja);
-
-                cal.setTime(dt1);
-
-                for (Date dt = dt1; dt.compareTo(dt2) <= 0; dt = cal.getTime()) {
-                    System.out.println(df.format(dt));
-                    try {
-                        ProgressBar.setStatus("Del. logestoque na data de: " + df.format(dt) + "...");
-
-                        dao.deletaLogEstoque(dt, idLoja, todasLojas);
-                        fw.write("Dia " + df.format(dt) + " deletado da tabela;\n");
-
-                        ProgressBar.next();
-                    } catch (Exception ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                    cal.add(Calendar.DATE, +1);
-                    //dt = cal.getTime();
-                }
-                fw.close();
-                //pw.close();
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-
-        if (chkEscrita.isSelected()) {
-            try {
-                if (todasLojas) {
-                    fw = new FileWriter("c:\\vr\\implantacao\\escrita_geral.txt");
-                    //pw = new PrintWriter(fw);
-                    fw.write("Tabela escrita - Loja Geral\n");
-                } else {
-                    fw = new FileWriter("c:\\vr\\implantacao\\escrita_loja" + idLoja + ".txt");
-                    //pw = new PrintWriter(fw);
-                    fw.write("Tabela escrita - Loja ID: " + idLoja + "\n");
-                }
-                
-                cal.setTime(dt1);
-                
-                for (Date dt = dt1; dt.compareTo(dt2) <= 0; dt = cal.getTime()) {
-                    System.out.println(df.format(dt));
-                    try {
-                        ProgressBar.setStatus("Del. escrita na data de: " + df.format(dt) + "...");
-
-                        //dao.deletaLogEstoque(dt, idLoja, todasLojas);
-                        fw.write("Dia " + df.format(dt) + " deletado da tabela;\n");
-
-                        ProgressBar.next();
-                    } catch (Exception ex) {
-                        Exceptions.printStackTrace(ex);
-                    }
-                    cal.add(Calendar.DATE, +1);
-                    //dt = cal.getTime();
-                }
-                fw.close();
-                //pw.close();
-                
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                Exceptions.printStackTrace(ex);
-            }
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -403,4 +321,68 @@ public class CleanDataBase extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel pnlBotao;
     private vrframework.bean.panel.VRPanel pnlPeriodo;
     // End of variables declaration//GEN-END:variables
+}
+
+enum DatabaseCleanerOpcao {
+    LOG_ESTOQUE
+}
+
+class DatabaseCleaner {
+    
+    public static final DateFormat DT_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+    
+    private final Date dtInicio;
+    private final Date dtTermino;
+    private final Integer[] idLojas;
+    private final Set<DatabaseCleanerOpcao> opcoes;
+    private final VRToVRDAO dao = new VRToVRDAO();
+    
+    public DatabaseCleaner(Date dtInicio, Date dtTermino, Integer[] idLojas, Set<DatabaseCleanerOpcao> opcoes) {
+        this.idLojas = idLojas;        
+        this.dtTermino = dtTermino;
+        this.dtInicio = dtInicio;
+        this.opcoes = opcoes;
+    }
+    
+    public void remove() throws IOException {        
+
+        Calendar cal = Calendar.getInstance();
+        
+        try (FileWriter log = new FileWriter("log" + new SimpleDateFormat("yyyy-MM-dd hh-mm-dd") + ".txt")) {            
+            for (int idLoja: this.idLojas) {
+                log.write("Inicio : " + idLoja + "\n");
+                
+                String file = "logestoque_loja" + idLoja + ".txt";
+                try (FileWriter fw = new FileWriter(file)) {                    
+                    fw.write("Tabela logestoque - Loja ID: " + idLoja + "\n");
+                    
+                    cal.setTime(this.dtInicio);
+                    for (Date dt = this.dtInicio; dt.compareTo(this.dtTermino) <= 0; dt = cal.getTime()) {
+                        
+                        System.out.println(DT_FORMAT.format(dt));
+                        log.write(String.format("", DT_FORMAT.format(dt)));
+                        
+                        if (opcoes.contains(DatabaseCleanerOpcao.LOG_ESTOQUE)) {
+                            try {
+                                ProgressBar.setStatus("Del. logestoque na data de: " + DT_FORMAT.format(dt) + "...");
+
+                                dao.deletaLogEstoque(dt, idLoja);
+                                fw.write("Dia " + DT_FORMAT.format(dt) + " deletado da tabela;\n");
+
+                                ProgressBar.next();
+                            } catch (Exception ex) {
+                                Exceptions.printStackTrace(ex);
+                                log.write("\n");
+                                log.write("ERRO: " + ex.getMessage() + "\n");
+                                log.write(ExceptionUtils.getStackTrace(ex));
+                            }
+                        }
+                        
+                        cal.add(Calendar.DATE, +1);
+                    }
+                }
+            }
+        }
+    }
+    
 }

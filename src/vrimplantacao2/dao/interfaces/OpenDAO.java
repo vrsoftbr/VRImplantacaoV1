@@ -92,6 +92,10 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
     }
     
     private boolean importarSomenteBalanca = false;
+    private String complemento = "";
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim().toUpperCase();
+    }
 
     public void setImportarSomenteBalanca(boolean importarSomenteBalanca) {
         this.importarSomenteBalanca = importarSomenteBalanca;
@@ -99,7 +103,11 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Open";
+        if (this.complemento.equals("")) {
+            return "Open";
+        } else {
+            return "Open - " + this.complemento;
+        }
     }
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
@@ -287,56 +295,53 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
-        if (opcao == OpcaoProduto.EAN) {
-            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                    "		select\n" +
-                    "			p.CODPRO10 id,\n" +
-                    "			p.BARRA210 ean,\n" +
-                    "                   p.UNIDAD10 unidade\n" +
-                    "		from\n" +
-                    "			genpro p\n" +
-                    "		where\n" +
-                    "			p.BARRA210 != ''\n" +
-                    "		union\n" +
-                    "		select\n" +
-                    "			p.CODPRO10 id,\n" +
-                    "			p.BARRA310 ean,\n" +
-                    "                   p.UNIDAD10 unidade\n" +
-                    "		from\n" +
-                    "			genpro p\n" +
-                    "		where\n" +
-                    "			p.BARRA310 != ''\n" +
-                    "		union\n" +
-                    "		select\n" +
-                    "			p.CODPRO10 id,\n" +
-                    "			p.BARRA410 ean,\n" +
-                    "                   p.UNIDAD10 unidade\n" +
-                    "		from\n" +
-                    "			genpro p\n" +
-                    "		where\n" +
-                    "			p.BARRA410 != ''\n"
-                )) {
-                    List<ProdutoIMP> result = new ArrayList<>();
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        
-                        imp.setImportSistema(getSistema());
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("id"));
-                        imp.setEan(rst.getString("ean"));
-                        imp.setQtdEmbalagem(1);
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
-                        imp.seteBalanca(false);
-                        
-                        result.add(imp);
-                    }
-                    return result;
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                "		select\n" +
+                "			p.CODPRO10 id,\n" +
+                "			p.BARRA210 ean,\n" +
+                "                   p.UNIDAD10 unidade\n" +
+                "		from\n" +
+                "			genpro p\n" +
+                "		where\n" +
+                "			p.BARRA210 != ''\n" +
+                "		union\n" +
+                "		select\n" +
+                "			p.CODPRO10 id,\n" +
+                "			p.BARRA310 ean,\n" +
+                "                   p.UNIDAD10 unidade\n" +
+                "		from\n" +
+                "			genpro p\n" +
+                "		where\n" +
+                "			p.BARRA310 != ''\n" +
+                "		union\n" +
+                "		select\n" +
+                "			p.CODPRO10 id,\n" +
+                "			p.BARRA410 ean,\n" +
+                "                   p.UNIDAD10 unidade\n" +
+                "		from\n" +
+                "			genpro p\n" +
+                "		where\n" +
+                "			p.BARRA410 != ''\n"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(1);
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.seteBalanca(false);
+
+                    result.add(imp);
                 }
             }
-        }
-        return super.getProdutos(opcao);
+        }        
+        return result;
     }
 
     @Override
