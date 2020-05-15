@@ -21,6 +21,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -357,6 +358,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceita"));
                     imp.setIcmsDebitoId(rst.getString("Aliquota_NF"));
                     imp.setIcmsCreditoId(rst.getString("Aliquota_NF"));
+                    
+                    imp.setPautaFiscalId(imp.getImportId());
+                    
                     result.add(imp);
                 }
             }
@@ -406,27 +410,39 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	mx.cod_natureza_receita,\n"
                     + "	mx.cest,\n"
                     + "	mx.mxf_piscofins_cst_s,\n"
-                    + "	coalesce(mx.mxf_pis_alq_s, 0) mxf_pis_alq_s,\n"
-                    + "	coalesce(mx.mxf_pis_alq_s, 0) mxf_pis_alq_s,\n"
+                    + "	(cast(coalesce(mx.mxf_pis_alq_s, 0) as numeric) / 1000) mxf_pis_alq_s,\n"
+                    + "	(cast(coalesce(mx.mxf_pis_alq_s, 0) as numeric) / 1000) mxf_pis_alq_s,\n"
                     + "	mx.mxf_piscofins_cst_e,\n"
-                    + "	coalesce(mx.mxf_pis_alq_e, 0) mxf_pis_alq_e,\n"
-                    + "	coalesce(mx.mxf_cofins_alq_e, 0) mxf_cofins_alq_e,\n"
+                    + "	(cast(coalesce(mx.mxf_pis_alq_e, 0) as numeric) / 1000) mxf_pis_alq_e,\n"
+                    + "	(cast(coalesce(mx.mxf_cofins_alq_e, 0)  as numeric) / 1000) mxf_cofins_alq_e,\n"
                     + "	mx.mxf_icms_cst_s,\n"
-                    + "	coalesce(mx.mxf_icms_alq_s, '0') mxf_icms_alq_s,\n"
-                    + "	coalesce(mx.mxf_icms_rbc_s, '0') mxf_icms_rbc_s,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_alq_s, '0') as numeric) / 1000) mxf_icms_alq_s,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_rbc_s, '0') as numeric) / 1000) mxf_icms_rbc_s,\n"
                     + "	mx.mxf_icms_cst_e,\n"
-                    + "	coalesce(mx.mxf_icms_alq_e, '0') mxf_icms_alq_e,\n"
-                    + "	coalesce(mx.mxf_icms_rbc_e, '0') mxf_icms_rbc_e, \n"
-                    + "	coalesce(mx.mxf_icms_iva_valor, '0') mxf_icms_iva_valor\n"
+                    + "	(cast(coalesce(mx.mxf_icms_alq_e, '0') as numeric) / 1000) mxf_icms_alq_e,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_rbc_e, '0') as numeric) / 1000) mxf_icms_rbc_e, \n"
+                    + "	(cast(coalesce(mx.mxf_icms_iva_valor, '0') as numeric) / 1000) mxf_icms_iva_valor\n"
                     + "from dbo.produtosMixFiscal mx\n"
                     + "order by mx.codigo_produto"
             )) {
                 while (rst.next()) {
-
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setId(rst.getString("codigo_produto"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setIva(rst.getDouble("mxf_icms_iva_valor"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setUf(Parametros.get().getUfPadraoV2().getSigla());
+                    
+                    imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                    imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                    imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                    imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                    
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
