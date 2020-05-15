@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
@@ -51,7 +53,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
@@ -119,6 +121,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " al.PERCENTUAL as aliquota, \n"
                     + "	al.REDUCAO as reducao \n"
                     + "from dbo.Aliquotas_NF al\n"
+                    + "where codigo in (select Aliquota_NF from dbo.Produtos)\n"        
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -238,9 +241,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	p.Produto_Id as id,\n"
-                    + "	ean.Codigo_Automacao,\n"
-                    + "	ean.Digito_Automacao,\n"
+                    + "	cast(p.Produto_Id as bigint) as id,\n"
+                    + "	cast(ean.Codigo_Automacao as bigint) as Codigo_Automacao,\n"
+                    + "	cast(ean.Digito_Automacao as bigint) as Digito_Automacao,\n"
                     + " p.Peso_Variavel,\n"
                     + " p.Pre_Pesado,\n"
                     + " p.Qtd_Decimal,\n"
@@ -288,20 +291,48 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join dbo.Grupo_Precos_Produtos f on f.Produto_Id = p.Produto_Id\n"
                     + "order by p.Produto_Id"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("Codigo_Automacao") + rst.getString("Digito_Automacao"));
 
-                    if ((rst.getString("Descricao_Balanca") != null)
-                            && (!rst.getString("Descricao_Balanca").trim().isEmpty())) {
-                        imp.seteBalanca(true);
+                    String ean = rst.getString("Codigo_Automacao") + rst.getString("Digito_Automacao");
+                    
+                    if ((rst.getString("Codigo_Automacao") != null)
+                            && (!rst.getString("Codigo_Automacao").trim().isEmpty())
+                            && (rst.getString("Digito_Automacao") != null)
+                            && (!rst.getString("Digito_Automacao").trim().isEmpty())) {
+                        
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(ean.substring(0, ean.length() -1));
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
+                        if ((rst.getInt("Pre_Pesado") == 1)
+                                && (ean.length() <= 6)) {
+                            imp.setEan(ean.substring(0, ean.length() - 1));
+                        } else {
+                            imp.setEan(ean);
+                        }
                     } else {
                         imp.seteBalanca(false);
+                        imp.setEan(ean);
                     }
-
+                    
+                    //imp.seteBalanca(rst.getInt("balanca") > 0);
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -405,8 +436,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	f.Codigo as id,\n"
-                    + " f.Tipo,\n"
+                    + "	cast(f.Codigo as bigint) as id,\n"
+                    + " f.Tipo as idtipofornecedor,\n"
                     + " tf.Descricao as tipofornecedor,\n"
                     + " f.RazaoSocial as razao,\n"
                     + " f.NomeFantasia as fantasia,\n"
@@ -424,7 +455,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " f.Telex,\n"
                     + " f.TeleContato,\n"
                     + " f.Contato,\n"
-                    + "	f.CGC as cnpj,\n"
+                    + "	cast(f.CGC as bigint) as cnpj,\n"
                     + " f.InscricaoEstadual as ie,\n"
                     + " f.InscrMunicipal as im,\n"
                     + " f.PrazoEntrega,\n"
@@ -481,7 +512,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCondicaoPagamento(rst.getInt("CondicaoPagto"));
                     imp.setObservacao(rst.getString("Observacao"));
 
-                    switch (rst.getInt("tipofornecedor")) {
+                    switch (rst.getInt("idtipofornecedor")) {
                         case 1:
                             imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
                             break;
@@ -513,7 +544,34 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("TeleContato").trim().isEmpty())) {
                         imp.addTelefone(rst.getString("Contato") == null ? "CONTATO" : rst.getString("Contato"), rst.getString("TeleContato"));
                     }
+                    
+                    // Dados do Supervisor
+                    imp.addContato(
+                            rst.getString("Supervisor") == null ? "" : rst.getString("Supervisor"), 
+                            rst.getString("TelSupervisor") == null ? "" : rst.getString("TelSupervisor"), 
+                            rst.getString("CelSupervisor") == null ? "" : rst.getString("CelSupervisor"), 
+                            TipoContato.COMERCIAL, 
+                            rst.getString("EmailSupervisor") == null ? "" : rst.getString("EmailSupervisor").toLowerCase()
+                    );
 
+                    // Dados do Vendedor
+                    imp.addContato(
+                            rst.getString("Vendedor") == null ? "" : rst.getString("Vendedor"), 
+                            rst.getString("TelVendedor") == null ? "" : rst.getString("TelVendedor"), 
+                            rst.getString("CelVendedor") == null ? "" : rst.getString("CelVendedor"), 
+                            TipoContato.COMERCIAL, 
+                            rst.getString("EmailVendedor") == null ? "" : rst.getString("EmailVendedor").toLowerCase()
+                    );
+
+                    // Dados do Gerente
+                    imp.addContato(
+                            rst.getString("Gerente") == null ? "" : rst.getString("Gerente"), 
+                            rst.getString("TelGerente") == null ? "" : rst.getString("TelGerente"), 
+                            rst.getString("CelGerente") == null ? "" : rst.getString("CelGerente"), 
+                            TipoContato.COMERCIAL, 
+                            rst.getString("EmailGerente") == null ? "" : rst.getString("EmailGerente").toLowerCase()
+                    );
+                    
                     result.add(imp);
                 }
             }
