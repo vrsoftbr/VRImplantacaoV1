@@ -1,7 +1,7 @@
 package vrimplantacao2.gui.component;
 
+import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,9 +17,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.Conexao;
+import vrframework.classe.OperacaoCanceladaException;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao.dao.fiscal.EscritaDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
@@ -31,7 +32,7 @@ import vrimplantacao2.dao.interfaces.VRToVRDAO;
 public class CleanDataBase extends VRInternalFrame {
 
     private static CleanDataBase instance = null;
-    private ConexaoPostgres2 connPost = new ConexaoPostgres2();
+    private CleanDataBaseTableModel model;
 
     public CleanDataBase(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -65,7 +66,8 @@ public class CleanDataBase extends VRInternalFrame {
     }
 
     public void carregarLojaVR() throws Exception {
-        tblLojas.setModel(new CleanDataBaseTableModel());
+        this.model = new CleanDataBaseTableModel();
+        tblLojas.setModel(this.model);
     }
     
     private void deletarRegistro() {
@@ -76,7 +78,12 @@ public class CleanDataBase extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
                     
-                    ArrayList<Integer> list = new ArrayList();                    
+                    ArrayList<Integer> list = new ArrayList();
+                    for (CleanDataBaseTableModelRecord r: model.lojas) {
+                        if (r.selected) {
+                            list.add(r.id);
+                        }
+                    }
                     
                     Set<DatabaseCleanerOpcao> opcoes = new HashSet<>();
                     
@@ -92,7 +99,7 @@ public class CleanDataBase extends VRInternalFrame {
                             DatabaseCleaner.DT_FORMAT.parse(edtDtTermino.getText()),
                             list.toArray(new Integer[]{}),
                             opcoes
-                    );
+                    ).remove();
 
                     ProgressBar.dispose();
                     Util.exibirMensagem("PROCESSO DE EXCLUSÃO CONCLUÍDO", getTitle());
@@ -113,8 +120,6 @@ public class CleanDataBase extends VRInternalFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tblLojas = new vrframework.bean.table.VRTable();
-        chkAll = new javax.swing.JCheckBox();
-        chkNone = new javax.swing.JCheckBox();
         lblLojaOrigem = new javax.swing.JLabel();
         chkLogEstoque = new vrframework.bean.checkBox.VRCheckBox();
         chkVenda = new vrframework.bean.checkBox.VRCheckBox();
@@ -125,6 +130,8 @@ public class CleanDataBase extends VRInternalFrame {
         edtDtTermino = new vrframework.bean.calendar.VRCalendar();
         pnlBotao = new vrframework.bean.panel.VRPanel();
         btnIniciar = new vrframework.bean.button.VRButton();
+        btnSelTudo = new vrframework.bean.button.VRButton();
+        btnSelNada = new vrframework.bean.button.VRButton();
 
         tblLojas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -139,22 +146,18 @@ public class CleanDataBase extends VRInternalFrame {
         ));
         jScrollPane1.setViewportView(tblLojas);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkAll, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.chkAll.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkNone, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.chkNone.text")); // NOI18N
-
         lblLojaOrigem.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        org.openide.awt.Mnemonics.setLocalizedText(lblLojaOrigem, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.lblLojaOrigem.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblLojaOrigem, "Lojas");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkLogEstoque, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.chkLogEstoque.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkLogEstoque, "Log Estoque");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkVenda, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.chkVenda.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkVenda, "Venda");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkEscrita, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.chkEscrita.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkEscrita, "Escrita");
 
-        pnlPeriodo.setBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.pnlPeriodo.border.title"))); // NOI18N
+        pnlPeriodo.setBorder(javax.swing.BorderFactory.createTitledBorder("Período"));
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblPeriodo, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.lblPeriodo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lblPeriodo, "á");
 
         javax.swing.GroupLayout pnlPeriodoLayout = new javax.swing.GroupLayout(pnlPeriodo);
         pnlPeriodo.setLayout(pnlPeriodoLayout);
@@ -188,7 +191,7 @@ public class CleanDataBase extends VRInternalFrame {
         pnlBotao.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         btnIniciar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnIniciar, org.openide.util.NbBundle.getMessage(CleanDataBase.class, "CleanDataBase.btnIniciar.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnIniciar, "Iniciar");
         btnIniciar.setFocusable(false);
         btnIniciar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnIniciar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -211,6 +214,20 @@ public class CleanDataBase extends VRInternalFrame {
             .addComponent(btnIniciar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
+        org.openide.awt.Mnemonics.setLocalizedText(btnSelTudo, "Sel. Tudo");
+        btnSelTudo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelTudoActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(btnSelNada, "Sel. Nada");
+        btnSelNada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelNadaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -219,13 +236,15 @@ public class CleanDataBase extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(pnlPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblLojaOrigem, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pnlBotao, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnSelTudo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSelNada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(lblLojaOrigem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1)
+                            .addComponent(pnlBotao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -235,10 +254,7 @@ public class CleanDataBase extends VRInternalFrame {
                                 .addComponent(chkEscrita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(chkAll)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(chkNone)))
+                            .addComponent(pnlPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -250,16 +266,16 @@ public class CleanDataBase extends VRInternalFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkAll)
-                    .addComponent(chkNone))
+                    .addComponent(btnSelTudo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSelNada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkLogEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEscrita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlBotao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -278,13 +294,27 @@ public class CleanDataBase extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnIniciarActionPerformed
 
+    private void btnSelTudoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelTudoActionPerformed
+        for (CleanDataBaseTableModelRecord r: this.model.lojas) {
+            r.selected = true;
+        }
+        this.model.fireTableDataChanged();
+    }//GEN-LAST:event_btnSelTudoActionPerformed
+
+    private void btnSelNadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelNadaActionPerformed
+        for (CleanDataBaseTableModelRecord r: this.model.lojas) {
+            r.selected = false;
+        }
+        this.model.fireTableDataChanged();
+    }//GEN-LAST:event_btnSelNadaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnIniciar;
-    private javax.swing.JCheckBox chkAll;
+    private vrframework.bean.button.VRButton btnSelNada;
+    private vrframework.bean.button.VRButton btnSelTudo;
     private vrframework.bean.checkBox.VRCheckBox chkEscrita;
     private vrframework.bean.checkBox.VRCheckBox chkLogEstoque;
-    private javax.swing.JCheckBox chkNone;
     private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private vrframework.bean.calendar.VRCalendar edtDtInicio;
     private vrframework.bean.calendar.VRCalendar edtDtTermino;
@@ -401,56 +431,73 @@ class DatabaseCleaner {
         this.opcoes = opcoes;
     }
     
-    public void remove() throws IOException {        
+    public void remove() throws Exception {
+        
+        cancelado = false;
 
         Calendar cal = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh-mm-dd");
+        SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         
-        try (FileWriter log = new FileWriter("log" + new SimpleDateFormat("yyyy-MM-dd hh-mm-dd") + ".txt")) {                        
+        try (FileWriter log = new FileWriter("log-exclusao-" + fileDateFormat.format(new Date()) + ".txt", true)) {  
+            log.write(String.format("Operação de exclusão iniciada em %s\n", format.format(new Date())));                      
             for (int idLoja: this.idLojas) {
-                try {
-                    ConexaoPostgres2.begin();
+                
+                if (cancelado) return;
 
-                    log.write("Inicio : " + idLoja + "\n");
+                log.write("LOJA " + idLoja + "\n");
 
-                    String file = "logestoque_loja" + idLoja + ".txt";
-                    try (FileWriter fw = new FileWriter(file)) {                    
-                        fw.write("Tabela logestoque - Loja ID: " + idLoja + "\n");
+                cal.setTime(this.dtInicio);
+                for (Date dt = this.dtInicio; dt.compareTo(this.dtTermino) <= 0; dt = cal.getTime()) {
 
-                        cal.setTime(this.dtInicio);
-                        for (Date dt = this.dtInicio; dt.compareTo(this.dtTermino) <= 0; dt = cal.getTime()) {
+                    try {
+                        Conexao.begin();
 
-                            System.out.println(DT_FORMAT.format(dt));
-                            log.write(String.format("", DT_FORMAT.format(dt)));
+                        System.out.println(DT_FORMAT.format(dt));
 
-                            if (opcoes.contains(DatabaseCleanerOpcao.LOG_ESTOQUE)) {
-                                apagarLogEstoque(dt, idLoja, fw, log);
-                            }
-                            if (opcoes.contains(DatabaseCleanerOpcao.ESCRITA)) {
-                                apagarEscrita(dt, idLoja, fw, log);
-                            }
-
-                            cal.add(Calendar.DATE, +1);
+                        if (opcoes.contains(DatabaseCleanerOpcao.LOG_ESTOQUE)) {
+                            apagarLogEstoque(dt, idLoja, log);
                         }
-                    }
+                        if (opcoes.contains(DatabaseCleanerOpcao.ESCRITA)) {
+                            apagarEscrita(dt, idLoja, log);
+                        }
 
-                    ConexaoPostgres2.commit();
-                } catch (Exception ex) {
-                    ConexaoPostgres2.rollback();
-                    throw ex;
+                        cal.add(Calendar.DATE, +1);
+
+                        Conexao.commit();
+                    } catch (Exception ex) {
+                        Conexao.rollback();
+                        if (!(ex instanceof OperacaoCanceladaException)) {
+                            log.write(String.format("Operação cancelada em %s", DT_FORMAT.format(new Date())));
+                            throw ex;
+                        }
+                        log.write(String.format("Operação de exclusão cancelada em %s\n", format.format(new Date()))); 
+                    }
+                    
+                    log.flush();
+
                 }
+                
+                if (!cancelado) log.write(String.format("LOJA " + idLoja + " CONCLUÍDA em %s\n", format.format(new Date()))); 
+                
             }
+            log.write(String.format("Operação de exclusão CONCLUÍDA em %s\n", format.format(new Date()))); 
         }
     }
 
-    private void apagarLogEstoque(Date dt, int idLoja, final FileWriter fw, final FileWriter log) throws IOException {
+    private void apagarLogEstoque(Date dt, int idLoja, final FileWriter log) throws Exception {
         try {
-            ProgressBar.setStatus("Del. logestoque na data de: " + DT_FORMAT.format(dt) + "...");
-            
+            if (cancelado) return;
+            ProgressBar.setStatus("LOJA " + idLoja + " - Del. logestoque na data de: " + DT_FORMAT.format(dt) + "...");            
             dao.deletaLogEstoque(dt, idLoja);
-            fw.write("Dia " + DT_FORMAT.format(dt) + " deletado da tabela;\n");
+            log.write("Dia " + DT_FORMAT.format(dt) + " - LOJA " + idLoja + " - deletado do LOGESTOQUE\n");
             
             ProgressBar.next();
         } catch (Exception ex) {
+            if (ex instanceof OperacaoCanceladaException) {
+                cancelado = true;
+                throw ex;
+            }
             Exceptions.printStackTrace(ex);
             log.write("\n");
             log.write("ERRO: " + ex.getMessage() + "\n");
@@ -458,17 +505,26 @@ class DatabaseCleaner {
         }
     }
 
+    private boolean cancelado = false;
     private final EscritaDAO escritaDAO = new EscritaDAO();
-    private void apagarEscrita(Date dt, int idLoja, FileWriter fw, FileWriter log) throws IOException {
+    private void apagarEscrita(Date dt, int idLoja, FileWriter log) throws Exception {
         try {
-            ProgressBar.setStatus("Del. escrita na data de: " + DT_FORMAT.format(dt) + "...");
+            ProgressBar.setStatus("LOJA " + idLoja + " - Del. escrita na data de: " + DT_FORMAT.format(dt) + "...");
+            List<Integer> ids = escritaDAO.getIdsPorData(idLoja, dt);
+            ProgressBar.setMaximum(ids.size());
             
+            for (Integer id: ids) {
+                if (cancelado) return;
+                escritaDAO.excluirId(id);
+                ProgressBar.next();
+            }
             
-            escritaDAO.excluirData(dt, idLoja);
-            fw.write("Dia " + DT_FORMAT.format(dt) + " deletado da tabela;\n");
-            
-            ProgressBar.next();
+            log.write("Dia " + DT_FORMAT.format(dt) + " - LOJA " + idLoja + " - deletado da ESCRITA\n");
         } catch (Exception ex) {
+            if (ex instanceof OperacaoCanceladaException) {
+                cancelado = true;
+                throw ex;
+            }
             Exceptions.printStackTrace(ex);
             log.write("\n");
             log.write("ERRO: " + ex.getMessage() + "\n");
