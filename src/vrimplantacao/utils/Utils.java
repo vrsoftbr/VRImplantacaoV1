@@ -373,10 +373,11 @@ public class Utils {
 
     public static String formatDate(Date data) {
         if (data != null) {
-            return new SimpleDateFormat("yyyy-MM-dd").format(data);
+            return DATE_FORMAT.format(data);
         }
         return null;
     }
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public static String longIntSQL(long number, long nullValue) {
         return number != nullValue ? number + "" : null;
