@@ -27,6 +27,7 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -86,7 +87,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.FABRICANTE
                 }
         ));
     }
@@ -282,7 +284,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.CstPisCofinsEntrada, \n"
                     + " p.CstPisCofinsSaida, \n"
                     + " p.NaturezaReceita,\n"
-                    + " p.Fabricante as idfabricante\n"
+                    + " cast(p.Fabricante as bigint) as idfabricante\n"
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -405,7 +407,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	mx.mxf_icms_tipo_iva,\n"
-                    + "	mx.codigo_produto,\n"
+                    + "	cast(mx.codigo_produto as bigint) as codigo_produto,\n"
                     + "	mx.ncm,\n"
                     + "	mx.cod_natureza_receita,\n"
                     + "	mx.cest,\n"
@@ -427,16 +429,130 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setTipoIva(TipoIva.VALOR);
                     imp.setId(rst.getString("codigo_produto"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setIva(rst.getDouble("mxf_icms_iva_valor"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setUf(Parametros.get().getUfPadraoV2().getSigla());
                     
-                    imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
-                    imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
-                    imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
-                    imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                    switch (rst.getInt("mxf_icms_cst_s")) {
+                        case 0:
+                            imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            break;
+                        case 20:
+                            if (rst.getDouble("mxf_icms_rbc_s") == 0) {
+                                imp.setAliquotaDebito(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                                imp.setAliquotaDebitoForaEstado(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                            } else {
+                                imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                                imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            }
+                            break;
+                        case 40:
+                            if (rst.getDouble("mxf_icms_alq_s") > 0) {
+                                imp.setAliquotaDebito(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                                imp.setAliquotaDebitoForaEstado(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                            } else {
+                                imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                                imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            }
+                            break;
+                        case 41:
+                            if (rst.getDouble("mxf_icms_alq_s") > 0) {
+                                imp.setAliquotaDebito(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                                imp.setAliquotaDebitoForaEstado(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                            } else {
+                                imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                                imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            }
+                            break;
+                        case 60:
+                            if (rst.getDouble("mxf_icms_alq_s") > 0) {
+                                imp.setAliquotaDebito(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                                imp.setAliquotaDebitoForaEstado(0, rst.getDouble("mxf_icms_alq_s"), 0);
+                            } else {
+                                imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                                imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            }
+                            break;
+                        default:
+                            imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                            break;
+                    }
+
+
+                    switch (rst.getInt("mxf_icms_cst_e")) {
+                        case 0:
+                            imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            break;
+                        case 20:
+                            if (rst.getDouble("mxf_icms_rbc_e") == 0) {
+                                imp.setAliquotaCredito(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                                imp.setAliquotaCreditoForaEstado(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                            } else {
+                                imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                                imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            }
+                            break;
+                        case 40:
+                            if (rst.getDouble("mxf_icms_alq_e") > 0) {
+                                imp.setAliquotaCredito(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                                imp.setAliquotaCreditoForaEstado(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                            } else {
+                                imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                                imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            }
+                            break;
+                        case 41:
+                            if (rst.getDouble("mxf_icms_alq_e") > 0) {
+                                imp.setAliquotaCredito(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                                imp.setAliquotaCreditoForaEstado(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                            } else {
+                                imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                                imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            }
+                            break;
+                        case 51:
+                            if (rst.getDouble("mxf_icms_alq_e") > 0) {
+                                imp.setAliquotaCredito(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                                imp.setAliquotaCreditoForaEstado(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                            } else {
+                                imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                                imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            }
+                            break;
+                        case 60:
+                            if (rst.getDouble("mxf_icms_alq_e") > 0) {
+                                imp.setAliquotaCredito(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                                imp.setAliquotaCreditoForaEstado(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                            } else {
+                                imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                                imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            }
+                            break;
+                        case 70:
+                            if (rst.getDouble("mxf_icms_alq_e") > 0) {
+                                imp.setAliquotaCredito(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                                imp.setAliquotaCreditoForaEstado(0, rst.getDouble("mxf_icms_alq_e"), 0);
+                            } else {
+                                imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                                imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            }
+                            break;
+                        default:
+                            imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                            break;
+                    }
+                    
+                    //imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                    //imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
+                    //imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
+                    //imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
                     
                     result.add(imp);
                 }
