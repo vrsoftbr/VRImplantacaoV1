@@ -2,3 +2,4 @@ build/
 dist/
 *.db
 nbproject/private/
+*log*

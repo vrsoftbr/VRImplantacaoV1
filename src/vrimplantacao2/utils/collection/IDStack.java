@@ -35,7 +35,7 @@ public class IDStack {
     public final void add(long id) {
         SortedSet<Long> stack = getStack(id);        
         if (stack == null) {
-            Long ultimo = !stacks.isEmpty() ? stacks.lastKey() : 0;
+            Long ultimo = !stacks.isEmpty() ? stacks.lastKey() : 0L;
             Long proximo = ultimo;
             do {
                 proximo += intervalo;
