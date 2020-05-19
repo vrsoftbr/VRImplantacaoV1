@@ -82,7 +82,8 @@ public class ProtonDAO extends InterfaceDAO {
                     + "       tund_unidade_pk id,\n"
                     + "       tund_fantasia fantasia\n"
                     + "from \n"
-                    + "       TUND_UNIDADE")) {
+                    + "       TUND_UNIDADE\n"
+                    + " order by 1")) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("fantasia")));
                 }
