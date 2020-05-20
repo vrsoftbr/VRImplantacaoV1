@@ -53,7 +53,7 @@
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-              <Component id="tab" pref="294" max="32767" attributes="0"/>
+              <Component id="tab" pref="306" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -171,7 +171,7 @@
                           <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="418" max="32767" attributes="0"/>
+                      <EmptySpace pref="477" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -182,7 +182,7 @@
                       <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="208" max="32767" attributes="0"/>
+                      <EmptySpace pref="589" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -247,7 +247,7 @@
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="310" max="32767" attributes="0"/>
+                          <EmptySpace pref="369" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -263,7 +263,7 @@
                           <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="157" max="32767" attributes="0"/>
+                          <EmptySpace pref="538" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -312,7 +312,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="433" max="32767" attributes="0"/>
+                          <EmptySpace pref="492" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -321,7 +321,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="205" max="32767" attributes="0"/>
+                          <EmptySpace pref="586" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -353,7 +353,7 @@
                               <Component id="chkConveniado" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkConvRecebimento" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="393" max="32767" attributes="0"/>
+                          <EmptySpace pref="452" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -366,7 +366,7 @@
                           <Component id="chkConveniado" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="166" max="32767" attributes="0"/>
+                          <EmptySpace pref="543" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -410,7 +410,7 @@
                           <Component id="cbxUnifFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifCliPreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="242" max="32767" attributes="0"/>
+                      <EmptySpace pref="301" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -423,7 +423,7 @@
                       <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="185" max="32767" attributes="0"/>
+                      <EmptySpace pref="566" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

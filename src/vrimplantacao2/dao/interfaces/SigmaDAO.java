@@ -138,7 +138,7 @@ public class SigmaDAO extends InterfaceDAO {
         return new ArrayList<>(n1.values());
     }
 
-    public List<OfertaIMP> getofertas() throws Exception {
+    public List<OfertaIMP> getOfertas() throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
