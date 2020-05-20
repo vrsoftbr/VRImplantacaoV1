@@ -128,9 +128,9 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1ID(rst.getString("merc1").trim());
                     imp.setMerc1Descricao(rst.getString("desc_merc1"));
-                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2ID(rst.getString("merc2").trim());
                     imp.setMerc2Descricao(rst.getString("desc_merc2"));
                     imp.setMerc3ID(rst.getString("merc3"));
                     imp.setMerc3Descricao(rst.getString("desc_merc3"));
@@ -204,8 +204,8 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricaoproduto"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico1(rst.getString("merc1").trim());
+                    imp.setCodMercadologico2(rst.getString("merc2").trim());
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setTipoEmbalagem(rst.getString("embvenda"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
