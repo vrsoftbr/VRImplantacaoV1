@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.apache.commons.codec.binary.Base64;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -63,6 +64,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
             OpcaoProduto.EAN_EM_BRANCO,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
             OpcaoProduto.PESAVEL,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.DESC_COMPLETA,
@@ -194,6 +196,12 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     if ((imp.getEan() != null) && (!imp.getEan().trim().isEmpty())) {
                         if (imp.getEan().trim().length() <= 6) {
                             imp.seteBalanca("T".equals(rst.getString("balanca")));
+                            
+                            if (imp.isBalanca()) {
+                                imp.setManterEAN(false);
+                            } else {
+                                imp.setManterEAN(true);
+                            }
                         } else {
                             imp.seteBalanca(false);
                         }
@@ -207,8 +215,9 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     imp.setCodMercadologico1(rst.getString("merc1").trim());
                     imp.setCodMercadologico2(rst.getString("merc2").trim());
                     imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("embcompra"));
                     imp.setTipoEmbalagem(rst.getString("embvenda"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
                     imp.setDataCadastro(rst.getDate("data_cadastro"));
