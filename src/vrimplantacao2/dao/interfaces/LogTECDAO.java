@@ -43,10 +43,10 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stmt = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select id, descritivo from tributacao"
+                    "select id, descricao from aliquotas_icms"
             )) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descritivo")));
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
                 }
             }
         }
@@ -106,115 +106,66 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    p.id,\n"
-                    + "    ean.ean,\n"
-                    + "    p.descritivo,\n"
-                    + "    p.reduzido,\n"
-                    + "    coalesce_varchar(p.descritivocompleto, p.descritivo) descricaocompleta,\n"
-                    + "    pe.estoque_atual,\n"
-                    + "    pe.estoque_minimo,\n"
-                    + "    pe.estoque_padrao,\n"
-                    + "    coalesce(p.pesob, 0::numeric) AS pesob,\n"
-                    + "    coalesce(p.pesol, 0::numeric) AS pesol,\n"
-                    + "    pl.custo,\n"
-                    + "    pl.custo_liquido,\n"
-                    + "    pl.custo_medio,\n"
-                    + "    pl.custo_sem_imposto,\n"
-                    + "    pl.margemcad,\n"
-                    + "    pl.margemreal,\n"
-                    + "    pl.venda1,\n"
-                    + "    p.depto merc1,\n"
-                    + "    case when \n"
-                    + "	   p.secao = 0 then\n"
-                    + "	   1 else\n"
-                    + "	   p.secao end as merc2,\n"
-                    + "    case when \n"
-                    + "	   coalesce(p.grupo, coalesce(p.secao, p.depto)) = 0 then\n"
-                    + "	   1 else \n"
-                    + "	   coalesce(p.grupo, coalesce(p.secao, p.depto)) end as merc3,\n"
-                    + "    case when \n"
-                    + "	   coalesce(p.subgrupo, coalesce(p.grupo, p.secao)) = 0 then\n"
-                    + "	   1 else\n"
-                    + "	   coalesce(p.subgrupo, coalesce(p.grupo, p.secao)) end as merc4,\n"
-                    + "    p.unidade_venda,\n"
-                    + "    p.unidade_compra,\n"
-                    + "    p.embalagem_venda,\n"
-                    + "    p.embalagem_compra,\n"
-                    + "    p.datahorac,\n"
-                    + "    p.envia_balanca balanca,\n"
-                    + "    p.situacao,\n"
-                    + "    p.classificacao_fiscal ncm,\n"
-                    + "    coalesce_varchar(pc.valor, nc.valor) AS cest,\n"
-                    + "    (select t.icms from tributacao t where t.id = pl.idtributacao) icmsdebito,\n"
-                    + "    (select t.situacao_tributaria from tributacao t where t.id = pl.idtributacao) cstdebito,\n"
-                    + "    (select t.reducao from tributacao t where t.id = pl.idtributacao) reducaoicms,\n"
-                    + "    (select pt.idpis from produto_tributacao pt where pt.idproduto = p.id) cstpis,\n"
-                    + "    p.validade,\n"
-                    + "    vw.idgrupo_tributacao tribgrupo\n"
-                    + "from\n"
-                    + "    produto p\n"
-                    + "join\n"
-                    + "	  vw_produto_tributacao vw on p.id = vw.idproduto\n"
-                    + "join \n"
-                    + "    produto_loja pl on p.id = pl.produto\n"
-                    + "left join \n"
-                    + "    produto_ean ean on p.id = ean.produto\n"
-                    + "join \n"
-                    + "    produto_estoque pe on p.id = pe.produto\n"
-                    + "inner join \n"
-                    + "    empresa e on pl.empresa = e.id\n"
-                    + "join \n"
-                    + "    produto_config pc on p.id = pc.idproduto and pc.id::text = 'PRODUTO.CODIGO.CEST'::text\n"
-                    + "left join \n"
-                    + "    ncm n on p.classificacao_fiscal::text = n.id::text and\n"
-                    + "    p.extipi::text = n.extipi::text\n"
-                    + "left join \n"
-                    + "    ncm_config nc on n.id::text = nc.idncm::text and nc.id::text = 'NCM.CODIGO.CEST'::text\n"
-                    + "where\n"
-                    + "    pe.estoque = 1 and\n"
-                    + "    e.id = " + getLojaOrigem() + "\n"
-                    + "    --p.situacao in (0) 0: Normal; 1: Excluído; 2: Fora de Linha\n"
-                    + "order by\n"
-                    + "	 p.id")) {
+                    "select \n"
+                    + "	p.cod_produto importId,\n"
+                    + "	dat_cadastro dataCadastro,\n"
+                    + "	dat_alteracao dataAlteracao,\n"
+                    + "	cod_barra ean,\n"
+                    + "	und_produto tipoEmbalagem,\n"
+                    + "	case when cp.flg_balanca = 'S' then 1 else 0 end balanca,\n"
+                    + "	cp.balanca_dias_validade validade,\n"
+                    + "	des_completa descricaoCompleta,\n"
+                    + "	des_resumida descricaoReduzida,\n"
+                    + "	des_resumida descricaoGondola,\n"
+                    + "	cod_grupo m1,\n"
+                    + "	cod_subgrupo m2,\n"
+                    + "	pes_bruto pesoBruto,\n"
+                    + "	pes_liquido pesoLiquido,\n"
+                    + "	qtd_estoque estoque,\n"
+                    + "	vlr_custo_liquido custoSemImposto,\n"
+                    + "	cp.vlr_custo_bruto custoComImposto,    \n"
+                    + "	vlr_unitario1 precovenda,\n"
+                    + "	case when cp.flg_ativo = 'S' then 0 else 1 end situacao,\n"
+                    + "	des_ncm ncm,\n"
+                    + "	des_cest cest,\n"
+                    + "	cod_sit_tributaria icmsCstSaida,\n"
+                    + "	cp.aliq_ecf icmsAliqSaida\n"
+                    + "from	c_produto cp\n"
+                    + "	join produto p\n"
+                    + "	on p.cod_produto = cp.cod_produto\n"
+                    + "where cp.cod_empresa = " + getLojaOrigem() + "\n"
+                )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
+                    
+                    imp.setImportId(rs.getString("importId"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(rs.getString("descritivo"));
-                    imp.setDescricaoReduzida(rs.getString("reduzido"));
-                    imp.setEstoque(rs.getDouble("estoque_atual"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoque_minimo"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoque_padrao"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(rs.getDouble("custo"));
-                    imp.setMargem(rs.getDouble("margemreal"));
-                    imp.setPrecovenda(rs.getDouble("venda1"));
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setCodMercadologico4(rs.getString("merc4"));
-                    imp.setTipoEmbalagem(rs.getString("unidade_venda"));
-                    imp.setQtdEmbalagem(rs.getInt("embalagem_venda"));
-                    imp.setDataCadastro(rs.getDate("datahorac"));
+                    imp.setTipoEmbalagem(rs.getString("tipoEmbalagem"));
+                                        
+                    imp.setDescricaoCompleta(rs.getString("descricaoCompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoReduzida"));
+                    imp.setDescricaoGondola(rs.getString("descricaoGondola"));
+                    imp.setCodMercadologico1(rs.getString("m1"));
+                    imp.setCodMercadologico2(rs.getString("m2"));
+                    imp.setPesoBruto(rs.getDouble("pesoBruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoLiquido"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    
+                    imp.setCustoComImposto(rs.getDouble("custoComImposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custoSemImposto"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    
+                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
-
-                    if (rs.getInt("tribgrupo") == 1) {
-                        imp.setIcmsAliqSaida(18);
-                        imp.setIcmsCstSaida(10);
-                        imp.setIcmsReducaoSaida(0);
-                    } else {
-                        imp.setIcmsAliqSaida(18);
-                        imp.setIcmsCstSaida(0);
-                        imp.setIcmsReducaoSaida(0);
-                    }
-
+                   
+                    imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
+                    imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
                     imp.setValidade(rs.getInt("validade"));
 
                     if (v_usar_arquivoBalanca) {
@@ -241,8 +192,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setValidade(rs.getInt("validade"));
                         }
                     }
-                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
-
+                    
                     result.add(imp);
                 }
             }
@@ -346,7 +296,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                      "select	\n"
+                    "select	\n"
                     + "	 cod_cliente id,\n"
                     + "	 cpf_cgc cnpj,\n"
                     + "	 rg_inscr ie,\n"
@@ -490,7 +440,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("datavencimento"));
                     imp.setJuros(rs.getDouble("juros"));
                     imp.setCnpjCliente(rs.getString("cnpjCliente"));
-                    
+
                     result.add(imp);
                 }
             }

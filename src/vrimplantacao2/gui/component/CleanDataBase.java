@@ -1,6 +1,5 @@
 package vrimplantacao2.gui.component;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +23,7 @@ import vrframework.classe.Util;
 import vrimplantacao.dao.fiscal.EscritaDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
+import vrimplantacao2.dao.cadastro.venda.PdvVendaDAO;
 
 /**
  *
@@ -92,6 +92,9 @@ public class CleanDataBase extends VRInternalFrame {
                     }
                     if (chkEscrita.isSelected()) {
                         opcoes.add(DatabaseCleanerOpcao.ESCRITA);
+                    }
+                    if (chkVenda.isSelected()) {
+                        opcoes.add(DatabaseCleanerOpcao.VENDA);
                     }
                     
                     new DatabaseCleaner(
@@ -411,7 +414,8 @@ public class CleanDataBase extends VRInternalFrame {
 
 enum DatabaseCleanerOpcao {
     LOG_ESTOQUE,
-    ESCRITA
+    ESCRITA,
+    VENDA
 }
 
 class DatabaseCleaner {
@@ -460,6 +464,9 @@ class DatabaseCleaner {
                         }
                         if (opcoes.contains(DatabaseCleanerOpcao.ESCRITA)) {
                             apagarEscrita(dt, idLoja, log);
+                        }
+                        if (opcoes.contains(DatabaseCleanerOpcao.VENDA)) {
+                            apagarVenda(dt, idLoja, log);
                         }
 
                         cal.add(Calendar.DATE, +1);
@@ -520,6 +527,33 @@ class DatabaseCleaner {
             }
             
             log.write("Dia " + DT_FORMAT.format(dt) + " - LOJA " + idLoja + " - deletado da ESCRITA\n");
+        } catch (Exception ex) {
+            if (ex instanceof OperacaoCanceladaException) {
+                cancelado = true;
+                throw ex;
+            }
+            Exceptions.printStackTrace(ex);
+            log.write("\n");
+            log.write("ERRO: " + ex.getMessage() + "\n");
+            log.write(ExceptionUtils.getStackTrace(ex));
+        }
+    }
+    
+    private PdvVendaDAO pdvDAO;
+    private void apagarVenda(Date dt, int idLoja, FileWriter log) throws Exception {
+        try {
+            pdvDAO = new PdvVendaDAO();
+            ProgressBar.setStatus("LOJA " + idLoja + " - Del. venda na data de: " + DT_FORMAT.format(dt) + "...");
+            List<Integer> ids = pdvDAO.getIdsPorData(idLoja, dt);
+            ProgressBar.setMaximum(ids.size());
+            
+            for (Integer id: ids) {
+                if (cancelado) return;
+                pdvDAO.cleanerVenda(id);
+                ProgressBar.next();
+            }
+            
+            log.write("Dia " + DT_FORMAT.format(dt) + " - LOJA " + idLoja + " - deletado da VENDA\n");
         } catch (Exception ex) {
             if (ex instanceof OperacaoCanceladaException) {
                 cancelado = true;

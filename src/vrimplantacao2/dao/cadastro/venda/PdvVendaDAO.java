@@ -3,9 +3,12 @@ package vrimplantacao2.dao.cadastro.venda;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -385,6 +388,74 @@ public class PdvVendaDAO {
             "       DELETE FROM pdv.venda WHERE id = v_id;\n" +
             "   end if;" + 
             "end;\n" +
+            "$$;";
+            
+            LOG.finer(sql);
+            stm.execute(sql);
+        }
+    }
+    
+    public List<Integer> getIdsPorData(int idLoja, Date dt) throws Exception {
+        List<Integer> result = new ArrayList<>();
+        
+        try (Statement st = Conexao.createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	id\n" +
+                    "from\n" +
+                    "	pdv.venda v\n" +
+                    "where\n" +
+                    "	v.data = " + Utils.dateSQL(dt) + " and\n" +
+                    "	v.id_loja = " + idLoja + "\n" +
+                    "order by\n" +
+                    "	id desc"
+            )) {
+                while (rs.next()) {
+                    result.add(rs.getInt("id"));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    public void cleanerVenda(int id) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            String sql =
+            "do $$\n" +
+            "	declare\n" +
+            "		v_id integer = " + id + ";\n" +
+            "		v_iditem integer;\n" +
+            "	begin\n" +
+            "	   select id from pdv.vendaitem where id_venda = v_id into v_iditem;\n" +
+            "	   delete from scanntech.vendaitem where id_venda = v_id;\n" +
+            "      delete from scanntech.venda where id_venda = v_id;\n" +        
+            "	   delete from balanca.vendaoperadorbalanca where id_vendaitem = v_iditem;\n" +
+            "	   delete from pdv.perguntanota where id_venda = v_id;\n" +
+            "	   delete from crescevendas.vendacrescevendas where id_venda = v_id;\n" +
+            "	   delete from crescevendas.vendaitem where id_vendaitem = v_iditem;	\n" +
+            "	   delete from public.clientepreferencialpromocao where id_venda = v_id;\n" +
+            "	   delete from comissao.venda where id_venda = v_id;\n" +
+            "	   delete from connect.vendaefetuada where id_venda = v_id;\n" +
+            "	   delete from pdv.vendaenviocupomcfe where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapromocao where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapontuacao where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapromocaopontuacao where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapromocaoproduto where id_venda = v_id;\n" +
+            "	   delete from pdv.vendacfe where id_venda = v_id;        \n" +
+            "	   delete from pdv.vendakititem where id_vendakit in (select id from pdv.vendakit where id_venda = v_id);\n" +
+            "	   delete from pdv.vendakit where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapromocao where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapromocaocupom where id_venda = v_id;\n" +
+            "	   delete from pdv.vendapdvvendatef where id_venda = v_id;\n" +
+            "	   delete from pdv.vendafinalizadora where id_venda = v_id;\n" +
+            "	   delete from pdv.vendaitem where id_venda = v_id;\n" +
+            "	   delete from pdv.vendanfce where id_venda = v_id;\n" +
+            "	   delete from pdv.vendamfepagamento where id_venda = v_id;\n" +
+            "	   delete from pdv.vendamfe where id_venda = v_id;\n" +
+            "       delete from pdv.vendacfe where id_venda = v_id;\n" +
+            "	   delete from pdv.venda where id = v_id;\n" +
+            "	end;\n" +
             "$$;";
             
             LOG.finer(sql);

@@ -1775,6 +1775,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             if (chkReceitaProduto.isSelected()) {
                 importador.importarReceitas();
             }
+            
+            if (chkAssociado.isSelected()) {
+                importador.importarAssociado();
+            }
         }
         
 

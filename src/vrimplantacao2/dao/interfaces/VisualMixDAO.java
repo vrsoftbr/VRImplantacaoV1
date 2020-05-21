@@ -88,7 +88,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.FABRICANTE
+                    OpcaoProduto.FABRICANTE,
+                    OpcaoProduto.ASSOCIADO
                 }
         ));
     }
@@ -377,11 +378,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	p1.Produto_Id as produto_pai,\n"
-                    + "	p1.Descricao_Completa as descricao_pai,\n"
+                    + "	cast(p1.Produto_Id as bigint) as produto_pai,\n"
                     + "	p1.EspecUnitariaQtde as qtembalagem_pai,\n"
-                    + "	p2.Produto_Id as produto_filho,\n"
-                    + "	p2.Descricao_Completa as descricao_filho,\n"
+                    + "	cast(p2.Produto_Id as bigint) as produto_filho,\n"
                     + "	p2.EspecUnitariaQtde as qtdembalagem_filho\n"
                     + "from dbo.Produtos p1 \n"
                     + "join dbo.Produtos p2 on p2.ProdutoPai = p1.Produto_Id"
@@ -389,9 +388,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
                     imp.setId(rst.getString("produto_pai"));
-                    imp.setQtdEmbalagem(rst.getInt("qtembalagem_pai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtembalagem_pai") == 0 ? 1 : rst.getInt("qtembalagem_pai"));
                     imp.setProdutoAssociadoId(rst.getString("produto_filho"));
-                    imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_filho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_filho") == 0 ? 1 : rst.getInt("qtdembalagem_filho"));
                     result.add(imp);
                 }
             }
@@ -718,8 +717,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	pf.Fornecedor as idfornecedor,\n"
-                    + "	pf.Produto_Id as idproduto,\n"
+                    + "	cast(pf.Fornecedor as bigint) as idfornecedor,\n"
+                    + "	cast(pf.Produto_Id as bigint) as idproduto,\n"
                     + "	pf.Referencia as codigoexterno,\n"
                     + "	pf.Qtde_Emb as qtdembalagem,\n"
                     + "	pf.Preco_Tabela as custo\n"
