@@ -52,7 +52,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         
         /*try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select '1' id, 'LOJA 01' razao"
+                    ""
             )) {
                 while (rst.next()) {
                     System.out.println("Entrou...");
@@ -107,8 +107,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
@@ -120,12 +119,29 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "    id_ecf,\n" +
-                    "    descricao_tribut desc\n" +
+                    "    distinct\n" +
+                    "    pt.icms_aliquota||pt.icms_st||pt.icms_basecalc id,\n" +
+                    "    'ICMS: ' || round(pt.icms_aliquota, 2) || ' | CST: ' || pt.icms_st ||\n" +
+                    "    ' | RED: ' || round(pt.icms_basecalc, 2) descricao,\n" +
+                    "    pt.icms_st cst,\n" +
+                    "    pt.icms_aliquota icms,\n" +
+                    "    pt.icms_basecalc reducao\n" +
                     "from\n" +
-                    "    tribut_ecf")) {
+                    "    prod_tributos pt\n" +
+                    "where\n" +
+                    "    pt.estado = 'SP' and\n" +
+                    "    pt.icms_st is not null and\n" +
+                    "    pt.icms_aliquota is not null and\n" +
+                    "    pt.icms_basecalc is not null\n" +
+                    "order by\n" +
+                    "    pt.icms_st")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id_ecf"), rs.getString("desc")));
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"),
+                            rs.getInt("cst"),
+                            rs.getDouble("icms"),
+                            rs.getDouble("reducao")));
                 }
             }
         }
@@ -206,14 +222,22 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "    p.id_dep merc1,\n" +
                     "    p.id_set merc2,\n" +
                     "    p.id_sub merc3,\n" +
-                    "    p.id_ecf idicms,\n" +
+                    "    p.id_ecf idicms_old,\n" +
+                    "    coalesce(pt.icms_aliquota, 0)||\n" +
+                    "    coalesce(pt.icms_st, 0)||\n" +
+                    "    coalesce(pt.icms_basecalc, 0) idicms," + 
+                    "    coalesce(pt.icms_aliquota, 0) icms_debito,\n" +
+                    "    coalesce(pt.icms_st, 0) cst_debito,\n" +
+                    "    coalesce(pt.icms_basecalc, 0) reducao_debito,\n" +       
                     "    p.ncm_sh ncm,\n" +
                     "    p.cest,\n" +
                     "    p.nat_receita_pis naturezareceita\n" +
                     "from\n" +
                     "    produtos p\n" +
+                    "join prod_tributos pt on p.id_prod = pt.id_prod\n" +        
                     "left join unidades un on p.id_unid = un.id_unid\n" +
                     "left join unidades unc on p.id_unid_forn = unc.id_unid\n" +
+                    "where pt.estado = 'SP'\n" +       
                     "order by\n" +
                     "    1")) {
                 while(rs.next()) {
@@ -233,18 +257,35 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     imp.setSituacaoCadastro(rs.getInt("desativar") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoSemImposto(rs.getDouble("custoinicial"));
                     imp.setCustoComImposto(rs.getDouble("custofinal"));
-                    imp.setPiscofinsCstCredito(rs.getString("pis_st"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setPiscofinsCstDebito(rs.getString("pis_st"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setIcmsDebitoId(rs.getString("idicms"));
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    
+                    /*imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                    imp.setIcmsCstSaida(rs.getInt("cst_debito"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("reducao_debito"));
+                    if(imp.getIcmsCstSaida() == 0) {
+                        imp.setIcmsReducaoSaida(0);
+                    }
+                    
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_debito"));
+                    imp.setIcmsCstEntrada(rs.getInt("cst_debito"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("reducao_debito"));
+                    if(imp.getIcmsCstEntrada() == 0) {
+                        imp.setIcmsReducaoEntrada(0);
+                    }*/
+                    
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
@@ -435,6 +476,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "    c.data_nascimento,\n" +
                     "    c.desativar,\n" +
                     "    c.limite_credito,\n" +
+                    "    coalesce(c.crediario, 0) crediario,\n" +        
                     "    c.contato,\n" +
                     "    c.observacoes,\n" +
                     "    c.pai,\n" +
@@ -484,6 +526,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setObservacao(rs.getString("observacoes") == null ? "" : rs.getString("observacoes"));
+                    imp.setPermiteCreditoRotativo(rs.getInt("crediario") == 1);
                     
                     result.add(imp);
                 }
