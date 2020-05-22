@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,6 +57,16 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean soAtivos = false;
     private Date dtOfertas;
     private boolean ignorarEnviaBalanca = false;
+    private List<String> finalizadorasRotativo;
+    private List<String> finalizadorasCheque;
+    
+    public void setFinalizadorasRotativo(List<String> finalizadorasRotativo) {
+        this.finalizadorasRotativo = finalizadorasRotativo;
+    }
+
+    public void setFinalizadorasCheque(List<String> finalizadorasCheque) {
+        this.finalizadorasCheque = finalizadorasCheque;
+    }
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
@@ -385,7 +396,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
                     + "    coalesce(p.provld, 0) validade,\n"
                     + "    p.trbid,\n"
-                    //+ "    p.procest cest,\n"
+                    + "    p.procest cest,\n"
                     + "    p.natcodigo piscofins_natrec\n"
                     + "FROM \n"
                     + "    produto p\n"
@@ -485,9 +496,13 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setPesoBruto(rst.getDouble("pesobruto"));
                             imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                             imp.setIcmsCreditoId(rst.getString("trbid"));
+                            imp.setIcmsCreditoForaEstadoId(rst.getString("trbid"));
                             imp.setIcmsDebitoId(rst.getString("trbid"));
+                            imp.setIcmsDebitoForaEstadoId(rst.getString("trbid"));
+                            imp.setIcmsDebitoForaEstadoNfId(rst.getString("trbid"));
+                            imp.setIcmsConsumidorId(rst.getString("trbid"));
 
-                            //imp.setCest(rst.getString("cest"));
+                            imp.setCest(rst.getString("cest"));
 
                             int[] pis = piscofins.get(rst.getString("id"));
 
@@ -979,20 +994,37 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    public static class FinalizadoraRecord {
+        
+        public String id;
+        public String descricao;
+        public boolean selected = false;
 
-    public List<String> getFinalizadora() throws Exception {
-        List<String> result = new ArrayList<>();
+        public FinalizadoraRecord(String id, String descricao) {
+            this.id = id;
+            this.descricao = descricao;
+        }
+
+    }
+
+    public List<FinalizadoraRecord> getFinalizadora() throws Exception {
+        List<FinalizadoraRecord> result = new ArrayList<>();
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select FZDCOD, FZDDES from finalizadora order by FZDCOD"
             )) {
                 while (rst.next()) {
-                    result.add(rst.getString("FZDCOD") + " - " + rst.getString("FZDDES"));
+                    result.add(new FinalizadoraRecord(
+                            rst.getString("FZDCOD"),
+                            rst.getString("FZDDES")
+                    ));
                 }
             }
-            return result;
         }
+        
+        return result;
     }
 
     @Override
@@ -1000,6 +1032,15 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            StringBuilder builder = new StringBuilder();
+            for(Iterator<String> iterator = this.finalizadorasRotativo.iterator(); iterator.hasNext();) {
+                builder
+                        .append("'")
+                        .append(iterator.next())
+                        .append("'");
+                if (iterator.hasNext())
+                    builder.append(",");
+            }
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "    CTRID,\n"
@@ -1013,7 +1054,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM CONTARECEBER\n"
                     + "WHERE \n" //(COALESCE(CTRVLRPAG,0) < CTRVLRNOM)
                     + "COALESCE(ctrvlrdev,0) > 0 "
-                    + "AND FZDCOD IN (" + FZDCOD + ") "
+                    + "AND FZDCOD IN (" + builder.toString() + ") "
                     + "union all\n"
                     + "SELECT\n"
                     + "     CTRID,\n"

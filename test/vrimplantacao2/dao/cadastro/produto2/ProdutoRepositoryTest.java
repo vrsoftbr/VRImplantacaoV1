@@ -374,7 +374,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterAliquota_MOCA() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA();
-        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquotaSimples(imp);
+        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquota(imp);
         
         assertEquals(20, actual.getAliquotaDebito().getCst());
         assertEquals(4, actual.getAliquotaDebito().getId());
@@ -416,7 +416,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterAliquota_MOCA2() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA2();
-        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquotaSimples(imp);
+        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquota(imp);
         
         assertEquals(20, actual.getAliquotaDebito().getCst());
         assertEquals(4, actual.getAliquotaDebito().getId());
@@ -458,7 +458,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterAliquota_ACEM() throws Exception {
         ProdutoIMP imp = getProdutoIMP_ACEM();
-        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquotaSimples(imp);
+        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquota(imp);
         
         assertEquals(0, actual.getAliquotaDebito().getCst());
         assertEquals(2, actual.getAliquotaDebito().getId());
