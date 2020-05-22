@@ -234,18 +234,12 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
-                                  <Component id="chkIMportarCodCliente" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
-                                  <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPermiteRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="324" max="32767" attributes="0"/>
+                          <EmptySpace pref="482" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -253,15 +247,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkIMportarCodCliente" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="184" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="168" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -278,11 +271,6 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClientePreferencialActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIMportarCodCliente">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Iimportar C&#xf3;digo do Cliente"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Bloqueado"/>
@@ -291,6 +279,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliIERG">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="IE/RG"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkPermiteRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
                   </Properties>
                 </Component>
               </SubComponents>
