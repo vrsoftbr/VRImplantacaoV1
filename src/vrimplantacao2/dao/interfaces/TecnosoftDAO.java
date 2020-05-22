@@ -768,36 +768,103 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    pa.id_parc id,\n" +
-                    "    p.id_forn,\n" +
-                    "    p.data,\n" +        
-                    "    pp.notafiscal,\n" +
-                    "    pa.parcela,\n" +
-                    "    pa.vencimento,\n" +
-                    "    pa.valtotal,\n" +
-                    "    pa.valpago,\n" +
-                    "    pa.valrestante,\n" +
-                    "    pa.jur_desc,\n" +
-                    "    p.juros\n" +
-                    "from\n" +
-                    "    pagamentos p\n" +
-                    "join pag_parcelas pp on p.id_pag = pp.id_pag\n" +
-                    "join parcelas pa on pp.id_par = pa.id_parc\n" +
-                    "where\n" +
-                    "    pa.valrestante > 0 and\n" +
-                    "    pa.id_loja = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "    pa.vencimento")) {
+                    "SELECT * FROM (SELECT\n" +
+                                    "    P.ID_PAR,\n" +
+                                    "    P.ID_COM,\n" +
+                                    "    P.VENCIMENTO,\n" +
+                                    "    c.data emissao,\n" +
+                                    "    P.VALTOTAL,\n" +
+                                    "    P.VALPAGO,\n" +
+                                    "    P.VALRESTANTE,\n" +
+                                    "    P.JUR_DESC,\n" +
+                                    "    P.PAGAMENTO,\n" +
+                                    "    P.ID_FORN,\n" +
+                                    "    P.ID_PAG,\n" +
+                                    "    P.ID_LOJA,\n" +
+                                    "    P.PARCELA,\n" +
+                                    "    F.RAZAOSOCIAL,\n" +
+                                    "    C.NOTAFISCAL,\n" +
+                                    "    CAST(0 AS INTEGER) AS CE,\n" +
+                                    "    P.CODIGO_BARRAS,\n" +
+                                    "    C.OBSERVACAO\n" +
+                                    "FROM\n" +
+                                    "    COM_PARCELAS P\n" +
+                                    "LEFT JOIN FORNECEDORES F ON\n" +
+                                    "    F.ID_FORN = P.ID_FORN\n" +
+                                    "LEFT JOIN COMPRAS C ON\n" +
+                                    "    C.ID_COM = P.ID_COM\n" +
+                                    "UNION\n" +
+                                    "SELECT\n" +
+                                    "    CAR.ID_CART_FAT AS ID_PAR,\n" +
+                                    "    CAST(-1 AS INTEGER) AS ID_COM,\n" +
+                                    "    CAR.VENCIMENTO,\n" +
+                                    "    CAST(NULL AS DATE) emissao,\n" +
+                                    "    CAR.VALTOTAL,\n" +
+                                    "    CAR.VALPAGO,\n" +
+                                    "    CAR.VALRESTANTE,\n" +
+                                    "    CAST(0 AS FLOAT)AS JUR_DESC,\n" +
+                                    "    CAST(NULL AS DATE) AS PAGAMENTOS,\n" +
+                                    "    0 AS ID_FORN,\n" +
+                                    "    CAR.ID_PAG,\n" +
+                                    "    CAR.ID_LOJA,\n" +
+                                    "    CAST('' AS VARCHAR(7)) AS PARCELA,\n" +
+                                    "    CAST(CART.DESCRICAO AS VARCHAR(60)) AS FORNECEDORES,\n" +
+                                    "    CAST('' AS VARCHAR(10))AS NOTAFISCAL,\n" +
+                                    "    CAST(1 AS INTEGER) AS CE,\n" +
+                                    "    CAST('' AS VARCHAR(50))AS CODIGO_BARRAS,\n" +
+                                    "    CAST('' AS VARCHAR(80)) AS OBSERVACAO\n" +
+                                    "FROM\n" +
+                                    "    CARTAO_EMP_FATURA CAR\n" +
+                                    "LEFT JOIN CARTAO_EMPRES CART ON\n" +
+                                    "    CAR.ID_CART = CART.ID_CART\n" +
+                                    "UNION\n" +
+                                    "SELECT\n" +
+                                    "    CP.ID_PAR,\n" +
+                                    "    CP.ID_COM,\n" +
+                                    "    CP.VENCIMENTO,\n" +
+                                    "    PAG.data emissao,\n" +
+                                    "    CP.VALTOTAL,\n" +
+                                    "    CP.VALPAGO,\n" +
+                                    "    CP.VALRESTANTE,\n" +
+                                    "    CP.JUR_DESC,\n" +
+                                    "    CP.PAGAMENTO,\n" +
+                                    "    CP.ID_FORN,\n" +
+                                    "    CP.ID_PAG,\n" +
+                                    "    CP.ID_LOJA,\n" +
+                                    "    CP.PARCELA,\n" +
+                                    "    FORN.RAZAOSOCIAL,\n" +
+                                    "    COM.NOTAFISCAL,\n" +
+                                    "    CAST(3 AS INTEGER) AS CE,\n" +
+                                    "    CP.CODIGO_BARRAS,\n" +
+                                    "    COM.OBSERVACAO\n" +
+                                    "FROM\n" +
+                                    "    PAGAMENTOS PAG\n" +
+                                    "LEFT JOIN PAG_TIPO PG ON\n" +
+                                    "    PG.ID_PAG = PAG.ID_PAG\n" +
+                                    "LEFT JOIN PAG_PARCELAS PP ON\n" +
+                                    "    PP.ID_PAG = PG.ID_PAG\n" +
+                                    "LEFT JOIN COM_PARCELAS CP ON\n" +
+                                    "    CP.ID_PAR = PP.ID_PAR\n" +
+                                    "LEFT JOIN COMPRAS COM ON\n" +
+                                    "    COM.ID_COM = CP.ID_COM\n" +
+                                    "LEFT JOIN FORNECEDORES FORN ON\n" +
+                                    "    FORN.ID_FORN = COM.ID_FORN\n" +
+                                    "WHERE\n" +
+                                    "    PG.TIPO = 'Débito em Conta'\n" +
+                                    "    AND CP.VENCIMENTO >= CURRENT_DATE) PAG\n" +
+                                    "WHERE\n" +
+                                    "    pag.VALRESTANTE > 0 and\n" +
+                                    "    pag.id_loja = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     
-                    imp.setId(rs.getString("id"));
-                    imp.setIdFornecedor(rs.getString("id_forn"));
-                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valrestante"));
-                    imp.setDataEmissao(rs.getDate("data"));
-                    imp.setDataEntrada(rs.getDate("data"));
+                    imp.setId(rs.getString("ID_PAR"));
+                    imp.setIdFornecedor(rs.getString("ID_FORN"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("VALRESTANTE"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataEntrada(rs.getDate("emissao"));
                     imp.setNumeroDocumento(rs.getString("notafiscal"));
+                    imp.setObservacao("PARCELA: " + rs.getString("PARCELA") + " - OBS.: " + rs.getString("OBSERVACAO") == null ? "" : rs.getString("OBSERVACAO"));
                     
                     result.add(imp);
                 }
