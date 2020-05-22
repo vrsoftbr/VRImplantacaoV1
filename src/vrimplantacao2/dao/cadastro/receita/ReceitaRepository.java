@@ -47,7 +47,7 @@ public class ReceitaRepository {
         prodAntDAO.setImportSistema(provider.getSistema());
         prodAntDAO.setImportLoja(provider.getLoja());
 
-        provider.setMessage("Receita...Gravando receitas...", receita.size());
+        provider.setMessage("Receita...Gravando receitas de produto...", receita.size());
 
         provider.begin();
 
@@ -56,7 +56,7 @@ public class ReceitaRepository {
             for (ReceitaIMP imp : receita) {
 
                 ReceitaAnteriorVO anterior = anteriores.get(imp.getImportid());
-
+                System.out.println("AQUI " + imp.getImportid());
                 if (anterior == null) {
 
                     /* gravando cabeçalho */
@@ -65,7 +65,12 @@ public class ReceitaRepository {
                     vo.setId(id);
                     provider.gravar(vo);
 
+                    System.out.println("AQUI " + vo.getId());
+                    
                     if (!receitaLoja.containsKey(vo.getId(), provider.getLojaVR())) {
+                        
+                        System.out.println("ID " + vo.getId() + " LOJA " + provider.getLojaVR());
+                        
                         ReceitaLojaVO voLoja = new ReceitaLojaVO();
                         voLoja.setId_receita(vo.getId());
                         voLoja.setId_loja(provider.getLojaVR());
