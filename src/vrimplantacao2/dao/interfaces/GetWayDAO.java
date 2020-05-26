@@ -41,6 +41,7 @@ import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
@@ -1336,19 +1337,19 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setObservacao(imp.getObservacao()
                                 + " - Prazo visita: " + rst.getInt("PVISITA"));
                     }
-                    /*imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
+                    imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
                      + Utils.acertarTexto(rst.getString("DESCRICAOPAG").isEmpty() ? "0" : rst.getString("DESCRICAOPAG"))
-                     + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));*/
+                     + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
 
                     imp.setDatacadastro(rst.getDate("DTCAD"));
-                    //imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
-                    imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                    imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
+                    //imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
 
-                    /*if ((rst.getString("simples").equals("S"))) {
-                     imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
-                     } else {
-                     imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
-                     }*/
+                    if ((rst.getString("simples").equals("S"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    }
                     imp.addTelefone("FAX", rst.getString("FAX"));
                     if ((rst.getString("CONTATO") != null)
                             && (!rst.getString("CONTATO").trim().isEmpty())) {
