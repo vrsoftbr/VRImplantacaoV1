@@ -30,6 +30,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -206,21 +207,24 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "t.trbid,\n"
-                    + "t.trbdes,\n"
-                    + "t.trbtabb cst,\n"
-                    + "t.trbalq aliquota,\n"
-                    + "t.trbred reducao\n"
-                    + "from\n"
-                    + "TRIBUTACAO t\n"
-                    + "where t.trbid in (select trbid from produto)\n"
-                    + "order by 1"
+                    "select\n" +
+                    "	t.trbid,\n" +
+                    "	t.trbdes,\n" +
+                    "	t.trbtabb cst,\n" +
+                    "	t.trbalq aliquota,\n" +
+                    "	t.trbred reducao,\n" +
+                    "	coalesce(t.TRBALQFCP, 0) fcp\n" +
+                    "from\n" +
+                    "	TRIBUTACAO t\n" +
+                    "where\n" +
+                    "	t.trbid in (select trbid from produto)\n" +
+                    "order by\n" +
+                    "	1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("trbid"),
-                            rst.getString("trbdes"),
+                            String.format("%s - FCP %.2f", rst.getString("trbdes"), rst.getDouble("fcp")),
                             rst.getInt("cst"),
                             rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
@@ -1052,7 +1056,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ctrvlrdev,\n"
                     + "    ctrobs\n"
                     + "FROM CONTARECEBER\n"
-                    + "WHERE \n" //(COALESCE(CTRVLRPAG,0) < CTRVLRNOM)
+                    + "WHERE \n"
                     + "COALESCE(ctrvlrdev,0) > 0 "
                     + "AND FZDCOD IN (" + builder.toString() + ") "
                     + "union all\n"
@@ -1068,7 +1072,6 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM CONTARECEBER\n"
                     + "WHERE COALESCE(ctrvlrdev,0) > 0\n"
                     + "AND FZDCOD is null\n"
-                    + "" //+ "    (COALESCE(FZDCOD,'005') IN ('005'))"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1081,6 +1084,90 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rst.getDate("ctrdatvnc"));
                     imp.setValor(rst.getDouble("ctrvlrdev"));
                     imp.setObservacao(rst.getString("ctrobs"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+
+        try (Statement st = tipoConexao.getConnection().createStatement()) {            
+            try (ResultSet rs = st.executeQuery(
+                    "SELECT \n" +
+                    "	transacao.trnseq sequencia,\n" +
+                    "	transacao.cxanum numerocaixa,\n" +
+                    "	transacao.trndat data,\n" +
+                    "	transacao.trnseqeqp,\n" +
+                    "	transacao.cxanumeqp,\n" +
+                    "	transacao.funcod,\n" +
+                    "	transacao.trnfunaut,\n" +
+                    "	transacao.clicod,\n" +
+                    "	cliente.clides,\n" +
+                    "	finalizacao.fzdtext1 banco,\n" +
+                    "	finalizacao.fzdtext2 agencia,\n" +
+                    "	finalizacao.fzdtext3 conta,\n" +
+                    "	finalizacao.fzdtext4 numerocheque,\n" +
+                    "	finalizacao.fzddatven datavencimento,\n" +
+                    "	finalizacao.fzdvlr valor,\n" +
+                    "	finalizacao.fzdesp,\n" +
+                    "	finalizacao.fzdcod,\n" +
+                    "	finalizadora.fzddes observacao,\n" +
+                    "	finalizadora.fzdlercmc7,\n" +
+                    "	iteplapag.ipptxt1,\n" +
+                    "	iteplapag.ipptxt2,\n" +
+                    "	iteplapag.ipptxt3,\n" +
+                    "	iteplapag.ipptxt4,\n" +
+                    "	iteplapag.ippvlrlan,\n" +
+                    "	iteplapag.ippdatven\n" +
+                    "FROM transacao\n" +
+                    "	LEFT OUTER JOIN finalizacao ON (\n" +
+                    "		transacao.trnseq=finalizacao.trnseq\n" +
+                    "		AND transacao.trndat=finalizacao.trndat\n" +
+                    "		AND transacao.cxanum=finalizacao.cxanum\n" +
+                    "	)\n" +
+                    "	LEFT OUTER JOIN iteplapag ON (\n" +
+                    "		finalizacao.trnseq=iteplapag.trnseq\n" +
+                    "		AND finalizacao.trndat=iteplapag.trndat\n" +
+                    "		AND finalizacao.cxanum=iteplapag.cxanum\n" +
+                    "		AND finalizacao.fzdseq=iteplapag.seqfzd)\n" +
+                    "	LEFT OUTER JOIN cliente ON (\n" +
+                    "		cliente.clicod=transacao.clicod\n" +
+                    "	)\n" +
+                    "	LEFT OUTER JOIN finalizadora ON (\n" +
+                    "		finalizadora.fzdcod=finalizacao.fzdcod\n" +
+                    "	)\n" +
+                    "WHERE \n" +
+                    "	transacao.trntip <> '7'\n" +
+                    "	AND finalizacao.fzdesp = '1'\n" +
+                    "ORDER BY\n" +
+                    "	transacao.TRNDAT, transacao.trnseq"
+            )) {
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                while (rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+
+                    imp.setId(
+                            String.format(
+                                    "%s-%s-%s",
+                                    rs.getString("sequencia"),
+                                    rs.getString("numerocaixa"),
+                                    df.format(rs.getDate("data"))
+                            )
+                    );
+                    imp.setEcf(rs.getString("numerocaixa"));
+                    imp.setDate(rs.getDate("data"));
+                    imp.setBanco(Utils.stringToInt(rs.getString("banco")));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setConta(rs.getString("conta"));
+                    imp.setNumeroCheque(rs.getString("numerocheque"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }

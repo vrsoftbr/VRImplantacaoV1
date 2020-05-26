@@ -324,6 +324,9 @@ public class SysPdvGUI extends VRInternalFrame {
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
+                        }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
