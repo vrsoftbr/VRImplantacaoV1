@@ -52,7 +52,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         
         /*try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select '1' id, 'LOJA 01' razao"
+                    ""
             )) {
                 while (rst.next()) {
                     System.out.println("Entrou...");
@@ -107,8 +107,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
@@ -120,12 +119,29 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "    id_ecf,\n" +
-                    "    descricao_tribut desc\n" +
+                    "    distinct\n" +
+                    "    pt.icms_aliquota||pt.icms_st||pt.icms_basecalc id,\n" +
+                    "    'ICMS: ' || round(pt.icms_aliquota, 2) || ' | CST: ' || pt.icms_st ||\n" +
+                    "    ' | RED: ' || round(pt.icms_basecalc, 2) descricao,\n" +
+                    "    pt.icms_st cst,\n" +
+                    "    pt.icms_aliquota icms,\n" +
+                    "    pt.icms_basecalc reducao\n" +
                     "from\n" +
-                    "    tribut_ecf")) {
+                    "    prod_tributos pt\n" +
+                    "where\n" +
+                    "    pt.estado = 'SP' and\n" +
+                    "    pt.icms_st is not null and\n" +
+                    "    pt.icms_aliquota is not null and\n" +
+                    "    pt.icms_basecalc is not null\n" +
+                    "order by\n" +
+                    "    pt.icms_st")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id_ecf"), rs.getString("desc")));
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"),
+                            rs.getInt("cst"),
+                            rs.getDouble("icms"),
+                            rs.getDouble("reducao")));
                 }
             }
         }
@@ -206,14 +222,22 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "    p.id_dep merc1,\n" +
                     "    p.id_set merc2,\n" +
                     "    p.id_sub merc3,\n" +
-                    "    p.id_ecf idicms,\n" +
+                    "    p.id_ecf idicms_old,\n" +
+                    "    coalesce(pt.icms_aliquota, 0)||\n" +
+                    "    coalesce(pt.icms_st, 0)||\n" +
+                    "    coalesce(pt.icms_basecalc, 0) idicms," + 
+                    "    coalesce(pt.icms_aliquota, 0) icms_debito,\n" +
+                    "    coalesce(pt.icms_st, 0) cst_debito,\n" +
+                    "    coalesce(pt.icms_basecalc, 0) reducao_debito,\n" +       
                     "    p.ncm_sh ncm,\n" +
                     "    p.cest,\n" +
                     "    p.nat_receita_pis naturezareceita\n" +
                     "from\n" +
                     "    produtos p\n" +
+                    "join prod_tributos pt on p.id_prod = pt.id_prod\n" +        
                     "left join unidades un on p.id_unid = un.id_unid\n" +
                     "left join unidades unc on p.id_unid_forn = unc.id_unid\n" +
+                    "where pt.estado = 'SP'\n" +       
                     "order by\n" +
                     "    1")) {
                 while(rs.next()) {
@@ -233,18 +257,35 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     imp.setSituacaoCadastro(rs.getInt("desativar") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoSemImposto(rs.getDouble("custoinicial"));
                     imp.setCustoComImposto(rs.getDouble("custofinal"));
-                    imp.setPiscofinsCstCredito(rs.getString("pis_st"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setPiscofinsCstDebito(rs.getString("pis_st"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setIcmsDebitoId(rs.getString("idicms"));
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    
+                    /*imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                    imp.setIcmsCstSaida(rs.getInt("cst_debito"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("reducao_debito"));
+                    if(imp.getIcmsCstSaida() == 0) {
+                        imp.setIcmsReducaoSaida(0);
+                    }
+                    
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_debito"));
+                    imp.setIcmsCstEntrada(rs.getInt("cst_debito"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("reducao_debito"));
+                    if(imp.getIcmsCstEntrada() == 0) {
+                        imp.setIcmsReducaoEntrada(0);
+                    }*/
+                    
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
@@ -435,6 +476,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "    c.data_nascimento,\n" +
                     "    c.desativar,\n" +
                     "    c.limite_credito,\n" +
+                    "    coalesce(c.crediario, 0) crediario,\n" +        
                     "    c.contato,\n" +
                     "    c.observacoes,\n" +
                     "    c.pai,\n" +
@@ -484,6 +526,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setObservacao(rs.getString("observacoes") == null ? "" : rs.getString("observacoes"));
+                    imp.setPermiteCreditoRotativo(rs.getInt("crediario") == 1);
                     
                     result.add(imp);
                 }
@@ -725,36 +768,103 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    pa.id_parc id,\n" +
-                    "    p.id_forn,\n" +
-                    "    p.data,\n" +        
-                    "    pp.notafiscal,\n" +
-                    "    pa.parcela,\n" +
-                    "    pa.vencimento,\n" +
-                    "    pa.valtotal,\n" +
-                    "    pa.valpago,\n" +
-                    "    pa.valrestante,\n" +
-                    "    pa.jur_desc,\n" +
-                    "    p.juros\n" +
-                    "from\n" +
-                    "    pagamentos p\n" +
-                    "join pag_parcelas pp on p.id_pag = pp.id_pag\n" +
-                    "join parcelas pa on pp.id_par = pa.id_parc\n" +
-                    "where\n" +
-                    "    pa.valrestante > 0 and\n" +
-                    "    pa.id_loja = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "    pa.vencimento")) {
+                    "SELECT * FROM (SELECT\n" +
+                                    "    P.ID_PAR,\n" +
+                                    "    P.ID_COM,\n" +
+                                    "    P.VENCIMENTO,\n" +
+                                    "    c.data emissao,\n" +
+                                    "    P.VALTOTAL,\n" +
+                                    "    P.VALPAGO,\n" +
+                                    "    P.VALRESTANTE,\n" +
+                                    "    P.JUR_DESC,\n" +
+                                    "    P.PAGAMENTO,\n" +
+                                    "    P.ID_FORN,\n" +
+                                    "    P.ID_PAG,\n" +
+                                    "    P.ID_LOJA,\n" +
+                                    "    P.PARCELA,\n" +
+                                    "    F.RAZAOSOCIAL,\n" +
+                                    "    C.NOTAFISCAL,\n" +
+                                    "    CAST(0 AS INTEGER) AS CE,\n" +
+                                    "    P.CODIGO_BARRAS,\n" +
+                                    "    C.OBSERVACAO\n" +
+                                    "FROM\n" +
+                                    "    COM_PARCELAS P\n" +
+                                    "LEFT JOIN FORNECEDORES F ON\n" +
+                                    "    F.ID_FORN = P.ID_FORN\n" +
+                                    "LEFT JOIN COMPRAS C ON\n" +
+                                    "    C.ID_COM = P.ID_COM\n" +
+                                    "UNION\n" +
+                                    "SELECT\n" +
+                                    "    CAR.ID_CART_FAT AS ID_PAR,\n" +
+                                    "    CAST(-1 AS INTEGER) AS ID_COM,\n" +
+                                    "    CAR.VENCIMENTO,\n" +
+                                    "    CAST(NULL AS DATE) emissao,\n" +
+                                    "    CAR.VALTOTAL,\n" +
+                                    "    CAR.VALPAGO,\n" +
+                                    "    CAR.VALRESTANTE,\n" +
+                                    "    CAST(0 AS FLOAT)AS JUR_DESC,\n" +
+                                    "    CAST(NULL AS DATE) AS PAGAMENTOS,\n" +
+                                    "    0 AS ID_FORN,\n" +
+                                    "    CAR.ID_PAG,\n" +
+                                    "    CAR.ID_LOJA,\n" +
+                                    "    CAST('' AS VARCHAR(7)) AS PARCELA,\n" +
+                                    "    CAST(CART.DESCRICAO AS VARCHAR(60)) AS FORNECEDORES,\n" +
+                                    "    CAST('' AS VARCHAR(10))AS NOTAFISCAL,\n" +
+                                    "    CAST(1 AS INTEGER) AS CE,\n" +
+                                    "    CAST('' AS VARCHAR(50))AS CODIGO_BARRAS,\n" +
+                                    "    CAST('' AS VARCHAR(80)) AS OBSERVACAO\n" +
+                                    "FROM\n" +
+                                    "    CARTAO_EMP_FATURA CAR\n" +
+                                    "LEFT JOIN CARTAO_EMPRES CART ON\n" +
+                                    "    CAR.ID_CART = CART.ID_CART\n" +
+                                    "UNION\n" +
+                                    "SELECT\n" +
+                                    "    CP.ID_PAR,\n" +
+                                    "    CP.ID_COM,\n" +
+                                    "    CP.VENCIMENTO,\n" +
+                                    "    PAG.data emissao,\n" +
+                                    "    CP.VALTOTAL,\n" +
+                                    "    CP.VALPAGO,\n" +
+                                    "    CP.VALRESTANTE,\n" +
+                                    "    CP.JUR_DESC,\n" +
+                                    "    CP.PAGAMENTO,\n" +
+                                    "    CP.ID_FORN,\n" +
+                                    "    CP.ID_PAG,\n" +
+                                    "    CP.ID_LOJA,\n" +
+                                    "    CP.PARCELA,\n" +
+                                    "    FORN.RAZAOSOCIAL,\n" +
+                                    "    COM.NOTAFISCAL,\n" +
+                                    "    CAST(3 AS INTEGER) AS CE,\n" +
+                                    "    CP.CODIGO_BARRAS,\n" +
+                                    "    COM.OBSERVACAO\n" +
+                                    "FROM\n" +
+                                    "    PAGAMENTOS PAG\n" +
+                                    "LEFT JOIN PAG_TIPO PG ON\n" +
+                                    "    PG.ID_PAG = PAG.ID_PAG\n" +
+                                    "LEFT JOIN PAG_PARCELAS PP ON\n" +
+                                    "    PP.ID_PAG = PG.ID_PAG\n" +
+                                    "LEFT JOIN COM_PARCELAS CP ON\n" +
+                                    "    CP.ID_PAR = PP.ID_PAR\n" +
+                                    "LEFT JOIN COMPRAS COM ON\n" +
+                                    "    COM.ID_COM = CP.ID_COM\n" +
+                                    "LEFT JOIN FORNECEDORES FORN ON\n" +
+                                    "    FORN.ID_FORN = COM.ID_FORN\n" +
+                                    "WHERE\n" +
+                                    "    PG.TIPO = 'Débito em Conta'\n" +
+                                    "    AND CP.VENCIMENTO >= CURRENT_DATE) PAG\n" +
+                                    "WHERE\n" +
+                                    "    pag.VALRESTANTE > 0 and\n" +
+                                    "    pag.id_loja = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     
-                    imp.setId(rs.getString("id"));
-                    imp.setIdFornecedor(rs.getString("id_forn"));
-                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valrestante"));
-                    imp.setDataEmissao(rs.getDate("data"));
-                    imp.setDataEntrada(rs.getDate("data"));
+                    imp.setId(rs.getString("ID_PAR"));
+                    imp.setIdFornecedor(rs.getString("ID_FORN"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("VALRESTANTE"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataEntrada(rs.getDate("emissao"));
                     imp.setNumeroDocumento(rs.getString("notafiscal"));
+                    imp.setObservacao("PARCELA: " + rs.getString("PARCELA") + " - OBS.: " + rs.getString("OBSERVACAO") == null ? "" : rs.getString("OBSERVACAO"));
                     
                     result.add(imp);
                 }

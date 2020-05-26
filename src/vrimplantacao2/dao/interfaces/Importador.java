@@ -989,7 +989,7 @@ public class Importador {
         rep.importar(receita, opt);
     }
     
-    public void importarReceitas() throws Exception {
+    public void importarReceitasProducao() throws Exception {
         ProgressBar.setStatus("Receitas...Gerando listagem...");
         List<receita.ReceitaIMP> receitas = getInterfaceDAO().getReceitasProducao();
         receita2.ReceitaRepository rep = new receita2.ReceitaRepository(
@@ -997,6 +997,18 @@ public class Importador {
             getLojaOrigem(),
             getLojaVR()
         );
+        rep.importar(receitas);
+    }
+
+    public void importarReceitas() throws Exception {
+        ProgressBar.setStatus("Receitas...Gerando listagem...");
+        List<ReceitaIMP> receitas = getInterfaceDAO().getReceitas();
+        ReceitaRepositoryProvider provider = new ReceitaRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        ReceitaRepository rep = new ReceitaRepository(provider);
         rep.importar(receitas);
     }
     

@@ -172,7 +172,7 @@ public class LogTECGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    logtecDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
+                    //logtecDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
                     
                     Importador importador = new Importador(logtecDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
