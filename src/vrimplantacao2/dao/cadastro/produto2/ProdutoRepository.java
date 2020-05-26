@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -17,11 +16,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
-import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
-import vrimplantacao2.vo.cadastro.LogProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
@@ -51,7 +48,6 @@ public class ProdutoRepository {
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private boolean naoTransformarEANemUN = false;
-    private boolean usarConversaoDeAliquotaSimples = true;
     private boolean importarMenoresQue7Digitos = false;
     private boolean copiarIcmsDebitoParaCredito = false;
     public boolean importarSomenteLoja = false;
@@ -80,7 +76,6 @@ public class ProdutoRepository {
     }
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
-        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
@@ -251,7 +246,6 @@ public class ProdutoRepository {
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
         Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
-        usarConversaoDeAliquotaSimples = !op.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
@@ -465,7 +459,6 @@ public class ProdutoRepository {
      * @throws Exception
      */
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
-        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
@@ -615,7 +608,6 @@ public class ProdutoRepository {
      * @throws Exception
      */
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
-        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         
         provider.begin();
@@ -791,132 +783,14 @@ public class ProdutoRepository {
         }
     }
     
+    /**
+     * Converte um {@link ProdutoIMP} em {@link ProdutoAliquotaVO}.
+     *
+     * @param imp
+     * @return
+     * @throws Exception
+     */
     public ProdutoAliquotaVO converterAliquota(ProdutoIMP imp) throws Exception {
-        if (usarConversaoDeAliquotaSimples) {
-            return converterAliquotaSimples(imp);
-        } else {
-            return converterAliquotaCompleta(imp);
-        }
-    }
-    
-    /**
-     * Converte um {@link ProdutoIMP} em {@link ProdutoAliquotaVO}.
-     *
-     * @param imp
-     * @return
-     * @throws Exception
-     */
-    public ProdutoAliquotaVO converterAliquotaSimples(ProdutoIMP imp) throws Exception {
-        ProdutoAliquotaVO aliquota = new ProdutoAliquotaVO();
-        aliquota.setEstado(provider.tributo().getUf(getLojaVR()));
-
-        Icms aliqCredito;
-        Icms aliqDebito;
-        Icms debitoForaEstado;
-        Icms creditoForaEstado;
-        Icms debitoForaEstadoNfe;
-        Icms consumidor;
-
-        String idIcmsDebito = imp.getIcmsDebitoId();
-        String idIcmsCredito = imp.getIcmsCreditoId();
-        String idIcmsCreditoFornecedor = imp.getIcmsCreditoId();
-
-        if (idIcmsDebito != null) {
-
-            aliqDebito = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
-            debitoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
-            debitoForaEstadoNfe = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
-
-            int icmsCstSaida = aliqDebito.getCst();
-            double icmsAliqSaida = aliqDebito.getAliquota();
-            double icmsReducaoSaida = aliqDebito.getReduzido();
-
-            if (icmsCstSaida == 20) {
-                double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);
-                consumidor = provider.tributo().getIcms(0, aliq, 0);
-            } else {
-                consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
-            }
-        } else {
-            int icmsCstSaida = imp.getIcmsCstSaida();
-            double icmsAliqSaidaForaEstado = 0;
-            double icmsAliqSaida = 0;
-            double icmsReducaoSaida = 0;
-
-            if (icmsCstSaida == 20 || icmsCstSaida == 0) {
-                icmsAliqSaida = imp.getIcmsAliqSaida();
-                icmsReducaoSaida = imp.getIcmsReducaoSaida();
-                icmsAliqSaidaForaEstado = imp.getIcmsAliqSaidaForaEstado();
-            }
-            
-            aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
-            debitoForaEstado = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaidaForaEstado, icmsReducaoSaida);
-            debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaidaForaEstado, icmsReducaoSaida);
-
-            if (imp.getIcmsCstConsumidor() == -1) {
-                if (icmsCstSaida == 20) {
-                    double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
-                    consumidor = provider.tributo().getIcms(0, aliq, 0);
-                } else {
-                    consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
-                }
-            } else {
-                consumidor = provider.tributo().getIcms(imp.getIcmsCstConsumidor(), imp.getIcmsAliqConsumidor(), 0);
-            }
-        }
-        
-        if (copiarIcmsDebitoParaCredito) {
-            aliqCredito = aliqDebito;
-            creditoForaEstado = debitoForaEstado;
-        } else {
-            if (idIcmsCredito != null) {
-                aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
-                creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
-            } else {
-                int icmsCstEntrada = imp.getIcmsCstEntrada();
-                double icmsAliqEntrada = 0;
-                double icmsReducaoEntrada = 0;
-
-                if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
-                    icmsAliqEntrada = imp.getIcmsAliqEntrada();
-                    icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
-                }
-
-                aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
-                creditoForaEstado = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
-            }
-        }
-
-        aliquota.setAliquotaCredito(aliqCredito);
-        aliquota.setAliquotaDebito(aliqDebito);
-        aliquota.setAliquotaDebitoForaEstado(debitoForaEstado);
-        aliquota.setAliquotaCreditoForaEstado(creditoForaEstado);
-        aliquota.setAliquotaDebitoForaEstadoNf(debitoForaEstadoNfe);
-        aliquota.setAliquotaConsumidor(consumidor);
-        
-        if(idIcmsCreditoFornecedor != null) {
-            aliquota.setAliquotaCreditoFornecedor(idIcmsCreditoFornecedor);
-        }
-        
-        aliquota.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
-        
-        /*int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
-        aliquota.setBeneficio(idBeneficio);                        
-        if(idBeneficio != 0) {
-            provider.aliquota().salvarAliquotaBeneficio(aliquota);
-        }*/
-        
-        return aliquota;
-    }
-
-    /**
-     * Converte um {@link ProdutoIMP} em {@link ProdutoAliquotaVO}.
-     *
-     * @param imp
-     * @return
-     * @throws Exception
-     */
-    public ProdutoAliquotaVO converterAliquotaCompleta(ProdutoIMP imp) throws Exception {
         ProdutoAliquotaVO aliquota = new ProdutoAliquotaVO();
         aliquota.setEstado(provider.tributo().getUf(getLojaVR()));
 

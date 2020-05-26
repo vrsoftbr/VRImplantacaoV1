@@ -594,6 +594,14 @@ public class ProdutoAnteriorDAO {
     public void salvar(ProdutoAnteriorVO anterior) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
+            
+            //<editor-fold defaultstate="collapsed" desc="Conflito de Insert - Melhoria">
+            /*INSERT INTO cliente VALUES (2, 'MARIAA')
+            ON CONFLICT (id)
+            DO
+              UPDATE SET nome = 'MARIAA';*/
+            //</editor-fold>
+
             sql.setTableName("codant_produto");
             sql.setSchema("implantacao");
             sql.put("impsistema", anterior.getImportSistema());

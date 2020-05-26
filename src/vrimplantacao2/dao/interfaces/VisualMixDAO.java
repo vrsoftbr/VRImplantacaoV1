@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -38,6 +40,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 /**
  *
@@ -89,11 +93,15 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
                     OpcaoProduto.FABRICANTE,
-                    OpcaoProduto.ASSOCIADO
+                    OpcaoProduto.ASSOCIADO,
+                    OpcaoProduto.COMPRADOR,
+                    OpcaoProduto.COMPRADOR_PRODUTO,
+                    OpcaoProduto.RECEITA,
+                    OpcaoProduto.RECEITA_BALANCA
                 }
         ));
     }
-       
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -125,7 +133,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " al.PERCENTUAL as aliquota, \n"
                     + "	al.REDUCAO as reducao \n"
                     + "from dbo.Aliquotas_NF al\n"
-                    + "where codigo in (select Aliquota_NF from dbo.Produtos)\n"        
+                    + "where codigo in (select Aliquota_NF from dbo.Produtos)\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -285,7 +293,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.CstPisCofinsEntrada, \n"
                     + " p.CstPisCofinsSaida, \n"
                     + " p.NaturezaReceita,\n"
-                    + " cast(p.Fabricante as bigint) as idfabricante\n"
+                    + " cast(p.Fabricante as bigint) as idfabricante,\n"
+                    + " p.Comprador as idcomprador\n"
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -304,14 +313,14 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
 
                     String ean = rst.getString("Codigo_Automacao") + rst.getString("Digito_Automacao");
-                    
+
                     if ((rst.getString("Codigo_Automacao") != null)
                             && (!rst.getString("Codigo_Automacao").trim().isEmpty())
                             && (rst.getString("Digito_Automacao") != null)
                             && (!rst.getString("Digito_Automacao").trim().isEmpty())) {
-                        
+
                         long codigoProduto;
-                        codigoProduto = Long.parseLong(ean.substring(0, ean.length() -1));
+                        codigoProduto = Long.parseLong(ean.substring(0, ean.length() - 1));
                         if (codigoProduto <= Integer.MAX_VALUE) {
                             produtoBalanca = produtosBalanca.get((int) codigoProduto);
                         } else {
@@ -335,7 +344,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca(false);
                         imp.setEan(ean);
                     }
-                    
+
                     //imp.seteBalanca(rst.getInt("balanca") > 0);
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
@@ -347,6 +356,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("Mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
+                    imp.setIdComprador(rst.getString("idcomprador"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
@@ -361,9 +371,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceita"));
                     imp.setIcmsDebitoId(rst.getString("Aliquota_NF"));
                     imp.setIcmsCreditoId(rst.getString("Aliquota_NF"));
-                    
+
                     imp.setPautaFiscalId(imp.getImportId());
-                    
+
                     result.add(imp);
                 }
             }
@@ -434,7 +444,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIva(rst.getDouble("mxf_icms_iva_valor"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setUf(Parametros.get().getUfPadraoV2().getSigla());
-                    
+
                     switch (rst.getInt("mxf_icms_cst_s")) {
                         case 0:
                             imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
@@ -481,7 +491,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
                             break;
                     }
-
 
                     switch (rst.getInt("mxf_icms_cst_e")) {
                         case 0:
@@ -547,12 +556,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
                             break;
                     }
-                    
+
                     //imp.setAliquotaDebito(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
                     //imp.setAliquotaDebitoForaEstado(rst.getInt("mxf_icms_cst_s"), rst.getDouble("mxf_icms_alq_s"), rst.getDouble("mxf_icms_rbc_s"));
                     //imp.setAliquotaCredito(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
                     //imp.setAliquotaCreditoForaEstado(rst.getInt("mxf_icms_cst_e"), rst.getDouble("mxf_icms_alq_e"), rst.getDouble("mxf_icms_rbc_e"));
-                    
                     result.add(imp);
                 }
             }
@@ -675,34 +683,34 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("TeleContato").trim().isEmpty())) {
                         imp.addTelefone(rst.getString("Contato") == null ? "CONTATO" : rst.getString("Contato"), rst.getString("TeleContato"));
                     }
-                    
+
                     // Dados do Supervisor
                     imp.addContato(
-                            rst.getString("Supervisor") == null ? "" : rst.getString("Supervisor"), 
-                            rst.getString("TelSupervisor") == null ? "" : rst.getString("TelSupervisor"), 
-                            rst.getString("CelSupervisor") == null ? "" : rst.getString("CelSupervisor"), 
-                            TipoContato.COMERCIAL, 
+                            rst.getString("Supervisor") == null ? "" : rst.getString("Supervisor"),
+                            rst.getString("TelSupervisor") == null ? "" : rst.getString("TelSupervisor"),
+                            rst.getString("CelSupervisor") == null ? "" : rst.getString("CelSupervisor"),
+                            TipoContato.COMERCIAL,
                             rst.getString("EmailSupervisor") == null ? "" : rst.getString("EmailSupervisor").toLowerCase()
                     );
 
                     // Dados do Vendedor
                     imp.addContato(
-                            rst.getString("Vendedor") == null ? "" : rst.getString("Vendedor"), 
-                            rst.getString("TelVendedor") == null ? "" : rst.getString("TelVendedor"), 
-                            rst.getString("CelVendedor") == null ? "" : rst.getString("CelVendedor"), 
-                            TipoContato.COMERCIAL, 
+                            rst.getString("Vendedor") == null ? "" : rst.getString("Vendedor"),
+                            rst.getString("TelVendedor") == null ? "" : rst.getString("TelVendedor"),
+                            rst.getString("CelVendedor") == null ? "" : rst.getString("CelVendedor"),
+                            TipoContato.COMERCIAL,
                             rst.getString("EmailVendedor") == null ? "" : rst.getString("EmailVendedor").toLowerCase()
                     );
 
                     // Dados do Gerente
                     imp.addContato(
-                            rst.getString("Gerente") == null ? "" : rst.getString("Gerente"), 
-                            rst.getString("TelGerente") == null ? "" : rst.getString("TelGerente"), 
-                            rst.getString("CelGerente") == null ? "" : rst.getString("CelGerente"), 
-                            TipoContato.COMERCIAL, 
+                            rst.getString("Gerente") == null ? "" : rst.getString("Gerente"),
+                            rst.getString("TelGerente") == null ? "" : rst.getString("TelGerente"),
+                            rst.getString("CelGerente") == null ? "" : rst.getString("CelGerente"),
+                            TipoContato.COMERCIAL,
                             rst.getString("EmailGerente") == null ? "" : rst.getString("EmailGerente").toLowerCase()
                     );
-                    
+
                     result.add(imp);
                 }
             }
@@ -752,7 +760,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.Nome as razao, \n"
                     + "	c.Apelido as fantasia,\n"
                     + "	c.RG, \n"
-                    + "	c.CPF, \n"
+                    + "	cast(c.CPF as bigint) as CPF, \n"
                     + "	c.IDSexo as sexo,\n"
                     + "	c.DataNascimento,\n"
                     + "	c.EstadoCivil,\n"
@@ -812,7 +820,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorLimite(rst.getDouble("valorlimite"));
                     imp.setPermiteCheque(true);
                     imp.setPermiteCreditoRotativo(true);
-                    imp.setDataNascimento(rst.getDate("NomeConjuge"));
+                    imp.setDataNascimento(rst.getDate("DataNascimento"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setNomeConjuge(rst.getString("NomeConjuge"));
                     imp.setCargo(rst.getString("cargo"));
@@ -840,7 +848,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<CompradorIMP> getCompradores() throws Exception {
         List<CompradorIMP> result = new ArrayList<>();
@@ -853,7 +861,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from dbo.Compradores"
             )) {
                 while (rst.next()) {
-                    CompradorIMP imp = new CompradorIMP();                    
+                    CompradorIMP imp = new CompradorIMP();
                     imp.setId(rst.getString("Codigo"));
                     imp.setDescricao(rst.getString("Nome"));
                     result.add(imp);
@@ -861,5 +869,90 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	cast(r.Codigo_Produto as bigint) as codigo_receita,\n"
+                    + "	cast(p.Produto_Id as bigint) as id_produto,\n"
+                    + "	p.Descricao_Completa as descricao_receita,\n"
+                    + "	r.Quant_Produto as qtd,\n"
+                    + "	r.Fator as fator,\n"
+                    + "	cast(ri.Codigo_Produto as bigint) as codigo_item,\n"
+                    + "	p2.Descricao_Completa as descrocao_item,\n"
+                    + "	(ri.Quant_Produto * 1000) as qtd_item,\n"
+                    + "	ri.Fator as fator_item\n"
+                    + "from dbo.Receita r\n"
+                    + "join dbo.Produtos p on p.Produto_Id = r.Codigo_Produto\n"
+                    + "join dbo.Receita_Itens ri on ri.Codigo_Produto_Receita = r.Codigo_Produto\n"
+                    + "join dbo.Produtos p2 on p2.Produto_Id = ri.Codigo_Produto \n"
+                    + "order by r.Codigo_Produto"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportsistema(getSistema());
+                    imp.setImportid(rst.getString("codigo_receita"));
+                    imp.setIdproduto(rst.getString("id_produto"));
+                    imp.setDescricao(rst.getString("descricao_receita"));
+                    imp.setRendimento(rst.getDouble("qtd"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setQtdembalagemreceita(rst.getInt("qtd_item") == 0 ? 1 * 1000 : rst.getInt("qtd_item"));
+                    imp.setFator(rst.getDouble("fator_item") == 0 ? 1 : rst.getDouble("fator_item"));
+                    imp.setFichatecnica("");
+
+                    imp.getProdutos().add(rst.getString("codigo_item"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	cast(rb.Codigo as bigint) as id,\n"
+                    + "	rb.Descricao as descricao,\n"
+                    + "	CONCAT(\n"
+                    + "	rb.Linha01, ' ', rb.Linha02, ' ', rb.Linha03, ' ',\n"
+                    + "	rb.Linha04, ' ', rb.Linha05, ' ', rb.Linha06, ' ',\n"
+                    + "	rb.Linha07, ' ', rb.Linha08, ' ', rb.Linha09, ' ',\n"
+                    + "	rb.Linha10, ' ' , rb.Linha11, ' ', rb.Linha12) as receita,\n"
+                    + "	cast(rbp.Produto_Id as bigint) as id_produto,\n"
+                    + "	p.Descricao_Completa as desricaoproduto\n"
+                    + "from dbo.Ingrediente_Novo rb\n"
+                    + "join dbo.Embalagem rbp on rbp.Ingredientes = rb.Codigo\n"
+                    + "join dbo.Produtos p on p.Produto_Id = rbp.Produto_Id\n"
+                    + "order by rb.Descricao"
+            )) {
+                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
+                while (rst.next()) {
+                    
+                    ReceitaBalancaIMP imp = receitas.get(rst.getString("id"));
+                    
+                    if (imp == null) {
+                        imp = new ReceitaBalancaIMP();
+                        imp.setId(rst.getString("id"));
+                        imp.setDescricao(rst.getString("descricao"));
+                        imp.setReceita(rst.getString("receita"));
+                        receitas.put(imp.getId(), imp);
+                    }
+                    
+                    imp.getProdutos().add(rst.getString("id_produto"));
+                }
+                
+                return new ArrayList<>(receitas.values());
+            }
+        }
     }
 }

@@ -708,11 +708,11 @@ public class FornecedorDAO {
                     sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());
                 }
                 
-                if (opt.contains(OpcaoFornecedor.NUMERO)) {
-                    sql.setWhere("id = " + vo.getId() + " and numero = '0' ");
-                } else {
+                //if (opt.contains(OpcaoFornecedor.NUMERO)) {
+                //    sql.setWhere("id = " + vo.getId() + " and numero = '0' ");
+                //} else {
                     sql.setWhere("id = " + vo.getId());
-                }
+                //}
                 
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());

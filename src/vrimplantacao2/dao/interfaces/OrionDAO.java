@@ -338,7 +338,14 @@ public class OrionDAO extends InterfaceDAO {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("codigo"));
+                    
+                    if ((rst.getString("codigo") != null)
+                            && (!rst.getString("codigo").trim().isEmpty())) {
+                        imp.setImportId(rst.getString("codigo"));
+                    } else {
+                        imp.setImportId(rst.getString("cgc"));
+                    }
+                    
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("nome"));
                     imp.setCnpj_cpf(rst.getString("cgc"));
@@ -491,7 +498,7 @@ public class OrionDAO extends InterfaceDAO {
 
                     if ((rst.getString("contato") != null)
                             && (!rst.getString("contato").trim().isEmpty())) {
-                        imp.setObservacao(rst.getString("CONTATO " + rst.getString("contato")));
+                        imp.setObservacao("CONTATO " + rst.getString("contato"));
                     }
                     if ((rst.getString("contatcom") != null)
                             && (!rst.getString("contatcom").trim().isEmpty())) {

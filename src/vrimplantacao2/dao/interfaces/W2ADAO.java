@@ -92,7 +92,7 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     " icms \n" +
                     "where \n" +
                     " codigo_do_icms in \n" +
-                    "    (select codigo_do_icms from produtos)")) {
+                    "    (select distinct codigo_do_icms from produtos)")) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"), 
@@ -116,7 +116,7 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     " icms \n" +
                     "where \n" +
                     " codigo_do_icms in \n" +
-                    "    (select codigo_icms_compra from produtos)")) {
+                    "    (select distinct codigo_icms_compra from produtos)")) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"),
