@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,7 +68,9 @@ public class SigmaDAO extends InterfaceDAO {
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
-                    OpcaoProduto.NUTRICIONAL
+                    OpcaoProduto.NUTRICIONAL,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.OFERTA
                 }
         ));
     }
@@ -138,43 +141,38 @@ public class SigmaDAO extends InterfaceDAO {
         return new ArrayList<>(n1.values());
     }
 
-    public List<OfertaIMP> getOfertas() throws Exception {
+    @Override
+    public List<OfertaIMP> getOfertas(Date datatermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "    cod_produto idproduto,\n"
-                    + "    validade_promocao datainicio,\n"
-                    + "    validade_promocao_fim datafim,\n"
-                    + "    valor_tabela_1 preconormal,\n"
-                    + "    case when validade_promocao_fim > 'now' then 'A' else 'I' end situacaooferta,\n"
-                    + "    p.*\n"
-                    + "from produto p\n"
-                    + "    where validade_promocao_fim is not null\n"
-                    + "    and validade_promocao_fim >= 'now'"
+                    + "    i.cod_produto,\n"
+                    + "    i.preco_venda,\n"
+                    + "    i.preco_promocional,\n"
+                    + "    o.data_inicial,\n"
+                    + "    o.data_final\n"
+                    + "from promocoes_produto i\n"
+                    + "join promocoes o\n"
+                    + "    on o.cod_promocao = i.cod_campanha"
+                    //+ " and o.data_final >= 'now'"
             )) {
-                while (rst.next()){
+                while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    imp.setIdProduto(rst.getString("idproduto"));
-                    imp.setDataInicio(rst.getDate("datainicio"));
-                    imp.setDataFim(rst.getDate("datafim"));
-                    imp.setPrecoNormal(rst.getDouble("preconormal"));
-                    if ("A".equals(rst.getString("situacaoOferta"))) {
-                        imp.setSituacaoOferta(SituacaoOferta.ATIVO);
-                    } else {
-                        if ("I".equals(rst.getString("situacaoOferta"))) {
-                            imp.setSituacaoOferta(SituacaoOferta.CANCELADO);
-                        }
-                    }
-                
+                    imp.setIdProduto(rst.getString("cod_produto"));
+                    imp.setDataInicio(rst.getDate("data_inicial"));
+                    imp.setDataFim(rst.getDate("data_final"));
+                    imp.setPrecoNormal(rst.getDouble("preco_venda"));
+                    imp.setPrecoOferta(rst.getDouble("preco_promocional"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     result.add(imp);
-                    }
                 }
             }
-
-            return result;
         }
+
+        return result;
+    }
 
         @Override
         public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
@@ -297,10 +295,22 @@ public class SigmaDAO extends InterfaceDAO {
                         imp.setPiscofinsCstDebito(rst.getInt("piscofinscstdebito"));
                         imp.setPiscofinsCstCredito(rst.getInt("piscofinscstcredito"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("piscofinsNaturezaReceita"));
-                        imp.setIcmsCst(rst.getInt("icms_cst"));
-                        imp.setIcmsAliq(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducao(rst.getDouble("icms_reducao"));
-
+                        imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaida(rst.getDouble("icms_reducao"));
+                        imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_reducao"));
+                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_reducao"));
+                        imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_reducao"));
+                        imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_reducao"));
+                        
                         result.add(imp);
 
                         cont1++;

@@ -785,7 +785,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.des_email_vend email_vendedor,\n"
                     + "    f.num_celular celular,\n"
                     + "    f.num_med_cpgto condicaopagamento,\n"
-                    + "    case lf.inativo when 'S' then 1 else 0 end ativo\n"
+                    + "    lf.inativo as ativo\n"
                     + "from\n"
                     + "    " + tab_fornecedor + " f\n"
                     + "    left join " + tab_cidade + " cd on\n"
@@ -821,7 +821,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoSeguranca(rst.getInt("prazoseguranca"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setAtivo("S".equals(rst.getString("ativo")));
 
                     imp.setObservacao(
                             new StringBuilder()
