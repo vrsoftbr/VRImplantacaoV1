@@ -327,80 +327,83 @@ public class RPInfoDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	p.prod_codigo id,\n"
-                    + "	p.prod_datacad datacadastro,\n"
-                    + "	p.prod_dataalt dataalteracao,\n"
-                    + "	ean.ean,\n"
-                    + "	ean.qtdembalagem,\n"
-                    + " p.prod_qemb embalagemcotacao,\n"
-                    + "	case\n"
-                    + "	when p.prod_balanca = 'P' then 'KG'\n"
-                    + "	when p.prod_balanca = 'U' then 'UN'\n"
-                    + "	when ean.qtdembalagem = 1 then 'UN'\n"
-                    + "	else un.prun_emb end unidade,\n"
-                    + "	case \n"
-                    + "	when p.prod_balanca in ('P', 'U') then 1\n"
-                    + "	else 0 end e_balanca,\n"
-                    + "	coalesce(un.prun_validade, 0) validade,\n"
-                    + "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompletacomplemento,\n"
-                    + " p.prod_descricao descricaocompleta,\n"        
-                    + "	p.prod_descrpdvs descricaoreduzida,\n"
-                    + "	p.prod_dpto_codigo merc1,\n"
-                    + "	p.prod_grup_codigo merc2,\n"
-                    + "	p.prod_codpreco id_familia,\n"
-                    + "	p.prod_peso pesobruto,\n"
-                    + "	p.prod_pesoliq pesoliquido,\n"
-                    + "	un.prun_estmin estoqueminimo,\n"
-                    + "	un.prun_estmax estoquemaximo,\n"
-                    + "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n"
-                    + "	un.prun_prultcomp,\n"
-                    + "	un.prun_ctcompra custosemimposto,\n"
-                    //+ " un.prun_ctfiscal custocomimposto,\n"
-                    + "	un.prun_prultcomp custocomimposto,\n"
-                    + "	un.prun_margem margem,\n"
-                    + "	un.prun_prvenda precovenda,\n"
-                    + "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n"
-                    + "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n"
-                    + "	p.prod_codigoncm ncm,\n"
-                    + "	ax.prau_cest cest,\n"
-                    + "	tr.trib_codnf cst,\n"
-                    + "	tr.trib_icms icms,\n"
-                    + "	tr.trib_redbc icmsreducao,\n"
-                    + "	tr.trib_cstpis cstpiscofins,\n"
-                    + "	tr.trib_natpiscof naturezareceita,\n"
-                    + " un.prun_setor setor,\n"
-                    + " un.prun_setordep departamento\n"
-                    + "from\n"
-                    + "	produtos p\n"
-                    + "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n"
-                    + "	left join produn un on p.prod_codigo = un.prun_prod_codigo\n"
-                    + "	left join (\n"
-                    + "		select\n"
-                    + "			prod_codigo id,\n"
-                    + "			prod_codbarras ean,\n"
-                    + "			prod_funcao unidade,\n"
-                    + "			1 qtdembalagem\n"
-                    + "		from\n"
-                    + "			produtos\n"
-                    + "		union\n"
-                    + "		select\n"
-                    + "			prod_codigo id,\n"
-                    + "			prod_codcaixa ean,\n"
-                    + "			prod_emb unidade,\n"
-                    + "			prod_qemb qtdembalagem\n"
-                    + "		from\n"
-                    + "			produtos\n"
-                    + "		where\n"
-                    + "			nullif(trim(prod_codcaixa),'') is not null\n"
-                    + "	) ean on ean.id = p.prod_codigo\n"
-                    + "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo) and\n"
-                    + " tr.trib_unidades = un.prun_unid_codigo\n"
-                    + "where\n"
-                    + "	un.prun_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                    + "	tr.trib_mvtos like '%EVP%'\n"
-                    + "order by\n"
-                    + "	id"
+                    "select\n" +
+                    "	p.prod_codigo id,\n" +
+                    "	p.prod_datacad datacadastro,\n" +
+                    "	p.prod_dataalt dataalteracao,\n" +
+                    "	ean.ean,\n" +
+                    "	ean.qtdembalagem,\n" +
+                    "	p.prod_qemb embalagemcotacao,\n" +
+                    "	case\n" +
+                    "	when p.prod_balanca = 'P' then 'KG'\n" +
+                    "	when p.prod_balanca = 'U' then 'UN'\n" +
+                    "	when ean.qtdembalagem = 1 then 'UN'\n" +
+                    "	else un.prun_emb end unidade,\n" +
+                    "	case \n" +
+                    "	when p.prod_balanca in ('P', 'U') then 1\n" +
+                    "	else 0 end e_balanca,\n" +
+                    "	coalesce(un.prun_validade, 0) validade,\n" +
+                    "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompletacomplemento,\n" +
+                    "	p.prod_descricao descricaocompleta,        \n" +
+                    "	p.prod_descrpdvs descricaoreduzida,\n" +
+                    "	p.prod_dpto_codigo merc1,\n" +
+                    "	p.prod_grup_codigo merc2,\n" +
+                    "	p.prod_codpreco id_familia,\n" +
+                    "	p.prod_peso pesobruto,\n" +
+                    "	p.prod_pesoliq pesoliquido,\n" +
+                    "	un.prun_estmin estoqueminimo,\n" +
+                    "	un.prun_estmax estoquemaximo,\n" +
+                    "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n" +
+                    "	un.prun_prultcomp,\n" +
+                    "	un.prun_ctcompra custosemimposto,\n" +
+                    "	--un.prun_ctfiscal custocomimposto,\n" +
+                    "	un.prun_prultcomp custocomimposto,\n" +
+                    "	un.prun_margem margem,\n" +
+                    "	un.prun_prvenda precovenda,\n" +
+                    "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n" +
+                    "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n" +
+                    "	p.prod_codigoncm ncm,\n" +
+                    "	ax.prau_cest cest,\n" +
+                    "	tr.trib_codigo id_tributacao,\n" +
+                    "	tr.trib_data,\n" +
+                    "	tr.trib_codnf cst,\n" +
+                    "	tr.trib_icms icms,\n" +
+                    "	tr.trib_redbc icmsreducao,\n" +
+                    "	tr.trib_cstpis cstpiscofins,\n" +
+                    "	tr.trib_natpiscof naturezareceita,\n" +
+                    "	un.prun_setor setor,\n" +
+                    "	un.prun_setordep departamento\n" +
+                    "from\n" +
+                    "	produtos p\n" +
+                    "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n" +
+                    "	left join produn un on p.prod_codigo = un.prun_prod_codigo\n" +
+                    "	left join (\n" +
+                    "		select\n" +
+                    "			prod_codigo id,\n" +
+                    "			prod_codbarras ean,\n" +
+                    "			prod_funcao unidade,\n" +
+                    "			1 qtdembalagem\n" +
+                    "		from\n" +
+                    "			produtos\n" +
+                    "		union\n" +
+                    "		select\n" +
+                    "			prod_codigo id,\n" +
+                    "			prod_codcaixa ean,\n" +
+                    "			prod_emb unidade,\n" +
+                    "			prod_qemb qtdembalagem\n" +
+                    "		from\n" +
+                    "			produtos\n" +
+                    "		where\n" +
+                    "			nullif(trim(prod_codcaixa),'') is not null\n" +
+                    "	) ean on ean.id = p.prod_codigo\n" +
+                    "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo)\n" +
+                    "where\n" +
+                    "	un.prun_unid_codigo = '" + getLojaOrigem() + "' and\n" +
+                    "	tr.trib_mvtos like '%EVP%' and\n" +
+                    "	tr.trib_unidades like '%" + getLojaOrigem() + "%' and\n" +
+                    "	tr.trib_uforigem = 'SP'\n" +
+                    "order by\n" +
+                    "	id"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -1249,9 +1252,9 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	ri.indd_cod2 id_produto_producao,\n"
                     + "	pr.prod_descricao descricao_producao,\n"
                     + "	ri.indd_qreceita qtdproducao,\n"
-                    + "   ri.indd_qcomercializacao qtdproduto,\n"
+                    + " ri.indd_qcomercializacao qtdproduto,\n"
                     + "	ri.indd_unid_codigo,\n"
-                    + "   ri.indd_fase fase\n"
+                    + " ri.indd_fase fase\n"
                     + "from\n"
                     + "	industc rp\n"
                     + "join industd ri on rp.indc_prod_codigo = ri.indd_cod1\n"
