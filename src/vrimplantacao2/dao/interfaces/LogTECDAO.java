@@ -333,7 +333,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	 est_civil TipoEstadoCivil,\n"
                         + "	 dat_nascto dataNascimento,\n"
                         + "	 dat_cadastro dataCadastro,\n"
-                        //+ "	 sexo,\n"
+                        + "	 coalesce(sexo,'M') sexo,\n"
                         + "	 local_trab empresa,\n"
                         + "	 end_trab empresaEndereco,\n"
                         + "	 fon_trab empresaTelefone,\n"
@@ -346,7 +346,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	 nom_mae nomeMae,\n"
                         + "	 observacao,\n"
                         + "	 num_fone telefone,\n"
-                        + "  num_celular celular,\n"
+                        + "      num_celular celular,\n"
                         + "	 email,\n"
                         + "	 endereco_cobranca cobrancaEndereco,\n"
                         + "	 bairro_cobranca cobrancaBairro,\n"
@@ -377,7 +377,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.setDataNascimento(rs.getDate("datanascimento"));
                         imp.setDataCadastro(rs.getDate("datacadastro"));
-                        //imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                        imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
 
                         imp.setEmpresa(rs.getString("empresa"));
                         imp.setEmpresaEndereco(rs.getString("empresaendereco"));
@@ -402,20 +402,6 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCobrancaMunicipio(rs.getString("cobrancamunicipio"));
                         imp.setCobrancaCep(rs.getString("cobrancacep"));
 
-                        /*
-                         if (rs.getString("telefones") != null && !"".equals(rs.getString("telefones"))) {
-                         array = new String[3];
-                         telefonesCliente = rs.getString("telefones");
-                         array = telefonesCliente.split(" / ");
-                         int c = 1;
-                         for (String telefones : array) {
-                         imp.addContato(String.valueOf(c), "TELEFONE " + c, telefones.trim(), null, null);
-                         c++;
-                         }
-                         }
-                         if (rs.getString("contatoemail") != null & !"".equals(rs.getString("contatoemail"))) {
-                         imp.addContato("EMAIL", rs.getString("contatoemail"), null, null, rs.getString("email"));
-                         }*/
                         result.add(imp);
                     }
                 }
