@@ -670,37 +670,44 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "    p.id_parc id,\n" +
-                    "    p.status_pagto,\n" +
-                    "    p.parcela,\n" +
-                    "    rp.orcamento doc,\n" +
-                    "    r.data,\n" +
-                    "    r.id_cli,\n" +
-                    "    c.terminal caixa,\n" +
+                    "    p.id_cli idcliente,\n" +
+                    "    p.valrestante valor,\n" +
+                    "    p.parcela,\n" +        
+                    "    v.data emissao,\n" +
                     "    p.vencimento,\n" +
-                    "    p.valtotal,\n" +
-                    "    p.valrestante + p.jur_desc valor,\n" +
-                    "    p.valpago,\n" +
-                    "    p.jur_desc\n" +
+                    "    v.hora,\n" +
+                    "    v.orcamento,\n" +
+                    "    v.id_caixa,\n" +
+                    "    c.terminal ecf,\n" +
+                    "    c.operador\n" +
                     "from\n" +
-                    "    recebimentos r\n" +
-                    "join rec_parcelas rp on r.id_rec = rp.id_rec\n" +
-                    "join parcelas p on rp.id_parc = p.id_parc\n" +
-                    "left join caixa c on r.id_caixa = c.id_caixa\n" +        
+                    "    parcelas p\n" +
+                    "left join vendas v on p.id_ven = v.id_ven\n" +
+                    "join caixa c on v.id_caixa = c.id_caixa\n" +
                     "where\n" +
-                    "    p.id_loja = " + getLojaOrigem() + " and\n" +
-                    "    p.valrestante > 0\n" +
+                    "    p.valrestante > 0 and\n" +
+                    "    p.id_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "    p.vencimento")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
                     imp.setId(rs.getString("id"));
-                    imp.setIdCliente(rs.getString("id_cli"));
+                    imp.setIdCliente(rs.getString("idcliente"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setDataEmissao(rs.getDate("data"));
-                    imp.setEcf(rs.getString("caixa"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setEcf(rs.getString("ecf"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setNumeroCupom(rs.getString("doc"));
+                    imp.setNumeroCupom(rs.getString("orcamento"));
+                    imp.setObservacao(rs.getString("operador"));
+                    
+                    String par[] = new String[2];
+                    
+                    if(rs.getString("parcela") != null) {
+                        par = rs.getString("parcela").split("/");
+                    
+                        imp.setParcela(Utils.stringToInt(par[0]));
+                    }
                     
                     result.add(imp);
                 }
@@ -716,43 +723,40 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "    c.id_chq,\n" +
-                    "    c.id_cli cliente,\n" +
-                    "    cl.docum1 cpf,\n" + 
-                    "    cl.docum2 rg,\n" +        
-                    "    cl.razaosocial,\n" +   
-                    "    c.lancamento,\n" +
+                    "    c.id_chq id,\n" +
+                    "    em.nome razao,\n" +
+                    "    em.documento cnpj,\n" +
+                    "    em.endereco,\n" +
+                    "    em.bairro,\n" +
+                    "    em.cep,\n" +
+                    "    em.cidade,\n" +
                     "    c.vencimento,\n" +
+                    "    c.dia_util,\n" +
                     "    c.valor,\n" +
                     "    c.banco,\n" +
                     "    c.agencia,\n" +
                     "    c.conta,\n" +
-                    "    c.status,\n" +
-                    "    c.num_chq,\n" +
-                    "    c.id_caixa,\n" +
-                    "    c.observacao,\n" +
-                    "    c.data_baixa\n" +
+                    "    c.num_chq cheque\n" +
                     "from\n" +
                     "    cheques c\n" +
-                    "join clientes cl on c.id_cli = cl.id_cli\n" +        
+                    "left join emitentes em on c.id_emit = em.id_emit\n" +
                     "where\n" +
-                    "    c.id_loja = " + getLojaOrigem() + " and\n" +
-                    "    c.data_baixa is null\n" +
+                    "    c.status = 'EMPRES' and\n" +
+                    "    c.id_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
-                    "    c.vencimento")) {
+                    "    vencimento")) {
                 while(rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     
-                    imp.setId(rs.getString("id_chq"));
-                    imp.setCpf(rs.getString("cpf"));
-                    imp.setNome(rs.getString("razaosocial"));
-                    imp.setRg(rs.getString("rg"));
+                    imp.setId(rs.getString("id"));
+                    imp.setCpf(rs.getString("cnpj"));
+                    imp.setNome(rs.getString("razao"));
                     imp.setDataDeposito(rs.getDate("vencimento"));
-                    imp.setDate(rs.getDate("lancamento"));
+                    imp.setDate(rs.getDate("dia_util"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setBanco(rs.getInt("banco"));
                     imp.setAgencia(rs.getString("agencia"));
-                    imp.setNumeroCheque(rs.getString("num_chq"));
+                    imp.setNumeroCheque(rs.getString("cheque"));
                     imp.setConta(rs.getString("conta"));
                     
                     result.add(imp);
