@@ -41,6 +41,7 @@ import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
@@ -81,7 +82,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean usaMargemSobreVenda = false;
     private boolean desconsiderarSetorBalanca = false;
     private boolean pesquisarKGnaDescricao;
-    private boolean utilizarIdIcmsNaEntrada = false;
     private boolean utilizarEmbalagemDeCompra = false;
     public boolean apenasProdutoAtivo = false;
     private boolean copiarIcmsDebitoNaEntrada = false;
@@ -89,7 +89,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean copiarDescricaoCompletaParaGondola = false;
     public boolean manterEAN = false;
     public boolean removerCodigoCliente = false;
-    public boolean utilizaAliquotaFCP = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -303,8 +302,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	prod.cst_pisentrada piscofins_cst_credito,\n"
                     + "	prod.cst_pissaida piscofins_cst_debito,\n"
                     + "	prod.nat_rec piscofins_natureza_receita,\n"
-                    //+ " ltrim(rtrim(prod.codaliq)) icms_debito_id,\n")
-                    + " ltrim(rtrim(prod.codaliq)) + coalesce(cast(fcp.VALORTRIB as varchar), '') icms_debito_id,\n"        
+                    + " ltrim(rtrim(prod.codaliq)) icms_debito_id,\n"
+                    + " fcp.VALORTRIB fcp,\n"                    
                     + "	prod.CODTRIB icms_cst_saida,\n"
                     + "	al.ALIQUOTA icms_aliquota_saida,\n"
                     + "	prod.PER_REDUC icms_reduzido_saida,\n"
@@ -389,46 +388,47 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_debito"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
-
-                    imp.setIcmsDebitoId(rst.getString("icms_debito_id"));
+                    
+                    String aliquotaDebitoId = formatTributacaoId(rst.getString("icms_debito_id"), rst.getDouble("fcp"));
+                    imp.setIcmsDebitoId(aliquotaDebitoId);
+                    imp.setIcmsDebitoForaEstadoId(aliquotaDebitoId);
+                    imp.setIcmsDebitoForaEstadoNfId(aliquotaDebitoId);
+                    imp.setIcmsConsumidorId(aliquotaDebitoId);
                     if (copiarIcmsDebitoNaEntrada) {
                         imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                        imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     } else {
-                        if (this.utilizarIdIcmsNaEntrada) {
+                        imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst_entrada")));
+                        imp.setIcmsAliqEntrada(Utils.stringToDouble(rst.getString("icms_aliquota_entrada")));
+                        imp.setIcmsReducaoEntrada(Utils.stringToDouble(rst.getString("icms_reduzido_entrada")));
+
+                        if (imp.getIcmsCstEntrada() != 20) {
+                            imp.setIcmsReducaoEntrada(0);
+                        }
+                        if (imp.getIcmsCstEntrada() != 0
+                                && imp.getIcmsCstEntrada() != 10
+                                && imp.getIcmsCstEntrada() != 20
+                                && imp.getIcmsCstEntrada() != 70) {
+                            imp.setIcmsAliqEntrada(0);
+                            imp.setIcmsReducaoEntrada(0);
+                        }
+
+                        String str = (imp.getImportId() + " - ICMS Entrada: "
+                                + imp.getIcmsCstEntrada() + " - "
+                                + MathUtils.trunc(imp.getIcmsAliqEntrada(), 2) + " - "
+                                + MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1));
+
+                        if (!icms.containsKey(
+                                imp.getIcmsCstEntrada(),
+                                MathUtils.trunc(imp.getIcmsAliqEntrada(), 2),
+                                MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
+                        )) {
                             imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                         } else {
-                            imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst_entrada")));
-                            imp.setIcmsAliqEntrada(Utils.stringToDouble(rst.getString("icms_aliquota_entrada")));
-                            imp.setIcmsReducaoEntrada(Utils.stringToDouble(rst.getString("icms_reduzido_entrada")));
-
-                            if (imp.getIcmsCstEntrada() != 20) {
-                                imp.setIcmsReducaoEntrada(0);
-                            }
-                            if (imp.getIcmsCstEntrada() != 0
-                                    && imp.getIcmsCstEntrada() != 10
-                                    && imp.getIcmsCstEntrada() != 20
-                                    && imp.getIcmsCstEntrada() != 70) {
-                                imp.setIcmsAliqEntrada(0);
-                                imp.setIcmsReducaoEntrada(0);
-                            }
-
-                            String str = (imp.getImportId() + " - ICMS Entrada: "
-                                    + imp.getIcmsCstEntrada() + " - "
-                                    + MathUtils.trunc(imp.getIcmsAliqEntrada(), 2) + " - "
-                                    + MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1));
-
-                            if (!icms.containsKey(
-                                    imp.getIcmsCstEntrada(),
-                                    MathUtils.trunc(imp.getIcmsAliqEntrada(), 2),
-                                    MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
-                            )) {
-                                imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                            } else {
-                                imp.setIcmsCreditoId(null);
-                                str += " - Encontrou";
-                            }
-                            LOG.finest(str);
+                            imp.setIcmsCreditoId(null);
+                            str += " - Encontrou";
                         }
+                        LOG.finest(str);
                     }
 
                     if (desconsiderarSetorBalanca) {
@@ -1337,19 +1337,19 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setObservacao(imp.getObservacao()
                                 + " - Prazo visita: " + rst.getInt("PVISITA"));
                     }
-                    /*imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
+                    imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
                      + Utils.acertarTexto(rst.getString("DESCRICAOPAG").isEmpty() ? "0" : rst.getString("DESCRICAOPAG"))
-                     + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));*/
+                     + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
 
                     imp.setDatacadastro(rst.getDate("DTCAD"));
-                    //imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
-                    imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                    imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
+                    //imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
 
-                    /*if ((rst.getString("simples").equals("S"))) {
-                     imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
-                     } else {
-                     imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
-                     }*/
+                    if ((rst.getString("simples").equals("S"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    }
                     imp.addTelefone("FAX", rst.getString("FAX"));
                     if ((rst.getString("CONTATO") != null)
                             && (!rst.getString("CONTATO").trim().isEmpty())) {
@@ -2124,22 +2124,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-
-    /*@Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
-        List<MapaTributoIMP> result = new ArrayList();
-
-        try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stmt.executeQuery(
-                    "select ltrim(rtrim(replace(codaliq,'\\','\\\\'))) codaliq, descricao from aliquota_icms"
-            )) {
-                while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
-                }
-            }
-        }
-        return result;
-    }*/
+    
+    private String formatTributacaoId(String id, double fcp) {
+        return String.format("%s-%.2f", id, fcp);
+    }
     
     //Utilizado este método com novo script para cliente que utiliza alíquota FCP
     @Override
@@ -2150,21 +2138,24 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stmt.executeQuery(
                     "select \n" +
                     "	distinct\n" +
-                    "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\'))) + \n" +
-                    "	case when cast(fcp.VALORTRIB as varchar) = '0.00' then \n" +
-                    "		'' else \n" +
-                    "			cast(fcp.VALORTRIB as varchar) end as codaliq, \n" +
-                    "	icms.descricao + ' ' + cast(fcp.VALORTRIB as varchar) + '% FCP' descricao\n" +
+                    "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\\\'))) id,\n" +
+                    "	coalesce(fcp.VALORTRIB, 0) fcp,\n" +
+                    "	icms.descricao\n" +
                     "from \n" +
                     "	aliquota_icms icms\n" +
-                    "join\n" +
-                    "	PRODUTOS p on icms.CODALIQ = p.CODALIQ\n" +
-                    "left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n" +
+                    "	left join\n" +
+                    "		PRODUTOS p on icms.CODALIQ = p.CODALIQ\n" +
+                    "	left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n" +
                     "where\n" +
-                    "	icms.descricao + ' ' + cast(fcp.VALORTRIB as varchar) is not null"
+                    "	icms.descricao is not null\n" +
+                    "order by\n" +
+                    "	id, fcp"
             )) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(
+                            formatTributacaoId(rs.getString("id"), rs.getDouble("fcp")), 
+                            String.format("%s + FCP %.2f %%", rs.getString("descricao"), rs.getDouble("fcp"))
+                    ));
                 }
             }
         }
@@ -2215,16 +2206,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setPesquisarKGnaDescricao(boolean pesquisarKGnaDescricao) {
         this.pesquisarKGnaDescricao = pesquisarKGnaDescricao;
-    }
-
-    /**
-     * Caso seja true, a aplicação copia o id do icms fixado na saída, para a
-     * entrada dos produtos também.
-     *
-     * @param utilizarIdIcmsNaEntrada
-     */
-    public void setUtilizarIdIcmsNaEntrada(boolean utilizarIdIcmsNaEntrada) {
-        this.utilizarIdIcmsNaEntrada = utilizarIdIcmsNaEntrada;
     }
 
     public void setCopiarIcmsDebitoNaEntrada(boolean copiarIcmsDebitoNaEntrada) {
