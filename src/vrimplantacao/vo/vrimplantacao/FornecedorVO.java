@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.vo.enums.ContaContabilFinanceiro;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
 
 public class FornecedorVO {
     public int id = 0;

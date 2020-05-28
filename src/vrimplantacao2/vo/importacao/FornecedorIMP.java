@@ -9,6 +9,7 @@ import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoPagamento;
 
@@ -68,6 +69,18 @@ public class FornecedorIMP {
     private int idBanco;
     private boolean emiteNfe = false;
     private boolean permiteNfSemPedido = false;
+    
+    private TipoIndicadorIE tipoIndicadorIe;
+
+    public TipoIndicadorIE getTipoIndicadorIe() {
+        return tipoIndicadorIe;
+    }
+
+    public void setTipoIndicadorIe(TipoIndicadorIE tipoIndicadorIe) {
+        this.tipoIndicadorIe = tipoIndicadorIe;
+    }
+    
+    
 
     public Set<Integer> getCondicoesPagamentos() {
         return condicoesPagamentos;

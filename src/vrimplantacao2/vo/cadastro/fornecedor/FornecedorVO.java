@@ -10,6 +10,7 @@ import vrimplantacao2.vo.cadastro.local.MunicipioVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoPagamento;
 
@@ -54,6 +55,16 @@ public class FornecedorVO {
     private int idBanco;
     private boolean utilizaNfe = false;
     private boolean permiteNfSemPedido = false;
+    
+    private TipoIndicadorIE tipoIndicadorIe;
+
+    public TipoIndicadorIE getTipoIndicadorIe() {
+        return tipoIndicadorIe;
+    }
+
+    public void setTipoIndicadorIe(TipoIndicadorIE tipoIndicadorIe) {
+        this.tipoIndicadorIe = tipoIndicadorIe;
+    }
     
     public static boolean testing = false;
     
