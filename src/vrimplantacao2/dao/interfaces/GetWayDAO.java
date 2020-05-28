@@ -1280,29 +1280,55 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, f.complemento, \n"
-                    + "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n"
-                    + "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n"
-                    + "    f.valor_compra, f.ativo, \n"
-                    + "    obs, \n"
-                    + "    c.descricao as descricaopag, \n"
-                    + "    f.pentrega, \n"
-                    + "    f.pvisita, \n"
-                    + "    coalesce(case \n"
-                    + "    when codtipofornec = 1 then 0 \n"
-                    + "    when codtipofornec = 2 then 1 \n"
-                    + "    when codtipofornec = 3 then 2 \n"
-                    + "    when codtipofornec = 4 then 3 \n"
-                    + "    when codtipofornec = 5 then 5 \n"
-                    + "    when codtipofornec = 6 then 6 \n"
-                    + "    when codtipofornec = 7 then 7 \n"
-                    + "    when codtipofornec = 8 then 8 \n"
-                    + "    end, 2) as codtipofornec, \n"
-                    + "    simples \n"
-                    + "from \n"
-                    + "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n"
-                    + "order by codfornec"
+                    "select \n" +
+                    "   f.codfornec,\n" +
+                    "	f.razao,\n" +
+                    "	coalesce(f.fantasia, f.RAZAO) fantasia,\n" +
+                    "	f.endereco,\n" +
+                    "	f.numero,\n" +
+                    "	f.bairro,\n" +
+                    "	f.complemento,\n" +
+                    "	f.cidade,\n" +
+                    "	f.estado,\n" +
+                    "	f.cep,\n" +
+                    "	f.telefone,\n" +
+                    "	f.fax,\n" +
+                    "	f.email,\n" +
+                    "	f.celular,\n" +
+                    "	f.fone1,\n" +
+                    "	f.contato,\n" +
+                    "	f.ie,\n" +
+                    "	f.cnpj_cpf,\n" +
+                    "	f.agencia,\n" +
+                    "	f.banco,\n" +
+                    "	f.conta,\n" +
+                    "	f.dtcad,\n" +
+                    "	f.valor_compra,\n" +
+                    "	f.ativo, \n" +
+                    "   f.obs, \n" +
+                    "   c.descricao as descricaopag, \n" +
+                    "   f.pentrega, \n" +
+                    "   f.pvisita,\n" +
+                    "   coalesce(\n" +
+                    "   	case \n" +
+                    "               when codtipofornec = 1 then 0 \n" +
+                    "               when codtipofornec = 2 then 1 \n" +
+                    "		    when codtipofornec = 3 then 2 \n" +
+                    "		    when codtipofornec = 4 then 3 \n" +
+                    "		    when codtipofornec = 5 then 5 \n" +
+                    "		    when codtipofornec = 6 then 6 \n" +
+                    "		    when codtipofornec = 7 then 7 \n" +
+                    "		    when codtipofornec = 8 then 8 \n" +
+                    "		end,\n" +
+                    "		2\n" +
+                    "	) as codtipofornec, \n" +
+                    "    simples \n" +
+                    "from \n" +
+                    "    fornecedores f \n" +
+                    "    left join condpagto c on\n" +
+                    "    	f.codcondpagto = c.codcondpagto \n" +
+                    "order by\n" +
+                    "	codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -1337,15 +1363,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setObservacao(imp.getObservacao()
                                 + " - Prazo visita: " + rst.getInt("PVISITA"));
                     }
-                    imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
-                     + Utils.acertarTexto(rst.getString("DESCRICAOPAG").isEmpty() ? "0" : rst.getString("DESCRICAOPAG"))
+                    imp.setObservacao(Utils.acertarTexto(rst.getString("OBS")) + " Cond. pag: "
+                     + Utils.acertarTexto(rst.getString("DESCRICAOPAG"))
                      + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
 
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
-                    //imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
 
-                    if ((rst.getString("simples").equals("S"))) {
+                    if (Utils.acertarTexto(rst.getString("simples")).equals("S")) {
                         imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
                     } else {
                         imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
@@ -1395,7 +1420,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             );
                         }
                     }
-
+                    /*
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select f.CODFORNEC, "
@@ -1512,6 +1537,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             }
                         }
                     }
+                    */
                     vResult.add(imp);
                 }
             }

@@ -884,8 +884,11 @@
                                       <Component id="chkComplemento" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
+                              <Component id="chkFIndicadorIe" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTelefone" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="279" max="32767" attributes="0"/>
+                          <EmptySpace pref="250" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -911,7 +914,13 @@
                           <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkSituacaoCadastroForn" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="211" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFIndicadorIe" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFTelefone" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFFantasia" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="145" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -985,6 +994,21 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkComplemento">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Complemento"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFIndicadorIe">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Indicador IE"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTelefone">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Telefone"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFFantasia">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
                   </Properties>
                 </Component>
               </SubComponents>
