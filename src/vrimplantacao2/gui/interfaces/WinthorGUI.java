@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-import org.netbeans.lib.awtextra.AbsoluteLayout;
 import org.openide.util.Exceptions;
 import vrframework.bean.checkBox.VRCheckBox;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -111,6 +110,9 @@ public class WinthorGUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
+        
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(vLojaCliente);
         
         centralizarForm();
         this.setMaximum(false);

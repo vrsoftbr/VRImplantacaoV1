@@ -13,7 +13,6 @@ import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.sistema.EstadoDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.TipoIndicadorIE;
 import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.collection.IDStack;
@@ -26,6 +25,7 @@ import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.vo.enums.ContaContabilFinanceiro;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -222,11 +222,7 @@ public class FornecedorDAO {
                                     sql.put("utilizaedi", false);// boolean NOT NULL DEFAULT false,
                                     sql.put("tiporegravencimento", -1);// integer NOT NULL DEFAULT '-1'::integer,
                                     sql.put("nfemitidapostofiscal", false);// boolean DEFAULT false,
-                                    if (vo.getInscricaoEstadual() != null && !"".equals(vo.getInscricaoEstadual()) && !"ISENTO".equals(vo.getInscricaoEstadual())) {
-                                        sql.put("id_tipoindicadorie", TipoIndicadorIE.CONTRIBUINTE_ICMS.getId());
-                                    } else {
-                                        sql.put("id_tipoindicadorie", TipoIndicadorIE.NAO_CONTRIBUINTE.getId());
-                                    }
+                                    incluirTipoIndicadorIE(vo, sql);
 
                                     stm.execute(sql.getInsert());
                                     getExistentes().put(vo, vo.getId());
@@ -623,11 +619,7 @@ public class FornecedorDAO {
             sql.put("tiporegravencimento", -1);// integer NOT NULL DEFAULT '-1'::integer,
             sql.put("nfemitidapostofiscal", false);// boolean DEFAULT false,
             sql.put("id_tipoempresa", vo.getTipoEmpresa().getId());// integer not null,
-            if (vo.getInscricaoEstadual() != null && !"".equals(vo.getInscricaoEstadual()) && !"ISENTO".equals(vo.getInscricaoEstadual())) {
-                sql.put("id_tipoindicadorie", TipoIndicadorIE.CONTRIBUINTE_ICMS.getId());
-            } else {
-                sql.put("id_tipoindicadorie", TipoIndicadorIE.NAO_CONTRIBUINTE.getId());
-            }
+            incluirTipoIndicadorIE(vo, sql);
             stm.execute(sql.getInsert());
         }
     }
@@ -707,17 +699,27 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.PERMITE_NF_SEM_PEDIDO)) {
                     sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());
                 }
-                
-                //if (opt.contains(OpcaoFornecedor.NUMERO)) {
-                //    sql.setWhere("id = " + vo.getId() + " and numero = '0' ");
-                //} else {
-                    sql.setWhere("id = " + vo.getId());
-                //}
+                if (opt.contains(OpcaoFornecedor.TIPO_INDICADOR_IE)) {
+                    incluirTipoIndicadorIE(vo, sql);
+                }
+                sql.setWhere("id = " + vo.getId());
                 
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
                 }
             }
+        }
+    }
+
+    private void incluirTipoIndicadorIE(FornecedorVO vo, SQLBuilder sql) {
+        if (vo.getTipoIndicadorIe() == null) {
+            if (vo.getInscricaoEstadual() != null && !"".equals(vo.getInscricaoEstadual()) && !"ISENTO".equals(vo.getInscricaoEstadual())) {
+                sql.put("id_tipoindicadorie", TipoIndicadorIE.CONTRIBUINTE_ICMS.getId());
+            } else {
+                sql.put("id_tipoindicadorie", TipoIndicadorIE.NAO_CONTRIBUINTE.getId());
+            }
+        } else {
+            sql.put("id_tipoindicadorie", vo.getTipoIndicadorIe().getId());
         }
     }
 

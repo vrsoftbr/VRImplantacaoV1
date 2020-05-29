@@ -560,6 +560,7 @@ public class FornecedorRepository {
         vo.setIdBanco(imp.getIdBanco() == 0 ? 804 : imp.getIdBanco());
         vo.setUtilizaNfe(imp.isEmiteNfe());
         vo.setPermiteNfSemPedido(imp.isPermiteNfSemPedido());
+        vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
