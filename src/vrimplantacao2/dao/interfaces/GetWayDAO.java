@@ -1299,7 +1299,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    when codtipofornec = 7 then 7 \n"
                     + "    when codtipofornec = 8 then 8 \n"
                     + "    end, 2) as codtipofornec, \n"
-                    + "    simples \n"
+                    + "    case when simples = 'S' then 'S' else 'N' end simples \n"
                     + "from \n"
                     + "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n"
                     + "order by codfornec"
@@ -1337,10 +1337,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setObservacao(imp.getObservacao()
                                 + " - Prazo visita: " + rst.getInt("PVISITA"));
                     }
-                    imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
+                    /**imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
                      + Utils.acertarTexto(rst.getString("DESCRICAOPAG").isEmpty() ? "0" : rst.getString("DESCRICAOPAG"))
                      + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
-
+                    */
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
                     //imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
