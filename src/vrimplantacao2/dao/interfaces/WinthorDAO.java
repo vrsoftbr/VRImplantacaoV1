@@ -384,6 +384,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setIcmsReducao(rst.getDouble("icmsred"));
                     imp.setIcmsDebitoId(rst.getString("idtributacao"));
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
 
                     Trib trib = tribs.get(rst.getString("codncmex"));
                     if (trib != null) {
