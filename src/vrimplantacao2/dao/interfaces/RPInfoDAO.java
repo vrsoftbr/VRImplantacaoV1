@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -106,6 +108,42 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.SECAO,
             OpcaoProduto.PRATELEIRA
         }));
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	a.agof_datai datainicio,\n" +
+                    "	a.agof_dataf datatermino,\n" +
+                    "	i.prag_prod_codigo idproduto,\n" +
+                    "	i.prag_precooferta precooferta,\n" +
+                    "	i.prag_prnormal preconormal,\n" +
+                    "	i.prag_custo precocusto\n" +
+                    "from \n" +
+                    "	agof a\n" +
+                    "join\n" +
+                    "	pragof i on a.agof_codigo = i.prag_agof_codigo\n" +
+                    "where \n" +
+                    "	a.agof_dataf >= current_date and\n" +
+                    "	a.agof_unidades like '%" + getLojaOrigem() + "%'")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datatermino"));
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setPrecoNormal(rs.getDouble("preconormal"));
+                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
