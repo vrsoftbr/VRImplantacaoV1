@@ -27,7 +27,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="tabsOpcoes" alignment="0" max="32767" attributes="0"/>
+          <Component id="tabsOpcoes" min="-2" pref="425" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -162,7 +162,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="txtNutricional" pref="0" max="32767" attributes="0"/>
+                              <Component id="txtNutricional" min="-2" pref="323" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnImportarNutricional" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -170,12 +170,11 @@
                               <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="rdbToledo" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="3" max="32767" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -223,7 +222,7 @@
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="rdbNutriconal"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Toledo"/>
+                <Property name="text" type="java.lang.String" value="Toledo (ITENSMGV)"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JRadioButton" name="rdbToledoProduto">
@@ -231,7 +230,7 @@
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="rdbNutriconal"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Toledo x Produto"/>
+                <Property name="text" type="java.lang.String" value="Toledo x Produto (INFNUTRI)"/>
               </Properties>
             </Component>
           </SubComponents>
