@@ -208,7 +208,9 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	0 icms_red_s,\n" +
                 "	coalesce(trib.cod_situacao, cp.cod_sit_tributaria) icms_cst_e,\n" +
                 "	coalesce(trib.aliq_icms, cp.aliq_ecf) icms_aliq_e,\n" +
-                "	coalesce(trib.per_reducao, 0) icms_red_e\n" +
+                "	coalesce(trib.per_reducao, 0) icms_red_e,\n" +
+                "	p.und_referencia unidadevolume,\n" +
+                "	p.qtd_referencia volume\n" +
                 "from\n" +
                 "	c_produto cp\n" +
                 "	join produto p\n" +
@@ -284,6 +286,9 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinsCstDebito"));
                     imp.setPiscofinsCstCredito(rs.getInt("piscofinsCstCredito"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("natrec"));
+                    
+                    imp.setVolume(rs.getDouble("volume"));
+                    imp.setTipoEmbalagemVolume(rs.getString("unidadevolume"));
 
                     result.add(imp);
                 }
