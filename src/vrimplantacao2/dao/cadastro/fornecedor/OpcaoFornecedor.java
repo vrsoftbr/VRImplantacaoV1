@@ -46,7 +46,8 @@ public enum OpcaoFornecedor {
     CELULAR, 
     BLOQUEADO, 
     EMITE_NFE, 
-    PERMITE_NF_SEM_PEDIDO;
+    PERMITE_NF_SEM_PEDIDO,
+    TIPO_INDICADOR_IE;
     
     private List<FornecedorIMP> listaEspecial;
 

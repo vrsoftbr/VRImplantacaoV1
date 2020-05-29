@@ -314,6 +314,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rs = stm.executeQuery(
                         "select	\n"
+                        + "	 cod_empresa,\n"
                         + "	 cod_cliente id,\n"
                         + "	 cpf_cgc cnpj,\n"
                         + "	 rg_inscr ie,\n"
@@ -333,7 +334,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	 est_civil TipoEstadoCivil,\n"
                         + "	 dat_nascto dataNascimento,\n"
                         + "	 dat_cadastro dataCadastro,\n"
-                        //+ "	 sexo,\n"
+                        + "	 coalesce(sexo,'M') sexo,\n"
                         + "	 local_trab empresa,\n"
                         + "	 end_trab empresaEndereco,\n"
                         + "	 fon_trab empresaTelefone,\n"
@@ -346,7 +347,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	 nom_mae nomeMae,\n"
                         + "	 observacao,\n"
                         + "	 num_fone telefone,\n"
-                        + "  num_celular celular,\n"
+                        + "      num_celular celular,\n"
                         + "	 email,\n"
                         + "	 endereco_cobranca cobrancaEndereco,\n"
                         + "	 bairro_cobranca cobrancaBairro,\n"
@@ -355,11 +356,11 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "from cliente cli\n"
                         + "	 left join cidade cid\n"
                         + "	   on cid.cod_cidade = cli.cod_cidade\n"
-                        + "where cod_empresa = " + getLojaOrigem() + "\n"
+                        //+ "where cod_empresa = " + getLojaOrigem() + "\n"
                         + "order by cod_cliente")) {
                     while (rs.next()) {
                         ClienteIMP imp = new ClienteIMP();
-                        imp.setId(rs.getString("id"));
+                        imp.setId(rs.getString("cod_empresa") + "-" + rs.getString("id"));
                         imp.setCnpj(rs.getString("cnpj"));
                         imp.setInscricaoestadual(rs.getString("ie"));
                         imp.setRazao(rs.getString("razao"));
@@ -377,7 +378,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.setDataNascimento(rs.getDate("datanascimento"));
                         imp.setDataCadastro(rs.getDate("datacadastro"));
-                        //imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                        imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
 
                         imp.setEmpresa(rs.getString("empresa"));
                         imp.setEmpresaEndereco(rs.getString("empresaendereco"));
@@ -402,20 +403,6 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCobrancaMunicipio(rs.getString("cobrancamunicipio"));
                         imp.setCobrancaCep(rs.getString("cobrancacep"));
 
-                        /*
-                         if (rs.getString("telefones") != null && !"".equals(rs.getString("telefones"))) {
-                         array = new String[3];
-                         telefonesCliente = rs.getString("telefones");
-                         array = telefonesCliente.split(" / ");
-                         int c = 1;
-                         for (String telefones : array) {
-                         imp.addContato(String.valueOf(c), "TELEFONE " + c, telefones.trim(), null, null);
-                         c++;
-                         }
-                         }
-                         if (rs.getString("contatoemail") != null & !"".equals(rs.getString("contatoemail"))) {
-                         imp.addContato("EMAIL", rs.getString("contatoemail"), null, null, rs.getString("email"));
-                         }*/
                         result.add(imp);
                     }
                 }
@@ -428,23 +415,28 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
             List<CreditoRotativoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rs = stm.executeQuery(
-                        "select \n"
-                        + "	  distinct on (cod_receber)\n"
-                        + "	  cod_receber id,\n"
-                        + "	  dat_emissao dataemissao,\n"
-                        + "	  num_doc numeroCupom,\n"
-                        + "	  vlr_doc valor,\n"
-                        + "	  desc_doc observacao,\n"
-                        + "	  r.cod_cliente idCliente,\n"
-                        + "	  dat_vencto dataVencimento,\n"
-                        + "	  vlr_juros juros,\n"
-                        + "	  c.cpf_cgc cnpjCliente\n"
-                        + "from receber r\n"
-                        + "	  left join cliente c\n"
-                        + "		on r.cod_cliente = c.cod_cliente\n"
-                        + "	  where flg_aberto = 'S'\n"
-                        + "		and r.cod_empresa = " + getLojaOrigem() + "\n"
-                        + "	order by 1,2")) {
+                        "select\n" +
+                        "	r.cod_empresa,\n" +
+                        "	cod_receber id,\n" +
+                        "	dat_emissao dataemissao,\n" +
+                        "	num_doc numeroCupom,\n" +
+                        "	vlr_doc valor,\n" +
+                        "	desc_doc observacao,\n" +
+                        "	r.cod_empresa_cliente,\n" +
+                        "	r.cod_cliente idCliente,\n" +
+                        "	dat_vencto dataVencimento,\n" +
+                        "	vlr_juros juros,\n" +
+                        "	c.cpf_cgc cnpjCliente\n" +
+                        "from\n" +
+                        "	receber r\n" +
+                        "	left join cliente c on \n" +
+                        "		r.cod_cliente = c.cod_cliente and\n" +
+                        "		r.cod_empresa = c.cod_empresa\n" +
+                        "where\n" +
+                        "	flg_aberto = 'S'\n" +
+                        //"	and r.cod_empresa = " + getLojaOrigem() + "\n" +
+                        "order by\n" +
+                        "	1,2")) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
                         imp.setId(rs.getString("id"));
@@ -453,7 +445,11 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setNumeroCupom(rs.getString("numerocupom"));
                         imp.setValor(rs.getDouble("valor"));
                         imp.setObservacao(rs.getString("observacao"));
-                        imp.setIdCliente(rs.getString("idcliente"));
+                        imp.setIdCliente(String.format(
+                                "%s-%s",
+                                rs.getString("cod_empresa_cliente"),
+                                rs.getString("idcliente")
+                        ));
                         imp.setDataVencimento(rs.getDate("datavencimento"));
                         imp.setJuros(rs.getDouble("juros"));
                         imp.setCnpjCliente(rs.getString("cnpjCliente"));
