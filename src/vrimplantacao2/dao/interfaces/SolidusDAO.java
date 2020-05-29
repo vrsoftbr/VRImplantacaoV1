@@ -727,6 +727,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_entrada_aliq"));
                     imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_entrada_reducao"));
 
+                    imp.setIcmsCstConsumidor(rst.getInt("icms_saida_cst"));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("icms_saida_aliq"));
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("icms_saida_reducao"));
+                    
                     imp.setPautaFiscalId(rst.getString("ncm"));
                     imp.setDivisao(rst.getString("divisao"));
 

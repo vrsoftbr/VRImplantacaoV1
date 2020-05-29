@@ -233,7 +233,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis_saida"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_pis_entrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
-                    imp.setIcmsCstSaida(rst.getInt("cst_aliquota_credito"));
+                    imp.setIcmsCstSaida(rst.getInt("cst_aliquota_debito"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliquota_debito"));
                     imp.setIcmsCstSaidaForaEstado(rst.getInt("cst_aliquota_debito_fora"));
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fora"));

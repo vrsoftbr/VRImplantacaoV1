@@ -522,6 +522,7 @@ public class SolidusGUI extends VRInternalFrame {
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
         txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
+        pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabsConexoes = new javax.swing.JTabbedPane();
         conexaoFirebird = new vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel();
         conexaoOracle = new vrimplantacao2.gui.component.conexao.oracle.ConexaoOraclePanel();
@@ -1176,6 +1177,7 @@ public class SolidusGUI extends VRInternalFrame {
         );
 
         tabs.addTab("Unificação", vRPanel2);
+        tabs.addTab("Importar Balança", pnlBalanca);
 
         conexaoFirebird.setSistema(SISTEMA);
         tabsConexoes.addTab("Firebird", conexaoFirebird);
@@ -1403,6 +1405,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.list.VRList listEntidadesCheque;
     private vrframework.bean.list.VRList listEntidadesConvenio;
     private vrframework.bean.list.VRList listEntidadesRotativo;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlProdutoCustom;
     private vrframework.bean.panel.VRPanel tabCheque;
     private vrframework.bean.panel.VRPanel tabClienteDados;
