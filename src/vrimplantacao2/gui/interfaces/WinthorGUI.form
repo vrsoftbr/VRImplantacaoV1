@@ -169,7 +169,11 @@
                               <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkT1Estoque" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkT1Custo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkTemBalanca" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -216,7 +220,7 @@
                                   <Component id="chkQtdEmbalagemCompra" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="27" max="32767" attributes="0"/>
+                          <EmptySpace pref="41" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -282,6 +286,7 @@
                                       <Component id="chkT1NatReceita" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkTipoEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTemBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
@@ -305,7 +310,7 @@
                                   <Component id="chkQtdEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="15" max="32767" attributes="0"/>
+                          <EmptySpace pref="19" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -467,6 +472,14 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagemCompra">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. Compra"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tem Balan&#xe7;a"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
                   </Properties>
                 </Component>
               </SubComponents>
