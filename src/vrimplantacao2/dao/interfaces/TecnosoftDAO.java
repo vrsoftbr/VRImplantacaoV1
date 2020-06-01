@@ -521,7 +521,8 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setDataNascimento(rs.getDate("data_nascimento"));
-                    imp.setAtivo(rs.getInt("desativar") == 1 ? false : true);
+                    
+                    imp.setAtivo(rs.getInt("crediario") == 1 ? true : false);
                     imp.setValorLimite(rs.getDouble("limite_credito"));
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setNomePai(rs.getString("pai"));
