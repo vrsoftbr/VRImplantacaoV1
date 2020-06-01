@@ -8,6 +8,7 @@ import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.importacao.NutricionalToledoIMP;
@@ -19,6 +20,8 @@ import vrimplantacao2.vo.importacao.NutricionalToledoIMP;
 public class NutricionalToledoDAO {
 
     Utils util = new Utils();
+    public static String sistema;
+    public static String loja;
 
     public List<NutricionalToledoIMP> getNutricionalToledoProduto(String arquivo) throws Exception {
         List<NutricionalToledoIMP> result = new ArrayList<>();
@@ -28,7 +31,7 @@ public class NutricionalToledoDAO {
             NutricionalToledoIMP toledo = new NutricionalToledoIMP();
             StringLine ln = new StringLine(vToledo.get(i));
             if (!vToledo.get(i).trim().isEmpty()) {
-                ln.jump(4);
+                /*ln.jump(4);
                 switch (ln.sbi(1)) {
                     case 1: toledo.setPesavel("U"); break;
                     case 5: toledo.setPesavel("U"); break;
@@ -38,20 +41,26 @@ public class NutricionalToledoDAO {
                 ln.jump(6);
                 toledo.setValidade(ln.sbi(3));
                 toledo.setDescricao(ln.sb(25));
-                ln.sb(25);
-                /*if ("0".equals(vToledo.get(i).substring(2, 3))) {
-                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
+                ln.sb(25);*/
+                if ("0".equals(vToledo.get(i).substring(2, 3))) {
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
                     toledo.setPesavel("P");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    toledo.setCodigo(toledo.getNutricional());
                 } else {
-                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
+                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
                     toledo.setPesavel("U");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                }*/
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    toledo.setCodigo(toledo.getNutricional());
+                }
             }
             result.add(toledo);
         }
@@ -69,6 +78,7 @@ public class NutricionalToledoDAO {
                 NutricionalToledoVO vo = new NutricionalToledoVO();
                 if (!vToledo.get(i).trim().isEmpty()) {
                     vo.setId(Utils.stringToInt(vToledo.get(i).substring(2, 7)));
+                    System.out.println("ID NUTRI: " + vo.getId());
                     vo.setQuantidade(Utils.stringToInt(vToledo.get(i).substring(8, 11)));
                     vo.setId_tipounidadeporcao(Utils.stringToInt(vToledo.get(i).substring(11, 12)));
                     vo.setMedidainteira(Utils.stringToInt(vToledo.get(i).substring(13, 14)));
@@ -199,7 +209,7 @@ public class NutricionalToledoDAO {
 
         for (NutricionalToledoVO vo : toledo) {
             
-            final MultiMap<Integer, NutricionalToledoVO> nutricionais = getNutricionalProduto();
+            final MultiMap<Integer, NutricionalToledoVO> nutricionais = getNutricionalProduto(sistema, loja);
             
             NutricionalToledoVO prod = nutricionais.get(vo.getId());
             
@@ -245,18 +255,25 @@ public class NutricionalToledoDAO {
                 stm.execute(sql.getInsert());
             }
             
+            int idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
+            
+            if(idProduto == -1) {
+                System.out.println("Produto Balança Não Encontrado: " + vo.getIdProduto() + "\n"
+                        + "Desc: " + vo.getDescricao());
+            }
+            
             try(Statement stm = Conexao.createStatement()) {
                 SQLBuilder sql = new SQLBuilder();
                 sql.setTableName("nutricionaltoledoitem");
                 sql.put("id_nutricionaltoledo", vo.getId());
-                sql.put("id_produto", prod.getIdProduto());
+                sql.put("id_produto", idProduto);
                 
                 stm.execute(sql.getInsert());
             }
         }
     }
     
-    private MultiMap<Integer, NutricionalToledoVO> getNutricionalProduto() throws Exception {
+    private MultiMap<Integer, NutricionalToledoVO> getNutricionalProduto(String sistema, String loja) throws Exception {
         MultiMap<Integer, NutricionalToledoVO> result = new MultiMap<>();
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
@@ -267,7 +284,8 @@ public class NutricionalToledoDAO {
                     "	descricao,\n" +
                     "	produto \n" +
                     "from \n" +
-                    "	implantacao.codant_nutricionaltoledo\n" +
+                    "	implantacao.codant_nutricionaltoledo where nutricional != 0 and\n" +
+                    "   sistema = '" + sistema + "' and loja = '" + loja + "'\n" +       
                     "order by \n" +
                     "	nutricional")) {
                 while(rs.next()) {
@@ -298,7 +316,7 @@ public class NutricionalToledoDAO {
         }
     }
 
-    public static void importarNutricionalToledoProduto(String arquivo, String sistema, String loja) throws Exception {
+    public static void importarNutricionalToledoProduto(String arquivo) throws Exception {
         ProgressBar.setStatus("Carregando dados...Nutricional Toledo Produto...");
         List<NutricionalToledoIMP> nutricionalToledo = new NutricionalToledoDAO().getNutricionalToledoProduto(arquivo);
         new NutricionalToledoDAO().salvarNutricionalProduto(nutricionalToledo, sistema, loja);
