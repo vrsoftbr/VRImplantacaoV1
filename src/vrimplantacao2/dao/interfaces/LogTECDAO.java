@@ -275,6 +275,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rs.getString("id_icms_s"));
                     imp.setIcmsDebitoForaEstadoId(rs.getString("id_icms_s"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms_s"));
+                    imp.setIcmsConsumidorId(rs.getString("id_icms_s"));
                     String icmsEntradaId = formatTributacaoID(
                             rs.getInt("icms_cst_e"),
                             rs.getDouble("icms_aliq_e"),
