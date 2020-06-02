@@ -18,6 +18,7 @@ import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -30,6 +31,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -39,7 +41,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class RPInfoDAO extends InterfaceDAO {
+public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarFuncionario = false;
     public boolean gerarCodigoAtacado = true;
@@ -104,6 +106,7 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.PESAVEL,
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ATACADO,
             OpcaoProduto.RECEITA,
             OpcaoProduto.SECAO,
@@ -361,6 +364,49 @@ public class RPInfoDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "with loja as (\n" +
+                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    ")\n" +
+                    "select \n" +
+                    "	distinct on (tr.trib_codigo)\n" +
+                    "	tr.trib_codigo id_tributacao,\n" +
+                    "	tr.trib_descricao descricao,\n" +
+                    "	tr.trib_codnf cst,\n" +
+                    "	tr.trib_icms aliquota,\n" +
+                    "	tr.trib_redbc reducao,\n" +
+                    "	coalesce(tr.trib_fcpaliq, 0) fcp\n" +
+                    "from\n" +
+                    "	tributacao tr\n" +
+                    "	join loja on true\n" +
+                    "where\n" +
+                    "	tr.trib_uforigem = loja.uf\n" +
+                    "	and tr.trib_mvtos like '%EVP%'\n" +
+                    "order by\n" +
+                    "	tr.trib_codigo, tr.trib_cstpis desc"
+            )) {
+                while (rst.next()) {
+                    result.add(
+                            new MapaTributoIMP(
+                                    rst.getString("id_tributacao"),
+                                    rst.getString("descricao"),
+                                    rst.getInt("cst"),
+                                    rst.getDouble("aliquota"),
+                                    rst.getDouble("reducao")
+                            )
+                    );
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -368,20 +414,6 @@ public class RPInfoDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "with loja as (\n" +
                     "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
-                    "),\n" +
-                    "piscofins_e as (\n" +
-                    "	select distinct on (tr.trib_codigo)\n" +
-                    "		tr.trib_codigo id_tributacao,\n" +
-                    "		tr.trib_cstpis cstpiscofins,\n" +
-                    "		tr.trib_natpiscof naturezareceita\n" +
-                    "	from\n" +
-                    "		tributacao tr\n" +
-                    "		join loja on true\n" +
-                    "	where\n" +
-                    "		tr.trib_uforigem = loja.uf\n" +
-                    "		and tr.trib_mvtos like '%EAQ%'\n" +
-                    "	order by\n" +
-                    "		tr.trib_codigo, tr.trib_cstpis desc\n" +
                     "),\n" +
                     "piscofins_s as (\n" +
                     "	select distinct on (tr.trib_codigo)\n" +
@@ -443,9 +475,9 @@ public class RPInfoDAO extends InterfaceDAO {
                     "	cest.cest,\n" +
                     "	un.prun_setor setor,\n" +
                     "	un.prun_setordep departamento,\n" +
-                    "	piscofins_e.cstpiscofins piscofins_e,\n" +
                     "	piscofins_s.cstpiscofins piscofins_s,\n" +
-                    "	piscofins_s.naturezareceita piscofins_natrec\n" +
+                    "	piscofins_s.naturezareceita piscofins_natrec,\n" +
+                    "	p.prod_trib_codigo id_icms\n" +
                     "from\n" +
                     "	produtos p\n" +
                     "	join loja on true\n" +
@@ -473,8 +505,6 @@ public class RPInfoDAO extends InterfaceDAO {
                     "		where\n" +
                     "			nullif(trim(prod_codcaixa),'') is not null\n" +
                     "	) ean on ean.id = p.prod_codigo\n" +
-                    "	left join piscofins_e on\n" +
-                    "		piscofins_e.id_tributacao = p.prod_trib_codigo\n" +
                     "	left join piscofins_s on\n" +
                     "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
                     "order by\n" +
@@ -548,11 +578,15 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_s"));
-                    imp.setPiscofinsCstCredito(rst.getString("piscofins_e"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
-                    /*imp.setIcmsAliq(rst.getDouble("icms"));
-                    imp.setIcmsReducao(rst.getDouble("icmsreducao"));
-                    imp.setIcmsCst(rst.getInt("cst"));*/
+                    
+                    imp.setIcmsConsumidorId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
+                    
                     if (rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
                         if (rst.getString("setor").length() > 2) {
                             imp.setSetor(rst.getString("setor").trim().substring(0, 2));
