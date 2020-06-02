@@ -716,6 +716,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	v.numcfe\n"
                     + "from vendas v\n"
                     + "where v.data between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    //+ " and v.numcfe = '000126'\n"
                     + "order by v.data";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);

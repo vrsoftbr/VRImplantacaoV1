@@ -12,6 +12,20 @@ import vrimplantacao2.vo.enums.TipoSexo;
  * @author Leandro
  */
 public class ClientePreferencialVO {
+
+    /**
+     * @return the dataNascimentoConjuge
+     */
+    public Date getDataNascimentoConjuge() {
+        return dataNascimentoConjuge;
+    }
+
+    /**
+     * @param dataNascimentoConjuge the dataNascimentoConjuge to set
+     */
+    public void setDataNascimentoConjuge(Date dataNascimentoConjuge) {
+        this.dataNascimentoConjuge = dataNascimentoConjuge;
+    }
     private int id;
     private String nome = "SEM NOME";
     private SituacaoCadastro situacaocadastro = SituacaoCadastro.ATIVO;
@@ -44,6 +58,7 @@ public class ClientePreferencialVO {
     private double valorLimite = 0;// numeric(11,2) NOT NULL,
     private String nomeConjuge;// character varying(35) NOT NULL,
     private int cpfConjuge;
+    private Date dataNascimentoConjuge;
     private TipoInscricao tipoInscricao = TipoInscricao.FISICA;
     private int vencimentoCreditoRotativo = 0;// integer NOT NULL,
     private String observacao2 = "";// character varying(2500) NOT NULL,
