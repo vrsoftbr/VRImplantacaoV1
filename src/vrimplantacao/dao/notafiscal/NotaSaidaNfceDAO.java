@@ -331,7 +331,19 @@ public class NotaSaidaNfceDAO {
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
-                            codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cEAN.getTextContent().replace("'", "").replace("\n", "").trim());
+                            
+                            String ean;
+                            
+                            if ((cEAN.getTextContent() != null) &&
+                                    (!cEAN.getTextContent().trim().isEmpty()) &&
+                                    (!cEAN.getTextContent().contains("SEM GTIN"))) {
+                                
+                                ean = cEAN.getTextContent();
+                            } else {
+                                ean = cProd.getTextContent();
+                            }
+                            
+                            codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), ean.replace("'", "").replace("\n", "").trim());
                         }
                     } else {
 

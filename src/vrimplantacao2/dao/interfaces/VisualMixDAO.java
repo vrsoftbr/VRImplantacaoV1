@@ -582,7 +582,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " f.NomeFantasia as fantasia,\n"
                     + "	f.TipoLogradouro as logradouro,\n"
                     + " f.Endereco,\n"
-                    + " f.NumeroEnd as numero,\n"
+                    + " CAST(f.NumeroEnd as bigint) as numero,\n"
                     + " f.Complemento,\n"
                     + " f.Bairro,\n"
                     + " f.Cidade as municipio,\n"
@@ -598,6 +598,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " f.InscricaoEstadual as ie,\n"
                     + " f.InscrMunicipal as im,\n"
                     + " f.PrazoEntrega,\n"
+                    + " f.FrequenciaVisita as prazoVisita,\n"
                     + " f.DataCadastro,\n"
                     + "	f.CondicaoPagto,\n"
                     + " cp.Descricao as condicaopagamento,\n"
@@ -646,8 +647,27 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("Cep"));
                     imp.setDatacadastro(rst.getDate("DataCadastro"));
-                    imp.setTel_principal(rst.getString("Telefone"));
+
+                    if ((rst.getString("Telefone") != null)
+                            && (!rst.getString("Telefone").trim().isEmpty())) {
+
+                        if (rst.getString("Telefone").startsWith("0")) {
+                            imp.setTel_principal(rst.getString("Telefone").substring(1));
+                        }
+                    }
+
                     imp.setPrazoEntrega(rst.getInt("PrazoEntrega"));
+                    imp.setPrazoVisita(rst.getInt("prazoVisita"));
+                    imp.setPrazoSeguranca(2);
+                    imp.setPrazoPedido(rst.getInt("PrazoEntrega"));
+
+                    imp.addDivisao(
+                            imp.getImportId(),
+                            imp.getPrazoVisita(),
+                            imp.getPrazoEntrega(),
+                            imp.getPrazoSeguranca()
+                    );
+
                     imp.setCondicaoPagamento(rst.getInt("CondicaoPagto"));
                     imp.setObservacao(rst.getString("Observacao"));
 
@@ -780,6 +800,14 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.DataAdmissao,\n"
                     + "	c.CodigoProfissao,\n"
                     + "	c.TelefoneEmpresa,\n"
+                    + "	e.Descricao as nomeempresa,\n"
+                    + "	e.EnderecoEmpresa,\n"
+                    + "	e.NumeroEmpresa,\n"
+                    + "	e.ComplementoEmpresa,\n"
+                    + "	e.BairroEmpresa,\n"
+                    + "	e.CidadeEmpresa,\n"
+                    + "	e.EstadoEmpresa,\n"
+                    + "	e.CEPEmpresa,"
                     + "	c.RamalEmpresa,\n"
                     + "	c.DataInclusao as datacadastro,\n"
                     + "	c.Telefone,\n"
@@ -788,6 +816,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.LimiteCredito as valorlimite,\n"
                     + "	c.LimiteCheques,\n"
                     + "	c.DescProfissao as cargo,\n"
+                    + " p.Descricao as profissao\n,"        
                     + "	c.Renda as salario,\n"
                     + "	c.EnderecoEntrega,\n"
                     + "	c.NumeroEntrega,\n"
@@ -796,8 +825,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.CidadeEntrega as municipioentrega,\n"
                     + "	c.UFEntrega as ufentrega,\n"
                     + "	c.CEPEntrega as cepentrega,\n"
-                    + "	c.FoneEntrega as telefoneentrega\n"
+                    + "	c.FoneEntrega as telefoneentrega,\n"
+                    + " c.DataNascimentoConjuge as datanascimentoconjuge\n"
                     + "from dbo.Clientes c\n"
+                    + "left join [DiggerMatriz].[dbo].Empresa e on e.Codigo = c.Empresa\n" 
+                    + "left join [DiggerMatriz].[dbo].Profissao p on p.Codigo = c.CodigoProfissao\n"
                     + "where c.IDLoja = " + getLojaOrigem() + "\n"
                     + "order by 1"
             )) {
@@ -823,9 +855,20 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rst.getDate("DataNascimento"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setNomeConjuge(rst.getString("NomeConjuge"));
-                    imp.setCargo(rst.getString("cargo"));
-                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setDataNascimentoConjuge(rst.getDate("datanascimentoconjuge"));
+                                        
+                    imp.setEmpresa(rst.getString("nomeempresa"));
+                    imp.setEmpresaEndereco(rst.getString("EnderecoEmpresa"));
+                    imp.setEmpresaNumero(rst.getString("NumeroEmpresa"));
+                    imp.setEmpresaComplemento(rst.getString("ComplementoEmpresa"));
+                    imp.setEmpresaBairro(rst.getString("BairroEmpresa"));
+                    imp.setEmpresaMunicipio(rst.getString("CidadeEmpresa"));
+                    imp.setEmpresaUf(rst.getString("EstadoEmpresa"));
+                    imp.setEmpresaCep(rst.getString("CEPEmpresa"));
                     imp.setEmpresaTelefone(rst.getString("TelefoneEmpresa"));
+                    imp.setDataAdmissao(rst.getDate("DataAdmissao"));
+                    imp.setCargo(rst.getString("profissao"));
+                    imp.setSalario(rst.getDouble("salario"));
 
                     if (rst.getInt("EstadoCivil") == 2) {
                         imp.setEstadoCivil(TipoEstadoCivil.CASADO);
@@ -937,9 +980,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
                 while (rst.next()) {
-                    
+
                     ReceitaBalancaIMP imp = receitas.get(rst.getString("id"));
-                    
+
                     if (imp == null) {
                         imp = new ReceitaBalancaIMP();
                         imp.setId(rst.getString("id"));
@@ -947,10 +990,10 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setReceita(rst.getString("receita"));
                         receitas.put(imp.getId(), imp);
                     }
-                    
+
                     imp.getProdutos().add(rst.getString("id_produto"));
                 }
-                
+
                 return new ArrayList<>(receitas.values());
             }
         }

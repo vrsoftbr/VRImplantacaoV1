@@ -666,6 +666,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setIcmsDebitoId(rs.getString("id_icms"));
         imp.setIcmsDebitoForaEstadoId(rs.getString("id_icms"));
         imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms"));
+        imp.setIcmsConsumidorId(rs.getString("id_icms"));
         imp.setIcmsCreditoId(rs.getString("id_icms"));
         imp.setIcmsCreditoForaEstadoId(rs.getString("id_icms"));
         
