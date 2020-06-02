@@ -59,7 +59,7 @@
                   <Component id="txtCompLoja" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="294" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" pref="298" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -127,6 +127,26 @@
                     <Property name="text" type="java.lang.String" value="Fornecedor"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornNumeroEnd">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornTelefone">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Telefone"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornPrazoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prazo Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornPrazoPedido">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prazo Pedido"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
@@ -155,10 +175,39 @@
                                   <Component id="chkClienteBloqueado" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkDataNascimentoConjuge" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkCliEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliEnderecoEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliNumeroEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliComplementoEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliBairroEmpresa" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkCliMunicipioEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliUFEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliCepEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliTelefoneEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkCliCargoEmpresa" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkCliDataAdmissaoEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliSalarioEmpresa" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="231" max="32767" attributes="0"/>
+                          <EmptySpace pref="63" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -170,10 +219,32 @@
                               <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkDataNascimentoConjuge" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCliEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliEnderecoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliNumeroEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliComplementoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliBairroEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCliMunicipioEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliUFEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliCepEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliTelefoneEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliCargoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCliDataAdmissaoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliSalarioEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="186" max="32767" attributes="0"/>
+                          <EmptySpace pref="115" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -199,6 +270,71 @@
                     <Property name="text" type="java.lang.String" value="Valor Limite"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDataNascimentoConjuge">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Data Nascimento Conjuge"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliEnderecoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Endere&#xe7;o Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliNumeroEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliComplementoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Complemento Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliBairroEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bairro Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliMunicipioEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Munic&#xed;pio Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliUFEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="UF Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliCepEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cep Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliTelefoneEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Telefone Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliCargoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cargo Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliDataAdmissaoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Data Admiss&#xe3;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliSalarioEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Sal&#xe1;rio"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tabParametro">
@@ -216,7 +352,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkIcmsForaEstado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="399" max="32767" attributes="0"/>
+                          <EmptySpace pref="477" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -261,7 +397,7 @@
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="264" max="32767" attributes="0"/>
+                      <EmptySpace pref="342" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

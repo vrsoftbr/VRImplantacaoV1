@@ -18,6 +18,20 @@ import vrimplantacao2.vo.enums.TipoSexo;
  * @author Leandro
  */
 public class ClienteIMP {
+
+    /**
+     * @return the dataNascimentoConjuge
+     */
+    public Date getDataNascimentoConjuge() {
+        return dataNascimentoConjuge;
+    }
+
+    /**
+     * @param dataNascimentoConjuge the dataNascimentoConjuge to set
+     */
+    public void setDataNascimentoConjuge(Date dataNascimentoConjuge) {
+        this.dataNascimentoConjuge = dataNascimentoConjuge;
+    }
     private String id;
     private String cnpj;
     private TipoInscricao tipoInscricao = TipoInscricao.VAZIO;
@@ -58,6 +72,7 @@ public class ClienteIMP {
     private double valorLimite = 0;
     private String nomeConjuge;
     private String cpfConjuge;
+    private Date dataNascimentoConjuge;
     private String nomePai;
     private String nomeMae;
     private String observacao;

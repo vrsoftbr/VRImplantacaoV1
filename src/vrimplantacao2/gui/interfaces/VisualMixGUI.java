@@ -178,14 +178,27 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                         tabProdutos.executarImportacao();
                         
                         if (chkFornecedor.isSelected()) {
-                            importador.importarFornecedor(
-                                    OpcaoFornecedor.DADOS,
-                                    OpcaoFornecedor.CONTATOS
-                            );
+                            importador.importarFornecedor();
                         }
 
                         {
                             List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                            
+                            if (chkFornNumeroEnd.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.NUMERO);
+                            }
+                            
+                            if (chkFornTelefone.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.TELEFONE);
+                            }
+                            
+                            if (chkFornPrazoFornecedor.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.PRAZO_FORNECEDOR);
+                            }
+                            
+                            if (chkFornPrazoPedido.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR);
+                            }
 
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
@@ -207,6 +220,47 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkClienteValorLimite.isSelected()) {
                             opt.add(OpcaoCliente.VALOR_LIMITE);
                         }
+                        if (chkDataNascimentoConjuge.isSelected()) {
+                            opt.add(OpcaoCliente.DATA_NASCIMENTO_CONJUGE);
+                        }
+                        
+                        if (chkCliEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.EMPRESA);
+                        }
+                        if (chkCliEnderecoEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.ENDERECO_EMPRESA);
+                        }
+                        if (chkCliNumeroEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.NUMERO_EMPRESA);
+                        }
+                        if (chkCliComplementoEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.COMPLEMENTO_EMPRESA);
+                        }
+                        if (chkCliBairroEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.BAIRRO_EMPRESA);
+                        }
+                        if (chkCliMunicipioEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.MUNICIPIO_EMPRESA);
+                        }
+                        if (chkCliUFEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.UF_EMPRESA);
+                        }
+                        if (chkCliCepEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.CEP_EMPRESA);
+                        }
+                        if (chkCliTelefoneEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.TELEFONE_EMPRESA);
+                        }
+                        if (chkCliCargoEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.CARGO);
+                        }
+                        if (chkCliDataAdmissaoEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.DATA_ADMISSAO);
+                        }
+                        if (chkCliSalarioEmpresa.isSelected()) {
+                            opt.add(OpcaoCliente.SALARIO);
+                        }
+                        
                         if (!opt.isEmpty()) {
                             importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                         }
@@ -266,12 +320,29 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornNumeroEnd = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornTelefone = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornPrazoPedido = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteValorLimite = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataNascimentoConjuge = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliEnderecoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliNumeroEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliComplementoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliBairroEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliMunicipioEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliUFEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliCepEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliTelefoneEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliCargoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliDataAdmissaoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliSalarioEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         tabParametro = new javax.swing.JPanel();
         chkIcmsForaEstado = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -304,6 +375,18 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         chkFornecedor.setText("Fornecedor");
         tabFornecedor.add(chkFornecedor);
 
+        chkFornNumeroEnd.setText("Número");
+        tabFornecedor.add(chkFornNumeroEnd);
+
+        chkFornTelefone.setText("Telefone");
+        tabFornecedor.add(chkFornTelefone);
+
+        chkFornPrazoFornecedor.setText("Prazo Fornecedor");
+        tabFornecedor.add(chkFornPrazoFornecedor);
+
+        chkFornPrazoPedido.setText("Prazo Pedido");
+        tabFornecedor.add(chkFornPrazoPedido);
+
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
 
@@ -317,6 +400,32 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkClienteValorLimite.setText("Valor Limite");
 
+        chkDataNascimentoConjuge.setText("Data Nascimento Conjuge");
+
+        chkCliEmpresa.setText("Empresa");
+
+        chkCliEnderecoEmpresa.setText("Endereço Empresa");
+
+        chkCliNumeroEmpresa.setText("Número Empresa");
+
+        chkCliComplementoEmpresa.setText("Complemento Empresa");
+
+        chkCliBairroEmpresa.setText("Bairro Empresa");
+
+        chkCliMunicipioEmpresa.setText("Município Empresa");
+
+        chkCliUFEmpresa.setText("UF Empresa");
+
+        chkCliCepEmpresa.setText("Cep Empresa");
+
+        chkCliTelefoneEmpresa.setText("Telefone Empresa");
+
+        chkCliCargoEmpresa.setText("Cargo Empresa");
+
+        chkCliDataAdmissaoEmpresa.setText("Data Admissão");
+
+        chkCliSalarioEmpresa.setText("Salário");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -329,9 +438,35 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(231, Short.MAX_VALUE))
+                        .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkDataNascimentoConjuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addComponent(chkCliEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliEnderecoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliNumeroEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliComplementoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliBairroEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addComponent(chkCliMunicipioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliUFEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliCepEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliTelefoneEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkCliCargoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addComponent(chkCliDataAdmissaoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(63, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -340,10 +475,29 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataNascimentoConjuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliEnderecoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliNumeroEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliComplementoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliBairroEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliMunicipioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliUFEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliCepEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliTelefoneEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliCargoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliDataAdmissaoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(186, Short.MAX_VALUE))
+                .addContainerGap(115, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -357,7 +511,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabParametroLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkIcmsForaEstado)
-                .addContainerGap(399, Short.MAX_VALUE))
+                .addContainerGap(477, Short.MAX_VALUE))
         );
         tabParametroLayout.setVerticalGroup(
             tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -393,7 +547,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(264, Short.MAX_VALUE))
+                .addContainerGap(342, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -485,7 +639,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(lblCompLoja)
                     .addComponent(txtCompLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -511,10 +665,27 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCliBairroEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliCargoEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliCepEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliComplementoEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliDataAdmissaoEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliEnderecoEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliMunicipioEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliNumeroEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliSalarioEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliTelefoneEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCliUFEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkClienteBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkDataNascimentoConjuge;
+    private vrframework.bean.checkBox.VRCheckBox chkFornNumeroEnd;
+    private vrframework.bean.checkBox.VRCheckBox chkFornPrazoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornPrazoPedido;
+    private vrframework.bean.checkBox.VRCheckBox chkFornTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkIcmsForaEstado;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;

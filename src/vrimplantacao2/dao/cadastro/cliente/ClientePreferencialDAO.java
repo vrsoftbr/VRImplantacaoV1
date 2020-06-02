@@ -79,6 +79,7 @@ public class ClientePreferencialDAO {
             sql.put("outrarenda", 0);
             sql.put("cpfconjuge", cliente.getCpfConjuge());
             sql.put("rgconjuge", "");
+            sql.put("datanascimentoconjuge", cliente.getDataNascimentoConjuge());
             sql.put("orgaoemissorconjuge", "");
             sql.put("empresaconjuge", "");
             sql.put("enderecoempresaconjuge", "SEM ENDERECO");
@@ -346,6 +347,9 @@ public class ClientePreferencialDAO {
                 }
                 if (opt.contains(OpcaoCliente.DATA_CADASTRO)) {
                     sql.put("datacadastro", vo.getDataCadastro());
+                }
+                if (opt.contains(OpcaoCliente.DATA_NASCIMENTO_CONJUGE)) {
+                    sql.put("datanascimentoconjuge", vo.getDataNascimentoConjuge());
                 }
                 sql.setWhere("id = " + vo.getId());
                 if (!sql.isEmpty()) {

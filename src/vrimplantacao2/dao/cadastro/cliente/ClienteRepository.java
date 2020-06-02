@@ -239,6 +239,9 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.BAIRRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.DATA_NASCIMENTO_CONJUGE)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 provider.notificar();
             }
@@ -525,6 +528,7 @@ public class ClienteRepository {
         vo.setValorLimite(imp.getValorLimite());
         vo.setNomeConjuge(imp.getNomeConjuge());
         vo.setCpfConjuge(imp.getCpfConjuge());
+        vo.setDataNascimentoConjuge(imp.getDataNascimentoConjuge());
         vo.setNomePai(imp.getNomePai());
         vo.setNomeMae(imp.getNomeMae());
         vo.setObservacao("IMPORTACAO VR" + imp.getObservacao() == null ? "" : " - " + imp.getObservacao());
