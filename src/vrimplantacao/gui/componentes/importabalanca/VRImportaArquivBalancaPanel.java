@@ -159,10 +159,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         });
 
         rdbNutriconal.add(rdbToledo);
-        rdbToledo.setText("Toledo");
+        rdbToledo.setText("Toledo (ITENSMGV)");
 
         rdbNutriconal.add(rdbToledoProduto);
-        rdbToledoProduto.setText("Toledo x Produto");
+        rdbToledoProduto.setText("Toledo x Produto (INFNUTRI)");
 
         javax.swing.GroupLayout tabNutricionalLayout = new javax.swing.GroupLayout(tabNutricional);
         tabNutricional.setLayout(tabNutricionalLayout);
@@ -172,17 +172,16 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addContainerGap()
                 .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
-                        .addComponent(txtNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(txtNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnImportarNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
                         .addComponent(rdbFilizolaRdc360)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(rdbToledo)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(rdbToledoProduto)
-                        .addGap(0, 3, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(rdbToledoProduto)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         tabNutricionalLayout.setVerticalGroup(
             tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,7 +207,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabsOpcoes)
+            .addComponent(tabsOpcoes, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -256,12 +255,15 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                     ProgressBar.show();
                     ProgressBar.setCancel(false);
                     
-                    if (!txtNutricional.getArquivo().isEmpty()) {                        
+                    if (!txtNutricional.getArquivo().isEmpty()) {
+                        NutricionalToledoDAO.sistema = sistema;
+                        NutricionalToledoDAO.loja = loja;
+                        
                         if (rdbFilizolaRdc360.isSelected()) {
                             NutricionalFilizolaDAO.importarArquivoRdc360(sistema, loja, txtNutricional.getArquivo());
                         }
                         if(rdbToledo.isSelected()) {
-                            NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo(), sistema, loja);
+                            NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo());
                         }
                         if(rdbToledoProduto.isSelected()) {
                             NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo());

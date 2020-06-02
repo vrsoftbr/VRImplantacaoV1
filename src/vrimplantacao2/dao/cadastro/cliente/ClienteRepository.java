@@ -239,7 +239,11 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.BAIRRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+
                     if (opt.contains(OpcaoCliente.DATA_NASCIMENTO_CONJUGE)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }

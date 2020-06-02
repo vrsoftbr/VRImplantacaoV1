@@ -238,6 +238,7 @@
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPermiteRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCSituacao" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="482" max="32767" attributes="0"/>
                       </Group>
@@ -254,7 +255,9 @@
                           <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="168" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCSituacao" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="145" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -284,6 +287,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkPermiteRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCSituacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cdastro"/>
                   </Properties>
                 </Component>
               </SubComponents>
