@@ -731,8 +731,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setFantasia(rst.getString("razaosocial"));
-                    imp.setRazao(rst.getString("nomefantasia"));
+                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("nomefantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpjcpf"));
                     imp.setIe_rg(rst.getString("ierg"));
                     imp.setInsc_municipal(rst.getString("inscmun"));
@@ -760,14 +760,22 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                      }*/
                     switch (rst.getString("tipofornecedor").trim()) {
                         case "A":
-                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                         case "D":
                             imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
+                        case "E":
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                            break;
                         case "P":
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                            break;
+                        case "R":
                             imp.setProdutorRural();
                             break;
                         case "S":
@@ -783,7 +791,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoEmpresa(TipoEmpresa.SOCIEDADE_CIVIL);
                             break;
                         default:
-                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                     }
