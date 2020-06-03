@@ -77,7 +77,7 @@ public class SysPdvGUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
                        
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        conexaoFirebird.setOnConectar(() -> {
+        /*conexaoFirebird.setOnConectar(() -> {
             dao.setTipoConexao(SysPdvDAO.TipoConexao.FIREBIRD);
             gravarParametros();
             carregarLojaCliente();
@@ -92,7 +92,7 @@ public class SysPdvGUI extends VRInternalFrame {
             carregarLojaVR();
             carregarFinalizadora();
             tabProdutos.btnMapaTribut.setEnabled(true);
-        });
+        });*/
         carregarParametros();        
         centralizarForm();
         this.setMaximum(false);
@@ -206,7 +206,7 @@ public class SysPdvGUI extends VRInternalFrame {
         cmbLojaOrigem.setSelectedIndex(index);
     }
     
-    private FinalizadoraTableModel rotativoModel = new FinalizadoraTableModel(new ArrayList<>());
+    /*private FinalizadoraTableModel rotativoModel = new FinalizadoraTableModel(new ArrayList<>());
     private FinalizadoraTableModel chequeModel = new FinalizadoraTableModel(new ArrayList<>());
     private void carregarFinalizadora() throws Exception {
         this.rotativoModel = new FinalizadoraTableModel(this.dao.getFinalizadora());
@@ -233,9 +233,9 @@ public class SysPdvGUI extends VRInternalFrame {
             }
         });
         tblCheque.setModel(this.chequeModel);
-    }
+    }*/
     
-    private List<String> getFinalizadorasRotativo() {
+    /*private List<String> getFinalizadorasRotativo() {
         List<String> result = new ArrayList<>();
         this.rotativoModel.getItens().stream()
                 .filter((f) -> f.selected)
@@ -249,7 +249,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 .filter((f) -> f.selected)
                 .forEach((f) -> result.add(f.id));
         return result;
-    }
+    }*/
     
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -283,8 +283,8 @@ public class SysPdvGUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     dao.setComplementoSistema(txtComplNomeSistema.getText());
-                    dao.setFinalizadorasRotativo(getFinalizadorasRotativo());
-                    dao.setFinalizadorasCheque(getFinalizadorasCheque());
+                    //dao.setFinalizadorasRotativo(getFinalizadorasRotativo());
+                    //dao.setFinalizadorasCheque(getFinalizadorasCheque());
                     dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
                     
                     switch(tabsConexoes.getSelectedIndex()) {

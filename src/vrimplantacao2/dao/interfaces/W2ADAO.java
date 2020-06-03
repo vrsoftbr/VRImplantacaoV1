@@ -37,6 +37,7 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
@@ -257,6 +258,7 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rs.getDouble("estoque"));
                     
                     imp.setIcmsDebitoId(rs.getString("idicms_debito"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(rs.getString("idicms_credito"));
                     
                     imp.setSituacaoCadastro(rs.getBoolean("situacaocadastro") == true ? 1 : 0);
@@ -269,6 +271,10 @@ public class W2ADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("pis_debito"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPautaFiscalId(imp.getImportId());
+                    
+                    if(imp.getEan().length() < 7) {
+                        imp.setManterEAN(true);
+                    }
                     
                     result.add(imp);
                 }
