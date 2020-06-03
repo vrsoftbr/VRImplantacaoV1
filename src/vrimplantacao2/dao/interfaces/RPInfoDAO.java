@@ -896,7 +896,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clie_sitconv permitecreditorotativo,\n"
                     + "	c.clie_sitcheque permitecheque,\n"
                     + "	c.clie_senhapdv senhapdv,\n"
-                    + " c.clie_descrestadocivil civil\n"        
+                    + " c.clie_descrestadocivil civil,\n"        
+                    + " c.clie_contacontabil,\n" 
+                    + "	c.clie_contagerencial\n"       
                     + "from\n"
                     + "	clientes c\n"
                     + "	left join municipios mr on\n"
@@ -978,6 +980,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                     
+                    if(rst.getString("clie_contacontabil") != null && rst.getString("clie_contagerencial") != null) {
+                        imp.setPermiteCreditoRotativo(true);
+                        imp.setPermiteCheque(true);
+                    }
 
                     result.add(imp);
                 }
