@@ -24,6 +24,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -553,6 +554,11 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setEan(rst.getString("ean"));
                         }
                     }
+                    
+                    if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+                        imp.setManterEAN(true);
+                    }
+                    
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("embalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
@@ -881,7 +887,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clie_diavenc diavencimento,\n"
                     + "	c.clie_sitconv permitecreditorotativo,\n"
                     + "	c.clie_sitcheque permitecheque,\n"
-                    + "	c.clie_senhapdv senhapdv\n"
+                    + "	c.clie_senhapdv senhapdv,\n"
+                    + " c.clie_descrestadocivil civil\n"        
                     + "from\n"
                     + "	clientes c\n"
                     + "	left join municipios mr on\n"
@@ -942,6 +949,27 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
                     imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
                     imp.setBloqueado("I".equals(rst.getString("clie_situacao")));
+                    
+                    if(rst.getString("civil") != null && !"".equals(rst.getString("civil"))) {
+                        String estCivil = rst.getString("civil");
+                        switch(estCivil.toUpperCase().trim()) {
+                            case "SOLTEIRO":
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                            case "CASADO":
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            case "DIVORCIADO":
+                                imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
+                            case "VIÚVO":
+                                imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
+                            default: imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                                break;
+                        }
+                    }
+                    
 
                     result.add(imp);
                 }
