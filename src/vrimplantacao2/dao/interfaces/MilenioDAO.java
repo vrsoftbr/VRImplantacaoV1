@@ -575,7 +575,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.PROPESLIQVDA pesoliquido,\n" +
                     "	case when r.REFDATFIMLIN < CURRENT_TIMESTAMP then 0 else 1 end ativo,\n" +
                     "	case when r.REFBLQCMP = 'S' then 1 else 0 end descontinuado,\n" +
-                    "	p.PRONCM ncm,\n" +
+                    "	r.REFNCM ncm,\n" +
                     "	r.CSTCOD cest,\n" +
                     "	r.FORCOD fabricante,\n" +
                     "	p.PROMRG1 margem,\n" +
@@ -889,49 +889,47 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             try (ResultSet rs = st.executeQuery(
                     "select\n" +
-                    "	ag.AGECOD id,\n" +
-                    "	ag.AGECGCCPF cnpj,\n" +
-                    "	ag.AGECGFRG ierg,\n" +
-                    "	ag.AGEORGEXP orgaoemissor,\n" +
-                    "	ag.AGEDES razao,\n" +
-                    "	ag.AGEFAN fantasia,\n" +
-                    "	ag.AGEINSMUN inscmun,\n" +
+                    "	CLICOD id,\n" +
+                    "	AGECGCCPF cnpj,\n" +
+                    "	AGECGFRG ierg,\n" +
+                    "	ageorgexp orgaoemissor,\n" +
+                    "	AGEDES razao,\n" +
+                    "	AGEFAN fantasia,\n" +
+                    "	AGEINSMUN inscmun,\n" +
                     "	1 ativo,\n" +
-                    "	case when ag.STACOD = '002' then 1 else 0 end bloqueado,\n" +
-                    "	ag.AGEDATBLO databloqueio,\n" +
-                    "	ag.AGEEND endereco,\n" +
-                    "	ag.AGENUM numero,\n" +
-                    "	ag.AGECPL complemento,\n" +
-                    "	ag.AGEBAI bairro,\n" +
-                    "	ag.AGECID cidade,\n" +
-                    "	ag.AGEEST estado,\n" +
-                    "	ag.AGECEP cep,\n" +
-                    "	c.CLIESTCIV estadocivil,\n" +
-                    "	c.CLIDATNAS datanascimento,\n" +
-                    "	ag.AGEDATCAD datacadastro,\n" +
-                    "	ag.AGEDATALT dataalteracao,\n" +
-                    "	c.CLISEX sexo,\n" +
-                    "	c.CLIEMP empresa,\n" +
-                    "	c.CLIEMPEND enderecoempresa,\n" +
-                    "	c.CLIEMPTEL telempresa,\n" +
-                    "	c.CLIDATFUN dataadmissao,\n" +
-                    "	c.CLIREN salario,\n" +
-                    "	c.CLILIMCRE limitecredito,\n" +
-                    "	c.CLICONJG conjuge,\n" +
-                    "	c.CLICONJGCPF conjugecpf,\n" +
-                    "	c.CLIMAE mae,\n" +
-                    "	c.CLIPAI pai,\n" +
-                    "	c.CLISITOBS observacoes,\n" +
-                    "	c.CLIDIAFECH diavencimento,\n" +
-                    "	ag.AGETEL1,\n" +
-                    "	ag.AGETEL2,\n" +
-                    "	ag.AGEFAX \n" +
+                    "	case when STACOD = '002' then 1 else 0 end bloqueado,\n" +
+                    "	AGEDATBLO databloqueio,\n" +
+                    "	AGEEND endereco,\n" +
+                    "	AGENUM numero,\n" +
+                    "	AGECPL complemento,\n" +
+                    "	AGEBAI bairro,\n" +
+                    "	AGECID cidade,\n" +
+                    "	AGEEST estado,\n" +
+                    "	AGECEP cep,\n" +
+                    "	CLIESTCIV estadocivil,\n" +
+                    "	CLIDATNAS datanascimento,\n" +
+                    "	AGEDATCAD datacadastro,\n" +
+                    "	AGEDATALT dataalteracao,\n" +
+                    "	CLISEX sexo,\n" +
+                    "	CLIEMP empresa,\n" +
+                    "	CLIEMPEND enderecoempresa,\n" +
+                    "	CLIEMPTEL telempresa,\n" +
+                    "	CLIDATFUN dataadmissao,\n" +
+                    "	CLIREN salario,\n" +
+                    "	CLILIMCRE limitecredito,\n" +
+                    "	CLICONJG conjuge,\n" +
+                    "	CLICONJGCPF conjugecpf,\n" +
+                    "	CLIMAE mae,\n" +
+                    "	CLIPAI pai,\n" +
+                    "	CLISITOBS observacoes,\n" +
+                    "	CLIDIAFECH diavencimento,\n" +
+                    "	AGETEL1,\n" +
+                    "	AGETEL2,\n" +
+                    "	AGEFAX\n" +
                     "from\n" +
-                    "	CLIENTE c\n" +
-                    "	join AGENTE ag on\n" +
-                    "		c.AGECOD = ag.AGECOD\n" +
+                    "	dbo.V_CLIENTE as v\n" +
                     "order by\n" +
-                    "	ag.AGECOD"
+                    "	CLICOD"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
