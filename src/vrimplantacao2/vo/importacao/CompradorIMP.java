@@ -5,9 +5,24 @@ package vrimplantacao2.vo.importacao;
  * @author Leandro
  */
 public class CompradorIMP {
+
+    /**
+     * @return the manterId
+     */
+    public Boolean getManterId() {
+        return manterId;
+    }
+
+    /**
+     * @param manterId the manterId to set
+     */
+    public void setManterId(Boolean manterId) {
+        this.manterId = manterId;
+    }
     
     private String id;
     private String descricao;
+    private Boolean manterId = false;
 
     public CompradorIMP() {
     }

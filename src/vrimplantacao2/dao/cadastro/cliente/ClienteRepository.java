@@ -246,6 +246,43 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    
+                    if (opt.contains(OpcaoCliente.EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.ENDERECO_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.NUMERO_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.COMPLEMENTO_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.BAIRRO_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.MUNICIPIO_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.UF_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.CEP_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.TELEFONE_EMPRESA)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.CARGO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.SALARIO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.DATA_ADMISSAO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 provider.notificar();
             }
