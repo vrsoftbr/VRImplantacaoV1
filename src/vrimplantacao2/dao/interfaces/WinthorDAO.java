@@ -474,7 +474,11 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.dtcadastro datacadastro, \n" +
                     "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n" +
                     "	p.CODAUXILIAR2,\n" +
-                    "	COALESCE(ean.qtunit, 1) qtdembalagem,\n" +
+                    "	COALESCE((CASE WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1\n" +
+                    "	 THEN ean.QTMINIMAATACADO\n" +
+                    "	--Qtd embalagem por embalagem\n" +
+                    "	WHEN ean.QTUNIT >=2 THEN ean.QTUNIT ELSE 0 END), 1) as qtdembalagem,\n" +
+                    "	coalesce(ean.qtunit, 1) embalagemunitario,\n" +
                     "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n" +
                     "	p.qtunitcx qtdembalagemcompra,\n" +
                     "	p.unidademaster tipoembalagemcompra,        \n" +
@@ -507,10 +511,10 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	icms.codicm icmsaliq,\n" +
                     "	icms.codicmtab icmsred,\n" +
                     "	p.codncmex,\n" +
-                    "	p.codfornec fabricante\n" +
+                    "	p.codfornec fabricante        \n" +
                     "FROM\n" +
                     "	pcprodut p\n" +
-                    "	JOIN pcfilial emp ON emp.codigo = " + getLojaOrigem() + "\n" +
+                    "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n" +
                     "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n" +
                     "	LEFT JOIN PCEMBALAGEM ean ON\n" +
                     "		ean.codprod = p.codprod AND\n" +
@@ -537,14 +541,14 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	LEFT JOIN pctribpiscofins piscofins ON\n" +
                     "		piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
                     "	LEFT JOIN (select \n" +
-                    "			icm.codprod,\n" +
-                    "			icm.codst,\n" +
-                    "			reg.codfilial\n" +
-                    "		  from \n" +
-                    "			pctabpr icm \n" +
-                    "		  left join pcregiao reg on icm.numregiao = reg.numregiao\n" +
-                    "		  left join PCTRIBUT trb on icm.codst = trb.codst) tabst on tabst.codprod = p.codprod and\n" +
-                    "		  tabst.codfilial = emp.codigo\n" +
+                    "					icm.codprod,\n" +
+                    "					icm.codst,\n" +
+                    "					reg.codfilial\n" +
+                    "				from \n" +
+                    "					pctabpr icm \n" +
+                    "				left join pcregiao reg on icm.numregiao = reg.numregiao\n" +
+                    "				left join PCTRIBUT trb on icm.codst = trb.codst) tabst on tabst.codprod = p.codprod and\n" +
+                    "				tabst.codfilial = emp.codigo\n" +
                     "ORDER BY id, ean"
             )) {
                 int cont = 0, cont2 = 0;
@@ -568,17 +572,16 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca(false);
                     }
                     
-                    if(temArquivoBalanca && imp.isBalanca()) {
+                    if(temArquivoBalanca && imp.isBalanca() && imp.getEan() != null && !"".equals(imp.getEan())) {
                         ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
                         
-                        imp.setEan(String.valueOf(bal.getCodigo()));
-                        
                         if (bal != null) {
+                            imp.setEan(String.valueOf(bal.getCodigo()));
                             imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
                             imp.setValidade(bal.getValidade() > 1 ? bal.getValidade() : rst.getInt("validade"));
                         } else {
-                            rst.getInt("validade");
-                            imp.setTipoEmbalagem(rst.getString("unidade"));
+                            imp.setValidade(rst.getInt("validade"));
+                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                             imp.seteBalanca(false);
                         }
                     }
@@ -656,11 +659,11 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "SELECT \n" +
-                        "	p.CODPROD,\n" +
-                        "	p.codauxiliar,\n" +
+                        "	p.CODPROD idproduto,\n" +
+                        "	p.codauxiliar ean,\n" +
                         "	p.qtunit,\n" +
                         "	p.QTMINIMAATACADO,\n" +
-                        "	p.PVENDA,\n" +
+                        "	p.PVENDA precovenda,\n" +
                         "	-- Qtd de atacado por quantidade total\n" +
                         "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
                         "	 THEN p.QTMINIMAATACADO\n" +
@@ -689,11 +692,16 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setImportId(rst.getString("idproduto"));
                         imp.setEan(rst.getString("ean"));
-                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        imp.setAtacadoPreco(rst.getDouble("precoAtacado"));
-                        imp.setPrecovenda(rst.getDouble("precoVenda"));
+                    
+                        if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+                            imp.setEan(getLojaOrigem() + "00000" + imp.getEan());
+                        }
+                        
+                        imp.setQtdEmbalagem(rst.getInt("qtdatacado"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
 
                         vResult.add(imp);
                     }
@@ -748,9 +756,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtunit"));
                     
-                    long ean = Utils.stringToInt(imp.getEan());
-                    
-                    if(imp.getEan() != null && !"".equals(imp.getEan()) && ean < 9999999) {
+                    if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
                         imp.setEan(getLojaOrigem() + "00000" + imp.getEan());
                     }
                     

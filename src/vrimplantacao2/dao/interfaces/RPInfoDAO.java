@@ -17,18 +17,22 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -38,7 +42,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class RPInfoDAO extends InterfaceDAO {
+public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarFuncionario = false;
     public boolean gerarCodigoAtacado = true;
@@ -103,6 +107,7 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.PESAVEL,
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ATACADO,
             OpcaoProduto.RECEITA,
             OpcaoProduto.SECAO,
@@ -360,11 +365,79 @@ public class RPInfoDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "with loja as (\n" +
+                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    ")\n" +
+                    "select \n" +
+                    "	distinct on (tr.trib_codigo)\n" +
+                    "	tr.trib_codigo id_tributacao,\n" +
+                    "	tr.trib_descricao descricao,\n" +
+                    "	tr.trib_codnf cst,\n" +
+                    "	tr.trib_icms aliquota,\n" +
+                    "	tr.trib_redbc reducao,\n" +
+                    "	coalesce(tr.trib_fcpaliq, 0) fcp\n" +
+                    "from\n" +
+                    "	tributacao tr\n" +
+                    "	join loja on true\n" +
+                    "where\n" +
+                    "	tr.trib_uforigem = loja.uf\n" +
+                    "	and tr.trib_mvtos like '%EVP%'\n" +
+                    "order by\n" +
+                    "	tr.trib_codigo, tr.trib_cstpis desc"
+            )) {
+                while (rst.next()) {
+                    result.add(
+                            new MapaTributoIMP(
+                                    rst.getString("id_tributacao"),
+                                    rst.getString("descricao"),
+                                    rst.getInt("cst"),
+                                    rst.getDouble("aliquota"),
+                                    rst.getDouble("reducao")
+                            )
+                    );
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
+                    "with loja as (\n" +
+                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    "),\n" +
+                    "piscofins_s as (\n" +
+                    "	select distinct on (tr.trib_codigo)\n" +
+                    "		tr.trib_codigo id_tributacao,\n" +
+                    "		tr.trib_cstpis cstpiscofins,\n" +
+                    "		tr.trib_natpiscof naturezareceita\n" +
+                    "	from\n" +
+                    "		tributacao tr\n" +
+                    "		join loja on true\n" +
+                    "	where\n" +
+                    "		tr.trib_uforigem = loja.uf\n" +
+                    "		and tr.trib_mvtos like '%EVP%'\n" +
+                    "	order by\n" +
+                    "		tr.trib_codigo, tr.trib_cstpis desc\n" +
+                    "),\n" +
+                    "cest as (\n" +
+                    "	select\n" +
+                    "		distinct on (id_produto)\n" +
+                    "		prau_prod_codigo id_produto,\n" +
+                    "		prau_cest cest\n" +
+                    "	from\n" +
+                    "		prodaux p\n" +
+                    ")\n" +
                     "select\n" +
                     "	p.prod_codigo id,\n" +
                     "	p.prod_datacad datacadastro,\n" +
@@ -394,27 +467,26 @@ public class RPInfoDAO extends InterfaceDAO {
                     "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n" +
                     "	un.prun_prultcomp,\n" +
                     "	un.prun_ctcompra custosemimposto,\n" +
-                    "	--un.prun_ctfiscal custocomimposto,\n" +
                     "	un.prun_prultcomp custocomimposto,\n" +
                     "	un.prun_margem margem,\n" +
                     "	un.prun_prvenda precovenda,\n" +
                     "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n" +
                     "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n" +
                     "	p.prod_codigoncm ncm,\n" +
-                    "	ax.prau_cest cest,\n" +
-                    "	tr.trib_codigo id_tributacao,\n" +
-                    "	tr.trib_data,\n" +
-                    "	tr.trib_codnf cst,\n" +
-                    "	tr.trib_icms icms,\n" +
-                    "	tr.trib_redbc icmsreducao,\n" +
-                    "	tr.trib_cstpis cstpiscofins,\n" +
-                    "	tr.trib_natpiscof naturezareceita,\n" +
+                    "	cest.cest,\n" +
                     "	un.prun_setor setor,\n" +
-                    "	un.prun_setordep departamento\n" +
+                    "	un.prun_setordep departamento,\n" +
+                    "	piscofins_s.cstpiscofins piscofins_s,\n" +
+                    "	piscofins_s.naturezareceita piscofins_natrec,\n" +
+                    "	p.prod_trib_codigo id_icms\n" +
                     "from\n" +
                     "	produtos p\n" +
-                    "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n" +
-                    "	left join produn un on p.prod_codigo = un.prun_prod_codigo\n" +
+                    "	join loja on true\n" +
+                    "	left join cest on\n" +
+                    "		p.prod_codigo = cest.id_produto\n" +
+                    "	left join produn un on\n" +
+                    "		p.prod_codigo = un.prun_prod_codigo and\n" +
+                    "		un.prun_unid_codigo = loja.id\n" +
                     "	left join (\n" +
                     "		select\n" +
                     "			prod_codigo id,\n" +
@@ -434,15 +506,12 @@ public class RPInfoDAO extends InterfaceDAO {
                     "		where\n" +
                     "			nullif(trim(prod_codcaixa),'') is not null\n" +
                     "	) ean on ean.id = p.prod_codigo\n" +
-                    "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo)\n" +
-                    "where\n" +
-                    "	un.prun_unid_codigo = '" + getLojaOrigem() + "' and\n" +
-                    "	tr.trib_mvtos like '%EVP%' and\n" +
-                    "	tr.trib_unidades like '%" + getLojaOrigem() + "%' and\n" +
-                    "	tr.trib_uforigem = 'SP'\n" +
+                    "	left join piscofins_s on\n" +
+                    "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
                     "order by\n" +
                     "	id"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -451,28 +520,47 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    if (rst.getInt("e_balanca") == 1) {
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(rst.getString("ean"));
-                        String pBalanca = String.valueOf(codigoProduto);
-
-                        if (pBalanca.length() < 7) {
-                            imp.seteBalanca(true);
-                            imp.setEan(rst.getString("ean"));
-                            if (removeDigitoEAN) {
-                                imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                    
+                    long codigoProduto;
+                    codigoProduto = Long.parseLong(rst.getString("ean"));
+                    String pBalanca = String.valueOf(codigoProduto);
+                    
+                    ProdutoBalancaVO bal;
+                    if (removeDigitoEAN) {
+                        bal = balanca.get(Utils.stringToInt(pBalanca.substring(0, pBalanca.length() - 1), -2));
+                    } else {
+                        bal = balanca.get(Utils.stringToInt(pBalanca, -2));
+                    }
+                    
+                    if (bal != null) {
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.setQtdEmbalagem(1);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN": "KG");
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        if (rst.getInt("e_balanca") == 1) {
+                            if (pBalanca.length() < 7) {
+                                imp.seteBalanca(true);
+                                imp.setEan(rst.getString("ean"));
+                                if (removeDigitoEAN) {
+                                    imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                                }
+                            } else {
+                                imp.seteBalanca(false);
+                                imp.setEan(rst.getString("ean"));
                             }
                         } else {
                             imp.seteBalanca(false);
                             imp.setEan(rst.getString("ean"));
                         }
-                    } else {
-                        imp.seteBalanca(false);
-                        imp.setEan(rst.getString("ean"));
                     }
+                    
+                    if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+                        imp.setManterEAN(true);
+                    }
+                    
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("embalagemcotacao"));
-                    //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -495,11 +583,16 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDescontinuado(rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("cstpiscofins"));
-                    imp.setIcmsAliq(rst.getDouble("icms"));
-                    imp.setIcmsReducao(rst.getDouble("icmsreducao"));
-                    imp.setIcmsCst(rst.getInt("cst"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_s"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
+                    
+                    imp.setIcmsConsumidorId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoId(rst.getString("id_icms"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
+                    
                     if (rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
                         if (rst.getString("setor").length() > 2) {
                             imp.setSetor(rst.getString("setor").trim().substring(0, 2));
@@ -644,8 +737,8 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setFantasia(rst.getString("razaosocial"));
-                    imp.setRazao(rst.getString("nomefantasia"));
+                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("nomefantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpjcpf"));
                     imp.setIe_rg(rst.getString("ierg"));
                     imp.setInsc_municipal(rst.getString("inscmun"));
@@ -673,14 +766,22 @@ public class RPInfoDAO extends InterfaceDAO {
                      }*/
                     switch (rst.getString("tipofornecedor").trim()) {
                         case "A":
-                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                         case "D":
                             imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
+                        case "E":
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                            break;
                         case "P":
+                            imp.setTipoFornecedor(TipoFornecedor.PRESTADOR);
+                            imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                            break;
+                        case "R":
                             imp.setProdutorRural();
                             break;
                         case "S":
@@ -696,7 +797,7 @@ public class RPInfoDAO extends InterfaceDAO {
                             imp.setTipoEmpresa(TipoEmpresa.SOCIEDADE_CIVIL);
                             break;
                         default:
-                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                             break;
                     }
@@ -794,7 +895,10 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	c.clie_diavenc diavencimento,\n"
                     + "	c.clie_sitconv permitecreditorotativo,\n"
                     + "	c.clie_sitcheque permitecheque,\n"
-                    + "	c.clie_senhapdv senhapdv\n"
+                    + "	c.clie_senhapdv senhapdv,\n"
+                    + " c.clie_descrestadocivil civil,\n"        
+                    + " c.clie_contacontabil,\n" 
+                    + "	c.clie_contagerencial\n"       
                     + "from\n"
                     + "	clientes c\n"
                     + "	left join municipios mr on\n"
@@ -855,6 +959,31 @@ public class RPInfoDAO extends InterfaceDAO {
                     //imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
                     imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
                     imp.setBloqueado("I".equals(rst.getString("clie_situacao")));
+                    
+                    if(rst.getString("civil") != null && !"".equals(rst.getString("civil"))) {
+                        String estCivil = rst.getString("civil");
+                        switch(estCivil.toUpperCase().trim()) {
+                            case "SOLTEIRO":
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                            case "CASADO":
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            case "DIVORCIADO":
+                                imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
+                            case "VIÚVO":
+                                imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
+                            default: imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                                break;
+                        }
+                    }
+                    
+                    if(rst.getString("clie_contacontabil") != null && rst.getString("clie_contagerencial") != null) {
+                        imp.setPermiteCreditoRotativo(true);
+                        imp.setPermiteCheque(true);
+                    }
 
                     result.add(imp);
                 }
