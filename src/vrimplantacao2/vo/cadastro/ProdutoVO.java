@@ -14,6 +14,20 @@ import vrimplantacao2.vo.enums.PisCofinsVO;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 
 public class ProdutoVO {
+
+    /**
+     * @return the numeroparcela
+     */
+    public int getNumeroparcela() {
+        return numeroparcela;
+    }
+
+    /**
+     * @param numeroparcela the numeroparcela to set
+     */
+    public void setNumeroparcela(int numeroparcela) {
+        this.numeroparcela = numeroparcela;
+    }
     
     private int id = 0;
     private int idProduto2 = 0;
@@ -53,6 +67,7 @@ public class ProdutoVO {
     private boolean vendaControlada = false;
     private boolean produtoecommerce = false;
     private int codigoAnp = 0;
+    private int numeroparcela = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {

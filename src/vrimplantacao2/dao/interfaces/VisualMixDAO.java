@@ -60,6 +60,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
@@ -97,7 +99,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.COMPRADOR,
                     OpcaoProduto.COMPRADOR_PRODUTO,
                     OpcaoProduto.RECEITA,
-                    OpcaoProduto.RECEITA_BALANCA
+                    OpcaoProduto.RECEITA_BALANCA,
+                    OpcaoProduto.NUMERO_PARCELA
                 }
         ));
     }
@@ -282,8 +285,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.Situacao as situacaocadastro,\n"
                     + "	p.SituacaoTributaria as csticms, \n"
                     + " est.EstoqueInicial as estoque, \n"
-                    + " p.Estoque_Minimo, \n"
-                    + " p.Estoque_Maximo, \n"
+                    //+ " p.Estoque_Minimo, \n"
+                    //+ " p.Estoque_Maximo, \n"
                     + " p.EspecUnitariaTipo as tipoembalagem, \n"
                     + " p.EspecUnitariaQtde as qtdembalagem,\n"
                     + "	p.TipoProduto, \n"
@@ -294,7 +297,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.CstPisCofinsSaida, \n"
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
-                    + " p.Comprador as idcomprador\n"
+                    + " cast(p.Comprador as bigint) as idcomprador,\n"
+                    + " p.PontoPedido as numeroparcela\n"        
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -357,13 +361,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
+                    imp.setNumeroparcela(rst.getInt("numeroparcela"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rst.getDouble("Estoque_Minimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("Estoque_Maximo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("CstPisCofinsSaida"));
@@ -899,13 +902,16 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	Codigo,\n"
+                    + "	cast(Codigo as bigint) as id,\n"
                     + "	Nome\n"
                     + "from dbo.Compradores"
             )) {
                 while (rst.next()) {
                     CompradorIMP imp = new CompradorIMP();
-                    imp.setId(rst.getString("Codigo"));
+                    
+                    imp.setManterId(true);
+                    
+                    imp.setId(rst.getString("id"));
                     imp.setDescricao(rst.getString("Nome"));
                     result.add(imp);
                 }

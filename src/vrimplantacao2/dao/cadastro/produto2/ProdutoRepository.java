@@ -1192,6 +1192,8 @@ public class ProdutoRepository {
             vo.setCodigoAnp(codigoANP);
         }
         
+        vo.setNumeroparcela(imp.getNumeroparcela());
+        
         return vo;
     }
 

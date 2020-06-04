@@ -63,18 +63,21 @@
                           <Component id="chkMercadologicoPorNivelReplicar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkMercadologicoNaoExcluir" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="214" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkManterCodigoMercadologico" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="93" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                   <Component id="chkMercadologicoPorNivelReplicar" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkMercadologicoNaoExcluir" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkManterCodigoMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel3" min="-2" pref="23" max="-2" attributes="0"/>
                           </Group>
@@ -108,6 +111,11 @@
                     <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="true" type="code"/>
                     </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterCodigoMercadologico">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Manter C&#xf3;digo Mercadol&#xf3;gico"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -1374,17 +1382,6 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="chkNutricionalToledo" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="chkNutricionalFilizola" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="chkInventario" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="chkReceitaProduto" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="chkDivisao" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="0" attributes="0">
                                           <Component id="chkAssociado" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkComprador" min="-2" max="-2" attributes="0"/>
@@ -1395,6 +1392,19 @@
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkReceitaFilizola" min="-2" max="-2" attributes="0"/>
                                       </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkNutricionalToledo" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkNutricionalFilizola" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="chkInventario" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkReceitaProduto" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkDivisao" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkNumeroParcela" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
@@ -1402,7 +1412,7 @@
                                   <Component id="chkDivisaoProduto" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1426,6 +1436,7 @@
                               <Component id="chkInventario" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkReceitaProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkDivisao" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNumeroParcela" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkDivisaoProduto" min="-2" max="-2" attributes="0"/>
@@ -1496,6 +1507,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDivisaoProduto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Divisao x Produto"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNumeroParcela">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero Parcela"/>
                   </Properties>
                 </Component>
               </SubComponents>

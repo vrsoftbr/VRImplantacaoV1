@@ -182,7 +182,7 @@ public class ProdutoDAO {
             sql.put("utilizavalidadeentrada", false);
             sql.put("impostomedioestadual", 0);
             sql.put("id_tipocompra", 0);
-            sql.put("numeroparcela", 0);
+            sql.put("numeroparcela", vo.getNumeroparcela());
             sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagemVolume().getId());
             sql.put("volume", vo.getVolume());
             sql.put("id_normacompra", vo.getNormaCompra().getId());
@@ -342,6 +342,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.CODIGO_ANP) && vo.getCodigoAnp() != 0) {
             sql.put("id_codigoanp", vo.getCodigoAnp());
+        }
+        if (opt.contains(OpcaoProduto.NUMERO_PARCELA)) {
+            sql.put("numeroparcela", vo.getNumeroparcela());
         }
 
         sql.setWhere("id = " + vo.getId());

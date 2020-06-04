@@ -52,7 +52,14 @@ public class MercadologicoRepository {
     }
     
     public void salvar(MercadologicoVO pai, MercadologicoNivelIMP merc, int nivel, int nivelMaximo, Set<OpcaoProduto> opt) throws Exception {
-        MercadologicoVO vo = converterMercadologico(pai, merc, nivel);
+        MercadologicoVO vo;
+                
+        if (!opt.contains(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO)) {
+            vo = converterMercadologico(pai, merc, nivel);
+        } else {
+            vo = converterMercadologicoManterCodigo(pai, merc, nivel);
+        }
+                
         gravarMercadologico(vo);
         
         MercadologicoAnteriorVO ant = converterMercadologicoAnterior(merc, vo);
@@ -175,6 +182,34 @@ public class MercadologicoRepository {
         return vo;
     }    
 
+    public MercadologicoVO converterMercadologicoManterCodigo(MercadologicoVO pai, MercadologicoNivelIMP merc, int nivel) throws Exception {
+        MercadologicoVO vo = new MercadologicoVO();
+        vo.setDescricao(merc.getDescricao());
+        vo.setNivel(nivel);
+        if (nivel == 1) {
+            vo.setMercadologico1(Integer.parseInt(merc.getId()));
+        } else if (nivel == 2) {
+            vo.setMercadologico1(Integer.parseInt(merc.getMercadologicoPai().getId()));
+            vo.setMercadologico2(Integer.parseInt(merc.getId()));
+        } else if (nivel == 3) {
+            vo.setMercadologico1(Integer.parseInt(merc.getMercadologicoPai().getMercadologicoPai().getId()));
+            vo.setMercadologico2(Integer.parseInt(merc.getMercadologicoPai().getId()));
+            vo.setMercadologico3(Integer.parseInt(merc.getId()));
+        } else if (nivel == 4) {
+            vo.setMercadologico1(Integer.parseInt(merc.getMercadologicoPai().getMercadologicoPai().getMercadologicoPai().getId()));
+            vo.setMercadologico2(Integer.parseInt(merc.getMercadologicoPai().getMercadologicoPai().getId()));
+            vo.setMercadologico3(Integer.parseInt(merc.getMercadologicoPai().getId()));
+            vo.setMercadologico4(Integer.parseInt(merc.getId()));
+        } else if (nivel == 5) {
+            vo.setMercadologico1(Integer.parseInt(merc.getMercadologicoPai().getMercadologicoPai().getMercadologicoPai().getMercadologicoPai().getId()));
+            vo.setMercadologico2(Integer.parseInt(merc.getMercadologicoPai().getMercadologicoPai().getMercadologicoPai().getId()));
+            vo.setMercadologico3(Integer.parseInt(merc.getMercadologicoPai().getMercadologicoPai().getId()));
+            vo.setMercadologico4(Integer.parseInt(merc.getMercadologicoPai().getId()));
+            vo.setMercadologico5(Integer.parseInt(merc.getId()));
+        }
+        return vo;
+    }    
+    
     public void completarSubNiveis(MercadologicoVO vo, int nivel, int nivelMaximo) throws Exception {
         int i = nivel + 1; 
         if (i <= nivelMaximo) {
