@@ -149,6 +149,8 @@ public class RPInfoGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         conexao.carregarParametros();
         tabProdutos.carregarParametros(params, SISTEMA);
+        chkUtilizarCustoNota.setSelected(params.getBool(SISTEMA, "UTILIZAR_CUSTO_NOTA"));
+        chkRemoveDigitoBalanca.setSelected(params.getBool(SISTEMA, "REMOVER_DIGITO_BALANCA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -157,6 +159,8 @@ public class RPInfoGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         conexao.atualizarParametros();
         tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(chkUtilizarCustoNota.isSelected(), SISTEMA, "UTILIZAR_CUSTO_NOTA");
+        params.put(chkRemoveDigitoBalanca.isSelected(), SISTEMA, "REMOVER_DIGITO_BALANCA");
         
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -188,6 +192,7 @@ public class RPInfoGUI extends VRInternalFrame {
                     dao.gerarCodigoAtacado = chkGerarCodigoAtacado.isSelected();
                     dao.idLojaVR = idLojaVR;
                     dao.removeDigitoEAN = chkRemoveDigitoBalanca.isSelected();
+                    dao.utilizarCustoNota = chkUtilizarCustoNota.isSelected();
                     
                     Importador importador = new Importador(dao);
                     
@@ -352,6 +357,7 @@ public class RPInfoGUI extends VRInternalFrame {
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         chkGerarCodigoAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkRemoveDigitoBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkUtilizarCustoNota = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel2 = new javax.swing.JLabel();
@@ -637,6 +643,8 @@ public class RPInfoGUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkRemoveDigitoBalanca, "Remove Digíto do EAN para Produto de Balança");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkUtilizarCustoNota, "Utilizar custo das notas");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -647,8 +655,11 @@ public class RPInfoGUI extends VRInternalFrame {
                     .addComponent(pnlBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkGerarCodigoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkRemoveDigitoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkRemoveDigitoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(vRPanel1Layout.createSequentialGroup()
+                                .addComponent(chkGerarCodigoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkUtilizarCustoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -656,7 +667,9 @@ public class RPInfoGUI extends VRInternalFrame {
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkGerarCodigoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkGerarCodigoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUtilizarCustoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkRemoveDigitoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -828,6 +841,7 @@ public class RPInfoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkUtilizarCustoNota;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;

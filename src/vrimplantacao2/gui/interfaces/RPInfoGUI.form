@@ -527,8 +527,12 @@
                           <Component id="pnlBalanca" pref="645" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkGerarCodigoAtacado" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkRemoveDigitoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkRemoveDigitoBalanca" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkUtilizarCustoNota" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -541,7 +545,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkGerarCodigoAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUtilizarCustoNota" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkRemoveDigitoBalanca" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -562,6 +569,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRemoveDigitoBalanca">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Remove Dig&#xed;to do EAN para Produto de Balan&#xe7;a"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarCustoNota">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Utilizar custo das notas"/>
               </Properties>
             </Component>
           </SubComponents>
