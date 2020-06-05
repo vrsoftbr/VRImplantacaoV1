@@ -12,6 +12,20 @@ import vrimplantacao2.vo.enums.TipoProduto;
 @DatabaseTable(tableName = "miglog.produto")
 public class ProdutoIMP {
 
+    /**
+     * @return the numeroparcela
+     */
+    public int getNumeroparcela() {
+        return numeroparcela;
+    }
+
+    /**
+     * @param numeroparcela the numeroparcela to set
+     */
+    public void setNumeroparcela(int numeroparcela) {
+        this.numeroparcela = numeroparcela;
+    }
+
     public ProdutoIMP() {
     }
     
@@ -51,6 +65,7 @@ public class ProdutoIMP {
     @DatabaseField private double estoqueMinimo = 0;
     @DatabaseField private double estoque = 0;
     @DatabaseField private double troca = 0;
+    @DatabaseField private int numeroparcela = 0;
     
     @DatabaseField private double margem = 0;
     @DatabaseField private double margemMinima = 0;

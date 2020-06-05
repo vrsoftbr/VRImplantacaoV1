@@ -48,6 +48,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean gerarCodigoAtacado = true;
     public int idLojaVR = 1;
     public boolean removeDigitoEAN = false;
+    public boolean utilizarCustoNota = false;
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -112,7 +113,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.ATACADO,
             OpcaoProduto.RECEITA,
             OpcaoProduto.SECAO,
-            OpcaoProduto.PRATELEIRA
+            OpcaoProduto.PRATELEIRA,
+            OpcaoProduto.OFERTA
         }));
     }
 
@@ -122,6 +124,26 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
+                    "with loja as (\n" +
+                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    ")\n" +
+                    "select\n" +
+                    "	p.prod_codigo idproduto,\n" +
+                    "	coalesce(un.prun_dtinioferta, current_date) datainicio,\n" +
+                    "	un.prun_dtoferta datatermino,\n" +
+                    "	un.prun_prnormal preconormal,\n" +
+                    "	un.prun_prvenda precooferta\n" +
+                    "from\n" +
+                    "	produtos p\n" +
+                    "	join loja on true\n" +
+                    "	left join produn un on\n" +
+                    "		p.prod_codigo = un.prun_prod_codigo and\n" +
+                    "		un.prun_unid_codigo = loja.id\n" +
+                    "where\n" +
+                    "	un.prun_oferta = 'S'\n" +
+                    "order by\n" +
+                    "	id"
+                    /*
                     "select \n" +
                     "	a.agof_datai datainicio,\n" +
                     "	a.agof_dataf datatermino,\n" +
@@ -136,6 +158,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where \n" +
                     "	a.agof_dataf > current_date and\n" +
                     "	a.agof_unidades like '%" + getLojaOrigem() + "%'")) {
+                    "	a.agof_dataf >= current_date and\n" +
+                    "	a.agof_unidades like '%" + getLojaOrigem() + "%'"
+                    */
+                    )) {
                 while(rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
                     
@@ -417,6 +443,70 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "with loja as (\n" +
                     "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
                     "),\n" +
+                    "nf2019 as (\n" +
+                    "	select\n" +
+                    "		distinct on\n" +
+                    "		(mprd_prod_codigo) mprd_prod_codigo,\n" +
+                    "		mprd_datamvto,\n" +
+                    "		(mprd_prcompra / mprd_qtde) as custocompra,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_alsubtribinf / 100) valoricms,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqpis / 100) valorpis,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqcofins / 100) valorcofins,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_subtrib / 100) valorst,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_percipi / 100) valoripi\n" +
+                    "	from\n" +
+                    "		movprodd19 m\n" +
+                    "		join loja on loja.id = m.mprd_unid_codigo\n" +
+                    "	where\n" +
+                    "		m.mprd_dcto_tipo like '%EAQ%'\n" +
+                    "	order by\n" +
+                    "		mprd_prod_codigo,\n" +
+                    "		mprd_datamvto desc\n" +
+                    "),\n" +
+                    "nf2020 as (\n" +
+                    "	select\n" +
+                    "		distinct on\n" +
+                    "		(mprd_prod_codigo) mprd_prod_codigo,\n" +
+                    "		mprd_datamvto,\n" +
+                    "		(mprd_prcompra / mprd_qtde) as custocompra,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_alsubtribinf / 100) valoricms,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqpis / 100) valorpis,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqcofins / 100) valorcofins,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_subtrib / 100) valorst,\n" +
+                    "		(mprd_prcompra / mprd_qtde) * (mprd_percipi / 100) valoripi\n" +
+                    "	from\n" +
+                    "		movprodd20 m\n" +
+                    "		join loja on loja.id = m.mprd_unid_codigo\n" +
+                    "	where\n" +
+                    "		m.mprd_dcto_tipo like '%EAQ%'\n" +
+                    "	order by\n" +
+                    "		mprd_prod_codigo,\n" +
+                    "		mprd_datamvto desc	\n" +
+                    "),\n" +
+                    "nf as (\n" +
+                    "	select\n" +
+                    "	distinct on (mprd_prod_codigo)\n" +
+                    "		*\n" +
+                    "	from\n" +
+                    "		(\n" +
+                    "			select * from nf2019\n" +
+                    "			union all\n" +
+                    "			select * from nf2020\n" +
+                    "		) a\n" +
+                    "	order by\n" +
+                    "		mprd_prod_codigo,\n" +
+                    "		mprd_datamvto desc	\n" +
+                    "),\n" +
+                    "custo as (\n" +
+                    "	select\n" +
+                    "		nf.mprd_prod_codigo,	\n" +
+                    "		nf.custocompra - nf.valoricms - nf.valorpis - nf.valorcofins custosemimposto_nf,\n" +
+                    "		nf.custocompra + nf.valorst + nf.valoripi custocomimposto_nf\n" +
+                    "	from\n" +
+                    "		nf\n" +
+                    "	order by\n" +
+                    "		nf.mprd_prod_codigo\n" +
+                    "),\n" +
                     "piscofins_s as (\n" +
                     "	select distinct on (tr.trib_codigo)\n" +
                     "		tr.trib_codigo id_tributacao,\n" +
@@ -469,6 +559,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	un.prun_prultcomp,\n" +
                     "	un.prun_ctcompra custosemimposto,\n" +
                     "	un.prun_prultcomp custocomimposto,\n" +
+                    "	coalesce(custo.custosemimposto_nf, un.prun_ctcompra, 0) custosemimposto_nf,\n" +
+                    "	coalesce(custo.custocomimposto_nf, un.prun_prultcomp, 0) custocomimposto_nf,\n" +
                     "	un.prun_margem margem,\n" +
                     "	un.prun_prvenda precovenda,\n" +
                     "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n" +
@@ -509,6 +601,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	) ean on ean.id = p.prod_codigo\n" +
                     "	left join piscofins_s on\n" +
                     "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
+                    "	left join custo on\n" +
+                    "		custo.mprd_prod_codigo = p.prod_codigo\n" +
                     "order by\n" +
                     "	id"
             )) {
@@ -576,8 +670,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    if (utilizarCustoNota) {
+                        imp.setCustoSemImposto(rst.getDouble("custosemimposto_nf"));
+                        imp.setCustoComImposto(rst.getDouble("custocomimposto_nf"));
+                    } else {
+                        imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                        imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    }
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);

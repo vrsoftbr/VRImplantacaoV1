@@ -39,9 +39,14 @@ public class CompradorRepository {
                 
                 CompradorAnteriorVO anterior = anteriores.get(imp.getId());
                 
-                if (anterior == null) {                    
+                if (anterior == null) {
                     CompradorVO vo = converterComprador(imp); 
-                    vo.setId((int) idsVagos.pop(imp.getId()));
+                    
+                    if (imp.getManterId()) {
+                        vo.setId(Integer.parseInt(imp.getId()));
+                    } else {
+                        vo.setId((int) idsVagos.pop(imp.getId()));
+                    }
                     provider.gravar(vo);
                     
                     anterior = converterAnterior(imp);
