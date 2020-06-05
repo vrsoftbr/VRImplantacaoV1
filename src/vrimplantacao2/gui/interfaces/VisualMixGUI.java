@@ -106,6 +106,9 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.setOnConectar(this);
 
         carregarParametros();
+        
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(vLojaCliente);
 
         centralizarForm();
         this.setMaximum(false);

@@ -989,6 +989,7 @@ public class ProdutoRepository {
         complemento.setNormaReposicao(imp.getNormaReposicao());
         complemento.setSetor(imp.getSetor());
         complemento.setPrateleira(imp.getPrateleira());
+        complemento.setTeclaassociada((int) imp.getTeclaAssociada());
 
         return complemento;
     }

@@ -13,6 +13,20 @@ import vrimplantacao2.vo.enums.TipoProduto;
 public class ProdutoIMP {
 
     /**
+     * @return the teclaAssociada
+     */
+    public double getTeclaAssociada() {
+        return teclaAssociada;
+    }
+
+    /**
+     * @param teclaAssociada the teclaAssociada to set
+     */
+    public void setTeclaAssociada(int teclaAssociada) {
+        this.teclaAssociada = teclaAssociada;
+    }
+
+    /**
      * @return the numeroparcela
      */
     public int getNumeroparcela() {
@@ -73,7 +87,8 @@ public class ProdutoIMP {
     @DatabaseField private double custoComImposto = 0;    
     @DatabaseField private double custoAnteriorSemImposto = 0;
     @DatabaseField private double custoAnteriorComImposto = 0;
-    @DatabaseField private double precovenda = 0;    
+    @DatabaseField private double precovenda = 0;
+    @DatabaseField private int teclaAssociada = 0;
     
     @DatabaseField private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     @DatabaseField private boolean descontinuado = false;
