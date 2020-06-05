@@ -300,12 +300,19 @@
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="chkImportarFuncionario" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkPermiteRotativ" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
                               </Group>
-                              <EmptySpace pref="156" max="32767" attributes="0"/>
+                              <EmptySpace pref="319" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -323,14 +330,20 @@
                                   <Component id="chkImportarFuncionario" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkEstadoCivil" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPermiteRotativ" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="39" max="32767" attributes="0"/>
+                              <EmptySpace pref="43" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -404,6 +417,16 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueado">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkEstadoCivil">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Estado Civil"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkPermiteRotativ">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
                       </Properties>
                     </Component>
                   </SubComponents>
