@@ -1,24 +1,31 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoDBF;
+import vrimplantacao.classe.Global;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao2.dao.interfaces.OrionDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao.vo.vrimplantacao.SqlVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
+import vrimplantacao2.dao.interfaces.DJSystemDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class DJSystemGUI extends VRInternalFrame {
@@ -29,6 +36,7 @@ public class DJSystemGUI extends VRInternalFrame {
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
+    private SqlVO oSql = null;
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -53,7 +61,7 @@ public class DJSystemGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private OrionDAO orionDAO = new OrionDAO();
+    private DJSystemDAO dao = new DJSystemDAO();
     private ConexaoDBF connDBF = new ConexaoDBF();
     
     private DJSystemGUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -62,7 +70,29 @@ public class DJSystemGUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
         carregarParametros();
         
-        pnlProduto.setOpcoesDisponiveis(orionDAO);
+        pnlProduto.setOpcoesDisponiveis(dao);
+        pnlProduto.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                    return SISTEMA;
+            }
+
+            @Override
+            public String getLoja() {
+                vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                return vLojaCliente;
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
         
         centralizarForm();
         
@@ -94,7 +124,7 @@ public class DJSystemGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : orionDAO.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -131,9 +161,8 @@ public class DJSystemGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    orionDAO.i_arquivo = txtDatabase.getText();
                     
-                    Importador importador = new Importador(orionDAO);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);                    
 
@@ -200,6 +229,86 @@ public class DJSystemGUI extends VRInternalFrame {
 
         thread.start();
     }
+    
+    private void configurarColuna() throws Exception {
+        List<VRColumnTable> vColuna = new ArrayList();
+
+        for (String coluna : oSql.vHeader) {
+            vColuna.add(new VRColumnTable(coluna, 80, true, SwingConstants.LEFT, false, null));
+        }
+
+        tblConsulta.configurarColuna(vColuna, this, "tblConsulta", "exibirConsulta", Global.idUsuario);
+    }
+    
+    public void exibirConsulta() throws Exception {
+        Object[][] dados = new Object[oSql.vConsulta.size()][tblConsulta.getvColuna().size()];
+
+        int l = 0;
+
+        for (List<String> vColuna : oSql.vConsulta) {
+            for (int c = 0; c < vColuna.size(); c++) {
+                dados[l][tblConsulta.getOrdem(c)] = vColuna.get(tblConsulta.getOrdem(c));
+            }
+
+            l++;
+        }
+
+        tblConsulta.setModel(dados);
+    }
+    
+    private void executarSQL() throws Exception {
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    setWaitCursor();
+
+                    btnExecutar2.setEnabled(false);
+
+                    String sql = txtSql.getSelectedText() == null ? txtSql.getText() : txtSql.getSelectedText();
+
+                    tblConsulta.clear();
+                    txtMensagem.setText("");
+
+                    if (sql.trim().toUpperCase().startsWith("SELECT")) {
+                        oSql = dao.consultar(sql);
+
+                        configurarColuna();
+
+                        exibirConsulta();
+                        txtMensagem.setText(oSql.vConsulta.size() + " registros recuperados.");
+
+                        if (oSql.vConsulta.size() > 0) {
+                            tpnResultado.setSelectedIndex(0);
+                        } else {
+                            tpnResultado.setSelectedIndex(1);
+                        }
+
+                    } else {
+                        if (Global.idUsuario > 0) {
+                            throw new VRException("Operação não permitida!");
+                        }
+
+                        //String result = new AlfaSoftwareDAO().executar(sql);
+                        //txtMensagem.setText(result);
+
+                        //tpnResultado.setSelectedIndex(1);
+                    }
+
+                } catch (Exception ex) {
+                    txtMensagem.setText(ex.getMessage());
+                    tpnResultado.setSelectedIndex(1);
+
+                } finally {
+                    setDefaultCursor();                    
+                    btnExecutar2.setEnabled(true);
+                }
+            }
+        };
+
+        thread.start();
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -242,10 +351,10 @@ public class DJSystemGUI extends VRInternalFrame {
         pnlConexao = new vrframework.bean.panel.VRPanel();
         tabsConn = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
-        vRLabel25 = new vrframework.bean.label.VRLabel();
+        lblBancoDados = new vrframework.bean.label.VRLabel();
         vRTextField1 = new vrframework.bean.textField.VRTextField();
         txtDatabase = new vrframework.bean.textField.VRTextField();
-        jLabel2 = new javax.swing.JLabel();
+        lblLojaOrigem = new javax.swing.JLabel();
         btnConectar = new javax.swing.JToggleButton();
         cmbLojaOrigem = new javax.swing.JComboBox();
 
@@ -253,7 +362,8 @@ public class DJSystemGUI extends VRInternalFrame {
         vRTextArea1.setRows(5);
         jScrollPane1.setViewportView(vRTextArea1);
 
-        setTitle("Importação Orion");
+        setResizable(true);
+        setTitle("Importação SJ System");
         setToolTipText("");
 
         vRToolBarPadrao3.setRollover(true);
@@ -342,7 +452,7 @@ public class DJSystemGUI extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         pnlImportacao.addTab("Fornecedores", pnlFornecedor);
@@ -383,7 +493,7 @@ public class DJSystemGUI extends VRInternalFrame {
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         pnlImportacao.addTab("Clientes", pnlCliente);
@@ -413,7 +523,7 @@ public class DJSystemGUI extends VRInternalFrame {
         );
         vRPanel15Layout.setVerticalGroup(
             vRPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+            .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
         );
 
         tpnResultado.addTab("Saída de Dados", vRPanel15);
@@ -432,7 +542,7 @@ public class DJSystemGUI extends VRInternalFrame {
         );
         vRPanel16Layout.setVerticalGroup(
             vRPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
         );
 
         tpnResultado.addTab("Mensagens", vRPanel16);
@@ -445,14 +555,14 @@ public class DJSystemGUI extends VRInternalFrame {
             .addGroup(pnlSQLLayout.createSequentialGroup()
                 .addComponent(btnExecutar2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addComponent(tpnResultado, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+            .addComponent(tpnResultado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         pnlSQLLayout.setVerticalGroup(
             pnlSQLLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlSQLLayout.createSequentialGroup()
                 .addComponent(btnExecutar2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tpnResultado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -498,7 +608,7 @@ public class DJSystemGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(101, Short.MAX_VALUE))
+                .addContainerGap(143, Short.MAX_VALUE))
         );
 
         pnlDados.addTab("Unificação", pnlUnificacao);
@@ -507,11 +617,11 @@ public class DJSystemGUI extends VRInternalFrame {
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Dbf"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
-        vRLabel25.setText("Banco de Dados");
+        lblBancoDados.setText("Banco de Dados");
 
         vRTextField1.setText("vRTextField1");
 
-        jLabel2.setText("Loja Origem");
+        lblLojaOrigem.setText("Loja Origem");
 
         btnConectar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
         btnConectar.setText("Conectar");
@@ -536,7 +646,7 @@ public class DJSystemGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -544,7 +654,7 @@ public class DJSystemGUI extends VRInternalFrame {
                         .addGap(0, 0, 0)
                         .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addComponent(lblLojaOrigem)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -554,14 +664,14 @@ public class DJSystemGUI extends VRInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(lblLojaOrigem))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -605,10 +715,10 @@ public class DJSystemGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnlDados, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlDados, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlBotao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -696,11 +806,12 @@ public class DJSystemGUI extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private vrframework.bean.label.VRLabel lblBancoDados;
+    private javax.swing.JLabel lblLojaOrigem;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlBotao;
     private vrframework.bean.panel.VRPanel pnlCliente;
@@ -717,7 +828,6 @@ public class DJSystemGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtDatabase;
     private javax.swing.JTextArea txtMensagem;
     private vrframework.bean.textArea.VRTextArea txtSql;
-    private vrframework.bean.label.VRLabel vRLabel25;
     private vrframework.bean.panel.VRPanel vRPanel15;
     private vrframework.bean.panel.VRPanel vRPanel16;
     private vrframework.bean.textArea.VRTextArea vRTextArea1;
