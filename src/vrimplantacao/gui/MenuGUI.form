@@ -1596,6 +1596,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAdmRioPretoActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuDJSystem">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="DJ System"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuDJSystemActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuDB2">

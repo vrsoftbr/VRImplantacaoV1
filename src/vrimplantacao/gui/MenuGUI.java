@@ -118,6 +118,7 @@ import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
 import vrimplantacao2.gui.interfaces.ControlXGUI;
+import vrimplantacao2.gui.interfaces.DJSystemGUI;
 import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
@@ -766,6 +767,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSiaCriareDbf = new javax.swing.JMenuItem();
         mnuVCash = new javax.swing.JMenuItem();
         mnuAdmRioPreto = new javax.swing.JMenuItem();
+        mnuDJSystem = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuCache = new javax.swing.JMenu();
@@ -2539,6 +2541,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuOrion.add(mnuAdmRioPreto);
+
+        mnuDJSystem.setText("DJ System");
+        mnuDJSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDJSystemActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuDJSystem);
 
         mnuDatabase.add(mnuOrion);
 
@@ -4565,6 +4575,10 @@ public final class MenuGUI extends VRMdiFrame {
         TecnosoftGUI.exibir(this);
     }//GEN-LAST:event_mnuTecnosoftActionPerformed
 
+    private void mnuDJSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDJSystemActionPerformed
+        DJSystemGUI.exibir(this);
+    }//GEN-LAST:event_mnuDJSystemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4689,6 +4703,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
+    private javax.swing.JMenuItem mnuDJSystem;
     private javax.swing.JMenuItem mnuDLink;
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
