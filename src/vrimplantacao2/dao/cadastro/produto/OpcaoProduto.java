@@ -299,6 +299,18 @@ public enum OpcaoProduto {
             return "Troca (prod. complemento)";
         }
     },
+    TECLA_ASSOCIADA {
+        @Override
+        public String toString() {
+            return "Tecla Associada";
+        }
+    },
+    NUMERO_PARCELA {
+        @Override
+        public String toString() {
+            return "Número Parcela";
+        }
+    },
     FAMILIA_PRODUTO, 
     PRODUTOS, 
     EAN, 
@@ -306,7 +318,7 @@ public enum OpcaoProduto {
     MERCADOLOGICO_PRODUTO, 
     RECEITA_BALANCA, 
     NUTRICIONAL, 
-    COMPRADOR, 
+    COMPRADOR,
     MAPA_TRIBUTACAO,
     IMPORTAR_RESETAR_BALANCA, 
     IMPORTAR_GERAR_SUBNIVEL_MERC, 
@@ -317,7 +329,8 @@ public enum OpcaoProduto {
     ASSOCIADO, 
     MERCADOLOGICO_POR_NIVEL_REPLICAR, 
     MERCADOLOGICO_POR_NIVEL, 
-    MERCADOLOGICO_NAO_EXCLUIR, 
+    MERCADOLOGICO_NAO_EXCLUIR,
+    MANTER_CODIGO_MERCADOLOGICO,
     INVENTARIO, 
     PESO_BRUTO, 
     PESO_LIQUIDO, 

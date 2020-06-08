@@ -67,6 +67,9 @@
           <StringArray count="0"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbLojaOrigemActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
@@ -297,12 +300,19 @@
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Component id="chkImportarFuncionario" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkPermiteRotativ" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
                               </Group>
-                              <EmptySpace pref="156" max="32767" attributes="0"/>
+                              <EmptySpace pref="319" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -320,14 +330,20 @@
                                   <Component id="chkImportarFuncionario" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkEstadoCivil" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPermiteRotativ" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="39" max="32767" attributes="0"/>
+                              <EmptySpace pref="43" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -401,6 +417,16 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueado">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkEstadoCivil">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Estado Civil"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkPermiteRotativ">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -518,13 +544,23 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="chkGerarCodigoAtacado" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkRemoveDigitoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="pnlBalanca" pref="645" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkRemoveDigitoBalanca" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkUtilizarCustoNota" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="350" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -532,15 +568,22 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkGerarCodigoAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUtilizarCustoNota" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkRemoveDigitoBalanca" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="188" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="pnlBalanca" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="92" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
+            <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">
+            </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarCodigoAtacado">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Gerar C&#xf3;digo de Atacado"/>
@@ -549,6 +592,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRemoveDigitoBalanca">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Remove Dig&#xed;to do EAN para Produto de Balan&#xe7;a"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarCustoNota">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Utilizar custo das notas"/>
               </Properties>
             </Component>
           </SubComponents>

@@ -989,6 +989,7 @@ public class ProdutoRepository {
         complemento.setNormaReposicao(imp.getNormaReposicao());
         complemento.setSetor(imp.getSetor());
         complemento.setPrateleira(imp.getPrateleira());
+        complemento.setTeclaassociada((int) imp.getTeclaAssociada());
 
         return complemento;
     }
@@ -1191,6 +1192,8 @@ public class ProdutoRepository {
         if(codigoANP != null) {
             vo.setCodigoAnp(codigoANP);
         }
+        
+        vo.setNumeroparcela(imp.getNumeroparcela());
         
         return vo;
     }
@@ -1412,10 +1415,6 @@ public class ProdutoRepository {
         if (desconto == 0 && imp.getAtacadoPreco() > 0 && imp.getAtacadoPreco() != imp.getPrecovenda()) {
             //desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
             desconto = (100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100));
-            
-            if ("9999994530".equals(imp.getEan())) {
-                System.out.println(desconto + " - " + imp.getAtacadoPreco() + " - " + imp.getPrecovenda());
-            }
         }
         vo.setDesconto(desconto);
         return vo;

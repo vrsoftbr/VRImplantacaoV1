@@ -351,6 +351,42 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.DATA_NASCIMENTO_CONJUGE)) {
                     sql.put("datanascimentoconjuge", vo.getDataNascimentoConjuge());
                 }
+                if (opt.contains(OpcaoCliente.EMPRESA)) {
+                    sql.put("empresa", vo.getEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.ENDERECO_EMPRESA)) {
+                    sql.put("enderecoempresa", vo.getEnderecoEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.NUMERO_EMPRESA)) {
+                    sql.put("numeroempresa", vo.getNumeroEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.COMPLEMENTO_EMPRESA)) {
+                    sql.put("complementoempresa", vo.getComplementoEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.BAIRRO_EMPRESA)) {
+                    sql.put("bairroempresa", vo.getBairroEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.CEP_EMPRESA)) {
+                    sql.put("cepempresa", vo.getCepEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.MUNICIPIO_EMPRESA)) {
+                    sql.put("id_municipioempresa", vo.getId_municipioEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.UF_EMPRESA)) {
+                    sql.put("id_estadoempresa", vo.getId_estadoEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.TELEFONE_EMPRESA)) {
+                    sql.put("telefoneempresa", vo.getTelefoneEmpresa());
+                }
+                if (opt.contains(OpcaoCliente.CARGO)) {
+                    sql.put("cargo", vo.getCargo());
+                }
+                if (opt.contains(OpcaoCliente.SALARIO)) {
+                    sql.put("salario", vo.getSalario());
+                }
+                if (opt.contains(OpcaoCliente.DATA_ADMISSAO)) {
+                    sql.put("dataadmissao", vo.getDataAdmissao());
+                }
                 sql.setWhere("id = " + vo.getId());
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
