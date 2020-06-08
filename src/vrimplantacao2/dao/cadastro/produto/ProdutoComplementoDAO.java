@@ -160,7 +160,7 @@ public class ProdutoComplementoDAO {
                 sql.put("customediosemimposto", 0);
                 sql.put("id_aliquotacredito", vo.getIdAliquotaCredito());
                 sql.putNull("dataultimavenda");
-                sql.put("teclaassociada", 0);
+                sql.put("teclaassociada", vo.getTeclaassociada());
                 sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
                 sql.put("id_loja", vo.getIdLoja());
                 sql.put("descontinuado", vo.isDescontinuado());
@@ -340,6 +340,9 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.PRATELEIRA)) {
                 sql.put("prateleira", complemento.getPrateleira());
+            }
+            if (opt.contains(OpcaoProduto.TECLA_ASSOCIADA)) {
+                sql.put("teclaassociada", complemento.getTeclaassociada());
             }
             if ((opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO))
                     || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))

@@ -8,6 +8,20 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
 
 public class ProdutoComplementoVO {
+
+    /**
+     * @return the teclaassociada
+     */
+    public int getTeclaassociada() {
+        return teclaassociada;
+    }
+
+    /**
+     * @param teclaassociada the teclaassociada to set
+     */
+    public void setTeclaassociada(int teclaassociada) {
+        this.teclaassociada = teclaassociada;
+    }
     
     private int id = 0;
     private ProdutoVO produto;
@@ -34,6 +48,7 @@ public class ProdutoComplementoVO {
     private String prateleira = "";
     private Date dataMovimento;
     private Timestamp dataHora;
+    private int teclaassociada;
 
     public void setId(int id) {
         this.id = id;

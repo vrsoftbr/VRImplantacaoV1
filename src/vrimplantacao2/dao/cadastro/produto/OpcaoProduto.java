@@ -299,6 +299,18 @@ public enum OpcaoProduto {
             return "Troca (prod. complemento)";
         }
     },
+    TECLA_ASSOCIADA {
+        @Override
+        public String toString() {
+            return "Tecla Associada";
+        }
+    },
+    NUMERO_PARCELA {
+        @Override
+        public String toString() {
+            return "Número Parcela";
+        }
+    },
     FAMILIA_PRODUTO, 
     PRODUTOS, 
     EAN, 
@@ -324,7 +336,6 @@ public enum OpcaoProduto {
     PESO_LIQUIDO, 
     IMPORTAR_PDV_VR,
     RECEITA,
-    NUMERO_PARCELA,
     ACEITA_MULTIPLICACAO_PDV {
         @Override
         public String toString() {
