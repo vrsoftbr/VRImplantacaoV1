@@ -471,17 +471,17 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n" +
                     "	p.codprod id,\n" +
-                    "	p.dtcadastro datacadastro, \n" +
+                    "	p.dtcadastro datacadastro,\n" +
                     "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n" +
                     "	p.CODAUXILIAR2,\n" +
                     "	COALESCE((CASE WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1\n" +
                     "	 THEN ean.QTMINIMAATACADO\n" +
                     "	--Qtd embalagem por embalagem\n" +
-                    "	WHEN ean.QTUNIT >=2 THEN ean.QTUNIT ELSE 0 END), 1) as qtdembalagem,\n" +
+                    "	WHEN ean.QTUNIT >=2 THEN ean.QTUNIT ELSE 1 END), 1) as qtdembalagem,\n" +
                     "	coalesce(ean.qtunit, 1) embalagemunitario,\n" +
                     "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n" +
                     "	p.qtunitcx qtdembalagemcompra,\n" +
-                    "	p.unidademaster tipoembalagemcompra,        \n" +
+                    "	p.unidademaster tipoembalagemcompra,\n" +
                     "	p.aceitavendafracao e_balanca,\n" +
                     "	ean.prazoval validade,\n" +
                     "	p.descricao descricaocompleta,\n" +
@@ -511,7 +511,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	icms.codicm icmsaliq,\n" +
                     "	icms.codicmtab icmsred,\n" +
                     "	p.codncmex,\n" +
-                    "	p.codfornec fabricante        \n" +
+                    "	p.codfornec fabricante\n" +
                     "FROM\n" +
                     "	pcprodut p\n" +
                     "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n" +
@@ -519,7 +519,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	LEFT JOIN PCEMBALAGEM ean ON\n" +
                     "		ean.codprod = p.codprod AND\n" +
                     "		ean.codfilial = emp.codigo AND \n" +
-                    "		ean.CODAUXILIAR = COALESCE(p.CODAUXILIAR, p.CODPROD) \n" +
+                    "		ean.CODAUXILIAR = COALESCE(p.CODAUXILIAR, p.CODPROD)\n" +
                     "	JOIN pcest est ON\n" +
                     "		est.codprod = p.codprod AND\n" +
                     "		est.codfilial = emp.codigo\n" +
@@ -540,7 +540,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		ic.codst = icms.codst\n" +
                     "	LEFT JOIN pctribpiscofins piscofins ON\n" +
                     "		piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
-                    "	LEFT JOIN (select \n" +
+                    "	LEFT JOIN (select\n" +
                     "					icm.codprod,\n" +
                     "					icm.codst,\n" +
                     "					reg.codfilial\n" +

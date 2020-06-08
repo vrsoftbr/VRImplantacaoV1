@@ -140,7 +140,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		p.prod_codigo = un.prun_prod_codigo and\n" +
                     "		un.prun_unid_codigo = loja.id\n" +
                     "where\n" +
-                    "	un.prun_oferta = 'S'\n" +
+                    "	un.prun_oferta = 'S' and\n" +
+                    "   un.prun_dtoferta > current_date\n" +        
                     "order by\n" +
                     "	id"
                     /*
@@ -448,12 +449,12 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		distinct on\n" +
                     "		(mprd_prod_codigo) mprd_prod_codigo,\n" +
                     "		mprd_datamvto,\n" +
-                    "		(mprd_prcompra / mprd_qtde) as custocompra,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_alsubtribinf / 100) valoricms,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqpis / 100) valorpis,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqcofins / 100) valorcofins,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_subtrib / 100) valorst,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_percipi / 100) valoripi\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n" +
                     "	from\n" +
                     "		movprodd19 m\n" +
                     "		join loja on loja.id = m.mprd_unid_codigo\n" +
@@ -468,12 +469,12 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		distinct on\n" +
                     "		(mprd_prod_codigo) mprd_prod_codigo,\n" +
                     "		mprd_datamvto,\n" +
-                    "		(mprd_prcompra / mprd_qtde) as custocompra,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_alsubtribinf / 100) valoricms,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqpis / 100) valorpis,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_aliqcofins / 100) valorcofins,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_subtrib / 100) valorst,\n" +
-                    "		(mprd_prcompra / mprd_qtde) * (mprd_percipi / 100) valoripi\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n" +
+                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n" +
                     "	from\n" +
                     "		movprodd20 m\n" +
                     "		join loja on loja.id = m.mprd_unid_codigo\n" +
