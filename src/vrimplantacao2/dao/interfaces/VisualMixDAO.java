@@ -406,7 +406,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rst.getInt("qtembalagem_pai") == 0 ? 1 : rst.getInt("qtembalagem_pai"));
                     imp.setProdutoAssociadoId(rst.getString("produto_filho"));
                     imp.setQtdEmbalagemItem(rst.getInt("qtdembalagem_filho") == 0 ? 1 : rst.getInt("qtdembalagem_filho"));
-                    imp.setAplicaCusto(true);
                     result.add(imp);
                 }
             }
