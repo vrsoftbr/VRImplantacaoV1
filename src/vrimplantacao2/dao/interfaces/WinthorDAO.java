@@ -12,7 +12,10 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
@@ -37,6 +40,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public boolean temArquivoBalanca = false;
+    
     @Override
     public String getSistema() {
         return "WINTHOR";
@@ -189,7 +194,8 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
         
     }
 
-    @Override
+    //<editor-fold defaultstate="collapsed" desc="Comentado metódo do produto para uma nova versão do select">
+    /*@Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
@@ -416,6 +422,346 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                         cont = 0;
                     }
                 }                
+            }
+        }
+        return result;
+    }*/
+    //</editor-fold>
+    
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            Map<String, Trib> tribs = new HashMap<>();
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "      ent.ncm,\n" +
+                    "      case ent.tipofornec\n" +
+                    "      when 'I' then 1\n" +
+                    "      when 'D' then 2\n" +
+                    "      when 'C' then 3\n" +
+                    "      when 'V' then 4\n" +
+                    "      else 10 end tipo,\n" +
+                    "      trib.codsittribpiscofins piscofins,\n" +
+                    "      trib.sittribut icms_cst,\n" +
+                    "      trib.percicm icms_aliquota,\n" +
+                    "      trib.percbaseredent icms_reducao\n" +
+                    "from \n" +
+                    "     PCTRIBENTRADA ent\n" +
+                    "     join PCTRIBFIGURA trib on\n" +
+                    "          ent.codfigura = trib.codfigura\n" +
+                    "     join pcfilial e on\n" +
+                    "          e.codigo = ent.codfilial\n" +
+                    "where\n" +
+                    "     ent.codfilial = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "      ncm, tipo"
+            )) {
+                while (rst.next()) {
+                    if (!tribs.containsKey(rst.getString("ncm"))) {
+                        tribs.put(rst.getString("ncm"), new Trib(
+                                rst.getInt("icms_cst"),
+                                rst.getDouble("icms_aliquota"),
+                                rst.getDouble("icms_reducao"),
+                                rst.getInt("piscofins")
+                        ));
+                    }
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n" +
+                    "	p.codprod id,\n" +
+                    "	p.dtcadastro datacadastro, \n" +
+                    "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n" +
+                    "	p.CODAUXILIAR2,\n" +
+                    "	COALESCE((CASE WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1\n" +
+                    "	 THEN ean.QTMINIMAATACADO\n" +
+                    "	--Qtd embalagem por embalagem\n" +
+                    "	WHEN ean.QTUNIT >=2 THEN ean.QTUNIT ELSE 0 END), 1) as qtdembalagem,\n" +
+                    "	coalesce(ean.qtunit, 1) embalagemunitario,\n" +
+                    "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n" +
+                    "	p.qtunitcx qtdembalagemcompra,\n" +
+                    "	p.unidademaster tipoembalagemcompra,        \n" +
+                    "	p.aceitavendafracao e_balanca,\n" +
+                    "	ean.prazoval validade,\n" +
+                    "	p.descricao descricaocompleta,\n" +
+                    "	p.codepto merc1,\n" +
+                    "	p.codsec merc2,\n" +
+                    "	p.codcategoria merc3,\n" +
+                    "	p.codsubcategoria merc4,\n" +
+                    "	CASE WHEN p.codprodprinc != p.codprod then p.codprodprinc else null END id_familiaproduto,\n" +
+                    "	round(coalesce(p.pesobruto, 0),2) pesobruto,\n" +
+                    "	round(coalesce(p.pesoliq, 0),2) pesoliquido,\n" +
+                    "	coalesce(est.estmin, 0) estoqueminimo,\n" +
+                    "	coalesce(est.estmax, 0) estoquemaximo,    \n" +
+                    "	coalesce(est.qtest,0) estoque,\n" +
+                    "	coalesce(ean.margem,0) margem,\n" +
+                    "	coalesce(est.custoreal,0) custosemimposto,\n" +
+                    "	coalesce(est.custorep,0) custocomimposto,\n" +
+                    "	coalesce(ean.pvenda / (CASE WHEN coalesce(ean.qtunit,1) = 0 THEN 1 ELSE coalesce(ean.qtunit,1) end),0) precovenda,\n" +
+                    "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n" +
+                    "	p.nbm ncm,\n" +
+                    "	coalesce(est.codcest, p.codcest) cest,\n" +
+                    "	piscofins.sittribut piscofins_debito,\n" +
+                    "	piscofins.descricaotribpiscofins,\n" +
+                    "	p.codsittribpiscofins piscofins,\n" +
+                    "	t.codnatrec piscofins_natrec,\n" +
+                    "	tabst.codst idtributacao,\n" +
+                    "	icms.sittribut icmscst,\n" +
+                    "	icms.codicm icmsaliq,\n" +
+                    "	icms.codicmtab icmsred,\n" +
+                    "	p.codncmex,\n" +
+                    "	p.codfornec fabricante        \n" +
+                    "FROM\n" +
+                    "	pcprodut p\n" +
+                    "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n" +
+                    "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n" +
+                    "	LEFT JOIN PCEMBALAGEM ean ON\n" +
+                    "		ean.codprod = p.codprod AND\n" +
+                    "		ean.codfilial = emp.codigo AND \n" +
+                    "		ean.CODAUXILIAR = p.CODAUXILIAR \n" +
+                    "	JOIN pcest est ON\n" +
+                    "		est.codprod = p.codprod AND\n" +
+                    "		est.codfilial = emp.codigo\n" +
+                    "	LEFT JOIN pcprodfilial pf ON\n" +
+                    "		pf.codprod = p.codprod AND\n" +
+                    "		pf.codfilial = emp.codigo\n" +
+                    "	LEFT JOIN PCTABESCRSPED t ON\n" +
+                    "		(T.CODPROD = p.codprod OR p.codprod = 0)\n" +
+                    "		AND T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n" +
+                    "		AND ((T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n" +
+                    "		OR  (T.DATAINIESCR <= current_date AND T.DATAFINESCR IS NULL)\n" +
+                    "		OR  (current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR AND T.DATAINIESCR IS NOT NULL AND T.DATAFINESCR IS NOT NULL))\n" +
+                    "	LEFT JOIN PCTABTRIB ic ON\n" +
+                    "		ic.codprod = p.codprod\n" +
+                    "		AND ic.codfilialnf = emp.codigo\n" +
+                    "		AND ic.ufdestino = emp.uf\n" +
+                    "	LEFT JOIN PCTRIBUT icms ON\n" +
+                    "		ic.codst = icms.codst\n" +
+                    "	LEFT JOIN pctribpiscofins piscofins ON\n" +
+                    "		piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
+                    "	LEFT JOIN (select \n" +
+                    "					icm.codprod,\n" +
+                    "					icm.codst,\n" +
+                    "					reg.codfilial\n" +
+                    "				from \n" +
+                    "					pctabpr icm \n" +
+                    "				left join pcregiao reg on icm.numregiao = reg.numregiao\n" +
+                    "				left join PCTRIBUT trb on icm.codst = trb.codst) tabst on tabst.codprod = p.codprod and\n" +
+                    "				tabst.codfilial = emp.codigo\n" +
+                    "ORDER BY id, ean"
+            )) {
+                int cont = 0, cont2 = 0;
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcompra"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcompra"));
+                    if(rst.getString("e_balanca") != null && !"".equals(rst.getString("e_balanca"))) {
+                        imp.seteBalanca("S".equals(rst.getString("e_balanca").trim()) ? true : false);
+                    } else {
+                        imp.seteBalanca(false);
+                    }
+                    
+                    if(temArquivoBalanca && imp.isBalanca() && imp.getEan() != null && !"".equals(imp.getEan())) {
+                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+                        
+                        if (bal != null) {
+                            imp.setEan(String.valueOf(bal.getCodigo()));
+                            imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                            imp.setValidade(bal.getValidade() > 1 ? bal.getValidade() : rst.getInt("validade"));
+                        } else {
+                            imp.setValidade(rst.getInt("validade"));
+                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                            imp.seteBalanca(false);
+                        }
+                    }
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                    imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
+                    imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
+                    imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
+                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
+                    imp.setPesoBruto(Utils.stringToDouble(rst.getString("pesoliquido")));
+                    imp.setPesoLiquido(Utils.stringToDouble(rst.getString("pesobruto")));                    
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    //imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                    //imp.setPiscofinsCstCredito(0);
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins"));
+                    imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
+                    //imp.setIcmsCst(rst.getInt("icmscst"));
+                    //imp.setIcmsAliq(rst.getDouble("icmsaliq"));
+                    //imp.setIcmsReducao(rst.getDouble("icmsred"));
+                    imp.setIcmsDebitoId(rst.getString("idtributacao"));
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    
+                    Trib trib = tribs.get(rst.getString("codncmex"));
+                    if (trib != null) {
+                        imp.setPiscofinsCstDebito(0);
+                        imp.setPiscofinsCstCredito(trib.pisCofins);
+                        imp.setIcmsCst(trib.icmsCst);
+                        imp.setIcmsAliq(trib.icmsAliq);
+                        imp.setIcmsReducao(trib.icmsRed);
+                        if ("561421".equals(imp.getImportId())) {
+                            System.out.println(String.format(
+                                    "cst=%d aliq=%f red=%f piscofins=%d",
+                                    trib.icmsCst,
+                                    trib.icmsAliq,
+                                    trib.icmsRed,
+                                    trib.pisCofins                                    
+                            ));
+                        }
+                    }
+                    
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
+
+                    result.add(imp);
+
+                    cont2++;
+                    cont++;
+
+                    if (cont == 1000) {
+                        ProgressBar.setStatus("Carregando produtos...." + cont2);
+                        cont = 0;
+                    }
+                }                
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n" +
+                        "	p.CODPROD idproduto,\n" +
+                        "	p.codauxiliar ean,\n" +
+                        "	p.qtunit,\n" +
+                        "	p.QTMINIMAATACADO,\n" +
+                        "	p.PVENDA precovenda,\n" +
+                        "	-- Qtd de atacado por quantidade total\n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.QTMINIMAATACADO\n" +
+                        "	--Qtd embalagem por embalagem\n" +
+                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 0 END) AS qtdatacado,\n" +
+                        "	-- Preço do atacado por quantidade total\n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.PVENDAATAC \n" +
+                        "	-- Preço do atacado por embalagem\n" +
+                        "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n" +
+                        "		THEN round((p.PVENDA / p.QTUNIT), 2) END) AS precoatacado, \n" +
+                        "	p.MARGEM,\n" +
+                        "	p.MARGEMIDEALATAC,\n" +
+                        "	p.EMBALAGEM,\n" +
+                        "	p.UNIDADE\n" +
+                        "FROM \n" +
+                        "	pcembalagem p \n" +
+                        "WHERE \n" +
+                        "	CODFILIAL = '" + getLojaOrigem() + "' AND\n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.QTMINIMAATACADO\n" +
+                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 0 END) > 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEan(rst.getString("ean"));
+                    
+                        if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+                            imp.setEan(getLojaOrigem() + "00000" + imp.getEan());
+                        }
+                        
+                        imp.setQtdEmbalagem(rst.getInt("qtdatacado"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT * FROM (SELECT \n" +
+                            "	p.CODPROD,\n" +
+                            "	p.codfilial,\n" +
+                            "	p.CODAUXILIAR ean,\n" +
+                            "	p.UNIDADE,\n" +
+                            "	-- Qtd de atacado por quantidade total\n" +
+                            "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                            "	 THEN p.QTMINIMAATACADO\n" +
+                            "	--Qtd embalagem por embalagem\n" +
+                            "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END), 0) AS QTUNIT\n" +
+                            "FROM \n" +
+                            "	pcembalagem p \n" +
+                            "union\n" +
+                            "SELECT\n" +
+                            "	a.codprod,\n" +
+                            "	'0' codfilial,\n" +
+                            "	a.ean,\n" +
+                            "	a.unidade,\n" +
+                            "	a.qtunit\n" +
+                            "from\n" +
+                            "	(SELECT codprod, codauxiliar ean, descricao, unidade, qtunit, prazoval FROM pcprodut\n" +
+                            "	UNION\n" +
+                            "	SELECT codprod, codauxiliar2 ean, descricao, unidade, qtunit, prazoval FROM pcprodut) a\n" +
+                            "WHERE \n" +
+                            "	NOT ean IN (SELECT codauxiliar FROM pcembalagem)\n" +
+                            "ORDER BY \n" +
+                            "	codprod) eans WHERE eans.codfilial = '" + getLojaOrigem() + "'")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codprod"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtunit"));
+                    
+                    if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
+                        imp.setEan(getLojaOrigem() + "00000" + imp.getEan());
+                    }
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;

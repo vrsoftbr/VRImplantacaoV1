@@ -13,10 +13,10 @@ public class CreditoRotativoItemIMP {
     private double desconto = 0D;
     private double multa = 0D;
     
-    private int id_banco = -1;
+    private int id_banco = 804;
     private String agencia;
     private String conta;
-    private int id_tiporecebimento = -1;
+    private int id_tiporecebimento = 0;
     
     private Date dataPagamento;
     private String observacao;
