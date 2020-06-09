@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -307,6 +308,7 @@ public class SigmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
                     imp.setIcmsConsumidorId(rst.getString("id_icms"));
+                    imp.setManterEAN(Utils.stringToLong(imp.getEan()) <= 999999);
 
                     result.add(imp);
 
