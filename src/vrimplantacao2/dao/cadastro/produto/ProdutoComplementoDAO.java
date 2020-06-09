@@ -323,6 +323,9 @@ public class ProdutoComplementoDAO {
             if (opt.contains(OpcaoProduto.TIPO_PRODUTO)) {
                 sql.put("id_tipoproduto", complemento.getTipoProduto().getId());
             }
+            if (opt.contains(OpcaoProduto.TIPO_ATACADO)) {
+                sql.put("id_tipodescontoatacado", complemento.getTipoAtacado().getId());
+            }
             if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
                 sql.put("fabricacaopropria", complemento.isFabricacaoPropria());
             }

@@ -45,6 +45,7 @@ public class ProdutoVO {
     private double pesoBruto = 0;
     private double pesoLiquido = 0;
     private double margemMinima = 0;
+    private double margemMaxima = 0;
     private double margem = 0;
     private NcmVO ncm = new NcmVO();
     private PisCofinsVO pisCofinsDebito = PisCofinsDAO.PISCOFINS_DEBITO_PADRAO;
@@ -436,5 +437,13 @@ public class ProdutoVO {
 
     public void setProdutoecommerce(boolean produtoecommerce) {
         this.produtoecommerce = produtoecommerce;
+    }
+
+    public double getMargemMaxima() {
+        return margemMaxima;
+    }
+
+    public void setMargemMaxima(double margemMaxima) {
+        this.margemMaxima = margemMaxima;
     }
 }
