@@ -708,6 +708,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setPrateleira(rst.getString("departamento").trim());
                         }
                     }
+                    
+                    imp.setManterEAN(Utils.stringToLong(imp.getEan()) <= 999999);
 
                     result.add(imp);
                 }
