@@ -266,6 +266,7 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
             sql.put("margemminima", vo.getMargemMinima());
+            sql.put("margemmaxima", vo.getMargemMaxima());
         }
         if (opt.contains(OpcaoProduto.MARGEM)) {
             sql.put("margem", vo.getMargem());

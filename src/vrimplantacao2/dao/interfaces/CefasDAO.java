@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoOracle;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -224,8 +223,7 @@ public class CefasDAO extends InterfaceDAO {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     }
                     if((rs.getString("codigobarras") != null) && 
-                            (rs.getString("codigobarras").length() <= 6) && 
-                                ("KG".equals(rs.getString("unidade").trim()))) {
+                            (rs.getString("codigobarras").length() <= 6)) {
                         if(vBalanca) {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
