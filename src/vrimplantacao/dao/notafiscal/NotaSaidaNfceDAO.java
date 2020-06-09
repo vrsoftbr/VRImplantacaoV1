@@ -290,7 +290,8 @@ public class NotaSaidaNfceDAO {
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
                 if (verificarCodigoAnterior) {
-                    String codigo = Utils.stringLong(cProd.getTextContent()), codigoAcom, idProduto;
+                    String codigo = String.format("%.0f", Utils.stringToDouble(cProd.getTextContent()));
+                    String codigoAcom, idProduto;
                     //codigoAcom = codigo.substring(0, codigo.length() - 2);
                     idProduto = codigo;
                     ProdutoMapa mp = mapa.get(tipo.toString(), idProduto);
