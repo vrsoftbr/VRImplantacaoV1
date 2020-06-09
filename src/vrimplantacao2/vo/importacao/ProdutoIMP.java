@@ -7,6 +7,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoAtacado;
 import vrimplantacao2.vo.enums.TipoProduto;
 
 @DatabaseTable(tableName = "miglog.produto")
@@ -83,6 +84,7 @@ public class ProdutoIMP {
     
     @DatabaseField private double margem = 0;
     @DatabaseField private double margemMinima = 0;
+    @DatabaseField private double margemMaxima = 0;
     @DatabaseField private double custoSemImposto = 0;
     @DatabaseField private double custoComImposto = 0;    
     @DatabaseField private double custoAnteriorSemImposto = 0;
@@ -146,6 +148,7 @@ public class ProdutoIMP {
     @DatabaseField private String uf;
     @DatabaseField private String codigoGIA;
     @DatabaseField private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
+    @DatabaseField private TipoAtacado tipoAtacado = TipoAtacado.EMBALAGEM;
     @DatabaseField private boolean fabricacaoPropria = false;
     @DatabaseField private boolean manterEAN = false;
     @DatabaseField private boolean importarEANUnitarioMenor7 = false;
@@ -1039,5 +1042,20 @@ public class ProdutoIMP {
     public void setImportarEANUnitarioMenor7(boolean importarEANUnitarioMenor7) {
         this.importarEANUnitarioMenor7 = importarEANUnitarioMenor7;
     }
-    
+
+    public double getMargemMaxima() {
+        return margemMaxima;
+    }
+
+    public void setMargemMaxima(double margemMaxima) {
+        this.margemMaxima = margemMaxima;
+    }
+
+    public TipoAtacado getTipoAtacado() {
+        return tipoAtacado;
+    }
+
+    public void setTipoAtacado(TipoAtacado tipoAtacado) {
+        this.tipoAtacado = tipoAtacado;
+    }
 }

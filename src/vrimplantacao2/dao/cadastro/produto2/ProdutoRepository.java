@@ -983,6 +983,7 @@ public class ProdutoRepository {
         complemento.setDescontinuado(imp.isDescontinuado());
         complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         complemento.setTipoProduto(imp.getTipoProduto());
+        complemento.setTipoAtacado(imp.getTipoAtacado());
         complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
         complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
         complemento.setDataPrimeiraAlteracao(imp.getDataCadastro());
@@ -1082,6 +1083,7 @@ public class ProdutoRepository {
         vo.setFamiliaProduto(provider.getFamiliaProduto(imp.getIdFamiliaProduto()));
         vo.setMargem(imp.getMargem());
         vo.setMargemMinima(imp.getMargemMinima());
+        vo.setMargemMaxima(imp.getMargemMaxima());
         MercadologicoVO merc = provider.getMercadologico(
                 fillNull(imp.getCodMercadologico1()),
                 fillNull(imp.getCodMercadologico2()),

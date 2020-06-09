@@ -118,6 +118,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Atacado";
         }
+    }, TIPO_ATACADO {
+        @Override
+        public String toString() {
+            return "Tipo de Atacado";
+        }
     }, VR_ATACADO {
         @Override
         public String toString() {

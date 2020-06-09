@@ -158,7 +158,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
@@ -176,9 +176,17 @@
                               </Group>
                               <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkMargemMaxMin" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="chkTipoEmbalagemCompra" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkQtdEmbalagemCompra" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkFamilia" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkT1EAN" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -208,26 +216,21 @@
                                               <Component id="chkFabricante" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkFamilia" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkTipoAtacado" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                   </Group>
                               </Group>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkTipoEmbalagemCompra" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkQtdEmbalagemCompra" min="-2" max="-2" attributes="0"/>
-                              </Group>
                           </Group>
-                          <EmptySpace pref="41" max="32767" attributes="0"/>
+                          <EmptySpace pref="35" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="3" attributes="0">
@@ -239,7 +242,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkT1DescGondola" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkFamilia" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTipoAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <Group type="103" groupAlignment="1" attributes="0">
@@ -273,15 +276,6 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
-                                  <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
-                                  <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkT1NatReceita" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -299,18 +293,25 @@
                                       <Component id="chkT1AtivoInativo" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkNutricionalToledo" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkFabricante" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkT1Estoque" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                                  <Component id="chkTipoEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkQtdEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
+                                  <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="19" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkMargemMaxMin" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkQtdEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFamilia" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                          <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -482,6 +483,16 @@
                     </Property>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo de Atacado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargemMaxMin">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Margem Max. e Min."/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">
@@ -532,7 +543,7 @@
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="105" max="32767" attributes="0"/>
+                          <EmptySpace pref="139" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -635,7 +646,7 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="82" max="32767" attributes="0"/>
+                          <EmptySpace pref="116" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -730,7 +741,7 @@
                           <Component id="chkConvConveniado" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="110" max="32767" attributes="0"/>
+                          <EmptySpace pref="144" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -811,7 +822,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="87" max="32767" attributes="0"/>
+                      <EmptySpace pref="121" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

@@ -17,6 +17,7 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoAtacado;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -706,6 +707,116 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setQtdEmbalagem(rst.getInt("qtdatacado"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setPrecovenda(rst.getDouble("precovarejo"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        } else if (opt == OpcaoProduto.MARGEM_MINIMA) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n" +
+                        "	p.CODPROD idproduto,\n" +
+                        "	p.CODAUXILIAR ean,\n" +
+                        "	p.UNIDADE,\n" +
+                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.MARGEMIDEALATAC \n" +
+                        "	WHEN p.QTUNIT >=2 THEN \n" +
+                        "		(SELECT min(margem) FROM pcembalagem\n" +
+                        "		WHERE \n" +
+                        "		 codprod = p.CODPROD AND \n" +
+                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemminima,\n" +
+                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.margem \n" +
+                        "	WHEN p.QTUNIT >=2 THEN \n" +
+                        "		(SELECT max(margem) FROM pcembalagem\n" +
+                        "		WHERE \n" +
+                        "		 codprod = p.CODPROD AND \n" +
+                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemmaxima,\n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN 'QTD_TOTAL'\n" +
+                        "	--Qtd embalagem por embalagem\n" +
+                        "	WHEN p.QTUNIT >=2 THEN 'QTD_EMBALAGEM' ELSE 'EMBALAGEM' END) AS tipoatacado\n" +
+                        "FROM \n" +
+                        "	pcembalagem p\n" +
+                        "WHERE \n" +
+                        "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.QTMINIMAATACADO\n" +
+                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) > 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEan(rst.getString("ean"));
+                        imp.setMargemMinima(rst.getDouble("margemminima"));
+                        imp.setMargemMaxima(rst.getDouble("margemmaxima"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        } else if(opt == OpcaoProduto.TIPO_ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n" +
+                        "	p.CODPROD idproduto,\n" +
+                        "	p.CODAUXILIAR ean,\n" +
+                        "	p.UNIDADE,\n" +
+                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.MARGEMIDEALATAC \n" +
+                        "	WHEN p.QTUNIT >=2 THEN \n" +
+                        "		(SELECT min(margem) FROM pcembalagem\n" +
+                        "		WHERE \n" +
+                        "		 codprod = p.CODPROD AND \n" +
+                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemminima,\n" +
+                        "	COALESCE((CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.margem \n" +
+                        "	WHEN p.QTUNIT >=2 THEN \n" +
+                        "		(SELECT max(margem) FROM pcembalagem\n" +
+                        "		WHERE \n" +
+                        "		 codprod = p.CODPROD AND \n" +
+                        "		 CODFILIAL = p.CODFILIAL) ELSE 0 END), 0) margemmaxima,\n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN 'QTD_TOTAL'\n" +
+                        "	--Qtd embalagem por embalagem\n" +
+                        "	WHEN p.QTUNIT >=2 THEN 'QTD_EMBALAGEM' ELSE 'EMBALAGEM' END) AS tipoatacado\n" +
+                        "FROM \n" +
+                        "	pcembalagem p\n" +
+                        "WHERE \n" +
+                        "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.QTMINIMAATACADO\n" +
+                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) > 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEan(rst.getString("ean"));
+                        
+                        if(rst.getString("tipoatacado") != null &&
+                                !"".equals(rst.getString("tipoatacado"))) {
+                            switch(rst.getString("tipoatacado").trim()) {
+                                case "QTD_TOTAL":
+                                    imp.setTipoAtacado(TipoAtacado.QTDE_TOTAL);
+                                    break;
+                                case "QTD_EMBALAGEM":
+                                    imp.setTipoAtacado(TipoAtacado.QTDE_EMBALAGEM);
+                                    break;
+                                default: imp.setTipoAtacado(TipoAtacado.EMBALAGEM);
+                                    break;
+                            }
+                        }
 
                         vResult.add(imp);
                     }
