@@ -82,6 +82,8 @@ public class UniplusDAO extends InterfaceDAO {
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.PRODUTOS,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.ATIVO,
             OpcaoProduto.DESC_COMPLETA,
             OpcaoProduto.DESC_GONDOLA,
@@ -149,11 +151,11 @@ public class UniplusDAO extends InterfaceDAO {
         List<FamiliaProdutoIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select "
-                    + "  codigofamilia, "
-                    + "  nome descricao"
-                    + "from "
-                    + "  familia"
+                      "select \n"
+                    + "	 codigo codigofamilia,\n"
+                    + "  nome descricao\n"
+                    + "from \n"
+                    + "	 familiaproduto"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -262,7 +264,7 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                         imp.setQtdEmbalagem(1);
-                        imp.setValidade(rs.getInt(bal.getValidade()));
+                        //imp.setValidade(rs.getInt(bal.getValidade()));
                     }
 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
