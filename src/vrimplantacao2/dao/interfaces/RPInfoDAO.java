@@ -26,10 +26,12 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -1628,6 +1630,22 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(String.format("%s-%s", rs.getString("pfin_transacao"), rs.getString("pfin_operacao")));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntrada(rs.getDate("dataentrada"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setVencimento(rs.getDate("vencimento"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    parc.setNumeroParcela(rs.getInt("parcela"));
+                    parc.setObservacao(rs.getString("observacao"));
+                    parc.setId_banco(Utils.stringToInt(rs.getString("banco")));
+                    parc.setAgencia(rs.getString("agencia"));
+                    
+                    result.add(imp);
                 }
             }
         }
