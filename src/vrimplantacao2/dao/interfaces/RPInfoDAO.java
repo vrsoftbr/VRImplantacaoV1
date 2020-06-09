@@ -26,9 +26,12 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -1587,6 +1590,64 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
 
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	pg.pfin_transacao,\n" +
+                    "	pg.pfin_operacao,\n" +
+                    "	pg.pfin_codentidade id_fornecedor,\n" +
+                    "	pg.pfin_numerodcto numerodocumento,\n" +
+                    "	pg.pfin_dataemissao dataemissao,\n" +
+                    "	pg.pfin_datalcto dataentrada,\n" +
+                    "	pg.pfin_valor valor,\n" +
+                    "	pg.pfin_datavcto vencimento,\n" +
+                    "	pg.pfin_parcela parcela,\n" +
+                    "	pg.pfin_observacao observacao,\n" +
+                    "	pg.pfin_banco banco,\n" +
+                    "	pg.pfin_agencia agencia,\n" +
+                    "	pg.pfin_espe_codigo id_especie\n" +
+                    "from\n" +
+                    "	pendfin pg\n" +
+                    "    join planoger pl on\n" +
+                    "    	pg.pfin_pger_conta = pl.pger_conta\n" +
+                    "    join fornecedores f on\n" +
+                    "    	pg.pfin_codentidade = f.forn_codigo\n" +
+                    "where\n" +
+                    "	pg.pfin_status = 'P'\n" +
+                    "    and pg.pfin_pr = 'P'\n" +
+                    "    and pg.pfin_catentidade != 'C'\n" +
+                    "    and pg.pfin_seqbaixa is null\n" +
+                    "    and pg.pfin_unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    "order by\n" +
+                    "	1, 2"
+            )) {
+                while (rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(String.format("%s-%s", rs.getString("pfin_transacao"), rs.getString("pfin_operacao")));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntrada(rs.getDate("dataentrada"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setVencimento(rs.getDate("vencimento"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    parc.setNumeroParcela(rs.getInt("parcela"));
+                    parc.setObservacao(rs.getString("observacao"));
+                    parc.setId_banco(Utils.stringToInt(rs.getString("banco")));
+                    parc.setAgencia(rs.getString("agencia"));
+                    
+                    result.add(imp);
+                }
+            }
         }
         return result;
     }
