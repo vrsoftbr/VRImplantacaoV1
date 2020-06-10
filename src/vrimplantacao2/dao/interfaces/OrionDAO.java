@@ -234,7 +234,8 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("vendavare"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custobase"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    //imp.setCustoComImposto(rst.getDouble("custobase"));
                     //imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setEstoque(rst.getDouble("quantfisc"));
                     imp.setNcm(rst.getString("ncm"));
@@ -245,6 +246,10 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setIcmsCstSaida(rst.getInt("sittribut"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("reducao"));
+                    
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoConsumidor(imp.getIcmsReducaoSaida());
 
                     imp.setIcmsCstSaidaForaEstado(rst.getInt("sittribut"));
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms"));

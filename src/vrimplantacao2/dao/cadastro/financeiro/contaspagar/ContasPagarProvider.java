@@ -4,6 +4,7 @@ import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.RepositoryProvider;
+import vrimplantacao2.dao.cadastro.diversos.BancoDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorVO;
@@ -27,6 +28,7 @@ public class ContasPagarProvider implements RepositoryProvider {
     private PagarOutrasDespesasVencimentoDAO vencimentoDAO;
     private PagarFornecedorDAO pagarFornecedorDAO;
     private PagarFornecedorParcelaDAO pagarFornecedorParcelaDAO;
+    private BancoDAO bancoDAO;
 
     public ContasPagarProvider(String sistema, String agrupador, int lojaVR) throws Exception {
         this.sistema = sistema;
@@ -38,6 +40,7 @@ public class ContasPagarProvider implements RepositoryProvider {
         this.anteriorDAO = new ContaPagarAnteriorDAO();
         this.pagarFornecedorDAO = new PagarFornecedorDAO();
         this.pagarFornecedorParcelaDAO = new PagarFornecedorParcelaDAO();
+        this.bancoDAO = new BancoDAO();
         this.anteriorDAO.createTable();
     }
 
@@ -127,6 +130,10 @@ public class ContasPagarProvider implements RepositoryProvider {
 
     public void gravarVencimento(PagarFornecedorParcelaVO parc) throws Exception {
         this.pagarFornecedorParcelaDAO.gravarPagarFornecedorParcela(parc);
+    }
+    
+    public Set<Integer> getBancosExistentes() throws Exception {
+        return bancoDAO.getBancosExistentes();
     }
     
 }

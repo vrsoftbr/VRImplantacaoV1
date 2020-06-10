@@ -44,6 +44,7 @@ public class ContasPagarRepository {
         provider.notificar("Contas à Pagar - Preparando a importação...");
         MultiMap<String, FornecedorAnteriorVO> fornecedores = provider.getFornecedores();
         MultiMap<String, ContaPagarAnteriorVO> anteriores = provider.getAnteriores();
+        Set<Integer> bancosExistentes = provider.getBancosExistentes();
         
         provider.notificar("Contas à Pagar - Importando...", organizados.size());
         provider.begin();
@@ -105,8 +106,10 @@ public class ContasPagarRepository {
                         }
                         
                         if (importarOutrasDespesas) {
-                            anterior.setTipo(ContaPagarAnteriorTipo.OUTRASDESPESAS);                        
+                            anterior.setTipo(ContaPagarAnteriorTipo.OUTRASDESPESAS);
+                            System.out.println("OUTRASDESPESAS");
                         } else {
+                            System.out.println("PAGARFORNECEDOR");
                             anterior.setTipo(ContaPagarAnteriorTipo.PAGARFORNECEDOR);
                         }
                         

@@ -22,6 +22,8 @@ public class NutricionalToledoDAO {
     Utils util = new Utils();
     public static String sistema;
     public static String loja;
+    public boolean ignorarUltimoDigito = false;
+    public int opcaoCodigo = 1;
 
     public List<NutricionalToledoIMP> getNutricionalToledoProduto(String arquivo) throws Exception {
         List<NutricionalToledoIMP> result = new ArrayList<>();
@@ -77,7 +79,13 @@ public class NutricionalToledoDAO {
             for (int i = 0; i < vToledo.size(); i++) {
                 NutricionalToledoVO vo = new NutricionalToledoVO();
                 if (!vToledo.get(i).trim().isEmpty()) {
-                    vo.setId(Utils.stringToInt(vToledo.get(i).substring(2, 7)));
+                    
+                    if (opcaoCodigo == 1) {
+                        vo.setId(Utils.stringToInt(vToledo.get(i).substring(1, 7)));
+                    } else {
+                        vo.setId(Utils.stringToInt(vToledo.get(i).substring(2, 7)));
+                    }
+                    
                     System.out.println("ID NUTRI: " + vo.getId());
                     vo.setQuantidade(Utils.stringToInt(vToledo.get(i).substring(8, 11)));
                     vo.setId_tipounidadeporcao(Utils.stringToInt(vToledo.get(i).substring(11, 12)));
@@ -255,7 +263,18 @@ public class NutricionalToledoDAO {
                 stm.execute(sql.getInsert());
             }
             
-            int idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
+            int idProduto = -1;
+            
+            if (this.opcaoCodigo == 2) {
+                idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
+            } else {
+                
+                if (ignorarUltimoDigito) {
+                    idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(sistema, loja, String.valueOf(vo.getId()));
+                } else {
+                    idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(vo.getId()));
+                }
+            }
             
             if(idProduto == -1) {
                 System.out.println("Produto Balança Não Encontrado: " + vo.getIdProduto() + "\n"
@@ -326,6 +345,15 @@ public class NutricionalToledoDAO {
         ProgressBar.setStatus("Importando dados...Nutricional Toledo...");
         List<NutricionalToledoVO> nutri = new NutricionalToledoDAO().getNutricionalToledo(arquivo);
         new NutricionalToledoDAO().salvarNutricionalToledo(nutri);
+    }
+    
+    public static void importarNutricionalToledo(String arquivo, int opcaoCodigo, boolean ignorarUltimoDigito) throws Exception {
+        ProgressBar.setStatus("Importando dados...Nutricional Toledo...");
+        List<NutricionalToledoVO> nutri = new NutricionalToledoDAO().getNutricionalToledo(arquivo);
+        NutricionalToledoDAO dao = new NutricionalToledoDAO();
+        dao.ignorarUltimoDigito = ignorarUltimoDigito;
+        dao.opcaoCodigo = opcaoCodigo;
+        dao.salvarNutricionalToledo(nutri);
     }
 }
 
