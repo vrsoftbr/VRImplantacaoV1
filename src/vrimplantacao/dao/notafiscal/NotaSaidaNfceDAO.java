@@ -74,11 +74,11 @@ public class NotaSaidaNfceDAO {
             stm.execute(
                     "do $$\n" +
                     "begin\n" +
-                    "	if (not exists(select id from pdv.tipomodelo where id = 999)) then\n" +
-                    "		insert into pdv.tipomodelo values (999, 22, 'GENERICA', 1, false);\n" +
-                    "	end if;\n" +
                     "	if (not exists(select id from pdv.tipomarca where id = 999)) then\n" +
                     "		insert into pdv.tipomarca values (999, 'GENERICA', 'GG');\n" +
+                    "	end if;\n" +
+                    "	if (not exists(select id from pdv.tipomodelo where id = 999)) then\n" +
+                    "		insert into pdv.tipomodelo values (999, 999, 'GENERICA', 1, false);\n" +
                     "	end if;\n" +
                     "end\n" +
                     "$$"
@@ -290,7 +290,8 @@ public class NotaSaidaNfceDAO {
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
                 if (verificarCodigoAnterior) {
-                    String codigo = cProd.getTextContent().replace("'", "").replace("\n", "").trim(), codigoAcom, idProduto;
+                    String codigo = String.format("%.0f", Utils.stringToDouble(cProd.getTextContent()));
+                    String codigoAcom, idProduto;
                     //codigoAcom = codigo.substring(0, codigo.length() - 2);
                     idProduto = codigo;
                     ProdutoMapa mp = mapa.get(tipo.toString(), idProduto);

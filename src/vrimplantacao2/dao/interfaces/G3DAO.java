@@ -270,6 +270,8 @@ public class G3DAO extends InterfaceDAO {
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     }
+                    
+                    imp.setManterEAN(Utils.stringToLong(imp.getEan()) <= 999999);
 
                     result.add(imp);
                 }

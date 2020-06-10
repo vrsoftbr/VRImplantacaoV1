@@ -5,6 +5,7 @@ import java.util.Date;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoAtacado;
 import vrimplantacao2.vo.enums.TipoProduto;
 
 public class ProdutoComplementoVO {
@@ -34,6 +35,7 @@ public class ProdutoComplementoVO {
     private double custoComImposto = 0;
     private double custoAnteriorSemImposto = 0;
     private double custoAnteriorComImposto = 0;
+    private double custoMedio = 0;
     private double precoVenda = 0;
     private double precoDiaSeguinte = 0;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
@@ -41,6 +43,7 @@ public class ProdutoComplementoVO {
     private boolean fabricacaoPropria = false;
     private boolean emiteEtiqueta = true;
     private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
+    private TipoAtacado tipoAtacado = TipoAtacado.EMBALAGEM;
     private int idAliquotaCredito = 0;
     private Date dataPrimeiraAlteracao;
     private NormaCompra normaReposicao = NormaCompra.CAIXA;
@@ -249,4 +252,21 @@ public class ProdutoComplementoVO {
     public void setDataHora(Timestamp dataHora) {
         this.dataHora = dataHora;
     }
+
+    public TipoAtacado getTipoAtacado() {
+        return tipoAtacado;
+    }
+
+    public void setTipoAtacado(TipoAtacado tipoAtacado) {
+        this.tipoAtacado = tipoAtacado;
+    }
+
+    public double getCustoMedio() {
+        return custoMedio;
+    }
+
+    public void setCustoMedio(double custoMedio) {
+        this.custoMedio = custoMedio;
+    }
+    
 }

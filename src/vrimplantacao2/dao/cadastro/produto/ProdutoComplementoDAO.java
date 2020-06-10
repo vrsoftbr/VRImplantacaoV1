@@ -281,6 +281,8 @@ public class ProdutoComplementoDAO {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
+                sql.put("customediocomimposto", complemento.getCustoMedio());
+                sql.put("customediosemimposto", complemento.getCustoMedio());
                 
                 gerarLogCusto(complemento);
             }
@@ -322,6 +324,10 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.TIPO_PRODUTO)) {
                 sql.put("id_tipoproduto", complemento.getTipoProduto().getId());
+            }
+            if (opt.contains(OpcaoProduto.TIPO_ATACADO)) {
+                iniciaTipoAtacado(complemento);
+                sql.put("id_tipodescontoatacado", complemento.getTipoAtacado().getId());
             }
             if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
                 sql.put("fabricacaopropria", complemento.isFabricacaoPropria());
@@ -676,6 +682,15 @@ public class ProdutoComplementoDAO {
             sql.put("titulo", titulo);
             sql.put("info", info);
             stm.execute(sql.getInsert());
+        }
+    }
+    
+    private void iniciaTipoAtacado(ProdutoComplementoVO vo) throws Exception {
+        try(Statement stm = Conexao.createStatement()) {
+            stm.execute("update produtocomplemento "
+                    + "set id_tipodescontoatacado = null "
+                    + "where id_produto = " + vo.getProduto().getId() + ""
+                    + " and id_loja = " + vo.getIdLoja());
         }
     }
 }

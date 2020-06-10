@@ -37,6 +37,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
     
+    private boolean utilizarREFPLU = false;
+    public void setUtilizarREFPLU(boolean utilizarREFPLU) {
+        this.utilizarREFPLU = utilizarREFPLU;
+    }
+    
     private String complemento = "";
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
@@ -378,7 +383,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		lc.LOJCOD = lj.LOJCOD and\n" +
                     "		lc.LOCCOD = '" + this.localEstoque + "'\n" +
                     "	left join PRECO pr on\n" +
-                    "		pr.REFPLU = r.REFPLU and\n" +
+                    (utilizarREFPLU ? "  pr.REFPLU = r.REFPLU and\n" : "  pr.PROCOD = r.PROCOD and\n") +
                     "		pr.LOJCOD = lj.LOJCOD"
             )) {
                 while (rs.next()) {
@@ -553,6 +558,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
             }                            
             try (ResultSet rs = st.executeQuery(
                     "select\n" +
+                    "	r.REFCOD,\n" +
                     "	r.REFPLU,\n" +
                     "	r.REFPLUDV,\n" +
                     "	r.REFCODINT,\n" +
@@ -620,7 +626,12 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     
         imp.setImportSistema(getSistema());
         imp.setImportLoja(getLojaOrigem());
-        imp.setImportId(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
+        
+        if (utilizarREFPLU) {
+            imp.setImportId(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
+        } else {
+            imp.setImportId(rs.getString("REFCOD"));
+        }
         
         imp.setEan(rs.getString("ean"));
         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));  
@@ -813,6 +824,7 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                     "SELECT distinct\n" +
+                    "	r.REFCOD,\n" +
                     "	r.REFPLU,\n" +
                     "	r.REFPLUDV,\n" +
                     "	cf.FORCOD id_fornecedor,\n" +
@@ -834,7 +846,11 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    imp.setIdProduto(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
+                    if (utilizarREFPLU) {
+                        imp.setIdProduto(rs.getString("REFPLU") + rs.getString("REFPLUDV"));
+                    } else {
+                        imp.setIdProduto(rs.getString("REFCOD"));
+                    }                    
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setPesoEmbalagem(rs.getDouble("pesoembalagem"));
