@@ -295,7 +295,8 @@ public class NotaEntradaDAO {
 
         //carregar produto
         sql = new StringBuilder();
-        sql.append("SELECT produto.id_tipoembalagem, produto.ncm1, produto.ncm2, produto.ncm3, produto.excecao, produto.qtdembalagem, COALESCE(pf.qtdembalagem, 0) AS qtdembalagemfornecedor,");
+        //sql.append("SELECT produto.id_tipoembalagem, produto.ncm1, produto.ncm2, produto.ncm3, produto.excecao, produto.qtdembalagem, COALESCE(pf.qtdembalagem, 0) AS qtdembalagemfornecedor,");
+        sql.append("SELECT produto.id_tipoembalagem, produto.ncm1, produto.ncm2, produto.ncm3, produto.qtdembalagem, COALESCE(pf.qtdembalagem, 0) AS qtdembalagemfornecedor,");
         sql.append(" COALESCE(pf.codigoexterno, '') AS codigoexterno, produto.verificacustotabela, produto.perda,");
 
         if (utilizaCustoMedio) {
@@ -328,7 +329,7 @@ public class NotaEntradaDAO {
         oItem.ncm1 = rst.getObject("ncm1") == null ? -1 : rst.getInt("ncm1");
         oItem.ncm2 = rst.getObject("ncm2") == null ? -1 : rst.getInt("ncm2");
         oItem.ncm3 = rst.getObject("ncm3") == null ? -1 : rst.getInt("ncm3");
-        oItem.excecao = rst.getObject("excecao") == null ? -1 : rst.getInt("excecao");
+        //oItem.excecao = rst.getObject("excecao") == null ? -1 : rst.getInt("excecao");
         oItem.codigoExterno = rst.getString("codigoexterno");
 
         if (new ParametroDAO().get(24).getBoolean()) { //utiliza embalgem fornecedor
