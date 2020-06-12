@@ -180,6 +180,29 @@ public class ProdutoAnteriorDAO {
         return retorno;
     }
 
+    public int getProdutoAnteriorSemUltimoDigito2(String sistema, String loja, String id) throws Exception {
+        int retorno = -1;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	ant.codigoatual \n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "where \n"
+                    + " ant.impsistema = " + SQLUtils.stringSQL(sistema) + " "
+                    + " and ant.imploja = " + SQLUtils.stringSQL(loja) + " "
+                    + " and substring(ant.impid, 1, char_length(ant.impid) -1) = " + SQLUtils.stringSQL(id) + "\n"
+            )) {
+                if (rst.next()) {
+                    retorno = rst.getInt("codigoatual");
+                } else {
+                    retorno = -1;
+                }
+            }
+        }
+        return retorno;
+    }
+    
     public int getCodigoAnterior2ByEAN(String sistema, String loja, String id) throws Exception {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {

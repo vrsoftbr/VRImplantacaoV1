@@ -89,6 +89,7 @@ public class ProdutoIMP {
     @DatabaseField private double custoComImposto = 0;    
     @DatabaseField private double custoAnteriorSemImposto = 0;
     @DatabaseField private double custoAnteriorComImposto = 0;
+    @DatabaseField private double custoMedio = 0;
     @DatabaseField private double precovenda = 0;
     @DatabaseField private int teclaAssociada = 0;
     
@@ -1057,5 +1058,13 @@ public class ProdutoIMP {
 
     public void setTipoAtacado(TipoAtacado tipoAtacado) {
         this.tipoAtacado = tipoAtacado;
+    }
+
+    public double getCustoMedio() {
+        return custoMedio;
+    }
+
+    public void setCustoMedio(double custoMedio) {
+        this.custoMedio = custoMedio;
     }
 }
