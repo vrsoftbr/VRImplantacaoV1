@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
@@ -16,6 +17,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoAtacado;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -34,6 +36,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 /**
  *
@@ -1508,4 +1511,58 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n" +
+                    "	pr.CODPROD,\n" +
+                    "	pr.DESCRICAO,\n" +
+                    "	rec.CODIGO idreceita,\n" +
+                    "	rec.DESCRICAO descreceita,\n" +
+                    "	rec.INGREDIENTE1,\n" +
+                    "	rec.INGREDIENTE2,\n" +
+                    "	rec.INGREDIENTE3,\n" +
+                    "	rec.INGREDIENTE4,\n" +
+                    "	rec.INGREDIENTE5,\n" +
+                    "	rec.INGREDIENTE6,\n" +
+                    "	rec.INGREDIENTE7\n" +
+                    "FROM \n" +
+                    "	pcprodut pr \n" +
+                    "JOIN pcembalagem emb ON pr.CODPROD = emb.CODPROD\n" +
+                    "JOIN PCINFEXTRA rec ON emb.CODINFEXTRABAL = rec.CODIGO\n" +
+                    "WHERE \n" +
+                    "	emb.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
+                    "	emb.CODINFEXTRABAL IS NOT NULL \n" +
+                    "ORDER BY \n" +
+                    "	pr.CODPROD"
+            )) {
+                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
+                while (rst.next()) {
+
+                    ReceitaBalancaIMP imp = receitas.get(rst.getString("idreceita"));
+
+                    if (imp == null) {
+                        imp = new ReceitaBalancaIMP();
+                        imp.setId(rst.getString("idreceita"));
+                        imp.setDescricao(rst.getString("descreceita"));
+                        imp.setReceita(
+                            rst.getString("INGREDIENTE1") == null ? "" : rst.getString("INGREDIENTE1") + " " +
+                            rst.getString("INGREDIENTE2") == null ? "" : rst.getString("INGREDIENTE2") + " " +
+                            rst.getString("INGREDIENTE3") == null ? "" : rst.getString("INGREDIENTE3") + " " +
+                            rst.getString("INGREDIENTE4") == null ? "" : rst.getString("INGREDIENTE4") + " " +
+                            rst.getString("INGREDIENTE5") == null ? "" : rst.getString("INGREDIENTE5") + " " +
+                            rst.getString("INGREDIENTE6") == null ? "" : rst.getString("INGREDIENTE6") + " " +
+                            rst.getString("INGREDIENTE7")== null ? "" : rst.getString("INGREDIENTE7"));
+                        receitas.put(imp.getId(), imp);
+                    }
+
+                    imp.getProdutos().add(rst.getString("CODPROD"));
+                }
+
+                return new ArrayList<>(receitas.values());
+            }
+        }
+    }
 }

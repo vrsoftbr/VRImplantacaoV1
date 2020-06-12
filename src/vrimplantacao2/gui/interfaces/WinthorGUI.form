@@ -48,7 +48,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabs" pref="269" max="32767" attributes="0"/>
+              <Component id="tabs" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -197,16 +197,18 @@
                                   <Component id="chkValidade" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkT1DescReduzida" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1ProdMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkNCM" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkQtdEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCEST" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkReceitaToledo" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkTipoEmbalagemCompra" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkFabricante" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
@@ -215,7 +217,6 @@
                                       <Component id="chkTipoAtacado" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkCEST" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="9" max="32767" attributes="0"/>
                       </Group>
@@ -316,7 +317,10 @@
                                               <Component id="chkQtdEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="chkCEST" min="-2" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="3" attributes="0">
+                                              <Component id="chkCEST" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkReceitaToledo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          </Group>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
@@ -524,6 +528,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCEST">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="CEST"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkReceitaToledo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receita Toledo"/>
                   </Properties>
                 </Component>
               </SubComponents>

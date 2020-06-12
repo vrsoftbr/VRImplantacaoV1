@@ -26,13 +26,14 @@ import vrimplantacao2.dao.interfaces.WinthorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 
 public class WinthorGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "WINTHOR";
     private static final String SERVIDOR_SQL = "Oracle";
     private static WinthorGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
@@ -52,7 +53,7 @@ public class WinthorGUI extends VRInternalFrame {
             tabsConn.setSelectedIndex(0);
         }
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
@@ -74,17 +75,16 @@ public class WinthorGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private WinthorDAO winthorDAO = new WinthorDAO();
     private ConexaoOracle connOracle = new ConexaoOracle();
-    
+
     private WinthorGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
-        
+
         this.title = "Importação " + SISTEMA;
-                
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
@@ -96,7 +96,7 @@ public class WinthorGUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                    return SISTEMA;
+                return SISTEMA;
             }
 
             @Override
@@ -110,10 +110,10 @@ public class WinthorGUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
-        
+
         vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
         vRImportaArquivBalancaPanel1.setLoja(vLojaCliente);
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -142,18 +142,18 @@ public class WinthorGUI extends VRInternalFrame {
         }
 
         if (tabsConn.getSelectedIndex() == 0) {
-            ConexaoOracle.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            ConexaoOracle.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
         } else {
             ConexaoOracle.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
-                
+
         gravarParametros();
-        
+
         carregarLojaVR();
         carregarLojaCliente();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -167,12 +167,12 @@ public class WinthorGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: winthorDAO.getLojasCliente()) {
+        for (Estabelecimento loja : winthorDAO.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -181,10 +181,10 @@ public class WinthorGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new WinthorGUI(i_mdiFrame);
             }
@@ -196,15 +196,15 @@ public class WinthorGUI extends VRInternalFrame {
             i_mdiFrame.setDefaultCursor();
         }
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame, boolean lite) {
         try {
             i_mdiFrame.setWaitCursor();
-            
+
             if (instance == null || instance.isClosed()) {
                 instance = new WinthorGUI(i_mdiFrame);
             }
-           
+
             if (lite) {
                 instance.cmbLojaOrigem.setEnabled(false);
                 instance.cmbLojaVR.setEnabled(false);
@@ -212,16 +212,16 @@ public class WinthorGUI extends VRInternalFrame {
                 instance.tabs.remove(instance.vRPanel2);
                 instance.vRTabbedPane2.remove(instance.vRPanel9);
                 instance.vRTabbedPane2.remove(instance.tabConvenio);
-                
+
                 Component[] comp = instance.vRPanel7.getComponents();
-                
-                for(Component c : comp) {
-                    if(c instanceof VRCheckBox) {
-                       VRCheckBox chks = (VRCheckBox) c;
-                       chks.setVisible(false);
+
+                for (Component c : comp) {
+                    if (c instanceof VRCheckBox) {
+                        VRCheckBox chks = (VRCheckBox) c;
+                        chks.setVisible(false);
                     }
                 }
-                
+
                 instance.chkProdutos.setVisible(true);
                 instance.chkT1AtivoInativo.setVisible(true);
                 instance.chkT1Custo.setVisible(true);
@@ -238,16 +238,16 @@ public class WinthorGUI extends VRInternalFrame {
                 instance.chkT1ICMS.setVisible(true);
                 instance.chkNCM.setVisible(true);
                 instance.chkCEST.setVisible(true);
-                
+
                 instance.btnMapaTrib.setVisible(false);
                 instance.chkFContatos.setVisible(false);
                 instance.chkFPrazoFornecedor.setVisible(false);
                 instance.chkFCondicaoPagamento.setVisible(false);
-                
+
                 instance.vRPanel7.setLayout(new FlowLayout());
             }
             instance.setVisible(true);
-            
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         } finally {
@@ -259,24 +259,25 @@ public class WinthorGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
-                    
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+
                     Importador importador = new Importador(winthorDAO);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);     
-                    
+                    importador.setLojaVR(idLojaVR);
+
                     winthorDAO.temArquivoBalanca = chkTemBalanca.isSelected();
 
                     if (tabs.getSelectedIndex() == 0) {
-                    
-                        if (chkFamiliaProduto.isSelected()) {                        
+
+                        if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
 
@@ -325,7 +326,7 @@ public class WinthorGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -337,7 +338,7 @@ public class WinthorGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -365,8 +366,14 @@ public class WinthorGUI extends VRInternalFrame {
                             if (chkFabricante.isSelected()) {
                                 opcoes.add(OpcaoProduto.FABRICANTE);
                             }
-                            if (!opcoes.isEmpty()) {
-                                importador.atualizarProdutos(opcoes);
+                            {
+                                List<OpcaoReceitaBalanca> opcoesReceita = new ArrayList<>();
+                                if (chkReceitaToledo.isSelected()) {
+                                    opcoesReceita.add(OpcaoReceitaBalanca.TOLEDO);
+                                }
+                                if (!opcoesReceita.isEmpty()) {
+                                    importador.importarReceitaBalanca(opcoesReceita.toArray(new OpcaoReceitaBalanca[]{}));
+                                }
                             }
                         }
 
@@ -385,20 +392,20 @@ public class WinthorGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
                         }
-                        
+
                         if (chkFCondicaoPagamento.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
                         }
-                        
+
                         if (chkFPrazoFornecedor.isSelected()) {
                             opcoes.add(OpcaoFornecedor.PRAZO_FORNECEDOR);
                         }
-                        
+
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
@@ -410,27 +417,27 @@ public class WinthorGUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
-                        
+
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
+
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        
+
                         if (chkConvEmpresa.isSelected()) {
                             importador.importarConvenioEmpresa();
                         }
-                        
+
                         if (chkConvConveniado.isSelected()) {
                             importador.importarConvenioConveniado();
                         }
-                        
+
                         if (chkConvRecebimento.isSelected()) {
                             importador.importarConvenioTransacao();
                         }
-                        
+
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -440,19 +447,19 @@ public class WinthorGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {                    
+                    try {
                         ConexaoOracle.close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -511,6 +518,7 @@ public class WinthorGUI extends VRInternalFrame {
         chkICMSCred = new vrframework.bean.checkBox.VRCheckBox();
         chkNCM = new vrframework.bean.checkBox.VRCheckBox();
         chkCEST = new vrframework.bean.checkBox.VRCheckBox();
+        chkReceitaToledo = new javax.swing.JCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -680,6 +688,8 @@ public class WinthorGUI extends VRInternalFrame {
 
         chkCEST.setText("CEST");
 
+        chkReceitaToledo.setText("Receita Toledo");
+
         javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
         vRPanel7.setLayout(vRPanel7Layout);
         vRPanel7Layout.setHorizontalGroup(
@@ -724,16 +734,17 @@ public class WinthorGUI extends VRInternalFrame {
                             .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkNCM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkQtdEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkQtdEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCEST, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkReceitaToledo)
                             .addComponent(chkTipoEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkFabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkTipoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkCEST, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkTipoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(9, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
@@ -809,7 +820,9 @@ public class WinthorGUI extends VRInternalFrame {
                                     .addComponent(chkTipoEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkQtdEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkCEST, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(chkCEST, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(chkReceitaToledo)))
                             .addGroup(vRPanel7Layout.createSequentialGroup()
                                 .addGap(4, 4, 4)
                                 .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1255,7 +1268,7 @@ public class WinthorGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1398,6 +1411,7 @@ public class WinthorGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemCompra;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private javax.swing.JCheckBox chkReceitaToledo;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
