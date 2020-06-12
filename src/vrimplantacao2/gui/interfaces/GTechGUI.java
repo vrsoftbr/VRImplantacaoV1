@@ -43,6 +43,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         conexaoMySQL.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        chkFiltrarKgNoSql.setSelected(params.getBool(SISTEMA, "FILTRAR_KG_NO_SQL"));
     }
 
     private void gravarParametros() throws Exception {
@@ -58,6 +59,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
+        params.put(chkFiltrarKgNoSql.isSelected(), SISTEMA, "FILTRAR_KG_NO_SQL");
         params.salvar();
     }
 
@@ -168,6 +170,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    dao.filtrarKgNoSql = chkFiltrarKgNoSql.isSelected();
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
@@ -176,7 +179,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis();
+                            importador.importarMercadologico();
                         }
 
                         if (chkProdutos.isSelected()) {
@@ -262,6 +265,9 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                             if (chkPProdComprador.isSelected()) {
                                 opcoes.add(OpcaoProduto.COMPRADOR_PRODUTO);
+                            }
+                            if (chkAtacado.isSelected()) {
+                                opcoes.add(OpcaoProduto.ATACADO);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
@@ -352,6 +358,9 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
+        tabBalanca = new vrframework.bean.panel.VRPanel();
+        pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        chkFiltrarKgNoSql = new vrframework.bean.checkBox.VRCheckBox();
         tabProdutos = new javax.swing.JPanel();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
@@ -391,6 +400,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkOferta = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -413,6 +423,33 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         vRLabel1.setText("Loja (Cliente):");
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
+
+        chkFiltrarKgNoSql.setText("Filtrar KG no SQL");
+
+        javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
+        tabBalanca.setLayout(tabBalancaLayout);
+        tabBalancaLayout.setHorizontalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabBalancaLayout.createSequentialGroup()
+                        .addComponent(chkFiltrarKgNoSql, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(pnlBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        tabBalancaLayout.setVerticalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkFiltrarKgNoSql, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(142, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Balança", tabBalanca);
 
         tabProdutos.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -557,6 +594,9 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         chkOferta.setText("Oferta");
         tabProdutos.add(chkOferta);
 
+        chkAtacado.setText("Atacado");
+        tabProdutos.add(chkAtacado);
+
         btnMapaTrib.setEnabled(false);
         btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -581,14 +621,14 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
                 .addContainerGap())
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
                 .addGap(74, 74, 74))
         );
 
@@ -610,7 +650,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(365, Short.MAX_VALUE))
+                .addContainerGap(376, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -621,7 +661,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(200, Short.MAX_VALUE))
+                .addContainerGap(205, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -729,6 +769,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -744,6 +785,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
+    private vrframework.bean.checkBox.VRCheckBox chkFiltrarKgNoSql;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkICMS;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
@@ -777,7 +819,9 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrframework.bean.panel.VRPanel tabBalanca;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
