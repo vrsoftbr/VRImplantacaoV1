@@ -196,14 +196,13 @@ public class Organizador {
             validos.clear();
             invalidos.clear();
         }
-        
-        
+            
         LOG.fine("QTDs Balanca: " + balanca.size() + "|Normais: " + normais.size());
-        for (ProdutoIMP produto : manterEAN.values()) {
+        for (ProdutoIMP produto : balanca.values()) {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             result.put(produto, chave);
         }
-        for (ProdutoIMP produto : balanca.values()) {
+        for (ProdutoIMP produto : manterEAN.values()) {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             result.put(produto, chave);
         }
@@ -278,10 +277,10 @@ public class Organizador {
             
             long ean = Utils.stringToLong(produto.getEan());
             String un = Utils.acertarTexto(produto.getTipoEmbalagem(), 2);
-            if (produto.isManterEAN()) {
-                manterEAN.put(produto, chave);
-            } else if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
+            if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
                 balanca.put(produto, chave);
+            } else if (produto.isManterEAN()) {
+                manterEAN.put(produto, chave);
             } else {
                 normais.put(produto, chave);
             }
