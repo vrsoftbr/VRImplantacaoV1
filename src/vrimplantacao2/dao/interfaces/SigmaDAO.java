@@ -4,12 +4,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.joda.time.Interval;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
@@ -488,45 +491,44 @@ public class SigmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    c.cod_cliente id,\n"
-                    + "    c.razao_social nome,\n"
-                    + "    c.logradouro res_endereco,\n"
-                    + "    c.numero res_numero,\n"
-                    + "    c.complemento res_complemento,\n"
-                    + "    c.bairro res_bairro,\n"
-                    + "    c.municipio res_municipio,\n"
-                    + "    c.uf res_uf,\n"
-                    + "    c.cep res_cep,\n"
-                    + "    c.fone_1 fone1,\n"
-                    + "    trim(coalesce(c.fone_2,'')) fone2,\n"
-                    + "    c.celular,\n"
-                    + "    c.insc_estadual inscricaoestadual,\n"
-                    + "    c.cnpj_cpf cnpj,\n"
-                    + "    1 sexo,\n"
-                    + "    c.dias_carencia prazodias,\n"
-                    + "    c.email,\n"
-                    + "    c.data_cadastro datacadastro,\n"
-                    + "    c.limite_credito limite,\n"
-                    + "    case c.situacao when 'B' then 1 else 0 end bloqueado,\n"
-                    + "    c.obs observacao,\n"
-                    + "    c.data_nascimento datanascimento,\n"
-                    + "    null nomePai,\n"
-                    + "    null nomeMae,\n"
-                    + "    null empresa,\n"
-                    + "    null telEmpresa,\n"
-                    + "    null cargo,\n"
-                    + "    0 salario,\n"
-                    + "    0 estadoCivil,\n"
-                    + "    null conjuge,\n"
-                    + "    c.orgao orgaoemissor\n"
-                    + "from\n"
-                    + "    cliente c\n"
-                    + "where\n"
-                    + "    c.tipocad = 'C' and\n"
-                    + "    not c.razao_social is null\n"
-                    + "order by\n"
-                    + "    c.cod_cliente"
+                    "select\n" +
+                    "    c.cod_cliente id,\n" +
+                    "    c.razao_social nome,\n" +
+                    "    c.logradouro res_endereco,\n" +
+                    "    c.numero res_numero,\n" +
+                    "    c.complemento res_complemento,\n" +
+                    "    c.bairro res_bairro,\n" +
+                    "    c.municipio res_municipio,\n" +
+                    "    c.uf res_uf,\n" +
+                    "    c.cep res_cep,\n" +
+                    "    c.fone_1 fone1,\n" +
+                    "    trim(coalesce(c.fone_2,'')) fone2,\n" +
+                    "    c.celular,\n" +
+                    "    c.insc_estadual inscricaoestadual,\n" +
+                    "    c.cnpj_cpf cnpj,\n" +
+                    "    1 sexo,\n" +
+                    "    c.dias_carencia prazodias,\n" +
+                    "    c.email,\n" +
+                    "    c.data_cadastro datacadastro,\n" +
+                    "    c.limite_credito limite,\n" +
+                    "    case c.situacao when 'B' then 1 else 0 end bloqueado,\n" +
+                    "    c.obs observacao,\n" +
+                    "    c.data_nascimento datanascimento,\n" +
+                    "    null nomePai,\n" +
+                    "    null nomeMae,\n" +
+                    "    null empresa,\n" +
+                    "    null telEmpresa,\n" +
+                    "    null cargo,\n" +
+                    "    0 salario,\n" +
+                    "    0 estadoCivil,\n" +
+                    "    null conjuge,\n" +
+                    "    c.orgao orgaoemissor\n" +
+                    "from\n" +
+                    "    cliente c\n" +
+                    "where\n" +
+                    "    not c.razao_social is null\n" +
+                    "order by\n" +
+                    "    c.cod_cliente"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -572,44 +574,42 @@ public class SigmaDAO extends InterfaceDAO implements MapaTributoProvider {
         int cont = 0;
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    r.codigo id,\n"
-                    + "    r.codcliente id_clientepreferencial,\n"
-                    + "    c.cnpj_cpf cnpj,\n"
-                    + "    r.dataemissao emissao,\n"
-                    + "    r.historico,\n"
-                    + "    r.valor,\n"
-                    + "    r.datavencimento venc,\n"
-                    + "    r.datapagamento datapag,\n"
-                    + "    r.valorrecebido,\n"
-                    + "    r.documento cupom\n"
-                    + "from\n"
-                    + "    receber r\n"
-                    + "    join cliente c on r.codcliente = c.cod_cliente\n"
-                    + "where\n"
-                    + "    r.status = 'ABERTO'"
+                    "select\n" +
+                    "    r.codigo id,\n" +
+                    "    r.codcliente id_clientepreferencial,\n" +
+                    "    c.cnpj_cpf cnpj,\n" +
+                    "    r.dataemissao emissao,\n" +
+                    "    r.historico,\n" +
+                    "    r.saldo valor,\n" +
+                    "    r.JUROS,\n" +
+                    "    r.MORA,\n" +
+                    "    r.datavencimento venc,\n" +
+                    "    r.datapagamento datapag,\n" +
+                    "    r.valorrecebido,\n" +
+                    "    r.documento cupom\n" +
+                    "from\n" +
+                    "    receber r\n" +
+                    "    join cliente c on r.codcliente = c.cod_cliente\n" +
+                    "where\n" +
+                    "    r.saldo > 0"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-
+                    
                     imp.setId(rst.getString("id"));
                     imp.setIdCliente(rst.getString("id_clientepreferencial"));
                     imp.setCnpjCliente(rst.getString("cnpj"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setValor(rst.getDouble("valor"));
+                    long venc = rst.getDate("venc").getTime();
+                    long now = new Date().getTime();
+                    if (now > venc) {
+                        Interval i = new Interval(venc, now);
+                        imp.setJuros((rst.getDouble("valor") * (rst.getDouble("mora") / 100)) * i.toDuration().getStandardDays());
+                    }
                     imp.setDataVencimento(rst.getDate("venc"));
                     imp.setObservacao(rst.getString("historico"));
-                    if (rst.getDate("datapag") != null) {
-                        imp.addPagamento(
-                                imp.getId(),
-                                rst.getDouble("valorrecebido"),
-                                0,
-                                0,
-                                rst.getDate("datapag"),
-                                ""
-                        );
-                    }
 
                     result.add(imp);
 
