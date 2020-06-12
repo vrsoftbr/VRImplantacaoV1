@@ -589,26 +589,30 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			prod_codigo id,\n" +
                     "			prod_codbarras ean,\n" +
                     "			prod_funcao unidade,\n" +
-                    "			1 qtdembalagem\n" +
+                    "			1 qtdembalagem,\n" +
+                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]',''),'')::bigint longean\n" +
                     "		from\n" +
                     "			produtos\n" +
+                    "		where			\n" +
+                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]',''),'')::bigint > 0\n" +
                     "		union\n" +
                     "		select\n" +
                     "			prod_codigo id,\n" +
                     "			prod_codcaixa ean,\n" +
                     "			prod_emb unidade,\n" +
-                    "			prod_qemb qtdembalagem\n" +
+                    "			prod_qemb qtdembalagem,\n" +
+                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]',''),'')::bigint longean\n" +
                     "		from\n" +
                     "			produtos\n" +
-                    "		where\n" +
-                    "			nullif(trim(prod_codcaixa),'') is not null\n" +
+                    "		where			\n" +
+                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]',''),'')::bigint > 0\n" +
                     "	) ean on ean.id = p.prod_codigo\n" +
                     "	left join piscofins_s on\n" +
                     "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
                     "	left join custo on\n" +
                     "		custo.mprd_prod_codigo = p.prod_codigo\n" +
                     "order by\n" +
-                    "	id"
+                    "	longean"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -652,10 +656,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.seteBalanca(false);
                             imp.setEan(rst.getString("ean"));
                         }
-                    }
-                    
-                    if(imp.getEan() != null && !"".equals(imp.getEan()) && imp.getEan().length() < 7) {
-                        imp.setManterEAN(true);
                     }
                     
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
@@ -712,7 +712,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                     
-                    imp.setManterEAN(Utils.stringToLong(imp.getEan()) <= 999999);
+                    long ean = Utils.stringToLong(imp.getEan(), -2);
+                    
+                    imp.setManterEAN(ean <= 999999 && ean > 0 && !imp.isBalanca());
 
                     result.add(imp);
                 }
