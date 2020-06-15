@@ -74,7 +74,7 @@ public class CefasDAO extends InterfaceDAO {
                     "select\n"
                     + "    d.codepto merc1,\n"
                     + "    d.departamento descmerc1,\n"
-                    + "    s.codsec merc2,\n"
+                    + "    coalesce(cast(s.codsec as integer), 1) merc2,\n"
                     + "    s.secao descmerc2,\n"
                     + "    coalesce(cast(c.codcateg as integer), 1) merc3,\n"
                     + "    decode(c.categoria, '', s.secao, c.categoria) descmerc3,\n"
@@ -125,7 +125,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "    p.embalagem,\n"
                     + "    p.codbarra codigobarras,\n"
                     + "    p.codepto merc1,\n"
-                    + "    p.codsec merc2,\n"
+                    + "    decode(p.codsec, '', '1', p.codsec) merc2,\n"
                     + "    decode(p.codcat, '', '1', p.codcat) merc3,\n"
                     + "    decode(p.codsubcat, '', '1', p.codsubcat) merc4,\n"
                     + "    p.dtcadastro,\n"
@@ -155,9 +155,8 @@ public class CefasDAO extends InterfaceDAO {
                     + "join\n"
                     + "    tributacao t on t.codtribut = pre.codtribut\n"
                     + "left join\n"
-                    + "    prodmelo pm on pm.codbarra = p.codbarra\n"
-                    + "left join\n"
-                    + "    embalagem em on em.codprod = p.codprod\n"
+                    + "    embalagem em on em.codprod = p.codprod and\n"
+                    + "    em.codbarra = p.codbarra\n"        
                     + "left join\n"
                     + "    estoque e on e.codprod = p.codprod\n"
                     + "left join\n"
@@ -179,7 +178,8 @@ public class CefasDAO extends InterfaceDAO {
                     + "    where\n"
                     + "        pis.operacao = 'S') pissaida on p.codprod = pissaida.codprod\n"
                     + "where \n"
-                    + "    pre.numregiao = 1\n"
+                    + "    pre.numregiao = 1 and\n"
+                    + "    em.codfilial = " + getLojaOrigem() + " \n"        
                     + "order by\n"
                     + "    p.codprod")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -215,6 +215,11 @@ public class CefasDAO extends InterfaceDAO {
                     imp.setIcmsCstEntrada(rs.getInt("cst"));
                     imp.setIcmsReducaoSaida(rs.getInt("redicms"));
                     imp.setIcmsReducaoEntrada(rs.getInt("redicms"));
+                    
+                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoConsumidor(imp.getIcmsReducaoSaida());
+                    
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     if (rs.getDate("excluido") == null) {
@@ -245,6 +250,40 @@ public class CefasDAO extends InterfaceDAO {
                         }  
                     }
                     imp.setFornecedorFabricante(rs.getString("fornprincipal"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "    codprod,\n" +
+                    "    unidade,\n" +
+                    "    codbarra,\n" +
+                    "    qtunit \n" +
+                    "from \n" +
+                    "    embalagem\n" +
+                    "where \n" +
+                    "    codfilial = " + getLojaOrigem() + "\n" +
+                    "order by \n" +
+                    "    codprod")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("codprod"));
+                    imp.setEan(rs.getString("codbarra"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtunit"));
+                    
                     result.add(imp);
                 }
             }
