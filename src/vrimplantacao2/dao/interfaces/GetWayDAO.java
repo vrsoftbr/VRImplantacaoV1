@@ -326,7 +326,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
                     + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"      
                     + "where pl.codloja = " + getLojaOrigem() + "\n"
-                    + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S' " : "")        
+                    + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S'\n" : "")        
                     + "order by\n"
                     + "	id"
             )) {
