@@ -217,7 +217,7 @@ public class ControlXDAO extends InterfaceDAO {
                     + "	inscricao inscricaoestadual,\n"
                     + "	nome razao,\n"
                     + "	nomefantasia fantasia,\n"
-                    + "	situacao ativo,\n"
+                    + "	case situacao when 'A' then 1 else 0 end ativo,\n"
                     + "	entendereco endereco,\n"
                     + "	entnumeroendereco numero,\n"
                     + "	entbairro bairro,\n"
@@ -232,7 +232,7 @@ public class ControlXDAO extends InterfaceDAO {
                     + "	salario,\n"
                     + "	valorcredito valorLimite,\n"
                     + "	cconjuge nomeConjuge,\n"
-                    + "	cconjugenasc dataNascimentoConjuge,\n"
+                    + "	cconjugenasc nascimentoConjuge,\n"
                     + "	cnomepai nomePai,\n"
                     + "	cnomemae nomeMae,\n"
                     + "	obs observacao,\n"
@@ -249,7 +249,7 @@ public class ControlXDAO extends InterfaceDAO {
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setAtivo("1".equals(rs.getString("ativo")));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setBairro(rs.getString("bairro"));
@@ -264,7 +264,7 @@ public class ControlXDAO extends InterfaceDAO {
                     imp.setSalario(rs.getDouble("salario"));
                     imp.setValorLimite(rs.getDouble("valorlimite"));
                     imp.setNomeConjuge(rs.getString("nomeconjuge"));
-                    imp.setDataNascimentoConjuge(rs.getDate("dataNascimentoConjuge"));
+                    imp.setDataNascimentoConjuge(rs.getDate("nascimentoConjuge"));
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setObservacao(rs.getString("observacao"));
