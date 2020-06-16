@@ -296,7 +296,8 @@ public class SigmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
-                    imp.setCustoComImposto(rst.getDouble("custoComImposto"));
+                    imp.setCustoComImposto(rst.getDouble("custoSemImposto"));
+                    //imp.setCustoComImposto(rst.getDouble("custoComImposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaoCadastro")));
                     imp.setNcm(rst.getString("ncm"));
