@@ -11,6 +11,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
@@ -166,8 +167,8 @@ public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.lucro margem,\n" +
                     "    p.valor_custo custocomimposto,\n" +
                     "    p.valor_venda preco,\n" +
-                    "    case p.excluido when 1 then 0 else 1 end excluido,\n" +
-                    "    case p.desativado when 1 then 0 else 1 end situacaocadastro,\n" +
+                    "    p.desativado descontinuado,\n" +
+                    "    case p.excluido when 1 then 0 else 1 end situacaocadastro,\n" +
                     "    p.ncm,\n" +
                     "    p.cest,\n" +
                     "    ce.cst piscofinsdebito,\n" +
@@ -197,20 +198,20 @@ public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
                 Map<Integer, ProdutoBalancaVO> balancas = new ProdutoBalancaDAO().getProdutosBalanca();
                 Set<String> identificarBalanca = identificarBalanca();
                 while(rs.next()) {
-                    
                     result.add(converterIMP(rs, balancas, identificarBalanca));
-                    
-                    int qtdAtacado = rs.getInt("qtd_atacado");
+                   
                     double valorAtacado = rs.getDouble("valor_venda_atacado");
+                    int qtdAtacado = rs.getInt("qtd_atacado");                    
                     
                     if (qtdAtacado > 0 && valorAtacado > 0) {
-                        ProdutoIMP imp = converterIMP(rs, balancas, identificarBalanca);
-                        imp.setEan("999999" + imp.getImportId());
-                        imp.setQtdEmbalagem(qtdAtacado);
-                        imp.setAtacadoPreco(valorAtacado);
-                        result.add(imp);
-                    }
-                    
+                        ProdutoIMP produto = converterIMP(rs, balancas, identificarBalanca);
+                        produto.setEan(String.format("999999%06d", Integer.parseInt(produto.getImportId())));
+                        produto.setQtdEmbalagem(qtdAtacado);
+                        produto.setAtacadoPreco(valorAtacado);
+                        int ean = Utils.stringToInt(produto.getEan(), -2);   
+                        produto.setManterEAN(ean <= 999999 && ean > 0);
+                        result.add(produto);
+                    }                    
                 }
             }
         }
@@ -252,12 +253,12 @@ public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setCustoComImposto(rs.getDouble("custocomimposto"));
         imp.setCustoSemImposto(rs.getDouble("custocomimposto"));
         imp.setPrecovenda(rs.getDouble("preco"));
-        imp.setDescontinuado(rs.getBoolean("excluido"));
+        imp.setDescontinuado(rs.getBoolean("descontinuado"));
         imp.setSituacaoCadastro(rs.getInt("situacaocadastro"));
         imp.setNcm(rs.getString("ncm"));
         imp.setCest(rs.getString("cest"));
         imp.setPiscofinsCstDebito(rs.getString("piscofinsdebito"));
-        imp.setPiscofinsCstCredito(rs.getString("piscofinscredito"));
+        //imp.setPiscofinsCstCredito(rs.getString("piscofinscredito"));
         imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnatureza"));
         imp.setIcmsDebitoId(rs.getString("icmsdebid"));
         imp.setIcmsDebitoForaEstadoId(rs.getString("icmsdebid"));
@@ -269,6 +270,24 @@ public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setManterEAN(ean <= 999999 && ean > 0);
         
         return imp;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
+        if (opcao == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            
+            for (ProdutoIMP produto: getProdutos()) {
+                if (produto.getQtdEmbalagem() > 0 && produto.getAtacadoPreco() > 0) {                    
+                    int ean = Utils.stringToInt(produto.getEan(), -2);
+                    produto.setManterEAN(ean <= 999999 && ean > 0);
+                    result.add(produto);
+                }
+            }
+            
+            return result;
+        }
+        return null;
     }
     
     @Override
@@ -410,7 +429,7 @@ public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("nome_fantasia"));
-                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));  
                     if(rs.getString("inscricao_estadual") == null && "".equals(rs.getString("inscricao_estadual"))) {
                         imp.setInscricaoestadual(rs.getString("rg"));
                     } else {
@@ -430,7 +449,7 @@ public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorLimite(rs.getDouble("limite"));
                     imp.setDataNascimento(rs.getDate("data_nasc"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setAtivo(rs.getInt("excluido") == 1);
+                    imp.setAtivo(rs.getInt("excluido") == 0);
                     
                     result.add(imp);
                 }
