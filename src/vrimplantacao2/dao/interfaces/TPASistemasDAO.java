@@ -38,7 +38,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author lucasrafael
  */
-public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
+public class TPASistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String pais;
     public String uf;
@@ -46,7 +46,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Kairos";
+        return "TPASistemas";
     }
 
     @Override
@@ -85,7 +85,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ATACADO
         ));
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -123,63 +123,63 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    codb.numerocodigobarraproduto,\n" +
-                    "    p.codigoproduto,\n" +
-                    "    p.codigoncm,\n" +
-                    "    p.codigogrupoproduto,\n" +
-                    "    p.codigosubgrupoproduto,\n" +
-                    "    p.descricao,\n" +
-                    "    p.descricaotecnica,\n" +
-                    "    p.observacoes,\n" +
-                    "    p.siglaunidade,\n" +
-                    "    p.pesobruto,\n" +
-                    "    p.pesoliquido,\n" +
-                    "    p.prazovalidade,\n" +
-                    "    p.datacadastro,\n" +
-                    "	 preco.preconormal precovenda,\n" +
-                    "	 preco.precopromocao atacpreco,\n" +
-                    "	 preco.quantidadeiniciopromocao atacqtd,\n" +
-                    "    p.margemlucroteorica,\n" +
-                    "    p.situacao,\n" +
-                    "    p.classificacaofiscal,\n" +
-                    "    p.situacaotributariapisent,\n" +
-                    "    p.situacaotributariapis,\n" +
-                    "    p.situacaotributariacofinsent,\n" +
-                    "    p.situacaotributariacofins,\n" +
-                    "    p.naturezareceitapiscofins,\n" +
-                    "    codb.siglaunidade tipoembalagem,\n" +
-                    "    codb.quantidadeproduto,\n" +
-                    "    gfp.codigogrupofiscal,\n" +
-                    "    gf.descricao,\n" +
-                    "    p.codigoespecificadorst as cest,\n" +
-                    "    case p.situacao when 'A' then 1 else 0 end situacaocadastro,\n" +
-                    "    case p.situacaocompra when 'I' then 1 else 0 end descontinuado\n" +
-                    "from\n" +
-                    "    produto p\n" +
-                    "	join Filial fl on\n" +
-                    "		fl.codigofilial = '" + getLojaOrigem() + "'\n" +
-                    "	join Municipio mun on\n" +
-                    "		fl.codigomunicipio = mun.codigomunicipio\n" +
-                    "    left join codigobarraproduto codb on\n" +
-                    "        codb.codigoproduto = p.codigoproduto\n" +
-                    "    left join grupofiscalproduto gfp on\n" +
-                    "        gfp.codigoproduto = p.codigoproduto\n" +
-                    "        and gfp.siglapais = mun.SiglaPais\n" +
-                    "        and gfp.siglauf = mun.SiglaUF \n" +
-                    "        and gfp.codigofilial = fl.codigofilial\n" +
-                    "    left join grupofiscal gf on\n" +
-                    "        gf.codigogrupofiscal = gfp.codigogrupofiscal\n" +
-                    "        and gf.siglauf = mun.SiglaUF\n" +
-                    "        and gf.siglapais = mun.SiglaPais\n" +
-                    "        and gf.codigofilial = fl.codigofilial\n" +
-                    "	left join precovendaproduto preco on\n" +
-                    "		preco.CodigoFilial = fl.CodigoFilial\n" +
-                    "		and preco.codigoproduto = p.codigoproduto\n" +
-                    "		and preco.CodigoCondicaoPagamento = 1\n" +
-                    "		and preco.SiglaUnidade = p.siglaunidade\n" +
-                    "order by\n" +
-                    "    p.codigoproduto, codb.numerocodigobarraproduto desc"
+                    "select\n"
+                    + "    codb.numerocodigobarraproduto,\n"
+                    + "    p.codigoproduto,\n"
+                    + "    p.codigoncm,\n"
+                    + "    p.codigogrupoproduto,\n"
+                    + "    p.codigosubgrupoproduto,\n"
+                    + "    p.descricao,\n"
+                    + "    p.descricaotecnica,\n"
+                    + "    p.observacoes,\n"
+                    + "    p.siglaunidade,\n"
+                    + "    p.pesobruto,\n"
+                    + "    p.pesoliquido,\n"
+                    + "    p.prazovalidade,\n"
+                    + "    p.datacadastro,\n"
+                    + "	 preco.preconormal precovenda,\n"
+                    + "	 preco.precopromocao atacpreco,\n"
+                    + "	 preco.quantidadeiniciopromocao atacqtd,\n"
+                    + "    p.margemlucroteorica,\n"
+                    + "    p.situacao,\n"
+                    + "    p.classificacaofiscal,\n"
+                    + "    p.situacaotributariapisent,\n"
+                    + "    p.situacaotributariapis,\n"
+                    + "    p.situacaotributariacofinsent,\n"
+                    + "    p.situacaotributariacofins,\n"
+                    + "    p.naturezareceitapiscofins,\n"
+                    + "    codb.siglaunidade tipoembalagem,\n"
+                    + "    codb.quantidadeproduto,\n"
+                    + "    gfp.codigogrupofiscal,\n"
+                    + "    gf.descricao,\n"
+                    + "    p.codigoespecificadorst as cest,\n"
+                    + "    case p.situacao when 'A' then 1 else 0 end situacaocadastro,\n"
+                    + "    case p.situacaocompra when 'I' then 1 else 0 end descontinuado\n"
+                    + "from\n"
+                    + "    produto p\n"
+                    + "	join Filial fl on\n"
+                    + "		fl.codigofilial = '" + getLojaOrigem() + "'\n"
+                    + "	join Municipio mun on\n"
+                    + "		fl.codigomunicipio = mun.codigomunicipio\n"
+                    + "    left join codigobarraproduto codb on\n"
+                    + "        codb.codigoproduto = p.codigoproduto\n"
+                    + "    left join grupofiscalproduto gfp on\n"
+                    + "        gfp.codigoproduto = p.codigoproduto\n"
+                    + "        and gfp.siglapais = mun.SiglaPais\n"
+                    + "        and gfp.siglauf = mun.SiglaUF \n"
+                    + "        and gfp.codigofilial = fl.codigofilial\n"
+                    + "    left join grupofiscal gf on\n"
+                    + "        gf.codigogrupofiscal = gfp.codigogrupofiscal\n"
+                    + "        and gf.siglauf = mun.SiglaUF\n"
+                    + "        and gf.siglapais = mun.SiglaPais\n"
+                    + "        and gf.codigofilial = fl.codigofilial\n"
+                    + "	left join precovendaproduto preco on\n"
+                    + "		preco.CodigoFilial = fl.CodigoFilial\n"
+                    + "		and preco.codigoproduto = p.codigoproduto\n"
+                    + "		and preco.CodigoCondicaoPagamento = 1\n"
+                    + "		and preco.SiglaUnidade = p.siglaunidade\n"
+                    + "order by\n"
+                    + "    p.codigoproduto, codb.numerocodigobarraproduto desc"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -192,22 +192,22 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem(
-                                "P".equals(bal.getPesavel()) ?
-                                "KG" :
-                                "UN"
+                                "P".equals(bal.getPesavel())
+                                        ? "KG"
+                                        : "UN"
                         );
                         imp.setValidade(bal.getValidade());
                     } else {
                         imp.setTipoEmbalagem(rst.getString("TipoEmbalagem"));
                         imp.setValidade(rst.getInt("PrazoValidade"));
-                        
+
                     }
                     imp.setQtdEmbalagem(rst.getInt("QuantidadeProduto"));
                     imp.setDescricaoCompleta(rst.getString("Descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("CodigoGrupoProduto"));
-                    imp.setCodMercadologico2(rst.getString("CodigoSubGrupoProduto"));                    
+                    imp.setCodMercadologico2(rst.getString("CodigoSubGrupoProduto"));
                     imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("MargemLucroTeorica"));
                     imp.setNcm(rst.getString("CodigoNcm"));
@@ -239,18 +239,18 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
-                        "	preco.codigoproduto id_produto,\n" +
-                        "        preco.preconormal precovenda,\n" +
-                        "        preco.quantidadeiniciopromocao qtdembalagem,\n" +
-                        "        preco.precopromocao precoatacado\n" +
-                        "from\n" +
-                        "	precovendaproduto preco\n" +
-                        "where\n" +
-                        "	preco.CodigoFilial = '" + getLojaOrigem() + "'\n" +
-                        "	and preco.CodigoCondicaoPagamento = 1\n" +
-                        "	and preco.SiglaUnidade in ('UN', 'KG')\n" +
-                        "	and preco.datainiciopromocao <= getdate() and preco.datafimpromocao >= getdate() + 360"
+                        "select\n"
+                        + "	preco.codigoproduto id_produto,\n"
+                        + "        preco.preconormal precovenda,\n"
+                        + "        preco.quantidadeiniciopromocao qtdembalagem,\n"
+                        + "        preco.precopromocao precoatacado\n"
+                        + "from\n"
+                        + "	precovendaproduto preco\n"
+                        + "where\n"
+                        + "	preco.CodigoFilial = '" + getLojaOrigem() + "'\n"
+                        + "	and preco.CodigoCondicaoPagamento = 1\n"
+                        + "	and preco.SiglaUnidade in ('UN', 'KG')\n"
+                        + "	and preco.datainiciopromocao <= getdate() and preco.datafimpromocao >= getdate() + 360"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -326,67 +326,51 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select tp.CodigoTipoPessoa, p.CodigoPessoa, p.RazaoSocial, p.NomeFantasia, \n"
-                    + "       p.DataNascimento, p.Sexo, p.EstadoCivil, p.Contato, p.Observacoes, \n"
-                    + "       p.DataCadastro, endP.Endereco, endP.Numero, endP.Bairro, endP.Complemento, \n"
-                    + "       m.CodigoIBGEMunicipio, m.Nome as municipio, m.SiglaUF, endP.CEP, endP.PontoReferencia, \n"
-                    + "       endP.ContatoEndereco, \n"
-                    + "(select top(1) telP.NumeroTelefone \n"
-                    + "   from TelefonePessoa telP \n"
-                    + "  where telP.CodigoPessoa = p.CodigoPessoa) as Telefone, \n"
-                    + "(select docCnpj.NumeroDocumento \n"
-                    + "   from DocumentoPessoa docCnpj \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docCnpj.CodigoDocumento \n"
-                    + "  where docCnpj.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 1) as Cnpj, \n"
-                    + "(select docInscEst.NumeroDocumento \n"
-                    + "   from DocumentoPessoa docInscEst \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docInscEst.CodigoDocumento \n"
-                    + "  where docInscEst.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 3) as InscricaoEstadual, \n"
-                    + "(select docRG.NumeroDocumento \n"
-                    + "   from DocumentoPessoa docRG \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docRG.CodigoDocumento \n"
-                    + "  where docRG.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 2) as RG, \n"
-                    + "(select docRG.OrgaoExpedidor \n"
-                    + "   from DocumentoPessoa docRG \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docRG.CodigoDocumento \n"
-                    + "  where docRG.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 2) as OrgaoExp \n"
-                    + "from Pessoa p \n"
-                    + "left join EnderecoPessoa endP on endP.CodigoPessoa = p.CodigoPessoa \n"
-                    + "left join Municipio m on endP.CodigoMunicipio = m.CodigoMunicipio \n"
-                    + "inner join TipoPessoa tp on tp.CodigoPessoa = p.CodigoPessoa and tp.CodigoTipoPessoa = 'F' \n"
-                    + "order by p.CodigoPessoa"
+                      "select \n"
+                    + "	codifabric id,\n"
+                    + "	forc35raza razao,\n"
+                    + "	forc10apel fantasia,\n"
+                    + "	forc15cgc cnpj,\n"
+                    + "	forc19insc ie_rg,\n"
+                    + "	forc35ende endereco,\n"
+                    + "	forc10comp complemento,\n"
+                    + "	forc20bair bairro,\n"
+                    + "	forccdibge ibge_municipio,\n"
+                    + "	forc20cida municipio,\n"
+                    + "	forc02esta uf,\n"
+                    + "	forc08cep cep,\n"
+                    + "	forc25fone telefone,\n"
+                    + "	forddtinic datacadastro,\n"
+                    + "	observacoe observacao,"
+                    + " forc20cont contato\n"
+                    + "from rc008for"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("CodigoPessoa"));
-                    imp.setRazao(rst.getString("RazaoSocial"));
-                    imp.setFantasia(rst.getString("NomeFantasia"));
-                    imp.setCnpj_cpf(rst.getString("Cnpj"));
-                    imp.setIe_rg(rst.getString("InscricaoEstadual"));
-                    imp.setDatacadastro(rst.getDate("DataCadastro"));
-                    imp.setEndereco(rst.getString("Endereco"));
-                    imp.setNumero(rst.getString("Numero"));
-                    imp.setBairro(rst.getString("Bairro"));
-                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
-                    imp.setIbge_municipio(rst.getInt("CodigoIBGEMunicipio"));
-                    imp.setUf(rst.getString("SiglaUF"));
-                    imp.setCep(rst.getString("CEP"));
-                    imp.setTel_principal(rst.getString("Telefone"));
-                    imp.setObservacao(rst.getString("Observacoes"));
+                    imp.setIbge_municipio(rst.getInt("ibge_municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("observacao"));
 
-                    if ((rst.getString("Contato") != null)
-                            && (!rst.getString("Contato").trim().isEmpty())) {
-                        imp.setObservacao(imp.getObservacao() + " CONTATO " + rst.getString("Contato"));
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+                        imp.setObservacao(imp.getObservacao() + " CONTATO " + rst.getString("contato"));
                     }
 
-                    try (Statement stm1 = ConexaoSqlServer.getConexao().createStatement()) {
+                    /*try (Statement stm1 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst1 = stm1.executeQuery(
                                 "select \n"
                                 + "CodigoPessoa, NumeroTelefone \n"
@@ -423,7 +407,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                                 );
                             }
                         }
-                    }
+                    }*/
                     result.add(imp);
                 }
             }
@@ -452,17 +436,17 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("CodigoProduto"));
                     imp.setCodigoExterno(rst.getString("Referencia"));
                     imp.setDataAlteracao(rst.getDate("AlteracaoDataHora"));
-                    
-                    if ((rst.getString("SiglaUnidade") != null) &&
-                            (!rst.getString("SiglaUnidade").trim().isEmpty())) {
-                        
+
+                    if ((rst.getString("SiglaUnidade") != null)
+                            && (!rst.getString("SiglaUnidade").trim().isEmpty())) {
+
                         int qtdEmbalagem = Integer.parseInt(Utils.formataNumero(rst.getString("SiglaUnidade")));
-                        
+
                         if (qtdEmbalagem > 0) {
                             imp.setQtdEmbalagem(qtdEmbalagem);
                         }
                     }
-                            
+
                     result.add(imp);
                 }
             }
@@ -474,106 +458,104 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            
-            HashSet<String> movimento = new HashSet<>();            
+
+            HashSet<String> movimento = new HashSet<>();
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n" +
-                    "            mv.codigopessoalancamento\n" +
-                    "        from\n" +
-                    "            movimentofinanceiro mv\n" +
-                    "        where\n" +
-                    "            mv.statuslancamento = 'G' \n" +
-                    "            and mv.tipolancamento = 'C'"
+                    "select distinct\n"
+                    + "            mv.codigopessoalancamento\n"
+                    + "        from\n"
+                    + "            movimentofinanceiro mv\n"
+                    + "        where\n"
+                    + "            mv.statuslancamento = 'G' \n"
+                    + "            and mv.tipolancamento = 'C'"
             )) {
                 while (rst.next()) {
                     movimento.add(rst.getString("codigopessoalancamento"));
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    coalesce(nullif(ltrim(tp.codigotipopessoa),'') ,'Z') codigotipopessoa,\n" +
-                    "    p.codigopessoa,\n" +
-                    "    p.razaosocial,\n" +
-                    "    p.nomefantasia,\n" +
-                    "    p.datanascimento,\n" +
-                    "    p.sexo,\n" +
-                    "    p.estadocivil,\n" +
-                    "    p.contato,\n" +
-                    "    p.observacoes,\n" +
-                    "    p.datacadastro,\n" +
-                    "    endp.endereco,\n" +
-                    "    endp.numero,\n" +
-                    "    endp.bairro,\n" +
-                    "    endp.complemento,\n" +
-                    "    m.codigoibgemunicipio,\n" +
-                    "    m.nome municipio,\n" +
-                    "    m.siglauf,\n" +
-                    "    endp.cep,\n" +
-                    "    endp.pontoreferencia,\n" +
-                    "    endp.contatoendereco,\n" +
-                    "    (select\n" +
-                    "         top(1) telp.numerotelefone\n" +
-                    "     from\n" +
-                    "         telefonepessoa telp\n" +
-                    "     where\n" +
-                    "         telp.codigopessoa = p.codigopessoa) as telefone,\n" +
-                    "    (select\n" +
-                    "         doccnpj.numerodocumento\n" +
-                    "     from\n" +
-                    "         documentopessoa doccnpj\n" +
-                    "         left join documento doc on doc.codigodocumento = doccnpj.codigodocumento\n" +
-                    "     where\n" +
-                    "         doccnpj.codigopessoa = p.codigopessoa and\n" +
-                    "         doc.codigodocumento = 1) as cnpj,\n" +
-                    "    (select\n" +
-                    "         docinscest.numerodocumento\n" +
-                    "     from\n" +
-                    "         documentopessoa docinscest\n" +
-                    "         left join documento doc on doc.codigodocumento = docinscest.codigodocumento\n" +
-                    "     where\n" +
-                    "         docinscest.codigopessoa = p.codigopessoa and\n" +
-                    "         doc.codigodocumento = 3) as inscricaoestadual,\n" +
-                    "    (select\n" +
-                    "         docrg.numerodocumento\n" +
-                    "     from\n" +
-                    "         documentopessoa docrg\n" +
-                    "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n" +
-                    "     where\n" +
-                    "         docrg.codigopessoa = p.codigopessoa and\n" +
-                    "         doc.codigodocumento = 2) as rg,\n" +
-                    "    (select\n" +
-                    "         docrg.orgaoexpedidor\n" +
-                    "     from\n" +
-                    "         documentopessoa docrg\n" +
-                    "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n" +
-                    "     where\n" +
-                    "         docrg.codigopessoa = p.codigopessoa and\n" +
-                    "         doc.codigodocumento = 2) as orgaoexp,\n" +
-                    "    (select\n" +
-                    "         top(1) c.limitecredito\n" +
-                    "     from\n" +
-                    "         cliente c\n" +
-                    "         inner join documentopessoa dp on dp.numerodocumento = c.cnpjcpfcliente and dp.codigopessoa = p.codigopessoa) limitecredito\n" +
-                    "from\n" +
-                    "    pessoa p\n" +
-                    "    left join enderecopessoa endp on endp.codigopessoa = p.codigopessoa\n" +
-                    "    left join municipio m on endp.codigomunicipio = m.codigomunicipio\n" +
-                    "    left join tipopessoa tp on tp.codigopessoa = p.codigopessoa\n" +
-                    "order by\n" +
-                    "    codigotipopessoa, p.codigopessoa"
+                    "select\n"
+                    + "    coalesce(nullif(ltrim(tp.codigotipopessoa),'') ,'Z') codigotipopessoa,\n"
+                    + "    p.codigopessoa,\n"
+                    + "    p.razaosocial,\n"
+                    + "    p.nomefantasia,\n"
+                    + "    p.datanascimento,\n"
+                    + "    p.sexo,\n"
+                    + "    p.estadocivil,\n"
+                    + "    p.contato,\n"
+                    + "    p.observacoes,\n"
+                    + "    p.datacadastro,\n"
+                    + "    endp.endereco,\n"
+                    + "    endp.numero,\n"
+                    + "    endp.bairro,\n"
+                    + "    endp.complemento,\n"
+                    + "    m.codigoibgemunicipio,\n"
+                    + "    m.nome municipio,\n"
+                    + "    m.siglauf,\n"
+                    + "    endp.cep,\n"
+                    + "    endp.pontoreferencia,\n"
+                    + "    endp.contatoendereco,\n"
+                    + "    (select\n"
+                    + "         top(1) telp.numerotelefone\n"
+                    + "     from\n"
+                    + "         telefonepessoa telp\n"
+                    + "     where\n"
+                    + "         telp.codigopessoa = p.codigopessoa) as telefone,\n"
+                    + "    (select\n"
+                    + "         doccnpj.numerodocumento\n"
+                    + "     from\n"
+                    + "         documentopessoa doccnpj\n"
+                    + "         left join documento doc on doc.codigodocumento = doccnpj.codigodocumento\n"
+                    + "     where\n"
+                    + "         doccnpj.codigopessoa = p.codigopessoa and\n"
+                    + "         doc.codigodocumento = 1) as cnpj,\n"
+                    + "    (select\n"
+                    + "         docinscest.numerodocumento\n"
+                    + "     from\n"
+                    + "         documentopessoa docinscest\n"
+                    + "         left join documento doc on doc.codigodocumento = docinscest.codigodocumento\n"
+                    + "     where\n"
+                    + "         docinscest.codigopessoa = p.codigopessoa and\n"
+                    + "         doc.codigodocumento = 3) as inscricaoestadual,\n"
+                    + "    (select\n"
+                    + "         docrg.numerodocumento\n"
+                    + "     from\n"
+                    + "         documentopessoa docrg\n"
+                    + "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n"
+                    + "     where\n"
+                    + "         docrg.codigopessoa = p.codigopessoa and\n"
+                    + "         doc.codigodocumento = 2) as rg,\n"
+                    + "    (select\n"
+                    + "         docrg.orgaoexpedidor\n"
+                    + "     from\n"
+                    + "         documentopessoa docrg\n"
+                    + "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n"
+                    + "     where\n"
+                    + "         docrg.codigopessoa = p.codigopessoa and\n"
+                    + "         doc.codigodocumento = 2) as orgaoexp,\n"
+                    + "    (select\n"
+                    + "         top(1) c.limitecredito\n"
+                    + "     from\n"
+                    + "         cliente c\n"
+                    + "         inner join documentopessoa dp on dp.numerodocumento = c.cnpjcpfcliente and dp.codigopessoa = p.codigopessoa) limitecredito\n"
+                    + "from\n"
+                    + "    pessoa p\n"
+                    + "    left join enderecopessoa endp on endp.codigopessoa = p.codigopessoa\n"
+                    + "    left join municipio m on endp.codigomunicipio = m.codigomunicipio\n"
+                    + "    left join tipopessoa tp on tp.codigopessoa = p.codigopessoa\n"
+                    + "order by\n"
+                    + "    codigotipopessoa, p.codigopessoa"
             )) {
                 while (rst.next()) {
-                    
-                    if (
-                            !"C".equals(rst.getString("codigotipopessoa")) &&
-                            !movimento.contains(rst.getString("CodigoPessoa"))
-                    ) {
+
+                    if (!"C".equals(rst.getString("codigotipopessoa"))
+                            && !movimento.contains(rst.getString("CodigoPessoa"))) {
                         continue;
-                    }                    
-                    
+                    }
+
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("CodigoPessoa"));
                     imp.setRazao(rst.getString("RazaoSocial"));
                     imp.setFantasia(rst.getString("NomeFantasia"));
@@ -720,32 +702,32 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result =  new ArrayList<>();
-        
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	mv.codigofilial,\n" +
-                    "	mv.nsufinanceiro id,\n" +
-                    "	mv.dataemissao,\n" +
-                    "	mv.valorvencimento valor,\n" +
-                    "	mv.historicolivre observacao,\n" +
-                    "	mv.codigopessoalancamento idcliente,\n" +
-                    "	mv.datavencimento,\n" +
-                    "	mv.parcela\n" +
-                    "from\n" +
-                    "	movimentofinanceiro mv\n" +
-                    "where\n" +
-                    "	mv.codigofilial = '" + getLojaOrigem() + "'\n" +
-                    "	and mv.statuslancamento = 'G' \n" +
-                    "	and mv.tipolancamento = 'C' \n" +
-                    "order by\n" +
-                    "	mv.codigofilial,\n" +
-                    "	mv.nsufinanceiro"
+                    "select\n"
+                    + "	mv.codigofilial,\n"
+                    + "	mv.nsufinanceiro id,\n"
+                    + "	mv.dataemissao,\n"
+                    + "	mv.valorvencimento valor,\n"
+                    + "	mv.historicolivre observacao,\n"
+                    + "	mv.codigopessoalancamento idcliente,\n"
+                    + "	mv.datavencimento,\n"
+                    + "	mv.parcela\n"
+                    + "from\n"
+                    + "	movimentofinanceiro mv\n"
+                    + "where\n"
+                    + "	mv.codigofilial = '" + getLojaOrigem() + "'\n"
+                    + "	and mv.statuslancamento = 'G' \n"
+                    + "	and mv.tipolancamento = 'C' \n"
+                    + "order by\n"
+                    + "	mv.codigofilial,\n"
+                    + "	mv.nsufinanceiro"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rst.getString("codigofilial") + "-" + rst.getString("id"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setValor(rst.getDouble("valor"));
@@ -753,42 +735,42 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rst.getString("idcliente"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
                     imp.setParcela(rst.getInt("parcela"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
-        List<ChequeIMP> result =  new ArrayList<>();
-        
+        List<ChequeIMP> result = new ArrayList<>();
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	c.codigofilial,\n" +
-                    "	c.codigoinstituicaofinanceira,\n" +
-                    "	c.numeroagencia,\n" +
-                    "	c.numerocontacorrente,\n" +
-                    "	c.numerocheque,\n" +
-                    "	c.cnpjcpfemitente,\n" +
-                    "	c.dataemissao,\n" +
-                    "	c.datacheque datacheque,\n" +
-                    "	c.datalancamento,\n" +
-                    "	c.valornominal\n" +
-                    "from\n" +
-                    "	chequerecebido c\n" +
-                    "where\n" +
-                    "	c.codigofilial = '" + getLojaOrigem() + "'\n" +
-                    "order by\n" +
-                    "	1,2,3,4,5"
+                    "select\n"
+                    + "	c.codigofilial,\n"
+                    + "	c.codigoinstituicaofinanceira,\n"
+                    + "	c.numeroagencia,\n"
+                    + "	c.numerocontacorrente,\n"
+                    + "	c.numerocheque,\n"
+                    + "	c.cnpjcpfemitente,\n"
+                    + "	c.dataemissao,\n"
+                    + "	c.datacheque datacheque,\n"
+                    + "	c.datalancamento,\n"
+                    + "	c.valornominal\n"
+                    + "from\n"
+                    + "	chequerecebido c\n"
+                    + "where\n"
+                    + "	c.codigofilial = '" + getLojaOrigem() + "'\n"
+                    + "order by\n"
+                    + "	1,2,3,4,5"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     imp.setId(String.format(
                             "%s-%s-%s-%s-%s",
                             rst.getString("codigofilial"),
@@ -805,15 +787,13 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataDeposito(rst.getDate("datalancamento"));
                     imp.setValor(rst.getDouble("valornominal"));
                     imp.setSituacaoCheque(SituacaoCheque.BAIXADO);
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
-    
-        
+
 }
