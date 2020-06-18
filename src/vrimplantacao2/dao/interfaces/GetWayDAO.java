@@ -1755,6 +1755,16 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
+                    if ((rst.getString("EMAIL") != null)
+                            && (!rst.getString("EMAIL").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "EMAIL",
+                                null,
+                                null,
+                                rst.getString("EMAIL")
+                        );
+                    }
                     vResult.add(imp);
                 }
             }

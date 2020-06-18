@@ -491,15 +491,25 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkValorLimite.isSelected()) {
                                 opt.add(OpcaoCliente.VALOR_LIMITE);
                             }
+                            
+                            if (chkCContato.isSelected()) {
+                                opt.add(OpcaoCliente.CONTATOS);
+                            }
 
                             if (!opt.isEmpty()) {
                                 importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                             }
 
                         }
+                        
+                        List<OpcaoCliente> opt = new ArrayList<>();
 
+                        if (chkCContato.isSelected()) {
+                            opt.add(OpcaoCliente.CONTATOS);
+                        }
+                        
                         if (chkClienteEventual.isSelected()) {
-                            importador.importarClienteEventual();
+                            importador.importarClienteEventual(opt.toArray(new OpcaoCliente[]{}));
                         }
 
                         if (chkRotativo.isSelected()) {
@@ -676,6 +686,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkreceberDevolucao = new vrframework.bean.checkBox.VRCheckBox();
         chkReceberVerba = new vrframework.bean.checkBox.VRCheckBox();
         chkRemoverIDCliente = new vrframework.bean.checkBox.VRCheckBox();
+        chkCContato = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel8 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -1125,6 +1136,8 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkRemoverIDCliente.setText("Remover Código Extra do ID do Cliente");
 
+        chkCContato.setText("Contato");
+
         javax.swing.GroupLayout vRPanel9Layout = new javax.swing.GroupLayout(vRPanel9);
         vRPanel9.setLayout(vRPanel9Layout);
         vRPanel9Layout.setHorizontalGroup(
@@ -1140,15 +1153,16 @@ public class GetWayGUI extends VRInternalFrame {
                         .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(vRPanel9Layout.createSequentialGroup()
                         .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(10, 10, 10)
+                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
                         .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkRemoverIDCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkReceberVerba, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(vRPanel9Layout.createSequentialGroup()
@@ -1182,7 +1196,9 @@ public class GetWayGUI extends VRInternalFrame {
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkRemoverIDCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1803,6 +1819,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkAssociado;
     private vrframework.bean.checkBox.VRCheckBox chkAssociadoSomenteAtivos;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
+    private vrframework.bean.checkBox.VRCheckBox chkCContato;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;

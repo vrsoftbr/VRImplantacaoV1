@@ -527,8 +527,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n" +
                     "	LEFT JOIN PCEMBALAGEM ean ON\n" +
                     "		ean.codprod = p.codprod AND\n" +
-                    "		ean.codfilial = emp.codigo AND \n" +
-                    "		ean.CODAUXILIAR = COALESCE(p.CODAUXILIAR, p.CODPROD)\n" +
+                    "		ean.codfilial = emp.codigo\n" + 
                     "	LEFT JOIN pcest est ON\n" +
                     "		est.codprod = p.codprod AND\n" +
                     "		est.codfilial = emp.codigo\n" +
@@ -557,6 +556,7 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     "				left join pcregiao reg on icm.numregiao = reg.numregiao\n" +
                     "				left join PCTRIBUT trb on icm.codst = trb.codst) tabst on tabst.codprod = p.codprod and\n" +
                     "				tabst.codfilial = emp.codigo\n" +
+                    "	WHERE coalesce(ean.QTUNIT, 1) = 1\n" +        
                     "ORDER BY id, ean"
             )) {
                 int cont = 0, cont2 = 0;
@@ -692,23 +692,17 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                         "SELECT \n" +
                         "	p.CODPROD idproduto,\n" +
                         "	p.codauxiliar ean,\n" +
-                        "	COALESCE((SELECT \n" +
-                        "		pc.PVENDA\n" +
-                        "	FROM \n" +
-                        "		pcprodut pr JOIN PCEMBALAGEM pc ON pr.codprod = pc.CODPROD AND\n" +
-                        "		COALESCE(pr.CODAUXILIAR, pr.CODPROD) = pc.CODAUXILIAR\n" +
-                        "	WHERE pc.CODFILIAL = p.CODFILIAL AND \n" +
-                        "		pr.CODPROD = p.CODPROD), p.PVENDA) AS precovarejo,\n" +
+                        "	varejo.pvenda AS precovarejo,\n" +
                         "	-- Qtd de atacado por quantidade total\n" +
                         "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
                         "	 THEN p.QTMINIMAATACADO\n" +
                         "	--Qtd embalagem por embalagem\n" +
-                        "	WHEN p.QTUNIT >= 2 THEN p.QTUNIT ELSE 0 END) AS qtdatacado,\n" +
+                        "	WHEN p.QTUNIT >=2 THEN p.QTUNIT ELSE 1 END) AS qtdatacado,\n" +
                         "	-- Preço do atacado por quantidade total\n" +
                         "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
                         "	 THEN p.PVENDAATAC \n" +
                         "	-- Preço do atacado por embalagem\n" +
-                        "	WHEN p.QTUNIT >= 2 AND p.PVENDA > 0 \n" +
+                        "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n" +
                         "		THEN round((p.PVENDA / p.QTUNIT), 2) END) AS precoatacado, \n" +
                         "	p.MARGEM,\n" +
                         "	p.MARGEMIDEALATAC,\n" +
@@ -716,11 +710,28 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                         "	p.UNIDADE\n" +
                         "FROM \n" +
                         "	pcembalagem p\n" +
+                        "JOIN\n" +
+                        "	(SELECT \n" +
+                        "		a.PVENDA,\n" +
+                        "		a.CODPROD,\n" +
+                        "		a.CODFILIAL,\n" +
+                        "		a.QTUNIT\n" +
+                        "	FROM \n" +
+                        "		PCEMBALAGEM a \n" +
+                        "	WHERE \n" +
+                        "		COALESCE(a.QTUNIT, 1) = 1 and \n" +
+                        "		a.dtinativo IS NULL) varejo ON p.CODPROD = varejo.codprod AND \n" +
+                        "		varejo.codfilial = p.CODFILIAL\n" +
                         "WHERE \n" +
                         "	p.CODFILIAL = '" + getLojaOrigem() + "' AND \n" +
                         "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
                         "	 THEN p.QTMINIMAATACADO\n" +
-                        "	WHEN p.QTUNIT >= 2 THEN p.QTUNIT ELSE 0 END) > 1"
+                        "	WHEN p.QTUNIT >= 2 THEN p.QTUNIT ELSE 1 END) > 1 AND \n" +
+                        "	(CASE WHEN p.QTUNIT = 1 AND p.QTMINIMAATACADO > 1\n" +
+                        "	 THEN p.PVENDAATAC \n" +
+                        "	-- Preço do atacado por embalagem\n" +
+                        "	WHEN p.QTUNIT >=2 AND p.PVENDA > 0 \n" +
+                        "		THEN round((p.PVENDA / p.QTUNIT), 2) END) > 0"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
