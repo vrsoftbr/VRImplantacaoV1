@@ -659,6 +659,8 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkProdutos" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkProdutosBalanca" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkEAN" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="chkEANemBranco" min="-2" max="-2" attributes="0"/>
@@ -678,6 +680,7 @@
                               <Component id="chkProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkEAN" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkEANemBranco" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkProdutosBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -709,6 +712,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEANemBranco">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="EAN em branco"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutosBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produtos Balan&#xe7;a"/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -59,20 +59,44 @@ public class ProdutoFornecedorDAO {
     public ProdutoFornecedorVO carregar(long i_id, long i_idLoja) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
-        StringBuilder sql = null;
+        //StringBuilder sql = null;
+        String sql = "";
 
         stm = Conexao.createStatement();
 
-        sql = new StringBuilder();
-        sql.append("SELECT produtofornecedor.*, produto.id_tipoembalagem, COALESCE(pauta.iva, 0) AS iva, pc.precovenda");
+        //sql = new StringBuilder();
+        
+        sql = "select\n" +
+            "	produtofornecedor.*,\n" +
+            "	produto.id_tipoembalagem,\n" +
+            "	coalesce(pauta.iva, 0) as iva,\n" +
+            "	pc.precovenda\n" +
+            "from\n" +
+            "	produtofornecedor\n" +
+            "inner join produto on\n" +
+            "	produto.id = produtofornecedor.id_produto\n" +
+            "inner join produtoaliquota pa on pa.id_produto = produto.id\n" +
+            "left join pautafiscal as pauta on\n" +
+            "	pauta.ncm1 = produto.ncm1\n" +
+            "	and pauta.ncm2 = produto.ncm2\n" +
+            "	and pauta.ncm3 = produto.ncm3\n" +
+            "	and pauta.excecao = pa.excecao\n" +
+            "	and pauta.id_estado = " + Global.idEstado + "\n" +
+            "inner join produtocomplemento as pc on\n" +
+            "	pc.id_produto = produto.id\n" +
+            "	and pc.id_loja = " + i_idLoja + "\n" +
+            "where\n" +
+            "	produtofornecedor.id = " + i_id;
+        
+        /*sql.append("SELECT produtofornecedor.*, produto.id_tipoembalagem, COALESCE(pauta.iva, 0) AS iva, pc.precovenda");
         sql.append(" FROM produtofornecedor");
         sql.append(" INNER JOIN produto ON produto.id = produtofornecedor.id_produto");
         sql.append(" LEFT JOIN pautafiscal AS pauta ON pauta.ncm1 = produto.ncm1 AND pauta.ncm2 = produto.ncm2 AND pauta.ncm3 = produto.ncm3");
         sql.append(" AND pauta.excecao = produto.excecao AND pauta.id_estado = " + Global.idEstado);
         sql.append(" INNER JOIN produtocomplemento AS pc ON pc.id_produto = produto.id AND pc.id_loja = " + i_idLoja);
-        sql.append(" WHERE produtofornecedor.id = " + i_id);
+        sql.append(" WHERE produtofornecedor.id = " + i_id);*/
 
-        rst = stm.executeQuery(sql.toString());
+        rst = stm.executeQuery(sql);
 
         if (!rst.next()) {
             throw new VRException("Produto não encontrado!");

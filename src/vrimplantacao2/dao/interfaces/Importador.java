@@ -308,6 +308,21 @@ public class Importador {
 
     }
     
+    public void importarProdutosBalanca(OpcaoProduto... opcoes) throws Exception {
+
+        ProgressBar.setStatus("Carregando produtos de Balança...");
+        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutosBalanca();
+        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        provider.setLoja(getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaVR(getLojaVR());
+        provider.setOpcoes(opcoes);
+
+        ProdutoRepository repository = new ProdutoRepository(provider);
+        repository.salvar(produtos);
+
+    }
+    
     /**
      * Importa produtos novos e atualiza os cadastros.
      * @param opcoes

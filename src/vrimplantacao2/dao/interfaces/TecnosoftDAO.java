@@ -612,7 +612,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
             this.sql
                     = "select\n" +
                     "    v.id_ven id,\n" +
-                    "    sat.numero cupom,\n" +
+                    "    coalesce(sat.numero, v.orcamento) cupom,\n" +
                     "    v.orcamento,\n" +
                     "    v.terminal caixa,\n" +
                     "    v.data,\n" +
@@ -633,11 +633,12 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "    v.observacao\n" +
                     "from\n" +
                     "    vendas v\n" +
-                    "join sat_cupom sat on v.id_cup = sat.id_cup\n" +
-                    "join sat_equipamento sate on sat.id_sat = sate.id_sat\n" +
+                    "left join sat_cupom sat on v.id_cup = sat.id_cup\n" +
+                    "left join sat_equipamento sate on sat.id_sat = sate.id_sat\n" +
                     "where\n" +
                     "    v.data between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n" +
                     "    v.tipo = 'VENDA' and\n" +
+                    "    v.valtotal > 0 and\n" +
                     "    v.id_loja = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -969,6 +970,7 @@ public class TecnosoftDAO extends InterfaceDAO implements MapaTributoProvider{
                     "where\n" +
                     "    v.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
                     "    i.id_loja = " + idLojaCliente + " and\n" +
+                    "    i.total > 0 and\n" +
                     "    v.tipo = 'VENDA'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
