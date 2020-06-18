@@ -123,63 +123,7 @@ public class TPASistemasDAO extends InterfaceDAO implements MapaTributoProvider 
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    codb.numerocodigobarraproduto,\n"
-                    + "    p.codigoproduto,\n"
-                    + "    p.codigoncm,\n"
-                    + "    p.codigogrupoproduto,\n"
-                    + "    p.codigosubgrupoproduto,\n"
-                    + "    p.descricao,\n"
-                    + "    p.descricaotecnica,\n"
-                    + "    p.observacoes,\n"
-                    + "    p.siglaunidade,\n"
-                    + "    p.pesobruto,\n"
-                    + "    p.pesoliquido,\n"
-                    + "    p.prazovalidade,\n"
-                    + "    p.datacadastro,\n"
-                    + "	 preco.preconormal precovenda,\n"
-                    + "	 preco.precopromocao atacpreco,\n"
-                    + "	 preco.quantidadeiniciopromocao atacqtd,\n"
-                    + "    p.margemlucroteorica,\n"
-                    + "    p.situacao,\n"
-                    + "    p.classificacaofiscal,\n"
-                    + "    p.situacaotributariapisent,\n"
-                    + "    p.situacaotributariapis,\n"
-                    + "    p.situacaotributariacofinsent,\n"
-                    + "    p.situacaotributariacofins,\n"
-                    + "    p.naturezareceitapiscofins,\n"
-                    + "    codb.siglaunidade tipoembalagem,\n"
-                    + "    codb.quantidadeproduto,\n"
-                    + "    gfp.codigogrupofiscal,\n"
-                    + "    gf.descricao,\n"
-                    + "    p.codigoespecificadorst as cest,\n"
-                    + "    case p.situacao when 'A' then 1 else 0 end situacaocadastro,\n"
-                    + "    case p.situacaocompra when 'I' then 1 else 0 end descontinuado\n"
-                    + "from\n"
-                    + "    produto p\n"
-                    + "	join Filial fl on\n"
-                    + "		fl.codigofilial = '" + getLojaOrigem() + "'\n"
-                    + "	join Municipio mun on\n"
-                    + "		fl.codigomunicipio = mun.codigomunicipio\n"
-                    + "    left join codigobarraproduto codb on\n"
-                    + "        codb.codigoproduto = p.codigoproduto\n"
-                    + "    left join grupofiscalproduto gfp on\n"
-                    + "        gfp.codigoproduto = p.codigoproduto\n"
-                    + "        and gfp.siglapais = mun.SiglaPais\n"
-                    + "        and gfp.siglauf = mun.SiglaUF \n"
-                    + "        and gfp.codigofilial = fl.codigofilial\n"
-                    + "    left join grupofiscal gf on\n"
-                    + "        gf.codigogrupofiscal = gfp.codigogrupofiscal\n"
-                    + "        and gf.siglauf = mun.SiglaUF\n"
-                    + "        and gf.siglapais = mun.SiglaPais\n"
-                    + "        and gf.codigofilial = fl.codigofilial\n"
-                    + "	left join precovendaproduto preco on\n"
-                    + "		preco.CodigoFilial = fl.CodigoFilial\n"
-                    + "		and preco.codigoproduto = p.codigoproduto\n"
-                    + "		and preco.CodigoCondicaoPagamento = 1\n"
-                    + "		and preco.SiglaUnidade = p.siglaunidade\n"
-                    + "order by\n"
-                    + "    p.codigoproduto, codb.numerocodigobarraproduto desc"
+                    "select * from RC003EST"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -349,6 +293,7 @@ public class TPASistemasDAO extends InterfaceDAO implements MapaTributoProvider 
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -459,7 +404,7 @@ public class TPASistemasDAO extends InterfaceDAO implements MapaTributoProvider 
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
 
-            HashSet<String> movimento = new HashSet<>();
+            /*HashSet<String> movimento = new HashSet<>();
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "            mv.codigopessoalancamento\n"
@@ -472,87 +417,17 @@ public class TPASistemasDAO extends InterfaceDAO implements MapaTributoProvider 
                 while (rst.next()) {
                     movimento.add(rst.getString("codigopessoalancamento"));
                 }
-            }
+            }*/
 
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    coalesce(nullif(ltrim(tp.codigotipopessoa),'') ,'Z') codigotipopessoa,\n"
-                    + "    p.codigopessoa,\n"
-                    + "    p.razaosocial,\n"
-                    + "    p.nomefantasia,\n"
-                    + "    p.datanascimento,\n"
-                    + "    p.sexo,\n"
-                    + "    p.estadocivil,\n"
-                    + "    p.contato,\n"
-                    + "    p.observacoes,\n"
-                    + "    p.datacadastro,\n"
-                    + "    endp.endereco,\n"
-                    + "    endp.numero,\n"
-                    + "    endp.bairro,\n"
-                    + "    endp.complemento,\n"
-                    + "    m.codigoibgemunicipio,\n"
-                    + "    m.nome municipio,\n"
-                    + "    m.siglauf,\n"
-                    + "    endp.cep,\n"
-                    + "    endp.pontoreferencia,\n"
-                    + "    endp.contatoendereco,\n"
-                    + "    (select\n"
-                    + "         top(1) telp.numerotelefone\n"
-                    + "     from\n"
-                    + "         telefonepessoa telp\n"
-                    + "     where\n"
-                    + "         telp.codigopessoa = p.codigopessoa) as telefone,\n"
-                    + "    (select\n"
-                    + "         doccnpj.numerodocumento\n"
-                    + "     from\n"
-                    + "         documentopessoa doccnpj\n"
-                    + "         left join documento doc on doc.codigodocumento = doccnpj.codigodocumento\n"
-                    + "     where\n"
-                    + "         doccnpj.codigopessoa = p.codigopessoa and\n"
-                    + "         doc.codigodocumento = 1) as cnpj,\n"
-                    + "    (select\n"
-                    + "         docinscest.numerodocumento\n"
-                    + "     from\n"
-                    + "         documentopessoa docinscest\n"
-                    + "         left join documento doc on doc.codigodocumento = docinscest.codigodocumento\n"
-                    + "     where\n"
-                    + "         docinscest.codigopessoa = p.codigopessoa and\n"
-                    + "         doc.codigodocumento = 3) as inscricaoestadual,\n"
-                    + "    (select\n"
-                    + "         docrg.numerodocumento\n"
-                    + "     from\n"
-                    + "         documentopessoa docrg\n"
-                    + "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n"
-                    + "     where\n"
-                    + "         docrg.codigopessoa = p.codigopessoa and\n"
-                    + "         doc.codigodocumento = 2) as rg,\n"
-                    + "    (select\n"
-                    + "         docrg.orgaoexpedidor\n"
-                    + "     from\n"
-                    + "         documentopessoa docrg\n"
-                    + "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n"
-                    + "     where\n"
-                    + "         docrg.codigopessoa = p.codigopessoa and\n"
-                    + "         doc.codigodocumento = 2) as orgaoexp,\n"
-                    + "    (select\n"
-                    + "         top(1) c.limitecredito\n"
-                    + "     from\n"
-                    + "         cliente c\n"
-                    + "         inner join documentopessoa dp on dp.numerodocumento = c.cnpjcpfcliente and dp.codigopessoa = p.codigopessoa) limitecredito\n"
-                    + "from\n"
-                    + "    pessoa p\n"
-                    + "    left join enderecopessoa endp on endp.codigopessoa = p.codigopessoa\n"
-                    + "    left join municipio m on endp.codigomunicipio = m.codigomunicipio\n"
-                    + "    left join tipopessoa tp on tp.codigopessoa = p.codigopessoa\n"
-                    + "order by\n"
-                    + "    codigotipopessoa, p.codigopessoa"
+                    "select * from rc042cli"
             )) {
                 while (rst.next()) {
 
-                    if (!"C".equals(rst.getString("codigotipopessoa"))
+                    /*if (!"C".equals(rst.getString("codigotipopessoa"))
                             && !movimento.contains(rst.getString("CodigoPessoa"))) {
                         continue;
-                    }
+                    }*/
 
                     ClienteIMP imp = new ClienteIMP();
 
@@ -686,9 +561,7 @@ public class TPASistemasDAO extends InterfaceDAO implements MapaTributoProvider 
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select CodigoFilial, NomeFantasia \n"
-                    + "from Filial\n"
-                    + "order by 1"
+                    "select * from rc002loj"
             )) {
                 while (rst.next()) {
                     result.add(
