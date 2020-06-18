@@ -34,6 +34,7 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
@@ -85,6 +86,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.DATA_CADASTRO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                    OpcaoProduto.QTD_EMBALAGEM_EAN,
                     OpcaoProduto.PESAVEL,
                     OpcaoProduto.VALIDADE,
                     OpcaoProduto.DESC_COMPLETA,
@@ -115,7 +118,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.RECEITA,
                     OpcaoProduto.RECEITA_BALANCA,
                     OpcaoProduto.NUMERO_PARCELA,
-                    OpcaoProduto.TECLA_ASSOCIADA
+                    OpcaoProduto.TECLA_ASSOCIADA,
+                    OpcaoProduto.PRODUTOS_BALANCA
                 }
         ));
     }
@@ -265,6 +269,152 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	cast(p.Produto_Id as bigint) as id,\n"
+                    + " cast(p.Digito_Id as bigint) as digito,\n"        
+                    + "	cast(ean.Codigo_Automacao as bigint) as Codigo_Automacao,\n"
+                    + "	cast(ean.Digito_Automacao as bigint) as Digito_Automacao,\n"
+                    + " cast(ean.Tipo_Codigo as bigint) as tipocodigo,\n"        
+                    + " p.Peso_Variavel,\n"
+                    + " p.Pre_Pesado,\n"
+                    + " p.Qtd_Decimal,\n"
+                    + " p.ProdutoPai,\n"
+                    + "	p.Descricao_Completa as descricaocompleta, \n"
+                    + " p.Descricao_Reduzida as descricaoreduzida, \n"
+                    + " p.Descricao_Balanca,\n"
+                    + "	est.Custo_Ultima_Entrada_Com_Icms as custocomimposto,\n"
+                    + " est.Custo_Ultima_Entrada_Sem_Icms as custosemimposto,\n"
+                    + "	pre.preco_venda as precovenda,\n"
+                    + " p.Margem_Atacado, \n"
+                    + " p.Margem_Teorica, \n"
+                    + " p.MargemFixa, \n"
+                    + " p.Aliquota, \n"
+                    + " p.Aliquota_FCP, \n"
+                    + " p.Aliquota_Interna, \n"
+                    + " p.Aliquota_NF,\n"
+                    + " f.Codigo as idfamiliaproduto,\n"
+                    + "	p.Mercadologico1, \n"
+                    + " p.Mercadologico2, \n"
+                    + " p.Mercadologico3, \n"
+                    + " p.Mercadologico4, \n"
+                    + " p.Mercadologico5, \n"
+                    + " p.Situacao as situacaocadastro,\n"
+                    + "	p.SituacaoTributaria as csticms, \n"
+                    + " est.EstoqueInicial as estoque, \n"
+                    + " p.EspecUnitariaTipo as tipoembalagem, \n"
+                    + " p.EspecUnitariaQtde as qtdembalagem,\n"
+                    + " emb.Qtd_Produto as qtdembalagem_ean,"         
+                    + "	p.TipoProduto, \n"
+                    + " p.Codigo_NCM as ncm, \n"
+                    + " p.CEST as cest, \n"
+                    + " p.TipoCodMercad as tipomercadoria,\n"
+                    + "	p.CstPisCofinsEntrada, \n"
+                    + " p.CstPisCofinsSaida, \n"
+                    + " p.NaturezaReceita,\n"
+                    + " cast(p.Fabricante as bigint) as idfabricante,\n"
+                    + " cast(p.Comprador as bigint) as idcomprador,\n"
+                    + " p.PontoPedido as numeroparcela,\n"
+                    + " fz.Tecla\n"
+                    + "from dbo.Produtos p\n"
+                    + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
+                    + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
+                    + "left join dbo.Produtos_Estoque est on est.Produto_Id = p.Produto_Id\n"
+                    + "	and est.Loja = " + getLojaOrigem() + "\n"
+                    + "left join dbo.Automacao ean on ean.Produto_Id = p.Produto_Id\n"
+                    + "left join dbo.Grupo_Precos_Produtos f on f.Produto_Id = p.Produto_Id\n"
+                    + "left join dbo.Filizola fz on fz.CodigoProduto = p.Produto_Id\n"
+                    + "where p.Peso_Variavel = 1\n"
+                    + "and ean.Codigo_Automacao is not null\n"
+                    + "and ean.Codigo_Automacao <= 999999\n"        
+                    + "left join dbo.Embalagem emb on emb.Produto_Id = p.Produto_Id\n" 
+                    + "	and emb.Sequencia = ean.Seq_Embalagem\n"
+                    + "order by p.Produto_Id"
+            )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id") + rst.getString("digito"));
+
+                    String ean = (rst.getString("Codigo_Automacao") + rst.getString("Digito_Automacao")).trim();
+
+                    if ((rst.getString("Codigo_Automacao") != null)
+                            && (!rst.getString("Codigo_Automacao").trim().isEmpty())
+                            && (rst.getString("Digito_Automacao") != null)
+                            && (!rst.getString("Digito_Automacao").trim().isEmpty())) {
+
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(rst.getString("Codigo_Automacao").trim());
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                            imp.setEan(rst.getString("Codigo_Automacao").trim());
+                        } else {
+                            
+                            if (rst.getInt("Peso_Variavel") == 1) {                                
+                                imp.seteBalanca(true);
+                                imp.setEan(rst.getString("Codigo_Automacao").trim());
+                            } else {
+                                imp.seteBalanca(false);
+                                imp.setEan(ean);
+                            }
+                        }
+                    } else {
+                        imp.seteBalanca(false);
+                        imp.setEan(ean);
+                    }
+
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem_ean"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setIdFamiliaProduto(rst.getString("idfamiliaproduto"));
+                    imp.setCodMercadologico1(rst.getString("Mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("Mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("Mercadologico3"));
+                    imp.setFornecedorFabricante(rst.getString("idfabricante"));
+                    imp.setIdComprador(rst.getString("idcomprador"));
+                    imp.setNumeroparcela(rst.getInt("numeroparcela"));
+                    imp.setMargem(rst.getDouble("Margem_Teorica"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setTeclaAssociada(rst.getInt("Tecla"));
+                    imp.setSituacaoCadastro("A".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("CstPisCofinsSaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("CstPisCofinsEntrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceita"));
+                    imp.setIcmsDebitoId(rst.getString("Aliquota_NF"));
+                    imp.setIcmsCreditoId(rst.getString("Aliquota_NF"));
+
+                    imp.setPautaFiscalId(imp.getImportId());
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;        
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -304,6 +454,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " est.EstoqueInicial as estoque, \n"
                     + " p.EspecUnitariaTipo as tipoembalagem, \n"
                     + " p.EspecUnitariaQtde as qtdembalagem,\n"
+                    + " emb.Qtd_Produto as qtdembalagem_ean,"        
                     + "	p.TipoProduto, \n"
                     + " p.Codigo_NCM as ncm, \n"
                     + " p.CEST as cest, \n"
@@ -323,54 +474,36 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join dbo.Automacao ean on ean.Produto_Id = p.Produto_Id\n"
                     + "left join dbo.Grupo_Precos_Produtos f on f.Produto_Id = p.Produto_Id\n"
                     + "left join dbo.Filizola fz on fz.CodigoProduto = p.Produto_Id\n"
+                    + "left join dbo.Embalagem emb on emb.Produto_Id = p.Produto_Id\n" 
+                    + "	and emb.Sequencia = ean.Seq_Embalagem\n"
                     + "order by p.Produto_Id"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id") + rst.getString("digito"));
 
                     String ean = (rst.getString("Codigo_Automacao") + rst.getString("Digito_Automacao")).trim();
-
+                        
                     if ((rst.getString("Codigo_Automacao") != null)
                             && (!rst.getString("Codigo_Automacao").trim().isEmpty())
                             && (rst.getString("Digito_Automacao") != null)
                             && (!rst.getString("Digito_Automacao").trim().isEmpty())) {
 
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(rst.getString("Codigo_Automacao").trim());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
-                        }
-
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
-                            imp.setEan(rst.getString("Codigo_Automacao").trim());
-                        } else {
-                            
-                            if (rst.getInt("Pre_Pesado") == 1) {
+                        
+                        if (ean.trim().length() <= 6) {
+                            if (rst.getInt("tipocodigo") == 2) {
                                 imp.seteBalanca(true);
-                                imp.setEan(rst.getString("Codigo_Automacao").trim());
+                                imp.setEan(rst.getString("Codigo_Automacao"));
                             } else {
-
-                                if ((rst.getInt("tipocodigo") == 2) && ((ean.length() <= 6))) {
-                                    imp.seteBalanca(true);
-                                    imp.setEan(rst.getString("Codigo_Automacao").trim());
-                                } else if ((rst.getInt("tipocodigo") != 2) && ((ean.length() <= 6))) {
-                                    imp.seteBalanca(false);
-                                    imp.setEan(ean);
-                                    imp.setManterEAN(true);
-                                } else {
-                                    imp.seteBalanca(false);
-                                    imp.setEan(ean);
-                                }
+                                imp.seteBalanca(false);
+                                imp.setEan(ean);
+                                imp.setManterEAN(true);
                             }
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setEan(ean);
                         }
                     } else {
                         imp.seteBalanca(false);
@@ -379,6 +512,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem_ean"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -395,13 +529,20 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setTeclaAssociada(rst.getInt("Tecla"));
+                    imp.setSituacaoCadastro("A".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("CstPisCofinsSaida"));
                     imp.setPiscofinsCstCredito(rst.getString("CstPisCofinsEntrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceita"));
+                    
                     imp.setIcmsDebitoId(rst.getString("Aliquota_NF"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("Aliquota_NF"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("Aliquota_NF"));
                     imp.setIcmsCreditoId(rst.getString("Aliquota_NF"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("Aliquota_NF"));
+                    imp.setIcmsConsumidorId(rst.getString("Aliquota_NF"));
+                    
 
                     imp.setPautaFiscalId(imp.getImportId());
 
@@ -1057,7 +1198,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cp.observacao as observacao,\n"
                     + "	td.Anotacao,\n"
                     + "	tp.descricao,\n"
-                    + "	cp.Sequencial as parcela,\n"
+                    + "	cast(cp.Sequencial as bigint) as parcela,\n"
                     + "	cp.Serie,\n"
                     + "	cp.Juros,\n"
                     + " cp.BancoCobranca as idbanco\n"
