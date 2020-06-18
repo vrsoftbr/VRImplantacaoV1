@@ -682,16 +682,17 @@
                                       <Component id="cmbTipoDocCheque" min="-2" pref="159" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkPagamentoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkPagamentoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkCContato" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkRemoverIDCliente" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkReceberVerba" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" attributes="0">
@@ -735,7 +736,10 @@
                               <Component id="chkRemoverIDCliente" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkPagamentoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCContato" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -843,6 +847,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRemoverIDCliente">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Remover C&#xf3;digo Extra do ID do Cliente"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCContato">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contato"/>
                   </Properties>
                 </Component>
               </SubComponents>
