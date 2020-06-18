@@ -11,10 +11,12 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -178,10 +180,10 @@ public class PhixaDAO extends InterfaceDAO {
                                 && "1".equals(rs.getString("balanca").trim())) {
                         imp.setEan(rs.getString("referencia"));
                         imp.seteBalanca(true);
-                    } else if(rs.getString("ean") == null && "".equals(rs.getString("ean"))) {
+                    } else if(rs.getString("ean") == null || "".equals(rs.getString("ean").trim())) {
                         if(rs.getString("referencia") != null && !"".equals(rs.getString("referencia"))) {
                             if(rs.getString("referencia").length() < 7) {
-                                imp.setEan("referencia");
+                                imp.setEan(rs.getString("referencia"));
                                 imp.setManterEAN(true);
                             }
                         }
@@ -307,6 +309,39 @@ public class PhixaDAO extends InterfaceDAO {
                         imp.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
                         imp.setIcmsCstEntrada(imp.getIcmsCstConsumidor());
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codigo_produto id,\n" +
+                    "	codigo_barra_produto ean,\n" +
+                    "	u.descricao_unidade unidade\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "left join unidade u on p.unidade_produto = u.codigo_unidade\n" +
+                    "where \n" +
+                    "	codigo_barra_produto != ''")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    
+                    result.add(imp);
                 }
             }
         }
@@ -395,7 +430,7 @@ public class PhixaDAO extends InterfaceDAO {
                     if(tel != null && !"".equals(tel)) {
                         String tels[] = new String[3];
                         tels = tel.split("/");
-                        for(int i = 0; i <= tels.length; i++) {
+                        for(int i = 0; i < tels.length; i++) {
                             if(email != null && !"".equals("email")) {
                                 imp.addContato(String.valueOf(i), "TELEFONE" + i, tels[i].trim(), null, TipoContato.NFE, email);
                             } else {
@@ -634,6 +669,52 @@ public class PhixaDAO extends InterfaceDAO {
                     if(cont != null && !"".equals(cont)) {
                         imp.addContato("1", cont, null, null, null);
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	c.codigo_conta id,\n" +
+                    "	c.data_conta data,\n" +
+                    "	c.data_vencimento_conta vencimento,\n" +
+                    "	c.numero_nota_conta nota,\n" +
+                    "	c.valor_conta valor,\n" +
+                    "	c.obs_conta,\n" +
+                    "	c.descricao_conta,\n" +
+                    "	c.terminal_conta caixa,\n" +
+                    "	c.saldo_pendente_conta saldo,\n" +
+                    "	c.cliente_conta,\n" +
+                    "	c.funcionario_conta\n" +
+                    "from\n" +
+                    "	conta c\n" +
+                    "where \n" +
+                    "	c.loja_conta = " + getLojaOrigem() + " and \n" +
+                    "	c.operacao_conta > 0 and \n" +
+                    "	c.saldo_pendente_conta > 0 and\n" +
+                    "	--c.data_vencimento_conta between '2020-06-01' and '2020-06-30' and \n" +
+                    "	c.cliente_conta > 0 or c.funcionario_conta > 0\n" +
+                    "order by \n" +
+                    "	c.data_conta")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("cliente_conta"));
+                    imp.setDataEmissao(rs.getDate("data"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("nota"));
+                    imp.setValor(rs.getDouble("saldo"));
+                    imp.setEcf(rs.getString("caixa"));
                     
                     result.add(imp);
                 }

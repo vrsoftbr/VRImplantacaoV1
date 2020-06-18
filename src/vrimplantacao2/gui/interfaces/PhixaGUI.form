@@ -29,7 +29,7 @@
           <Group type="102" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="conexao" pref="604" max="32767" attributes="0"/>
+                  <Component id="conexao" pref="611" max="32767" attributes="0"/>
                   <Component id="pnlLoja" alignment="0" max="32767" attributes="0"/>
                   <Component id="tabOperacoes" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
@@ -174,27 +174,7 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="chkClienteBloqueado" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkDataNascimentoConjuge" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkCliEmpresa" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliEnderecoEmpresa" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliNumeroEmpresa" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliComplementoEmpresa" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliBairroEmpresa" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkCliMunicipioEmpresa" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -210,9 +190,31 @@
                                   <Component id="chkCliDataAdmissaoEmpresa" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCliSalarioEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkDataNascimentoConjuge" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkCliComplementoEmpresa" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkCliEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliEnderecoEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkClienteBloqueado" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliBairroEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliNumeroEmpresa" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkImpFuncionario" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="63" max="32767" attributes="0"/>
+                          <EmptySpace pref="94" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -222,17 +224,16 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkClienteBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkDataNascimentoConjuge" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkImpFuncionario" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkCliEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliEnderecoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliNumeroEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCliComplementoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliBairroEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -246,6 +247,8 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkCliDataAdmissaoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliSalarioEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkDataNascimentoConjuge" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliComplementoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -340,6 +343,11 @@
                     <Property name="text" type="java.lang.String" value="Sal&#xe1;rio"/>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JCheckBox" name="chkImpFuncionario">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Importar Funcino&#xe1;rio com Cliente"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>
@@ -365,7 +373,7 @@
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="342" max="32767" attributes="0"/>
+                      <EmptySpace pref="349" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -382,7 +390,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="147" max="32767" attributes="0"/>
+                      <EmptySpace pref="143" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

@@ -183,6 +183,7 @@ import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao2.gui.interfaces.OrionTechGUI;
 import vrimplantacao2.gui.interfaces.OryonGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
+import vrimplantacao2.gui.interfaces.PhixaGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PomaresGUI;
 import vrimplantacao2.gui.interfaces.ProtonGUI;
@@ -681,6 +682,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAccesys = new javax.swing.JMenuItem();
         mnuAccesys1 = new javax.swing.JMenuItem();
         mnuVisualMix = new javax.swing.JMenuItem();
+        mnuPhixa = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1872,6 +1874,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuVisualMix);
+
+        mnuPhixa.setLabel("Phixa");
+        mnuPhixa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPhixaActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuPhixa);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4579,6 +4589,10 @@ public final class MenuGUI extends VRMdiFrame {
         DJSystemGUI.exibir(this);
     }//GEN-LAST:event_mnuDJSystemActionPerformed
 
+    private void mnuPhixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPhixaActionPerformed
+        PhixaGUI.exibir(this);
+    }//GEN-LAST:event_mnuPhixaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4781,6 +4795,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuOryon;
     private javax.swing.JMenuItem mnuParametros;
     private javax.swing.JMenuItem mnuParametros1;
+    private javax.swing.JMenuItem mnuPhixa;
     private javax.swing.JMenu mnuPlanilha;
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
