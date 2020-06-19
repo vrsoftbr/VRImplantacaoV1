@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -1830,7 +1831,15 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
             
             if (chkAssociado.isSelected()) {
-                importador.importarAssociado();
+                
+                List<OpcaoAssociado> opt = new ArrayList<>();
+                if (chkInverterAssociado.isSelected()) {
+                    opt.add(OpcaoAssociado.IMP_INVERTER);
+                }
+                if (chkAssociadoSomenteAtivos.isSelected()) {
+                    opt.add(OpcaoAssociado.IMP_SOMENTE_ATIVOS);
+                }
+                importador.importarAssociado(opt.toArray(new OpcaoAssociado[]{}));
             }
         }
         
