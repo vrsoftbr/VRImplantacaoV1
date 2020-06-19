@@ -160,6 +160,10 @@ public class ContasPagarRepository {
                         } else {
                             //Converte e grava a parcela do pagar fornecedor
                             PagarFornecedorParcelaVO parc = converterPagarFornecedorParcela(cp);
+                            if (!bancosExistentes.contains(parc.getId_banco())) {
+                                parc.setId_banco(804);
+                            }
+                            
                             parc.setId_pagarfornecedor(anterior.getCodigoAtual());
                             provider.gravarVencimento(parc);
                         }
