@@ -15,6 +15,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.GTechDAO;
@@ -269,6 +270,12 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkAtacado.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATACADO);
                             }
+                            if (chkNcm.isSelected()) {
+                                opcoes.add(OpcaoProduto.NCM);
+                            }
+                            if (chkCest.isSelected()) {
+                                opcoes.add(OpcaoProduto.CEST);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -320,6 +327,9 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
 
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
+                        }
+                        if (chkCAtivo.isSelected()) {
+                            importador.atualizarClientePreferencial(OpcaoCliente.SITUACAO_CADASTRO);
                         }
                         
                         if (chkCreditoRotativo.isSelected()) {
@@ -402,6 +412,8 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         chkOferta = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
+        chkNcm = new vrframework.bean.checkBox.VRCheckBox();
+        chkCest = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -410,6 +422,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCAtivo = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -605,6 +618,12 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
         });
         tabProdutos.add(btnMapaTrib);
 
+        chkNcm.setText("NCM");
+        tabProdutos.add(chkNcm);
+
+        chkCest.setText("CEST");
+        tabProdutos.add(chkCest);
+
         tabImportacao.addTab("Produtos", tabProdutos);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -640,6 +659,8 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCreditoRotativo.setText("Crédito Rotativo");
 
+        chkCAtivo.setText("Ativo");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -649,7 +670,8 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(376, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -661,7 +683,9 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(205, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chkCAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -771,6 +795,8 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
+    private vrframework.bean.checkBox.VRCheckBox chkCAtivo;
+    private vrframework.bean.checkBox.VRCheckBox chkCest;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
@@ -792,6 +818,7 @@ public class GTechGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
+    private vrframework.bean.checkBox.VRCheckBox chkNcm;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     private vrframework.bean.checkBox.VRCheckBox chkOferta;
