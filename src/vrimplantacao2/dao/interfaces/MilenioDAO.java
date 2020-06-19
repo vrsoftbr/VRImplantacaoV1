@@ -394,12 +394,13 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                         estoque.put(rs.getString("id_produto"), p);
                     }
                     p.precoVenda = rs.getDouble("precovenda");
-                    if (
-                            rs.getDouble("atacado") > 0 &&
-                            rs.getDouble("qtdatacado") > 1)
-                    {
+                    if (rs.getInt("qtdatacado") > 1) {
                         p.qtdAtacado = rs.getInt("qtdatacado");
-                        p.atacado = rs.getDouble("atacado");
+                        if (rs.getDouble("atacado") > 0) {
+                            p.atacado = rs.getDouble("atacado");
+                        } else {
+                            p.atacado = rs.getDouble("precovenda");
+                        }
                     }
                 }
             }
@@ -604,7 +605,10 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     ProdutoMilenio m = estoque.get(rs.getString("REFPLU"));
                     result.add(converterProdutoIMP(rs, m, false));
-                    if (m.atacado > 0 && m.qtdAtacado > 1) {
+                    if (Utils.stringToLong(rs.getString("REFPLU")) == 110358L) {
+                        System.out.println("Achou");
+                    }
+                    if (m.qtdAtacado > 1) {
                         result.add(converterProdutoIMP(rs, m, true));
                     }
                     
@@ -643,8 +647,9 @@ public class MilenioDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setPiscofinsCstDebito(m.pisCofinsDebito);
             imp.setPiscofinsNaturezaReceita(m.naturezaReceita);
             imp.setEstoque(m.estoque);
+            
             if (isAtacado) {
-                imp.setEan("999999" + imp.getImportId());
+                imp.setEan("999999" + String.format("%06d", Utils.stringToInt(imp.getImportId())));
                 imp.setQtdEmbalagem(m.qtdAtacado);
                 imp.setAtacadoPreco(m.atacado);
             }
