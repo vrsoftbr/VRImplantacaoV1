@@ -26,7 +26,6 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
-import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -1494,46 +1493,47 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             if (importarFuncionario) {
                 try (ResultSet rs = stm.executeQuery(
-                        "select \n"
-                        + "	pfin_operacao id,\n"
-                        + "	pfin_dataemissao emissao,\n"
-                        + "	pfin_datavcto vencimento,\n"
-                        + "	pfin_pdvs_codigo ecf,\n"
-                        + "	pfin_codentidade::varchar idcliente,\n"
-                        + "	c.clie_razaosocial razao,\n"
-                        + "	c.clie_cnpjcpf cnpj,\n"
-                        + "	pfin_complemento observacao,\n"
-                        + "	pfin_numerodcto cupom,\n"
-                        + "	pfin_parcela parcela,\n"
-                        + "	pfin_valor valor\n"
-                        + "from \n"
-                        + "	pendfin\n"
-                        + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
-                        + "where\n"
-                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                        + "	pfin_pr = 'R' and\n"
-                        + "	pfin_status = 'P' and\n"
-                        + "	pfin_pger_conta in (112201, 112202, 112203, 112204, 112205, 112206, 112207, 112208, 112209) "
-                        + "union all "
-                        + "select \n"
-                        + "	pfin_operacao id,\n"
-                        + "	pfin_dataemissao emissao,\n"
-                        + "	pfin_datavcto vencimento,\n"
-                        + "	pfin_pdvs_codigo ecf,\n"
-                        + "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n"
-                        + "	f.func_nome razao,\n"
-                        + "	f.func_cpf cnpj,\n"
-                        + "	pfin_complemento observacao,\n"
-                        + "	pfin_numerodcto cupom,\n"
-                        + "	pfin_parcela parcela,\n"
-                        + "	pfin_valor valor\n"
-                        + "from \n"
-                        + "	pendfin\n"
-                        + "left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n"
-                        + "where\n"
-                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                        + "	pfin_pr = 'R' and\n"
-                        + "	pfin_status = 'P'")) {
+                        "select \n" +
+                        "	pfin_operacao id,\n" +
+                        "	pfin_dataemissao emissao,\n" +
+                        "	pfin_datavcto vencimento,\n" +
+                        "	pfin_pdvs_codigo ecf,\n" +
+                        "	pfin_codentidade::varchar idcliente,\n" +
+                        "	c.clie_razaosocial razao,\n" +
+                        "	c.clie_cnpjcpf cnpj,\n" +
+                        "	pfin_complemento observacao,\n" +
+                        "	pfin_numerodcto cupom,\n" +
+                        "	pfin_parcela parcela,\n" +
+                        "	pfin_valor valor\n" +
+                        "from \n" +
+                        "	pendfin\n" +
+                        "	left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n" +
+                        "where\n" +
+                        "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
+                        "	pfin_pr = 'R' and\n" +
+                        "	pfin_status = 'P' and\n" +
+                        "	pfin_pger_conta in (112152) \n" +
+                        "union all \n" +
+                        "select \n" +
+                        "	pfin_operacao id,\n" +
+                        "	pfin_dataemissao emissao,\n" +
+                        "	pfin_datavcto vencimento,\n" +
+                        "	pfin_pdvs_codigo ecf,\n" +
+                        "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n" +
+                        "	f.func_nome razao,\n" +
+                        "	f.func_cpf cnpj,\n" +
+                        "	pfin_complemento observacao,\n" +
+                        "	pfin_numerodcto cupom,\n" +
+                        "	pfin_parcela parcela,\n" +
+                        "	pfin_valor valor\n" +
+                        "from \n" +
+                        "	pendfin\n" +
+                        "	left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n" +
+                        "where\n" +
+                        "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
+                        "	pfin_pr = 'R' and\n" +
+                        "	pfin_status = 'P' and\n" +
+                        "	pfin_pger_conta in (112152) ")) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -1573,7 +1573,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
                         + "	pfin_pr = 'R' and\n"
                         + "	pfin_status = 'P' and\n"
-                        + "	pfin_pger_conta in (112101, 112201, 112202, 112203, 112204, 112205, 112206, 112207, 112208, 112209)")) {
+                        + "	pfin_pger_conta in (112152)")) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
