@@ -160,6 +160,10 @@ public class ContasPagarRepository {
                         } else {
                             //Converte e grava a parcela do pagar fornecedor
                             PagarFornecedorParcelaVO parc = converterPagarFornecedorParcela(cp);
+                            if (!bancosExistentes.contains(parc.getId_banco())) {
+                                parc.setId_banco(804);
+                            }
+                            
                             parc.setId_pagarfornecedor(anterior.getCodigoAtual());
                             provider.gravarVencimento(parc);
                         }
@@ -283,7 +287,7 @@ public class ContasPagarRepository {
         vo.setId_banco(cp.getId_banco());
         vo.setId_tipopagamento(cp.getTipoPagamento().getId());
         vo.setNumerocheque(cp.getNumerocheque());
-        vo.setNumeroparcela(cp.getNumeroParcela());
+        vo.setNumeroparcela(cp.getNumeroParcela() == 0 ? 1 : cp.getNumeroParcela());
         vo.setObservacao("IMPORTADO VR" + (cp.getObservacao() == null ? "" : " " + cp.getObservacao()));
         vo.setSituacaopagarfornecedorparcela(cp.isPago() ? SituacaoPagarFornecedorParcela.PAGO : SituacaoPagarFornecedorParcela.ABERTO);
         vo.setValor(cp.getValor());

@@ -551,45 +551,42 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        if (opt == OpcaoProduto.PAUTA_FISCAL_PRODUTO) {
+        if (opt == OpcaoProduto.EXCECAO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "	cast(p.Produto_Id as bigint) as id_produto,\n"
-                        + "	cast(p.Digito_Id as bigint) as digito_produto,\n"
-                        + "	mx.ncm, \n"
-                        + "	cast(mx.icms_cst_e as bigint) as icms_cst_e,\n"
-                        + "	mx.icms_alqt_e,\n"
-                        + "	mx.icms_rbc_e,\n"
-                        + "	cast(mx.icms_cst_s as bigint) as icms_cst_s,\n"
-                        + "	mx.icms_alqt_s,\n"
-                        + "	mx.icms_rbc_s,\n"
-                        + "	coalesce(mx.tipo_iva, '') tipo_iva,\n"
-                        + "	coalesce(mx.iva, 0) iva\n"
-                        + "from dbo.MXF_PRODUTOS mx\n"
+                        + "	cast(p.Produto_Id as bigint) as id,\n"
+                        + "	cast(p.Digito_Id as bigint) as digito,\n"
+                        + "	cast(mx.ncm as bigint) as ncm,\n"
+                        + "	mx.mxf_icms_cst_s as icms_cst_s,\n"
+                        + "	(cast(coalesce(mx.mxf_icms_alq_s, '0') as numeric) / 1000) icms_alqt_s,\n"
+                        + "	(cast(coalesce(mx.mxf_icms_rbc_s, '0') as numeric) / 1000) icms_rbc_s,\n"
+                        + "	mx.mxf_icms_cst_e as icms_cst_e,\n"
+                        + "	(cast(coalesce(mx.mxf_icms_alq_e, '0') as numeric) / 1000) icms_alqt_e,\n"
+                        + "	(cast(coalesce(mx.mxf_icms_rbc_e, '0') as numeric) / 1000) icms_rbc_e, \n"
+                        + "	(cast(coalesce(mx.mxf_icms_iva_valor, '0') as numeric) / 1000) iva\n"
+                        + "from dbo.produtosMixFiscal mx\n"
                         + "join dbo.Produtos p on p.Produto_Id = mx.codigo_produto\n"
-                        + "where mx.ncm is not null\n"
-                        + "and coalesce(mx.iva, 0) > 0\n"
-                        + "order by mx.ncm"
+                        + "where (cast(coalesce(mx.mxf_icms_iva_valor, '0') as numeric) / 1000) > 0\n"
+                        + "and mx.ncm is not null"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("id_produto") + rst.getString("digito_produto"));
-                        
+                        imp.setImportId(rst.getString("id") + rst.getString("digito"));
+
                         String id_pautafiscal = rst.getString("ncm")
-                            + rst.getString("icms_cst_e")
-                            + rst.getString("icms_alqt_e")
-                            + rst.getString("icms_rbc_e")
-                            + rst.getString("icms_cst_s")
-                            + rst.getString("icms_alqt_s")
-                            + rst.getString("icms_rbc_s")
-                            + rst.getString("tipo_iva")
-                            + rst.getString("iva");
-                        
+                                + rst.getString("icms_cst_s")
+                                + rst.getString("icms_alqt_s")
+                                + rst.getString("icms_rbc_s")
+                                + rst.getString("icms_cst_e")
+                                + rst.getString("icms_alqt_e")
+                                + rst.getString("icms_rbc_e")
+                                + rst.getString("iva");
+
                         imp.setPautaFiscalId(id_pautafiscal);
-                        
+
                         result.add(imp);
                     }
                 }
@@ -634,35 +631,35 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "	ncm, \n"
-                    + "	cast(icms_cst_e as bigint) as icms_cst_e,\n"
-                    + "	icms_alqt_e,\n"
-                    + "	icms_rbc_e,\n"
-                    + "	cast(icms_cst_s as bigint) as icms_cst_s,\n"
-                    + "	icms_alqt_s,\n"
-                    + "	icms_rbc_s,\n"
-                    + "	coalesce(tipo_iva, '') tipo_iva,\n"
-                    + "	coalesce(iva, 0) iva\n"
-                    + "from dbo.MXF_PRODUTOS\n"
-                    + "where ncm is not null\n"
-                    + "and coalesce(iva, 0) > 0\n"
-                    + "order by ncm"
+                    "select\n"
+                    + "	distinct cast(mx.ncm as bigint) as ncm,\n"
+                    + "	mx.mxf_icms_cst_s as icms_cst_s,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_alq_s, '0') as numeric) / 1000) icms_alqt_s,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_rbc_s, '0') as numeric) / 1000) icms_rbc_s,\n"
+                    + "	mx.mxf_icms_cst_e as icms_cst_e,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_alq_e, '0') as numeric) / 1000) icms_alqt_e,\n"
+                    + "	(cast(coalesce(mx.mxf_icms_rbc_e, '0') as numeric) / 1000) icms_rbc_e, \n"
+                    + "	(cast(coalesce(mx.mxf_icms_iva_valor, '0') as numeric) / 1000) iva\n"
+                    + "from dbo.produtosMixFiscal mx\n"
+                    + "where (cast(coalesce(mx.mxf_icms_iva_valor, '0') as numeric) / 1000) > 0\n"
+                    + "and mx.ncm is not null"
             )) {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
-                    imp.setTipoIva("P".equals(rst.getString("tipo_iva")) ? TipoIva.PERCENTUAL : TipoIva.VALOR);
+                    imp.setTipoIva(TipoIva.VALOR);
                     imp.setId(
                             rst.getString("ncm")
+                            + rst.getString("icms_cst_s")
+                            + rst.getString("icms_alqt_s")
+                            + rst.getString("icms_rbc_s")                                    
                             + rst.getString("icms_cst_e")
                             + rst.getString("icms_alqt_e")
                             + rst.getString("icms_rbc_e")
-                            + rst.getString("icms_cst_s")
-                            + rst.getString("icms_alqt_s")
-                            + rst.getString("icms_rbc_s")
-                            + rst.getString("tipo_iva")
                             + rst.getString("iva")
                     );
+                    
+                    System.out.println(rst.getString("ncm"));
+                    
                     imp.setNcm(rst.getString("ncm"));
                     imp.setIva(rst.getDouble("iva"));
                     imp.setIvaAjustado(imp.getIva());

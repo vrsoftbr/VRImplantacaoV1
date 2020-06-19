@@ -72,8 +72,8 @@ public class UniplusGUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents();
         
-        tabBalanca.setSistema(NOME_SISTEMA);
-        tabBalanca.setLoja("");
+        //tabBalanca.setSistema(NOME_SISTEMA);
+        //tabBalanca.setLoja("");
         
         this.title = "Importação " + NOME_SISTEMA;
                 
@@ -157,6 +157,7 @@ public class UniplusGUI extends VRInternalFrame {
                     uniplusDAO.setForcarIdProdutoQuandoPesavel(chkForcarIdProdutoQuandoPesavel.isSelected());
                     uniplusDAO.setPrefixoAtacado(Utils.stringToInt(txtIDAtacado.getText(), 999));                     
                     uniplusDAO.setComplemento(txtLojaID.getText());
+                    uniplusDAO.DUN14Atacado = chkDUN14Atacado.isSelected();
                     
                     Importador importador = new Importador(uniplusDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
@@ -259,7 +260,6 @@ public class UniplusGUI extends VRInternalFrame {
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tab = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -273,6 +273,8 @@ public class UniplusGUI extends VRInternalFrame {
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
+        pnlParam = new vrframework.bean.panel.VRPanel();
+        chkDUN14Atacado = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -361,20 +363,20 @@ public class UniplusGUI extends VRInternalFrame {
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -414,8 +416,6 @@ public class UniplusGUI extends VRInternalFrame {
                 .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        tabBalanca.setSistema("");
-        tabImportacao.addTab("Balança", tabBalanca);
         tabImportacao.addTab("Produtos", tabProdutos);
 
         tabFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -525,7 +525,7 @@ public class UniplusGUI extends VRInternalFrame {
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(168, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
@@ -538,12 +538,33 @@ public class UniplusGUI extends VRInternalFrame {
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 168, Short.MAX_VALUE)
+            .addGap(0, 272, Short.MAX_VALUE)
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
 
         tabImportacao.addTab("Clientes", tabCliente);
+
+        chkDUN14Atacado.setText("Gerar DUN14 para Atacado");
+
+        javax.swing.GroupLayout pnlParamLayout = new javax.swing.GroupLayout(pnlParam);
+        pnlParam.setLayout(pnlParamLayout);
+        pnlParamLayout.setHorizontalGroup(
+            pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlParamLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(426, Short.MAX_VALUE))
+        );
+        pnlParamLayout.setVerticalGroup(
+            pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlParamLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(257, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Parâmetros Extra", pnlParam);
 
         tab.addTab("Importação", tabImportacao);
 
@@ -747,7 +768,7 @@ public class UniplusGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
-                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
+                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -833,7 +854,7 @@ public class UniplusGUI extends VRInternalFrame {
     }//GEN-LAST:event_chkVendasActionPerformed
 
     private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
-        tabBalanca.setLoja(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+        //tabBalanca.setLoja(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
     }//GEN-LAST:event_cmbLojaOrigemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -849,6 +870,7 @@ public class UniplusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
+    private vrframework.bean.checkBox.VRCheckBox chkDUN14Atacado;
     private vrframework.bean.checkBox.VRCheckBox chkForcarIdProdutoQuandoPesavel;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkLimite;
@@ -863,8 +885,8 @@ public class UniplusGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel pnlConexao;
     private vrframework.bean.panel.VRPanel pnlCustom;
     private vrframework.bean.panel.VRPanel pnlOutras;
+    private vrframework.bean.panel.VRPanel pnlParam;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
-    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;

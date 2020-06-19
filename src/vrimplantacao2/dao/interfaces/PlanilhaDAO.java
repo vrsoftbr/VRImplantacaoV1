@@ -778,7 +778,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     parc.setTipoPagamento(TipoPagamento.BOLETO_BANCARIO);
                 }
                 parc.setId_banco(linha.getInt("banco"));
-                parc.setNumeroParcela(linha.getInt("numeroparcela"));
+                parc.setNumeroParcela(linha.getInt("numeroparcela") == 0 ? 1 : linha.getInt("numeroparcela"));
                 parc.setNumerocheque(linha.getInt("numerocheque"));
                 parc.setObservacao(linha.getString("observacao"));
                 parc.setPago(linha.getBoolean("pago"));

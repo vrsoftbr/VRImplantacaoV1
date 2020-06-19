@@ -320,8 +320,14 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofins_entrada")));
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("piscofins_saida")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofins_nat_receita")));
+                    
                     imp.setIcmsDebitoId(rst.getString("aliquota"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("aliquota"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("aliquota"));
                     imp.setIcmsCreditoId(rst.getString("aliquota"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("aliquota"));
+                    imp.setIcmsConsumidorId(rst.getString("aliquota"));
+                    
                     imp.setPautaFiscalId(imp.getImportId());
                     imp.setSugestaoCotacao(rst.getInt("sugestaocotacao") == 1);
                     result.add(imp);
@@ -794,7 +800,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("cep"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
-                    imp.setDataNascimento(rst.getDate("nascimento"));
+                    //imp.setDataNascimento(rst.getDate("nascimento"));
 
                     if ((rst.getString("cpf") != null)
                             && (!rst.getString("cpf").trim().isEmpty())) {
@@ -1135,12 +1141,13 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "id, "
-                    + "nome "
+                    + "nome, "
+                    + "conta "        
                     + "from banco "
                     + "order by id"
             )) {
                 while (rst.next()) {
-                    result.add(new ItemComboVO(rst.getInt("id"), rst.getString("id") + " - " + rst.getString("nome")));
+                    result.add(new ItemComboVO(rst.getInt("id"), rst.getString("id") + " - " + rst.getString("nome") + " - " + rst.getString("conta")));
                 }
             }
         }

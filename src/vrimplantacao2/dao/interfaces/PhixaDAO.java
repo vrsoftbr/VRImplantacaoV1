@@ -432,9 +432,9 @@ public class PhixaDAO extends InterfaceDAO {
                         tels = tel.split("/");
                         for(int i = 0; i < tels.length; i++) {
                             if(email != null && !"".equals("email")) {
-                                imp.addContato(String.valueOf(i), "TELEFONE" + i, tels[i].trim(), null, TipoContato.NFE, email);
+                                imp.addContato(String.valueOf(i), "TELEFONE" + i+1, tels[i].trim(), null, TipoContato.NFE, email);
                             } else {
-                                imp.addContato(String.valueOf(i), "TELEFONE" + i, tels[i].trim(), null, TipoContato.NFE, null);
+                                imp.addContato(String.valueOf(i), "TELEFONE" + i+1, tels[i].trim(), null, TipoContato.NFE, null);
                             }
                         }
                     }
