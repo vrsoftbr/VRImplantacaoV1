@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
+import vrimplantacao.classe.ConexaoDB2;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -52,6 +55,53 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "Orion";
+    }
+    
+    public void gravar() throws Exception {
+        
+        String sql = "select "
+                + "e.plu, "
+                + "e.nome, "
+                + "((e.custobase - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto, \n"
+                + "e.custobase as custosemimposto, e.vendavare "
+                + "from estoque e ";
+        
+        Statement st = null;
+        StringBuilder sq = null;
+        
+        Conexao.begin();
+        
+        st = Conexao.createStatement();
+        
+        
+        int cont = 0;
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(sql)) {
+                while (rst.next()) {
+                    
+                    sq = new StringBuilder();
+                    sq.append("insert into implantacao.preco_custo_orion_loja3 (loja, codigo, nome, custocomimposto, custosemimposto, precovenda) ");
+                    sq.append("values (");
+                    sq.append("'"+getLojaOrigem()+"', ");
+                    sq.append("'"+rst.getString("plu")+"', ");
+                    sq.append("'"+Utils.acertarTexto(rst.getString("nome"))+ "', ");
+                    sq.append(rst.getDouble("custocomimposto")+ ", ");
+                    sq.append(rst.getDouble("custosemimposto") + ", ");
+                    sq.append(rst.getDouble("vendavare") + ");");
+                    
+                    st.execute(sq.toString());
+                    
+                    cont++;
+                    
+                    ProgressBar.setStatus("Gravando..." + cont);
+                }
+            }
+            
+            st.close();
+            Conexao.commit();
+        }
+        
+        
     }
     
     @Override
@@ -207,15 +257,20 @@ public class OrionDAO extends InterfaceDAO {
                     + "e.gradeum, "
                     + "e.gradedois, "
                     + "e.codsub, "
-                    + "e.ultprecust custosemimposto, "
+                    + "e.custobase custosemimposto, "
                     + "e.custobase, "        
-                    + "((e.ultprecust - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto "
+                    + "((e.custobase - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto "
                     + "from estoque e "
                     + "left join ligplu l on e.plu = l.plu  "
                     + "where e.plu is not null"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                int cont = 0;
                 while (rst.next()) {
+                    
+                    
+                    System.out.println(getLojaOrigem() + " - " + getSistema() + " - " + rst.getString("id_produto"));
+                    
                     ProdutoIMP imp = new ProdutoIMP();
                     ProdutoBalancaVO produtoBalanca;
 
@@ -234,9 +289,7 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("vendavare"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custo"));
-                    //imp.setCustoComImposto(rst.getDouble("custobase"));
-                    //imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setEstoque(rst.getDouble("quantfisc"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -302,6 +355,9 @@ public class OrionDAO extends InterfaceDAO {
                     }
 
                     result.add(imp);
+                    
+                    cont++;
+                    ProgressBar.setStatus("Carregando produtos..." + cont);
                 }
             }
         }
@@ -932,5 +988,4 @@ public class OrionDAO extends InterfaceDAO {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-
 }

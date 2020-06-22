@@ -145,6 +145,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkCustoComImposto.setVisible(opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO));
             chkCustoSemImposto.setVisible(opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO));
             chkEstoque.setVisible(opt.contains(OpcaoProduto.ESTOQUE));
+            chkEstoqueTroca.setVisible(opt.contains(OpcaoProduto.TROCA));
             chkEstoqueMinimo.setVisible(opt.contains(OpcaoProduto.ESTOQUE_MINIMO));
             chkEstoqueMaximo.setVisible(opt.contains(OpcaoProduto.ESTOQUE_MAXIMO));
             chkSituacaoCadastro.setVisible(opt.contains(OpcaoProduto.ATIVO));
@@ -383,6 +384,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkSecao = new vrframework.bean.checkBox.VRCheckBox();
         chkPrateleira = new vrframework.bean.checkBox.VRCheckBox();
         chkTeclaAssociada = new vrframework.bean.checkBox.VRCheckBox();
+        chkEstoqueTroca = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpTributacao = new vrframework.bean.panel.VRPanel();
         jLabel4 = new javax.swing.JLabel();
         chkPisCofins = new vrframework.bean.checkBox.VRCheckBox();
@@ -842,6 +844,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkTeclaAssociada, "Tecla Associada");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkEstoqueTroca, "Estoque Troca");
+
         javax.swing.GroupLayout pnlImpComplLayout = new javax.swing.GroupLayout(pnlImpCompl);
         pnlImpCompl.setLayout(pnlImpComplLayout);
         pnlImpComplLayout.setHorizontalGroup(
@@ -859,7 +863,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkCustoComImposto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(5, 5, 5)
                         .addComponent(chkEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(5, 5, 5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkEstoqueTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlImpComplLayout.createSequentialGroup()
                         .addComponent(chkDescontinuado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -904,7 +910,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkCustoSemImposto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCustoComImposto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkEstoqueTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(5, 5, 5)
                 .addGroup(pnlImpComplLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkDescontinuado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1344,6 +1352,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkEstoque;
     public vrframework.bean.checkBox.VRCheckBox chkEstoqueMaximo;
     public vrframework.bean.checkBox.VRCheckBox chkEstoqueMinimo;
+    public vrframework.bean.checkBox.VRCheckBox chkEstoqueTroca;
     public vrframework.bean.checkBox.VRCheckBox chkFabricacaoPropria;
     public vrframework.bean.checkBox.VRCheckBox chkFabricante;
     public vrframework.bean.checkBox.VRCheckBox chkFamilia;
@@ -1615,6 +1624,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkEstoque.isSelected()) {
                     opcoes.add(OpcaoProduto.ESTOQUE);
+                }
+                if (chkEstoqueTroca.isSelected()) {
+                    opcoes.add(OpcaoProduto.TROCA);
                 }
                 if (chkSecao.isSelected()) {
                     opcoes.add(OpcaoProduto.SECAO);
