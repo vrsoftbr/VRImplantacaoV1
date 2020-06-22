@@ -37,6 +37,7 @@ public class UniplusDAO extends InterfaceDAO {
     private int prefixoAtacado = 999;
     private String complemento = "";
     private boolean forcarIdProdutoQuandoPesavel = false;
+    public boolean DUN14Atacado = false;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
@@ -151,7 +152,7 @@ public class UniplusDAO extends InterfaceDAO {
         List<FamiliaProdutoIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                      "select \n"
+                    "select \n"
                     + "	 codigo codigofamilia,\n"
                     + "  nome descricao\n"
                     + "from \n"
@@ -193,7 +194,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + " fp.codigo codigofamilia,\n"
                     + "	p.precocusto, \n"
                     + "	p.preco,        \n"
-                    + "	preco.percentualmarkupajustado margem, \n"
+                    + "	p.percentualmarkupajustado margem, \n"
                     + "	preco.precoultimacompra custosemimposto,\n"
                     + "	preco.precocusto custocomimposto,\n"
                     + "	preco.preco as precovenda,\n"
@@ -272,7 +273,7 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setCustoSemImposto(rs.getDouble("precocusto"));
                         imp.setCustoComImposto(rs.getDouble("precocusto"));
                         imp.setPrecovenda(rs.getDouble("preco"));
-                        imp.setMargem(rs.getDouble("margemlucro"));
+                        //imp.setMargem(rs.getDouble("margemlucro"));
                     } else {
                         imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                         imp.setCustoComImposto(rs.getDouble("custocomimposto"));
@@ -280,6 +281,7 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setMargem(rs.getDouble("margem"));
                     }
 
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
                     imp.setEstoque(rs.getDouble("quantidade"));
@@ -311,38 +313,47 @@ public class UniplusDAO extends InterfaceDAO {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select \n"
+                        "select * from (select \n"
                         + "	codigo,\n"
                         + "	codigo ean,\n"
+                        + "	 ean ean13,\n"
                         + "	precopauta1 precoatacado,\n"
                         + "	quantidadepauta1 qtdembalagem,\n"
-                        + "       preco\n"
+                        + "	 preco\n"
                         + "from\n"
                         + "	produto\n"
                         + "where\n"
                         + "	precopauta1 > 0\n"
                         + "union all \n"
-                        + "select	\n"
+                        + "select\n"
                         + "	p.codigo,\n"
                         + "	p.codigo ean,\n"
+                        + "	 p.ean ean13,\n"
                         + "	p.precopauta1 precoatacado,\n"
                         + "	p.quantidadepauta1 qtdembalagem,\n"
-                        + "        preco.preco\n"
+                        + "	 preco.preco\n"
                         + "from produto p\n"
-                        + "join filial f on f.id = " + getLojaOrigem() + "\n"
+                        + "join filial f on f.id = " + getLojaOrigem()+ "\n"
                         + "left join formacaoprecoproduto preco on preco.idproduto = p.id\n"
                         + "	and preco.idfilial = f.id\n"
-                        + "where precopauta1 > 0"
+                        + "where precopauta1 > 0\n"
+                        + "and quantidadepauta1 > 1\n"
+                        + "order by 1) a where a.preco is not null"
                 )) {
                     while (rst.next()) {
 
-                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo"));
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("ean"));
 
+                        String ean13 = rst.getString("ean13");
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo"));
-                        imp.setEan(prefixoAtacado + String.valueOf(codigoAtual));
+                        if (ean13 != null && !"".equals(ean13) && ean13.length() > 6 && ean13.length() < 14) {
+                            imp.setEan("1" + ean13);
+                        } else {
+                            imp.setEan(prefixoAtacado + String.valueOf(codigoAtual));
+                        }
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setPrecovenda(rst.getDouble("preco"));
@@ -392,33 +403,69 @@ public class UniplusDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	p.codigo idproduto,\n"
-                    + "	ean.ean,\n"
-                    + "	1 qtdembalagem \n"
-                    + "from \n"
-                    + "	produtoean ean\n"
-                    + "join\n"
-                    + "	produto p on p.id = ean.idproduto\n"
-                    + "order by\n"
-                    + "	idproduto")) {
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("idproduto"));
-                    if (rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
-                        if (rs.getString("ean").length() > 14) {
-                            imp.setEan(rs.getString("ean").substring(0, 14));
-                        } else {
-                            imp.setEan(rs.getString("ean"));
-                        }
-                    }
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
 
-                    result.add(imp);
+        if (DUN14Atacado == true) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "	codigo,\n"
+                        + "	ean,\n"
+                        + "	'1'||ean dun14,\n"
+                        + "	quantidadepauta1,\n"
+                        + "	precopauta1,\n"
+                        + "     unidademedida\n"
+                        + "from produto\n"
+                        + "where\n"
+                        + "	quantidadepauta1 > 0\n"
+                        + "	and length(ean) > 6\n"
+                        + "	and length(ean) < 14\n"
+                        + "order by \n"
+                        + "	codigo"
+                )) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("codigo"));
+                        imp.setEan(rs.getString("dun14"));
+                        imp.setQtdEmbalagem(rs.getInt("quantidadepauta1"));
+                        imp.setTipoEmbalagem(rs.getString("unidademedida"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+        } else {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	p.codigo idproduto,\n"
+                        + "	ean.ean,\n"
+                        + "	1 qtdembalagem \n"
+                        + "from \n"
+                        + "	produtoean ean\n"
+                        + "join\n"
+                        + "	produto p on p.id = ean.idproduto\n"
+                        + "order by\n"
+                        + "	idproduto")) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("idproduto"));
+                        if (rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
+                            if (rs.getString("ean").length() > 14) {
+                                imp.setEan(rs.getString("ean").substring(0, 14));
+                            } else {
+                                imp.setEan(rs.getString("ean"));
+                            }
+                        }
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+
+                        result.add(imp);
+                    }
                 }
             }
         }
