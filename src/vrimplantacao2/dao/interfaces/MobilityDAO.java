@@ -6,12 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -26,6 +29,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Importacao
  */
 public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    public boolean importarSomenteBalanca = false;
 
     @Override
     public String getSistema() {
@@ -226,20 +231,36 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by\n"
                     + "    p.id"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codigo_interno"));
-                    imp.setEan(Utils.formataNumero(rs.getString("ean")));
-                    if (rs.getInt("pesado") != 0) {
-                        if (imp.getEan() != null && !"".equals(imp.getEan())) {
-                            imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 1));
-                        }
+
+                    imp.setEan(rs.getString("ean"));
+                    int eanBalanca = Utils.stringToInt(imp.getEan().substring(0, imp.getEan().length() - 1), -2);
+                    ProdutoBalancaVO balanca = produtosBalanca.get(eanBalanca);
+                    if (balanca != null) {
+                        imp.setEan(String.valueOf(eanBalanca));
                         imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(balanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(balanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        if (this.importarSomenteBalanca) {
+                            continue;
+                        }
+                        imp.seteBalanca(rs.getInt("pesado") == 1);
+                        imp.setEan(rs.getString("ean"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setValidade(rs.getInt("validade"));
+                        imp.setQtdEmbalagem(1);
+                        long ean = Utils.stringToLong(rs.getString("ean"), -2);
+                        imp.setManterEAN(ean > 0 && ean <= 999999 && !imp.isBalanca());
                     }
-                    imp.setValidade(rs.getInt("validade"));
+
                     imp.setSituacaoCadastro(rs.getInt("ativo"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
@@ -248,7 +269,6 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setIdFamiliaProduto(rs.getString("familia"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoAnteriorComImposto(rs.getDouble("custoanterior"));
                     imp.setCustoAnteriorSemImposto(rs.getDouble("custoanterior"));
@@ -319,8 +339,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                      "from\n" +
                      "    cod_auxiliares c\n" +
                      "join produtos p on c.id_produto = p.id"*/
-                    
-                      " select\n"
+                    " select\n"
                     + "     codigo_interno id,\n"
                     + "     codigo_barras ean\n"
                     + " from produtos\n"
@@ -474,8 +493,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    pf.id,\n"
-                    + "    id_fornecedor,\n"
-                    + "    p.codigo_interno id_produto,\n"
+                    + "    f.i_numero id_fornecedor,\n"
+                    + "    p.id id_produto,\n"
                     + "    case when s_sequencial = '' then p.codigo_interno\n"
                     + "    else s_sequencial end as codexterno,\n"
                     + "    i_embalagem embalagem,\n"
@@ -484,8 +503,9 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    codigo_ref_fornecedor pf\n"
                     + "join produtos p on pf.id_produto = p.id\n"
+                    + "join fornecedores f on pf.id_fornecedor = f.id\n"
                     + "order by\n"
-                    + "    pf.id_fornecedor, p.codigo_interno"
+                    + "    f.numero, p.codigo_interno"
             )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
