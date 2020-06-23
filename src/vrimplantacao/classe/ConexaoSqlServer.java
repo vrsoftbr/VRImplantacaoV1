@@ -35,8 +35,8 @@ public class ConexaoSqlServer {
     }
 
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
-        Class.forName("net.sourceforge.jtds.jdbc.Driver");
-
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        
         usuario = i_usuario;
         senha = i_senha;
         strCon = conString;
@@ -50,7 +50,7 @@ public class ConexaoSqlServer {
     }
 
     public void abrirConexao(String i_ip, String i_ipSec, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
-        Class.forName("net.sourceforge.jtds.jdbc.Driver");
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
         ip = i_ip;
         ipSec = i_ipSec;
@@ -61,9 +61,9 @@ public class ConexaoSqlServer {
 
         try {
             if (!instance.trim().isEmpty()) {
-                con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + i_ip + ":" + i_porta + "/" + i_database + ";instance=" + instance, i_usuario, i_senha);
+                con = DriverManager.getConnection("jdbc:sqlserver://" + i_ip + "\\" + instance + ":" + i_porta + ";databaseName=" + i_database, i_usuario, i_senha);
             } else {
-                con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + i_ip + ":" + i_porta + "/" + i_database, i_usuario, i_senha);
+                con = DriverManager.getConnection("jdbc:sqlserver://" + i_ip + ":" + i_porta + ";databaseName=" + i_database, i_usuario, i_senha);
             }
 
         } catch (Exception ex) {
