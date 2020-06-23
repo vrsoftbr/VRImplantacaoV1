@@ -116,7 +116,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.RECEITA,
             OpcaoProduto.SECAO,
             OpcaoProduto.PRATELEIRA,
-            OpcaoProduto.OFERTA
+            OpcaoProduto.OFERTA,
+            OpcaoProduto.FABRICANTE
         }));
     }
 
@@ -574,7 +575,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	un.prun_setordep departamento,\n" +
                     "	piscofins_s.cstpiscofins piscofins_s,\n" +
                     "	piscofins_s.naturezareceita piscofins_natrec,\n" +
-                    "	p.prod_trib_codigo id_icms\n" +
+                    "	p.prod_trib_codigo id_icms,\n" +
+                    "	p.prod_forn_codigo\n" +
                     "from\n" +
                     "	produtos p\n" +
                     "	join loja on true\n" +
@@ -695,6 +697,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
+                    
+                    imp.setFornecedorFabricante(rst.getString("prod_forn_codigo"));
                     
                     if (rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
                         if (rst.getString("setor").length() > 2) {
@@ -1554,26 +1558,29 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             } else {
                 try (ResultSet rs = stm.executeQuery(
-                        "select \n"
-                        + "	pfin_operacao id,\n"
-                        + "	pfin_dataemissao emissao,\n"
-                        + "	pfin_datavcto vencimento,\n"
-                        + "	pfin_pdvs_codigo ecf,\n"
-                        + "	pfin_codentidade::varchar idcliente,\n"
-                        + "	c.clie_razaosocial razao,\n"
-                        + "	c.clie_cnpjcpf cnpj,\n"
-                        + "	pfin_complemento observacao,\n"
-                        + "	pfin_numerodcto cupom,\n"
-                        + "	pfin_parcela parcela,\n"
-                        + "	pfin_valor valor\n"
-                        + "from \n"
-                        + "	pendfin\n"
-                        + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
-                        + "where\n"
-                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                        + "	pfin_pr = 'R' and\n"
-                        + "	pfin_status = 'P' and\n"
-                        + "	pfin_pger_conta in (112152)")) {
+                        "select \n" +
+                        "	pfin_operacao id,\n" +
+                        "	pfin_dataemissao emissao,\n" +
+                        "	pfin_datavcto vencimento,\n" +
+                        "	pfin_pdvs_codigo ecf,\n" +
+                        "	pfin_codentidade::varchar idcliente,\n" +
+                        "	c.clie_razaosocial razao,\n" +
+                        "	c.clie_cnpjcpf cnpj,\n" +
+                        "	pfin_complemento observacao,\n" +
+                        "	pfin_numerodcto cupom,\n" +
+                        "	pfin_parcela parcela,\n" +
+                        "	pfin_valor valor,\n" +
+                        "	pfin_baixaparcial valorpago,\n" +
+                        "	pfin_juros juros,\n" +
+                        "	pfin_multa multa\n" +
+                        "from \n" +
+                        "	pendfin\n" +
+                        "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n" +
+                        "where\n" +
+                        "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
+                        "	pfin_pr = 'R' and\n" +
+                        "	pfin_status = 'P' and\n" +
+                        "	pfin_pger_conta in (112152)")) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -1585,7 +1592,21 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCnpjCliente(rs.getString("cnpj"));
                         imp.setParcela(rs.getInt("parcela"));
                         imp.setValor(rs.getDouble("valor"));
+                        imp.setJuros(rs.getDouble("juros"));
+                        imp.setMulta(rs.getDouble("multa"));
                         imp.setNumeroCupom(rs.getString("cupom"));
+                        
+                        double valorPago = rs.getDouble("valorpago");
+                        if (valorPago > 0) {
+                            imp.addPagamento(
+                                    rs.getString("id"),
+                                    valorPago,
+                                    0,
+                                    0,
+                                    imp.getDataEmissao(),
+                                    ""
+                            );
+                        }
 
                         result.add(imp);
                     }
