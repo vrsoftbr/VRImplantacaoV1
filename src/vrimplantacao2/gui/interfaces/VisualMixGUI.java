@@ -18,6 +18,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.VisualMixDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -275,6 +276,16 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
+                        
+                        
+                        if (tabImportacao.getSelectedIndex() == 3) {
+                            if (chkPdvVendas.isSelected()) {
+                                dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                                dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            }
+                        }
+                        
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
