@@ -124,8 +124,11 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
-            sql.put("margemminima", vo.getMargemMinima());
-            sql.put("margem", vo.getMargem());
+            if (Versao.menorQue(3,19)) {
+                sql.put("margemminima", vo.getMargemMinima());
+                sql.put("margemmaxima", vo.getMargemMaxima());
+                sql.put("margem", vo.getMargem());
+            }
             sql.put("verificacustotabela", false);
             sql.put("percentualipi", 0.0);
             sql.put("percentualfrete", 0.0);
@@ -194,8 +197,6 @@ public class ProdutoDAO {
             sql.putNull("substituicaoestadualexterior");
             sql.put("id_cest", vo.getCest() != null ? vo.getCest().getId() : null);
             sql.putNull("lastro");
-            sql.putNull("margemminima");
-            sql.putNull("margemmaxima");
             sql.put("permitedescontopdv", true);
             sql.put("verificapesopdv", false);
             sql.put("produtoecommerce", vo.isProdutoecommerce());
