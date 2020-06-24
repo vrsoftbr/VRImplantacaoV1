@@ -235,6 +235,7 @@ import vrimplantacao2.gui.interfaces.TecnosoftGUI;
 import vrimplantacao2.gui.interfaces.TiTecnologiaGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI3;
+import vrimplantacao2.gui.interfaces.TpaRootacGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
@@ -683,6 +684,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAccesys1 = new javax.swing.JMenuItem();
         mnuVisualMix = new javax.swing.JMenuItem();
         mnuPhixa = new javax.swing.JMenuItem();
+        mnuTpaRootac = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -893,7 +895,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblRazaoSocial, javax.swing.GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
+                .addComponent(lblRazaoSocial, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel5Layout.setVerticalGroup(
@@ -920,7 +922,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblVersao, javax.swing.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
+                .addComponent(lblVersao, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel6Layout.setVerticalGroup(
@@ -947,7 +949,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                .addComponent(lblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel3Layout.setVerticalGroup(
@@ -976,7 +978,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblData, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                .addComponent(lblData, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel2Layout.setVerticalGroup(
@@ -1882,6 +1884,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuPhixa);
+
+        mnuTpaRootac.setText("TPA/ROOTAC");
+        mnuTpaRootac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuTpaRootacActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuTpaRootac);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4593,6 +4603,10 @@ public final class MenuGUI extends VRMdiFrame {
         PhixaGUI.exibir(this);
     }//GEN-LAST:event_mnuPhixaActionPerformed
 
+    private void mnuTpaRootacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTpaRootacActionPerformed
+        TpaRootacGUI.exibir(this); //WIN-GE2SQLJG01G\ROOTAC_DB
+    }//GEN-LAST:event_mnuTpaRootacActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4842,6 +4856,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuTecnosoft;
     private javax.swing.JMenuItem mnuTga;
     private javax.swing.JMenuItem mnuThotau;
+    private javax.swing.JMenuItem mnuTpaRootac;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuUmPontoDois;
     private javax.swing.JMenuItem mnuUniplus;

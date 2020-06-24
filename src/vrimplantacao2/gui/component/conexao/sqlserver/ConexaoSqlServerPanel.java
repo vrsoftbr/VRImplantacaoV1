@@ -132,7 +132,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel26, "String de Conexão");
 
-        txtStrConexao.setText("jdbc:oracle:thin:@10.0.2.250:1521/orcl");
+        txtStrConexao.setText("jdbc:sqlserver://[host][\\instance][:port];trustServerCertificate=true");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
