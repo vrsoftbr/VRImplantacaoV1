@@ -273,6 +273,10 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                         }
                         
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
@@ -330,6 +334,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        vRCheckBox1 = new vrframework.bean.checkBox.VRCheckBox();
         conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
         lblLojaCliente = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
@@ -362,6 +367,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         chkCliCargoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkCliDataAdmissaoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkCliSalarioEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
@@ -381,6 +387,8 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         lblCompLoja = new javax.swing.JLabel();
         txtCompLoja = new javax.swing.JTextField();
+
+        vRCheckBox1.setText("vRCheckBox1");
 
         setTitle("Importação SambaNet V2");
         setToolTipText("");
@@ -451,6 +459,13 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         chkCliDataAdmissaoEmpresa.setText("Data Admissão");
 
         chkCliSalarioEmpresa.setText("Salário");
+        chkCliSalarioEmpresa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCliSalarioEmpresaActionPerformed(evt);
+            }
+        });
+
+        chkClienteEventual.setText("Cliente Eventual");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -491,7 +506,8 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(tabClientesLayout.createSequentialGroup()
                         .addComponent(chkCliDataAdmissaoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -523,7 +539,9 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(115, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(96, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -758,6 +776,10 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkPdvVendasActionPerformed
 
+    private void chkCliSalarioEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCliSalarioEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCliSalarioEmpresaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCliBairroEmpresa;
@@ -773,6 +795,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCliTelefoneEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkCliUFEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkClienteBloqueado;
+    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
     private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
@@ -806,6 +829,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTextField txtCompLoja;
+    private vrframework.bean.checkBox.VRCheckBox vRCheckBox1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
