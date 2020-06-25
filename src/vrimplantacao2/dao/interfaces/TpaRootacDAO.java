@@ -21,6 +21,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -438,6 +439,57 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     result.add(imp);
                 }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	rr.REFCCADCOD id_fornecedor,\n" +
+                        "	rr.CODIGOPLU id_produto,\n" +
+                        "	rr.REFCREFERE codigoexterno,\n" +
+                        "	rr.REFNQTDEMB qtdembalagem\n" +
+                        "from\n" +
+                        "	RCEstREF rr\n" +
+                        "where\n" +
+                        "	not nullif(rr.REFCCADCOD,'') is null and\n" +
+                        "	not nullif(rr.CODIGOPLU,'') is null and\n" +
+                        "	not nullif(rr.REFCREFERE,'') is null\n" +
+                        "union\n" +
+                        "select\n" +
+                        "	re.REFCCODFOR id_fornecedor,\n" +
+                        "	re.CODIGOPLU id_produto,\n" +
+                        "	re.REFCREFERE codigoexterno,\n" +
+                        "	re.REFNQTDEMB qtdembalagem\n" +
+                        "from\n" +
+                        "	RC003EST re\n" +
+                        "where\n" +
+                        "	not nullif(re.REFCCODFOR,'') is null and\n" +
+                        "	not nullif(re.CODIGOPLU,'') is null and\n" +
+                        "	not nullif(re.REFCREFERE,'') is null\n" +
+                        "order by\n" +
+                        "	1, 2"
+                )
+        ) {
+            while (rs.next()) {
+                ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                imp.setIdProduto(rs.getString("id_produto"));
+                imp.setCodigoExterno(rs.getString("codigoexterno"));
+                imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                
+                result.add(imp);
             }
         }
         
