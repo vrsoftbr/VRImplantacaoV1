@@ -79,7 +79,7 @@ public class OrionDAO extends InterfaceDAO {
                 while (rst.next()) {
                     
                     sq = new StringBuilder();
-                    sq.append("insert into implantacao.preco_custo_orion_loja3 (loja, codigo, nome, custocomimposto, custosemimposto, precovenda) ");
+                    sq.append("insert into implantacao.preco_custo_orion_loja1 (loja, codigo, nome, custocomimposto, custosemimposto, precovenda) ");
                     sq.append("values (");
                     sq.append("'"+getLojaOrigem()+"', ");
                     sq.append("'"+rst.getString("plu")+"', ");
