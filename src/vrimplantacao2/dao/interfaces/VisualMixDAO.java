@@ -132,7 +132,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "	codigo, \n"
                     + "	descricao\n"
-                    + "from dbo.Empresas_CAP\n"
+                    + "from dbo.Lojas\n"
                     + "order by 1"
             )) {
                 while (rs.next()) {
@@ -306,7 +306,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.Mercadologico5, \n"
                     + " p.Situacao as situacaocadastro,\n"
                     + "	p.SituacaoTributaria as csticms, \n"
-                    + " est.EstoqueInicial as estoque, \n"
+                    + " est.EstoqueInicial01 as estoque, \n"
+                    + " est.EstoqueInicial02 as troca,\n"        
                     + " p.EspecUnitariaTipo as tipoembalagem, \n"
                     + " p.EspecUnitariaQtde as qtdembalagem,\n"
                     + " emb.Qtd_Produto as qtdembalagem_ean,"
@@ -319,7 +320,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
                     + " cast(p.Comprador as bigint) as idcomprador,\n"
-                    + " p.PontoPedido as numeroparcela,\n"
                     + " fz.Tecla\n"
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
@@ -329,11 +329,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join dbo.Automacao ean on ean.Produto_Id = p.Produto_Id\n"
                     + "left join dbo.Grupo_Precos_Produtos f on f.Produto_Id = p.Produto_Id\n"
                     + "left join dbo.Filizola fz on fz.CodigoProduto = p.Produto_Id\n"
+                    + "left join dbo.Embalagem emb on emb.Produto_Id = p.Produto_Id\n"
+                    + "	and emb.Sequencia = ean.Seq_Embalagem\n"
                     + "where p.Peso_Variavel = 1\n"
                     + "and ean.Codigo_Automacao is not null\n"
                     + "and ean.Codigo_Automacao <= 999999\n"
-                    + "left join dbo.Embalagem emb on emb.Produto_Id = p.Produto_Id\n"
-                    + "	and emb.Sequencia = ean.Seq_Embalagem\n"
                     + "order by p.Produto_Id"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -390,12 +390,12 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
-                    imp.setNumeroparcela(rst.getInt("numeroparcela"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setTroca(rst.getDouble("troca"));
                     imp.setTeclaAssociada(rst.getInt("Tecla"));
                     imp.setSituacaoCadastro("A".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
@@ -463,7 +463,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
                     + " cast(p.Comprador as bigint) as idcomprador,\n"
-                    + " p.PontoPedido as numeroparcela,\n"
                     + " fz.Tecla\n"
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
@@ -520,7 +519,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
-                    imp.setNumeroparcela(rst.getInt("numeroparcela"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
