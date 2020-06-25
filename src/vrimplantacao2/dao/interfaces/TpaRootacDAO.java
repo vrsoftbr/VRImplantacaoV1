@@ -496,4 +496,95 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	c.clic05clie id,\n" +
+                        "	c.clic15cgc cnpj,\n" +
+                        "	c.clic19rg ie,\n" +
+                        "	c.clic35nome razaosocial,\n" +
+                        "	c.clic10apel nomefantasia,\n" +
+                        "	c.clic01stat ativo,\n" +
+                        "	c.clic35ende endereco,\n" +
+                        "	c.clic20bair bairro,\n" +
+                        "	c.clic20cida municipio,\n" +
+                        "	c.clic02esta uf,\n" +
+                        "	c.clic08cep cep,\n" +
+                        "	c.clic18fone as telefone,\n" +
+                        "	c.clic11fax as fax,\n" +
+                        "	c.clic40obs1 as observacao,\n" +
+                        "	c.estadocivi as estadocivil,\n" +
+                        "	c.datanascim datanascimento,\n" +
+                        "	c.clid08cada datacadastro,\n" +
+                        "	c.clic01sexo sexo,\n" +
+                        "	c.empresnome as empresa,\n" +
+                        "	c.empresende as empresaendereco,\n" +
+                        "	c.empresesta as empresauf,\n" +
+                        "	c.emprescida as empresamunicipio,\n" +
+                        "	c.empresbair as empresabairro,\n" +
+                        "	c.empresacep as empresacep,\n" +
+                        "	c.empresfone as empresatelefone,\n" +
+                        "	c.empresafax as empresafax,\n" +
+                        "	c.clin14sala salario,\n" +
+                        "	c.clinlimcon limite,\n" +
+                        "	c.clic40obs1,\n" +
+                        "	c.clic40obs2,\n" +
+                        "	c.clic40obs3,\n" +
+                        "	c.clindiavct diavencimento,\n" +
+                        "	c.clic18fone fone,\n" +
+                        "	c.CLIC11FAX fax,\n" +
+                        "	c.clicemail email\n" +
+                        "from\n" +
+                        "	rc042cli c\n" +
+                        "order by\n" +
+                        "	1"
+                )
+        ) {
+            while (rs.next()) {
+                ClienteIMP imp = new ClienteIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setCnpj(rs.getString("cnpj"));
+                imp.setInscricaoestadual(rs.getString("ie"));
+                imp.setRazao(rs.getString("razaosocial"));
+                imp.setFantasia(rs.getString("nomefantasia"));
+                imp.setAtivo("0".equals(rs.getString("ativo")));
+                imp.setEndereco(rs.getString("endereco"));
+                imp.setBairro(rs.getString("bairro"));
+                imp.setMunicipio(rs.getString("municipio"));
+                imp.setUf(rs.getString("uf"));
+                imp.setCep(rs.getString("cep"));
+                imp.setTelefone(rs.getString("telefone"));
+                imp.setFax(rs.getString("fax"));
+                imp.setObservacao2(rs.getString("observacao"));
+                imp.setEstadoCivil(rs.getString("estadocivil"));
+                imp.setDataNascimento(rs.getDate("datanascimento"));
+                imp.setDataCadastro(rs.getDate("datacadastro"));
+                imp.setSexo(rs.getString("sexo"));
+                imp.setEmpresa(rs.getString("empresa"));
+                imp.setEmpresaEndereco(rs.getString("empresaendereco"));
+                imp.setEmpresaUf(rs.getString("empresauf"));
+                imp.setEmpresaMunicipio(rs.getString("empresamunicipio"));
+                imp.setEmpresaBairro(rs.getString("empresabairro"));
+                imp.setEmpresaCep(rs.getString("empresacep"));
+                imp.setEmpresaTelefone(rs.getString("empresatelefone"));                
+                imp.setSalario(rs.getDouble("salario"));
+                imp.setValorLimite(rs.getDouble("limite"));
+                imp.setDiaVencimento(rs.getInt("diavencimento"));
+                imp.setTelefone(rs.getString("fone"));
+                imp.setFax(rs.getString("fax"));
+                imp.setEmail(rs.getString("email"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
 }
