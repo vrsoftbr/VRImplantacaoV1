@@ -124,7 +124,7 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
-            if (Versao.maiorQue(3,19)) {    // Estava menorQue
+	    if (Versao.menorQue(3,21)) {
                 sql.put("margemminima", vo.getMargemMinima());
                 sql.put("margemmaxima", vo.getMargemMaxima());
                 sql.put("margem", vo.getMargem());
