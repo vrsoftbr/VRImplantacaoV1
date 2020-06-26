@@ -62,8 +62,8 @@
                   </Group>
                   <Component id="btnMapaTribut" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="tab" pref="350" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+              <Component id="tab" pref="338" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -202,14 +202,18 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chkPrazoEntrega" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkCondPagamento" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="chkFornMunicipio" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="chkCondPagamento" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <Component id="chkContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="cmbPlanoContaPagar" alignment="0" min="-2" pref="229" max="-2" attributes="0"/>
                           <Component id="jLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="229" max="32767" attributes="0"/>
+                      <EmptySpace pref="142" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -221,6 +225,7 @@
                           <Component id="chkFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkEndereco" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkCondPagamento" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkFornMunicipio" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -234,7 +239,7 @@
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cmbPlanoContaPagar" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="180" max="32767" attributes="0"/>
+                      <EmptySpace pref="164" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -293,6 +298,11 @@
                 <Property name="text" type="java.lang.String" value="Carteira"/>
               </Properties>
             </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornMunicipio">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Munic&#xed;pio"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabCliente">
@@ -328,21 +338,26 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkObservacao" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkHistorico" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkDataCadastro" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkSexo" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkEstCivil" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkObservacao" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkHistorico" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkDataCadastro" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkSexo" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkEstCivil" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Component id="chkCliDataNascimento" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="246" max="32767" attributes="0"/>
                       </Group>
@@ -381,7 +396,9 @@
                               <Component id="chkCliIERG" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkHistorico" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="142" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCliDataNascimento" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="103" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -453,6 +470,11 @@
                     <Property name="text" type="java.lang.String" value="Hist&#xf3;rico"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliDataNascimento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Data Nascimento"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tablCreditoRotativo">
@@ -502,7 +524,7 @@
                               <Component id="cmbTipoCarteira" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="cmbTipoDocRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="224" max="32767" attributes="0"/>
+                          <EmptySpace pref="208" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -588,7 +610,7 @@
                               <Component id="cmbTipoCarteiraCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="cmbTipoDocCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="215" max="32767" attributes="0"/>
+                          <EmptySpace pref="199" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -650,7 +672,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlDadosDataVenda" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="206" max="32767" attributes="0"/>
+                          <EmptySpace pref="194" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -772,7 +794,7 @@
                       <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="241" max="32767" attributes="0"/>
+                      <EmptySpace pref="229" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -819,7 +841,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="292" max="32767" attributes="0"/>
+                      <EmptySpace pref="280" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -832,6 +854,15 @@
             </Component>
           </SubComponents>
         </Container>
+        <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Importar Balan&#xe7;a">
+                <Property name="tabTitle" type="java.lang.String" value="Importar Balan&#xe7;a"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+        </Component>
       </SubComponents>
     </Container>
   </SubComponents>
