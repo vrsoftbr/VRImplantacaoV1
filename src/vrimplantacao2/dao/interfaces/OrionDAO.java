@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoDB2;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -80,7 +79,7 @@ public class OrionDAO extends InterfaceDAO {
                 while (rst.next()) {
                     
                     sq = new StringBuilder();
-                    sq.append("insert into implantacao.preco_custo_orion_loja3 (loja, codigo, nome, custocomimposto, custosemimposto, precovenda) ");
+                    sq.append("insert into implantacao.preco_custo_orion_loja1 (loja, codigo, nome, custocomimposto, custosemimposto, precovenda) ");
                     sq.append("values (");
                     sq.append("'"+getLojaOrigem()+"', ");
                     sq.append("'"+rst.getString("plu")+"', ");

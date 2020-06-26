@@ -320,10 +320,28 @@ public class PhixaDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	p.codigo_produto as id,\n"
+                    + "	p.referencia_fornecedor_produto as ean,\n"
+                    + "	u.descricao_unidade unidade\n"
+                    + "from produto p\n"
+                    + "left join unidade u on p.unidade_produto = u.codigo_unidade\n"
+                    + "where p.referencia_fornecedor_produto is not null\n"
+                    + "and p.referencia_fornecedor_produto <> ''\n"
+                    + "union\n"
+                    + "select \n"
+                    + "	p.codigo_produto as id,\n"
+                    + "	p.codigo_barra_emb_produto as ean,\n"
+                    + "	u.descricao_unidade unidade\n"
+                    + "from produto p\n"
+                    + "left join unidade u on p.unidade_produto = u.codigo_unidade\n"
+                    + "where p.codigo_barra_emb_produto is not null\n"
+                    + "and p.codigo_barra_emb_produto <> ''"
+                    
+                    /*"select \n" +
                     "	codigo_produto id,\n" +
                     "	codigo_barra_produto ean,\n" +
                     "	u.descricao_unidade unidade\n" +
@@ -331,16 +349,17 @@ public class PhixaDAO extends InterfaceDAO {
                     "	produto p\n" +
                     "left join unidade u on p.unidade_produto = u.codigo_unidade\n" +
                     "where \n" +
-                    "	codigo_barra_produto != ''")) {
-                while(rs.next()) {
+                    "	codigo_barra_produto != ''"*/
+            )) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    
+
                     result.add(imp);
                 }
             }

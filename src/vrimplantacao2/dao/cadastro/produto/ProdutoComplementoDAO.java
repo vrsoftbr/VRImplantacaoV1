@@ -375,10 +375,11 @@ public class ProdutoComplementoDAO {
     }
 
     private void gerarLogCusto(ProdutoComplementoVO complemento) throws Exception {
-            ProdutoComplementoVO custoAnt = 
-                    getCustoProduto(complemento.getIdLoja(), complemento.getProduto().getId());
-            LogProdutoComplementoVO logCusto = new LogProdutoComplementoVO();
+        ProdutoComplementoVO custoAnt
+                = getCustoProduto(complemento.getIdLoja(), complemento.getProduto().getId());
+        LogProdutoComplementoVO logCusto = new LogProdutoComplementoVO();
 
+        if (custoAnt != null) {
             logCusto.setIdLoja(complemento.getIdLoja());
             logCusto.setProduto(complemento.getProduto());
             logCusto.setCustoAnteriorComImposto(custoAnt.getCustoComImposto());
@@ -388,8 +389,9 @@ public class ProdutoComplementoDAO {
             logCusto.setObservacao("ALTERADO VRIMPLANTACAO");
             logCusto.setDataMovimento(custoAnt.getDataMovimento());
             logCusto.setDataHora(custoAnt.getDataHora());
-            
+
             salvarLogCusto(logCusto);
+        }
     }
 
     private MultiMap<Integer, OfertaVO> ofertas;
