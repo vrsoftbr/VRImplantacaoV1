@@ -22,7 +22,6 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
@@ -1127,7 +1126,19 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valorconta"));
-                    imp.setNumeroCupom(rst.getString("documento").substring(0, rst.getString("documento").indexOf("/")));
+                    
+                    if ((rst.getString("documento") != null)
+                            && (!rst.getString("documento").trim().isEmpty())) {
+
+                        if (rst.getString("documento").contains("/")) {
+                            imp.setNumeroCupom(rst.getString("documento").substring(0, rst.getString("documento").indexOf("/")));
+                        } else {
+                            imp.setNumeroCupom(rst.getString("documento"));
+                        }
+                    } else {
+                        imp.setNumeroCupom(rst.getString("cupom"));
+                    }
+                    
                     imp.setEcf(rst.getString("caixa"));
                     imp.setObservacao(rst.getString("historico"));
                     if (rst.getDouble("valor_original") > 0) {

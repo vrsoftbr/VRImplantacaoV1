@@ -26,10 +26,10 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class PhixaGUI extends VRInternalFrame implements ConexaoEvent {
+public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "Phix";
-    private static PhixaGUI instance;
+    private static final String SISTEMA = "Avistare";
+    private static AvistareGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -74,7 +74,7 @@ public class PhixaGUI extends VRInternalFrame implements ConexaoEvent {
     }
     
 
-    private PhixaGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private AvistareGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -156,7 +156,7 @@ public class PhixaGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new PhixaGUI(i_mdiFrame);
+                instance = new AvistareGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -384,7 +384,7 @@ public class PhixaGUI extends VRInternalFrame implements ConexaoEvent {
         lblCompLoja = new javax.swing.JLabel();
         txtCompLoja = new javax.swing.JTextField();
 
-        setTitle("Importação SambaNet V2");
+        setTitle("Importação Avistare");
         setToolTipText("");
 
         conexao.setSistema("JM2Online");

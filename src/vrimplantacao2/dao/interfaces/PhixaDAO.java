@@ -8,10 +8,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -29,6 +29,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class PhixaDAO extends InterfaceDAO {
 
     public boolean importarFuncionario = false;
+    public String dataEmissao = "";
+    public int v_tipoDocumento;
     
     @Override
     public String getSistema() {
@@ -720,8 +722,9 @@ public class PhixaDAO extends InterfaceDAO {
                     "	c.loja_conta = " + getLojaOrigem() + " and \n" +
                     "	c.operacao_conta > 0 and \n" +
                     "	c.saldo_pendente_conta > 0 and\n" +
-                    "	--c.data_vencimento_conta between '2020-06-01' and '2020-06-30' and \n" +
+                    "	data_conta >= '" + dataEmissao + "' and \n" +
                     "	c.cliente_conta > 0 or c.funcionario_conta > 0\n" +
+                    "   and especie_cobranca_conta = " + v_tipoDocumento + " " +
                     "order by \n" +
                     "	c.data_conta")) {
                 while(rs.next()) {
@@ -736,6 +739,26 @@ public class PhixaDAO extends InterfaceDAO {
                     imp.setEcf(rs.getString("caixa"));
                     
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<ItemComboVO> getTipoDocumento() throws Exception {
+        List<ItemComboVO> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	codigo_especie_pagamento as id,\n"
+                    + "	descricao_especie_pagamento as descricao\n"
+                    + "from dbo.ESPECIE_PAGAMENTO\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new ItemComboVO(
+                            rst.getInt("id"),
+                            rst.getString("descricao")));
                 }
             }
         }
