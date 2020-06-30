@@ -328,7 +328,7 @@ public class UniplusDAO extends InterfaceDAO {
                         + "select\n"
                         + "	p.codigo,\n"
                         + "	p.codigo ean,\n"
-                        + "	 p.ean ean13,\n"
+                        + "	p.ean ean13,\n"
                         + "	p.precopauta1 precoatacado,\n"
                         + "	p.quantidadepauta1 qtdembalagem,\n"
                         + "	 preco.preco\n"
