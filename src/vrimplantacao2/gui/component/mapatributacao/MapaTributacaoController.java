@@ -109,8 +109,20 @@ public class MapaTributacaoController {
             vo.setOrigCst(imp.getCst());
             vo.setOrigAliquota(imp.getAliquota());
             vo.setOrigReduzido(imp.getReduzido());
-                        
-            vo.setAliquota(tributacaoVR.get(imp.getCst(), imp.getAliquota(), imp.getReduzido()));
+            
+            int cst;
+            if (imp.getCst() == 10 || imp.getCst() == 30 || imp.getCst() == 70) {
+                cst = 60;
+            } else {
+                cst = imp.getCst();
+            }
+            double aliquota = 
+                    imp.getCst() == 10 || imp.getCst() == 30 || imp.getCst() == 40 || imp.getCst() == 60 || imp.getCst() == 70 ?
+                    0 :
+                    imp.getAliquota();
+            double reduzido = imp.getCst() != 20 ? 0 : imp.getReduzido();
+            
+            vo.setAliquota(tributacaoVR.get(cst, aliquota, reduzido));
             
             result.add(vo);
         }
