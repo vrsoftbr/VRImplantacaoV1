@@ -49,11 +49,66 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
+            try (ResultSet rs = stm.executeQuery(
+                    "with loja as (\n" +
+                    "	select\n" +
+                    "		lojc05codi id,\n" +
+                    "		lojc02esta uf\n" +
+                    "	from\n" +
+                    "		rc002loj lj\n" +
+                    "	where\n" +
+                    "		lj.lojc05codi = '" + getLojaOrigem() + "'\n" +
+                    "),\n" +
+                    "trib as(\n" +
+                    "	select\n" +
+                    "		rf.FIGNID_FIG id,\n" +
+                    "		max(rf.FIGDDATVIG) datavigencia\n" +
+                    "	from\n" +
+                    "		RC104FIG rf\n" +
+                    "		join loja on\n" +
+                    "			rf.FIGC02ORIG = loja.uf and\n" +
+                    "			rf.FIGC02DEST = loja.uf\n" +
+                    "		join RCEstPre pre on\n" +
+                    "			pre.PRECCODLOJ = loja.id\n" +
+                    "	group by\n" +
+                    "		FIGNID_FIG\n" +
+                    ")\n" +
+                    "select distinct\n" +
+                    "	case substring(cast(rf.FIGC03CFOP as varchar(5)),1,1)\n" +
+                    "		when '5' then 'SAIDA'\n" +
+                    "		when '6' then 'SAIDA'\n" +
+                    "		when '1' then 'ENTRADA'\n" +
+                    "		when '2' then 'ENTRADA'\n" +
+                    "	end operacao,\n" +
+                    "	replace(rf.FIGC02FIGU, '\\', '\\\\') id,\n" +
+                    "	rf.FIGC003CST cst,\n" +
+                    "	rf.FIGN02ALIQ aliquota,\n" +
+                    "	rf.FIGN05REDU reducao\n" +
+                    "from\n" +
+                    "	RC104FIG rf\n" +
+                    "	join trib on\n" +
+                    "		rf.FIGNID_FIG = trib.id and \n" +
+                    "		rf.FIGDDATVIG = trib.datavigencia\n" +
+                    "where\n" +
+                    "	rf.FIGC03CFOP in (5929, 1102, 1403)"
             )) {
-                while (rst.next()) {
-                    result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descricao")));
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            String.format(
+                                    "%s-%s",
+                                    rs.getString("operacao"),
+                                    rs.getString("id")
+                            ),
+                            String.format(
+                                    "%03d-%.2f-%.2f",
+                                    rs.getInt("cst"),
+                                    rs.getDouble("aliquota"),
+                                    rs.getDouble("reducao")
+                            ),                            
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao")
+                    ));
                 }
             }
             return result;
@@ -282,7 +337,7 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
                     "with ean as (\n" +
                     "	select CODIGOPLU, EANCCODBAR, EANNQTDEMB from RC003EST where ltrim(rtrim(EANCCODBAR)) != ''\n" +
                     "	union\n" +
@@ -316,7 +371,8 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pre.PRENCUSMED customedio,\n" +
                     "	pre.PRECPROLIN ativo,\n" +
                     "	p.PROCCODNCM ncm,\n" +
-                    "	p.PROCCODCES cest\n" +
+                    "	p.PROCCODCES cest,\n" +
+                    "	replace(pre.PRECFIGURA, '\\', '\\\\') id_icms\n" +
                     "from\n" +
                     "	RC003EST p\n" +
                     "	join rc002loj lj on\n" +
@@ -333,50 +389,64 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.CODIGOPLU"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
-                while (rst.next()) {
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
+                    imp.setImportId(rs.getString("id"));
                     
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
                     if (bal != null) {
                         imp.setQtdEmbalagem(1);
                         imp.seteBalanca(true);
-                        imp.setEan(rst.getString("ean"));
+                        imp.setEan(rs.getString("ean"));
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                         imp.setValidade(bal.getValidade());
                     } else {                    
-                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        imp.seteBalanca("S".equals(rst.getString("pesado")));
-                        imp.setEan(rst.getString("ean"));
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
-                        imp.setValidade(rst.getInt("validade"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.seteBalanca("S".equals(rs.getString("pesado")));
+                        imp.setEan(rs.getString("ean"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setValidade(rs.getInt("validade"));
                     }
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
-                    imp.setCodMercadologico4(rst.getString("merc4"));
-                    imp.setCodMercadologico5(rst.getString("merc5"));
-                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setPrecovenda(rst.getDouble("preco"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoMedio(rst.getDouble("customedio"));
-                    imp.setSituacaoCadastro("S".equals(rst.getString("ativo")) ? 1 : 0);
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
+                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setCodMercadologico4(rs.getString("merc4"));
+                    imp.setCodMercadologico5(rs.getString("merc5"));
+                    imp.setIdFamiliaProduto(rs.getString("id_familia"));
+                    imp.setPesoBruto(rs.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setPrecovenda(rs.getDouble("preco"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoMedio(rs.getDouble("customedio"));
+                    imp.setSituacaoCadastro("S".equals(rs.getString("ativo")) ? 1 : 0);
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    
+                    imp.setIcmsDebitoId("SAIDA-" + rs.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoId("SAIDA-" + rs.getString("id_icms"));
+                    imp.setIcmsDebitoForaEstadoNfId("SAIDA-" + rs.getString("id_icms"));
+                    imp.setIcmsConsumidorId("SAIDA-" + rs.getString("id_icms"));
+                    if (rs.getString("id_icms") != null) {
+                        imp.setIcmsCreditoId("ENTRADA-" + rs.getString("id_icms"));
+                        imp.setIcmsCreditoForaEstadoId("ENTRADA-" + rs.getString("id_icms"));
+                    } else {
+                        imp.setIcmsCreditoId("SAIDA-" + rs.getString("id_icms"));
+                        imp.setIcmsCreditoForaEstadoId("SAIDA-" + rs.getString("id_icms"));
+                    }
+                    
+                    
                     
                     result.add(imp);
                 }
@@ -395,7 +465,8 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                       "select \n"
                     + "	codifabric id,\n"
                     + "	forc35raza razao,\n"
-                    + "	forc10apel fantasia,\n"
+                    + "	forc35raza fantasia,\n"
+                    //+ "	forc10apel fantasia,\n"
                     + "	forc15cgc cnpj,\n"
                     + "	forc19insc ie_rg,\n"
                     + "	forc35ende endereco,\n"
@@ -588,3 +659,28 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
 }
+
+/*
+CONVENIO
+
+select
+    l.lojc05codi id,
+    l.lojc35raza razao,
+    l.lojc15cgc cnpj,
+    l.lojc19insc inscricaoestadual,
+    l.lojc35ende endereco,
+    l.lojc10comp complemento,
+    l.lojcbairro bairro,
+    l.lojc20cida municipio,
+    l.lojc02esta uf,
+    l.lojc08cep cep,
+    l.lojc18fone telefone,
+    getDate() datainicio,
+    getDate() + 12000 datatermino,
+    'S' ativo,
+    0 desconto,
+    10 diapagamento,
+    'N' bloqueado
+from
+    rc002loj l
+*/
