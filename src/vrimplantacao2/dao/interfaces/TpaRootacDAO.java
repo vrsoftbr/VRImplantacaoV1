@@ -4,6 +4,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -296,7 +298,8 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
-                OpcaoProduto.ICMS
+                OpcaoProduto.ICMS,
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -450,6 +453,41 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     result.add(imp);
                 }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	o.CODIGOPLU id_produto,\n" +
+                        "	o.OFEDINIOFE datainicio,\n" +
+                        "	o.OFEDFIMOFE datatermino,\n" +
+                        "	o.OFENVLROFE valoroferta\n" +
+                        "from\n" +
+                        "	RCEstOfe o\n" +
+                        "where\n" +
+                        "	o.OFECCODLOJ = '" + getLojaOrigem() + "'\n" +
+                        "order by\n" +
+                        "	1"
+                )
+        ) {
+            while (rs.next()) {
+                OfertaIMP imp = new OfertaIMP();
+                
+                imp.setIdProduto(rs.getString("id_produto"));
+                imp.setDataInicio(rs.getDate("datainicio"));
+                imp.setDataFim(rs.getDate("datatermino"));
+                imp.setPrecoOferta(rs.getDouble("valoroferta"));
+                
+                result.add(imp);
             }
         }
         
