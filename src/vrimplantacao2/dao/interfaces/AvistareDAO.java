@@ -17,8 +17,10 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -79,6 +81,25 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = 'CNPJ') as cnpj,\n"
+                    + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = 'EmpresaRegistro') as razao\n"
+                    + "from dbo.TB_CONFIG"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("cnpj"), rst.getString("razao")));
+                }
+            }
+        }
+
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -155,30 +176,39 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    
+                    imp.setEan(rst.getString("ean"));
+
                     ProdutoBalancaVO produtoBalanca;
                     long codigoProduto;
                     codigoProduto = Long.parseLong(imp.getImportId());
-                    
+
                     if (codigoProduto <= Integer.MAX_VALUE) {
                         produtoBalanca = produtosBalanca.get((int) codigoProduto);
                     } else {
                         produtoBalanca = null;
                     }
-                    
+
                     if (produtoBalanca != null) {
                         imp.seteBalanca(true);
                         imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 1);
                     } else {
                         imp.seteBalanca(false);
-                    }
+                        
+                        if ((imp.getEan() != null)
+                                && (!imp.getEan().trim().isEmpty())) {
 
+                            if (Long.parseLong(Utils.formataNumero(imp.getEan())) <= 999999) {
+                                imp.setManterEAN(true);
+                            } else {
+                                imp.setManterEAN(false);
+                            }
+                        }
+                    }
                     
-                    imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -315,6 +345,24 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rst.getString("telefone"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
+
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.NFE);
+                    }
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+                        imp.addCelular("CELULAR", rst.getString("celular"));
+                    }
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
+                    }
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addTelefone("FAX", rst.getString("fax"));
+                    }
+
                     result.add(imp);
                 }
             }
@@ -342,10 +390,11 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -355,10 +404,10 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	c.CliID,\n"
+                    + "	c.CliID as id,\n"
                     + "	c.CliCodigoPessoal,\n"
-                    + "	c.CliLimiteTotal,\n"
-                    + "	c.CliLimiteSaldo,\n"
+                    + "	c.CliLimiteTotal as valortotal,\n"
+                    + "	c.CliLimiteSaldo as valorsaldo,\n"
                     + "	pes.PessoaNome as razao,\n"
                     + "	pes.PessoaFantasia as fantasia,\n"
                     + "	pes.PessoaCpfCnpj as cnpj,\n"
@@ -391,10 +440,39 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by c.CliID"
             )) {
                 while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setUfIBGE(rst.getInt("uf_ibge"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setValorLimite(rst.getDouble("valortotal"));
 
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
+                    }
+
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
