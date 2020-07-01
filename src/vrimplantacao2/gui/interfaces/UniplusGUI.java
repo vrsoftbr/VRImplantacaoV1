@@ -158,6 +158,7 @@ public class UniplusGUI extends VRInternalFrame {
                     uniplusDAO.setPrefixoAtacado(Utils.stringToInt(txtIDAtacado.getText(), 999));                     
                     uniplusDAO.setComplemento(txtLojaID.getText());
                     uniplusDAO.DUN14Atacado = chkDUN14Atacado.isSelected();
+                    uniplusDAO.NewEan = chkNewEan.isSelected();
                     
                     Importador importador = new Importador(uniplusDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
@@ -275,6 +276,7 @@ public class UniplusGUI extends VRInternalFrame {
         tablCreditoRotativo = new javax.swing.JPanel();
         pnlParam = new vrframework.bean.panel.VRPanel();
         chkDUN14Atacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkNewEan = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -547,13 +549,17 @@ public class UniplusGUI extends VRInternalFrame {
 
         chkDUN14Atacado.setText("Gerar DUN14 para Atacado");
 
+        chkNewEan.setText("Prefixo + Cód.");
+
         javax.swing.GroupLayout pnlParamLayout = new javax.swing.GroupLayout(pnlParam);
         pnlParam.setLayout(pnlParamLayout);
         pnlParamLayout.setHorizontalGroup(
             pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlParamLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlParamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNewEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(426, Short.MAX_VALUE))
         );
         pnlParamLayout.setVerticalGroup(
@@ -561,7 +567,9 @@ public class UniplusGUI extends VRInternalFrame {
             .addGroup(pnlParamLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkDUN14Atacado, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(257, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNewEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(238, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Parâmetros Extra", pnlParam);
@@ -874,6 +882,7 @@ public class UniplusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkForcarIdProdutoQuandoPesavel;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkLimite;
+    private vrframework.bean.checkBox.VRCheckBox chkNewEan;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkVendas;

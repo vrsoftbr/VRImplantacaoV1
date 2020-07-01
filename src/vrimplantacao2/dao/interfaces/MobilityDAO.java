@@ -384,7 +384,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ddd,\n"
                     + "    ddd2,\n"
                     + "    ddd_cel,\n"
-                    + "    ddd || '' || telefone1 as telefone,\n"
+                    + "    ddd || '' || telefone1 as telprincipal,\n"
                     + "    ddd2 || '' || telefone2 as telefone2,\n"
                     + "    fax,\n"
                     + "    celular,\n"
@@ -419,18 +419,18 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumero(rs.getString("numero"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTel_principal(rs.getString("telefone"));
-                    /*if(rs.getString("telefone") != null
-                     && !"0".equals(rs.getString("telefone"))
-                     && !"".equals(rs.getString("telefone"))) {
-                     imp.setTel_principal(rs.getString("telefone"));
-                     }*/
+
+                    if (rs.getString("telprincipal") != null
+                            && !"0".equals(rs.getString("telprincipal"))
+                            && !"".equals(rs.getString("telprincipal"))) {
+                        imp.setTel_principal(rs.getString("telprincipal"));
+                    }
                     if (rs.getString("telefone2") != null
                             && !"0".equals(rs.getString("telefone2"))
                             && !"".equals(rs.getString("telefone2"))) {
                         imp.addContato("1",
                                 "TELEFONE2",
-                                (rs.getString("ddd2") + rs.getString("telefone2")),
+                                (rs.getString("telefone2")),
                                 null,
                                 TipoContato.COMERCIAL,
                                 null);
@@ -577,9 +577,13 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setCnpj(rs.getString("cnpj"));
-                    if (imp.getCnpj() == null && "".equals(imp.getCnpj())) {
+
+                    if (imp.getCnpj() != null && !imp.getCnpj().trim().isEmpty()) {
+                        imp.setCnpj(rs.getString("cnpj"));
+                    } else {
                         imp.setCnpj(rs.getString("cpf"));
                     }
+
                     imp.setInscricaoestadual(rs.getString("insc_estadual"));
                     if (imp.getInscricaoestadual() == null && "".equals(imp.getInscricaoestadual())) {
                         imp.setInscricaoestadual(rs.getString("rg"));

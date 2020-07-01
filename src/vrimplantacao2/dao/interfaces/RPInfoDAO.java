@@ -1559,6 +1559,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             } else {
                 try (ResultSet rs = stm.executeQuery(
                         "select \n" +
+                        "	pfin_pger_conta conta,\n" +
+                        "       pfin_unid_codigo unidade,\n" +
                         "	pfin_operacao id,\n" +
                         "	pfin_dataemissao emissao,\n" +
                         "	pfin_datavcto vencimento,\n" +
@@ -1580,7 +1582,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
                         "	pfin_pr = 'R' and\n" +
                         "	pfin_status = 'P' and\n" +
-                        "	pfin_pger_conta in (112152)")) {
+                        "       pfin_catentidade = 'C' and\n" +
+                        "       not pfin_pger_conta in (117301, 112501)\n"
+                )) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -1592,9 +1596,16 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCnpjCliente(rs.getString("cnpj"));
                         imp.setParcela(rs.getInt("parcela"));
                         imp.setValor(rs.getDouble("valor"));
-                        imp.setJuros(rs.getDouble("juros"));
-                        imp.setMulta(rs.getDouble("multa"));
+                        //imp.setJuros(rs.getDouble("juros"));
+                        //imp.setMulta(rs.getDouble("multa"));
                         imp.setNumeroCupom(rs.getString("cupom"));
+                        String format = String.format("LOJA %s CONTA %s OBS %s",
+                                rs.getString("unidade"),
+                                rs.getString("conta"),
+                                rs.getString("observacao")
+                        );
+                        System.out.println(format);
+                        imp.setObservacao(format);
                         
                         double valorPago = rs.getDouble("valorpago");
                         if (valorPago > 0) {

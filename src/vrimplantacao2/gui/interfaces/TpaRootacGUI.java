@@ -21,7 +21,6 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.RPInfoDAO;
 import vrimplantacao2.dao.interfaces.TpaRootacDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;

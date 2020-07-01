@@ -464,9 +464,12 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkDUN14Atacado" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkDUN14Atacado" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNewEan" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="426" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -476,7 +479,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkDUN14Atacado" min="-2" pref="31" max="-2" attributes="0"/>
-                          <EmptySpace pref="257" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkNewEan" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="238" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -485,6 +490,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDUN14Atacado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Gerar DUN14 para Atacado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNewEan">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prefixo + C&#xf3;d."/>
                   </Properties>
                 </Component>
               </SubComponents>

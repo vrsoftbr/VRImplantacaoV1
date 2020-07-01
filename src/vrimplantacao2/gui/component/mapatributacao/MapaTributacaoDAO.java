@@ -76,7 +76,7 @@ public class MapaTributacaoDAO {
                     + "where	\n"
                     + "	mp.sistema = " + SQLUtils.stringSQL(sistema) + " and\n"
                     + "	mp.agrupador = " + SQLUtils.stringSQL(agrupador) + "\n"
-                    + "order by mp.orig_id"
+                    + "order by mp.id_aliquota desc, mp.orig_id"
             )) {
                 while (rst.next()) {
                     MapaTributoVO vo = new MapaTributoVO();
@@ -173,18 +173,21 @@ public class MapaTributacaoDAO {
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	id,\n"
-                    + "	descricao,\n"
-                    + "	situacaotributaria,\n"
-                    + "	porcentagem,\n"
-                    + "	reduzido	\n"
-                    + "from \n"
-                    + "	aliquota\n"
-                    + "where\n"
-                    + "	id_situacaocadastro = 1\n"
-                    + "order by\n"
-                    + "	descricao"
+                    "select\n" +
+                    "	id,\n" +
+                    "	descricao,\n" +
+                    "	situacaotributaria,\n" +
+                    "	porcentagem,\n" +
+                    "	case\n" +
+                    "		when situacaotributaria in (20, 70) then reduzido\n" +
+                    "		else 0\n" +
+                    "	end reduzido\n" +
+                    "from \n" +
+                    "	aliquota\n" +
+                    "where\n" +
+                    "	id_situacaocadastro = 1\n" +
+                    "order by\n" +
+                    "	descricao"
             )) {
                 while (rst.next()) {
                     Icms vo = new Icms(

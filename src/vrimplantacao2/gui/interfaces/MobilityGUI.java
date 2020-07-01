@@ -85,7 +85,7 @@ public class MobilityGUI extends VRInternalFrame {
 
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.tabParametros.add(pnlCustom);
-        
+
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
@@ -108,9 +108,9 @@ public class MobilityGUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-            
+
         });
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -184,7 +184,7 @@ public class MobilityGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    
+
                     dao.importarSomenteBalanca = chkImportarBalanca.isSelected();
 
                     if (tab.getSelectedIndex() == 0) {
@@ -193,20 +193,34 @@ public class MobilityGUI extends VRInternalFrame {
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor(
-                                    OpcaoFornecedor.TELEFONE);
+                                    OpcaoFornecedor.CONTATOS);
                         }
+
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
+
+                            if (chkTelefone.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.TELEFONE);
+                            }
+
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            }
+                        }
+
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        if(chkContaPagar.isSelected()) {
+                        if (chkContaPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        } 
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
-                                    OpcaoCliente.DADOS, 
-                                    OpcaoCliente.CONTATOS, 
-                                    OpcaoCliente.VALOR_LIMITE, 
+                                    OpcaoCliente.CNPJ,
+                                    OpcaoCliente.DADOS,
+                                    OpcaoCliente.CONTATOS,
+                                    OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO,
                                     OpcaoCliente.EMAIL);
                         }
@@ -215,24 +229,30 @@ public class MobilityGUI extends VRInternalFrame {
                             if (chkBloqueado.isSelected()) {
                                 opcoes.add(OpcaoCliente.BLOQUEADO);
                             }
+                            if (chkCpfCnpj.isSelected()) {
+                                opcoes.add(OpcaoCliente.CNPJ);
+                            }
                             if (chkCliIERG.isSelected()) {
                                 opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                             }
                             if (chkCVencimento.isSelected()) {
                                 opcoes.add(OpcaoCliente.VENCIMENTO_ROTATIVO);
                             }
+                            if (chkClienteEventual.isSelected()) {
+                                importador.importarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
-                            }                            
+                            }
                         }
-                        
+
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        if(chkPdvVendas.isSelected()) {
+                        if (chkPdvVendas.isSelected()) {
                             //dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
@@ -299,12 +319,15 @@ public class MobilityGUI extends VRInternalFrame {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContaPagar = new javax.swing.JCheckBox();
+        chkTelefone = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkCliIERG = new vrframework.bean.checkBox.VRCheckBox();
         chkCVencimento = new javax.swing.JCheckBox();
+        chkCpfCnpj = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabCheque = new vrframework.bean.panel.VRPanel();
@@ -429,6 +452,8 @@ public class MobilityGUI extends VRInternalFrame {
 
         chkContaPagar.setText("Conta a Pagar");
 
+        chkTelefone.setText("Telefones");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -436,16 +461,21 @@ public class MobilityGUI extends VRInternalFrame {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabFornecedorLayout.createSequentialGroup()
+                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(45, 45, 45)
+                        .addComponent(chkTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkContaPagar))
-                .addContainerGap(491, Short.MAX_VALUE))
+                .addContainerGap(483, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -471,6 +501,15 @@ public class MobilityGUI extends VRInternalFrame {
 
         chkCVencimento.setText("Vencimento Rotativo");
 
+        chkCpfCnpj.setText("CPF/CNPJ");
+
+        chkClienteEventual.setText("Cliente Eventual");
+        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClienteEventualActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -478,19 +517,29 @@ public class MobilityGUI extends VRInternalFrame {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCVencimento))
-                .addContainerGap(482, Short.MAX_VALUE))
+                    .addComponent(chkCVencimento)
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(24, 24, 24)
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(431, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -889,6 +938,10 @@ public class MobilityGUI extends VRInternalFrame {
 
     }//GEN-LAST:event_txtComplementoKeyReleased
 
+    private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkClienteEventualActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarFirebird;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -900,13 +953,16 @@ public class MobilityGUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkCVencimento;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
+    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkContaPagar;
+    private vrframework.bean.checkBox.VRCheckBox chkCpfCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkImportarBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkTelefone;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
