@@ -1337,7 +1337,10 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         String idVenda = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom");
                         String id = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom")
                                 + rst.getString("idproduto") + rst.getString("digitoproduto")
-                                + rst.getString("sequencia");
+                                + rst.getString("sequencia") 
+                                /*+ rst.getString("Quantidade")
+                                + rst.getString("Preco_Total")
+                                + rst.getString("cancelado")*/;
                         
                         next.setId(id);
                         next.setVenda(idVenda);

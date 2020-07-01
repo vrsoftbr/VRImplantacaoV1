@@ -104,6 +104,7 @@ import vrimplantacao2.gui.interfaces.AtmaGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AutomaqGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
+import vrimplantacao2.gui.interfaces.AvistareGUI;
 import vrimplantacao2.gui.interfaces.BaseGUI;
 import vrimplantacao2.gui.interfaces.BrainSoftGUI;
 import vrimplantacao2.gui.interfaces.BrajanGestoresGUI;
@@ -685,6 +686,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuVisualMix = new javax.swing.JMenuItem();
         mnuPhixa = new javax.swing.JMenuItem();
         mnuTpaRootac = new javax.swing.JMenuItem();
+        mnuAvistate = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1892,6 +1894,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuTpaRootac);
+
+        mnuAvistate.setText("Avistare");
+        mnuAvistate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAvistateActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuAvistate);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4607,6 +4617,11 @@ public final class MenuGUI extends VRMdiFrame {
         TpaRootacGUI.exibir(this); //WIN-GE2SQLJG01G\ROOTAC_DB
     }//GEN-LAST:event_mnuTpaRootacActionPerformed
 
+    private void mnuAvistateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAvistateActionPerformed
+        // TODO add your handling code here:
+        AvistareGUI.exibir(this);
+    }//GEN-LAST:event_mnuAvistateActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4713,6 +4728,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAutomaq;
     private javax.swing.JMenu mnuAvancadas;
     private javax.swing.JMenuItem mnuAvance;
+    private javax.swing.JMenuItem mnuAvistate;
     private javax.swing.JMenuItem mnuBase;
     private javax.swing.JMenuItem mnuBrainSoft;
     private javax.swing.JMenuItem mnuBrajanGestores;

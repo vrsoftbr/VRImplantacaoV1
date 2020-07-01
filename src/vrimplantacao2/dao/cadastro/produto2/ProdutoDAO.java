@@ -124,11 +124,11 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
-	    if (Versao.menorQue(4)) {
+            if (Versao.maiorQue(3,18)) {
                 sql.put("margemminima", vo.getMargemMinima());
                 sql.put("margemmaxima", vo.getMargemMaxima());
-                sql.put("margem", vo.getMargem());
             }
+            sql.put("margem", vo.getMargem());
             sql.put("verificacustotabela", false);
             sql.put("percentualipi", 0.0);
             sql.put("percentualfrete", 0.0);

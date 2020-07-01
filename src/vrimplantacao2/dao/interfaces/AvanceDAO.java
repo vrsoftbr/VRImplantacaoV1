@@ -104,7 +104,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.VR_ATACADO
+                    OpcaoProduto.VR_ATACADO,
                 }
         ));
     }
@@ -133,6 +133,20 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	distinct\n"
+                    + "   d.CODIGO cod_merc1,\n"
+                    + "   d.NOME descmerc1,\n"
+                    + "   g.CODIGO cod_merc2,\n"
+                    + "   g.NOME descmerc2,\n"
+                    + "   f.id AS cod_merc3,\n"
+                    + "   f.descricao AS descmerc3\n"
+                    + "FROM\n"
+                    + "cadmer p\n"
+                    + "JOIN depto d ON p.DEPART = d.CODIGO\n"
+                    + "JOIN grupo g ON p.GRUPO = g.CODIGO\n"
+                    + "JOIN familia f ON p.id_familia = f.id\n"
+                    + "ORDER BY 1, 3, 5"
+            /*"SELECT\n"
+                    + "	distinct\n"
                     + "	m.CODIGO cod_merc1,\n"
                     + " m.NOME descmerc1,	\n"
                     + "	d.CODIGO cod_merc2,\n"
@@ -144,7 +158,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "JOIN marca m ON p.MARCA = m.CODIGO	\n"
                     + "JOIN depto d ON p.DEPART = d.CODIGO\n"
                     + "JOIN grupo g ON p.GRUPO = g.CODIGO\n"
-                    + "ORDER BY 1, 3, 5"
+                    + "ORDER BY 1, 3, 5"*/
             )) {
                 while (rst.next()) {
 
@@ -192,7 +206,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -337,7 +351,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-
+    
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
@@ -685,6 +699,12 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
+                    + "	id_cadmer AS CODPROD,\n"
+                    + "	codfor AS CODFOR,\n"
+                    + "	referencia\n"
+                    + "from cadmer_referencia\n"
+                    + "ORDER BY codfor"
+                    /*"SELECT \n"
                     + "pf.CODPROD,\n"
                     + "pf.CODFOR,\n"
                     + "pf.datahora,\n"
@@ -693,7 +713,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM forprod pf\n"
                     + "LEFT JOIN (SELECT id_cadmer, referencia, codfor\n"
                     + "       FROM cadmer_referencia) merc ON merc.id_cadmer = pf.CODPROD\n"
-                    + "                                    AND merc.codfor = pf.CODFOR"
+                    + "                                    AND merc.codfor = pf.CODFOR"*/
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -702,7 +722,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("CODPROD"));
                     imp.setIdFornecedor(rst.getString("CODFOR"));
                     imp.setCodigoExterno(rst.getString("referencia"));
-                    imp.setCustoTabela(rst.getDouble("valor"));
+                    //imp.setCustoTabela(rst.getDouble("valor"));
                     result.add(imp);
                 }
             }
@@ -719,7 +739,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT \n"
                     + "c.codigo,\n"
                     + "c.nome,\n"
-                    + "c.nascimento,\n"
+                    + "case when nascimento = '0000-00-00' then NULL "
+                    + "ELSE nascimento END nascimento,\n"
                     + "c.estcivil,\n"
                     + "c.sexo,\n"
                     + "c.rg,\n"
@@ -800,7 +821,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("cep"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
-                    //imp.setDataNascimento(rst.getDate("nascimento"));
+                    imp.setDataNascimento(rst.getDate("nascimento"));
 
                     if ((rst.getString("cpf") != null)
                             && (!rst.getString("cpf").trim().isEmpty())) {
@@ -842,24 +863,21 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limitecheque"));
                     //imp.setObservacao("Fantasia: " + rst.getString("fantasia") + " - "
                     //        + Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));
-                    
-                    imp.setObservacao(Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));                    
+
+                    imp.setObservacao(Utils.acertarTexto(rst.getString("obs")) + " " + Utils.acertarTexto(rst.getString("anotacoes")));
                     imp.setObservacao2(imp.getObservacao());
 
                     /*if (rst.getDouble("limite") > 0) {
                         imp.setPermiteCreditoRotativo(true);
                     }*/
-                                        
                     imp.setBloqueado(rst.getInt("bloqueado_crd") == 1);
                     imp.setPermiteCheque((rst.getInt("bloqueado") == 0));
-                    imp.setPermiteCreditoRotativo(rst.getInt("bloqueado_crd") == 0);                    
-                    
+                    imp.setPermiteCreditoRotativo(rst.getInt("bloqueado_crd") == 0);
+
                     /*if (rst.getDouble("limitecheque") > 0) {
                         imp.setPermiteCheque(true);
                     }*/
-
                     //imp.setBloqueado(rst.getInt("bloqueado") == 0 ? false : true);
-
                     if (rst.getString("sexo") != null && !"".equals(rst.getString("sexo"))) {
                         imp.setSexo("F".equals(rst.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     }
@@ -933,7 +951,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE valorpago < valor\n"
                     + "AND pago = 0\n"
                     + "AND codcli IS NOT NULL\n"
-                    + "AND id_banco = " + v_contaCarteira
+                    //+ "AND id_banco = " + v_contaCarteira
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -942,7 +960,19 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valorconta"));
-                    imp.setNumeroCupom(rst.getString("documento").substring(0, rst.getString("documento").indexOf("/")));
+                    
+                    if ((rst.getString("documento") != null)
+                            && (!rst.getString("documento").trim().isEmpty())) {
+
+                        if (rst.getString("documento").contains("/")) {
+                            imp.setNumeroCupom(rst.getString("documento").substring(0, rst.getString("documento").indexOf("/")));
+                        } else {
+                            imp.setNumeroCupom(rst.getString("documento"));
+                        }
+                    } else {
+                        imp.setNumeroCupom(rst.getString("cupom"));
+                    }
+                    
                     imp.setEcf(rst.getString("caixa"));
                     imp.setObservacao(rst.getString("historico"));
                     if (rst.getDouble("valor_original") > 0) {

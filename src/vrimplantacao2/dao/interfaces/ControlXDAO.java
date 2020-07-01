@@ -296,7 +296,7 @@ public class ControlXDAO extends InterfaceDAO {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                      "select\n"
                     + "	cr.acesso id,\n"
                     + "	emissao dataEmissao,\n"
                     + "	documento numeroCupom,\n"
