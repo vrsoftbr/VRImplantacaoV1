@@ -13,7 +13,6 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -48,11 +47,9 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
         conexao.atualizarParametros();
-        Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
-        if (cliente != null) {
-            params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
-            vLojaCliente = cliente.cnpj;
-        }
+        params.put(txtLojaCliente.getText(), SISTEMA, "LOJA_CLIENTE");
+        vLojaCliente = txtLojaCliente.getText();
+        
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
@@ -75,8 +72,6 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.user = "sa";
         conexao.pass = "";
 
-        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        
         tabProdutos.setOpcoesDisponiveis(dao);
         
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
@@ -92,7 +87,7 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
 
             @Override
             public String getLoja() {                
-                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                dao.setLojaOrigem(txtLojaCliente.getText());
                 return dao.getLojaOrigem();
             }
 
@@ -113,6 +108,12 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
         this.setMaximum(false);
     }
 
+    public void carregarNomeLojaCliente() throws Exception {
+        for (String loja : dao.getNomeLojaCliente()) {
+            txtNomeLojaCliente.setText(loja);
+        }
+    }
+    
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -125,20 +126,6 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
             cont++;
         }
         cmbLojaVR.setSelectedIndex(index);
-    }
-
-    public void carregarLojaCliente() throws Exception {
-        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        int cont = 0;
-        int index = 0;
-        for (Estabelecimento loja : dao.getLojasCliente()) {
-            cmbLojaOrigem.addItem(loja);
-            if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
-                index = cont;
-            }
-            cont++;
-        }
-        cmbLojaOrigem.setSelectedIndex(index);
     }
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
@@ -168,7 +155,7 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                     ProgressBar.setCancel(true);
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    idLojaCliente = txtLojaCliente.getText();
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -263,8 +250,6 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
     private void initComponents() {
 
         conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
-        lblLojaCliente = new vrframework.bean.label.VRLabel();
-        cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -291,16 +276,13 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         lblCompLoja = new javax.swing.JLabel();
-        txtCompLoja = new javax.swing.JTextField();
+        txtLojaCliente = new javax.swing.JTextField();
+        txtNomeLojaCliente = new vrframework.bean.textField.VRTextField();
 
         setTitle("Importação Avistare");
         setToolTipText("");
 
         conexao.setSistema("JM2Online");
-
-        lblLojaCliente.setText("Loja (Cliente):");
-
-        cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -438,7 +420,7 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lblCompLoja.setText("Complemento Loja:");
+        lblCompLoja.setText("Loja:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -453,11 +435,9 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lblCompLoja)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCompLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(txtNomeLojaCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -467,12 +447,11 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1, 1, 1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblCompLoja)
-                    .addComponent(txtCompLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNomeLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -512,19 +491,18 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
-    private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lblCompLoja;
-    private vrframework.bean.label.VRLabel lblLojaCliente;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private javax.swing.JTextField txtCompLoja;
+    private javax.swing.JTextField txtLojaCliente;
+    private vrframework.bean.textField.VRTextField txtNomeLojaCliente;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
@@ -535,7 +513,7 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
 
         gravarParametros();
         carregarLojaVR();
-        carregarLojaCliente();
+        carregarNomeLojaCliente();
     }
 
 }
