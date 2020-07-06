@@ -78,6 +78,8 @@ public class OryonGUI extends VRInternalFrame {
 
         carregarParametros();
         
+        txtSenha.setText("paralelo");
+        
         centralizarForm();
         this.setMaximum(false);
         

@@ -108,7 +108,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                 OpcaoProduto.OFERTA,
-                OpcaoProduto.CODIGO_BENEFICIO
+                OpcaoProduto.CODIGO_BENEFICIO,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         ));
     }
 
