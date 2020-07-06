@@ -18,6 +18,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SircomDAO;
@@ -190,20 +191,36 @@ public class SircomGUI extends VRInternalFrame {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
+                        
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                            
+                            if (chkFornBloqueado.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.BLOQUEADO);
+                            }
+                            if (chkFornTelefone.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.TELEFONE);
+                            }
+                            if (chkFornContatos.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CONTATOS);
+                            }
+                            if (chkTipoFornecedor.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.TIPO_FORNECEDOR);
+                            }
+                            
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            }
+                        }
+                        
+                        
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        if(chkContaPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        } 
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
-                                    OpcaoCliente.DADOS, 
-                                    OpcaoCliente.CONTATOS, 
-                                    OpcaoCliente.VALOR_LIMITE, 
-                                    OpcaoCliente.SITUACAO_CADASTRO,
-                                    OpcaoCliente.EMAIL);
+                                    OpcaoCliente.DADOS);
                         }
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
@@ -291,7 +308,10 @@ public class SircomGUI extends VRInternalFrame {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkContaPagar = new javax.swing.JCheckBox();
+        chkFornBloqueado = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornTelefone = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornContatos = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -401,7 +421,13 @@ public class SircomGUI extends VRInternalFrame {
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
 
-        chkContaPagar.setText("Conta a Pagar");
+        chkFornBloqueado.setText("Bloqueado");
+
+        chkFornTelefone.setText("Telefone");
+
+        chkFornContatos.setText("Contatos");
+
+        chkTipoFornecedor.setText("Tipo Fornecedor");
 
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
@@ -410,21 +436,32 @@ public class SircomGUI extends VRInternalFrame {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkContaPagar))
-                .addContainerGap(491, Short.MAX_VALUE))
+                    .addGroup(tabFornecedorLayout.createSequentialGroup()
+                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkFornBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkFornTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(396, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chkContaPagar)
-                .addContainerGap(216, Short.MAX_VALUE))
+                .addContainerGap(242, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -878,11 +915,14 @@ public class SircomGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
-    private javax.swing.JCheckBox chkContaPagar;
+    private vrframework.bean.checkBox.VRCheckBox chkFornBloqueado;
+    private vrframework.bean.checkBox.VRCheckBox chkFornContatos;
+    private vrframework.bean.checkBox.VRCheckBox chkFornTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkTipoFornecedor;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;

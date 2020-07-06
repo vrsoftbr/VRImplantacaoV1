@@ -100,6 +100,24 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    public List<String> getNomeLojaCliente() throws Exception {
+        List<String> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = 'EmpresaRegistro') as razao\n"
+                    + "from dbo.TB_CONFIG"
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getString("razao"));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
