@@ -279,7 +279,8 @@ public class UniplusDAO extends InterfaceDAO {
                     } else {
                         imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                         imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                        imp.setPrecovenda(rs.getDouble("precovenda"));
+                        imp.setPrecovenda(rs.getDouble("preco"));
+                        //imp.setPrecovenda(rs.getDouble("precovenda"));
                         imp.setMargem(rs.getDouble("margem"));
                     }
 
@@ -445,10 +446,7 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rs.getString("codigo"));
-                        imp.setEan(String.format(
-                                "555%06d",
-                                Utils.stringToInt(rs.getString("codigo"))
-                        ));                        
+                        imp.setEan(String.format("555%06d",Utils.stringToInt(rs.getString("codigo"))));
                         imp.setQtdEmbalagem(rs.getInt("quantidadepauta1"));
                         imp.setTipoEmbalagem(rs.getString("unidademedida"));                        
 
