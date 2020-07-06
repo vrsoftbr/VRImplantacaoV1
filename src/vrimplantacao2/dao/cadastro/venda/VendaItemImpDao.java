@@ -64,8 +64,14 @@ public class VendaItemImpDao {
      */
     public void persistir(Iterator<VendaItemIMP> iterator) throws Exception {
         TableUtils.createTableIfNotExists(dao.getConnectionSource(), VendaItemIMP.class);
-                               
-        dao.callBatchTasks(new GravarItensTransaction(iterator));
+        try {
+            dao.callBatchTasks(new GravarItensTransaction(iterator));
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("Batch tasks")) {
+                throw (Exception) ex.getCause();
+            }
+            throw ex;
+        }
     }
     
     /**

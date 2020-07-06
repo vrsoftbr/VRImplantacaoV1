@@ -56,8 +56,14 @@ public class VendaImpDao {
      */
     public void persistir(Iterator<VendaIMP> iterator) throws Exception {
         TableUtils.createTableIfNotExists(dao.getConnectionSource(), VendaIMP.class);
-
-        dao.callBatchTasks(new GravarVendasTransaction(iterator));
+        try {
+            dao.callBatchTasks(new GravarVendasTransaction(iterator));
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("Batch tasks")) {
+                throw (Exception) ex.getCause();
+            }
+            throw ex;
+        }
     }
 
     public long getCount() throws SQLException {
@@ -116,13 +122,17 @@ public class VendaImpDao {
                 LOG.fine("Vendas gravadas no banco temporário");
 
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() + " - " + imp.getId() : "") + e.getMessage(), e);
-                System.out.println(
-                        "COO: " + vimp.getNumeroCupom() + " Data: " + vimp.getData() + 
-                                " ECF: " + vimp.getEcf());
-                if (e.getCause() != null) {                    
-                    throw (Exception) e.getCause();
-                } else {
+                try {
+                    LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() + " - " + imp.getId() : "") + e.getMessage(), e);
+                    System.out.println(
+                            "COO: " + vimp.getNumeroCupom() + " Data: " + vimp.getData() + 
+                                    " ECF: " + vimp.getEcf());
+                    if (e.getCause() != null) {                    
+                        throw (Exception) e.getCause();
+                    } else {
+                        throw e;
+                    }
+                } catch (Exception ex) {
                     throw e;
                 }
             }
