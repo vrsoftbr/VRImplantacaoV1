@@ -97,6 +97,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         result.add(OpcaoProduto.PAUTA_FISCAL);
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
+        result.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
 
         return result;
     }
@@ -383,6 +384,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
+                
+                produto.setManterEAN(linha.getBoolean("manterean"));
 
                 result.add(produto);
             }
