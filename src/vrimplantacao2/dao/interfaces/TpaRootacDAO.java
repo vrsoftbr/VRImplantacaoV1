@@ -2,10 +2,12 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +18,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -25,6 +29,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  * 
@@ -33,6 +39,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
+    public Date vendaDataIni;
+    public Date vendaDataFim;
     
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
@@ -356,7 +364,7 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	0 validade,\n" +
                     "	p.PROCDESCRI descricaocompleta,\n" +
                     "	p.PROCDESRES descricaoreduzida,\n" +
-                    "	p.PROCCODSET merc1,	\n" +
+                    "	p.PROCCODSET merc1,\n" +
                     "	p.PROCCODGRU merc2,\n" +
                     "	p.PROCCODSGR merc3,\n" +
                     "	p.PROCCODFAM merc4,\n" +
@@ -467,14 +475,23 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                 Statement st = ConexaoSqlServer.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
                         "select\n" +
-                        "	o.CODIGOPLU id_produto,\n" +
-                        "	o.OFEDINIOFE datainicio,\n" +
-                        "	o.OFEDFIMOFE datatermino,\n" +
-                        "	o.OFENVLROFE valoroferta\n" +
+                        "	ofe.CODIGOPLU id_produto,\n" +
+                        "	ofe.OFEDINIOFE datainicio,\n" +
+                        "	ofe.OFEDFIMOFE datatermino,\n" +
+                        "	ofe.OFENVLROFE valoroferta,\n" +
+                        "	pre.PRENVDAATU valornormal\n" +
                         "from\n" +
-                        "	RCEstOfe o\n" +
+                        "	rc002loj lj\n" +
+                        "	join RCEstOfe ofe on\n" +
+                        "		lj.lojc05codi = ofe.OFECCODLOJ\n" +
+                        "	join RC003EST p on\n" +
+                        "		ofe.CODIGOPLU = p.CODIGOPLU and\n" +
+                        "		ofe.OFECCODLOJ = lj.lojc05codi\n" +
+                        "	join RCEstPre pre on\n" +
+                        "		pre.CODIGOPLU = ofe .CODIGOPLU and\n" +
+                        "		pre.PRECCODLOJ = ofe.OFECCODLOJ\n" +
                         "where\n" +
-                        "	o.OFECCODLOJ = '" + getLojaOrigem() + "'\n" +
+                        "	lj.lojc05codi = '" + getLojaOrigem() + "'\n" +
                         "order by\n" +
                         "	1"
                 )
@@ -486,6 +503,7 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDataInicio(rs.getDate("datainicio"));
                 imp.setDataFim(rs.getDate("datatermino"));
                 imp.setPrecoOferta(rs.getDouble("valoroferta"));
+                imp.setPrecoNormal(rs.getDouble("valornormal"));
                 
                 result.add(imp);
             }
@@ -696,7 +714,163 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new TpaRootacVendaIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new TpaRootacVendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+    }
+    
+    private static class TpaRootacVendaIterator extends MultiStatementIterator<VendaIMP> {
+
+        public TpaRootacVendaIterator(String idLojas, Date dataInicial, Date dataTermino) throws Exception {
+            super(
+                new CustomNextBuilder(),
+                new MultiStatementIterator.StatementBuilder() {
+                    @Override
+                    public Statement makeStatement() throws Exception {
+                        return ConexaoSqlServer.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                    }
+                }
+            );
+
+            for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLojas), dataInicial, dataTermino, new SimpleDateFormat("dd/MM/yyyy"))) {
+                this.addStatement(statement);
+            }
+        }
+
+        private String getFullSQL(String idLoja) throws Exception {
+
+            return
+                    "select\n" +
+                    "	f.IdDocumento id,\n" +
+                    "	f.NumeroNF numerocupom,\n" +
+                    "	f.Serie ecf,\n" +
+                    "	f.DataEmissao data,\n" +
+                    "	case when f.DataCancelamento is null then 0 else 1 end cancelado,\n" +
+                    "	f.TotalNF subtotalimpressora,\n" +
+                    "	f.IdConsumidor cpf,\n" +
+                    "	f.TotalDesconto valordesconto,\n" +
+                    "	f.Serie,\n" +
+                    "	f.ChaveNFE chave\n" +
+                    "from\n" +
+                    "	ROOTAC_NOT.dbo.DocumentoFiscal f\n" +
+                    "	join (select lj.lojc05codi id, cast(cast(lj.lojc15cgc as  bigint) as varchar) cnpj from ROOTAC_CAD.dbo.rc002loj lj) lj on\n" +
+                    "		f.CNPJ = lj.cnpj\n" +
+                    "where\n" +
+                    "	lj.id = '" + idLoja + "' and	\n" +
+                    "	cast(f.DataEmissao as date) >= '{DATA_INICIO}' and\n" +
+                    "	cast(f.DataEmissao as date) <= '{DATA_TERMINO}'\n" +
+                    "order by\n" +
+                    "	f.IdDocumento";
+
+        }
+
+        private static class CustomNextBuilder implements MultiStatementIterator.NextBuilder<VendaIMP> {
+
+            @Override
+            public VendaIMP makeNext(ResultSet rst) throws Exception {
+                VendaIMP imp = new VendaIMP();
+
+                imp.setId(rst.getString("id"));
+                imp.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                imp.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                imp.setData(rst.getDate("data"));
+                imp.setHoraInicio(rst.getDate("data"));
+                imp.setHoraTermino(rst.getDate("data"));
+                imp.setCancelado(rst.getBoolean("cancelado"));
+                imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                imp.setCpf(rst.getString("cpf"));
+                imp.setValorDesconto(rst.getDouble("valordesconto"));
+                imp.setNumeroSerie(rst.getString("Serie"));
+                imp.setChaveNfCe(rst.getString("chave"));
+
+                return imp;
+            }
+
+        }
+
+    }
+    
+    private static class TpaRootacVendaItemIterator extends MultiStatementIterator<VendaItemIMP> {
+
+        public TpaRootacVendaItemIterator(String idLoja, Date dataInicial, Date dataTermino) throws Exception {
+            super(
+                new CustomNextBuilder(),
+                new MultiStatementIterator.StatementBuilder() {
+                    @Override
+                    public Statement makeStatement() throws Exception {
+                        return ConexaoSqlServer.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                    }
+                }
+            );
+
+            for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
+                this.addStatement(statement);
+            }
+        }
+        
+        private String getFullSQL(String idLoja) throws Exception {
+            return 
+                    "select\n" +
+                    "	i.IdDocumento,\n" +
+                    "	i.NumeroItem,\n" +
+                    "	i.CodigoProduto id_produto,\n" +
+                    "	i.DescricaoProduto descricaoreduzida,\n" +
+                    "	i.Quantidade qtd,\n" +
+                    "	i.ValorTotal totalbruto,\n" +
+                    "	i.itemCancelado cancelado,\n" +
+                    "	i.ValorDesconto desconto,\n" +
+                    "	i.CodigoEAN ean,\n" +
+                    "	i.Unidade,\n" +
+                    "	i.ICMSCst,\n" +
+                    "	i.ICMSAliquota\n" +
+                    "from\n" +
+                    "	ROOTAC_NOT.dbo.DocumentoItem i\n" +
+                    "	join ROOTAC_NOT.dbo.DocumentoFiscal f on\n" +
+                    "		i.IdDocumento = f.IdDocumento\n" +
+                    "	join (select lj.lojc05codi id, cast(cast(lj.lojc15cgc as  bigint) as varchar) cnpj from ROOTAC_CAD.dbo.rc002loj lj) lj on\n" +
+                    "		f.CNPJ = lj.cnpj\n" +
+                    "where\n" +
+                    "	lj.id = '" + idLoja + "' and	\n" +
+                    "	cast(f.DataEmissao as date) >= '{DATA_INICIO}' and\n" +
+                    "	cast(f.DataEmissao as date) <= '{DATA_TERMINO}'\n" +
+                    "order by\n" +
+                    "	i.IdDocumento, i.NumeroItem";
+        }
+        
+        private static class CustomNextBuilder implements NextBuilder<VendaItemIMP> {
+
+            @Override
+            public VendaItemIMP makeNext(ResultSet rst) throws Exception {
+                VendaItemIMP imp = new VendaItemIMP();
+                
+                imp.setId(rst.getString("IdDocumento") + "-" + rst.getString("NumeroItem"));
+                imp.setVenda(rst.getString("IdDocumento"));
+                imp.setSequencia(rst.getInt("NumeroItem"));
+                imp.setProduto(String.format("%06d", Utils.stringToInt(rst.getString("id_produto"))));
+                imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                imp.setQuantidade(rst.getDouble("qtd"));
+                imp.setTotalBruto(rst.getDouble("totalbruto"));
+                imp.setCancelado(rst.getBoolean("cancelado"));
+                imp.setValorDesconto(rst.getDouble("desconto"));
+                imp.setCodigoBarras(rst.getString("ean"));
+                imp.setUnidadeMedida(rst.getString("Unidade"));
+                imp.setIcmsCst(Utils.stringToInt(rst.getString("ICMSCst")));
+                imp.setIcmsAliq(Utils.stringToDouble(rst.getString("ICMSAliquota")));
+                
+                return imp;
+            }
+            
+        }
+    }
+
 }
+
+
 
 /*
 CONVENIO
