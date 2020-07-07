@@ -972,6 +972,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        //Tabela de plano de contas: "fincta"
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -999,7 +1000,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
                     "	r.ctrtipo = 'C' and\n" +
-                    "   r.ctrgrupo not in (2, 3) \n" +        
+                    "   r.ctrgrupo in (0, 1, 3, 4, 5, 6, 7, 8, 10) \n" +        
                     "order by\n" +
                     "	r.ctrdtemiss"
             )) {
@@ -1185,6 +1186,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
+        //Tabela de plano de contas: "fincta"
         List<ChequeIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -1220,7 +1222,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
                     "	r.ctrtipo = 'C' and\n" +
-                    "	r.ctrgrupo IN (2, 3)\n" +
+                    "	r.ctrgrupo IN (2, 9)\n" +
                     "order by\n" +
                     "	r.ctrdtemiss")) {
                 while(rs.next()) {
