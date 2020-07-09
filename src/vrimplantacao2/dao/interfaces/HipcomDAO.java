@@ -427,7 +427,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join cotemb cot on\n" +
                     "		cot.embcodplu = p.procodplu\n" +
                     "	LEFT join\n" +
-                    "		(SELECT\n" +
+                    "		(SELECT\n" + 
                                 "	trccodplu,\n" +
                                 "	sum(trcqtde) estoquetroca\n" +
                                 "FROM \n" +
@@ -1202,6 +1202,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrvalor valor,\n" +
                     "	r.ctrjuros juros,\n" +
                     "	r.ctrdesc desconto,\n" +
+                    "   r.ctralinea alinea, \n" +        
                     "	r.ctrvalabt abatimento,\n" +
                     "	r.ctrsaldo valorfinal,\n" +
                     "	r.ctrobs observacao,\n" +
@@ -1222,7 +1223,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
                     "	r.ctrtipo = 'C' and\n" +
-                    "	r.ctrgrupo IN (2, 9)\n" +
+                    "	r.ctrgrupo IN (2, 9) and\n" +
+                    "   r.ctralinea IN (11, 12, 13, 14, 20, 21, 22, 23, 24, 25, 28, 29, 35, 37, 62, 63)\n" +
                     "order by\n" +
                     "	r.ctrdtemiss")) {
                 while(rs.next()) {
@@ -1242,6 +1244,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRg(rs.getString("rg"));
                     imp.setTelefone(rs.getString("fone"));
                     imp.setVistaPrazo(rs.getInt("ctrgrupo") == 2 ? TipoVistaPrazo.A_VISTA : TipoVistaPrazo.PRAZO);
+                    imp.setAlinea(rs.getInt("alinea"));
                     
                     result.add(imp);
                 }
