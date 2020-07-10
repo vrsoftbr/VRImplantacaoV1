@@ -737,7 +737,7 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             );
 
-            for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLojas), dataInicial, dataTermino, new SimpleDateFormat("dd/MM/yyyy"))) {
+            for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLojas), dataInicial, dataTermino, new SimpleDateFormat("dd-MM-yyyy"))) {
                 this.addStatement(statement);
             }
         }
@@ -770,7 +770,7 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         private static class CustomNextBuilder implements MultiStatementIterator.NextBuilder<VendaIMP> {
-
+            
             @Override
             public VendaIMP makeNext(ResultSet rst) throws Exception {
                 VendaIMP imp = new VendaIMP();
@@ -808,7 +808,7 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             );
 
-            for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
+            for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja), dataInicial, dataTermino, new SimpleDateFormat("dd-MM-yyyy"))) {
                 this.addStatement(statement);
             }
         }
