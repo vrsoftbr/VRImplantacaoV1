@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -22,6 +23,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SysPdvDAO;
 import vrimplantacao2.dao.interfaces.SysPdvDAO.FinalizadoraRecord;
+import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -77,22 +79,28 @@ public class SysPdvGUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
                        
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        /*conexaoFirebird.setOnConectar(() -> {
-            dao.setTipoConexao(SysPdvDAO.TipoConexao.FIREBIRD);
-            gravarParametros();
-            carregarLojaCliente();
-            carregarLojaVR();
-            carregarFinalizadora();
-            tabProdutos.btnMapaTribut.setEnabled(true);
+        conexaoFirebird.setOnConectar(new ConexaoEvent(){
+            @Override
+            public void executar() throws Exception {
+                dao.setTipoConexao(SysPdvDAO.TipoConexao.FIREBIRD);
+                gravarParametros();
+                carregarLojaCliente();
+                carregarLojaVR();
+                carregarFinalizadora();
+                tabProdutos.btnMapaTribut.setEnabled(true);
+            }            
         });
-        conexaoSqlServer.setOnConectar(() -> {
-            dao.setTipoConexao(SysPdvDAO.TipoConexao.SQL_SERVER);
-            gravarParametros();
-            carregarLojaCliente();
-            carregarLojaVR();
-            carregarFinalizadora();
-            tabProdutos.btnMapaTribut.setEnabled(true);
-        });*/
+        conexaoSqlServer.setOnConectar(new ConexaoEvent(){
+            @Override
+            public void executar() throws Exception {
+                dao.setTipoConexao(SysPdvDAO.TipoConexao.SQL_SERVER);
+                gravarParametros();
+                carregarLojaCliente();
+                carregarLojaVR();
+                carregarFinalizadora();
+                tabProdutos.btnMapaTribut.setEnabled(true);
+            }            
+        });
         carregarParametros();        
         centralizarForm();
         this.setMaximum(false);
@@ -206,50 +214,58 @@ public class SysPdvGUI extends VRInternalFrame {
         cmbLojaOrigem.setSelectedIndex(index);
     }
     
-    /*private FinalizadoraTableModel rotativoModel = new FinalizadoraTableModel(new ArrayList<>());
-    private FinalizadoraTableModel chequeModel = new FinalizadoraTableModel(new ArrayList<>());
+    private FinalizadoraTableModel rotativoModel = new FinalizadoraTableModel(new ArrayList<FinalizadoraRecord>());
+    private FinalizadoraTableModel chequeModel = new FinalizadoraTableModel(new ArrayList<FinalizadoraRecord>());
     private void carregarFinalizadora() throws Exception {
         this.rotativoModel = new FinalizadoraTableModel(this.dao.getFinalizadora());
-        this.rotativoModel.getItens().stream()
-                .forEach((f) -> {f.selected = rotativoSelecionado.contains(f.id);});
-        this.rotativoModel.addTableModelListener((e) -> {
-            FinalizadoraRecord item = this.rotativoModel.getItens().get(e.getLastRow());
-            if (item.selected) {
-                this.rotativoSelecionado.add(item.id);
-            } else {
-                this.rotativoSelecionado.remove(item.id);
+        for (FinalizadoraRecord f: this.rotativoModel.getItens()) {
+            f.selected = rotativoSelecionado.contains(f.id);
+        }
+        this.rotativoModel.addTableModelListener(new TableModelListener(){
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                FinalizadoraRecord item = rotativoModel.getItens().get(e.getLastRow());
+                if (item.selected) {
+                    rotativoSelecionado.add(item.id);
+                } else {
+                    rotativoSelecionado.remove(item.id);
+                }
             }
         });
         tblRotativo.setModel(this.rotativoModel);
         this.chequeModel = new FinalizadoraTableModel(this.dao.getFinalizadora());
-        this.chequeModel.getItens().stream()
-                .forEach((f) -> {f.selected = chequeSelecionado.contains(f.id);});
-        this.chequeModel.addTableModelListener((e) -> {
-            FinalizadoraRecord item = this.chequeModel.getItens().get(e.getLastRow());
-            if (item.selected) {
-                this.chequeSelecionado.add(item.id);
-            } else {
-                this.chequeSelecionado.remove(item.id);
+        for (FinalizadoraRecord f: this.chequeModel.getItens()) {
+            f.selected = chequeSelecionado.contains(f.id);
+        }
+        this.chequeModel.addTableModelListener(new TableModelListener(){
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                FinalizadoraRecord item = chequeModel.getItens().get(e.getLastRow());
+                if (item.selected) {
+                    chequeSelecionado.add(item.id);
+                } else {
+                    chequeSelecionado.remove(item.id);
+                }
             }
         });
         tblCheque.setModel(this.chequeModel);
-    }*/
+    }
     
-    /*private List<String> getFinalizadorasRotativo() {
+    private List<String> getFinalizadorasRotativo() {
         List<String> result = new ArrayList<>();
-        this.rotativoModel.getItens().stream()
-                .filter((f) -> f.selected)
-                .forEach((f) -> result.add(f.id));
+        for (FinalizadoraRecord f: this.rotativoModel.getItens()) {
+            result.add(f.id);
+        }
         return result;
     }
     
     private List<String> getFinalizadorasCheque() {
         List<String> result = new ArrayList<>();
-        this.chequeModel.getItens().stream()
-                .filter((f) -> f.selected)
-                .forEach((f) -> result.add(f.id));
+        for (FinalizadoraRecord f: this.chequeModel.getItens()) {
+            result.add(f.id);
+        }
         return result;
-    }*/
+    }
     
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {

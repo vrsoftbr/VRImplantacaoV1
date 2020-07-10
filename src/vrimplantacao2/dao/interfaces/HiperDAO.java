@@ -15,6 +15,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -162,7 +163,7 @@ public class HiperDAO extends InterfaceDAO {
                     + "left join natureza_receita_pis_cofins nat2 on nat2.id_natureza_receita_pis_cofins = p.id_natureza_receita_cofins\n"
                     + "left join view_hiperpdv_produto_tributacao_icms icm on icm.id_produto = p.id_produto\n"
                     + "left join situacao_tributaria_icms cst_icms on cst_icms.id_situacao_tributaria_icms = icm.id_situacao_tributaria_icms\n"
-                    + "	and icm.uf_de = 'RJ' and icm.uf_para = 'RJ'\n"
+                    + "	and icm.uf_de = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ") and icm.uf_para = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ")\n"
                     + "order by id_produto"
             )) {
                 while (rst.next()) {
@@ -405,6 +406,50 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setCobrancaMunicipio(rst.getString("cidade_cobranca"));
                     imp.setCobrancaUf(rst.getString("uf_cobranca"));
                     imp.setValorLimite(rst.getDouble("limite_credito"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	id_documento_receber,\n" +
+                    "	id_tipo_documento_financeiro,\n" +
+                    "	id_entidade,\n" +
+                    "	data_emissao,\n" +
+                    "	data_vencimento,\n" +
+                    "	data_quitacao,\n" +
+                    "	valor,\n" +
+                    "	saldo,\n" +
+                    "	situacao,\n" +
+                    "	numero_documento_receber,\n" +
+                    "	descricao,\n" +
+                    "	id_entidade_portador,\n" +
+                    "	id_centro_lucro\n" +
+                    "FROM \n" +
+                    "	documento_receber\n" +
+                    "where\n" +
+                    "	situacao = 1 and \n" +
+                    "	id_filial_geracao = " + getLojaOrigem() + " and \n" +
+                    "	id_entidade not in (6, 90, 91, 92, 96, 93)")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id_documento_receber"));
+                    imp.setIdCliente(rs.getString("id_entidade"));
+                    imp.setDataEmissao(rs.getDate("data_emissao"));
+                    imp.setDataVencimento(rs.getDate("data_vencimento"));
+                    imp.setValor(rs.getDouble("saldo"));
+                    imp.setNumeroCupom(rs.getString("numero_documento_receber"));
+                    imp.setObservacao(rs.getString("descricao"));
+                    
                     result.add(imp);
                 }
             }
