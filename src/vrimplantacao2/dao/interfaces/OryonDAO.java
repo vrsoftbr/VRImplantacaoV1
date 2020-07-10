@@ -536,6 +536,29 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(imp);
                 }
             }
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    p.Codigo as id_produto,\n" +
+                    "    p.Fornecedor as id_fornecedor,\n" +
+                    "    p.Codigo_forn as codigoexterno\n" +
+                    "from\n" +
+                    "    tabela_pro p\n" +
+                    "where\n" +
+                    "    not p.Codigo_forn is null and\n" +
+                    "    not p.Fornecedor is null\n" +
+                    "order by\n" +
+                    "    p.codigo")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    
+                    result.add(imp);
+                }
+            }
         }
         return result;
     }
@@ -687,33 +710,50 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "   codigo_fluxo as id,\n" +
-                    "   duplicata,\n" +
-                    "   num_maquina as ecf,\n" +
-                    "   dia as datalanc,\n" +
-                    "   vencimento,\n" +
-                    "   numero as coo,\n" +
-                    "   prazo as valor,\n" +
-                    "   cliente,\n" +
-                    "   descricao as observacao\n" +
+                    "  r.Duplicata as id,\n" +
+                    "  r.Dia as emissao,\n" +
+                    "  r.Num_NF as numerocupom,\n" +
+                    "  r.Num_maquina as ecf,\n" +
+                    "  r.Valor_total as valor,\n" +
+                    "  r.Duplicata,\n" +
+                    "  r.Unidade_origem,\n" +
+                    "  r.Observacoes,\n" +
+                    "  r.Cliente as id_cliente,\n" +
+                    "  r.Vencimento,\n" +
+                    "  r.Data_pgto,\n" +
+                    "  r.Valor_pago\n" +
                     "from\n" +
-                    "   tabela_fluxo\n" +
+                    "  Tabela_Caderno r\n" +
                     "where\n" +
-                    "   cliente is not null and\n" +
-                    "   data_baixa is null and\n" +
-                    "   duplicata is not null\n" +
+                    "  Status = 0\n" +
                     "order by\n" +
-                    "   vencimento")) {
+                    "  r.Vencimento")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setDataEmissao(rs.getDate("datalanc"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setIdCliente(rs.getString("cliente"));
-                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
                     imp.setEcf(rs.getString("ecf"));
-                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(
+                            String.format(
+                                    "LOJA ORIG %s DUPLIC %s OBS %s",
+                                    rs.getString("Duplicata"),
+                                    rs.getString("Unidade_origem"),
+                                    rs.getString("Observacoes")
+                            )
+                    );
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setDataVencimento(rs.getDate("Vencimento"));
+                    double valorPago = rs.getDouble("Valor_pago");
+                    if (valorPago > 0) {
+                        imp.addPagamento(imp.getId(), valorPago,
+                                0,
+                                0,
+                                rs.getDate("Data_pgto"),
+                                ""
+                        );
+                    }
                     
                     result.add(imp);
                 }
