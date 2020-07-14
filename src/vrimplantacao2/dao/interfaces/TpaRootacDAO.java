@@ -778,9 +778,9 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setId(rst.getString("id"));
                 imp.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                 imp.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                imp.setData(rst.getDate("data"));
-                imp.setHoraInicio(rst.getDate("data"));
-                imp.setHoraTermino(rst.getDate("data"));
+                imp.setData(rst.getTimestamp("data"));
+                imp.setHoraInicio(rst.getTime("data"));
+                imp.setHoraTermino(rst.getTime("data"));
                 imp.setCancelado(rst.getBoolean("cancelado"));
                 imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                 imp.setCpf(rst.getString("cpf"));
