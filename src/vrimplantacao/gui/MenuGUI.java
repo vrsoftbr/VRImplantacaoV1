@@ -119,6 +119,7 @@ import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
 import vrimplantacao2.gui.interfaces.ControlXGUI;
+import vrimplantacao2.gui.interfaces.Cronos20GUI;
 import vrimplantacao2.gui.interfaces.DJSystemGUI;
 import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
@@ -728,6 +729,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuBrajanGestores = new javax.swing.JMenuItem();
         mnuLogTec = new javax.swing.JMenuItem();
         mnuNCA = new javax.swing.JMenuItem();
+        mnuCronos20 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -2223,6 +2225,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuNCA);
+
+        mnuCronos20.setText("Cronos 20");
+        mnuCronos20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCronos20ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuCronos20);
 
         mnuDatabase.add(jMenu8);
 
@@ -4622,6 +4632,10 @@ public final class MenuGUI extends VRMdiFrame {
         AvistareGUI.exibir(this);
     }//GEN-LAST:event_mnuAvistateActionPerformed
 
+    private void mnuCronos20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCronos20ActionPerformed
+        Cronos20GUI.exibir(this);
+    }//GEN-LAST:event_mnuCronos20ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4746,6 +4760,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControlX;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
+    private javax.swing.JMenuItem mnuCronos20;
     private javax.swing.JMenu mnuDB2;
     private javax.swing.JMenuItem mnuDJSystem;
     private javax.swing.JMenuItem mnuDLink;
