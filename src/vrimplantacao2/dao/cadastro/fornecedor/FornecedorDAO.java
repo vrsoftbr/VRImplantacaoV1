@@ -644,6 +644,15 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.ENDERECO)) {
                     sql.put("endereco", vo.getEndereco());
                 }
+                if (opt.contains(OpcaoFornecedor.ENDERECO_COMPLETO)) {
+                    sql.put("endereco", vo.getEndereco());
+                    sql.put("complemento", vo.getComplemento());
+                    sql.put("numero", vo.getNumero());
+                    sql.put("bairro", vo.getBairro());
+                    sql.put("cep", vo.getCep());
+                    sql.put("id_municipio", vo.getMunicipio().getId());
+                    sql.put("id_estado", vo.getEstado() == null ? Parametros.get().getUfPadrao().getId() : vo.getEstado().getId());
+                }
                 if (opt.contains(OpcaoFornecedor.COMPLEMENTO)) {
                     sql.put("complemento", vo.getComplemento());
                 }
