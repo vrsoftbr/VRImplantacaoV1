@@ -180,7 +180,7 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
 
-                    String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
+                    /*String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
                     String[] cods = merc.split("\\.");
 
                     for (int i = 0; i < cods.length; i++) {
@@ -194,7 +194,8 @@ public class HiperDAO extends InterfaceDAO {
                         }
                     }
 
-                    imp.setCodMercadologico3("1");
+                    imp.setCodMercadologico3("1");*/
+                    imp.setCodMercadologico1(rst.getString("mercadologico"));
                     imp.setMargem(rst.getDouble("markup_varejo"));
                     imp.setCustoComImposto(rst.getDouble("preco_custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
@@ -383,7 +384,7 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setCnpj(rst.getString("cnpj") == null ? rst.getString("cpf") : rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("ie"));
                     imp.setAtivo(rst.getInt("inativo") == 1);
                     imp.setDataCadastro(rst.getDate("datacadastro"));

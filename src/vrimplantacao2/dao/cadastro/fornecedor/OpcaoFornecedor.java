@@ -18,6 +18,7 @@ public enum OpcaoFornecedor {
     RAZAO_SOCIAL,
     NOME_FANTASIA,
     ENDERECO,
+    ENDERECO_COMPLETO,
     BAIRRO,
     UNIFICACAO, 
     CONDICAO_PAGAMENTO,
