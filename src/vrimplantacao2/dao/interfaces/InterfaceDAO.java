@@ -19,7 +19,6 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
-import vrimplantacao2.dao.repositories.Recorder;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -528,12 +527,6 @@ public abstract class InterfaceDAO {
      */
     public List<DivisaoIMP> getDivisoes() throws Exception {
         return new ArrayList<>();
-    }
-    
-    public void getProdutos(Recorder<ProdutoIMP> rec) throws Exception {
-        for (ProdutoIMP imp: getProdutos()) {
-            rec.add(imp);
-        }
     }
     
     /**

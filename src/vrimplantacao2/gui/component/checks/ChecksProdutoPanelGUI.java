@@ -52,7 +52,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         }
         
     };
-    private boolean utilizarVersao2 = false;
 
     public void setParametrosExtras(List<OpcaoProduto> parametrosExtras) {
         this.parametrosExtras = parametrosExtras;
@@ -1516,14 +1515,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkCopiarIcmsDebitoNaEntrada.setSelected(parametros.getBool(concat(params, "COPIAR_DEBITO_NO_CREDITO" )));
         
     }
-
-    /**
-     * Aciona o novo produto repository para fazer a importação dos produtos.
-     * @param b 
-     */
-    public void setUtilizarVersao2(boolean utilizarVersao2) {
-        this.utilizarVersao2 = utilizarVersao2;
-    }
     
     public class ProdutoPanelImportador {
         public void importar() throws Exception {
@@ -1552,11 +1543,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     opt.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
                 }
                 opt.addAll(getParametrosExtras());
-                if (utilizarVersao2) {
-                    importador.importarProdutoNovo(opt.toArray(new OpcaoProduto[]{}));
-                } else {
-                    importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
-                }
+                importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
             }
             
             if (chkProdutosBalanca.isSelected()) {
@@ -1786,11 +1773,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     if (importador.getInterfaceDAO().getOpcoesDisponiveisProdutos().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)) {
                         opcoes.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
                     }
-                    if (utilizarVersao2) {
-                        importador.importarProdutoNovo(opcoes.toArray(new OpcaoProduto[]{}));
-                    } else {
-                        importador.atualizarProdutos(opcoes);
-                    }
+                    importador.atualizarProdutos(opcoes);
                 }
             }
             if (chkEAN.isSelected()) {

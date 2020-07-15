@@ -77,9 +77,6 @@ import vrimplantacao2.dao.cadastro.venda.VendaImpDao;
 import vrimplantacao2.dao.cadastro.venda.VendaItemImpDao;
 import vrimplantacao2.dao.cadastro.venda.VendaRepository;
 import vrimplantacao2.dao.cadastro.venda.VendaRepositoryProvider;
-import vrimplantacao2.dao.repositories.MigracaoFuture;
-import vrimplantacao2.dao.repositories.Recorder;
-import vrimplantacao2.dao.repositories.produto.ProdutoRepository2;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.divisao.DivisaoRepository;
 import vrimplantacao2.vo.cadastro.divisao.DivisaoRepositoryProvider;
@@ -320,30 +317,6 @@ public class Importador {
 
         ProdutoRepository repository = new ProdutoRepository(provider);
         repository.salvar(produtos);
-
-    }
-    
-    /**
-     * Importa produtos novos e atualiza os cadastros.
-     * @param opcoes
-     * @throws Exception 
-     */
-    public void importarProdutoNovo(OpcaoProduto... opcoes) throws Exception {
-
-        ProgressBar.setStatus("Carregando produtos...");
-        
-        Set<OpcaoProduto> opt = new HashSet<>(Arrays.asList(opcoes));
-                
-        new ProdutoRepository2(
-                getSistema(),
-                getLojaOrigem(),
-                getLojaVR()
-        ).importar(new MigracaoFuture<ProdutoIMP>() {
-            @Override
-            public void call(Recorder<ProdutoIMP> recorder) throws Exception {
-                getInterfaceDAO().getProdutos(recorder);
-            }
-        }, opt);
 
     }
 
