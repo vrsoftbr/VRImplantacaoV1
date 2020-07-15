@@ -9,13 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -24,6 +25,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 /**
  *
  * @author Importacao
+ * Sistema WEB - Foi desenvolvido por backup enviado pela software house
  */
 public class Cronos20DAO extends InterfaceDAO {
 
@@ -64,7 +66,6 @@ public class Cronos20DAO extends InterfaceDAO {
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
-            OpcaoProduto.ATACADO,
             OpcaoProduto.VALIDADE
         }));
     }
@@ -408,4 +409,272 @@ public class Cronos20DAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT c.id,\n" +
+                    "    c.id_operacao_fiscal,\n" +
+                    "    c.id_pessoa,\n" +
+                    "    c.id_atividade_for_cli,\n" +
+                    "    c.id_situacao_for_cli,\n" +
+                    "    empresa.id AS id_empresa,\n" +
+                    "    c.desde,\n" +
+                    "    c.data_cadastro,\n" +
+                    "    c.observacao,\n" +
+                    "    c.conta_tomador,\n" +
+                    "    c.gera_financeiro,\n" +
+                    "    c.indicador_preco,\n" +
+                    "    c.porcento_desconto,\n" +
+                    "    c.forma_desconto,\n" +
+                    "    c.limite_credito,\n" +
+                    "    c.tipo_frete,\n" +
+                    "    e.logradouro,\n" +
+                    "    e.numero,\n" +
+                    "    e.complemento,\n" +
+                    "    e.bairro,\n" +
+                    "    e.cidade,\n" +
+                    "    e.cep,\n" +
+                    "    e.municipio_ibge,\n" +
+                    "    e.uf,\n" +
+                    "    e.fone,\n" +
+                    "    p.nome,\n" +
+                    "    p.tipo,\n" +
+                    "    p.email,\n" +
+                    "    p.site,\n" +
+                    "    pf.cpf AS cpf_cnpj,\n" +
+                    "    pf.rg AS rg_ie,\n" +
+                    "    empresa.razao_social AS empresa_razao_social,\n" +
+                    "    empresa.nome_fantasia AS empresa_nome_fantasia,\n" +
+                    "    empresa.cnpj AS empresa_cnpj,\n" +
+                    "    empresa.inscricao_estadual AS empresa_inscricao_estadual,\n" +
+                    "    empresa.imagem_logotipo AS empresa_imagem_logotipo,\n" +
+                    "    empresa_endereco.logradouro AS empresa_endereco_logradouro,\n" +
+                    "    empresa_endereco.numero AS empresa_endereco_numero,\n" +
+                    "    empresa_endereco.complemento AS empresa_endereco_complemento,\n" +
+                    "    empresa_endereco.bairro AS empresa_endereco_bairro,\n" +
+                    "    empresa_endereco.cidade AS empresa_endereco_cidade,\n" +
+                    "    empresa_endereco.cep AS empresa_endereco_cep,\n" +
+                    "    empresa_endereco.fone AS empresa_endereco_fone,\n" +
+                    "    empresa_endereco.uf AS empresa_endereco_uf,\n" +
+                    "    empresa.email AS empresa_email\n" +
+                    "   FROM tioferreira.pessoa p\n" +
+                    "     JOIN tioferreira.pessoa_fisica pf ON pf.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.cliente c ON c.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.pessoa_endereco e ON e.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.empresa_pessoa ep ON ep.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.empresa empresa ON ep.id_empresa = empresa.id\n" +
+                    "     JOIN tioferreira.empresa_endereco empresa_endereco ON empresa_endereco.id_empresa = empresa.id\n" +
+                    "  WHERE empresa_endereco.principal = 'S'::bpchar AND p.cliente = 'S'::bpchar AND e.principal = 'S'::bpchar and \n" +
+                    "  	empresa.id = " + getLojaOrigem() + "\n" +
+                    "UNION\n" +
+                    " SELECT c.id,\n" +
+                    "    c.id_operacao_fiscal,\n" +
+                    "    c.id_pessoa,\n" +
+                    "    c.id_atividade_for_cli,\n" +
+                    "    c.id_situacao_for_cli,\n" +
+                    "    empresa.id AS id_empresa,\n" +
+                    "    c.desde,\n" +
+                    "    c.data_cadastro,\n" +
+                    "    c.observacao,\n" +
+                    "    c.conta_tomador,\n" +
+                    "    c.gera_financeiro,\n" +
+                    "    c.indicador_preco,\n" +
+                    "    c.porcento_desconto,\n" +
+                    "    c.forma_desconto,\n" +
+                    "    c.limite_credito,\n" +
+                    "    c.tipo_frete,\n" +
+                    "    e.logradouro,\n" +
+                    "    e.numero,\n" +
+                    "    e.complemento,\n" +
+                    "    e.bairro,\n" +
+                    "    e.cidade,\n" +
+                    "    e.cep,\n" +
+                    "    e.municipio_ibge,\n" +
+                    "    e.uf,\n" +
+                    "    e.fone,\n" +
+                    "    p.nome,\n" +
+                    "    p.tipo,\n" +
+                    "    p.email,\n" +
+                    "    p.site,\n" +
+                    "    pj.cnpj AS cpf_cnpj,\n" +
+                    "    pj.inscricao_estadual AS rg_ie,\n" +
+                    "    empresa.razao_social AS empresa_razao_social,\n" +
+                    "    empresa.nome_fantasia AS empresa_nome_fantasia,\n" +
+                    "    empresa.cnpj AS empresa_cnpj,\n" +
+                    "    empresa.inscricao_estadual AS empresa_inscricao_estadual,\n" +
+                    "    empresa.imagem_logotipo AS empresa_imagem_logotipo,\n" +
+                    "    empresa_endereco.logradouro AS empresa_endereco_logradouro,\n" +
+                    "    empresa_endereco.numero AS empresa_endereco_numero,\n" +
+                    "    empresa_endereco.complemento AS empresa_endereco_complemento,\n" +
+                    "    empresa_endereco.bairro AS empresa_endereco_bairro,\n" +
+                    "    empresa_endereco.cidade AS empresa_endereco_cidade,\n" +
+                    "    empresa_endereco.cep AS empresa_endereco_cep,\n" +
+                    "    empresa_endereco.fone AS empresa_endereco_fone,\n" +
+                    "    empresa_endereco.uf AS empresa_endereco_uf,\n" +
+                    "    empresa.email AS empresa_email\n" +
+                    " FROM tioferreira.pessoa p\n" +
+                    "     JOIN tioferreira.pessoa_juridica pj ON pj.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.cliente c ON c.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.pessoa_endereco e ON e.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.empresa_pessoa ep ON ep.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.empresa empresa ON ep.id_empresa = empresa.id\n" +
+                    "     JOIN tioferreira.empresa_endereco empresa_endereco ON empresa_endereco.id_empresa = empresa.id\n" +
+                    "  WHERE empresa_endereco.principal = 'S'::bpchar AND p.cliente = 'S'::bpchar AND e.principal = 'S'::bpchar and \n" +
+                    "  	empresa.id = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setCnpj(rs.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rs.getString("rg_ie"));
+                    imp.setFantasia(rs.getString("nome"));
+                    imp.setAtivo(rs.getInt("id_situacao_for_cli") == 1);
+                    imp.setDataCadastro(rs.getDate("desde"));
+                    imp.setObservacao(rs.getString("observacao") != null ? rs.getString("observacao") : "");
+                    if(rs.getString("gera_financeiro") != null && rs.getString("gera_financeiro").equals("S")) {
+                        imp.setPermiteCreditoRotativo(true);
+                        imp.setPermiteCheque(true);
+                    }
+                    imp.setValorLimite(rs.getDouble("limite_credito"));
+                    imp.setEndereco(rs.getString("logradouro"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setMunicipioIBGE(rs.getString("municipio_ibge"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("fone"));
+                    imp.setEmail(rs.getString("email"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	 lr.id,\n" +
+                    "    c.id AS id_cliente,\n" +
+                    "    lr.id_empresa,\n" +
+                    "    p.nome,\n" +
+                    "    pf.cpf AS cpf_cnpj,\n" +
+                    "    lr.data_lancamento,\n" +
+                    "    lr.valor_a_receber AS valor_lancamento,\n" +
+                    "    lr.quantidade_parcela,\n" +
+                    "    lr.numero_documento,\n" +
+                    "    pr.numero_parcela,\n" +
+                    "    pr.data_vencimento,\n" +
+                    "    pr.valor AS valor_parcela,\n" +
+                    "    pr.taxa_juro,\n" +
+                    "    pr.valor_juro,\n" +
+                    "    pr.taxa_multa,\n" +
+                    "    pr.valor_multa,\n" +
+                    "    pr.taxa_desconto,\n" +
+                    "    pr.valor_desconto,\n" +
+                    "    ( SELECT COALESCE(sum(fin_parcela_recebimento.valor_recebido), 0::numeric) AS \"coalesce\"\n" +
+                    "           FROM tioferreira.fin_parcela_recebimento\n" +
+                    "          WHERE fin_parcela_recebimento.id_fin_parcela_receber = pr.id) AS valor_recebido,\n" +
+                    "    ( SELECT COALESCE(sum(fin_parcela_recebimento.valor_juro), 0::numeric) AS \"coalesce\"\n" +
+                    "           FROM tioferreira.fin_parcela_recebimento\n" +
+                    "          WHERE fin_parcela_recebimento.id_fin_parcela_receber = pr.id) AS juros_recebido,\n" +
+                    "    ( SELECT COALESCE(sum(fin_parcela_recebimento.valor_multa), 0::numeric) AS \"coalesce\"\n" +
+                    "           FROM tioferreira.fin_parcela_recebimento\n" +
+                    "          WHERE fin_parcela_recebimento.id_fin_parcela_receber = pr.id) AS multa_recebido,\n" +
+                    "    s.id AS id_status_parcela,\n" +
+                    "    s.situacao AS situacao_parcela,\n" +
+                    "    s.descricao AS descricao_situacao_parcela,\n" +
+                    "    cc.id AS id_conta_caixa,\n" +
+                    "    cc.nome AS nome_conta_caixa,\n" +
+                    "    cc.limite_cobranca_juro,\n" +
+                    "    pr.id AS id_parcela_receber,\n" +
+                    "    doc.sigla_documento\n" +
+                    "   FROM tioferreira.fin_lancamento_receber lr\n" +
+                    "     JOIN tioferreira.fin_parcela_receber pr ON pr.id_fin_lancamento_receber = lr.id\n" +
+                    "     JOIN tioferreira.fin_status_parcela s ON pr.id_fin_status_parcela = s.id\n" +
+                    "     JOIN tioferreira.conta_caixa cc ON pr.id_conta_caixa = cc.id\n" +
+                    "     JOIN tioferreira.fin_documento_origem doc ON lr.id_fin_documento_origem = doc.id\n" +
+                    "     JOIN tioferreira.cliente c ON lr.id_cliente = c.id\n" +
+                    "     JOIN tioferreira.pessoa p ON c.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.pessoa_fisica pf ON pf.id_pessoa = p.id\n" +
+                    "   where \n" +
+                    "   	s.situacao = '01' and \n" +
+                    "   	lr.id_empresa = " + getLojaOrigem() + "\n" +
+                    "UNION\n" +
+                    " SELECT lr.id,\n" +
+                    "    c.id AS id_cliente,\n" +
+                    "    lr.id_empresa,\n" +
+                    "    p.nome,\n" +
+                    "    pj.cnpj AS cpf_cnpj,\n" +
+                    "    lr.data_lancamento,\n" +
+                    "    lr.valor_a_receber AS valor_lancamento,\n" +
+                    "    lr.quantidade_parcela,\n" +
+                    "    lr.numero_documento,\n" +
+                    "    pr.numero_parcela,\n" +
+                    "    pr.data_vencimento,\n" +
+                    "    pr.valor AS valor_parcela,\n" +
+                    "    pr.taxa_juro,\n" +
+                    "    pr.valor_juro,\n" +
+                    "    pr.taxa_multa,\n" +
+                    "    pr.valor_multa,\n" +
+                    "    pr.taxa_desconto,\n" +
+                    "    pr.valor_desconto,\n" +
+                    "    ( SELECT COALESCE(sum(fin_parcela_recebimento.valor_recebido), 0::numeric) AS \"coalesce\"\n" +
+                    "           FROM tioferreira.fin_parcela_recebimento\n" +
+                    "          WHERE fin_parcela_recebimento.id_fin_parcela_receber = pr.id) AS valor_recebido,\n" +
+                    "    ( SELECT COALESCE(sum(fin_parcela_recebimento.valor_juro), 0::numeric) AS \"coalesce\"\n" +
+                    "           FROM tioferreira.fin_parcela_recebimento\n" +
+                    "          WHERE fin_parcela_recebimento.id_fin_parcela_receber = pr.id) AS juros_recebido,\n" +
+                    "    ( SELECT COALESCE(sum(fin_parcela_recebimento.valor_multa), 0::numeric) AS \"coalesce\"\n" +
+                    "           FROM tioferreira.fin_parcela_recebimento\n" +
+                    "          WHERE fin_parcela_recebimento.id_fin_parcela_receber = pr.id) AS multa_recebido,\n" +
+                    "    s.id AS id_status_parcela,\n" +
+                    "    s.situacao AS situacao_parcela,\n" +
+                    "    s.descricao AS descricao_situacao_parcela,\n" +
+                    "    cc.id AS id_conta_caixa,\n" +
+                    "    cc.nome AS nome_conta_caixa,\n" +
+                    "    cc.limite_cobranca_juro,\n" +
+                    "    pr.id AS id_parcela_receber,\n" +
+                    "    doc.sigla_documento\n" +
+                    "   FROM tioferreira.fin_lancamento_receber lr\n" +
+                    "     JOIN tioferreira.fin_parcela_receber pr ON pr.id_fin_lancamento_receber = lr.id\n" +
+                    "     JOIN tioferreira.fin_status_parcela s ON pr.id_fin_status_parcela = s.id\n" +
+                    "     JOIN tioferreira.conta_caixa cc ON pr.id_conta_caixa = cc.id\n" +
+                    "     JOIN tioferreira.fin_documento_origem doc ON lr.id_fin_documento_origem = doc.id\n" +
+                    "     JOIN tioferreira.cliente c ON lr.id_cliente = c.id\n" +
+                    "     JOIN tioferreira.pessoa p ON c.id_pessoa = p.id\n" +
+                    "     JOIN tioferreira.pessoa_juridica pj ON pj.id_pessoa = p.id\n" +
+                    "   where \n" +
+                    "   	s.situacao = '01' and \n" +
+                    "   	lr.id_empresa = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setCnpjCliente(rs.getString("cpf_cnpj"));
+                    imp.setDataEmissao(rs.getDate("data_lancamento"));
+                    imp.setParcela(rs.getInt("numero_parcela"));
+                    imp.setValor(rs.getDouble("valor_parcela"));
+                    imp.setDataVencimento(rs.getDate("data_vencimento"));
+                    imp.setNumeroCupom(rs.getString("numero_documento"));
+                    imp.setObservacao(rs.getString("numero_documento"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
