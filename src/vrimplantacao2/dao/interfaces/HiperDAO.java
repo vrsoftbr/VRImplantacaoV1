@@ -173,6 +173,15 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("codigo_barras"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
+                    
+                    if(imp.isBalanca()) {
+                        imp.setEan(imp.getImportId());
+                    }
+                    
+                    if(imp.getEan() != null && !imp.getEan().equals("") && imp.getEan().length() < 7) {
+                        imp.setManterEAN(true);
+                    }
+                    
                     imp.setValidade(rst.getInt("dias_validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
