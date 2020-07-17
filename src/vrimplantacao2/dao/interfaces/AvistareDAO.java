@@ -22,6 +22,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -487,6 +488,34 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
                     }
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate(null));
+                    imp.setNumeroCupom(rst.getString(null));
+                    imp.setEcf(rst.getString(null));
+                    imp.setValor(rst.getDouble(null));
+                    imp.setObservacao(rst.getString(null));
+                    imp.setIdCliente(rst.getString(null));
+                    imp.setDataVencimento(rst.getDate(null));
+                    imp.setJuros(rst.getDouble(null));
+                    imp.setCnpjCliente(rst.getString(null));
+                    
                     result.add(imp);
                 }
             }
