@@ -108,6 +108,7 @@ public class UniplusDAO extends InterfaceDAO {
             OpcaoProduto.NCM,
             OpcaoProduto.CEST,
             OpcaoProduto.ICMS,
+            OpcaoProduto.ICMS_CONSUMIDOR,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ATACADO,
@@ -293,6 +294,11 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setIcmsAliqEntrada(rs.getDouble("icmscredito"));
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("aliquotaicmsinterna"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("aliquotaicmsinterna"));
+
+                    imp.setIcmsAliqConsumidor(rs.getDouble("aliquotaicmsinterna"));
+                    imp.setIcmsCstConsumidor(rs.getInt("cst"));
+                    imp.setIcmsReducaoConsumidor(0);
+
                     imp.setPiscofinsCstCredito(rs.getString("cstpisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setNcm(rs.getString("ncm"));
@@ -359,19 +365,20 @@ public class UniplusDAO extends InterfaceDAO {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	p.codigo idproduto,\n"
-                    + "	e.codigo idfornecedor,\n"
-                    + "	pf.referenciafornecedor\n"
-                    + "from\n"
-                    + "	produtofornecedor pf\n"
-                    + "join\n"
-                    + "	produto p on p.id = pf.idproduto\n"
-                    + "join\n"
-                    + "	entidade e on e.id = pf.idfornecedor \n"
-                    + "where\n"
-                    + "	e.fornecedor = 1\n"
-                    + "order by\n"
-                    + "	pf.idproduto, pf.idfornecedor")) {
+                     + "	p.codigo idproduto,\n"
+                     + "	e.codigo idfornecedor,\n"
+                     + "	pf.referenciafornecedor\n"
+                     + "from\n"
+                     + "	produtofornecedor pf\n"
+                     + "join\n"
+                     + "	produto p on p.id = pf.idproduto\n"
+                     + "join\n"
+                     + "	entidade e on e.id = pf.idfornecedor \n"
+                     + "where\n"
+                     + "	e.fornecedor = 1\n"
+                     + "order by\n"
+                     + "	pf.idproduto, pf.idfornecedor"
+                    )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportSistema(getSistema());
@@ -446,9 +453,9 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rs.getString("codigo"));
-                        imp.setEan(String.format("555%06d",Utils.stringToInt(rs.getString("codigo"))));
+                        imp.setEan(String.format("555%06d", Utils.stringToInt(rs.getString("codigo"))));
                         imp.setQtdEmbalagem(rs.getInt("quantidadepauta1"));
-                        imp.setTipoEmbalagem(rs.getString("unidademedida"));                        
+                        imp.setTipoEmbalagem(rs.getString("unidademedida"));
 
                         result.add(imp);
                     }
