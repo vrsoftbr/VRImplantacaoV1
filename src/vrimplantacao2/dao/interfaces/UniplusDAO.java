@@ -39,6 +39,7 @@ public class UniplusDAO extends InterfaceDAO {
     private boolean forcarIdProdutoQuandoPesavel = false;
     public boolean DUN14Atacado = false;
     public boolean NewEan = false;
+    public boolean ProdutoFornecedorNotas = false;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
@@ -362,32 +363,64 @@ public class UniplusDAO extends InterfaceDAO {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                     + "	p.codigo idproduto,\n"
-                     + "	e.codigo idfornecedor,\n"
-                     + "	pf.referenciafornecedor\n"
-                     + "from\n"
-                     + "	produtofornecedor pf\n"
-                     + "join\n"
-                     + "	produto p on p.id = pf.idproduto\n"
-                     + "join\n"
-                     + "	entidade e on e.id = pf.idfornecedor \n"
-                     + "where\n"
-                     + "	e.fornecedor = 1\n"
-                     + "order by\n"
-                     + "	pf.idproduto, pf.idfornecedor"
-                    )) {
-                while (rs.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setCodigoExterno(rs.getString("referenciafornecedor"));
 
-                    result.add(imp);
+        if (ProdutoFornecedorNotas == true) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select distinct \n"
+                        + "	f.codigo idfornecedor,\n"
+                        + "	f.nome,\n"
+                        + "	nfi.produto idproduto,	\n"
+                        + "	nfi.referenciafornecedor referenciafornecedor\n"
+                        + "from \n"
+                        + "	notafiscalitem nfi\n"
+                        + "	join notafiscal nf 		on 		nf.id = nfi.idnotafiscal\n"
+                        + "	join entidade f			on 		f.id = nf.identidade\n"
+                        + "where\n"
+                        + "	nfi.referenciafornecedor != ''\n"
+                        + "order by\n"
+                        + "	f.codigo, nfi.produto"
+                )) {
+                    while (rs.next()) {
+                        ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setIdFornecedor(rs.getString("idfornecedor"));
+                        imp.setIdProduto(rs.getString("idproduto"));
+                        imp.setCodigoExterno(rs.getString("referenciafornecedor"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+        } else {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "	p.codigo idproduto,\n"
+                        + "	e.codigo idfornecedor,\n"
+                        + "	pf.referenciafornecedor referenciafornecedor\n"
+                        + "from\n"
+                        + "	produtofornecedor pf\n"
+                        + "join\n"
+                        + "	produto p on p.id = pf.idproduto\n"
+                        + "join\n"
+                        + "	entidade e on e.id = pf.idfornecedor \n"
+                        + "where\n"
+                        + "	e.fornecedor = 1\n"
+                        + "order by\n"
+                        + "	pf.idproduto, pf.idfornecedor"
+                )) {
+                    while (rs.next()) {
+                        ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setIdFornecedor(rs.getString("idfornecedor"));
+                        imp.setIdProduto(rs.getString("idproduto"));
+                        imp.setCodigoExterno(rs.getString("referenciafornecedor"));
+
+                        result.add(imp);
+                    }
                 }
             }
         }
