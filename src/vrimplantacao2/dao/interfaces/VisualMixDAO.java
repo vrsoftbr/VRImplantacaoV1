@@ -1220,15 +1220,15 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         private String sql;
         private VendaIMP next;
         private Set<String> uk = new HashSet<>();
+        private SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+        private SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom");
+                        String id = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom") + timestampDate.format(rst.getDate("data"));
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -1328,14 +1328,15 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
+        private SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
         
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom");
-                        String id = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom")
+                        String idVenda = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom") + timestampDate.format(rst.getDate("data"));
+                        String id = rst.getString("idloja") + rst.getString("pdv") + rst.getString("numerocupom") + timestampDate.format(rst.getDate("data"))
                                 + rst.getString("idproduto") + rst.getString("digitoproduto")
                                 + rst.getString("sequencia") 
                                 /*+ rst.getString("Quantidade")
