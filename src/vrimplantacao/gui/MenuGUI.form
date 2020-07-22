@@ -1273,6 +1273,21 @@
                         </MenuItem>
                       </SubComponents>
                     </Menu>
+                    <Menu class="javax.swing.JMenu" name="jMenu15">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="PostgreSQL 2"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuViggo">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Viggo"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuViggoActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu9">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="MySQL"/>
