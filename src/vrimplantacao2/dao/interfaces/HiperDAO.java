@@ -120,6 +120,34 @@ public class HiperDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	id_produto,\n" +
+                    "	codigo_barras,\n" +
+                    "	sigla_unidade_logistica embalagem\n" +
+                    "from \n" +
+                    "	produto_sinonimo")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id_produto"));
+                    imp.setEan(rs.getString("codigo_barras"));
+                    imp.setTipoEmbalagem(rs.getString("embalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -317,7 +345,7 @@ public class HiperDAO extends InterfaceDAO {
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rst = stm.executeQuery( 
                     "select \n"
                     + "id_produto, \n"
                     + "id_entidade as id_fornecedor,\n"
