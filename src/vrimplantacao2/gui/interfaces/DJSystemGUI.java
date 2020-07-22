@@ -185,6 +185,10 @@ public class DJSystemGUI extends VRInternalFrame {
                             if (chkFContatos.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.CONTATOS);
                             }
+                            
+                            if (chkFEndCobrancaForn.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.ENDERECO_COMPLETO_COBRANCA);
+                            }
 
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
@@ -196,6 +200,15 @@ public class DJSystemGUI extends VRInternalFrame {
 
                             if (chkRotativo.isSelected()) {
                                 importador.importarCreditoRotativo();
+                            }
+                            
+                            List<OpcaoCliente> opcoes = new ArrayList<>();                            
+                            
+                            if (chkCSituacao.isSelected()) {
+                                opcoes.add(OpcaoCliente.SITUACAO_CADASTRO);
+                            }
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                             }
                         } 
                     } else if (pnlDados.getSelectedIndex() == 1) {
@@ -328,9 +341,11 @@ public class DJSystemGUI extends VRInternalFrame {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFEndCobrancaForn = new javax.swing.JCheckBox();
         pnlCliente = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCSituacao = new javax.swing.JCheckBox();
         pnlSQL = new vrframework.bean.panel.VRPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtSql = new vrframework.bean.textArea.VRTextArea();
@@ -429,6 +444,8 @@ public class DJSystemGUI extends VRInternalFrame {
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
 
+        chkFEndCobrancaForn.setText("Endereço Cobrança");
+
         javax.swing.GroupLayout pnlFornecedorLayout = new javax.swing.GroupLayout(pnlFornecedor);
         pnlFornecedor.setLayout(pnlFornecedorLayout);
         pnlFornecedorLayout.setHorizontalGroup(
@@ -440,7 +457,8 @@ public class DJSystemGUI extends VRInternalFrame {
                     .addGroup(pnlFornecedorLayout.createSequentialGroup()
                         .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFEndCobrancaForn))
                 .addContainerGap(333, Short.MAX_VALUE))
         );
         pnlFornecedorLayout.setVerticalGroup(
@@ -452,7 +470,9 @@ public class DJSystemGUI extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkFEndCobrancaForn)
+                .addContainerGap(162, Short.MAX_VALUE))
         );
 
         pnlImportacao.addTab("Fornecedores", pnlFornecedor);
@@ -475,6 +495,8 @@ public class DJSystemGUI extends VRInternalFrame {
             }
         });
 
+        chkCSituacao.setText("Situação Cadastro");
+
         javax.swing.GroupLayout pnlClienteLayout = new javax.swing.GroupLayout(pnlCliente);
         pnlCliente.setLayout(pnlClienteLayout);
         pnlClienteLayout.setHorizontalGroup(
@@ -482,18 +504,23 @@ public class DJSystemGUI extends VRInternalFrame {
             .addGroup(pnlClienteLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pnlClienteLayout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkCSituacao))
                     .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(416, Short.MAX_VALUE))
+                .addContainerGap(285, Short.MAX_VALUE))
         );
         pnlClienteLayout.setVerticalGroup(
             pnlClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlClienteLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCSituacao))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addContainerGap(188, Short.MAX_VALUE))
         );
 
         pnlImportacao.addTab("Clientes", pnlCliente);
@@ -793,8 +820,10 @@ public class DJSystemGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnExecutar2;
     private vrframework.bean.button.VRButton btnMigrar;
+    private javax.swing.JCheckBox chkCSituacao;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
+    private javax.swing.JCheckBox chkFEndCobrancaForn;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
