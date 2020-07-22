@@ -11,6 +11,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -199,6 +200,34 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setManterEAN(true);
                         }
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	es1_cod idproduto,\n" +
+                    "	cg2_cod idfornecedor,\n" +
+                    "	es1_codforn codigoexterno\n" +
+                    "FROM \n" +
+                    "	es1i")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
                 }
