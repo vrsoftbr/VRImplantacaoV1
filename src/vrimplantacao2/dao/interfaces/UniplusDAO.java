@@ -63,13 +63,13 @@ public class UniplusDAO extends InterfaceDAO {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "	codigo,\n"
+                    + "	id,\n"
                     + "	nome,\n"
                     + "	cnpj\n"
                     + "from \n"
                     + "	filial")) {
                 while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("codigo"), rs.getString("nome")));
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
                 }
             }
         }
@@ -211,7 +211,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "	1 qtdembalagem, \n" +
                     "	p.custoindireto custooperacional,\n" +
                     "	p.percentuallucroajustado margemlucro,\n" +
-                    " fp.codigo codigofamilia,\n" +
+                    "   fp.codigo codigofamilia,\n" +
                     "	p.precocusto, \n" +
                     "	p.preco,        \n" +
                     "	p.percentualmarkupajustado margem, \n" +
