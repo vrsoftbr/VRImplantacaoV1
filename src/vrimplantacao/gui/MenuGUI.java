@@ -166,6 +166,7 @@ import vrimplantacao2.gui.interfaces.KairosGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
 import vrimplantacao2.gui.interfaces.LiderNetWorkGUI;
 import vrimplantacao2.gui.interfaces.LinceGUI;
+import vrimplantacao2.gui.interfaces.LinearGUI;
 import vrimplantacao2.gui.interfaces.LinnerGUI;
 import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LogTECGUI;
@@ -765,6 +766,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuExodus = new javax.swing.JMenuItem();
         mnuSiit = new javax.swing.JMenuItem();
         mnuMobnePdv = new javax.swing.JMenuItem();
+        mnuLinear = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2496,6 +2498,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuMobnePdv);
+
+        mnuLinear.setText("Linear");
+        mnuLinear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLinearActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuLinear);
 
         mnuDatabase.add(jMenu10);
 
@@ -4655,6 +4665,10 @@ public final class MenuGUI extends VRMdiFrame {
         ViggoGUI.exibir(this);
     }//GEN-LAST:event_mnuViggoActionPerformed
 
+    private void mnuLinearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLinearActionPerformed
+        LinearGUI.exibir(this);
+    }//GEN-LAST:event_mnuLinearActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4841,6 +4855,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuKcms;
     private javax.swing.JMenuItem mnuLiderNetWork;
     private javax.swing.JMenuItem mnuLince;
+    private javax.swing.JMenuItem mnuLinear;
     private javax.swing.JMenuItem mnuLinner;
     private javax.swing.JMenuItem mnuLiteci;
     private javax.swing.JMenuItem mnuLogTec;
