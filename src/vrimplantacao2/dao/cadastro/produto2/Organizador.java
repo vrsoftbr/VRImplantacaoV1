@@ -85,6 +85,7 @@ public class Organizador {
             separarBalancaNormaisManterEAN(filtrados, balanca, normais, manterEAN);
             
             filtrados.clear();
+            System.gc();
         }
         
         if (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
@@ -267,6 +268,8 @@ public class Organizador {
      */
     public void separarBalancaNormaisManterEAN(MultiMap<String, ProdutoIMP> filtrados, MultiMap<String, ProdutoIMP> balanca, MultiMap<String, ProdutoIMP> normais, MultiMap<String, ProdutoIMP> manterEAN) throws Exception {
         repository.setNotify("Produtos - Separando balan\u00e7a e normais...", 0);
+        boolean isManterEAN = repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                
         for (ProdutoIMP produto : filtrados.values()) {
             String[] chave = null;
             if (produto.isBalanca() && (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA))) {
@@ -279,7 +282,7 @@ public class Organizador {
             String un = Utils.acertarTexto(produto.getTipoEmbalagem(), 2);
             if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
                 balanca.put(produto, chave);
-            } else if (produto.isManterEAN()) {
+            } else if (ean >= 1 && ean <= 999999 && (produto.isManterEAN() || isManterEAN)) {
                 manterEAN.put(produto, chave);
             } else {
                 normais.put(produto, chave);

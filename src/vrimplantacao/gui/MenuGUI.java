@@ -166,6 +166,7 @@ import vrimplantacao2.gui.interfaces.KairosGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
 import vrimplantacao2.gui.interfaces.LiderNetWorkGUI;
 import vrimplantacao2.gui.interfaces.LinceGUI;
+import vrimplantacao2.gui.interfaces.LinearGUI;
 import vrimplantacao2.gui.interfaces.LinnerGUI;
 import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LogTECGUI;
@@ -245,6 +246,7 @@ import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.VCashGUI;
 import vrimplantacao2.gui.interfaces.VRToVRGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
+import vrimplantacao2.gui.interfaces.ViggoGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
@@ -730,6 +732,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLogTec = new javax.swing.JMenuItem();
         mnuNCA = new javax.swing.JMenuItem();
         mnuCronos20 = new javax.swing.JMenuItem();
+        jMenu15 = new javax.swing.JMenu();
+        mnuViggo = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -762,6 +766,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuExodus = new javax.swing.JMenuItem();
         mnuSiit = new javax.swing.JMenuItem();
         mnuMobnePdv = new javax.swing.JMenuItem();
+        mnuLinear = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2236,6 +2241,18 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuDatabase.add(jMenu8);
 
+        jMenu15.setText("PostgreSQL 2");
+
+        mnuViggo.setText("Viggo");
+        mnuViggo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuViggoActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuViggo);
+
+        mnuDatabase.add(jMenu15);
+
         jMenu9.setText("MySQL");
 
         jMenuItemFMSistemas.setText("FM Sistemas");
@@ -2481,6 +2498,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuMobnePdv);
+
+        mnuLinear.setText("Linear");
+        mnuLinear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLinearActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuLinear);
 
         mnuDatabase.add(jMenu10);
 
@@ -4636,6 +4661,14 @@ public final class MenuGUI extends VRMdiFrame {
         Cronos20GUI.exibir(this);
     }//GEN-LAST:event_mnuCronos20ActionPerformed
 
+    private void mnuViggoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuViggoActionPerformed
+        ViggoGUI.exibir(this);
+    }//GEN-LAST:event_mnuViggoActionPerformed
+
+    private void mnuLinearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLinearActionPerformed
+        LinearGUI.exibir(this);
+    }//GEN-LAST:event_mnuLinearActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4643,6 +4676,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu jMenu12;
     private javax.swing.JMenu jMenu13;
     private javax.swing.JMenu jMenu14;
+    private javax.swing.JMenu jMenu15;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu6;
@@ -4821,6 +4855,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuKcms;
     private javax.swing.JMenuItem mnuLiderNetWork;
     private javax.swing.JMenuItem mnuLince;
+    private javax.swing.JMenuItem mnuLinear;
     private javax.swing.JMenuItem mnuLinner;
     private javax.swing.JMenuItem mnuLiteci;
     private javax.swing.JMenuItem mnuLogTec;
@@ -4895,6 +4930,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuVCash;
     private javax.swing.JMenuItem mnuVRToVR;
     private javax.swing.JMenuItem mnuViaSoft;
+    private javax.swing.JMenuItem mnuViggo;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuVisualMix;
     private javax.swing.JMenuItem mnuW2A;

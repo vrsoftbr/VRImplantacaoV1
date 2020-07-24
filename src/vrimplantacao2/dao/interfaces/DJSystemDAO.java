@@ -268,6 +268,7 @@ public class DJSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rs.getString("tel"));
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setCnpj_cpf(rs.getString("cgc"));
+                    imp.copiarEnderecoParaCobranca();
                     
                     String email = rs.getString("e_mail");
                     
@@ -316,7 +317,8 @@ public class DJSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	mae_tel,\n" +
                     "	val_limite as limite,\n" +
                     "	e_mail as email,\n" +
-                    "	obs\n" +
+                    "	obs,\n" +
+                    "   nivel_cred situacao\n" +        
                     "from\n" +
                     "	cliente")) {
                 while(rs.next()) {
@@ -341,6 +343,7 @@ public class DJSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeMae(rs.getString("mae_tel"));
                     imp.setValorLimite(rs.getDouble("limite"));
                     imp.setEmail(rs.getString("email"));
+                    imp.setAtivo(rs.getInt("situacao") == 3 ? true : false);
                     
                     result.add(imp);
                 }
@@ -369,9 +372,7 @@ public class DJSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	faturas f \n" +
                     "join dpsaida d on f.numfat = d.numfat\n" +
                     "where\n" +
-                    "	d.data_pago is null\n" +        
-                    "order by\n" +
-                    "	d.data_venc")) {
+                    "	d.data_pago is null")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     

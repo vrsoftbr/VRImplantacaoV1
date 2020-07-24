@@ -653,6 +653,15 @@ public class FornecedorDAO {
                     sql.put("id_municipio", vo.getMunicipio().getId());
                     sql.put("id_estado", vo.getEstado() == null ? Parametros.get().getUfPadrao().getId() : vo.getEstado().getId());
                 }
+                if (opt.contains(OpcaoFornecedor.ENDERECO_COMPLETO_COBRANCA)) {
+                    sql.put("enderecocobranca", vo.getEnderecoCobranca());
+                    sql.put("complementocobranca", vo.getComplementoCobranca());
+                    sql.put("numerocobranca", vo.getNumeroCobranca());
+                    sql.put("bairrocobranca", vo.getBairroCobranca());
+                    sql.put("cepcobranca", vo.getCepCobranca());
+                    sql.put("id_municipiocobranca", vo.getMunicipioCobranca().getId());
+                    sql.put("id_estadocobranca", vo.getEstadoCobranca()== null ? Parametros.get().getUfPadrao().getId() : vo.getEstadoCobranca().getId());
+                }
                 if (opt.contains(OpcaoFornecedor.COMPLEMENTO)) {
                     sql.put("complemento", vo.getComplemento());
                 }

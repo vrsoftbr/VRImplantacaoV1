@@ -63,13 +63,13 @@ public class UniplusDAO extends InterfaceDAO {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "	codigo,\n"
+                    + "	id,\n"
                     + "	nome,\n"
                     + "	cnpj\n"
                     + "from \n"
                     + "	filial")) {
                 while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("codigo"), rs.getString("nome")));
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
                 }
             }
         }
@@ -181,68 +181,84 @@ public class UniplusDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	p.id,\n"
-                    + "	p.codigo, \n"
-                    + "	case when p.pesavel = 1 then p.codigo else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n"
-                    + "	p.inativo, \n"
-                    + "	p.diasvencimento as validade,\n"
-                    + "	p.nome as descricaocompleta, \n"
-                    + "	p.nomeecf as descricaoreduzida, \n"
-                    + "	p.nome as descricaogondola, \n"
-                    + "	p.datacadastro, \n"
-                    + "	p.unidademedida as unidade, \n"
-                    + "	1 qtdembalagem, \n"
-                    + "	p.custoindireto custooperacional,\n"
-                    + "	p.percentuallucroajustado margemlucro,\n"
-                    + " fp.codigo codigofamilia,\n"
-                    + "	p.precocusto, \n"
-                    + "	p.preco,        \n"
-                    + "	p.percentualmarkupajustado margem, \n"
-                    + "	preco.precoultimacompra custosemimposto,\n"
-                    + "	preco.precocusto custocomimposto,\n"
-                    + "	preco.preco as precovenda,\n"
-                    + "	p.quantidademinima, \n"
-                    + "	p.quantidademaxima, \n"
-                    + "	e.quantidade, \n"
-                    + "	p.tributacao, \n"
-                    + "	p.situacaotributaria as cst, \n"
-                    + "	p.cstpis, \n"
-                    + "	p.cstcofins, \n"
-                    + "	p.cstpisentrada, \n"
-                    + "	p.icmsentrada as icmscredito, \n"
-                    + "	p.icmssaida as icmsdebito, \n"
-                    + "	p.aliquotaicmsinterna, \n"
-                    + "	p.pesavel, \n"
-                    + "	p.ncm, \n"
-                    + "	p.idcest, \n"
-                    + "	cest.codigo as cest, \n"
-                    + "	p.cstpisentrada, \n"
-                    + "	p.cstpis, \n"
-                    + "	p.idfamilia, \n"
-                    + "	p.idhierarquia as merc1, \n"
-                    + "	p.idhierarquia as merc2, \n"
-                    + "	p.idhierarquia as merc3,\n"
-                    + "	r.codigo naturezareceita\n"
-                    + "from \n"
-                    + "	produto p\n"
-                    + "	join filial f on\n"
-                    + "		f.id = " + getLojaOrigem() + "\n"
-                    + "	left join formacaoprecoproduto preco on\n"
-                    + "		preco.idproduto = p.id and\n"
-                    + "		preco.idfilial = f.id\n"
-                    + "	left join saldoestoque e on\n"
-                    + "		e.idproduto = p.id and\n"
-                    + "		e.codigoproduto = p.codigo and\n"
-                    + "		e.idfilial = f.id\n"
-                    + "	left join cest on\n"
-                    + "		cest.id = p.idcest\n"
-                    + "	left join\n"
-                    + "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n"
-                    + " left join familiaproduto fp on\n"
-                    + "         p.idfamilia::bigint = fp.codigo::bigint\n"
-                    + " order by \n"
-                    + "	p.id"
+                    "with saldoestoque as (\n" +
+                    "	select\n" +
+                    "	distinct on (idfilial, idproduto,codigoproduto)\n" +
+                    "		idfilial,\n" +
+                    "		idproduto,\n" +
+                    "		codigoproduto,\n" +
+                    "		TO_CHAR(TO_TIMESTAMP(currenttimemillis / 1000), 'DD/MM/YYYY HH24:MI:SS') ultimaalteracao,\n" +
+                    "		quantidade\n" +
+                    "	from\n" +
+                    "		saldoestoque\n" +
+                    "	order by \n" +
+                    "		idfilial,\n" +
+                    "		idproduto,\n" +
+                    "		codigoproduto,\n" +
+                    "		currenttimemillis desc\n" +
+                    ")\n" +
+                    "select \n" +
+                    "	p.id,\n" +
+                    "	p.codigo, \n" +
+                    "	case when p.pesavel = 1 then p.codigo else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n" +
+                    "	p.inativo, \n" +
+                    "	p.diasvencimento as validade,\n" +
+                    "	p.nome as descricaocompleta, \n" +
+                    "	p.nomeecf as descricaoreduzida, \n" +
+                    "	p.nome as descricaogondola, \n" +
+                    "	p.datacadastro, \n" +
+                    "	p.unidademedida as unidade, \n" +
+                    "	1 qtdembalagem, \n" +
+                    "	p.custoindireto custooperacional,\n" +
+                    "	p.percentuallucroajustado margemlucro,\n" +
+                    "   fp.codigo codigofamilia,\n" +
+                    "	p.precocusto, \n" +
+                    "	p.preco,        \n" +
+                    "	p.percentualmarkupajustado margem, \n" +
+                    "	preco.precoultimacompra custosemimposto,\n" +
+                    "	preco.precocusto custocomimposto,\n" +
+                    "	preco.preco as precovenda,\n" +
+                    "	p.quantidademinima, \n" +
+                    "	p.quantidademaxima, \n" +
+                    "	e.quantidade, \n" +
+                    "	p.tributacao, \n" +
+                    "	p.situacaotributaria as cst, \n" +
+                    "	p.cstpis, \n" +
+                    "	p.cstcofins, \n" +
+                    "	p.cstpisentrada, \n" +
+                    "	p.icmsentrada as icmscredito, \n" +
+                    "	p.icmssaida as icmsdebito, \n" +
+                    "	p.aliquotaicmsinterna, \n" +
+                    "	p.pesavel, \n" +
+                    "	p.ncm, \n" +
+                    "	p.idcest, \n" +
+                    "	cest.codigo as cest, \n" +
+                    "	p.cstpisentrada, \n" +
+                    "	p.cstpis, \n" +
+                    "	p.idfamilia, \n" +
+                    "	p.idhierarquia as merc1, \n" +
+                    "	p.idhierarquia as merc2, \n" +
+                    "	p.idhierarquia as merc3,\n" +
+                    "	r.codigo naturezareceita\n" +
+                    "from \n" +
+                    "	produto p\n" +
+                    "	join filial f on\n" +
+                    "		f.id = " + getLojaOrigem() + "\n" +
+                    "	left join formacaoprecoproduto preco on\n" +
+                    "		preco.idproduto = p.id and\n" +
+                    "		preco.idfilial = f.id\n" +
+                    "	left join saldoestoque e on\n" +
+                    "		e.idproduto = p.id and\n" +
+                    "		e.codigoproduto = p.codigo and\n" +
+                    "		e.idfilial = f.id\n" +
+                    "	left join cest on\n" +
+                    "		cest.id = p.idcest\n" +
+                    "	left join\n" +
+                    "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
+                    " left join familiaproduto fp on\n" +
+                    "         p.idfamilia::bigint = fp.codigo::bigint	\n" +
+                    " order by \n" +
+                    "	p.id"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
