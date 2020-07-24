@@ -69,6 +69,7 @@ public class ProdutoVO {
     private boolean produtoecommerce = false;
     private int codigoAnp = 0;
     private int numeroparcela = 0;
+    private boolean manterDescricao = false;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -142,10 +143,18 @@ public class ProdutoVO {
     }
 
     public void setDescricaoReduzida(String descricaoReduzida) {
+        /*this.descricaoReduzida = isManterDescricao() 
+                ? Utils.acertarTextoCaseSensitive(descricaoReduzida, 22, "PRODUTO SEM DESCRICAO")
+                : Utils.acertarTexto(descricaoReduzida, 22, "PRODUTO SEM DESCRICAO");*/
+        //this.descricaoReduzida = Utils.acertarTextoCaseSensitive(descricaoReduzida, 22, "PRODUTO SEM DESCRICAO");
         this.descricaoReduzida = Utils.acertarTexto(descricaoReduzida, 22, "PRODUTO SEM DESCRICAO");
     }
 
     public void setDescricaoGondola(String descricaoGondola) {
+        /*this.descricaoGondola = isManterDescricao()
+                ? Utils.acertarTextoCaseSensitive(descricaoGondola, 60, "PRODUTO SEM DESCRICAO")
+                : Utils.acertarTexto(descricaoGondola, 60, "PRODUTO SEM DESCRICAO");*/
+        //this.descricaoGondola = Utils.acertarTextoCaseSensitive(descricaoGondola, 60, "PRODUTO SEM DESCRICAO");
         this.descricaoGondola = Utils.acertarTexto(descricaoGondola, 60, "PRODUTO SEM DESCRICAO");
     }
 
@@ -445,5 +454,19 @@ public class ProdutoVO {
 
     public void setMargemMaxima(double margemMaxima) {
         this.margemMaxima = margemMaxima;
+    }
+
+    /**
+     * @return the manterDescricao
+     */
+    public boolean isManterDescricao() {
+        return manterDescricao;
+    }
+
+    /**
+     * @param manterDescricao the manterDescricao to set
+     */
+    public void setManterDescricao(boolean manterDescricao) {
+        this.manterDescricao = manterDescricao;
     }
 }

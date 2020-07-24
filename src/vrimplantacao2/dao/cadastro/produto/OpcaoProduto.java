@@ -418,7 +418,8 @@ public enum OpcaoProduto {
      */
     IMPORTAR_NAO_GERAR_NOVA_LISTAGEM,
     VOLUME_TIPO_EMBALAGEM, 
-    VOLUME_QTD, 
+    VOLUME_QTD,
+    MANTER_DESCRICAO_PRODUTO,
     IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO {
         @Override
         public String toString() {

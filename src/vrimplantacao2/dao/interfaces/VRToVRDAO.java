@@ -112,7 +112,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	l.id,\n"

@@ -78,6 +78,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkResetarCodigoBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA));
         chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
         chkManterEANsMenores.setVisible(opt.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
+        chkManterDescricaoProduto.setVisible(opt.contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO));
                 
         if (
                 opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
@@ -336,6 +337,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkResetarCodigoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkManterEANsMenores = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
+        chkManterDescricaoProduto = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptAssociado = new vrframework.bean.panel.VRPanel();
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -517,6 +519,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkManterEANsMenores.setToolTipText("<html>\nMantem os EANs menores que <b>7</> dígitos nos produtos unitários.<br>\n<i>Diferentemente da opção \"Manter código PLU dos produtos de balança\", <br>\nessa rotina não muda o código interno dos produtos unitário.</i>\n</html>");
         chkManterEANsMenores.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkManterDescricaoProduto, "Manter Descrição Produto");
+
         javax.swing.GroupLayout pnlOptProdutoLayout = new javax.swing.GroupLayout(pnlOptProduto);
         pnlOptProduto.setLayout(pnlOptProdutoLayout);
         pnlOptProdutoLayout.setHorizontalGroup(
@@ -536,11 +540,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                             .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                                 .addComponent(chkSomarEstoqueAoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(chkManterEANsMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(chkManterEANsMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkManterDescricaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addComponent(btnMapaTribut, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(chkNaoTransformarEANemUN, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(0, 98, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -561,7 +567,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(chkSomarEstoqueAoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkManterEANsMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkManterEANsMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkManterDescricaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
 
@@ -1373,6 +1380,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkInverterAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     public vrframework.bean.checkBox.VRCheckBox chkManterCodigoMercadologico;
+    public vrframework.bean.checkBox.VRCheckBox chkManterDescricaoProduto;
     public vrframework.bean.checkBox.VRCheckBox chkManterEANsMenores;
     public vrframework.bean.checkBox.VRCheckBox chkMargem;
     public vrframework.bean.checkBox.VRCheckBox chkMargemMinima;
@@ -1483,6 +1491,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         parametros.put(chkInverterAssociado.isSelected(), concat(params, "INVERTER_ASSOCIADO" ));
         parametros.put(chkAssociadoSomenteAtivos.isSelected(), concat(params, "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" ));
         parametros.put(chkManterEANsMenores.isSelected(), concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS" ));
+        parametros.put(chkManterDescricaoProduto.isSelected(), concat(params, "MANTER_DESCRICAO_PRODUTO"));
         
         if (rdbPautaIdPauta.isSelected()) {
             parametros.put(1, concat(params, "PAUTA_OPCAO" ));
@@ -1504,6 +1513,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkInverterAssociado.setSelected(parametros.getBool(concat(params, "INVERTER_ASSOCIADO" )));
         chkAssociadoSomenteAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" )));
         chkManterEANsMenores.setSelected(parametros.getBool(concat(params, "IMPORTAR_EAN_MENORES_QUE_7_DIGITOS")));
+        chkManterDescricaoProduto.setSelected(parametros.getBool(concat(params, "MANTER_DESCRICAO_PRODUTO")));
         
         switch (parametros.getInt(concat(params, "PAUTA_OPCAO" ))) {
             case 2: rdbPautaIdProduto.setSelected(true); break;
@@ -1538,7 +1548,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkManterEANsMenores.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
-                }            
+                }
+                if (chkManterDescricaoProduto.isSelected()) {
+                    opt.add(OpcaoProduto.MANTER_DESCRICAO_PRODUTO);
+                }
                 if (chkCopiarIcmsDebitoNaEntrada.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
                 }
@@ -1602,6 +1615,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 List<OpcaoProduto> opcoes = new ArrayList<>();
                 if (chkSomarEstoqueAoProduto.isSelected()) {
                     opcoes.add(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE);
+                }
+                if (chkManterDescricaoProduto.isSelected()) {
+                    opcoes.add(OpcaoProduto.MANTER_DESCRICAO_PRODUTO);
                 }
                 if (chkCusto.isSelected()) {
                     opcoes.add(OpcaoProduto.CUSTO);

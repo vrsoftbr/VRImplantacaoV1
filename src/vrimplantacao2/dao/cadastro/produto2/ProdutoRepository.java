@@ -50,6 +50,7 @@ public class ProdutoRepository {
     private boolean naoTransformarEANemUN = false;
     private boolean importarMenoresQue7Digitos = false;
     private boolean copiarIcmsDebitoParaCredito = false;
+    private boolean manterDescricao = false;
     public boolean importarSomenteLoja = false;
     
     private Map<String, Entry<String, Integer>> divisoes;
@@ -1036,6 +1037,8 @@ public class ProdutoRepository {
     public ProdutoVO converterIMP(ProdutoIMP imp, int id, long ean,
             TipoEmbalagem unidade, boolean eBalanca) throws Exception {
 
+        manterDescricao = provider.getOpcoes().contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO);
+        
         if (fabricantes == null) {
             fabricantes = provider.getFornecedoresImportados();
         }
@@ -1048,6 +1051,7 @@ public class ProdutoRepository {
 
         ProdutoVO vo = new ProdutoVO();
 
+        vo.setManterDescricao(manterDescricao);
         vo.setId(id);
         vo.setDescricaoCompleta(imp.getDescricaoCompleta());
         if ("SEM DESCRICAO".equals(imp.getDescricaoReduzida())) {
@@ -1058,6 +1062,12 @@ public class ProdutoRepository {
         }
         vo.setDescricaoReduzida(imp.getDescricaoReduzida());
         vo.setDescricaoGondola(imp.getDescricaoGondola());
+        
+        if (vo.getId() == 1) {
+            System.out.println("imp " + imp.getDescricaoReduzida());
+            System.out.println("vo " + vo.getDescricaoReduzida());
+        }
+        
         vo.setQtdEmbalagem(imp.getQtdEmbalagemCotacao() == 0 ? 1 : imp.getQtdEmbalagemCotacao());
         vo.setSugestaoCotacao(imp.isSugestaoCotacao());
         vo.setSugestaoPedido(imp.isSugestaoPedido());

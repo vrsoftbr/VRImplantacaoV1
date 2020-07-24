@@ -80,6 +80,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.MANTER_DESCRICAO_PRODUTO,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
