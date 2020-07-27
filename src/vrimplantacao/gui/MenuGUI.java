@@ -245,6 +245,7 @@ import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.VCashGUI;
 import vrimplantacao2.gui.interfaces.VRToVRGUI;
+import vrimplantacao2.gui.interfaces.VarejoFacilGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.ViggoGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
@@ -799,6 +800,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuInfoMacStore = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         mnuContaPagar1 = new javax.swing.JMenuItem();
+        mnuVarejoFacil = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -2735,6 +2737,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu3.add(mnuContaPagar1);
 
+        mnuVarejoFacil.setText("Varejo Fácil");
+        mnuVarejoFacil.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVarejoFacilActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuVarejoFacil);
+
         mnuDatabase.add(jMenu3);
 
         mnuSQLite.setText("SQLite");
@@ -4669,6 +4679,11 @@ public final class MenuGUI extends VRMdiFrame {
         LinearGUI.exibir(this);
     }//GEN-LAST:event_mnuLinearActionPerformed
 
+    private void mnuVarejoFacilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVarejoFacilActionPerformed
+        // TODO add your handling code here:
+        VarejoFacilGUI.exibir(this);
+    }//GEN-LAST:event_mnuVarejoFacilActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4929,6 +4944,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuUpForti;
     private javax.swing.JMenuItem mnuVCash;
     private javax.swing.JMenuItem mnuVRToVR;
+    private javax.swing.JMenuItem mnuVarejoFacil;
     private javax.swing.JMenuItem mnuViaSoft;
     private javax.swing.JMenuItem mnuViggo;
     private javax.swing.JMenuItem mnuVisualComercio;

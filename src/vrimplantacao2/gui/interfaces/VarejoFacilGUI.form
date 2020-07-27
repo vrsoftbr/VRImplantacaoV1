@@ -29,7 +29,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="tabsProduto" max="32767" attributes="0"/>
+                  <Component id="tabsImportacao" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
@@ -51,7 +51,7 @@
                   <Component id="txtLoja" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabsProduto" pref="402" max="32767" attributes="0"/>
+              <Component id="tabsImportacao" pref="402" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -130,7 +130,7 @@
         </Component>
       </SubComponents>
     </Container>
-    <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabsProduto">
+    <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabsImportacao">
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
@@ -153,17 +153,21 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtPlanilhaFamilia" alignment="0" pref="560" max="32767" attributes="0"/>
                               <Group type="102" alignment="1" attributes="0">
                                   <Component id="chkInativacao" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Component id="btnMigrar1" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="pnlBalanca" alignment="0" pref="776" max="32767" attributes="0"/>
+                              <Component id="txtPlanilhaFornecedor" alignment="0" pref="776" max="32767" attributes="0"/>
+                              <Component id="txtPlanilhaCreditoRotativo" alignment="0" pref="776" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Component id="vRLabel24" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="506" max="32767" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="vRLabel26" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel24" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="pnlBalanca" alignment="0" pref="758" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -173,10 +177,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel26" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtPlanilhaFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="vRLabel24" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtPlanilhaFamilia" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="331" max="-2" attributes="0"/>
+                          <Component id="txtPlanilhaCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="293" max="-2" attributes="0"/>
                           <Component id="pnlBalanca" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -194,7 +202,7 @@
                     <Property name="text" type="java.lang.String" value="Informe a localiza&#xe7;&#xe3;o da planilha de Cr&#xe9;dito Rotativo"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtPlanilhaFamilia">
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtPlanilhaCreditoRotativo">
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkInativacao">
                   <Properties>
@@ -220,6 +228,13 @@
                     <Property name="sistema" type="java.lang.String" value=""/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtPlanilhaFornecedor">
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel26">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Informe a localiza&#xe7;&#xe3;o da planilha de Fornecedor"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>
@@ -227,8 +242,8 @@
         <Container class="vrframework.bean.panel.VRPanel" name="tabFornecedor">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Fornecedores e Clientes">
-                <Property name="tabTitle" type="java.lang.String" value="Fornecedores e Clientes"/>
+              <JTabbedPaneConstraints tabName="Clientes/Fornecedores">
+                <Property name="tabTitle" type="java.lang.String" value="Clientes/Fornecedores"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -238,7 +253,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRPanel2" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="vRPanel4" max="32767" attributes="0"/>
+                          <Component id="vRPanel2" alignment="1" max="32767" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -247,8 +265,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRPanel4" min="-2" pref="48" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="316" max="32767" attributes="0"/>
+                      <EmptySpace pref="262" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -268,25 +288,108 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClientesPreferenciais" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="654" max="32767" attributes="0"/>
+                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="chkClientesPreferenciais" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClientesPreferenciais">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
                   </Properties>
                 </Component>
               </SubComponents>
             </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel4">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Fornecedores"/>
+                  </Border>
+                </Property>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFornTipoEmpresa" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFornTipoFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="582" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                              <Component id="chkFornTipoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornTipoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornTipoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornTipoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
+        <Container class="vrframework.bean.panel.VRPanel" name="tabUnificacao">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Unifica&#xe7;&#xe3;o">
+                <Property name="tabTitle" type="java.lang.String" value="Unifica&#xe7;&#xe3;o"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkUnifFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="589" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkUnifFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="343" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifFornecedores">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Fornecedores (Somente com CPF/CNPJ)"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>
