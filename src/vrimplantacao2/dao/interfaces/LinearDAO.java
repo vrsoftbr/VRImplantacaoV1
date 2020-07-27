@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -11,11 +12,13 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -65,10 +68,16 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	reducao\n" +
                     "FROM \n" +
                     "	icms\n" +
+                    "WHERE \n" +
+                    "	codigo IN (SELECT e.ES1_TRIBUTACAO FROM es1 e WHERE e.es1_empresa = " + getLojaOrigem() + ")\n" +
                     "ORDER BY\n" +
                     "	codigo")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codigo"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(rs.getString("codigo"), 
+                            rs.getString("descricao"),
+                            rs.getInt("cst"), 
+                            rs.getDouble("icms"),
+                            rs.getDouble("reducao")));
                 }
             }
         }
@@ -288,8 +297,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     String cpf, cnpj, rg, ie;
                     
                     cpf = rs.getString("cpf");
@@ -310,9 +319,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setInsc_municipal(rs.getString("im"));
-                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setEndereco(Utils.acertarTexto(rs.getString("endereco")));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setComplemento(Utils.acertarTexto(rs.getString("complemento")));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setCep(rs.getString("cep"));
                     imp.setIbge_municipio(rs.getInt("municipioibge"));
@@ -323,7 +332,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     String fax = rs.getString("fax"), email;
                     
                     if(fax != null && !"".equals(fax)) {
-                        imp.addContato("FAX", rs.getString("contato"), fax, null, TipoContato.NFE, null);
+                        imp.addContato("FAX", Utils.acertarTexto(rs.getString("contato")), fax, null, TipoContato.NFE, null);
                     }
                     
                     email = rs.getString("email");
@@ -332,7 +341,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setObservacao(rs.getString("obs"));
+                    imp.setObservacao(Utils.acertarTexto(rs.getString("obs")));
                     imp.setPrazoVisita(rs.getInt("prazovisita"));
                     imp.setPrazoEntrega(rs.getInt("prazoentrega"));
                     imp.setAtivo(rs.getInt("situacao") == 0);
@@ -384,7 +393,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cg1_data nascimento,\n" +
                     "	c.cg1_profissao profissao,\n" +
                     "	c.CG1_EstCivil estadocivil,\n" +
-                    "	c.cg1_limite limite,\n" +
+                    "	case\n" +
+                    "	    when cg1_limite > 999999999.99 then 0 else\n" +
+                    "	cg1_limite end as limite,\n" +
                     "	c.cg1_status STATUS,\n" +
                     "	c.cg1_localentrega enderecoentrega,\n" +
                     "	c.cg1_bairroent bairroentrega,\n" +
@@ -456,7 +467,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeMae(rs.getString("mae"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setEstadoCivil(rs.getString("estadocivil"));
+                    
+                    String limite = rs.getString("limite");
                     imp.setValorLimite(rs.getDouble("limite"));
+                    if(limite.length() > 17) {
+                        imp.setValorLimite(0);
+                    }
+                    
                     imp.setEmpresa(rs.getString("empresa"));
                     imp.setNomeConjuge(rs.getString("conjuge"));
                     imp.setObservacao(rs.getString("obs"));
@@ -491,7 +508,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	fn1 f\n" +
                     "WHERE \n" +
                     "	f.fn1_dtbaixa IS null AND\n" +
-                    "	f.fn1_empresa = " + getLojaOrigem())) {
+                    "	f.fn1_empresa = " + getLojaOrigem() + " AND\n" +
+                    "	f.fn1_tipo NOT IN (37, 62, 64)")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
@@ -503,6 +521,115 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setValor(rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	f.FN1_NUM id,\n" +
+                    "	f.FN1_PARC parcela,\n" +
+                    "	f.CG1_COD idcliente,\n" +
+                    "	c.cg1_nome razao,\n" +
+                    "	c.cg1_fone telefone,\n" +
+                    "	c.cg1_cpf cpf,\n" +
+                    "	c.cg1_cgc cnpj,\n" +
+                    "	c.cg1_rg rg,\n" +
+                    "	c.cg1_inscestadual ie,\n" +
+                    "	f.fn1_doc documento,\n" +
+                    "	f.fn1_cmc7 cmc7,\n" +
+                    "	f.fn1_cheque cheque,\n" +
+                    "	f.FN1_DTCHEQUE datacheque,\n" +
+                    "	f.cg1_banco_num banco,\n" +
+                    "	f.caixa,\n" +
+                    "	f.cupom,\n" +
+                    "	f.FN1_EMISSAO emissao,\n" +
+                    "	f.FN1_VENC vencimento,\n" +
+                    "	f.fn1_hist observacao,\n" +
+                    "	f.FN1_JUROS juros,\n" +
+                    "	f.FN1_MULTA multa,\n" +
+                    "	f.FN1_VALOR valor\n" +
+                    "FROM \n" +
+                    "	fn1 f\n" +
+                    "JOIN cg1 c ON f.CG1_COD = c.cg1_cod\n" +
+                    "WHERE \n" +
+                    "	f.fn1_dtbaixa IS null AND\n" +
+                    "	f.fn1_empresa = " + getLojaOrigem() + " AND \n" +
+                    "	fn1_tipo IN (37, 62, 64)")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setDate(rs.getDate("emissao"));
+                    imp.setCmc7(rs.getString("cmc7"));
+                    imp.setNome(rs.getString("razao"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    
+                    String cpf = rs.getString("cpf"), cnpj = rs.getString("cnpj"),
+                            ie = rs.getString("ie"), rg = rs.getString("rg");
+                    if(cpf != null && !"".equals(cpf)) {
+                        imp.setCpf(cpf);
+                    } else {
+                        imp.setCpf(cnpj);
+                    }
+                    
+                    if(rg != null && !"".equals(rg)) {
+                        imp.setRg(rg);
+                    } else {
+                        imp.setRg(ie);
+                    }
+                    
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setEcf(rs.getString("caixa"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	o.es1_cod idproduto,\n" +
+                    "	es1_dtini datainicio,\n" +
+                    "	es1_dtfim datatermino,\n" +
+                    "	es1_valor precooferta,\n" +
+                    "	p.es1_prvarejo preconormal\n" +
+                    "FROM \n" +
+                    "	es1b o\n" +
+                    "JOIN es1 p ON o.ES1_COD = p.ES1_COD AND \n" +
+                    "	o.es1_empresa = p.es1_empresa\n" +
+                    "WHERE \n" +
+                    "	es1_dtfim > CURRENT_DATE AND \n" +
+                    "	o.es1_empresa = " +  getLojaOrigem() + "\n" +
+                    "ORDER BY 	\n" +
+                    "	3")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datatermino"));
+                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+                    imp.setPrecoNormal(rs.getDouble("preconormal"));
                     
                     result.add(imp);
                 }
