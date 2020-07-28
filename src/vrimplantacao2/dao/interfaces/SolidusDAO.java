@@ -208,6 +208,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.EAN,
             OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.OFERTA,
+            OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
             OpcaoProduto.PRECO,
             OpcaoProduto.CUSTO,
             OpcaoProduto.ESTOQUE,
