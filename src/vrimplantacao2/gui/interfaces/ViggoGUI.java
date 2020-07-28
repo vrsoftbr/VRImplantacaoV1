@@ -165,9 +165,6 @@ public class ViggoGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        if (chkContasAPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }
                         if (chkClientePreferencial.isSelected()) {                            
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
                         }
@@ -205,8 +202,6 @@ public class ViggoGUI extends VRInternalFrame {
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação " + NOME_SISTEMA + " realizada com sucesso!", getTitle());
-                    
-                    connSQL.close();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
@@ -251,8 +246,6 @@ public class ViggoGUI extends VRInternalFrame {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdutoNota = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -375,16 +368,6 @@ public class ViggoGUI extends VRInternalFrame {
             }
         });
 
-        chkContasAPagar.setText("Contas à Pagar");
-        chkContasAPagar.setEnabled(true);
-        chkContasAPagar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkContasAPagarActionPerformed(evt);
-            }
-        });
-
-        chkProdutoNota.setText("Produtos de Notas");
-
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -393,12 +376,8 @@ public class ViggoGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(tabFornecedorLayout.createSequentialGroup()
-                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(chkProdutoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(255, Short.MAX_VALUE))
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -406,12 +385,8 @@ public class ViggoGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoNota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(121, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
@@ -630,10 +605,6 @@ public class ViggoGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
-    private void chkContasAPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContasAPagarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkContasAPagarActionPerformed
-
     private void chkVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendasActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkVendasActionPerformed
@@ -649,12 +620,10 @@ public class ViggoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkForcarIdProdutoQuandoPesavel;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkLimite;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutoNota;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;

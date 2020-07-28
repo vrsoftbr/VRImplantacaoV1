@@ -12,8 +12,12 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -279,6 +283,105 @@ public class ViggoDAO extends InterfaceDAO implements MapaTributoProvider {
                 ));
             }
         }
+        
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	f.codigo id,\n" +
+                        "	f.nome razao,\n" +
+                        "	coalesce(nullif(trim(f.nome_fantasia),''), f.nome) fantasia,\n" +
+                        "	f.cpf_cnpj cnpj,\n" +
+                        "	f.insc_estadual ie,\n" +
+                        "	f.insc_suframa suframa,\n" +
+                        "	f.inativo,\n" +
+                        "	f.endereco,\n" +
+                        "	f.numero,\n" +
+                        "	f.complemento,\n" +
+                        "	f.bairro,\n" +
+                        "	c.codigo_municipio ibge_municipio,\n" +
+                        "	f.cep,\n" +
+                        "	f.data_cadastro,\n" +
+                        "	f.observacao,\n" +
+                        "	f.opt_simples simples,\n" +
+                        "	f.contribuinte_icms\n" +
+                        "from\n" +
+                        "	participante f\n" +
+                        "	left join cidade c on\n" +
+                        "		f.codigo_cidade = c.codigo \n" +
+                        "where\n" +
+                        "	f.tipo_participante = 1\n" +
+                        "order by\n" +
+                        "	f.codigo "
+                )
+        ) {
+            while (rs.next()) {
+                FornecedorIMP imp = new FornecedorIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportId(rs.getString("id"));
+                imp.setRazao(rs.getString("razao"));
+                imp.setFantasia(rs.getString("fantasia"));
+                imp.setCnpj_cpf(rs.getString("cnpj"));
+                imp.setIe_rg(rs.getString("ie"));
+                imp.setSuframa(rs.getString("suframa"));
+                imp.setAtivo(!rs.getBoolean("inativo"));
+                imp.setEndereco(rs.getString("endereco"));
+                imp.setNumero(rs.getString("numero"));
+                imp.setComplemento(rs.getString("complemento"));
+                imp.setBairro(rs.getString("bairro"));
+                imp.setIbge_municipio(rs.getInt("ibge_municipio"));
+                imp.setCep(rs.getString("cep"));
+                imp.setDatacadastro(rs.getDate("data_cadastro"));
+                imp.setObservacao(rs.getString("observacao"));
+                if (rs.getBoolean("simples")) {
+                    imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                } else {
+                    if (rs.getBoolean("contribuinte_icms")) {
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS);
+                    } else {
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+                    }                    
+                }
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        /*try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        ""
+                )
+        ) {
+            while (rs.next()) {
+                ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setIdFornecedor(rs.getString(""));
+                imp.set(rs.getString(""));
+                imp.set(rs.getString(""));
+                imp.set(rs.getString(""));
+                
+                result.add(imp);
+            }
+        }*/
         
         return result;
     }
