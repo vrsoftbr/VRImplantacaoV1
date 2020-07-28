@@ -122,27 +122,69 @@ public class UniplusDAO extends InterfaceDAO {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	id as merc1,\n"
-                    + "	nome as descmerc1,\n"
-                    + "	id as merc2,\n"
-                    + "	nome as descmerc2,\n"
-                    + "	id as merc3,\n"
-                    + "	nome as descmerc3 \n"
-                    + "from \n"
-                    + "	hierarquia \n"
-                    + "order by\n"
-                    + "	id")) {
+                    "with merc as (\n" +
+                    "select\n" +
+                    "	codigo,\n" +
+                    "	trim(substring(rpad(codigo,30,' '),1,6)) merc1,\n" +
+                    "	trim(substring(rpad(codigo,30,' '),7,6)) merc2,\n" +
+                    "	trim(substring(rpad(codigo,30,' '),13,6)) merc3,\n" +
+                    "	trim(substring(rpad(codigo,30,' '),19,6)) merc4,\n" +
+                    "	trim(substring(rpad(codigo,30,' '),25,6)) merc5,\n" +
+                    "	nome\n" +
+                    "from\n" +
+                    "	hierarquia\n" +
+                    "order by\n" +
+                    "	codigo\n" +
+                    "),\n" +
+                    "m1 as (select * from merc where merc2 = ''),\n" +
+                    "m2 as (select * from merc where merc2 != '' and merc3 = ''),\n" +
+                    "m3 as (select * from merc where merc3 != '' and merc4 = ''),\n" +
+                    "m4 as (select * from merc where merc4 != '' and merc5 = ''),\n" +
+                    "m5 as (select * from merc where merc5 != '')\n" +
+                    "--select * from m1\n" +
+                    "select\n" +
+                    "	m1.merc1,\n" +
+                    "	m1.nome merc1_desc,\n" +
+                    "	m2.merc2,\n" +
+                    "	m2.nome merc2_desc,\n" +
+                    "	m3.merc3,\n" +
+                    "	m3.nome merc3_desc,\n" +
+                    "	m4.merc4,\n" +
+                    "	m4.nome merc4_desc,\n" +
+                    "	m5.merc5,\n" +
+                    "	m5.nome merc5_desc\n" +
+                    "from\n" +
+                    "	m1\n" +
+                    "	left join m2 on\n" +
+                    "		m1.merc1 = m2.merc1\n" +
+                    "	left join m3 on\n" +
+                    "		m2.merc1 = m3.merc1 and\n" +
+                    "		m2.merc2 = m3.merc2\n" +
+                    "	left join m4 on\n" +
+                    "		m3.merc1 = m4.merc1 and\n" +
+                    "		m3.merc2 = m4.merc2 and\n" +
+                    "		m3.merc3 = m4.merc3\n" +
+                    "	left join m5 on\n" +
+                    "		m4.merc1 = m5.merc1 and\n" +
+                    "		m4.merc2 = m5.merc2 and\n" +
+                    "		m4.merc3 = m5.merc3 and\n" +
+                    "		m4.merc4 = m5.merc4"
+            )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
+                    
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setMerc1ID(rs.getString("merc1"));
-                    imp.setMerc1Descricao(rs.getString("descmerc1"));
+                    imp.setMerc1Descricao(rs.getString("merc1_desc"));
                     imp.setMerc2ID(rs.getString("merc2"));
-                    imp.setMerc2Descricao(rs.getString("descmerc2"));
+                    imp.setMerc2Descricao(rs.getString("merc2_desc"));
                     imp.setMerc3ID(rs.getString("merc3"));
-                    imp.setMerc3Descricao(rs.getString("descmerc3"));
+                    imp.setMerc3Descricao(rs.getString("merc3_desc"));
+                    imp.setMerc4ID(rs.getString("merc4"));
+                    imp.setMerc4Descricao(rs.getString("merc4_desc"));
+                    imp.setMerc5ID(rs.getString("merc5"));
+                    imp.setMerc5Descricao(rs.getString("merc5_desc"));
 
                     result.add(imp);
                 }
@@ -236,14 +278,16 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.cstpisentrada, \n" +
                     "	p.cstpis, \n" +
                     "	p.idfamilia, \n" +
-                    "	p.idhierarquia as merc1, \n" +
-                    "	p.idhierarquia as merc2, \n" +
-                    "	p.idhierarquia as merc3,\n" +
+                    "	trim(substring(rpad(merc.codigo,30,' '),1,6)) merc1,\n" +
+                    "	trim(substring(rpad(merc.codigo,30,' '),7,6)) merc2,\n" +
+                    "	trim(substring(rpad(merc.codigo,30,' '),13,6)) merc3,\n" +
+                    "	trim(substring(rpad(merc.codigo,30,' '),19,6)) merc4,\n" +
+                    "	trim(substring(rpad(merc.codigo,30,' '),25,6)) merc5,\n" +
                     "	r.codigo naturezareceita\n" +
                     "from \n" +
                     "	produto p\n" +
                     "	join filial f on\n" +
-                    "		f.id = " + getLojaOrigem() + "\n" +
+                    "		f.id = 1\n" +
                     "	left join formacaoprecoproduto preco on\n" +
                     "		preco.idproduto = p.id and\n" +
                     "		preco.idfilial = f.id\n" +
@@ -255,9 +299,11 @@ public class UniplusDAO extends InterfaceDAO {
                     "		cest.id = p.idcest\n" +
                     "	left join\n" +
                     "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
-                    " left join familiaproduto fp on\n" +
-                    "         p.idfamilia::bigint = fp.codigo::bigint	\n" +
-                    " order by \n" +
+                    "	left join familiaproduto fp on\n" +
+                    "	        p.idfamilia::bigint = fp.codigo::bigint\n" +
+                    "    left join hierarquia merc on\n" +
+                    "    	p.idhierarquia = merc.id\n" +
+                    "order by \n" +
                     "	p.id"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -323,6 +369,8 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setCodMercadologico4(rs.getString("merc4"));
+                    imp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
                     result.add(imp);
