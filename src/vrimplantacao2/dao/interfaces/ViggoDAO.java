@@ -14,6 +14,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -385,5 +386,77 @@ public class ViggoDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	p.codigo id,\n" +
+                        "	p.cpf_cnpj cnpj,\n" +
+                        "	p.insc_estadual ie,\n" +
+                        "	p.nome razao,\n" +
+                        "	coalesce(nullif(p.nome_fantasia,''), p.nome) fantasia,\n" +
+                        "	p.inativo,\n" +
+                        "	p.negativado,\n" +
+                        "	p.endereco,\n" +
+                        "	p.numero,\n" +
+                        "	p.complemento,\n" +
+                        "	p.bairro,\n" +
+                        "	c.codigo_municipio ibge_municipio,\n" +
+                        "	p.cep,\n" +
+                        "	p.data_nascimento,\n" +
+                        "	p.data_cadastro,\n" +
+                        "	p.nome_pai,\n" +
+                        "	p.nome_mae,\n" +
+                        "	p.observacao,\n" +
+                        "	p.contribuinte_icms\n" +
+                        "from\n" +
+                        "	participante p\n" +
+                        "	left join cidade c on\n" +
+                        "		p.codigo_cidade = c.codigo\n" +
+                        "where\n" +
+                        "	p.tipo_participante = 0 and\n" +
+                        "	not p.codigo in (0, 1)\n" +
+                        "order by\n" +
+                        "	p.codigo"
+                )
+        ) {
+            while (rs.next()) {
+                ClienteIMP imp = new ClienteIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setCnpj(rs.getString("cnpj"));
+                imp.setInscricaoestadual(rs.getString("ie"));
+                imp.setRazao(rs.getString("razao"));
+                imp.setFantasia(rs.getString("fantasia"));
+                imp.setAtivo(!rs.getBoolean("inativo"));
+                imp.setBloqueado(rs.getBoolean("negativado"));
+                imp.setEndereco(rs.getString("endereco"));
+                imp.setNumero(rs.getString("numero"));
+                imp.setComplemento(rs.getString("complemento"));
+                imp.setBairro(rs.getString("bairro"));
+                imp.setMunicipioIBGE(rs.getInt("ibge_municipio"));
+                imp.setCep(rs.getString("cep"));
+                imp.setDataNascimento(rs.getDate("data_nascimento"));
+                imp.setDataCadastro(rs.getDate("data_cadastro"));
+                imp.setNomePai(rs.getString("nome_pai"));
+                imp.setNomeMae(rs.getString("nome_mae"));
+                imp.setObservacao2(rs.getString("observacao"));
+                if (rs.getBoolean("contribuinte_icms")) {
+                    imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS);
+                } else {
+                    imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);                
+                }
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+        
 }
