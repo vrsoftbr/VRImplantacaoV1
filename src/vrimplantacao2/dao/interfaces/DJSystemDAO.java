@@ -223,6 +223,37 @@ public class DJSystemDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "  P.CODITE AS ID,\n" +
+                    "  P.UN AS EMBALAGEM,\n" +
+                    "  P.GTIN_PROD AS EAN,\n" +
+                    "  P.REFERENCIA\n" +
+                    "FROM\n" +
+                    " ITENS P WHERE P.REFERENCIA IS NOT NULL AND \n" +
+                    "   P.REFERENCIA != P.GTIN_PROD AND\n" +
+                    "   P.GTIN_PROD IS NOT NULL")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id") == null ? rs.getString("ean") : rs.getString("id"));
+                    imp.setEan(rs.getString("referencia"));
+                    imp.setTipoEmbalagem(rs.getString("embalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         
