@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -15,6 +17,8 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -457,6 +461,101 @@ public class ViggoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
+            Map<String, List<CreditoRotativoItemIMP>> pagamentos = new HashMap<>();
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	p.numero_conta_receber,\n" +
+                    "	p.numero_parcela,\n" +
+                    "	p.valor,\n" +
+                    "	p.desconto,\n" +
+                    "	p.juros,\n" +
+                    "	p.data_hora,\n" +
+                    "	p.observacao\n" +
+                    "from\n" +
+                    "	pagto_conta_receber p\n" +
+                    "where\n" +
+                    "	p.cancelado is null\n" +
+                    "order by\n" +
+                    "	p.numero_conta_receber,\n" +
+                    "	p.numero_parcela"
+            )) {
+                while (rs.next()) {
+                    final String id = rs.getString("numero_conta_receber") + "-" + rs.getString("numero_parcela");
+                    List<CreditoRotativoItemIMP> pag = pagamentos.get(id);
+                    if (pag == null) {
+                        pag = new ArrayList<>();
+                        pagamentos.put(id, pag);
+                    }
+                    CreditoRotativoItemIMP imp = new CreditoRotativoItemIMP();
+                    
+                    imp.setId(id);
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDesconto(rs.getDouble("desconto"));
+                    imp.setMulta(rs.getDouble("juros"));
+                    imp.setDataPagamento(rs.getDate("data_hora"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    pag.add(imp);
+                }
+            }
+            
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	pcr.numero_conta_receber,\n" +
+                    "	pcr.numero,\n" +
+                    "	cr.\"data\" emissao,\n" +
+                    "	cr.numero_cupom,\n" +
+                    "	substring(cr.numero_doc,3,1) ecf,\n" +
+                    "	pcr.valor,\n" +
+                    "	pcr.observacao,\n" +
+                    "	cr.codigo_participante id_cliente,\n" +
+                    "	pcr.vencimento,\n" +
+                    "	pcr.numero parcela,\n" +
+                    "	pcr.juros\n" +
+                    "from\n" +
+                    "	parcela_conta_receber pcr\n" +
+                    "	join conta_receber cr on\n" +
+                    "		pcr.numero_conta_receber = cr.numero\n" +
+                    "order by\n" +
+                    "	1, 2"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    final String id = rs.getString("numero_conta_receber") + "-" + rs.getString("numero");
+                    
+                    imp.setId(id);
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setNumeroCupom(rs.getString("numero_cupom"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    
+                    List<CreditoRotativoItemIMP> pag = pagamentos.get(id);
+                    if (pag != null) {
+                        for (CreditoRotativoItemIMP pg: pag) {
+                            pg.setCreditoRotativo(imp);
+                            imp.getPagamentos().add(pg);
+                        }
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;        
     }
         
 }
