@@ -656,7 +656,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.fn1_cmc7 cmc7,\n" +
                     "	f.fn1_cheque cheque,\n" +
                     "	f.FN1_DTCHEQUE datacheque,\n" +
-                    "	f.cg1_banco_num banco,\n" +
+                    "	bc.cg1_banco banco,\n" +
+                    "	bc.cg1_agencia agencia,\n" +
+                    "	bc.cg1_conta conta,\n" +
                     "	f.caixa,\n" +
                     "	f.cupom,\n" +
                     "	f.FN1_EMISSAO emissao,\n" +
@@ -668,17 +670,24 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "FROM \n" +
                     "	fn1 f\n" +
                     "JOIN cg1 c ON f.CG1_COD = c.cg1_cod\n" +
+                    "LEFT JOIN cg1_banco bc ON f.cg1_banco_num = bc.cg1_banco_num\n" +
                     "WHERE \n" +
                     "	f.fn1_dtbaixa IS null AND\n" +
                     "	f.fn1_empresa = " + getLojaOrigem() + " AND \n" +
-                    "	fn1_tipo IN (37, 62, 64)")) {
+                    "	fn1_tipo IN (37, 62, 64)\n" +
+                    "ORDER BY \n" +
+                    "	f.FN1_VENC")) {
                 while(rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     
                     imp.setId(rs.getString("id"));
                     imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setNumeroCheque(rs.getString("documento"));
                     imp.setDate(rs.getDate("emissao"));
                     imp.setCmc7(rs.getString("cmc7"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setConta(rs.getString("conta"));
                     imp.setNome(rs.getString("razao"));
                     imp.setTelefone(rs.getString("telefone"));
                     
