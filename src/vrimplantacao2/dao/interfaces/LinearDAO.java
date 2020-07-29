@@ -19,6 +19,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -169,6 +170,32 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "	tab_cod id,\n" +
+                    "	tab_desc descricao\n" +
+                    "FROM\n" +
+                    "	st_semelhante")) {
+                while(rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
@@ -187,7 +214,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pr.es1_familia merc1,\n" +
                     "	pr.es1_departamento merc2,\n" +
                     "	pr.es1_secao merc3,\n" +
-                    "	pr.es1_nbm ncm,\n" +
+                    "   pr.es1_semelhante idfamilia,\n" +        
+                    "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
                     "	pc.Es1_Ativo situacao,\n" +
                     "	pc.ES1_DTCAD cadastro,\n" +
@@ -203,6 +231,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.Es1_ESTMAXIMO estoquemaximo,\n" +
                     "	pc.ES1_PESAVEL pesavel,\n" +
                     "	pc.ES1_BALANCA balanca,\n" +
+                    "   pc.es1_vlbalanca validade,\n" +        
                     "	pc.es1_pesol pesoliquido,\n" +
                     "	pc.es1_pesob pesobruto,\n" +
                     "	pc.es1_cstpis cstpis,\n" +
@@ -221,6 +250,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
                     imp.seteBalanca(rs.getInt("balanca") == 1);
+                    imp.setValidade(rs.getInt("validade"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
@@ -231,6 +261,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
@@ -261,6 +292,36 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setManterEAN(true);
                         }
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	es1_cod id,\n" +
+                    "	es1_codbarra ean,\n" +
+                    "	es1_umvenda unidade,\n" +
+                    "	es1_qtvenda qtd\n" +
+                    "FROM \n" +
+                    "	es1a")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtd"));
                     
                     result.add(imp);
                 }
