@@ -223,7 +223,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_margemcom margempadrao,\n" +
                     "   pc.es1_ultmargem margemvarejo,\n" +        
                     "	pc.es1_prvarejo preco,\n" +
-                    "	pc.es1_prcusto custo,\n" +
+                    "	pc.es1_prcusto custosemimposto,\n" +
+                    "   pc.es1_prcompra custocomimposto,\n" +        
                     "   pc.es1_prcustomedio customedio,\n" +        
                     "	pc.es1_classfiscal,\n" +
                     "	pc.es2_qatu estoque,\n" +
@@ -275,8 +276,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margemvarejo"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoMedio(rs.getDouble("customedio"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
