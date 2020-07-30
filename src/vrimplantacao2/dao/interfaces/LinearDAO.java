@@ -19,6 +19,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -169,6 +170,32 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "	tab_cod id,\n" +
+                    "	tab_desc descricao\n" +
+                    "FROM\n" +
+                    "	st_semelhante")) {
+                while(rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
@@ -187,7 +214,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pr.es1_familia merc1,\n" +
                     "	pr.es1_departamento merc2,\n" +
                     "	pr.es1_secao merc3,\n" +
-                    "	pr.es1_nbm ncm,\n" +
+                    "   pr.es1_semelhante idfamilia,\n" +        
+                    "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
                     "	pc.Es1_Ativo situacao,\n" +
                     "	pc.ES1_DTCAD cadastro,\n" +
@@ -195,7 +223,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_margemcom margempadrao,\n" +
                     "   pc.es1_ultmargem margemvarejo,\n" +        
                     "	pc.es1_prvarejo preco,\n" +
-                    "	pc.es1_prcusto custo,\n" +
+                    "	pc.es1_prcusto custosemimposto,\n" +
+                    "   pc.es1_prcompra custocomimposto,\n" +        
                     "   pc.es1_prcustomedio customedio,\n" +        
                     "	pc.es1_classfiscal,\n" +
                     "	pc.es2_qatu estoque,\n" +
@@ -203,6 +232,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.Es1_ESTMAXIMO estoquemaximo,\n" +
                     "	pc.ES1_PESAVEL pesavel,\n" +
                     "	pc.ES1_BALANCA balanca,\n" +
+                    "   pc.es1_vlbalanca validade,\n" +        
                     "	pc.es1_pesol pesoliquido,\n" +
                     "	pc.es1_pesob pesobruto,\n" +
                     "	pc.es1_cstpis cstpis,\n" +
@@ -221,6 +251,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
                     imp.seteBalanca(rs.getInt("balanca") == 1);
+                    imp.setValidade(rs.getInt("validade"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
@@ -231,6 +262,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
@@ -244,8 +276,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margemvarejo"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoMedio(rs.getDouble("customedio"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
@@ -261,6 +293,36 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setManterEAN(true);
                         }
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	es1_cod id,\n" +
+                    "	es1_codbarra ean,\n" +
+                    "	es1_umvenda unidade,\n" +
+                    "	es1_qtvenda qtd\n" +
+                    "FROM \n" +
+                    "	es1a")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtd"));
                     
                     result.add(imp);
                 }
@@ -595,7 +657,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.fn1_cmc7 cmc7,\n" +
                     "	f.fn1_cheque cheque,\n" +
                     "	f.FN1_DTCHEQUE datacheque,\n" +
-                    "	f.cg1_banco_num banco,\n" +
+                    "	bc.cg1_banco banco,\n" +
+                    "	bc.cg1_agencia agencia,\n" +
+                    "	bc.cg1_conta conta,\n" +
                     "	f.caixa,\n" +
                     "	f.cupom,\n" +
                     "	f.FN1_EMISSAO emissao,\n" +
@@ -607,17 +671,24 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "FROM \n" +
                     "	fn1 f\n" +
                     "JOIN cg1 c ON f.CG1_COD = c.cg1_cod\n" +
+                    "LEFT JOIN cg1_banco bc ON f.cg1_banco_num = bc.cg1_banco_num\n" +
                     "WHERE \n" +
                     "	f.fn1_dtbaixa IS null AND\n" +
                     "	f.fn1_empresa = " + getLojaOrigem() + " AND \n" +
-                    "	fn1_tipo IN (37, 62, 64)")) {
+                    "	fn1_tipo IN (37, 62, 64)\n" +
+                    "ORDER BY \n" +
+                    "	f.FN1_VENC")) {
                 while(rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     
                     imp.setId(rs.getString("id"));
                     imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setNumeroCheque(rs.getString("documento"));
                     imp.setDate(rs.getDate("emissao"));
                     imp.setCmc7(rs.getString("cmc7"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setConta(rs.getString("conta"));
                     imp.setNome(rs.getString("razao"));
                     imp.setTelefone(rs.getString("telefone"));
                     
