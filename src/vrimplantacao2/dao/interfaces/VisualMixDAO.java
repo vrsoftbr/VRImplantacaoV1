@@ -1225,7 +1225,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
 
-                    imp.setIdProduto(rst.getString("idproduto") + rst.getString("digito_produto"));
+                    imp.setIdProduto(rst.getString("id_produto") + rst.getString("digito_produto"));
                     imp.setDataInicio(rst.getDate("datainicio"));
                     imp.setDataFim(rst.getDate("datatermino"));
                     imp.setPrecoOferta(rst.getDouble("precooferta"));
