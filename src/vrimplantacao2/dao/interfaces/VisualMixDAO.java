@@ -32,6 +32,8 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -48,6 +50,7 @@ import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -1188,6 +1191,52 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
+        return result;
+    }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	cast(p.Produto_Id as bigint) as id_produto,\n"
+                    + "	cast(p.Digito_Id as bigint) as digito_produto, \n"
+                    + "	o.Data_Inicio as datainicio,\n"
+                    + "	o.Data_Fim as datatermino,\n"
+                    + "	o.Preco_Promocao as precooferta\n"
+                    + "from dbo.promocoes o\n"
+                    + "join dbo.Produtos p on p.Produto_Id = o.Produto_Id\n"
+                    + "where o.loja = 0 \n"
+                    + "and o.Data_Fim >= '2020-08-04'\n"
+                    + "union all\n"
+                    + "select\n"
+                    + "	cast(p.Produto_Id as bigint) as id_produto,\n"
+                    + "	cast(p.Digito_Id as bigint) as digito_produto, \n"
+                    + "	o.Data_Inicio as datainicio,\n"
+                    + "	o.Data_Fim as datatermino,\n"
+                    + "	o.Preco_Promocao as precooferta\n"
+                    + "from dbo.promocoes o\n"
+                    + "join dbo.Produtos p on p.Produto_Id = o.Produto_Id\n"
+                    + "where o.loja = " + getLojaOrigem() + " \n"
+                    + "and o.Data_Fim >= '2020-08-04'"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    imp.setIdProduto(rst.getString("idproduto") + rst.getString("digito_produto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datatermino"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                    result.add(imp);
+
+                }
+            }
+        }
         return result;
     }
     
