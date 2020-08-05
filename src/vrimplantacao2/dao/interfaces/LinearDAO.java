@@ -203,7 +203,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
             try(ResultSet rs = stm.executeQuery(
                     "SELECT\n" +
                     "	pr.es1_cod id,\n" +
-                    "	pr.es1_codbarra ean,\n" +
+                    "	ean.es1_codbarra ean,\n" +
                     "	pr.es1_desc descricaocompleta,\n" +
                     "	pr.es1_compl descricaoreduzida,\n" +
                     "	pr.es1_descetiqueta descricaogondola,\n" +
@@ -214,25 +214,25 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pr.es1_familia merc1,\n" +
                     "	pr.es1_departamento merc2,\n" +
                     "	pr.es1_secao merc3,\n" +
-                    "   pr.es1_semelhante idfamilia,\n" +        
+                    "	pr.es1_semelhante idfamilia,\n" +
                     "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
                     "	pc.Es1_Ativo situacao,\n" +
                     "	pc.ES1_DTCAD cadastro,\n" +
                     "	pc.ES1_TRIBUTACAO idicms,\n" +
                     "	pc.es1_margemcom margempadrao,\n" +
-                    "   pc.es1_ultmargem margemvarejo,\n" +        
+                    "	pc.es1_ultmargem margemvarejo,\n" +
                     "	pc.es1_prvarejo preco,\n" +
                     "	pc.es1_prcusto custosemimposto,\n" +
-                    "   pc.es1_prcompra custocomimposto,\n" +        
-                    "   pc.es1_prcustomedio customedio,\n" +        
+                    "	pc.es1_prcompra custocomimposto,\n" +
+                    "	pc.es1_prcustomedio customedio,\n" +
                     "	pc.es1_classfiscal,\n" +
                     "	pc.es2_qatu estoque,\n" +
                     "	pc.Es1_ESTMINIMO estoqueminimo,\n" +
                     "	pc.Es1_ESTMAXIMO estoquemaximo,\n" +
                     "	pc.ES1_PESAVEL pesavel,\n" +
                     "	pc.ES1_BALANCA balanca,\n" +
-                    "   pc.es1_vlbalanca validade,\n" +        
+                    "	pc.es1_vlbalanca validade,\n" +
                     "	pc.es1_pesol pesoliquido,\n" +
                     "	pc.es1_pesob pesobruto,\n" +
                     "	pc.es1_cstpis cstpis,\n" +
@@ -241,8 +241,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "FROM\n" +
                     "	es1p pr\n" +
                     "JOIN es1 pc ON pr.es1_cod = pc.ES1_COD\n" +
+                    "LEFT JOIN es1a ean ON pr.es1_cod = ean.ES1_COD\n" +
                     "WHERE \n" +
                     "	pc.es1_empresa = " + getLojaOrigem())) {
+                //"   length(cast(convert(ean.es1_codbarra, UNSIGNED INTEGER) AS char)) > 6"
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
