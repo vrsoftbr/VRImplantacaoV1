@@ -704,8 +704,8 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	e.bairro,\n"
                     + "	c.codigo municipioibge,\n"
                     + "	c.nome municipio,\n"
-                    + "   es.codigoibge estadoibge,\n"
-                    + "   es.codigo estado,\n"
+                    + " es.codigoibge estadoibge,\n"
+                    + " es.codigo estado,\n"
                     + "	e.cep,\n"
                     + "	e.telefone,\n"
                     + "	e.celular,\n"
@@ -782,6 +782,7 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	f.tipo = 'R'\n"
                     + "	and f.idfilial = " + getLojaOrigem() + "\n"
                     + "	and f.idtipodocumentofinanceiro in (1,8)\n"
+                    + " and f.status = 'A'\n"
                     + "order by\n"
                     + "	f.id"
             )) {
