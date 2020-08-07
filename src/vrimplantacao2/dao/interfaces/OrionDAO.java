@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -99,13 +98,17 @@ public class OrionDAO extends InterfaceDAO {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         Map<String, Estabelecimento> result = new LinkedHashMap<>();
-        
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select firma as nome, cgc as id from config"
+                    "select "
+                    + "firma as nome, "
+                    + "cgc as id, "
+                    + "cgc as id2 "
+                    + "from config"
             )) {
                 while (rst.next()) {
-                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id"), rst.getString("nome")));
+                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id2"), rst.getString("nome")));
                 }
             }
         }

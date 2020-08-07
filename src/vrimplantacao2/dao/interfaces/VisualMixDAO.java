@@ -324,7 +324,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
                     + " cast(p.Comprador as bigint) as idcomprador,\n"
-                    + " fz.Tecla\n"
+                    + " fz.Tecla,\n"
+                    + " p.DataInclusao as datacadastro,\n"
+                    + " p.DataAlteracao as dataalteracao\n"        
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -392,6 +394,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("Mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("Mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
@@ -467,7 +471,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
                     + " cast(p.Comprador as bigint) as idcomprador,\n"
-                    + " fz.Tecla\n"
+                    + " fz.Tecla,\n"
+                    + " p.DataInclusao as datacadastro,\n"
+                    + " p.DataAlteracao as dataalteracao\n"        
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -521,6 +527,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("Mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("Mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
@@ -1168,7 +1176,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join dbo.Cobranca_TipoDocto td on td.Codigo = cp.TipoDocumento\n"
                     + "left join dbo.Tipos_Pagtos tp on tp.codigo = td.TipoPagto\n"
                     + "where cp.Loja = " + getLojaOrigem() + "\n"
-                    + "and cp.Codigo not in (select codigocobranca from dbo.Cobranca_PAGTO where empresa = " + getLojaOrigem() + ")"
+                    //+ "and cp.Codigo not in (select codigocobranca from dbo.Cobranca_PAGTO where empresa = " + getLojaOrigem() + ")\n"
+                    + "and cp.status = 1"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
