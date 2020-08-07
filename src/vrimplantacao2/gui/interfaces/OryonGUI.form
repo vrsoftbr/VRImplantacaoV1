@@ -167,19 +167,20 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkDiaVencimento" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkNomeCliente" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="vRPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="233" max="32767" attributes="0"/>
                       </Group>
@@ -198,13 +199,16 @@
                                       <Component id="chkNomeCliente" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkDiaVencimento" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="202" max="32767" attributes="0"/>
+                          <EmptySpace pref="68" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -325,6 +329,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeCliente">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nome"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDiaVencimento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Dia de Vencimento"/>
                   </Properties>
                 </Component>
               </SubComponents>

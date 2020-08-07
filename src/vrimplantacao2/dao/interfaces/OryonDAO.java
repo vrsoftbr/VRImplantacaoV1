@@ -658,7 +658,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   cancelado,\n" +
                     "   inativo,\n" +
                     "   sexomasc as sexo,\n" +
-                    "   profissao \n" +
+                    "   profissao,\n" +
+                    "   dia_pgto\n" +        
                     "from\n" +
                     "   tabela_cli\n" +
                     "order by\n" +
@@ -696,6 +697,7 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomePai(rs.getString("pai"));
                     imp.setEmail(rs.getString("email"));
                     imp.setAtivo("0".equals(rs.getString("inativo")));
+                    imp.setDiaVencimento(rs.getInt("dia_pgto"));
                     
                     result.add(imp);
                 }
@@ -721,7 +723,8 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  r.Cliente as id_cliente,\n" +
                     "  r.Vencimento,\n" +
                     "  r.Data_pgto,\n" +
-                    "  r.Valor_pago\n" +
+                    "  r.Valor_pago,\n" +
+                    "  r.valor_adicional as juros\n" +        
                     "from\n" +
                     "  Tabela_Caderno r\n" +
                     "where\n" +
@@ -735,6 +738,7 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rs.getString("numerocupom"));
                     imp.setEcf(rs.getString("ecf"));
                     imp.setValor(rs.getDouble("valor"));
+                    imp.setJuros(rs.getDouble("juros"));
                     imp.setObservacao(
                             String.format(
                                     "LOJA ORIG %s DUPLIC %s OBS %s",

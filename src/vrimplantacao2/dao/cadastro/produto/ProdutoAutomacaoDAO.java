@@ -21,18 +21,19 @@ import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class ProdutoAutomacaoDAO {
-    
+
     private Map<Long, Integer> eansCadastrados;
+
     public Map<Long, Integer> getEansCadastrados() throws Exception {
         if (eansCadastrados == null) {
             atualizaEansCadastrados();
         }
         return eansCadastrados;
     }
-    
-    public Set<Long> getEansCadastradosAtacado(int idLoja) throws Exception {        
+
+    public Set<Long> getEansCadastradosAtacado(int idLoja) throws Exception {
         Set<Long> result = new HashSet<>();
-    
+
         if (Versao.menorQue(3, 18, 1)) {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -58,7 +59,7 @@ public class ProdutoAutomacaoDAO {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -94,55 +95,56 @@ public class ProdutoAutomacaoDAO {
                     if (rst.next()) {
                         vo.setId(rst.getInt("id"));
                     }
-                }                
-                getEansCadastrados().put(vo.getCodigoBarras(), vo.getProduto().getId());                
+                }
+                getEansCadastrados().put(vo.getCodigoBarras(), vo.getProduto().getId());
             }
         }
     }
 
-    public void salvar(ProdutoIMP imp, ProdutoAnteriorVO anterior) throws Exception {              
-        ProdutoVO produto = anterior.getCodigoAtual(); 
+    public void salvar(ProdutoIMP imp, ProdutoAnteriorVO anterior) throws Exception {
+        ProdutoVO produto = anterior.getCodigoAtual();
         long ean = Utils.stringToLong(imp.getEan());
-        
-        if(produto == null) {
-            System.out.println("IMPID: " + anterior.getImportId() + " NAO ENCONTRADO!");
-        }
-                    
-        ProdutoAutomacaoVO automacao = produto.getEans().make(ean);
 
-        automacao.setCodigoBarras(ean);
-        automacao.setDun14(String.valueOf(ean).length() > 13);
-        automacao.setPesoBruto(imp.getPesoBruto());
-        automacao.setQtdEmbalagem(imp.getQtdEmbalagem());
-        automacao.setTipoEmbalagem(TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagem()));
-        
-        ProdutoAnteriorEanVO antEan = anterior.getEans().make(
-                imp.getImportSistema(),
-                imp.getImportLoja(),
-                imp.getImportId(),
-                imp.getEan()
-        );
-        
-        antEan.setEan(imp.getEan());
-        antEan.setQtdEmbalagem(imp.getQtdEmbalagem());
-        antEan.setTipoEmbalagem(imp.getTipoEmbalagem());
-        antEan.setValor(imp.getPrecovenda());
-        
-        salvar(automacao);
-        if (!eanAnteriorDAO.getEansAnteriores().containsKey(
-                antEan.getImportSistema(),
-                antEan.getImportLoja(),
-                antEan.getImportId(),
-                antEan.getEan()
-        )) {
-            eanAnteriorDAO.salvar(antEan);
-        }        
+        if (produto == null) {
+            System.out.println("IMPID: " + anterior.getImportId() + " NAO ENCONTRADO!");
+        } else {
+            ProdutoAutomacaoVO automacao = produto.getEans().make(ean);
+
+            automacao.setCodigoBarras(ean);
+            automacao.setDun14(String.valueOf(ean).length() > 13);
+            automacao.setPesoBruto(imp.getPesoBruto());
+            automacao.setQtdEmbalagem(imp.getQtdEmbalagem());
+            automacao.setTipoEmbalagem(TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagem()));
+
+            ProdutoAnteriorEanVO antEan = anterior.getEans().make(
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getImportId(),
+                    imp.getEan()
+            );
+
+            antEan.setEan(imp.getEan());
+            antEan.setQtdEmbalagem(imp.getQtdEmbalagem());
+            antEan.setTipoEmbalagem(imp.getTipoEmbalagem());
+            antEan.setValor(imp.getPrecovenda());
+
+            salvar(automacao);
+            if (!eanAnteriorDAO.getEansAnteriores().containsKey(
+                    antEan.getImportSistema(),
+                    antEan.getImportLoja(),
+                    antEan.getImportId(),
+                    antEan.getEan()
+            )) {
+                eanAnteriorDAO.salvar(antEan);
+            }
+        }
     }
-    
+
     private final ProdutoAnteriorEanDAO eanAnteriorDAO = new ProdutoAnteriorEanDAO();
 
     /**
      * Gera EAN para produtos que não os possuem.
+     *
      * @throws java.lang.Exception
      */
     public void salvarEansEmBranco() throws Exception {
@@ -150,29 +152,30 @@ public class ProdutoAutomacaoDAO {
             Collection<ProdutoVO> values = carregarCodigoBarrasEmBranco().values();
             ProgressBar.setStatus("Incluindo produtos com EAN em branco");
             ProgressBar.setMaximum(values.size());
-            for (ProdutoVO produto: values) {
-                for (ProdutoAutomacaoVO ean: produto.getEans().values()) {
+            for (ProdutoVO produto : values) {
+                for (ProdutoAutomacaoVO ean : produto.getEans().values()) {
                     //Se o ean não estiver cadastrado para outro produto
-                    if (!getEansCadastrados().containsKey(ean.getCodigoBarras())) {                    
+                    if (!getEansCadastrados().containsKey(ean.getCodigoBarras())) {
                         SQLBuilder sql = new SQLBuilder();
                         sql.setTableName("produtoautomacao");
-                        sql.put("id_produto", produto.getId());                
+                        sql.put("id_produto", produto.getId());
                         sql.put("codigobarras", ean.getCodigoBarras());
                         sql.put("qtdembalagem", ean.getQtdEmbalagem());
                         sql.put("id_tipoembalagem", ean.getTipoEmbalagem().getId());
 
-                        stm.execute(sql.getInsert());                    
+                        stm.execute(sql.getInsert());
                     }
                 }
                 ProgressBar.next();
             }
         }
     }
-    
+
     /**
      * Carrega uma listagem com os códigos em branco.
+     *
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     private Map<Long, ProdutoVO> carregarCodigoBarrasEmBranco() throws Exception {
         Map<Long, ProdutoVO> vProduto = new HashMap<>();
@@ -180,24 +183,24 @@ public class ProdutoAutomacaoDAO {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select id, id_tipoembalagem, pesavel from produto p where not exists(select pa.id from produtoautomacao pa where pa.id_produto = p.id)"
-            )) {     
+            )) {
                 while (rst.next()) {
-                    int idProduto  = rst.getInt("id");
+                    int idProduto = rst.getInt("id");
                     long codigobarras = idProduto;
-                    
+
                     ProdutoVO oProduto = new ProdutoVO();
                     oProduto.setId(idProduto);
                     ProdutoAutomacaoVO oAutomacao = oProduto.getEans().make(codigobarras);
                     oAutomacao.setTipoEmbalagem(TipoEmbalagem.getTipoEmbalagem(rst.getInt("id_tipoembalagem")));
                     oAutomacao.setCodigoBarras(codigobarras);
                     oAutomacao.setQtdEmbalagem(1);
-                    
+
                     vProduto.put(codigobarras, oProduto);
                 }
 
                 return vProduto;
             }
-        } 
+        }
     }
 
     public void atualizar(ProdutoAutomacaoVO automacao, Set<OpcaoProduto> opt) throws Exception {
@@ -216,7 +219,7 @@ public class ProdutoAutomacaoDAO {
             }
         }
     }
-    
+
     public boolean getEanById(long ean, int prod) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
