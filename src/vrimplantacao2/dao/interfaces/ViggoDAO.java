@@ -420,7 +420,8 @@ public class ViggoDAO extends InterfaceDAO implements MapaTributoProvider {
                         "	p.nome_pai,\n" +
                         "	p.nome_mae,\n" +
                         "	p.observacao,\n" +
-                        "	p.contribuinte_icms\n" +
+                        "	p.contribuinte_icms,\n" +
+                        "	p.limite_credito\n" +
                         "from\n" +
                         "	participante p\n" +
                         "	left join cidade c on\n" +
@@ -458,6 +459,7 @@ public class ViggoDAO extends InterfaceDAO implements MapaTributoProvider {
                 } else {
                     imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);                
                 }
+                imp.setValorLimite(rs.getDouble("limite_credito"));
                 
                 result.add(imp);
             }
