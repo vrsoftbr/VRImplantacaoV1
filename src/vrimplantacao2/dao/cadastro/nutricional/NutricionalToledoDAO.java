@@ -201,8 +201,10 @@ public class NutricionalToledoDAO {
                 sql.put("descricao", vo.getDescricao());
                 sql.put("validade", vo.getValidade());
                 if (vo.getNutricional() != 0) {
+                    System.out.println("Aqui");
                     sql.put("nutricional", vo.getNutricional());
                 } else {
+                    System.out.println("Aqui 2");
                     sql.put("nutricional", vo.getCodigo());
                 }
 
@@ -276,18 +278,18 @@ public class NutricionalToledoDAO {
                 }
             }
             
-            if(idProduto == -1) {
+            if (idProduto == -1) {
                 System.out.println("Produto Balança Não Encontrado: " + vo.getIdProduto() + "\n"
                         + "Desc: " + vo.getDescricao());
-            }
-            
-            try(Statement stm = Conexao.createStatement()) {
-                SQLBuilder sql = new SQLBuilder();
-                sql.setTableName("nutricionaltoledoitem");
-                sql.put("id_nutricionaltoledo", vo.getId());
-                sql.put("id_produto", idProduto);
-                
-                stm.execute(sql.getInsert());
+            } else {
+                try (Statement stm = Conexao.createStatement()) {
+                    SQLBuilder sql = new SQLBuilder();
+                    sql.setTableName("nutricionaltoledoitem");
+                    sql.put("id_nutricionaltoledo", vo.getId());
+                    sql.put("id_produto", idProduto);
+
+                    stm.execute(sql.getInsert());
+                }
             }
         }
     }

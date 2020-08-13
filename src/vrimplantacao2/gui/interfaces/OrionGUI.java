@@ -70,6 +70,7 @@ public class OrionGUI extends VRInternalFrame {
     }
 
     public void validarDadosAcesso() throws Exception {
+        ConexaoDBF.usarOdbc = true;
         ConexaoDBF.abrirConexao(txtDatabase.getText());
         gravarParametros();
         carregarLojaCliente();
@@ -117,31 +118,6 @@ public class OrionGUI extends VRInternalFrame {
         } finally {
             i_mdiFrame.setDefaultCursor();
         }
-    }
-
-    
-    public void gravar() throws Exception {
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    
-                    ProgressBar.show();
-                    orionDAO.gravar();
-                    
-                } catch (Exception ex) {
-                    try {                    
-                        connDBF.close();
-                    } catch (Exception ex1) {
-                        Exceptions.printStackTrace(ex1);
-                    }
-                    ProgressBar.dispose();
-                    Util.exibirMensagemErro(ex, getTitle());
-                }
-            }
-        };
-        
-        thread.start();
     }
     
     public void importarTabelas() throws Exception {
@@ -241,6 +217,7 @@ public class OrionGUI extends VRInternalFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         vRTextArea1 = new vrframework.bean.textArea.VRTextArea();
+        vRButton1 = new vrframework.bean.button.VRButton();
         vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -263,7 +240,6 @@ public class OrionGUI extends VRInternalFrame {
         vRLabel3 = new vrframework.bean.label.VRLabel();
         vRLabel4 = new vrframework.bean.label.VRLabel();
         txtDataTerminoVendas = new vrframework.bean.textField.VRTextField();
-        vRButton1 = new vrframework.bean.button.VRButton();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -284,6 +260,8 @@ public class OrionGUI extends VRInternalFrame {
         vRTextArea1.setColumns(20);
         vRTextArea1.setRows(5);
         jScrollPane1.setViewportView(vRTextArea1);
+
+        vRButton1.setText("vRButton1");
 
         setTitle("Importação Orion");
         setToolTipText("");
@@ -426,13 +404,6 @@ public class OrionGUI extends VRInternalFrame {
 
         vRLabel4.setText("Data Término");
 
-        vRButton1.setText("Gravar");
-        vRButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                vRButton1ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
         vRPanel4.setLayout(vRPanel4Layout);
         vRPanel4Layout.setHorizontalGroup(
@@ -448,9 +419,8 @@ public class OrionGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDataTerminoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(vRButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(458, Short.MAX_VALUE))
+                            .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(339, Short.MAX_VALUE))
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -467,30 +437,24 @@ public class OrionGUI extends VRInternalFrame {
                         .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDataInicioVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addComponent(vRButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 640, Short.MAX_VALUE)
-            .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(vRPanel1Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 204, Short.MAX_VALUE)
-            .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(vRPanel1Layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         tabsImportacao.addTab("Vendas", vRPanel1);
@@ -701,23 +665,6 @@ public class OrionGUI extends VRInternalFrame {
     private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbLojaOrigemActionPerformed
-
-    private void vRButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vRButton1ActionPerformed
-        // TODO add your handling code here:
-        
-        try {
-            this.setWaitCursor();
-            gravar();
-
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-        
-        
-    }//GEN-LAST:event_vRButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;

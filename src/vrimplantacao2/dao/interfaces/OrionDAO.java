@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -54,53 +53,6 @@ public class OrionDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "Orion";
-    }
-    
-    public void gravar() throws Exception {
-        
-        String sql = "select "
-                + "e.plu, "
-                + "e.nome, "
-                + "((e.custobase - e.descontos) + e.icmssubstr + e.encargos + e.frete + e.outrasdesp) as custocomimposto, \n"
-                + "e.custobase as custosemimposto, e.vendavare "
-                + "from estoque e ";
-        
-        Statement st = null;
-        StringBuilder sq = null;
-        
-        Conexao.begin();
-        
-        st = Conexao.createStatement();
-        
-        
-        int cont = 0;
-        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(sql)) {
-                while (rst.next()) {
-                    
-                    sq = new StringBuilder();
-                    sq.append("insert into implantacao.preco_custo_orion_loja1 (loja, codigo, nome, custocomimposto, custosemimposto, precovenda) ");
-                    sq.append("values (");
-                    sq.append("'"+getLojaOrigem()+"', ");
-                    sq.append("'"+rst.getString("plu")+"', ");
-                    sq.append("'"+Utils.acertarTexto(rst.getString("nome"))+ "', ");
-                    sq.append(rst.getDouble("custocomimposto")+ ", ");
-                    sq.append(rst.getDouble("custosemimposto") + ", ");
-                    sq.append(rst.getDouble("vendavare") + ");");
-                    
-                    st.execute(sq.toString());
-                    
-                    cont++;
-                    
-                    ProgressBar.setStatus("Gravando..." + cont);
-                }
-            }
-            
-            st.close();
-            Conexao.commit();
-        }
-        
-        
     }
     
     @Override
@@ -146,13 +98,17 @@ public class OrionDAO extends InterfaceDAO {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         Map<String, Estabelecimento> result = new LinkedHashMap<>();
-        
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select firma as nome, cgc as id from config"
+                    "select "
+                    + "firma as nome, "
+                    + "cgc as id, "
+                    + "cgc as id2 "
+                    + "from config"
             )) {
                 while (rst.next()) {
-                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id"), rst.getString("nome")));
+                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id2"), rst.getString("nome")));
                 }
             }
         }
@@ -757,7 +713,7 @@ public class OrionDAO extends InterfaceDAO {
 
         public VendaIterator(String dataInicio, String dataTermino) throws Exception {
             this.sql
-                    = "select \n"
+                    = "select distinct \n"
                     + "	v.codigo as id,\n"
                     + "	v.codcli as idcliente,\n"
                     + "	v.cupom as numerocupom,\n"
@@ -777,7 +733,6 @@ public class OrionDAO extends InterfaceDAO {
                     + "	v.numcfe\n"
                     + "from vendas v\n"
                     + "where v.data between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    //+ " and v.numcfe = '000126'\n"
                     + "order by v.data";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);

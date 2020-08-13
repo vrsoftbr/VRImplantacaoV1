@@ -374,7 +374,6 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace pref="356" max="32767" attributes="0"/>
@@ -392,10 +391,8 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkLimite" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="168" max="32767" attributes="0"/>
+                              <EmptySpace pref="195" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -433,11 +430,6 @@
                         <Property name="text" type="java.lang.String" value="Cheque"/>
                       </Properties>
                     </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRotativo">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
-                      </Properties>
-                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="tablCreditoRotativo">
@@ -452,15 +444,33 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="588" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="477" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="272" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="246" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                     </DimensionLayout>
                   </Layout>
+                  <SubComponents>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRotativo">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRotativoActionPerformed"/>
+                      </Events>
+                    </Component>
+                  </SubComponents>
                 </Container>
               </SubComponents>
             </Container>

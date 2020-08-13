@@ -32,6 +32,8 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -48,6 +50,7 @@ import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -321,7 +324,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
                     + " cast(p.Comprador as bigint) as idcomprador,\n"
-                    + " fz.Tecla\n"
+                    + " fz.Tecla,\n"
+                    + " p.DataInclusao as datacadastro,\n"
+                    + " p.DataAlteracao as dataalteracao\n"        
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -389,6 +394,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("Mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("Mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
@@ -464,7 +471,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.NaturezaReceita,\n"
                     + " cast(p.Fabricante as bigint) as idfabricante,\n"
                     + " cast(p.Comprador as bigint) as idcomprador,\n"
-                    + " fz.Tecla\n"
+                    + " fz.Tecla,\n"
+                    + " p.DataInclusao as datacadastro,\n"
+                    + " p.DataAlteracao as dataalteracao\n"        
                     + "from dbo.Produtos p\n"
                     + "left join dbo.Precos_Loja pre on pre.produto_id = p.Produto_Id\n"
                     + "	and pre.loja = " + getLojaOrigem() + " and pre.sequencia = 1\n"
@@ -518,6 +527,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("Mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("Mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("Mercadologico3"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setFornecedorFabricante(rst.getString("idfabricante"));
                     imp.setIdComprador(rst.getString("idcomprador"));
                     imp.setMargem(rst.getDouble("Margem_Teorica"));
@@ -1165,7 +1176,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join dbo.Cobranca_TipoDocto td on td.Codigo = cp.TipoDocumento\n"
                     + "left join dbo.Tipos_Pagtos tp on tp.codigo = td.TipoPagto\n"
                     + "where cp.Loja = " + getLojaOrigem() + "\n"
-                    + "and cp.Codigo not in (select codigocobranca from dbo.Cobranca_PAGTO where empresa = " + getLojaOrigem() + ")"
+                    //+ "and cp.Codigo not in (select codigocobranca from dbo.Cobranca_PAGTO where empresa = " + getLojaOrigem() + ")\n"
+                    + "and cp.status = 1"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -1188,6 +1200,52 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
+        return result;
+    }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	cast(p.Produto_Id as bigint) as id_produto,\n"
+                    + "	cast(p.Digito_Id as bigint) as digito_produto, \n"
+                    + "	o.Data_Inicio as datainicio,\n"
+                    + "	o.Data_Fim as datatermino,\n"
+                    + "	o.Preco_Promocao as precooferta\n"
+                    + "from dbo.promocoes o\n"
+                    + "join dbo.Produtos p on p.Produto_Id = o.Produto_Id\n"
+                    + "where o.loja = 0 \n"
+                    + "and o.Data_Fim >= '2020-08-04'\n"
+                    + "union all\n"
+                    + "select\n"
+                    + "	cast(p.Produto_Id as bigint) as id_produto,\n"
+                    + "	cast(p.Digito_Id as bigint) as digito_produto, \n"
+                    + "	o.Data_Inicio as datainicio,\n"
+                    + "	o.Data_Fim as datatermino,\n"
+                    + "	o.Preco_Promocao as precooferta\n"
+                    + "from dbo.promocoes o\n"
+                    + "join dbo.Produtos p on p.Produto_Id = o.Produto_Id\n"
+                    + "where o.loja = " + getLojaOrigem() + " \n"
+                    + "and o.Data_Fim >= '2020-08-04'"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    imp.setIdProduto(rst.getString("id_produto") + rst.getString("digito_produto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datatermino"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                    result.add(imp);
+
+                }
+            }
+        }
         return result;
     }
     

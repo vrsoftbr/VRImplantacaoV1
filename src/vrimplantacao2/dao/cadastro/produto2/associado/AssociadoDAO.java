@@ -29,8 +29,7 @@ public class AssociadoDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	id,\n" +
-                    "	id_produto,\n" +
-                    "	qtdembalagem\n" +
+                    "	id_produto\n" +
                     "from\n" +
                     "	associado\n" +
                     "order by\n" +
@@ -40,7 +39,6 @@ public class AssociadoDAO {
                     AssociadoVO vo = new AssociadoVO();
                     vo.setId(rst.getInt("id"));
                     vo.setIdProduto(rst.getInt("id_produto"));
-                    vo.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     result.put(vo.getIdProduto(), vo);
                 }
             }
@@ -50,7 +48,6 @@ public class AssociadoDAO {
                     "	i.id,\n" +
                     "	a.id_produto id_produto_pai,\n" +
                     "	i.id_produto,\n" +
-                    "	i.qtdembalagem,\n" +
                     "	i.percentualpreco,\n" +
                     "	i.aplicapreco,\n" +
                     "	i.aplicacusto,\n" +
@@ -70,7 +67,6 @@ public class AssociadoDAO {
                     item.setId(rst.getInt("id"));
                     item.setIdAssociado(pai.getId());
                     item.setIdProduto(rst.getInt("id_produto"));
-                    item.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     item.setPercentualPreco(rst.getDouble("percentualpreco"));
                     item.setAplicaPreco(rst.getBoolean("aplicapreco"));
                     item.setAplicaCusto(rst.getBoolean("aplicacusto"));

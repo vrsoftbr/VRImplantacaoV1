@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.financeiro.contaspagar;
 
+import java.util.Date;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -67,6 +68,10 @@ public class ContasPagarProvider implements RepositoryProvider {
         return this.anteriorDAO.getAnteriores(getSistema(), getAgrupador());
     }
 
+    public MultiMap<String, PagarFornecedorVO> getPagarFornecedores(int idLoja, int idFornecedor, int numeroDocumento, Date dataemissao) throws Exception {
+        return this.pagarFornecedorDAO.getPagarFornecedores(idLoja, idFornecedor, numeroDocumento, dataemissao);
+    }
+    
     public void notificar(String mensagem) throws Exception {
         ProgressBar.setStatus(mensagem);
     }
