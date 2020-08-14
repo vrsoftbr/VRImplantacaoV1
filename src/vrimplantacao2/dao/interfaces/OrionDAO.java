@@ -773,26 +773,39 @@ public class OrionDAO extends InterfaceDAO {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
+        private String i_idvenda, i_ecf, i_datavenda, i_idproduto, i_sequencia;
+        private Double i_qtdembalagem, i_aliquota;
+        private Integer i_cst;
 
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("idvenda") + rst.getString("ecf") + rst.getString("datavenda");
-                        String id = rst.getString("idvenda")
-                                + rst.getString("ecf")
-                                + rst.getString("datavenda")
-                                + rst.getString("idproduto")
-                                + rst.getString("sequencia")
-                                + rst.getString("qtdembalagem");
+                        
+                        i_idvenda = rst.getString("idvenda");
+                        i_ecf = rst.getString("ecf");
+                        i_datavenda = rst.getString("datavenda");
+                        i_idproduto = rst.getString("idproduto");
+                        i_sequencia = rst.getString("sequencia");
+                        i_qtdembalagem = rst.getDouble("qtdembalagem");
+                        i_cst = rst.getInt("cst");
+                        i_aliquota = rst.getDouble("aliquota");
+                        
+                        String idVenda = i_idvenda + i_ecf + i_datavenda;
+                        String id = i_idvenda
+                                + i_ecf
+                                + i_datavenda
+                                + i_idproduto
+                                + i_sequencia
+                                + String.valueOf(i_qtdembalagem);
 
                         next.setId(id);
                         next.setVenda(idVenda);
-                        next.setProduto(rst.getString("idproduto"));
-                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setProduto(i_idproduto);
+                        next.setSequencia(Integer.parseInt(i_sequencia));
                         next.setDescricaoReduzida(rst.getString("descricaoproduto"));
-                        next.setQuantidade(rst.getDouble("qtdembalagem"));
+                        next.setQuantidade(i_qtdembalagem);
                         next.setTotalBruto(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado("Cancelado".equals(rst.getString("status")));
@@ -801,29 +814,29 @@ public class OrionDAO extends InterfaceDAO {
                         
                         String trib = "";
                         
-                        if (rst.getInt("cst") == 40) {
+                        if (i_cst == 40) {
                             trib = "F";
-                        } else if (rst.getInt("cst") == 41) {
+                        } else if (i_cst == 41) {
                             trib = "N";
-                        } else if (rst.getInt("cst") == 60) {
+                        } else if (i_cst == 60) {
                             trib = "F";
-                        } else if (rst.getInt("cst") == 0) {
+                        } else if (i_cst == 0) {
 
-                            if (rst.getDouble("aliquota") == 7) {
+                            if (i_aliquota == 7) {
                                 trib = "0700";
-                            } else if (rst.getDouble("aliquota") == 11) {
+                            } else if (i_aliquota == 11) {
                                 trib = "1100";
-                            } else if (rst.getDouble("aliquota") == 4.5) {
+                            } else if (i_aliquota == 4.5) {
                                 trib = "0450";
-                            } else if (rst.getDouble("aliquota") == 12) {
+                            } else if (i_aliquota == 12) {
                                 trib = "1200";
-                            } else if (rst.getDouble("aliquota") == 18) {
+                            } else if (i_aliquota == 18) {
                                 trib = "1800";
-                            } else if (rst.getDouble("aliquota") == 25) {
+                            } else if (i_aliquota == 25) {
                                 trib = "2500";
-                            } else if (rst.getDouble("aliquota") == 27) {
+                            } else if (i_aliquota == 27) {
                                 trib = "2700";
-                            } else if (rst.getDouble("aliquota") == 17) {
+                            } else if (i_aliquota == 17) {
                                 trib = "1700";
                             } else {
                                 trib = "0";
