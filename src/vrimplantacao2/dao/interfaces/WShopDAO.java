@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -40,12 +41,43 @@ public class WShopDAO extends InterfaceDAO {
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        Set<OpcaoProduto> opt = new HashSet<>(OpcaoProduto.getMercadologico());
-        opt.addAll(OpcaoProduto.getPadrao());
-        opt.addAll(OpcaoProduto.getFamilia());
-        opt.addAll(OpcaoProduto.getComplementos());
-        opt.addAll(OpcaoProduto.getTributos());
-        return opt;
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA
+                }
+        ));
     }
 
     @Override
@@ -272,17 +304,38 @@ public class WShopDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custocomimposto"));
-                    //imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_naturezareceita"));
-                    imp.setIcmsCst(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
 
+                    imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("icms_reduzido"));
+
+                    imp.setIcmsCstSaidaForaEstado(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_reduzido"));
+
+                    imp.setIcmsCstSaidaForaEstadoNF(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_reduzido"));
+
+                    imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("icms_reduzido"));
+
+                    imp.setIcmsCstEntradaForaEstado(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_reduzido"));
+
+                    imp.setIcmsCstConsumidor(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("icms_reduzido"));
+                    
                     result.add(imp);
                 }
             }
@@ -291,7 +344,7 @@ public class WShopDAO extends InterfaceDAO {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         if (opt == OpcaoProduto.PRECO) {
@@ -325,7 +378,7 @@ public class WShopDAO extends InterfaceDAO {
             }
         }
         return null;
-    }
+    }*/
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
