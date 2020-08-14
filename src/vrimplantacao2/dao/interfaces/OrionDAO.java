@@ -669,19 +669,24 @@ public class OrionDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + rst.getString("ecf") + rst.getString("datavenda");
+                        String i_id = rst.getString("id");
+                        String i_numerocupom = rst.getString("numerocupom");
+                        String i_ecf = rst.getString("ecf");
+                        Date i_datavenda = rst.getDate("datavenda");
+                        
+                        String id = i_id + i_ecf + String.valueOf(i_datavenda);
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
 
                         next.setId(id);
                         
-                        next.setNumeroCupom(rst.getString("numerocupom") == null
-                                ? Utils.stringToInt(rst.getString("id"))
-                                : Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(i_numerocupom == null
+                                ? Utils.stringToInt(i_id)
+                                : Utils.stringToInt(i_numerocupom));
                         
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("datavenda"));
+                        next.setEcf(Utils.stringToInt(i_ecf));
+                        next.setData(i_datavenda);
                         next.setIdClientePreferencial(rst.getString("idcliente"));
 
                         /*String horaInicio = timestampDate.format(rst.getDate("datavenda"))
@@ -692,8 +697,8 @@ public class OrionDAO extends InterfaceDAO {
                                 + " "
                                 + rst.getString("horafim") == null ? "00:00:00" : rst.getString("horafim");*/
                         
-                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
-                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        String horaInicio = timestampDate.format(i_datavenda) + " 00:00:00";
+                        String horaTermino = timestampDate.format(i_datavenda) + " 00:00:00";
                         
                         next.setCancelado("Cancelado".equals(rst.getString("status")));
                         next.setHoraInicio(timestamp.parse(horaInicio));
@@ -732,7 +737,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	v.seriesat,\n"
                     + "	v.numcfe\n"
                     + "from vendas v\n"
-                    + "where v.data between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "where v.data between #" + dataInicio + "# and #" + dataTermino + "#\n"
                     + "order by v.data";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -904,7 +909,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	i.codplu as idproduto,\n"
                     + "	i.codestoque as codigobarras,\n"
                     + "	i.descricao as descricaoproduto,\n"
-                    + "	upper(i.unidade) as tipoembalagem,\n"
+                    + "	i.unidade as tipoembalagem,\n"
                     + "	i.quantpeso as qtdembalagem,\n"
                     + "	i.custo,\n"
                     + "	i.venda as precovenda,\n"
@@ -915,7 +920,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	i.sittribut as cst,\n"
                     + "	i.estado as status\n"
                     + "from detaven i\n"
-                    + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'"
+                    + "where i.datavenda between #" + dataInicio + "# and #" + dataTermino + "#\n"
                     + "and i.codplu is not null\n"
                     + "order by i.codvenda, i.terminal, i.item";
 
