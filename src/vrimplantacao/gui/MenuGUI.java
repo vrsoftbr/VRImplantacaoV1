@@ -143,6 +143,7 @@ import vrimplantacao2.gui.interfaces.G3GUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
 import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
+import vrimplantacao2.gui.interfaces.GenericGUI;
 import vrimplantacao2.gui.interfaces.GestorPdvGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
@@ -801,6 +802,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu3 = new javax.swing.JMenu();
         mnuContaPagar1 = new javax.swing.JMenuItem();
         mnuVarejoFacil = new javax.swing.JMenuItem();
+        mnuGeneric = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -2745,6 +2747,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu3.add(mnuVarejoFacil);
 
+        mnuGeneric.setText("Generic");
+        mnuGeneric.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGenericActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuGeneric);
+
         mnuDatabase.add(jMenu3);
 
         mnuSQLite.setText("SQLite");
@@ -4684,6 +4694,11 @@ public final class MenuGUI extends VRMdiFrame {
         VarejoFacilGUI.exibir(this);
     }//GEN-LAST:event_mnuVarejoFacilActionPerformed
 
+    private void mnuGenericActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGenericActionPerformed
+        // TODO add your handling code here:
+        GenericGUI.exibir(this);
+    }//GEN-LAST:event_mnuGenericActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4843,6 +4858,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG4;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
+    private javax.swing.JMenuItem mnuGeneric;
     private javax.swing.JMenuItem mnuGestorPDV;
     private javax.swing.JMenuItem mnuHRTechV1;
     private javax.swing.JMenuItem mnuHRTechV2;

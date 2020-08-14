@@ -57,6 +57,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
      */
     public VRImportaArquivBalancaPanel() {
         initComponents();
+        
+        rdbCodigoInterno.setSelected(true);
     }
 
     /**
@@ -310,9 +312,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         if(rdbToledo.isSelected()) {
                             NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo());
                         }
-                        if((rdbToledoProduto.isSelected()) && (!rdbCodigoInterno.isSelected()) && (!rdbCodigoBarras.isSelected())) {
-                            NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo());
-                        } else {
+                        if(rdbToledoProduto.isSelected()) {
                             NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo(), rdbCodigoInterno.isSelected() ? 1 : 2, chkIgnorarUltimoDigito.isSelected());
                         }
                     }                   

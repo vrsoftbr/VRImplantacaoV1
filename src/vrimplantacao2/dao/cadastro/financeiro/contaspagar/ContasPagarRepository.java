@@ -44,6 +44,7 @@ public class ContasPagarRepository {
         provider.notificar("Contas à Pagar - Preparando a importação...");
         MultiMap<String, FornecedorAnteriorVO> fornecedores = provider.getFornecedores();
         MultiMap<String, ContaPagarAnteriorVO> anteriores = provider.getAnteriores();
+        MultiMap<String, PagarFornecedorVO> pagarFornecedor;
         Set<Integer> bancosExistentes = provider.getBancosExistentes();
         
         provider.notificar("Contas à Pagar - Importando...", organizados.size());
@@ -59,7 +60,10 @@ public class ContasPagarRepository {
             System.out.println(String.format("SISTEMA: %s; LOJA: %s;", provider.getSistema(), provider.getAgrupador()));
             System.out.println(String.format(" forn_ant: %d; ant: %d; pagamentos: %d; organizados: %d", fornecedores.size(), anteriores.size(), pagamentos.size(), organizados.size()));
             
-            for (ContaPagarIMP imp: organizados.values()) {            
+            for (ContaPagarIMP imp: organizados.values()) {
+                
+                pagarFornecedor = null;
+                
                 ContaPagarAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
                         provider.getAgrupador(),
@@ -75,6 +79,18 @@ public class ContasPagarRepository {
                     if (fornecedorAnterior != null) {
                         if (fornecedorAnterior.getCodigoAtual() != null) {
                             fornecedor = fornecedorAnterior.getCodigoAtual();
+                                                        
+                            pagarFornecedor = provider.getPagarFornecedores(
+                                    provider.getLojaVR(), 
+                                    fornecedorAnterior.getCodigoAtual().getId(), 
+                                    Integer.parseInt(imp.getNumeroDocumento()), 
+                                    imp.getDataEmissao()
+                            );
+                            
+                            if (!pagarFornecedor.isEmpty()) {
+                                System.out.println(String.valueOf(imp.getNumeroDocumento()) + " -- " + String.valueOf(imp.getDataEmissao()));
+                                continue;
+                            }
                         }
                     } else {
                         System.out.println(String.format("FORN. NAO ENCONTRADO: %s %s %s", 

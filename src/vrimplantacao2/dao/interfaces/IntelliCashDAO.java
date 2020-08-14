@@ -426,9 +426,19 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getInt("pis_cst_e"));
                     imp.setPiscofinsCstDebito(rst.getInt("pis_cst_s"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("pis_natureza_receita"));
-                    imp.setIcmsCst(rst.getInt("icms_cst"));
-                    imp.setIcmsAliq(rst.getDouble("icms_aliq"));
-
+                    
+                    imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
+                    imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                    imp.setIcmsCstConsumidor(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("icms_aliq"));
                     result.add(imp);
                 }
             }
@@ -472,6 +482,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                         + "order by\n"
                         + "    a.id"
                 )) {
+                    int contador = 0;
                     while (rst.next()) {
                         FornecedorIMP imp = new FornecedorIMP();
 
@@ -549,6 +560,8 @@ public class IntelliCashDAO extends InterfaceDAO {
                             }
                         }
                         result.add(imp);
+                        contador++;
+                        System.out.println(String.valueOf(contador));
                     }
                 }
             }
@@ -672,6 +685,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     "    funcionarios fu\n" +
                     "left join ec_expt_agente ec on fu.id = ec.id\n" +
                     "order by 1")) {
+                int contador = 0;
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
@@ -757,6 +771,8 @@ public class IntelliCashDAO extends InterfaceDAO {
                         imp.setBloqueado(false);
                     }
                     result.add(imp);
+                    contador++;
+                    System.out.println(contador);
                 }
             }
         }

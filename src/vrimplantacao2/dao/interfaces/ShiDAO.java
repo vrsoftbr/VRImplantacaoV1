@@ -457,9 +457,15 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
+        Statement stm, stm2, stm3 = null;
+        ResultSet rst, rst2, rst3 = null;
 
-        try (Statement stm = sco.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+        try {
+            stm = sco.createStatement();
+            stm2 = sco.createStatement();
+            stm3 = sco.createStatement();
+
+            rst = stm.executeQuery(
                     "select\n"
                     + "    f.codigo id,\n"
                     + "    f.nomexx razao,\n"
@@ -482,233 +488,237 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    fornecedor f  \n"
                     + "order by\n"
                     + "    f.codigo"
-            )) {
-                while (rst.next()) {
-                    FornecedorIMP imp = new FornecedorIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setRazao(rst.getString("razao"));
-                    imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
-                    imp.setIe_rg(rst.getString("ie_rg"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
-                    imp.setEndereco(rst.getString("endereco"));
-                    imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("cidade"));
-                    imp.setUf(rst.getString("estado"));
-                    imp.setCep(rst.getString("cep"));
-                    imp.setValor_minimo_pedido(rst.getDouble("valor_minimo_pedido"));
-                    imp.setDatacadastro(rst.getDate("datacadastro"));
-                    imp.setObservacao(rst.getString("observacao"));
-                    imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
-                    imp.setPrazoVisita(rst.getInt("prazoVisita"));
-                    if (rst.getBoolean("simplesnac")) {
-                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
-                    } else {
-                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
-                    }
+            );
+            int contador = 0;
+            while (rst.next()) {
+                FornecedorIMP imp = new FornecedorIMP();
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportId(rst.getString("id"));
+                imp.setRazao(rst.getString("razao"));
+                imp.setFantasia(rst.getString("fantasia"));
+                imp.setCnpj_cpf(rst.getString("cnpj"));
+                imp.setIe_rg(rst.getString("ie_rg"));
+                imp.setAtivo(rst.getBoolean("ativo"));
+                imp.setEndereco(rst.getString("endereco"));
+                imp.setBairro(rst.getString("bairro"));
+                imp.setMunicipio(rst.getString("cidade"));
+                imp.setUf(rst.getString("estado"));
+                imp.setCep(rst.getString("cep"));
+                imp.setValor_minimo_pedido(rst.getDouble("valor_minimo_pedido"));
+                imp.setDatacadastro(rst.getDate("datacadastro"));
+                imp.setObservacao(rst.getString("observacao"));
+                imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
+                imp.setPrazoVisita(rst.getInt("prazoVisita"));
 
-                    try (Statement stm2 = sco.createStatement()) {
-                        try (ResultSet rst2 = stm2.executeQuery(
-                                "select\n"
-                                + "    codigo,\n"
-                                + "    trim(coalesce(contato,'')) contato,\n"
-                                + "    trim(coalesce(telefone,'')) telefone,\n"
-                                + "    trim(coalesce(fax,'')) fax,\n"
-                                + "    trim(coalesce(celular,'')) celular,\n"
-                                + "    trim(coalesce(email,'')) email\n"
-                                + "from\n"
-                                + "    contato\n"
-                                + "where\n"
-                                + "    fornecedor = " + imp.getImportId() + "\n"
-                                + "order by\n"
-                                + "    codigo"
-                        )) {
-                            boolean primeiro = true;
-                            while (rst2.next()) {
-                                String fone = !"".equals(rst2.getString("telefone")) ? rst2.getString("telefone") : rst2.getString("celular");
-                                if (primeiro && !"".equals(fone)) {
-                                    primeiro = false;
-                                    imp.setTel_principal(fone);
-                                }
-                                imp.addContato(
-                                        rst2.getString("codigo"),
-                                        rst2.getString("contato"),
-                                        rst2.getString("telefone"),
-                                        rst2.getString("celular"),
-                                        TipoContato.COMERCIAL,
-                                        rst2.getString("email")
-                                );
-                                if (!"".equals(rst2.getString("fax"))) {
-                                    imp.addContato(
-                                            rst2.getString("codigo"),
-                                            "FAX",
-                                            rst2.getString("telefone"),
-                                            rst2.getString("celular"),
-                                            TipoContato.COMERCIAL,
-                                            rst2.getString("email")
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    try (Statement stm3 = sco.createStatement()) {
-                        try (ResultSet rst3 = stm3.executeQuery(
-                                "select f.codigo, f.ciccgc, f.nomexx,\n"
-                                + "       f.pagame, p.descri, p.numpar,\n"
-                                + "       coalesce(p.dias01, 0) dias01, coalesce(p.dias02, 0) dias02,\n"
-                                + "       coalesce(p.dias03, 0) dias03, coalesce(p.dias04, 0) dias04,\n"
-                                + "       coalesce(p.dias05, 0) dias05, coalesce(p.dias06, 0) dias06,\n"
-                                + "       coalesce(p.dias07, 0) dias07, coalesce(p.dias08, 0) dias08,\n"
-                                + "       coalesce(p.dias09, 0) dias09, coalesce(p.dias10, 0) dias10,\n"
-                                + "       coalesce(p.dias11, 0) dias11, coalesce(p.dias12, 0) dias12,\n"
-                                + "       coalesce(p.dias13, 0) dias13, coalesce(p.dias14, 0) dias14,\n"
-                                + "       coalesce(p.dias15, 0) dias15, coalesce(p.dias16, 0) dias16,\n"
-                                + "       coalesce(p.dias17, 0) dias17, coalesce(p.dias18, 0) dias18,\n"
-                                + "       coalesce(p.dias19, 0) dias19, coalesce(p.dias20, 0) dias20,\n"
-                                + "       coalesce(p.dias21, 0) dias21, coalesce(p.dias22, 0) dias22,\n"
-                                + "       coalesce(p.dias23, 0) dias23, coalesce(p.dias24, 0) dias24\n"
-                                + "  from fornecedor f\n"
-                                + " inner join condfatur p on p.codigo = f.pagame "
-                                + " where f.codigo = '" + imp.getImportId() + "'"
-                        )) {
-                            int numParcelas, i = 1;
-                            if (rst3.next()) {
-                                numParcelas = rst3.getInt("numpar");
-                                while (i <= numParcelas) {
-                                    if (i == 1) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias01"));
-                                    }
-                                    if (i == 2) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias02"));
-
-                                    }
-                                    if (i == 3) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias03"));
-                                    }
-                                    if (i == 4) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias04"));
-                                    }
-                                    if (i == 5) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias05"));
-                                    }
-                                    if (i == 6) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias06"));
-                                    }
-                                    if (i == 7) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias07"));
-                                    }
-                                    if (i == 8) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias08"));
-                                    }
-                                    if (i == 9) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias09"));
-                                    }
-                                    if (i == 10) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias10"));
-                                    }
-                                    if (i == 11) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias11"));
-                                    }
-                                    if (i == 12) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias12"));
-                                    }
-                                    if (i == 13) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias13"));
-                                    }
-                                    if (i == 14) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias14"));
-                                    }
-                                    if (i == 15) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias15"));
-                                    }
-                                    if (i == 16) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias16"));
-                                    }
-                                    if (i == 17) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias17"));
-                                    }
-                                    if (i == 18) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias18"));
-                                    }
-                                    if (i == 19) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias19"));
-                                    }
-                                    if (i == 20) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias20"));
-                                    }
-                                    if (i == 21) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias21"));
-                                    }
-                                    if (i == 22) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias22"));
-                                    }
-                                    if (i == 23) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias23"));
-                                    }
-                                    if (i == 24) {
-                                        imp.addPagamento(
-                                                String.valueOf(i),
-                                                rst3.getInt("dias24"));
-                                    }
-                                    i++;
-                                }
-                            }
-                        }
-                    }
-                    result.add(imp);
+                if (rst.getBoolean("simplesnac")) {
+                    imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                } else {
+                    imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                 }
-            }
-        }
 
+                rst2 = stm2.executeQuery(
+                        "select\n"
+                        + "    codigo,\n"
+                        + "    trim(coalesce(contato,'')) contato,\n"
+                        + "    trim(coalesce(telefone,'')) telefone,\n"
+                        + "    trim(coalesce(fax,'')) fax,\n"
+                        + "    trim(coalesce(celular,'')) celular,\n"
+                        + "    trim(coalesce(email,'')) email\n"
+                        + "from\n"
+                        + "    contato\n"
+                        + "where\n"
+                        + "    fornecedor = " + imp.getImportId() + "\n"
+                        + "order by\n"
+                        + "    codigo"
+                );
+
+                boolean primeiro = true;
+                while (rst2.next()) {
+                    String fone = !"".equals(rst2.getString("telefone")) ? rst2.getString("telefone") : rst2.getString("celular");
+                    if (primeiro && !"".equals(fone)) {
+                        primeiro = false;
+                        imp.setTel_principal(fone);
+                    }
+                    imp.addContato(
+                            rst2.getString("codigo"),
+                            rst2.getString("contato"),
+                            rst2.getString("telefone"),
+                            rst2.getString("celular"),
+                            TipoContato.COMERCIAL,
+                            rst2.getString("email")
+                    );
+                    if (!"".equals(rst2.getString("fax"))) {
+                        imp.addContato(
+                                rst2.getString("codigo"),
+                                "FAX",
+                                rst2.getString("telefone"),
+                                rst2.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                rst2.getString("email")
+                        );
+                    }
+                }
+
+                rst3 = stm3.executeQuery(
+                        "select f.codigo, f.ciccgc, f.nomexx,\n"
+                        + "       f.pagame, p.descri, p.numpar,\n"
+                        + "       coalesce(p.dias01, 0) dias01, coalesce(p.dias02, 0) dias02,\n"
+                        + "       coalesce(p.dias03, 0) dias03, coalesce(p.dias04, 0) dias04,\n"
+                        + "       coalesce(p.dias05, 0) dias05, coalesce(p.dias06, 0) dias06,\n"
+                        + "       coalesce(p.dias07, 0) dias07, coalesce(p.dias08, 0) dias08,\n"
+                        + "       coalesce(p.dias09, 0) dias09, coalesce(p.dias10, 0) dias10,\n"
+                        + "       coalesce(p.dias11, 0) dias11, coalesce(p.dias12, 0) dias12,\n"
+                        + "       coalesce(p.dias13, 0) dias13, coalesce(p.dias14, 0) dias14,\n"
+                        + "       coalesce(p.dias15, 0) dias15, coalesce(p.dias16, 0) dias16,\n"
+                        + "       coalesce(p.dias17, 0) dias17, coalesce(p.dias18, 0) dias18,\n"
+                        + "       coalesce(p.dias19, 0) dias19, coalesce(p.dias20, 0) dias20,\n"
+                        + "       coalesce(p.dias21, 0) dias21, coalesce(p.dias22, 0) dias22,\n"
+                        + "       coalesce(p.dias23, 0) dias23, coalesce(p.dias24, 0) dias24\n"
+                        + "  from fornecedor f\n"
+                        + " inner join condfatur p on p.codigo = f.pagame "
+                        + " where f.codigo = '" + imp.getImportId() + "'"
+                );
+                int numParcelas, i = 1;
+                if (rst3.next()) {
+                    numParcelas = rst3.getInt("numpar");
+                    while (i <= numParcelas) {
+                        if (i == 1) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias01"));
+                        }
+                        if (i == 2) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias02"));
+
+                        }
+                        if (i == 3) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias03"));
+                        }
+                        if (i == 4) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias04"));
+                        }
+                        if (i == 5) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias05"));
+                        }
+                        if (i == 6) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias06"));
+                        }
+                        if (i == 7) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias07"));
+                        }
+                        if (i == 8) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias08"));
+                        }
+                        if (i == 9) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias09"));
+                        }
+                        if (i == 10) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias10"));
+                        }
+                        if (i == 11) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias11"));
+                        }
+                        if (i == 12) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias12"));
+                        }
+                        if (i == 13) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias13"));
+                        }
+                        if (i == 14) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias14"));
+                        }
+                        if (i == 15) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias15"));
+                        }
+                        if (i == 16) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias16"));
+                        }
+                        if (i == 17) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias17"));
+                        }
+                        if (i == 18) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias18"));
+                        }
+                        if (i == 19) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias19"));
+                        }
+                        if (i == 20) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias20"));
+                        }
+                        if (i == 21) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias21"));
+                        }
+                        if (i == 22) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias22"));
+                        }
+                        if (i == 23) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias23"));
+                        }
+                        if (i == 24) {
+                            imp.addPagamento(
+                                    String.valueOf(i),
+                                    rst3.getInt("dias24"));
+                        }
+                        i++;
+                    }
+                }
+                result.add(imp);
+                contador++;
+                System.out.println(contador);
+            }
+
+            stm.close();
+            stm2.close();
+            stm3.close();
+
+        } catch (SQLException ex) {
+            throw ex;
+        }
         return result;
     }
 
@@ -1208,13 +1218,29 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(Utils.stringLong(rst.getString("id_fornecedor")));
-                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setNumeroDocumento(Utils.formataNumero(rst.getString("numerodocumento")));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataEntrada(rst.getDate("dataentrada"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao(rst.getString("observacao") == null ? "" : rst.getString("observacao")
+                            + " PARCELA " + rst.getString("parcela")
+                            + " NUMERO DOCUMENTO " + rst.getString("numerodocumento")
+                    );
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
-                    parc.setNumeroParcela(Utils.stringToInt(rst.getString("parcela"), 1));
-                    parc.setObservacao(rst.getString("observacao"));
+                    
+                    if ((rst.getString("parcela") != null) &&
+                            (!rst.getString("parcela").trim().isEmpty())) {
+                        if (rst.getString("parcela").contains("/")) {
+                            parc.setNumeroParcela(Utils.stringToInt(rst.getString("parcela").substring(0, rst.getString("parcela").indexOf("/")), 1));
+                        } else {
+                            parc.setNumeroParcela(Utils.stringToInt(rst.getString("parcela"), 1));
+                        }
+                    }
+                    
+                    parc.setObservacao(
+                            rst.getString("observacao") == null ? "" : rst.getString("observacao")
+                            + " PARCELA " + rst.getString("parcela")
+                            + " NUMERO DOCUMENTO " + rst.getString("numerodocumento")
+                    );
 
                     result.add(imp);
                 }
@@ -1527,7 +1553,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "m.serie as numeroserie,\n"
                     + "cb.cupom as numerocupom,\n"
                     + "cb.chave as ChaveCfe,\n"
-                    + "--c.codcli as vc_clientepreferencial,\n"
+                    + "c.codcli as vc_clientepreferencial,\n"
                     + "cb.valor as subtotalimpressora,\n"
                     + "0 as desconto,\n"
                     + "0 as acrescimo,\n"
@@ -1538,7 +1564,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join convenio c on c.idmovdia = m.id and cb.cupom = c.cupom\n"
                     + "where m.filial = " + idLojaCliente + "\n"
                     + "and m.data >= '" + FORMAT.format(dataInicio) + "'\n"
-                    + "and m.data <= '" + FORMAT.format(dataTermino) + "'";
+                    + "and m.data <= '" + FORMAT.format(dataTermino) + "'\n"
+                    + "and cb.valor is not null";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             stm = con.createStatement();
@@ -1712,7 +1739,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join item i on i.idmovdia = m.id and cb.cupom = i.cupom\n"
                     + "where m.filial = " + idLojaCliente + "\n"
                     + "and m.data >= '" + FORMAT.format(dataInicio) + "'\n"
-                    + "and m.data <= '" + FORMAT.format(dataTermino) + "'";
+                    + "and m.data <= '" + FORMAT.format(dataTermino) + "'\n"
+                    + "and i.produto is not null";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             stm = con.createStatement();

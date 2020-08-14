@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -99,13 +98,17 @@ public class OrionDAO extends InterfaceDAO {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         Map<String, Estabelecimento> result = new LinkedHashMap<>();
-        
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select firma as nome, cgc as id from config"
+                    "select "
+                    + "firma as nome, "
+                    + "cgc as id, "
+                    + "cgc as id2 "
+                    + "from config"
             )) {
                 while (rst.next()) {
-                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id"), rst.getString("nome")));
+                    result.put(rst.getString("id"), new Estabelecimento(rst.getString("id2"), rst.getString("nome")));
                 }
             }
         }
@@ -666,19 +669,24 @@ public class OrionDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + rst.getString("ecf") + rst.getString("datavenda");
+                        String i_id = rst.getString("id");
+                        String i_numerocupom = rst.getString("numerocupom");
+                        String i_ecf = rst.getString("ecf");
+                        Date i_datavenda = rst.getDate("datavenda");
+                        
+                        String id = i_id + i_ecf + String.valueOf(i_datavenda);
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
 
                         next.setId(id);
                         
-                        next.setNumeroCupom(rst.getString("numerocupom") == null
-                                ? Utils.stringToInt(rst.getString("id"))
-                                : Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(i_numerocupom == null
+                                ? Utils.stringToInt(i_id)
+                                : Utils.stringToInt(i_numerocupom));
                         
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("datavenda"));
+                        next.setEcf(Utils.stringToInt(i_ecf));
+                        next.setData(i_datavenda);
                         next.setIdClientePreferencial(rst.getString("idcliente"));
 
                         /*String horaInicio = timestampDate.format(rst.getDate("datavenda"))
@@ -689,8 +697,8 @@ public class OrionDAO extends InterfaceDAO {
                                 + " "
                                 + rst.getString("horafim") == null ? "00:00:00" : rst.getString("horafim");*/
                         
-                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
-                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        String horaInicio = timestampDate.format(i_datavenda) + " 00:00:00";
+                        String horaTermino = timestampDate.format(i_datavenda) + " 00:00:00";
                         
                         next.setCancelado("Cancelado".equals(rst.getString("status")));
                         next.setHoraInicio(timestamp.parse(horaInicio));
@@ -729,7 +737,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	v.seriesat,\n"
                     + "	v.numcfe\n"
                     + "from vendas v\n"
-                    + "where v.data between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "where v.data between #" + dataInicio + "# and #" + dataTermino + "#\n"
                     + "order by v.data";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -765,26 +773,39 @@ public class OrionDAO extends InterfaceDAO {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
+        private String i_idvenda, i_ecf, i_datavenda, i_idproduto, i_sequencia;
+        private Double i_qtdembalagem, i_aliquota;
+        private Integer i_cst;
 
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("idvenda") + rst.getString("ecf") + rst.getString("datavenda");
-                        String id = rst.getString("idvenda")
-                                + rst.getString("ecf")
-                                + rst.getString("datavenda")
-                                + rst.getString("idproduto")
-                                + rst.getString("sequencia")
-                                + rst.getString("qtdembalagem");
+                        
+                        i_idvenda = rst.getString("idvenda");
+                        i_ecf = rst.getString("ecf");
+                        i_datavenda = rst.getString("datavenda");
+                        i_idproduto = rst.getString("idproduto");
+                        i_sequencia = rst.getString("sequencia");
+                        i_qtdembalagem = rst.getDouble("qtdembalagem");
+                        i_cst = rst.getInt("cst");
+                        i_aliquota = rst.getDouble("aliquota");
+                        
+                        String idVenda = i_idvenda + i_ecf + i_datavenda;
+                        String id = i_idvenda
+                                + i_ecf
+                                + i_datavenda
+                                + i_idproduto
+                                + i_sequencia
+                                + String.valueOf(i_qtdembalagem);
 
                         next.setId(id);
                         next.setVenda(idVenda);
-                        next.setProduto(rst.getString("idproduto"));
-                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setProduto(i_idproduto);
+                        next.setSequencia(Integer.parseInt(i_sequencia));
                         next.setDescricaoReduzida(rst.getString("descricaoproduto"));
-                        next.setQuantidade(rst.getDouble("qtdembalagem"));
+                        next.setQuantidade(i_qtdembalagem);
                         next.setTotalBruto(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado("Cancelado".equals(rst.getString("status")));
@@ -793,29 +814,29 @@ public class OrionDAO extends InterfaceDAO {
                         
                         String trib = "";
                         
-                        if (rst.getInt("cst") == 40) {
+                        if (i_cst == 40) {
                             trib = "F";
-                        } else if (rst.getInt("cst") == 41) {
+                        } else if (i_cst == 41) {
                             trib = "N";
-                        } else if (rst.getInt("cst") == 60) {
+                        } else if (i_cst == 60) {
                             trib = "F";
-                        } else if (rst.getInt("cst") == 0) {
+                        } else if (i_cst == 0) {
 
-                            if (rst.getDouble("aliquota") == 7) {
+                            if (i_aliquota == 7) {
                                 trib = "0700";
-                            } else if (rst.getDouble("aliquota") == 11) {
+                            } else if (i_aliquota == 11) {
                                 trib = "1100";
-                            } else if (rst.getDouble("aliquota") == 4.5) {
+                            } else if (i_aliquota == 4.5) {
                                 trib = "0450";
-                            } else if (rst.getDouble("aliquota") == 12) {
+                            } else if (i_aliquota == 12) {
                                 trib = "1200";
-                            } else if (rst.getDouble("aliquota") == 18) {
+                            } else if (i_aliquota == 18) {
                                 trib = "1800";
-                            } else if (rst.getDouble("aliquota") == 25) {
+                            } else if (i_aliquota == 25) {
                                 trib = "2500";
-                            } else if (rst.getDouble("aliquota") == 27) {
+                            } else if (i_aliquota == 27) {
                                 trib = "2700";
-                            } else if (rst.getDouble("aliquota") == 17) {
+                            } else if (i_aliquota == 17) {
                                 trib = "1700";
                             } else {
                                 trib = "0";
@@ -901,7 +922,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	i.codplu as idproduto,\n"
                     + "	i.codestoque as codigobarras,\n"
                     + "	i.descricao as descricaoproduto,\n"
-                    + "	upper(i.unidade) as tipoembalagem,\n"
+                    + "	i.unidade as tipoembalagem,\n"
                     + "	i.quantpeso as qtdembalagem,\n"
                     + "	i.custo,\n"
                     + "	i.venda as precovenda,\n"
@@ -912,7 +933,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "	i.sittribut as cst,\n"
                     + "	i.estado as status\n"
                     + "from detaven i\n"
-                    + "where i.datavenda between '" + dataInicio + "' and '" + dataTermino + "'"
+                    + "where i.datavenda between #" + dataInicio + "# and #" + dataTermino + "#\n"
                     + "and i.codplu is not null\n"
                     + "order by i.codvenda, i.terminal, i.item";
 
