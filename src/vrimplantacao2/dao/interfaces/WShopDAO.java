@@ -363,6 +363,7 @@ public class WShopDAO extends InterfaceDAO {
                     + "	wshop.pessoas p\n"
                     + "where\n"
                     + "	sttipopessoa = 'F'\n"
+                    + " and cdchamada not like 'N5%'\n"
                     + "order by\n"
                     + "	p.cdchamada::integer;"
             )) {
