@@ -265,12 +265,14 @@ public class ProdutoDAO {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
         }
-        if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
-            sql.put("margemminima", vo.getMargemMinima());
-            sql.put("margemmaxima", vo.getMargemMaxima());
-        }
-        if (opt.contains(OpcaoProduto.MARGEM)) {
-            sql.put("margem", vo.getMargem());
+        if (Versao.menorQue(4)) {
+            if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
+                sql.put("margemminima", vo.getMargemMinima());
+                sql.put("margemmaxima", vo.getMargemMaxima());
+            }
+            if (opt.contains(OpcaoProduto.MARGEM)) {
+                sql.put("margem", vo.getMargem());
+            }
         }
         if (opt.contains(OpcaoProduto.VALIDADE)) {
             sql.put("validade", vo.getValidade());

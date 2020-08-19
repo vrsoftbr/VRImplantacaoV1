@@ -139,16 +139,14 @@ public class WShopGUI extends VRInternalFrame {
                         }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {                            
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
+                            importador.importarClientePreferencial();
                         }
                         if (chkClienteEventual.isSelected()) {                            
-                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                            importador.importarClienteEventual();
                         }
-                        
-                         if(chkRotativo.isSelected()){
+                        if(chkRotativo.isSelected()){
                             importador.importarCreditoRotativo();
                         }
-                        
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {  
                             importador.unificarProdutos();

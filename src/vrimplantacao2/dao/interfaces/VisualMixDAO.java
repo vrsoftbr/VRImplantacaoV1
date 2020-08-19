@@ -1318,6 +1318,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setChaveCfe(rst.getString("ChaveCfe"));
+                        next.setChaveNfCe(rst.getString("chaveNfce"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -1345,6 +1346,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.CPFCNPJCLIENTE as cpf_cliente,\n"
                     + "	cast(v.CANCELADO as bigint) as cancelado,\n"
                     + "	nfe.CHAVE as chaveCfe,\n"
+                    + "	nfe.CHAVE as chaveNfce,\n"
                     + "	nfe.NUMEROSERIESAT as numeroserie\n"
                     + "from dbo.Sint_total_Cupom v\n"
                     + "left join dbo.SINT_NFCE nfe on \n"
