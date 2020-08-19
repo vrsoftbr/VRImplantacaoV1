@@ -20,6 +20,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -335,7 +337,7 @@ public class WShopDAO extends InterfaceDAO {
                     imp.setIcmsCstConsumidor(Utils.stringToInt(rst.getString("icms_cst")));
                     imp.setIcmsAliqConsumidor(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducaoConsumidor(rst.getDouble("icms_reduzido"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -379,7 +381,6 @@ public class WShopDAO extends InterfaceDAO {
         }
         return null;
     }*/
-
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -493,4 +494,116 @@ public class WShopDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	cdchamada id,\n"
+                    + "	nrcgc_cic cnpj,\n"
+                    + " nrincrest_rg as ie_rg,\n"
+                    + "	nmpessoa razao,\n"
+                    + "	nmfantasia fantasia,\n"
+                    + "	case when stativo = 'S' then 1 else 0 end ativo,\n"
+                    + "	nmendereco endereco,\n"
+                    + "	nrlogradouro numero,\n"
+                    + "	dscomplemento complemento,\n"
+                    + "	nmbairro bairro,\n"
+                    + "	nmcidade municipio,\n"
+                    + "	iduf uf,\n"
+                    + "	nmcep cep,\n"
+                    + "	dtcadastro dataCadastro,\n"
+                    + "	vlsalario salario,\n"
+                    + "	vllimitecompra valorLimite,\n"
+                    + "	nmobservacao observacao,\n"
+                    + "	referenciaendereco observacao2, \n"
+                    + "	diavencimento diaVencimento,\n"
+                    + "	nrtelefone telefone,\n"
+                    + "	nrpager celular,\n"
+                    + "	email email,\n"
+                    + "	nrtelfax fax\n"
+                    + "from\n"
+                    + "	wshop.pessoas cli\n"
+                    + "where\n"
+                    + "	sttipopessoa = 'C'\n"
+                    + "order by \n"
+                    + "	cdchamada"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDataCadastro(rst.getDate("dataCadastro"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("valorLimite"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao2(rst.getString("observacao2"));
+                    imp.setDiaVencimento(rst.getInt("diaVencimento"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setFax(rst.getString("fax"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	rec.nrtitulo id,\n"
+                    + "	rec.dtemissao dataEmissao,\n"
+                    + "	rec.nrtitulo numeroCupom,\n"
+                    + "	rec.nrtitulo ecf,\n"
+                    + "	rec.vltitulo valor,\n"
+                    + "	rec.nmobservacao observacao,\n"
+                    + "	cli.cdchamada idCliente,\n"
+                    + "	rec.dtvencimento dataVencimento,\n"
+                    + "	cli.nrcgc_cic cnpjCliente\n"
+                    + "from\n"
+                    + "	wshop.fluxo rec\n"
+                    + "join \n"
+                    + "	wshop.pessoas cli on rec.idpessoa = cli.idpessoa\n"
+                    + "where \n"
+                    + "	rec.dtbaixa is null\n"
+                    + "and rec.tppessoa = 'C'\n"        
+                    + "order by\n"
+                    + "	cdchamada::integer"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("dataEmissao"));
+                    imp.setDataVencimento(rst.getDate("dataVencimento"));
+                    imp.setIdCliente(rst.getString("idCliente"));
+                    imp.setCnpjCliente(rst.getString("cnpjCliente"));
+                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("numeroCupom")));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

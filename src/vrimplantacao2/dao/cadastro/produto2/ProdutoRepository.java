@@ -993,6 +993,9 @@ public class ProdutoRepository {
         complemento.setSetor(imp.getSetor());
         complemento.setPrateleira(imp.getPrateleira());
         complemento.setTeclaassociada((int) imp.getTeclaAssociada());
+        complemento.setMargem(imp.getMargem());
+        complemento.setMargemMinima(imp.getMargemMinima());
+        complemento.setMargemMaxima(imp.getMargemMaxima());
 
         return complemento;
     }

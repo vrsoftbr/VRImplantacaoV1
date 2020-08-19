@@ -11,6 +11,48 @@ import vrimplantacao2.vo.enums.TipoProduto;
 public class ProdutoComplementoVO {
 
     /**
+     * @return the margem
+     */
+    public double getMargem() {
+        return margem;
+    }
+
+    /**
+     * @param margem the margem to set
+     */
+    public void setMargem(double margem) {
+        this.margem = margem;
+    }
+
+    /**
+     * @return the margemminima
+     */
+    public double getMargemMinima() {
+        return margemminima;
+    }
+
+    /**
+     * @param margemminima the margemminima to set
+     */
+    public void setMargemMinima(double margemminima) {
+        this.margemminima = margemminima;
+    }
+
+    /**
+     * @return the margemmaxima
+     */
+    public double getMargemMaxima() {
+        return margemmaxima;
+    }
+
+    /**
+     * @param margemmaxima the margemmaxima to set
+     */
+    public void setMargemMaxima(double margemmaxima) {
+        this.margemmaxima = margemmaxima;
+    }
+
+    /**
      * @return the teclaassociada
      */
     public int getTeclaassociada() {
@@ -52,6 +94,9 @@ public class ProdutoComplementoVO {
     private Date dataMovimento;
     private Timestamp dataHora;
     private int teclaassociada;
+    private double margem;
+    private double margemminima;
+    private double margemmaxima;
 
     public void setId(int id) {
         this.id = id;

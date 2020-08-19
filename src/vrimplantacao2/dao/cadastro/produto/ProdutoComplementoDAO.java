@@ -79,6 +79,13 @@ public class ProdutoComplementoDAO {
                     sql.put("precovenda", vo.getPrecoVenda());
                     sql.put("precovendaanterior", 0);
                     sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
+                    
+                    if (Versao.maiorQue(3, 21)) {
+                        sql.put("margemminima", vo.getMargemMinima());
+                        sql.put("margemmaxima", vo.getMargemMaxima());
+                        sql.put("margem", vo.getMargem());
+                    }
+                    
                     if (unificacao) {
                         sql.put("estoque", 0);
                     } else {
@@ -147,6 +154,13 @@ public class ProdutoComplementoDAO {
                 sql.put("precovendaanterior", 0);
                 sql.put("dataprimeiraentrada", vo.getDataPrimeiraAlteracao());
                 sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
+                
+                if (Versao.maiorQue(3, 21)) {
+                    sql.put("margemminima", vo.getMargemMinima());
+                    sql.put("margemmaxima", vo.getMargemMaxima());
+                    sql.put("margem", vo.getMargem());
+                }
+                
                 if (unificacao) {
                     sql.put("estoque", 0);
                 } else {
@@ -300,6 +314,11 @@ public class ProdutoComplementoDAO {
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
+            if (Versao.maiorQue(3, 21)) {
+                if (opt.contains(OpcaoProduto.MARGEM)) {
+                    sql.put("margem", complemento.getMargem());
+                }
+            }
             if (opt.contains(OpcaoProduto.ESTOQUE)) {
                 if (opt.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {
                     sql.putSql("estoque", String.format(Locale.US, "estoque + (%.2f)", complemento.getEstoque()));
@@ -357,6 +376,13 @@ public class ProdutoComplementoDAO {
                         "id_produto = " + complemento.getProduto().getId() + " and "
                         + "id_loja = " + complemento.getIdLoja()
                 );
+            } if (opt.contains(OpcaoProduto.MARGEM)) {
+                sql.setWhere(
+                        "id_produto = " + complemento.getProduto().getId() + " and "
+                        + "id_loja = " + complemento.getIdLoja() + " and "
+                        + "coalesce(margem, 0) = 0 "
+                );
+                
             } else {
                 sql.setWhere(
                         "id_produto = " + complemento.getProduto().getId() + " and "
