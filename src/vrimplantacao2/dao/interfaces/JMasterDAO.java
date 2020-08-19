@@ -6,9 +6,12 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -76,17 +79,58 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct NATCODIGO, (NATCODIGO+' - '+ NATDESCRICAO+' - CST: '+cast(NATCST as varchar)+\n"
-                    + "' ICMS: '+cast(NATICM as varchar)+' RDZ: '+cast(NATICMREDUZ as varchar)) DESCRICAO\n"
-                    + "from cadnat\n"
-                    + "inner join VPRODLOJA on litnatfiscal = NATCODIGO\n"
-                    + "where NATTABNAT = 1\n"
-                    + "and NATESTADO = 'SP'\n"
-                    + "order by NATCODIGO"
+            try (ResultSet rs = stm.executeQuery(
+                    "with lj as (select LOJCODIGO id, LOJESTADO uf from CADLOJ l where l.LOJCODIGO = " + getLojaOrigem() + ")\n" +
+                    "select distinct\n" +
+                    "	'E' + aliq.NATCODIGO id,\n" +
+                    "	aliq.NATDESCRICAO descricao,\n" +
+                    "	aliq.NATMENSAGEM mensagem,\n" +
+                    "	aliq.NATCST cst,\n" +
+                    "	aliq.NATICMCOMPRA icms,\n" +
+                    "	aliq.NATICMREDCMP reduzido\n" +
+                    "from\n" +
+                    "	cadnat aliq\n" +
+                    "	join lj on\n" +
+                    "		aliq.NATESTADO = lj.uf\n" +
+                    "	join LOJITM li on\n" +
+                    "		li.LITNATFISCAL = aliq.NATCODIGO\n" +
+                    "where\n" +
+                    "	NATTABNAT = 1\n" +
+                    "union\n" +
+                    "select distinct\n" +
+                    "	'S' + aliq.NATCODIGO id,\n" +
+                    "	aliq.NATDESCRICAO descricao,\n" +
+                    "	aliq.NATMENSAGEM mensagem,\n" +
+                    "	aliq.NATCST cst,\n" +
+                    "	aliq.NATICM icms,\n" +
+                    "	aliq.NATICMREDUZ reduzido\n" +
+                    "from\n" +
+                    "	cadnat aliq\n" +
+                    "	join lj on\n" +
+                    "		aliq.NATESTADO = lj.uf\n" +
+                    "	join LOJITM li on\n" +
+                    "		li.LITNATFISCAL = aliq.NATCODIGO\n" +
+                    "where\n" +
+                    "	NATTABNAT = 1\n" +
+                    "order by\n" +
+                    "	id"
             )) {
-                while (rst.next()) {
-                    result.add(new MapaTributoIMP(rst.getString("NATCODIGO"), rst.getString("DESCRICAO")));
+                while (rs.next()) {
+                    String descricao = String.format(
+                            "%s - %s",
+                            rs.getString("descricao"),
+                            rs.getString("mensagem")
+                    );
+                    int cst = Utils.stringToInt(rs.getString("cst"));
+                    double aliq = rs.getDouble("icms");
+                    double reduzido = rs.getDouble("reduzido");
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
+                            descricao,
+                            cst,
+                            aliq,
+                            reduzido
+                    ));
                 }
             }
         }
@@ -182,22 +226,73 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.OFERTA
+        ));
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "p.gercodreduz, e.EANCODIGO, e.EANQTDE,\n"
-                    + "p.gersecao, p.gergrupo, p.gersubgrupo,\n"
-                    + "p.gerdescricao, p.gerdescreduz, p.gertipven,\n"
-                    + "p.gerembven, p.gerfamilia, p.gernbm, p.gertipopis,\n"
-                    + "p.gertipopie, p.litnatfiscal, p.litmrgven1, p.litcusrep,\n"
-                    + "p.litprcven1, p.litestqmin, p.litestql, p.litflinha, p.gercest,\n"
-                    + "i.NATCST, i.NATICM, i.NATICMREDUZ, i.NATDESCRICAO, p.LITTIPFOR\n"
-                    + "from VPRODLOJA p\n"
-                    + "left join CADEAN e on e.EANCODREDUZ = p.GERCODREDUZ\n"
-                    + "left join CADNAT i on i.NATCODIGO = p.litnatfiscal and i.NATTABNAT = 1 and i.NATESTADO = 'SP'\n"
-                    + "order by p.gercodreduz"
+                    "select\n" +
+                    "	p.GERCODREDUZ id,\n" +
+                    "	p.GERENTLIN datacadastro,\n" +
+                    "	ean.EANCODIGO ean,\n" +
+                    "	ean.EANQTDE qtdembalagem,\n" +
+                    "	p.GERTIPVEN unidade,\n" +
+                    "	p.gerembven qtdembalagemcotacao,\n" +
+                    "	p.GERPESOVARIAVEL e_balanca,\n" +
+                    "	p.GERFRACAO,\n" +
+                    "	p.GERVALIDADE validade,\n" +
+                    "	p.GERDESCRICAO descricaocompleta,\n" +
+                    "	p.GERDESCREDUZ descricaoreduzida,\n" +
+                    "	case when p.GERVENDAPARC = 0 then 1 else p.GERVENDAPARC end parcelas,\n" +
+                    "	p.GERSECAO merc1,\n" +
+                    "	p.GERGRUPO merc2,\n" +
+                    "	p.GERSUBGRUPO merc3,\n" +
+                    "	p.GERFAMILIA id_familia,\n" +
+                    "	p.GERPESOBRT pesobruto,\n" +
+                    "	p.GERPESOLIQ pesoliquido,\n" +
+                    "	est.LITESTQMIN estoqueminimo,\n" +
+                    "	est.LITESTQL estoque,\n" +
+                    "	est.LITMRGVEN1 margem,\n" +
+                    "	est.LITCUSREP custocomimposto,\n" +
+                    "	est.LITCUSREP custosemimposto,\n" +
+                    "	est.LITCUSMED customedio,\n" +
+                    "	est.LITPRCVEN1 precovenda,\n" +
+                    "	p.GERTECLA teclassociada,\n" +
+                    "	p.GERSAILIN saidadelinha,\n" +
+                    "	p.GERNBM ncm,\n" +
+                    "	p.GERCEST cest,\n" +
+                    "	p.GERTIPOPIS piscofins_saida,\n" +
+                    "	p.GERTIPOPIE piscofins_entrada,\n" +
+                    "	'E' + est.LITNATFISCAL id_icms_entrada,\n" +
+                    "	'S' + est.LITNATFISCAL id_icms_saida,\n" +
+                    "	p.GERCODFOR fornecedorfabricante\n" +
+                    "from\n" +
+                    "	dbo.CADGER p\n" +
+                    "	JOIN dbo.LOJITM est ON\n" +
+                    "		p.GERCODREDUZ = est.LITCODREDUZ \n" +
+                    "	JOIN dbo.LOJSEC ON\n" +
+                    "		est.LITLOJA = dbo.LOJSEC.LSCLOJA AND \n" +
+                    "		p.GERSECAO = dbo.LOJSEC.LSCSECAO\n" +
+                    "	left join CADEAN ean on\n" +
+                    "		p.GERCODREDUZ = ean.EANCODREDUZ\n" +
+                    "order by id, ean"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
