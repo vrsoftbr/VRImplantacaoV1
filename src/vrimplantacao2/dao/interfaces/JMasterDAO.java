@@ -330,7 +330,6 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	est.LITLOJA = " + getLojaOrigem() + "\n" +
                     "order by id, ean"
             )) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
@@ -340,7 +339,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
                     try {
-                        imp.setDataCadastro(dateFormat.parse(rs.getString("datacadastro")));
+                        imp.setDataCadastro(format.parse(rs.getString("datacadastro")));
                     } catch (ParseException ex) {
                         System.out.println("Data inválida - id:" + imp.getImportId() + " - " + rs.getString("datacadastro"));
                     }
@@ -373,7 +372,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoque"));
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoAnteriorComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoAnteriorSemImposto(rs.getDouble("custosemimposto"));
@@ -381,16 +380,16 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setTeclaAssociada(rs.getInt("teclassociada"));
                     try {
-                        java.util.Date date = dateFormat.parse(rs.getString("saidadelinha"));
+                        java.util.Date date = format.parse(rs.getString("saidadelinha"));
                         imp.setSituacaoCadastro(
                                 date.before(new java.util.Date()) ?
-                                SituacaoCadastro.ATIVO :
-                                SituacaoCadastro.EXCLUIDO
+                                SituacaoCadastro.EXCLUIDO :
+                                SituacaoCadastro.ATIVO
                         );
                     } catch (ParseException ex) {
                         System.out.println("Data inválida FORALINHA - id:" + imp.getImportId() + " - " + rs.getString("saidadelinha"));
                     }
-                    imp.setNcm(rs.getString("ncm"));
+                    imp.setNcm(Utils.formataNumero(rs.getString("ncm")).substring(0, 8));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofins_saida"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_entrada"));
