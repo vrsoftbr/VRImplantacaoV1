@@ -79,11 +79,11 @@ public class AssociadoRepository {
                                 vItem.setIdAssociado(vo.getId());
                                 vItem.setIdProduto(produtoFilho);
                                 vItem.setQtdEmbalagem(imp.getQtdEmbalagemItem());
-                                vItem.setAplicaEstoque(true);
-                                vItem.setAplicaCusto(false);
-                                vItem.setAplicaPreco(false);
-                                vItem.setPercentualCustoEstoque(0);
-                                vItem.setPercentualPreco(0);
+                                vItem.setAplicaEstoque(imp.isAplicaEstoque());
+                                vItem.setAplicaCusto(imp.isAplicaCusto());
+                                vItem.setAplicaPreco(imp.isAplicaPreco());
+                                vItem.setPercentualCustoEstoque(imp.getPercentualCusto());
+                                vItem.setPercentualPreco(imp.getPercentualPreco());
                                 provider.gravar(vItem);
                                 vo.getItens().put(vItem.getIdProduto(), vItem);                                
                             }
