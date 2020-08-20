@@ -164,6 +164,11 @@
                     <Property name="text" type="java.lang.String" value="Contas &#xe0; Pagar"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornReceberDevolucao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receber Devolu&#xe7;&#xe3;o"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
@@ -218,7 +223,11 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCliSalarioEmpresa" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkReceberVendaPrazo" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace pref="63" max="32767" attributes="0"/>
                       </Group>
@@ -258,7 +267,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkReceberVendaPrazo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="96" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -356,6 +368,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberVendaPrazo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receber Venda Prazo"/>
                   </Properties>
                 </Component>
               </SubComponents>

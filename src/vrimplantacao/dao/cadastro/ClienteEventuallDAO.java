@@ -333,4 +333,42 @@ public class ClienteEventuallDAO {
         }
         return result;
     }
+    
+    public int getIdByCodAnt(String sistema, String loja, String id) throws Exception {
+        int result;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select ant.id as codigoanterior, c.id as codigoatual "
+                    + "from implantacao.codant_clienteeventual ant \n"
+                    + "join clienteeventual c on c.id = ant.codigoatual\n"
+                    + "where ant.sistema = '" + sistema + "'\n"
+                    + "and ant.loja = '" + loja + "' \n"
+                    + "and ant.id = '" + id + "'"
+            )) {
+                if (rst.next()) {
+                    result = rst.getInt("codigoatual");
+                } else {
+                    result = -1;
+                }
+            }
+        }
+        return result;
+    }
+
+    public int getIdByCnpj(Long cnpj) throws Exception {
+        int result;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, cnpj from clienteeventual where cnpj = " + cnpj
+            )) {
+                if (rst.next()) {
+                    result = rst.getInt("id");
+                } else {
+                    result = -1;
+                }
+            }
+        }
+        return result;
+    }
+    
 }

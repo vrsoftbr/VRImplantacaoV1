@@ -22,15 +22,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
+import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
+import vrimplantacao2.dao.cadastro.financeiro.recebervendaprazo.ReceberVendaPrazaoDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
+import vrimplantacao2.vo.cadastro.financeiro.ReceberVendaPrazoVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
@@ -66,6 +73,12 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static final Logger LOG = Logger.getLogger(VisualMixDAO.class.getName());
+    
+    public boolean i_contaAbertaDevolucao = false;
+    public String dataEmissaoDevolucao;
+
+    public boolean i_contaAbertaVendaPrazo = false;
+    public String dataEmissaoVendaPr;
     
     @Override
     public String getSistema() {
@@ -1202,6 +1215,163 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
+        return result;
+    }
+    
+    public void importarReceberDevolucao(int idLojaVR) throws Exception {
+        List<ReceberDevolucaoVO> vResult;
+        try {
+            ProgressBar.setStatus("Carregando dados Receber Devolução...");
+            vResult = getReceberDevolucao();
+            if (!vResult.isEmpty()) {
+                new ReceberDevolucaoDAO().salvar(vResult, idLojaVR);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    List<ReceberDevolucaoVO> getReceberDevolucao() throws Exception {
+        List<ReceberDevolucaoVO> result = new ArrayList<>();
+        int idFornecedor;
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	cast(r.NumeroLancamento as bigint) as numero_lanc,\n"
+                    + "	cast(r.NumeroNota as bigint) as numero_nf,\n"
+                    + "	cast(r.Codigo_Destinatario as bigint) as id_fornecedor,\n"
+                    + "	r.nome as nome_fornecedor,\n"
+                    + "	r.InscEstadual as ie,\n"
+                    + "	cast(r.CGC as bigint) as cnpj,\n"
+                    + "	r.TotalDaNota as valor_nota,\n"
+                    + "	r.DataEmissao as data_emissao,\n"
+                    + "	v.Vencimento as data_vencimento,\n"
+                    + "	cast(v.Sequencia as bigint) as numero_parcela,\n"
+                    + "	v.Valor as valor_parcela,\n"
+                    + " r.OBS1 as obs_1,\n"
+                    + "	r.OBS2 as obs_2,\n"
+                    + "	r.OBS3 as obs_3,\n"
+                    + "	r.OBS4 as obs_4,\n"
+                    + "	r.OBS5 as obs_5,\n"
+                    + " r.Tipo as tipo\n"        
+                    + "from dbo.Notas_Capas_Emitidas r\n"
+                    + "join dbo.Notas_Emitidas_Vencimentos v\n"
+                    + "	on v.NumeroLanc = r.NumeroLancamento\n"
+                    + "where r.Tipo in (7, 8, 46, 47, 48, 49)\n"
+                    + "and r.DataEmissao < '2020-08-01'\n"
+                    + "and r.Situacao = 0\n"        
+                    + "and r.NumeroLoja = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ReceberDevolucaoVO vo = new ReceberDevolucaoVO();
+
+                    if ((rst.getString("cnpj") != null)
+                            && (!rst.getString("cnpj").trim().isEmpty())) {
+
+                        idFornecedor = new FornecedorDAO().getIdByCnpj(Long.parseLong(Utils.formataNumero(rst.getString("cnpj"))));
+
+                        if (idFornecedor != -1) {
+                            ReceberDevolucaoVO imp = new ReceberDevolucaoVO();
+                            imp.setIdFornecedor(idFornecedor);
+                            imp.setNumeroNota(rst.getInt("numero_nf"));
+                            imp.setDataemissao(rst.getDate("data_emissao"));
+                            imp.setDatavencimento(rst.getDate("data_vencimento"));
+                            imp.setValor(rst.getDouble("valor_parcela"));
+                            imp.setNumeroParcela(rst.getInt("numero_parcela"));
+                            imp.setObservacao("IMPORTADO VR " + " Tipo Conta " 
+                                    + rst.getString("tipo") + " - "
+                                    + " " + rst.getString("obs_1")
+                                    + " " + rst.getString("obs_2")
+                                    + " " + rst.getString("obs_3")
+                                    + " " + rst.getString("obs_4")
+                                    + " " + rst.getString("obs_5"));
+                            result.add(imp);
+                        } else {
+                            System.out.println("Fornecedor " + rst.getString("cnpj")
+                                    + " id " + rst.getString("id_fornecedor")
+                                    + " nome " + rst.getString("nome_fornecedor"));
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    public void importarReceberVendaPrazo(int idLojaVR) throws Exception {
+        List<ReceberVendaPrazoVO> vResult;
+        try {
+            ProgressBar.setStatus("Carregando dados Receber Venda Prazo...");
+            vResult = getReceberVendaPrazao();
+            if (!vResult.isEmpty()) {
+                new ReceberVendaPrazaoDAO().salvar(vResult, idLojaVR);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public List<ReceberVendaPrazoVO> getReceberVendaPrazao() throws Exception {
+        List<ReceberVendaPrazoVO> result = new ArrayList<>();
+        int idClienteEventual;
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	cast(r.NumeroLancamento as bigint) as numero_lanc,\n"
+                    + "	cast(r.NumeroNota as bigint) as numero_nf,\n"
+                    + "	cast(r.Codigo_Destinatario as bigint) as id_cliente,\n"
+                    + "	r.nome as nome_cliente,\n"
+                    + "	r.InscEstadual as ie,\n"
+                    + "	cast(r.CGC as bigint) as cnpj,\n"
+                    + "	r.TotalDaNota as valor_nota,\n"
+                    + "	r.DataEmissao as data_emissao,\n"
+                    + "	v.Vencimento as data_vencimento,\n"
+                    + "	cast(v.Sequencia as bigint) as numero_parcela,\n"
+                    + "	v.Valor as valor_parcela,\n"
+                    + "	r.OBS1 as obs_1,\n"
+                    + "	r.OBS2 as obs_2,\n"
+                    + "	r.OBS3 as obs_3,\n"
+                    + "	r.OBS4 as obs_4,\n"
+                    + "	r.OBS5 as obs_5,\n"
+                    + " r.Tipo as tipo\n"
+                    + "from dbo.Notas_Capas_Emitidas r\n"
+                    + "join dbo.Notas_Emitidas_Vencimentos v\n"
+                    + "	on v.NumeroLanc = r.NumeroLancamento\n"
+                    + "where r.Tipo in (6)\n"
+                    + "and r.DataEmissao >= '2020-08-01'\n"
+                    + "and r.NumeroLoja = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    idClienteEventual = new ClienteEventuallDAO().getIdByCnpj(rst.getLong("cnpj"));
+                    if (idClienteEventual != -1) {
+                        ReceberVendaPrazoVO vo = new ReceberVendaPrazoVO();
+                        vo.setId_clienteeventual(idClienteEventual);
+                        vo.setNumeronota(rst.getInt("numero_nf"));
+                        vo.setDataemissao(rst.getDate("data_emissao"));
+                        vo.setDatavencimento(rst.getDate("data_vencimento"));
+                        vo.setValor(rst.getDouble("valor_parcela"));
+                        vo.setValorliquido(vo.getValor());
+                        vo.setNumeroparcela(rst.getInt("numero_parcela"));
+                        vo.setObservacao("IMPORTADO VR " + " Tipo Conta "
+                                + rst.getString("tipo") + " - "
+                                + " " + rst.getString("obs_1")
+                                + " " + rst.getString("obs_2")
+                                + " " + rst.getString("obs_3")
+                                + " " + rst.getString("obs_4")
+                                + " " + rst.getString("obs_5"));
+                        result.add(vo);
+
+                    } else {
+                        System.out.println("Cliente " + rst.getString("cnpj")
+                                + " id " + rst.getString("id_cliente")
+                                + " nome " + rst.getString("nome_cliente"));
+
+                    }
+                }
+            }
+        }
         return result;
     }
     
