@@ -53,6 +53,7 @@ public class JMasterGUI extends VRInternalFrame {
         tabConexao.port = "1433";
         carregarParametros();
         
+        tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
@@ -154,6 +155,7 @@ public class JMasterGUI extends VRInternalFrame {
 
                     if (tabs.getSelectedIndex() == 0) {
                         dao.setComplemento(txtComplemento.getText());
+                        tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
                         
                         if (chkFornecedor.isSelected()) {

@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -239,6 +241,37 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
                 OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.NUMERO_PARCELA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.TECLA_ASSOCIADA,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.FABRICANTE,
                 OpcaoProduto.OFERTA
         ));
     }
@@ -247,7 +280,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	p.GERCODREDUZ id,\n" +
                     "	p.GERENTLIN datacadastro,\n" +
@@ -292,62 +325,81 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		p.GERSECAO = dbo.LOJSEC.LSCSECAO\n" +
                     "	left join CADEAN ean on\n" +
                     "		p.GERCODREDUZ = ean.EANCODREDUZ\n" +
+                    "where\n" +
+                    "	est.LITLOJA = " + getLojaOrigem() + "\n" +
                     "order by id, ean"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
-                while (rst.next()) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    ProdutoBalancaVO produtoBalanca;
-                    imp.setImportLoja(getLojaOrigem());
+                    
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("gercodreduz"));
-                    imp.setEan(rst.getString("EANCODIGO"));
-                    imp.setQtdEmbalagem(rst.getInt("gerembven"));
-                    imp.setCodMercadologico1(rst.getString("gersecao"));
-                    imp.setCodMercadologico2(rst.getString("gergrupo"));
-                    imp.setCodMercadologico3(rst.getString("gersubgrupo"));
-                    imp.setDescricaoCompleta(rst.getString("gerdescricao"));
-                    imp.setDescricaoReduzida(rst.getString("gerdescreduz"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("LITTIPFOR"));
-                    imp.setIdFamiliaProduto(rst.getString("gerfamilia"));
-                    imp.setMargem(rst.getDouble("litmrgven1"));
-                    imp.setPrecovenda(rst.getDouble("litprcven1"));
-                    imp.setCustoComImposto(rst.getDouble("litcusrep"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setEstoqueMinimo(rst.getDouble("litestqmin"));
-                    imp.setEstoque(rst.getDouble("litestql"));
-
-                    if ((rst.getString("gernbm") != null)
-                            && (!rst.getString("gernbm").trim().isEmpty())) {
-                        if (rst.getString("gernbm").trim().length() > 8) {
-                            imp.setNcm(rst.getString("gernbm").trim().substring(0, 8));
-                        } else {
-                            imp.setNcm(rst.getString("gernbm").trim());
-                        }
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    try {
+                        imp.setDataCadastro(dateFormat.parse(rs.getString("datacadastro")));
+                    } catch (ParseException ex) {
+                        System.out.println("Data inválida - id:" + imp.getImportId() + " - " + rs.getString("datacadastro"));
                     }
-
-                    imp.setCest(rst.getString("gercest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("gertipopis"));
-                    imp.setPiscofinsCstCredito(rst.getInt("gertipopie"));
-                    imp.setIcmsDebitoId(rst.getString("litnatfiscal"));
-                    imp.setIcmsCreditoId(rst.getString("litnatfiscal"));
-
-                    long codigoProduto;
-                    codigoProduto = Long.parseLong(imp.getImportId());
-                    if (codigoProduto <= Integer.MAX_VALUE) {
-                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                    } else {
-                        produtoBalanca = null;
-                    }
-
-                    if (produtoBalanca != null) {
+                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
+                    
+                    int ean = Utils.stringToInt(rs.getString("ean"), -2);
+                    ProdutoBalancaVO bal = balanca.get(ean);
+                    if (bal != null) {
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.setQtdEmbalagem(1);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                         imp.seteBalanca(true);
-                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
-                    } else {
-                        imp.setValidade(0);
-                        imp.seteBalanca(false);
+                        imp.setValidade(bal.getValidade());
+                    } else {                    
+                        imp.setEan(rs.getString("ean"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));                    
+                        imp.seteBalanca("S".equals(rs.getString("e_balanca")));
+                        imp.setValidade(rs.getInt("validade"));
                     }
+                    
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setNumeroparcela(rs.getInt("parcelas"));
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setIdFamiliaProduto(rs.getString("id_familia"));
+                    imp.setPesoBruto(rs.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoque"));
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setCustoAnteriorComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoAnteriorSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoMedio(rs.getDouble("customedio"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setTeclaAssociada(rs.getInt("teclassociada"));
+                    try {
+                        java.util.Date date = dateFormat.parse(rs.getString("saidadelinha"));
+                        imp.setSituacaoCadastro(
+                                date.before(new java.util.Date()) ?
+                                SituacaoCadastro.ATIVO :
+                                SituacaoCadastro.EXCLUIDO
+                        );
+                    } catch (ParseException ex) {
+                        System.out.println("Data inválida FORALINHA - id:" + imp.getImportId() + " - " + rs.getString("saidadelinha"));
+                    }
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    imp.setPiscofinsCstDebito(rs.getString("piscofins_saida"));
+                    imp.setPiscofinsCstCredito(rs.getString("piscofins_entrada"));
+                    imp.setIcmsCreditoId(rs.getString("id_icms_entrada"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("id_icms_entrada"));
+                    imp.setIcmsDebitoId(rs.getString("id_icms_saida"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("id_icms_saida"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_icms_saida"));
+                    imp.setIcmsConsumidorId(rs.getString("id_icms_saida"));
+                    imp.setFornecedorFabricante(rs.getString("fornecedorfabricante"));
 
                     vResult.add(imp);
                 }
@@ -801,7 +853,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "inner join JORLOJ loj on loj.JOLNUMERO = cap.JOCNUMERO and loj.JOLLOJA = " + getLojaOrigem() + "\n"
                     + "inner join JORDET det on det.JODNUMERO = cap.JOCNUMERO\n"
                     + "inner join VPRODLOJA pro on pro.GERCODREDUZ = det.JODCODREDUZ\n"
-                    + "where cap.jocdatafim > '" + v_dataTermino + "'\n"
+                    + "where cap.jocdatafim > '" + fmt.format(new java.util.Date()) + "'\n"
                     + "order by cap.jocdatafim desc"
             )) {
                 while (rst.next()) {
