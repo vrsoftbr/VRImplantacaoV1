@@ -14,6 +14,9 @@ public class AssociadoIMP {
     private String descricaoProdutoAssociado;
     private double percentualPreco = 0;
     private double percentualCusto = 0;
+    private boolean aplicaPreco = false;
+    private boolean aplicaCusto = false;
+    private boolean aplicaEstoque = true;
 
     public String getId() {
         return id;
@@ -83,6 +86,30 @@ public class AssociadoIMP {
      */
     public void setQtdEmbalagemItem(int qtdEmbalagemItem) {
         this.qtdEmbalagemItem = qtdEmbalagemItem;
+    }
+
+    public boolean isAplicaPreco() {
+        return aplicaPreco;
+    }
+
+    public void setAplicaPreco(boolean aplicaPreco) {
+        this.aplicaPreco = aplicaPreco;
+    }
+
+    public boolean isAplicaCusto() {
+        return aplicaCusto;
+    }
+
+    public void setAplicaCusto(boolean aplicaCusto) {
+        this.aplicaCusto = aplicaCusto;
+    }
+
+    public boolean isAplicaEstoque() {
+        return aplicaEstoque;
+    }
+
+    public void setAplicaEstoque(boolean aplicaEstoque) {
+        this.aplicaEstoque = aplicaEstoque;
     }
     
 }

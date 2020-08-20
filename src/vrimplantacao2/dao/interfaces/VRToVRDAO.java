@@ -23,6 +23,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -32,6 +33,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -80,6 +82,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                     OpcaoProduto.PESAVEL,
                     OpcaoProduto.VALIDADE,
+                    OpcaoProduto.ASSOCIADO,
                     OpcaoProduto.DESC_COMPLETA,
                     OpcaoProduto.DESC_GONDOLA,
                     OpcaoProduto.DESC_REDUZIDA,
@@ -107,6 +110,52 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	a2.id id,\n" +
+                    "	a2.id_produto idproduto,\n" +
+                    "   a2.qtdembalagem,\n" +        
+                    "	p2.descricaocompleta descricaoassociado,\n" +
+                    "	a.id_produto idprodutoitem,\n" +
+                    "	p.descricaocompleta descricaoassociadoitem,\n" +
+                    "	a.aplicacusto,\n" +
+                    "	a.aplicaestoque,\n" +
+                    "	a.aplicapreco,\n" +
+                    "	a.percentualcustoestoque,\n" +
+                    "	a.percentualpreco,\n" +
+                    "	a.qtdembalagem qtdembalagemitem\n" +
+                    "from\n" +
+                    "	associadoitem a\n" +
+                    "join produto p on a.id_produto = p.id\n" +
+                    "join associado a2 on a.id_associado = a2.id\n" +
+                    "join produto p2 on a2.id_produto = p2.id")) {
+                while(rs.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    
+                    imp.setId(rs.getString("idproduto"));
+                    imp.setDescricao(rs.getString("descricaoassociado"));
+                    imp.setProdutoAssociadoId(rs.getString("descricaoassociadoitem"));
+                    imp.setProdutoAssociadoId(rs.getString("idprodutoitem"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagemItem(rs.getInt("qtdembalagemitem"));
+                    imp.setPercentualCusto(rs.getDouble("percentualcustoestoque"));
+                    imp.setPercentualPreco(rs.getDouble("percentualpreco"));
+                    imp.setAplicaCusto(rs.getBoolean("aplicacusto"));
+                    imp.setAplicaEstoque(rs.getBoolean("aplicaestoque"));
+                    imp.setAplicaPreco(rs.getBoolean("aplicapreco"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {

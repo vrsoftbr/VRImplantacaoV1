@@ -159,6 +159,7 @@ import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.InovaGUI;
 import vrimplantacao2.gui.interfaces.IntelliCashGUI;
 import vrimplantacao2.gui.interfaces.IntelliconGUI;
+import vrimplantacao2.gui.interfaces.InterDataGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.JacsysGUI;
@@ -636,6 +637,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLiderNetWork = new javax.swing.JMenuItem();
         mnuRKSoftware = new javax.swing.JMenuItem();
         mnuTecnosoft = new javax.swing.JMenuItem();
+        mnuInterData = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1465,6 +1467,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuTecnosoft);
+
+        mnuInterData.setText("InterData");
+        mnuInterData.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuInterDataActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuInterData);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4700,6 +4710,10 @@ public final class MenuGUI extends VRMdiFrame {
         GenericGUI.exibir(this);
     }//GEN-LAST:event_mnuGenericActionPerformed
 
+    private void mnuInterDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInterDataActionPerformed
+        InterDataGUI.exibir(this);
+    }//GEN-LAST:event_mnuInterDataActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4877,6 +4891,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuInfoMacStore;
     private javax.swing.JMenu mnuInformix;
     private javax.swing.JMenuItem mnuIntellicon;
+    private javax.swing.JMenuItem mnuInterData;
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
     private javax.swing.JMenuItem mnuInventer;
