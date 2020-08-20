@@ -137,6 +137,7 @@ public class JMasterGUI extends VRInternalFrame {
     }
 
     public void importarTabelas() throws Exception {
+        gravarParametros();
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;

@@ -241,6 +241,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
                 OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
@@ -362,7 +363,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setNumeroparcela(rs.getInt("parcelas"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
@@ -435,98 +436,97 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> vResult = new ArrayList<>();
+        List<FornecedorIMP> result = new ArrayList<>();
         Utils util = new Utils();
         String observacao = null, dataCadastro;
         java.sql.Date data = null;
-        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "forcodigo, fordescri, forcgc, forendereco, fornumero, "
-                    + "forbairro, forcidade, forestado, forcep, forddd, fortelefone, "
-                    + "forfax, forinsc, fordtcad, forsituacao, forbanco, "
-                    + "foragencia, forconta, forrazao, foremail, forpj  "
-                    + "from CADFOR "
-                    + "order by forcodigo "
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	f.forcodigo id,\n" +
+                    "	f.FORRAZAO razao,\n" +
+                    "	f.FORDESCRI nome,\n" +
+                    "	f.FORCGC cnpj,\n" +
+                    "	f.FORINSC ie_rg,\n" +
+                    "	f.FORDTFLINHA dataforalinha,\n" +
+                    "	f.FORENDERECO endereco,\n" +
+                    "	f.FORNUMERO numero,\n" +
+                    "	f.FORCOMPL complemento,\n" +
+                    "	f.FORBAIRRO bairro,\n" +
+                    "	f.FORCIDADE cidade,\n" +
+                    "	f.FORESTADO uf,\n" +
+                    "	f.FORCEP cep,\n" +
+                    "	f.FORDDD ddd,\n" +
+                    "	f.FORTELEFONE telefone,\n" +
+                    "	f.FORDTCAD datacadastro,\n" +
+                    "	f.FORENTREGA prazoentrega,\n" +
+                    "	f.FORPRAZO prazopedido,\n" +
+                    "	f.FORFAX fax,\n" +
+                    "	f.FOREMAIL email,\n" +
+                    "	coalesce(rtrim(ltrim(f.FORCONTATO)), '') contato,\n" +
+                    "	f.FORDESCISS ,\n" +
+                    "	f.forbanco banco,\n" +
+                    "	f.FORAGENCIA agencia,\n" +
+                    "	f.FORCONTA conta\n" +
+                    "from\n" +
+                    "	CADFOR f\n" +
+                    "order by\n" +
+                    "	forcodigo"
             )) {
-                while (rst.next()) {
-                    if ((rst.getString("fordtcad") != null)
-                            && (!rst.getString("fordtcad").trim().isEmpty())) {
-                        if (util.validarData(Integer.parseInt(rst.getString("fordtcad").substring(4, 6)),
-                                Integer.parseInt(rst.getString("fordtcad").substring(6, 8)))) {
-                            dataCadastro = rst.getString("fordtcad").trim().substring(0, 4);
-                            dataCadastro = dataCadastro + "/" + rst.getString("fordtcad").trim().substring(4, 6);
-                            dataCadastro = dataCadastro + "/" + rst.getString("fordtcad").trim().substring(6, 8);
-                            data = new java.sql.Date(fmt.parse(dataCadastro).getTime());
-                        } else {
-                            dataCadastro = "";
-                        }
-                    } else {
-                        dataCadastro = "";
-                    }
-
+                while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("forcodigo"));
-                    imp.setRazao(rst.getString("forrazao"));
-                    imp.setFantasia(rst.getString("fordescri"));
-                    imp.setEndereco(rst.getString("forendereco"));
-                    imp.setNumero(rst.getString("fornumero"));
-                    imp.setBairro(rst.getString("forbairro"));
-                    imp.setMunicipio(rst.getString("forcidade"));
-                    imp.setUf(rst.getString("forestado"));
-                    imp.setCep(rst.getString("forcep"));
-                    imp.setTel_principal((rst.getString("forddd") == null ? "" : rst.getString("forddd"))
-                            + rst.getString("fortelefone"));
-                    imp.setCnpj_cpf(rst.getString("forcgc"));
-                    imp.setIe_rg(rst.getString("forinsc"));
-                    imp.setDatacadastro(("".equals(dataCadastro) ? new Date(new java.util.Date().getTime()) : data));
-                    imp.setAtivo(true);
-
-                    if ((rst.getString("forbanco") != null)
-                            && (!rst.getString("forbanco").trim().isEmpty())) {
-                        observacao = "BANCO " + rst.getString("forbanco") + " ";
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("nome"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie_rg"));
+                    try {
+                        java.util.Date foraLinha = fmt.parse(rs.getString("dataforalinha"));
+                        imp.setAtivo(!foraLinha.before(new java.util.Date()));
+                    } catch (ParseException ex) {
+                        System.out.println(String.format("Data inválida - ID: %s - %s", rs.getString("id"), rs.getString("dataforalinha")));
                     }
-
-                    if ((rst.getString("foragencia") != null)
-                            && (!rst.getString("foragencia").trim().isEmpty())) {
-                        observacao = observacao + "AGENCIA " + rst.getString("foragencia") + " ";
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    final String telefone = (rs.getString("ddd") == null ? "" : rs.getString("ddd"))
+                            + rs.getString("telefone");
+                    imp.setTel_principal(telefone);
+                    try {
+                        imp.setDatacadastro(fmt.parse(rs.getString("datacadastro")));
+                    } catch (ParseException ex) {
+                        System.out.println(String.format("Data cadastro inválida - ID: %s - %s", rs.getString("id"), rs.getString("datacadastro")));
                     }
-
-                    if ((rst.getString("forconta") != null)
-                            && (!rst.getString("forconta").trim().isEmpty())) {
-                        observacao = observacao + " CONTA " + rst.getString("forconta");
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    imp.setPrazoPedido(rs.getInt("prazopedido"));
+                    imp.addTelefone("FAX", rs.getString("fax"));
+                    imp.addContato("".equals(rs.getString("contato")) ? "CONTATO" : rs.getString("contato"), telefone, null, TipoContato.COMERCIAL, rs.getString("email"));
+                    if ((rs.getString("banco") != null)
+                            && (!rs.getString("banco").trim().isEmpty())) {
+                        observacao = "BANCO " + rs.getString("banco") + " ";
                     }
-
-                    if ((rst.getString("forfax") != null)
-                            && (!rst.getString("forfax").trim().isEmpty())) {
-                        imp.addContato(
-                                "1",
-                                "FAX",
-                                rst.getString("forfax"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
+                    if ((rs.getString("agencia") != null)
+                            && (!rs.getString("agencia").trim().isEmpty())) {
+                        observacao = observacao + "AGENCIA " + rs.getString("agencia") + " ";
                     }
-                    if ((rst.getString("forfax") != null)
-                            && (!rst.getString("forfax").trim().isEmpty())) {
-                        imp.addContato(
-                                "2",
-                                "EMAIL",
-                                null,
-                                null,
-                                TipoContato.COMERCIAL,
-                                rst.getString("foremail").toLowerCase().trim()
-                        );
-                    }
-                    vResult.add(imp);
+                    if ((rs.getString("conta") != null)
+                            && (!rs.getString("conta").trim().isEmpty())) {
+                        observacao = observacao + " CONTA " + rs.getString("conta");
+                    }                    
+                    imp.setObservacao(observacao);
+                   
+                    result.add(imp);
                 }
             }
         }
-        return vResult;
+        return result;
     }
 
     @Override
