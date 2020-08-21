@@ -24,6 +24,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -658,6 +659,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (!"".equals(obs4)) obs.append(!"".equals(obs.toString()) ? " -- " : "").append("OBS4 - ").append(obs4);
                     
                     imp.setObservacao2(obs.toString());
+                    imp.setObservacao("APELIDO " + imp.getFantasia());
                     imp.setDiaVencimento(rs.getInt("diavencimento"));
                     imp.setPrazoPagamento(rs.getInt("prazopagamento"));
                     imp.setEmail(rs.getString("email"));
@@ -739,68 +741,65 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
-        Utils util = new Utils();
-        String dataEmissao, dataDeposito;
-        java.sql.Date dataEmi = null, dataDep = null;
-        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "chrcgccpf, chrbanco, chragencia, chrconta, chrcheque, "
-                    + "chremissao, chrvencto, chrrazao, chrinscrg, chrvalor, "
-                    + "chrobserv1, chrobserv2, chrdtdeposito, chrpdv, chrtelefone "
-                    + "from CHQREC "
-                    + "where chrvlrpago = 0 "
-                    + "and chrpagamento = 0 "
-                    + "order by chremissao"
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.CHRCGCCPF cpf,\n" +
+                    "	c.CHRBANCO banco,\n" +
+                    "	c.CHRAGENCIA agencia,\n" +
+                    "	c.CHRCONTA conta,\n" +
+                    "	c.CHRCHEQUE numerocheque,\n" +
+                    "	c.CHREMISSAO dataemissao,\n" +
+                    "	c.CHRVENCTO datadeposito,\n" +
+                    "	c.CHRPDV pdv,\n" +
+                    "	c.CHRINSCRG rg,\n" +
+                    "	c.CHRDDD ddd,\n" +
+                    "	c.CHRTELEFONE telefone,\n" +
+                    "	c.CHRRAZAO nome,\n" +
+                    "	c.CHROBSERV1,\n" +
+                    "	c.CHROBSERV2,\n" +
+                    "	c.CHRJURODIA juros,\n" +
+                    "	c.CHRVALOR valor,\n" +
+                    "	case when c.CHRVLRPAGO >= c.CHRVALOR then 1 else 0 end pago\n" +
+                    "from\n" +
+                    "	CHQREC c\n" +
+                    "where\n" +
+                    "	c.CHRLOJA = 1\n" +
+                    "order by\n" +
+                    "	chremissao"
             )) {
-                while (rst.next()) {
-                    if ((rst.getString("chremissao") != null)
-                            && (!rst.getString("chremissao").trim().isEmpty())) {
-                        if (util.validarData(Integer.parseInt(rst.getString("chremissao").substring(4, 6)),
-                                Integer.parseInt(rst.getString("chremissao").substring(6, 8)))) {
-                            dataEmissao = rst.getString("chremissao").trim().substring(0, 4);
-                            dataEmissao = dataEmissao + "/" + rst.getString("chremissao").trim().substring(4, 6);
-                            dataEmissao = dataEmissao + "/" + rst.getString("chremissao").trim().substring(6, 8);
-                            dataEmi = new java.sql.Date(fmt.parse(dataEmissao).getTime());
-                        } else {
-                            dataEmissao = "";
-                        }
-                    } else {
-                        dataEmissao = "";
-                    }
-
-                    if ((rst.getString("chrdtdeposito") != null)
-                            && (!rst.getString("chrdtdeposito").trim().isEmpty())) {
-                        if (util.validarData(Integer.parseInt(rst.getString("chrdtdeposito").substring(4, 6)),
-                                Integer.parseInt(rst.getString("chrdtdeposito").substring(6, 8)))) {
-                            dataDeposito = rst.getString("chrdtdeposito").trim().substring(0, 4);
-                            dataDeposito = dataDeposito + "/" + rst.getString("chrdtdeposito").trim().substring(4, 6);
-                            dataDeposito = dataDeposito + "/" + rst.getString("chrdtdeposito").trim().substring(6, 8);
-                            dataDep = new java.sql.Date(fmt.parse(dataDeposito).getTime());
-                        } else {
-                            dataDeposito = "";
-                        }
-                    } else {
-                        dataDeposito = "";
-                    }
-
+                while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    imp.setId(rst.getString("chrcgccpf") + "-" + rst.getString("chrbanco") + "-"
-                            + rst.getString("chragencia") + "-" + rst.getString("chrconta") + "-" + rst.getString("chrcheque"));
-                    imp.setCpf(rst.getString("chrcgccpf"));
-                    imp.setRg(rst.getString("chrinscrg"));
-                    imp.setTelefone(rst.getString("chrtelefone"));
-                    imp.setNome(rst.getString("chrrazao"));
-                    imp.setDate("".equals(dataEmissao) ? new Date(new java.util.Date().getTime()) : dataEmi);
-                    imp.setDataDeposito("".equals(dataDeposito) ? new Date(new java.util.Date().getTime()) : dataDep);
-                    imp.setValor(rst.getDouble("chrvalor"));
-                    imp.setEcf(rst.getString("chrpdv"));
-                    imp.setNumeroCheque(rst.getString("chrcheque"));
-                    imp.setBanco(rst.getInt("chrbanco"));
-                    imp.setAgencia(rst.getString("chragencia"));
-                    imp.setConta(rst.getString("chrconta"));
-                    imp.setObservacao("IMPORTADO VR " + rst.getString("chrobserv2") + " " + rst.getString("chrobserv2"));
+                    imp.setId(String.format(
+                            "%s-%s-%s-%s-%s",
+                            rs.getString("cpf"),
+                            rs.getString("banco"),
+                            rs.getString("agencia"),
+                            rs.getString("conta"),
+                            rs.getString("numerocheque")
+                    ));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setNumeroCheque(rs.getString("numerocheque"));
+                    try {
+                        imp.setDate(fmt.parse(rs.getString("dataemissao")));
+                    } catch (ParseException ex ) {
+                        System.out.println(String.format("dataemissao inválido - ID: %s - %s", imp.getId(), rs.getString("dataemissao")));
+                    }
+                    try {
+                        imp.setDataDeposito(fmt.parse(rs.getString("datadeposito")));
+                    } catch (ParseException ex ) {
+                        System.out.println(String.format("datadeposito inválido - ID: %s - %s", imp.getId(), rs.getString("datadeposito")));
+                    }
+                    imp.setEcf(rs.getString("pdv"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setTelefone(formataTelefone(rs.getString("ddd"), rs.getString("telefone")));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setSituacaoCheque(rs.getBoolean("pago") ? SituacaoCheque.BAIXADO : SituacaoCheque.ABERTO);
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("CHROBSERV1") + " - " + rs.getString("CHROBSERV2"));
                     imp.setAlinea(0);
                     vResult.add(imp);
                 }
