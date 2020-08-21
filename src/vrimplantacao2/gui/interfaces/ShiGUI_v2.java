@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.ShiDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class ShiGUI_v2 extends VRInternalFrame {
@@ -70,7 +73,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
         params.salvar();
     }
 
-    private ShiDAO shiDAO = new ShiDAO();
+    private ShiDAO dao = new ShiDAO();
 
     private ShiGUI_v2(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -81,6 +84,31 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
+        tabProdutos.setOpcoesDisponiveis(dao);
+        
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {                
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+        
         carregarParametros();
 
         centralizarForm();
@@ -110,7 +138,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         if (tabsConn.getSelectedIndex() == 0) {
             if (!txtSFI.getArquivo().isEmpty()) {
-                shiDAO.setSfi(ConexaoFirebird.getNewConnection(
+                dao.setSfi(ConexaoFirebird.getNewConnection(
                         txtHost.getText(),
                         txtPorta.getInt(),
                         txtSFI.getArquivo(),
@@ -120,7 +148,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 ));
             }
             if (!txtCLI.getArquivo().isEmpty()) {
-                shiDAO.setCli(ConexaoFirebird.getNewConnection(
+                dao.setCli(ConexaoFirebird.getNewConnection(
                         txtHost.getText(),
                         txtPorta.getInt(),
                         txtCLI.getArquivo(),
@@ -130,7 +158,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 ));
             }
             if (!txtCUPOM.getArquivo().isEmpty()) {
-                shiDAO.setCupom(ConexaoFirebird.getNewConnection(
+                dao.setCupom(ConexaoFirebird.getNewConnection(
                         txtHost.getText(),
                         txtPorta.getInt(),
                         txtCUPOM.getArquivo(),
@@ -139,7 +167,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                         null
                 ));
             }
-            shiDAO.setSco(ConexaoFirebird.getNewConnection(
+            dao.setSco(ConexaoFirebird.getNewConnection(
                     txtHost.getText(),
                     txtPorta.getInt(),
                     txtSCO.getArquivo(),
@@ -173,7 +201,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : shiDAO.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -212,13 +240,16 @@ public class ShiGUI_v2 extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
 
-                    Importador importador = new Importador(shiDAO);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
-                    shiDAO.eFicha = chkTemFicha.isSelected();
+                    dao.eFicha = chkTemFicha.isSelected();
+                    tabProdutos.setImportador(importador);
 
                     if (tabs.getSelectedIndex() == 1) {
 
+                        tabProdutos.executarImportacao();
+                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -242,6 +273,10 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
                         if (chkTipoEmpresa.isSelected()) {
                             opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
+                        }
+                        
+                        if (chkFornTelefone.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.TELEFONE);
                         }
 
                         if (!opcoes.isEmpty()) {
@@ -268,13 +303,6 @@ public class ShiGUI_v2 extends VRInternalFrame {
                             importador.importarCheque();
                         }
 
-                        //if (chkNutricionalFilizola.isSelected()) {
-                        //    importador.importarNutricionalFilizola();
-                        //}
-                        //if (chkNutricionalToledo.isSelected()) {
-                        //importador.importarNutricionalToledo();
-                        //    shiDAO.importarNutricionalToledo();
-                        //}
                         if (chkConvEmpresa.isSelected()) {
                             importador.importarConvenioEmpresa();
                         }
@@ -291,8 +319,8 @@ public class ShiGUI_v2 extends VRInternalFrame {
                             if (edtVendaDtIni.getDate() == null || edtVendaDtFim.getDate() == null) {
                                 Util.exibirMensagem("Por favor, informe um intervalo de datas para importar as vendas", "Atenção");
                             } else {
-                                shiDAO.setDataInicioVenda(edtVendaDtIni.getDate());
-                                shiDAO.setDataTerminoVenda(edtVendaDtFim.getDate());
+                                dao.setDataInicioVenda(edtVendaDtIni.getDate());
+                                dao.setDataTerminoVenda(edtVendaDtFim.getDate());
                                 importador.importarHistoricoVendas(false);
                             }
                         }
@@ -301,8 +329,8 @@ public class ShiGUI_v2 extends VRInternalFrame {
                             if (edtVendaDtIni.getDate() == null || edtVendaDtFim.getDate() == null) {
                                 Util.exibirMensagem("Por favor, informe um intervalo de datas para importar as vendas", "Atenção");
                             } else {
-                                shiDAO.setDataInicioVenda(edtVendaDtIni.getDate());
-                                shiDAO.setDataTerminoVenda(edtVendaDtFim.getDate());
+                                dao.setDataInicioVenda(edtVendaDtIni.getDate());
+                                dao.setDataTerminoVenda(edtVendaDtFim.getDate());
                                 importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                             }
                         }
@@ -380,6 +408,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
         chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkFContasPagar = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornTelefone = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -615,6 +644,8 @@ public class ShiGUI_v2 extends VRInternalFrame {
             }
         });
 
+        chkFornTelefone.setText("Telefone");
+
         javax.swing.GroupLayout tabFornecedoresLayout = new javax.swing.GroupLayout(tabFornecedores);
         tabFornecedores.setLayout(tabFornecedoresLayout);
         tabFornecedoresLayout.setHorizontalGroup(
@@ -630,8 +661,9 @@ public class ShiGUI_v2 extends VRInternalFrame {
                     .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(chkFContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(589, Short.MAX_VALUE))
         );
         tabFornecedoresLayout.setVerticalGroup(
             tabFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -649,7 +681,9 @@ public class ShiGUI_v2 extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFornTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 148, Short.MAX_VALUE)
                 .addComponent(chkFContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -702,7 +736,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(135, Short.MAX_VALUE))
+                .addContainerGap(224, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -752,7 +786,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(163, Short.MAX_VALUE))
+                .addContainerGap(252, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Convênio", tabConvenio);
@@ -801,7 +835,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(edtVendaDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(164, Short.MAX_VALUE))
+                .addContainerGap(249, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Vendas", vRPanel1);
@@ -845,7 +879,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(140, Short.MAX_VALUE))
+                .addContainerGap(229, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", tabUnificacao);
@@ -903,7 +937,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 295, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -990,6 +1024,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkHistoricoVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
@@ -1042,21 +1077,21 @@ public class ShiGUI_v2 extends VRInternalFrame {
     // End of variables declaration//GEN-END:variables
 
     private void desconectar() throws SQLException {
-        if (shiDAO.getSco() != null) {
-            shiDAO.getSco().close();
-            shiDAO.setSco(null);
+        if (dao.getSco() != null) {
+            dao.getSco().close();
+            dao.setSco(null);
         }
-        if (shiDAO.getCli() != null) {
-            shiDAO.getCli().close();
-            shiDAO.setCli(null);
+        if (dao.getCli() != null) {
+            dao.getCli().close();
+            dao.setCli(null);
         }
-        if (shiDAO.getSfi() != null) {
-            shiDAO.getSfi().close();
-            shiDAO.setSfi(null);
+        if (dao.getSfi() != null) {
+            dao.getSfi().close();
+            dao.setSfi(null);
         }
-        if (shiDAO.getCupom() != null) {
-            shiDAO.getCupom().close();
-            shiDAO.setCupom(null);
+        if (dao.getCupom() != null) {
+            dao.getCupom().close();
+            dao.setCupom(null);
         }
     }
 

@@ -209,6 +209,7 @@ import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.SavGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI;
+import vrimplantacao2.gui.interfaces.ShiGUI_v2;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareMySqlGUI;
@@ -3170,7 +3171,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
     private void jMenuItemSHIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSHIActionPerformed
-        ShiGUI.exibir(this);
+        ShiGUI_v2.exibir(this);
     }//GEN-LAST:event_jMenuItemSHIActionPerformed
 
     private void jMenuItemGetWayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGetWayActionPerformed
