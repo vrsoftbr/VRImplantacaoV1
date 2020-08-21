@@ -99,7 +99,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
+                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
+                    OpcaoProduto.CODIGO_BENEFICIO
                 }
         ));
     }
@@ -285,8 +286,9 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    icm.tabicm_pbc icms_reducao_debito,\n"
                     + "    tipo_prod as tipoproduto,\n"
                     + "    p.icm_mva,\n"
-                    + "    p.tabicm\n"
-                    + "from\n" + "    est_produtos p\n"
+                    + "    p.tabicm,\n"
+                    + "    p.cbenef beneficio\n"        
+                    + "from est_produtos p\n"
                     + "left join est_atual e on p.id_produto = e.id_produto and\n"
                     + "    e.id_loja = " + getLojaOrigem() + "\n"
                     + "left join tab_icm icm on p.tabicm = icm.id_tabicm\n"
@@ -357,6 +359,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(icmsCre);
 
                     imp.setPautaFiscalId(imp.getImportId());
+                    imp.setBeneficio(rs.getString("beneficio"));
 
                     result.add(imp);
                 }

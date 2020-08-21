@@ -36,8 +36,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.PRODUTOS,
@@ -123,8 +123,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "    distinct\n" +
-                    "    lo.i_contador merc1,\n" +
-                    "    LO.SLOCALIZA descmerc1,\n" +
+                    "    coalesce(lo.i_contador, 1) merc1,\n" +
+                    "    coalesce(LO.SLOCALIZA, 'SEM DESC') descmerc1,\n" +
                     "    L.i_contador merc2,\n" +
                     "    L.A_LINHAPRO descmerc2,\n" +
                     "    s.i_contador merc3,\n" +
@@ -141,7 +141,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());                 
+                    imp.setImportLoja(getLojaOrigem()); 
+                    
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -224,6 +225,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.seteBalanca("SIM".equals(rs.getString("pesavel")));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
@@ -297,6 +300,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));

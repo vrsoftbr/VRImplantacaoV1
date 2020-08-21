@@ -578,11 +578,21 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaida(rs.getDouble("icms_aliquota"));
                     imp.setIcmsCstSaida(rs.getInt("icms_cst"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_reduzido"));
+                    
+                    //Aliquota Consumidor
+                    imp.setIcmsAliqConsumidor(rs.getDouble("icms_aliquota"));
+                    imp.setIcmsCstConsumidor(rs.getInt("icms_cst"));
+                    imp.setIcmsReducaoConsumidor(rs.getDouble("icms_reduzido"));
 
                     //Aliquota Credito
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_aliquota_credito"));
                     imp.setIcmsCstEntrada(rs.getInt("icms_cst_credito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_reduzido_credito"));
+                    
+                    //Aliquota Credito
+                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_aliquota_credito"));
+                    imp.setIcmsCstEntradaForaEstado(rs.getInt("icms_cst_credito"));
+                    imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("icms_reduzido_credito"));
 
                     result.add(imp);
                 }
