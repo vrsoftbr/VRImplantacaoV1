@@ -300,7 +300,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.GERPESOBRT pesobruto,\n" +
                     "	p.GERPESOLIQ pesoliquido,\n" +
                     "	est.LITESTQMIN estoqueminimo,\n" +
-                    "	est.LITESTQL estoque,\n" +
+                    "	est.LITESTQD estoque,\n" +
                     "	est.LITMRGVEN1 margem,\n" +
                     "	est.LITCUSREP custocomimposto,\n" +
                     "	est.LITCUSREP custosemimposto,\n" +
@@ -372,8 +372,8 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setCustoAnteriorComImposto(rs.getDouble("custocomimposto"));
-                    imp.setCustoAnteriorSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setCustoMedio(rs.getDouble("customedio"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setTeclaAssociada(rs.getInt("teclassociada"));
