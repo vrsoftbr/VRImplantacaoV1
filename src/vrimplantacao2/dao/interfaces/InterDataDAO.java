@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -233,7 +234,7 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rs.getInt("validade"));
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setEstoque(rs.getDouble("estoque"));
