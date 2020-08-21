@@ -387,7 +387,10 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     } catch (ParseException ex) {
                         System.out.println("Data inválida FORALINHA - id:" + imp.getImportId() + " - " + rs.getString("saidadelinha"));
                     }
-                    imp.setNcm(Utils.formataNumero(rs.getString("ncm")).substring(0, 8));
+                    String ncm = Utils.formataNumero(rs.getString("ncm"));
+                    if (ncm.length() == 10)
+                        ncm = "0" + ncm;
+                    imp.setNcm(ncm.substring(0, 8));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofins_saida"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_entrada"));
