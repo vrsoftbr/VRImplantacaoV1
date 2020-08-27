@@ -30,6 +30,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
@@ -73,15 +74,19 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    codigoenti id,\n"
-                    + "    apeltarefa razao\n"
-                    + "from\n"
-                    + "    fl060loj\n"
-                    + "order by\n"
-                    + "    1")) {
+                    "select\n" +
+                    "    lj.codigoenti id,\n" +
+                    "    rtrim(ltrim(cpf.NOMAPELIDO)) nome,\n" +
+                    "    rtrim(ltrim(cpf.NUMCGC_CPF)) cnpj\n" +
+                    "from\n" +
+                    "    fl060loj lj\n" +
+                    "    join FLCGCCPF cpf on\n" +
+                    "    	lj.CODCGCCPFS = cpf.CODIGOENTI\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
                 while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("razao")));
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("nome") + " - " + rs.getString("cnpj")));
                 }
             }
         }
@@ -297,7 +302,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "declare @loja integer = " + getLojaOrigem() + ";\n" +
-                    "select \n" +
+                    "declare @crt integer = 0;\n" +
+                    "select\n" +
+                    "	v.codigoloja,\n" +
                     "	p.codigoplu id, \n" +
                     "	case  \n" +
                     "		when p.estc13codi = '' then p.codigoplu  \n" +
@@ -331,7 +338,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "	pis_s.cstpis pis_cst_s,\n" +
                     "	pis_e.cstpis pis_cst_e,\n" +
                     "	pis_s.nat_rec_pis pis_natrec,\n" +
-                    "	coalesce(ext.tipo_item,'') tipo_item\n" +
+                    "	coalesce(ext.tipo_item,'') tipo_item,\n" +
+                    "	p.CODIGOENTI fabricante,\n" +
+                    "	p.comprador\n" +
                     "from\n" +
                     "	fl300est p\n" +
                     "	join fl304ven v on \n" +
@@ -348,12 +357,18 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "	left join fltabncm_pis pis_e on\n" +
                     "		ncm.codigoplu = p.codigoplu and\n" +
                     "		ncm.cod_ncm = pis_e.codigo and\n" +
-                    "		pis_e.id_opera = 1\n" +
+                    "		pis_e.id_opera = 1 and\n" +
+                    "		pis_e.ID_CRT = @crt and\n" +
+                    "		pis_e.ID_VALI = 0 and\n" +
+                    "		pis_e.ID_EXCE = 0\n" +
                     "	left join fltabncm_pis pis_s on\n" +
                     "		ncm.codigoplu = p.codigoplu and\n" +
                     "		ncm.cod_ncm = pis_s.codigo and\n" +
-                    "		pis_s.id_opera = 21\n" +
-                    "	join fl301est est on \n" +
+                    "		pis_s.id_opera = 21 and \n" +
+                    "		pis_s.ID_CRT = @crt and\n" +
+                    "		pis_s.ID_VALI = 0 and\n" +
+                    "		pis_s.ID_EXCE = 0\n" +
+                    "	left join fl301est est on \n" +
                     "		p.codigoplu = est.codigoplu and\n" +
                     "		est.codigoloja = v.codigoloja\n" +
                     "	left join (\n" +
@@ -369,7 +384,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "	left join FL300EXT ext on\n" +
                     "           ext.codigoplu = p.codigoplu\n" +
                     "order by\n" +
-                    "	p.codigoplu"
+                    "	id"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -424,11 +439,42 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<CompradorIMP> getCompradores() throws Exception {
+        List<CompradorIMP> result= new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	cp.CODIGOENTI id,\n" +
+                        "	ent.NOMEENTIDA nome,\n" +
+                        "	ent.NOMAPELIDO apelido\n" +
+                        "from\n" +
+                        "	FL010COM cp\n" +
+                        "	join FLCGCCPF ent on\n" +
+                        "		cp.ID_ENTIDADE = ent.ID_ENTIDADE\n" +
+                        "order by\n" +
+                        "	cp.CODIGOENTI"
+                )
+        ) {
+            while (rs.next()) {
+                result.add(new CompradorIMP(rs.getString("id"), rs.getString("nome")));
+            }
+        }
+        
+        return result;
+    }
+    
+    
+
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
@@ -454,7 +500,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
-                OpcaoProduto.TIPO_PRODUTO
+                OpcaoProduto.TIPO_PRODUTO,
+                OpcaoProduto.COMPRADOR,
+                OpcaoProduto.COMPRADOR_PRODUTO
         ));
     }
 
@@ -472,10 +520,11 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "	f.datusucada datacadastro,\n" +
                     "	cpf.nomeentida razao,\n" +
                     "	cpf.nomapelido fantasia,\n" +
-                    "	cpf.codinsc_rg rgie,\n" +
                     "	cpf.numcgc_cpf cnpj,\n" +
+                    "	cpf.codinsc_rg rgie,\n" +
+                    "   f.FORC01TIOP ativo,\n" +
                     "	cpf.tipempresa tipo,\n" +
-                    "	cpf.microempre,\n" +
+                    "	coalesce(cpf.microempre, '') microempre,\n" +
                     "	cpf.datanascim datanascimento,\n" +
                     "	coalesce(cpf.codcepcome,'') cep,\n" +
                     "	coalesce(cpf.codcepcobr,'') cep_cob,\n" +
@@ -508,7 +557,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "	f.codigoenti"
             )) {                
                 String msg = "Gerando lista de importação de fornecedores...";
-                int cont = 1;
+                int cont = 1;                
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportSistema(getSistema());
@@ -543,7 +592,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         if (end != null) {
                             end.numero = rs.getString("numero");
                         } else {
-                            LOG.warning("Fornecedor sem endereço: " + imp.getImportId() + " - " + imp.getRazao());
+                            LOG.log(Level.WARNING, "Fornecedor sem endereço: {0} - {1}", new Object[]{imp.getImportId(), imp.getRazao()});
                         }
                     }                    
                     
@@ -1164,11 +1213,11 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
+        private final Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private final ResultSet rst;
+        private final String sql;
         private VendaIMP next;
-        private Set<String> uk = new HashSet<>();
+        private final Set<String> uk = new HashSet<>();
 
         private void obterNext() {
             try {
@@ -1179,7 +1228,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         next = new VendaIMP();
                         String id = rst.getString("id");
                         if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
+                            LOG.log(Level.WARNING, "Venda {0} já existe na listagem", id);
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
@@ -1207,7 +1256,6 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 }
             } catch (SQLException | ParseException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
-                ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
         }
@@ -1248,7 +1296,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "	cast(c.datamovime as date) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
                     + "order by\n"
                     + "	c.datamovime, c.numerocupo";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
 
@@ -1274,9 +1322,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
-        private ResultSet rst;
-        private String sql;
+        private final Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private final ResultSet rst;
+        private final String sql;
         private VendaItemIMP next;
 
         private void obterNext() {
@@ -1288,7 +1336,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         next.setId(rst.getString("id"));
                         next.setVenda(rst.getString("id_venda"));
                         String id = rst.getString("id_produto");
-                        next.setCancelado(rst.getInt("cancelado") == 1 ? true : false);
+                        next.setCancelado(rst.getInt("cancelado") == 1);
                         id = id.substring(0, id.length() - 1);
                         next.setProduto(id);
                         if (rst.getString("id_produto").equals(rst.getString("codigobarras"))) {
@@ -1341,7 +1389,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "	(it.datamovime between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23))\n"
                     + "order by\n"
                     + "	it.codi_relacio, it.id_item";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
 
@@ -1373,6 +1421,16 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         String cidade;
         String estado;
         String cep;
+    }
+    
+    private static class Telefone {
+        int id;
+        String fone1;
+        String fone2;
+        String fax;
+        String celular;
+        String foneEmpresa;
+        String faxEmpresa;
     }
 
 }

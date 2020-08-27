@@ -1,7 +1,9 @@
 package vrimplantacao2.vo.importacao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.Factory;
@@ -54,10 +56,7 @@ public class FornecedorIMP {
     private Date datacadastro;
     private String observacao;
     
-    private int prazoEntrega = 0;
     private int prazoPedido = 0;
-    private int prazoVisita = 0;
-    private int prazoSeguranca = 0;
     private String idDivisao;
     
     private Set<Integer> condicoesPagamentos = new LinkedHashSet<>();
@@ -104,19 +103,7 @@ public class FornecedorIMP {
             }
     );
     
-    private final MultiMap<String, FornecedorDivisaoIMP> divisoes = new MultiMap<>(
-            new Factory<FornecedorDivisaoIMP>() {
-                @Override
-                public FornecedorDivisaoIMP make() {
-                    FornecedorDivisaoIMP ret = new FornecedorDivisaoIMP();
-                    ret.setImportSistema(FornecedorIMP.this.getImportSistema());
-                    ret.setImportLoja(FornecedorIMP.this.getImportLoja());
-                    ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
-                    
-                    return ret;
-                }
-            }
-    );
+    private final List<FornecedorDivisaoIMP> divisoes = new ArrayList<>();
     
     private final MultiMap<String, FornecedorPagamentoIMP> pagamentos = new MultiMap<>(
             new Factory<FornecedorPagamentoIMP>() {
@@ -268,15 +255,18 @@ public class FornecedorIMP {
     }
 
     public int getPrazoEntrega() {
-        return prazoEntrega;
+        if (getDivisoes().isEmpty()) return 0;
+        return getDivisoes().get(0).getPrazoEntrega();
     }
 
     public int getPrazoSeguranca() {
-        return prazoSeguranca;
+        if (getDivisoes().isEmpty()) return 0;
+        return getDivisoes().get(0).getPrazoSeguranca();
     }
 
     public int getPrazoVisita() {
-        return prazoVisita;
+        if (getDivisoes().isEmpty()) return 0;
+        return getDivisoes().get(0).getPrazoVisita();
     }
 
     public TipoFornecedor getTipoFornecedor() {
@@ -427,7 +417,7 @@ public class FornecedorIMP {
         return pagamentos;
     }
     
-    public MultiMap<String, FornecedorDivisaoIMP> getDivisoes() {
+    public List<FornecedorDivisaoIMP> getDivisoes() {
         return divisoes;
     }
 
@@ -436,15 +426,24 @@ public class FornecedorIMP {
     }
 
     public void setPrazoEntrega(int prazoEntrega) {
-        this.prazoEntrega = prazoEntrega < 0 ? 0 : prazoEntrega;
+        if (getDivisoes().isEmpty()) {
+            addDivisao("VR", 0, 0, 0);
+        }
+        getDivisoes().get(0).setPrazoEntrega(prazoEntrega < 0 ? 0 : prazoEntrega);
     }
 
     public void setPrazoSeguranca(int prazoSeguranca) {
-        this.prazoSeguranca = prazoSeguranca < 0 ? 0 : prazoSeguranca;
+        if (getDivisoes().isEmpty()) {
+            addDivisao("VR", 0, 0, 0);
+        }
+        getDivisoes().get(0).setPrazoSeguranca(prazoSeguranca < 0 ? 0 : prazoSeguranca);
     }
 
     public void setPrazoVisita(int prazoVisita) {
-        this.prazoVisita = prazoVisita < 0 ? 0 : prazoVisita;
+        if (getDivisoes().isEmpty()) {
+            addDivisao("VR", 0, 0, 0);
+        }
+        getDivisoes().get(0).setPrazoVisita(prazoVisita < 0 ? 0 : prazoVisita);
     }
 
     public void setTipoFornecedor(TipoFornecedor tipoFornecedor) {
@@ -509,7 +508,7 @@ public class FornecedorIMP {
     */    
     public FornecedorDivisaoIMP addDivisao(String id, int prazoVisita, int prazoEntrega, int prazoSeguranca) {
         
-        FornecedorDivisaoIMP div = divisoes.make(id);
+        FornecedorDivisaoIMP div = new FornecedorDivisaoIMP();
         div.setImportSistema(getImportSistema());
         div.setImportLoja(getImportLoja());
         div.setImportFornecedorId(getImportId());
@@ -517,6 +516,7 @@ public class FornecedorIMP {
         div.setPrazoEntrega(prazoEntrega);
         div.setPrazoSeguranca(prazoSeguranca);
         div.setPrazoVisita(prazoVisita);
+        this.divisoes.add(div);
         return div;
     }
     
@@ -574,7 +574,7 @@ public class FornecedorIMP {
      */
     public FornecedorContatoIMP addCelular(String descricao, String celular) {
         celular = Utils.stringLong(celular);
-        if (celular != null && !"0".equals(celular.trim())) {
+        if (celular != null && !"0".equals(celular.trim()) && celular.trim().length() > 3) {
             return addContato(descricao, "", celular, TipoContato.COMERCIAL, "");
         } else {
             return null;
@@ -590,7 +590,7 @@ public class FornecedorIMP {
      */
     public FornecedorContatoIMP addTelefone(String descricao, String telefone) {
         telefone = Utils.stringLong(telefone);
-        if (telefone != null && !"0".equals(telefone.trim())) {
+        if (telefone != null && !"0".equals(telefone.trim()) && telefone.trim().length() > 3) {
             return addContato(descricao, telefone, "", TipoContato.COMERCIAL, "");
         } else {
             return null;
