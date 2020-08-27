@@ -414,7 +414,11 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     
                     imp.setIcmsDebitoId(rs.getString("codtribsai"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("codtribsai"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("codtribsai"));
+                    imp.setIcmsConsumidorId(rs.getString("codtribsai"));
                     imp.setIcmsCreditoId(rs.getString("codtribent"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("codtribent"));
                     
                     switch (rs.getString("tipo_item")) {
                         case "02": imp.setTipoProduto(TipoProduto.EMBALAGEM); break;
@@ -429,7 +433,10 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rs.getString("pis_natrec"));
                     imp.setCest(rs.getString("cest"));
                     imp.seteBalanca("S".equals(rs.getString("pesavel")));
-                    imp.setValidade(rs.getInt("validade"));                    
+                    imp.setValidade(rs.getInt("validade"));
+                    
+                    imp.setIdComprador(rs.getString("comprador"));
+                    imp.setFornecedorFabricante(rs.getString("fabricante"));
 
                     result.add(imp);
                 }
@@ -498,11 +505,18 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.TIPO_PRODUTO,
                 OpcaoProduto.COMPRADOR,
-                OpcaoProduto.COMPRADOR_PRODUTO
+                OpcaoProduto.COMPRADOR_PRODUTO,
+                OpcaoProduto.FABRICANTE
         ));
     }
 
