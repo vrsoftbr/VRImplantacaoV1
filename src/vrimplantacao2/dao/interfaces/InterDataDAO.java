@@ -372,7 +372,7 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "    pagar p\n" +
                     "where\n" +
-                    "    p.a_pagueicont = 'NÃO'\n" +
+                    "    p.a_pagueicont = 'NÃO' and p.a_situacao = 'ATIVA'\n" +
                     "order by\n" +
                     "    p.d_venciconta")) {
                 while(rs.next()) {
@@ -381,18 +381,26 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
+                    imp.setNumeroDocumento(Utils.formataNumero(rs.getString("documento")));
+                    
+                    if(imp.getNumeroDocumento() != null && !"".equals(imp.getNumeroDocumento())) {
+                        if(imp.getNumeroDocumento().length() > 8) {
+                            imp.setNumeroDocumento(imp.getNumeroDocumento().substring(0, 8));
+                        }
+                    }
+                    
                     imp.setObservacao(rs.getString("obs"));
                     
                     String parcela = rs.getString("parcela");
                     
                     String parc[] = parcela.split("/");
                     
+                    imp.setNumeroDocumento(imp.getNumeroDocumento() + parc[0]);
+                    
                     imp.addVencimento(
                             rs.getDate("vencimento"), 
                             rs.getDouble("valor"),
-                            TipoPagamento.BOLETO_BANCARIO,
-                            Integer.parseInt(parc[0]));
+                            TipoPagamento.BOLETO_BANCARIO);
                     
                     result.add(imp);
                 }
