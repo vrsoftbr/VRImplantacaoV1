@@ -5,13 +5,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
@@ -24,6 +22,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.HRTechDAO_v2;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -41,12 +40,7 @@ public class HRTechGUI_v2 extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
-        txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
-        txtDatabase.setText(params.getWithNull("HRTECH", SISTEMA, "DATABASE"));
-        txtPorta.setText(params.getWithNull("1433", SISTEMA, "PORTA"));
-        txtUsuario.setText(params.getWithNull("sa", SISTEMA, "USUARIO"));
-        txtSenha.setText(params.getWithNull("HR", SISTEMA, "SENHA"));
-        txtCodConvenio.setText(params.getWithNull("000001", SISTEMA, "COD_CONVENIO"));
+        conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -54,12 +48,7 @@ public class HRTechGUI_v2 extends VRInternalFrame {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
-        params.put(txtHost.getText(), SISTEMA, "HOST");
-        params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
-        params.put(txtPorta.getText(), SISTEMA, "PORTA");
-        params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
-        params.put(txtSenha.getText(), SISTEMA, "SENHA");
-        params.put(txtCodConvenio.getText(), SISTEMA, "COD_CONVENIOs");
+        conexao.atualizarParametros();
 
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -79,6 +68,23 @@ public class HRTechGUI_v2 extends VRInternalFrame {
         initComponents();        
         this.title = "Importação " + SISTEMA;
         centralizarForm();
+        conexao.setSistema(SISTEMA);
+        conexao.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                gravarParametros();
+                carregarLojaCliente();
+                carregarLojaVR();
+                tabProdutos.btnMapaTribut.setEnabled(true);
+            }
+        });
+        
+        conexao.database = "HRTech";
+        conexao.host = "localhost";
+        conexao.user = "sa";
+        conexao.pass = "HR";
+        conexao.port = "1433";
+        
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
@@ -107,36 +113,6 @@ public class HRTechGUI_v2 extends VRInternalFrame {
         tabProdutos.btnMapaTribut.setEnabled(false);
         this.setMaximum(false);
         carregarParametros();
-    }
-
-    public void validarDadosAcesso() throws Exception {
-        if (tabsConn.getSelectedIndex() == 0) {
-            if (txtHost.getText().isEmpty()) {
-                throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL + "!");
-            }
-            if (txtPorta.getText().isEmpty()) {
-                throw new VRException("Favor informar a porta do banco de dados " + SERVIDOR_SQL + "!");
-            }
-            if (txtDatabase.getText().isEmpty()) {
-                throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
-            }
-        }
-        if (txtSenha.getText().isEmpty()) {
-            throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL + "!");
-        }
-        if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL + "!");
-        }
-
-        if (tabsConn.getSelectedIndex() == 0) {
-            connSqlServer.abrirConexao(txtHost.getText(), txtPorta.getInt(),
-                    txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
-        }
-
-        gravarParametros();
-        carregarLojaCliente();
-        carregarLojaVR();
-        tabProdutos.btnMapaTribut.setEnabled(true);
     }
 
     public void carregarLojaCliente() throws Exception {
@@ -313,13 +289,16 @@ public class HRTechGUI_v2 extends VRInternalFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         vRTextArea1 = new vrframework.bean.textArea.VRTextArea();
-        vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabsImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
+        pnlAdicionais = new vrframework.bean.panel.VRPanel();
+        pnlBal = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        txtCodConvenio = new vrframework.bean.textField.VRTextField();
+        lblLoja1 = new vrframework.bean.label.VRLabel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedores = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -348,29 +327,11 @@ public class HRTechGUI_v2 extends VRInternalFrame {
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel5 = new vrframework.bean.panel.VRPanel();
-        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
-        vRPanel6 = new vrframework.bean.panel.VRPanel();
-        txtUsuario = new vrframework.bean.textField.VRTextField();
-        txtSenha = new vrframework.bean.passwordField.VRPasswordField();
-        vRLabel20 = new vrframework.bean.label.VRLabel();
-        vRLabel21 = new vrframework.bean.label.VRLabel();
-        btnConectar = new javax.swing.JToggleButton();
-        tabsConn = new javax.swing.JTabbedPane();
-        pnlConexao = new javax.swing.JPanel();
-        txtHost = new vrframework.bean.textField.VRTextField();
-        vRLabel23 = new vrframework.bean.label.VRLabel();
-        txtPorta = new vrframework.bean.textField.VRTextField();
-        vRLabel24 = new vrframework.bean.label.VRLabel();
-        vRLabel25 = new vrframework.bean.label.VRLabel();
-        vRTextField1 = new vrframework.bean.textField.VRTextField();
-        txtDatabase = new javax.swing.JTextField();
-        vRLabel26 = new vrframework.bean.label.VRLabel();
-        txtCodConvenio = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        cmbLojaOrigem = new javax.swing.JComboBox();
-        lblLoja = new vrframework.bean.label.VRLabel();
         txtLojaMesmoID = new vrframework.bean.textField.VRTextField();
+        lblLoja = new vrframework.bean.label.VRLabel();
+        cmbLojaOrigem = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
 
         vRTextArea1.setColumns(20);
         vRTextArea1.setRows(5);
@@ -378,9 +339,6 @@ public class HRTechGUI_v2 extends VRInternalFrame {
 
         setTitle("Importação HRTech");
         setToolTipText("");
-
-        vRToolBarPadrao3.setRollover(true);
-        vRToolBarPadrao3.setVisibleImportar(true);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMigrar.setText("Migrar");
@@ -420,7 +378,39 @@ public class HRTechGUI_v2 extends VRInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Produtos", tabProdutos);
+        pnlBal.setLoja("00001");
+        pnlBal.setSistema("HRTech");
+
+        lblLoja1.setText("Cód. Convênio");
+
+        javax.swing.GroupLayout pnlAdicionaisLayout = new javax.swing.GroupLayout(pnlAdicionais);
+        pnlAdicionais.setLayout(pnlAdicionaisLayout);
+        pnlAdicionaisLayout.setHorizontalGroup(
+            pnlAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlAdicionaisLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(pnlBal, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(pnlAdicionaisLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblLoja1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCodConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlAdicionaisLayout.setVerticalGroup(
+            pnlAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlAdicionaisLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblLoja1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCodConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlBal, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE))
+        );
+
+        tabsImportacao.addTab("Parâmetros", pnlAdicionais);
+        tabsImportacao.addTab("Produtos", tabProdutos);
 
         tabFornecedores.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -531,10 +521,10 @@ public class HRTechGUI_v2 extends VRInternalFrame {
                 .addComponent(chkFUtilizaNfe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Fornecedores", tabFornecedores);
+        tabsImportacao.addTab("Fornecedores", tabFornecedores);
 
         chkClienteEventual.setText("Cliente Eventual");
 
@@ -642,12 +632,12 @@ public class HRTechGUI_v2 extends VRInternalFrame {
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Clientes", tabClientes);
+        tabsImportacao.addTab("Clientes", tabClientes);
 
-        tabs.addTab("Importação", vRTabbedPane2);
+        tabs.addTab("Importação", tabsImportacao);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
@@ -681,130 +671,12 @@ public class HRTechGUI_v2 extends VRInternalFrame {
                 .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(114, Short.MAX_VALUE))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
 
-        vRImportaArquivBalancaPanel1.setSistema("GetWay");
-
-        javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
-        vRPanel5.setLayout(vRPanel5Layout);
-        vRPanel5Layout.setHorizontalGroup(
-            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel5Layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        vRPanel5Layout.setVerticalGroup(
-            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(107, Short.MAX_VALUE))
-        );
-
-        tabs.addTab("Pesável", vRPanel5);
-
-        vRPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Sql Server"));
-        vRPanel6.setPreferredSize(new java.awt.Dimension(350, 350));
-
-        txtUsuario.setText("gwuniao");
-        txtUsuario.setCaixaAlta(false);
-        txtUsuario.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtUsuarioActionPerformed(evt);
-            }
-        });
-
-        txtSenha.setText("gwuniao");
-        txtSenha.setCaixaAlta(false);
-        txtSenha.setMascara("");
-        txtSenha.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSenhaActionPerformed(evt);
-            }
-        });
-
-        vRLabel20.setText("Usuário:");
-
-        vRLabel21.setText("Senha:");
-
-        btnConectar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
-        btnConectar.setText("Conectar");
-        btnConectar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConectarActionPerformed(evt);
-            }
-        });
-
-        txtHost.setText("192.168.1.100");
-        txtHost.setCaixaAlta(false);
-
-        vRLabel23.setText("Porta");
-
-        txtPorta.setText("1433");
-        txtPorta.setCaixaAlta(false);
-        txtPorta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPortaActionPerformed(evt);
-            }
-        });
-
-        vRLabel24.setText("Host");
-
-        vRLabel25.setText("Banco de Dados");
-
-        vRTextField1.setText("vRTextField1");
-
-        vRLabel26.setText("Cód. Convênio");
-
-        javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
-        pnlConexao.setLayout(pnlConexaoLayout);
-        pnlConexaoLayout.setHorizontalGroup(
-            pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCodConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2))
-        );
-        pnlConexaoLayout.setVerticalGroup(
-            pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlConexaoLayout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCodConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        tabsConn.addTab("Dados da conexão", pnlConexao);
-
-        jLabel2.setText("Loja Origem");
+        lblLoja.setText("Complemento");
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
@@ -813,58 +685,9 @@ public class HRTechGUI_v2 extends VRInternalFrame {
             }
         });
 
-        lblLoja.setText("Loja ID (Cliente)");
+        jLabel2.setText("Loja Origem");
 
-        javax.swing.GroupLayout vRPanel6Layout = new javax.swing.GroupLayout(vRPanel6);
-        vRPanel6.setLayout(vRPanel6Layout);
-        vRPanel6Layout.setHorizontalGroup(
-            vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabsConn)
-                    .addGroup(vRPanel6Layout.createSequentialGroup()
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(vRPanel6Layout.createSequentialGroup()
-                                .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnConectar))
-                            .addGroup(vRPanel6Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap())
-        );
-        vRPanel6Layout.setVerticalGroup(
-            vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel6Layout.createSequentialGroup()
-                .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(lblLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConectar)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        conexao.setSistema("HRTech");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -873,26 +696,39 @@ public class HRTechGUI_v2 extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(lblLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
+                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2))
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {cmbLojaOrigem, jLabel2, lblLoja, txtLojaMesmoID});
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -916,42 +752,14 @@ public class HRTechGUI_v2 extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkProdutoFornecedorActionPerformed
 
-    private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtUsuarioActionPerformed
-
-    private void txtSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtSenhaActionPerformed
-
-    private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
-        try {
-            this.setWaitCursor();
-            if (connSqlServer != null) {
-                connSqlServer.close();
-            }
-            validarDadosAcesso();
-            btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_btnConectarActionPerformed
-
-    private void txtPortaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPortaActionPerformed
-
     private void chkFContatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContatosActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFContatosActionPerformed
 
     private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
-        Estabelecimento est = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
-        if (est != null) {
-            //vRImportaArquivBalancaPanel1.setLoja(est.cnpj);
-        }
+        dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+        pnlBal.setSistema(dao.getSistema());
+        pnlBal.setLoja(dao.getLojaOrigem());
     }//GEN-LAST:event_cmbLojaOrigemActionPerformed
 
     private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
@@ -991,7 +799,6 @@ public class HRTechGUI_v2 extends VRInternalFrame {
     }//GEN-LAST:event_chkFCondicaoPagamentoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -1015,42 +822,28 @@ public class HRTechGUI_v2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private vrframework.bean.label.VRLabel lblLoja;
-    private javax.swing.JPanel pnlConexao;
+    private vrframework.bean.label.VRLabel lblLoja1;
+    private vrframework.bean.panel.VRPanel pnlAdicionais;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBal;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedores;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
-    private javax.swing.JTabbedPane tabsConn;
-    private javax.swing.JTextField txtCodConvenio;
-    private javax.swing.JTextField txtDatabase;
-    private vrframework.bean.textField.VRTextField txtHost;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabsImportacao;
+    private vrframework.bean.textField.VRTextField txtCodConvenio;
     private vrframework.bean.textField.VRTextField txtLojaMesmoID;
-    private vrframework.bean.textField.VRTextField txtPorta;
-    private vrframework.bean.passwordField.VRPasswordField txtSenha;
-    private vrframework.bean.textField.VRTextField txtUsuario;
-    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
-    private vrframework.bean.label.VRLabel vRLabel20;
-    private vrframework.bean.label.VRLabel vRLabel21;
-    private vrframework.bean.label.VRLabel vRLabel23;
-    private vrframework.bean.label.VRLabel vRLabel24;
-    private vrframework.bean.label.VRLabel vRLabel25;
-    private vrframework.bean.label.VRLabel vRLabel26;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
-    private vrframework.bean.panel.VRPanel vRPanel5;
-    private vrframework.bean.panel.VRPanel vRPanel6;
-    private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.textArea.VRTextArea vRTextArea1;
-    private vrframework.bean.textField.VRTextField vRTextField1;
-    private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
 
 }

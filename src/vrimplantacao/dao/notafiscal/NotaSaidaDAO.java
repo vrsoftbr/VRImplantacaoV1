@@ -781,7 +781,7 @@ public class NotaSaidaDAO {
                 finalizarEscrita(i_notaSaida);
             }
 
-            if (Parametros.get().getBool(true, "IMPORT_NFE", "PROCESSAR_FINALIZACOES")) {
+            if (Parametros.get().getBool(false, "IMPORT_NFE", "PROCESSAR_FINALIZACOES")) {
                 if (oTipoSaida.baixaEstoque || oTipoSaida.entraEstoque) {
                     finalizarEstoque(i_notaSaida);
                 }
