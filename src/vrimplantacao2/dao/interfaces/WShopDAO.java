@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import com.ibm.db2.jcc.DB2BaseDataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;

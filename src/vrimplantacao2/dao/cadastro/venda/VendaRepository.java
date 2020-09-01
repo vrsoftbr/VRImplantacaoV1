@@ -594,13 +594,21 @@ public class VendaRepository {
             item.setPrecoVenda(imp.getTotalBruto() / imp.getQuantidade());
         } else {
             item.setPrecoVenda(imp.getPrecoVenda());
-        }
+        }        
         item.setValorDesconto(imp.getValorDesconto());
         item.setValorAcrescimo(imp.getValorAcrescimo());
         
         Icms aliquota = provider.getAliquota(imp.getIcmsCst(), imp.getIcmsAliq(), imp.getIcmsReduzido());
         if (aliquota != null) {
-            item.setId_aliquota(aliquota.getId());
+            
+            if ((aliquota.getId() == 28) || (aliquota.getId() == 34)) {
+                item.setId_aliquota(7); // SUBSTITUIDO
+            } else if ((aliquota.getId() == 33) || (aliquota.getId() == 45)) {
+                item.setId_aliquota(6); // ISENTO
+            } else { //ISSO FOI FEITO POR MERCADINHO PIRATINGA, POR EXISTEM 3 CADASTROS DE SUBS E ISENTO
+                item.setId_aliquota(aliquota.getId());
+            }
+            
         } else {
             LOG.warning(String.format(
                     "Aliquota CST: %03d Aliq: %.2f Red: %.2f não "
