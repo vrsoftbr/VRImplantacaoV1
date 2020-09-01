@@ -99,10 +99,10 @@ public class STIGUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "consinco";
+        conexaoMySQL.database = "sti";
         conexaoMySQL.port = "3306";
-        conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "consinco";
+        conexaoMySQL.user = "consulta";
+        conexaoMySQL.pass = "#usuarioconsulta2020$";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
