@@ -24,9 +24,8 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
-import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -302,7 +301,7 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.GERPESOBRT pesobruto,\n" +
                     "	p.GERPESOLIQ pesoliquido,\n" +
                     "	est.LITESTQMIN estoqueminimo,\n" +
-                    "	est.LITESTQL estoque,\n" +
+                    "	est.LITESTQD estoque,\n" +
                     "	est.LITMRGVEN1 margem,\n" +
                     "	est.LITCUSREP custocomimposto,\n" +
                     "	est.LITCUSREP custosemimposto,\n" +
@@ -374,8 +373,8 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setCustoAnteriorComImposto(rs.getDouble("custocomimposto"));
-                    imp.setCustoAnteriorSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setCustoMedio(rs.getDouble("customedio"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setTeclaAssociada(rs.getInt("teclassociada"));
@@ -389,7 +388,10 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     } catch (ParseException ex) {
                         System.out.println("Data inválida FORALINHA - id:" + imp.getImportId() + " - " + rs.getString("saidadelinha"));
                     }
-                    imp.setNcm(Utils.formataNumero(rs.getString("ncm")).substring(0, 8));
+                    String ncm = Utils.formataNumero(rs.getString("ncm"));
+                    if (ncm.length() == 10)
+                        ncm = "0" + ncm;
+                    imp.setNcm(ncm.substring(0, 8));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofins_saida"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_entrada"));
@@ -554,145 +556,120 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
-        List<ClienteIMP> vResult = new ArrayList<>();
+        List<ClienteIMP> result = new ArrayList<>();
         Utils util = new Utils();
         String dataCadastro;
         java.sql.Date data = null;
-        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "clicliente, clirazao, clifantasia, clicgc, "
-                    + "cliendereco, clibairro, clicidade, cliestado, clicep, "
-                    + "clicasapropria, cliddd, clitelefone, clidddcom, "
-                    + "clitelefonecom, clifax, cliinsest, clidtcadas, clilimite, "
-                    + "clisituacao, clianiversario, clirendam, clisexo, cliestcivil, "
-                    + "clicargo, cliempresa, clipai, climae, cliobserv1, cliemail, clipj, clitiporec "
-                    + "from cadcli "
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.CLICLIENTE id,\n" +
+                    "	c.CLICGC cnpj,\n" +
+                    "	c.CLIINSEST ie,\n" +
+                    "	c.CLIRAZAO razao,\n" +
+                    "	c.CLIFANTASIA fantasia,\n" +
+                    "	case when c.CLISITUACAO = 'I' then 0 else 1 end ativo,\n" +
+                    "	c.CLIENDERECO endereco,\n" +
+                    "	c.CLINUMERO numero,\n" +
+                    "	c.CLIBAIRRO bairro,\n" +
+                    "	c.CLICIDADE cidade,\n" +
+                    "	c.CLIESTADO uf,\n" +
+                    "	c.CLICEP cep,\n" +
+                    "	c.CLIESTCIVIL estadocivil,\n" +
+                    "	c.CLIANIVERSARIO dataaniversario,\n" +
+                    "	c.CLIDTCADAS datacadastro,\n" +
+                    "	c.CLISEXO sexo,\n" +
+                    "	c.CLIEMPRESA empresa,\n" +
+                    "	c.CLIDDD ddd,\n" +
+                    "	c.CLITELEFONE telefone,\n" +
+                    "	c.CLIDDDCOM dddcomercial,\n" +
+                    "	c.CLITELEFONECOM telefonecomercial,\n" +
+                    "	c.CLIDDDCEL dddcelular,\n" +
+                    "	c.CLINROCEL celular,\n" +
+                    "	c.CLICARGO cargo,\n" +
+                    "	c.CLIRENDAM salario,\n" +
+                    "	c.CLILIMITE limite,\n" +
+                    "	c.CLICPFCONJUGE cpfconjuge,\n" +
+                    "	c.CLIPAI pai,\n" +
+                    "	c.CLIMAE mae,\n" +
+                    "	c.CLIOBSERV1,\n" +
+                    "	c.CLIOBSERV2,\n" +
+                    "	c.CLIOBSERV3,	\n" +
+                    "	c.CLIOBSERVACAO observacao,\n" +
+                    "	c.CLIDIAPGTO diavencimento,\n" +
+                    "	c.CLIULTDIA prazopagamento,\n" +
+                    "	c.CLIEMAIL email,\n" +
+                    "	c.CLIFAX fax\n" +
+                    "from\n" +
+                    "	cadcli c\n" +
+                    "order by\n" +
+                    "	c.clicliente"
             )) {
-                while (rst.next()) {
-                    if ((rst.getString("clidtcadas") != null)
-                            && (!rst.getString("clidtcadas").trim().isEmpty())) {
-                        if (util.validarData(Integer.parseInt(rst.getString("clidtcadas").substring(4, 6)),
-                                Integer.parseInt(rst.getString("clidtcadas").substring(6, 8)))) {
-                            dataCadastro = rst.getString("clidtcadas").trim().substring(0, 4);
-                            dataCadastro = dataCadastro + "/" + rst.getString("clidtcadas").trim().substring(4, 6);
-                            dataCadastro = dataCadastro + "/" + rst.getString("clidtcadas").trim().substring(6, 8);
-                            data = new java.sql.Date(fmt.parse(dataCadastro).getTime());
-                        } else {
-                            dataCadastro = "";
-                        }
-                    } else {
-                        dataCadastro = "";
-                    }
-
+                while (rs.next()) {
+                    
                     ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rst.getString("clicliente"));
-                    imp.setRazao(rst.getString("clirazao"));
-                    imp.setFantasia(rst.getString("clifantasia"));
-                    imp.setCnpj(rst.getString("clicgc"));
-                    imp.setInscricaoestadual(rst.getString("cliinsest"));
-                    imp.setEndereco(rst.getString("cliendereco"));
-                    imp.setBairro(rst.getString("clibairro"));
-                    imp.setMunicipio(rst.getString("clicidade"));
-                    imp.setUf(rst.getString("cliestado"));
-                    imp.setCep(rst.getString("clicep"));
-                    imp.setDataCadastro(("".equals(dataCadastro) ? new Date(new java.util.Date().getTime()) : data));
-                    imp.setValorLimite(rst.getDouble("clilimite"));
-                    imp.setEmpresa(rst.getString("cliempresa"));
-                    imp.setCargo(rst.getString("clicargo"));
-                    imp.setSalario(rst.getDouble("clirendam"));
-                    imp.setNomePai(rst.getString("clipai"));
-                    imp.setNomeMae(rst.getString("climae"));
-                    imp.setObservacao(rst.getString("cliobserv1"));
-                    imp.setTelefone((rst.getString("cliddd") == null ? "" : rst.getString("cliddd"))
-                            + rst.getString("clitelefone").trim());
-                    imp.setEmail(rst.getString("cliemail") == null ? "" : rst.getString("cliemail").toLowerCase());
-                    imp.setAtivo("A".equals(rst.getString("clisituacao").trim()));
-                    imp.setSexo("F".equals(rst.getString("clisexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setEstadoCivil(rs.getString("estadocivil"));
+                    try {
+                        imp.setDataNascimento(fmt.parse(rs.getString("dataaniversario")));
+                    } catch (ParseException ex) {
+                        System.out.println(String.format("Data nascimento inválida ID: %s - %s", imp.getId(), rs.getString("dataaniversario")));
+                    }
+                    try {
+                        imp.setDataCadastro(fmt.parse(rs.getString("datacadastro")));
+                    } catch (ParseException ex) {
+                        System.out.println(String.format("Data cadastro inválida ID: %s - %s", imp.getId(), rs.getString("dataaniversario")));
+                    }
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setTelefone(formataTelefone(rs.getString("ddd"), rs.getString("telefone")));
+                    imp.addTelefone("COMERCIAL", formataTelefone(rs.getString("dddcomercial"), rs.getString("telefonecomercial")));
+                    imp.setCelular(formataTelefone(rs.getString("dddcelular"), rs.getString("celular")));
+                    imp.setCargo(rs.getString("cargo"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setCpfConjuge(rs.getString("cpfconjuge"));
+                    imp.setNomePai(rs.getString("pai"));
+                    imp.setNomeMae(rs.getString("mae"));
+                    StringBuilder obs = new StringBuilder();
+                    
+                    String obs1 = Utils.acertarTexto(rs.getString("CLIOBSERV1"));
+                    if (!"".equals(obs1)) obs.append("OBS - ").append(obs1);
 
-                    if ((rst.getString("cliestcivil") != null)
-                            && (!rst.getString("cliestcivil").trim().isEmpty())) {
-                        if (null != rst.getString("cliestcivil").trim()) {
-                            switch (rst.getString("cliestcivil").trim()) {
-                                case "S":
-                                    imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
-                                    break;
-                                case "C":
-                                    imp.setEstadoCivil(TipoEstadoCivil.CASADO);
-                                    break;
-                                default:
-                                    imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
-                                    break;
-                            }
-                        }
-                    } else {
-                        imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
-                    }
-
-                    if ((rst.getString("clitiporec") != null)
-                            && (!rst.getString("clitiporec").trim().isEmpty())) {
-                        if (null != rst.getString("clitiporec").trim()) {
-                            switch (rst.getString("clitiporec").trim()) {
-                                case "C":
-                                    imp.setPermiteCheque(true);
-                                    imp.setPermiteCreditoRotativo(false);
-                                    imp.setBloqueado(false);
-                                    break;
-                                case "T":
-                                    imp.setPermiteCheque(true);
-                                    imp.setPermiteCreditoRotativo(true);
-                                    imp.setBloqueado(false);
-                                    break;
-                                case "R":
-                                    imp.setPermiteCheque(false);
-                                    imp.setPermiteCreditoRotativo(true);
-                                    imp.setBloqueado(false);
-                                    break;
-                                case "B":
-                                    imp.setPermiteCheque(false);
-                                    imp.setPermiteCreditoRotativo(false);
-                                    imp.setBloqueado(true);
-                                    break;
-                                default:
-                                    imp.setPermiteCheque(true);
-                                    imp.setPermiteCreditoRotativo(true);
-                                    imp.setBloqueado(false);
-                                    break;
-                            }
-                        }
-                    } else {
-                        imp.setPermiteCheque(true);
-                        imp.setPermiteCreditoRotativo(true);
-                        imp.setBloqueado(false);
-                    }
-
-                    if ((rst.getString("clitelefonecom") != null)
-                            && (!rst.getString("clitelefonecom").trim().isEmpty())) {
-                        imp.addContato(
-                                "1",
-                                "TELEFONE COM",
-                                (rst.getString("clidddcom") == null ? "" : rst.getString("clidddcom").trim())
-                                + rst.getString("clitelefonecom").trim(),
-                                null,
-                                null
-                        );
-                    }
-                    if ((rst.getString("clifax") != null)
-                            && (!rst.getString("clifax").trim().isEmpty())) {
-                        imp.addContato(
-                                "2",
-                                "FAX",
-                                rst.getString("clifax"),
-                                null,
-                                null
-                        );
-                    }
-                    vResult.add(imp);
+                    String obs2 = Utils.acertarTexto(rs.getString("CLIOBSERV2"));
+                    if (!"".equals(obs2)) obs.append(!"".equals(obs.toString()) ? " -- " : "").append("OBS2 - ").append(obs1);
+                    
+                    String obs3 = Utils.acertarTexto(rs.getString("CLIOBSERV3"));
+                    if (!"".equals(obs3)) obs.append(!"".equals(obs.toString()) ? " -- " : "").append("OBS3 - ").append(obs3);
+                    
+                    String obs4 = Utils.acertarTexto(rs.getString("observacao"));
+                    if (!"".equals(obs4)) obs.append(!"".equals(obs.toString()) ? " -- " : "").append("OBS4 - ").append(obs4);
+                    
+                    imp.setObservacao2(obs.toString());
+                    imp.setObservacao("APELIDO " + imp.getFantasia());
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    imp.setPrazoPagamento(rs.getInt("prazopagamento"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setFax(rs.getString("fax"));
+                    
+                    result.add(imp);
                 }
             }
         }
-        return vResult;
+        return result;
     }
 
     @Override
@@ -764,68 +741,65 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
-        Utils util = new Utils();
-        String dataEmissao, dataDeposito;
-        java.sql.Date dataEmi = null, dataDep = null;
-        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "chrcgccpf, chrbanco, chragencia, chrconta, chrcheque, "
-                    + "chremissao, chrvencto, chrrazao, chrinscrg, chrvalor, "
-                    + "chrobserv1, chrobserv2, chrdtdeposito, chrpdv, chrtelefone "
-                    + "from CHQREC "
-                    + "where chrvlrpago = 0 "
-                    + "and chrpagamento = 0 "
-                    + "order by chremissao"
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	c.CHRCGCCPF cpf,\n" +
+                    "	c.CHRBANCO banco,\n" +
+                    "	c.CHRAGENCIA agencia,\n" +
+                    "	c.CHRCONTA conta,\n" +
+                    "	c.CHRCHEQUE numerocheque,\n" +
+                    "	c.CHREMISSAO dataemissao,\n" +
+                    "	c.CHRVENCTO datadeposito,\n" +
+                    "	c.CHRPDV pdv,\n" +
+                    "	c.CHRINSCRG rg,\n" +
+                    "	c.CHRDDD ddd,\n" +
+                    "	c.CHRTELEFONE telefone,\n" +
+                    "	c.CHRRAZAO nome,\n" +
+                    "	c.CHROBSERV1,\n" +
+                    "	c.CHROBSERV2,\n" +
+                    "	c.CHRJURODIA juros,\n" +
+                    "	c.CHRVALOR valor,\n" +
+                    "	case when c.CHRVLRPAGO >= c.CHRVALOR then 1 else 0 end pago\n" +
+                    "from\n" +
+                    "	CHQREC c\n" +
+                    "where\n" +
+                    "	c.CHRLOJA = 1\n" +
+                    "order by\n" +
+                    "	chremissao"
             )) {
-                while (rst.next()) {
-                    if ((rst.getString("chremissao") != null)
-                            && (!rst.getString("chremissao").trim().isEmpty())) {
-                        if (util.validarData(Integer.parseInt(rst.getString("chremissao").substring(4, 6)),
-                                Integer.parseInt(rst.getString("chremissao").substring(6, 8)))) {
-                            dataEmissao = rst.getString("chremissao").trim().substring(0, 4);
-                            dataEmissao = dataEmissao + "/" + rst.getString("chremissao").trim().substring(4, 6);
-                            dataEmissao = dataEmissao + "/" + rst.getString("chremissao").trim().substring(6, 8);
-                            dataEmi = new java.sql.Date(fmt.parse(dataEmissao).getTime());
-                        } else {
-                            dataEmissao = "";
-                        }
-                    } else {
-                        dataEmissao = "";
-                    }
-
-                    if ((rst.getString("chrdtdeposito") != null)
-                            && (!rst.getString("chrdtdeposito").trim().isEmpty())) {
-                        if (util.validarData(Integer.parseInt(rst.getString("chrdtdeposito").substring(4, 6)),
-                                Integer.parseInt(rst.getString("chrdtdeposito").substring(6, 8)))) {
-                            dataDeposito = rst.getString("chrdtdeposito").trim().substring(0, 4);
-                            dataDeposito = dataDeposito + "/" + rst.getString("chrdtdeposito").trim().substring(4, 6);
-                            dataDeposito = dataDeposito + "/" + rst.getString("chrdtdeposito").trim().substring(6, 8);
-                            dataDep = new java.sql.Date(fmt.parse(dataDeposito).getTime());
-                        } else {
-                            dataDeposito = "";
-                        }
-                    } else {
-                        dataDeposito = "";
-                    }
-
+                while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    imp.setId(rst.getString("chrcgccpf") + "-" + rst.getString("chrbanco") + "-"
-                            + rst.getString("chragencia") + "-" + rst.getString("chrconta") + "-" + rst.getString("chrcheque"));
-                    imp.setCpf(rst.getString("chrcgccpf"));
-                    imp.setRg(rst.getString("chrinscrg"));
-                    imp.setTelefone(rst.getString("chrtelefone"));
-                    imp.setNome(rst.getString("chrrazao"));
-                    imp.setDate("".equals(dataEmissao) ? new Date(new java.util.Date().getTime()) : dataEmi);
-                    imp.setDataDeposito("".equals(dataDeposito) ? new Date(new java.util.Date().getTime()) : dataDep);
-                    imp.setValor(rst.getDouble("chrvalor"));
-                    imp.setEcf(rst.getString("chrpdv"));
-                    imp.setNumeroCheque(rst.getString("chrcheque"));
-                    imp.setBanco(rst.getInt("chrbanco"));
-                    imp.setAgencia(rst.getString("chragencia"));
-                    imp.setConta(rst.getString("chrconta"));
-                    imp.setObservacao("IMPORTADO VR " + rst.getString("chrobserv2") + " " + rst.getString("chrobserv2"));
+                    imp.setId(String.format(
+                            "%s-%s-%s-%s-%s",
+                            rs.getString("cpf"),
+                            rs.getString("banco"),
+                            rs.getString("agencia"),
+                            rs.getString("conta"),
+                            rs.getString("numerocheque")
+                    ));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setNumeroCheque(rs.getString("numerocheque"));
+                    try {
+                        imp.setDate(fmt.parse(rs.getString("dataemissao")));
+                    } catch (ParseException ex ) {
+                        System.out.println(String.format("dataemissao inválido - ID: %s - %s", imp.getId(), rs.getString("dataemissao")));
+                    }
+                    try {
+                        imp.setDataDeposito(fmt.parse(rs.getString("datadeposito")));
+                    } catch (ParseException ex ) {
+                        System.out.println(String.format("datadeposito inválido - ID: %s - %s", imp.getId(), rs.getString("datadeposito")));
+                    }
+                    imp.setEcf(rs.getString("pdv"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setTelefone(formataTelefone(rs.getString("ddd"), rs.getString("telefone")));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setSituacaoCheque(rs.getBoolean("pago") ? SituacaoCheque.BAIXADO : SituacaoCheque.ABERTO);
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("CHROBSERV1") + " - " + rs.getString("CHROBSERV2"));
                     imp.setAlinea(0);
                     vResult.add(imp);
                 }
@@ -899,6 +873,10 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    private String formataTelefone(String ddd, String telefone) {
+        return (ddd == null ? "" : ddd) + Utils.formataNumero(telefone);
     }
     
 }

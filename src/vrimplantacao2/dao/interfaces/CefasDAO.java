@@ -138,6 +138,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "    e.custoreal custo,\n"
                     + "    em.margem,\n"
                     + "    pre.pvenda venda,\n"
+                    + "    em.PVENDA precovenda,\n"        
                     + "    pisentrada.cstpis pisentrada,\n"
                     + "    pissaida.cstpis pissaida,\n"
                     + "    pissaida.cest,\n"
@@ -205,13 +206,15 @@ public class CefasDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rs.getDouble("custo"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setPrecovenda(rs.getDouble("venda"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pissaida"));
+                    
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
                     imp.setIcmsCstSaida(rs.getInt("cst"));
+                    
                     imp.setIcmsCstEntrada(rs.getInt("cst"));
                     imp.setIcmsReducaoSaida(rs.getInt("redicms"));
                     imp.setIcmsReducaoEntrada(rs.getInt("redicms"));
@@ -250,6 +253,7 @@ public class CefasDAO extends InterfaceDAO {
                         }  
                     }
                     imp.setFornecedorFabricante(rs.getString("fornprincipal"));
+                    
                     result.add(imp);
                 }
             }

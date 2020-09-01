@@ -1,8 +1,6 @@
 package vrimplantacao.gui.interfaces;
 
 import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -15,8 +13,6 @@ import vrimplantacao2.dao.interfaces.JMasterDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -164,27 +160,7 @@ public class JMasterGUI extends VRInternalFrame {
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
-                        }
-                        
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                        }                        
-                        if (chkFCondicaoPagamento.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO2);
-                        }                        
-                        if (chkFPrazoFornecedor.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.PRAZO_FORNECEDOR);
-                        }
-                        if (chkSituacaoCadastroForn.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
-                        }
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
-                        }
-                        if (chkContasPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }                        
+                        }                    
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE, 
                                     OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL);
@@ -232,11 +208,6 @@ public class JMasterGUI extends VRInternalFrame {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
-        chkFPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
-        chkSituacaoCadastroForn = new vrframework.bean.checkBox.VRCheckBox();
-        chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -277,34 +248,6 @@ public class JMasterGUI extends VRInternalFrame {
             }
         });
 
-        chkFContatos.setText("Contatos");
-        chkFContatos.setEnabled(true);
-        chkFContatos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFContatosActionPerformed(evt);
-            }
-        });
-
-        chkFPrazoFornecedor.setText("Prazo Fornecedor");
-        chkFPrazoFornecedor.setEnabled(true);
-        chkFPrazoFornecedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFPrazoFornecedorActionPerformed(evt);
-            }
-        });
-
-        chkFCondicaoPagamento.setText("Condição Pagamento");
-        chkFCondicaoPagamento.setEnabled(true);
-        chkFCondicaoPagamento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFCondicaoPagamentoActionPerformed(evt);
-            }
-        });
-
-        chkSituacaoCadastroForn.setText("Situacao Cadastro");
-
-        chkContasPagar.setText("Contas a Pagar");
-
         chkProdutoFornecedor.setText("Produto Fornecedor");
         chkProdutoFornecedor.setEnabled(true);
         chkProdutoFornecedor.addActionListener(new java.awt.event.ActionListener() {
@@ -319,19 +262,10 @@ public class JMasterGUI extends VRInternalFrame {
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(tabFornecedorLayout.createSequentialGroup()
-                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(57, 57, 57)
-                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkSituacaoCadastroForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(203, Short.MAX_VALUE))
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(260, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -340,17 +274,7 @@ public class JMasterGUI extends VRInternalFrame {
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkSituacaoCadastroForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(187, Short.MAX_VALUE))
         );
 
         tabsImportacao.addTab("Fornecedor", tabFornecedor);
@@ -540,18 +464,6 @@ public class JMasterGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
-    private void chkFContatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContatosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFContatosActionPerformed
-
-    private void chkFPrazoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFPrazoFornecedorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFPrazoFornecedorActionPerformed
-
-    private void chkFCondicaoPagamentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFCondicaoPagamentoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFCondicaoPagamentoActionPerformed
-
     private void chkProdutoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkProdutoFornecedorActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkProdutoFornecedorActionPerformed
@@ -581,14 +493,9 @@ public class JMasterGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
-    private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
-    private vrframework.bean.checkBox.VRCheckBox chkFContatos;
-    private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
-    private vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastroForn;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;

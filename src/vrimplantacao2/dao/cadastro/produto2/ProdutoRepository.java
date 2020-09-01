@@ -411,13 +411,17 @@ public class ProdutoRepository {
                                     idProdutoAliquota = provider.aliquota().getProdutoAliquotaByProduto(prod.getId());
                             
                             if (produtoAliquotaBeneficio != 0 && beneficio != 0 && idProdutoAliquota != 0) {
+                                System.out.println("BENEFICIO: " + beneficio + " E PRODUTO: " + prod.getId() + " NÃO ENCONTRADO!");
                                 aliquota.setBeneficio(beneficio);
                                 aliquota.setId(idProdutoAliquota);
                                 provider.aliquota().atualizaBeneficio(aliquota);
                             } else if(produtoAliquotaBeneficio == 0 && beneficio != 0 && idProdutoAliquota != 0) {
+                                System.out.println("BENEFICIO: " + beneficio + " E PRODUTO: " + prod.getId() + " NÃO ENCONTRADO!");
                                 aliquota.setBeneficio(beneficio);
                                 aliquota.setId(idProdutoAliquota);
                                 provider.aliquota().salvarAliquotaBeneficio(aliquota);
+                            } else {
+                                System.out.println("BENEFICIO: " + beneficio + " E PRODUTO: " + prod.getId() + " NÃO ENCONTRADO!");
                             }
                         }
                         

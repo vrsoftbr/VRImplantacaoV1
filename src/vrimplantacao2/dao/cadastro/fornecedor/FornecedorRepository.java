@@ -398,7 +398,7 @@ public class FornecedorRepository {
     public void processarDivisoes(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> div) throws Exception {
         Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
         
-        for (FornecedorDivisaoIMP impDiv : imp.getDivisoes().values()) {
+        for (FornecedorDivisaoIMP impDiv : imp.getDivisoes()) {
 
             Map.Entry<String, Integer> divisao = divisoes.get(impDiv.getImportId());
             int idDivisao = 0;

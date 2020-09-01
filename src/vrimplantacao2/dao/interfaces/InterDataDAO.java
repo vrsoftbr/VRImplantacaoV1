@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -36,8 +37,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.FAMILIA,
                     OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.PRODUTOS,
@@ -123,8 +124,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "    distinct\n" +
-                    "    lo.i_contador merc1,\n" +
-                    "    LO.SLOCALIZA descmerc1,\n" +
+                    "    coalesce(lo.i_contador, 1) merc1,\n" +
+                    "    coalesce(LO.SLOCALIZA, 'SEM DESC') descmerc1,\n" +
                     "    L.i_contador merc2,\n" +
                     "    L.A_LINHAPRO descmerc2,\n" +
                     "    s.i_contador merc3,\n" +
@@ -141,7 +142,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());                 
+                    imp.setImportLoja(getLojaOrigem()); 
+                    
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -224,13 +226,15 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.seteBalanca("SIM".equals(rs.getString("pesavel")));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setValidade(rs.getInt("validade"));
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setEstoque(rs.getDouble("estoque"));
@@ -297,6 +301,8 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
@@ -366,7 +372,7 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "    pagar p\n" +
                     "where\n" +
-                    "    p.a_pagueicont = 'NÃO'\n" +
+                    "    p.a_pagueicont = 'NÃO' and p.a_situacao = 'ATIVA'\n" +
                     "order by\n" +
                     "    p.d_venciconta")) {
                 while(rs.next()) {
@@ -375,18 +381,26 @@ public class InterDataDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
+                    imp.setNumeroDocumento(Utils.formataNumero(rs.getString("documento")));
+                    
+                    if(imp.getNumeroDocumento() != null && !"".equals(imp.getNumeroDocumento())) {
+                        if(imp.getNumeroDocumento().length() > 8) {
+                            imp.setNumeroDocumento(imp.getNumeroDocumento().substring(0, 8));
+                        }
+                    }
+                    
                     imp.setObservacao(rs.getString("obs"));
                     
                     String parcela = rs.getString("parcela");
                     
                     String parc[] = parcela.split("/");
                     
+                    imp.setNumeroDocumento(imp.getNumeroDocumento() + parc[0]);
+                    
                     imp.addVencimento(
                             rs.getDate("vencimento"), 
                             rs.getDouble("valor"),
-                            TipoPagamento.BOLETO_BANCARIO,
-                            Integer.parseInt(parc[0]));
+                            TipoPagamento.BOLETO_BANCARIO);
                     
                     result.add(imp);
                 }
