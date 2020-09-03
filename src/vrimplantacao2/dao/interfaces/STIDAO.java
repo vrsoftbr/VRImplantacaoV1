@@ -12,6 +12,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -216,9 +217,46 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setPiscofinsNaturezaReceita(rs.getString("natreceita"));
                     
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "  f.codigo,\n" +
+                    "  f.cnpj,\n" +
+                    "  f.insc_est ie,\n" +
+                    "  f.razao,\n" +
+                    "  f.fantasia,\n" +
+                    "  f.endereco,\n" +
+                    "  f.numero,\n" +
+                    "  f.complemento,\n" +
+                    "  f.bairro,\n" +
+                    "  f.cep,\n" +
+                    "  f.cidade,\n" +
+                    "  f.uf,\n" +
+                    "  f.fone,\n" +
+                    "  f.celular,\n" +
+                    "  f.fax,\n" +
+                    "  f.contato,\n" +
+                    "  f.email,\n" +
+                    "  f.obs,\n" +
+                    "  f.inativo\n" +
+                    "FROM\n" +
+                    "  fornecedores f")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
                 }
             }
         }

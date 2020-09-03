@@ -325,23 +325,48 @@ public class CefasDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "    codfornec idfornecedor,\n"
-                    + "    codprod idproduto,\n"
-                    + "    codprodfor referencia\n"
-                    + "from \n"
-                    + "    prodfornec\n"
-                    + "where\n"
-                    + "    codprod != 0\n"
-                    + "order by\n"
-                    + "    codprod, codfornec")) {
+                    "SELECT\n" +
+                    "	distinct\n" +
+                    "	pf.CODPROD idproduto,\n" +
+                    "	pf.CODFORNEC idfornecedor,\n" +
+                    "	pf.CODPRODFOR codigoexterno,\n" +
+                    "	ent.unidade,\n" +
+                    "	COALESCE(ent.qtd, 0) AS qtd\n" +
+                    "from \n" +
+                    "	prodfornec pf\n" +
+                    "LEFT JOIN \n" +
+                    "	(SELECT \n" +
+                    "		itemxml.QTUNITCX qtd,\n" +
+                    "		nfent.CODFORNEC,\n" +
+                    "		itemxml.CODPROD,\n" +
+                    "		itemxml.UNIDADE,\n" +
+                    "		itemxml.CODPRODFOR,\n" +
+                    "		itemxml.DTMOV\n" +
+                    "	FROM \n" +
+                    "		itemxml\n" +
+                    "	JOIN NFENT ON itemxml.NUMNOTA = nfent.NUMNOTA \n" +
+                    "	WHERE nfent.CODFILIAL = '" + getLojaOrigem() + "') ent ON pf.CODPROD = ent.codprod AND \n" +
+                    "		pf.CODFORNEC = ent.codfornec AND \n" +
+                    "		ent.codprodfor = pf.CODPRODFOR\n" +
+                    "where\n" +
+                    "	pf.codprod != 0 AND \n" +
+                    "	to_date(ent.dtmov, 'dd/MM/yyyy') = (SELECT \n" +
+                    "					max(to_date(ent.dtmov, 'dd/MM/yyyy'))\n" +
+                    "				FROM \n" +
+                    "					itemxml JOIN NFENT ON itemxml.NUMNOTA = nfent.NUMNOTA \n" +
+                    "				WHERE ent.codprod = itemxml.codprod AND \n" +
+                    "					ent.codfornec = NFENT.codfornec AND \n" +
+                    "					ent.codprodfor = itemxml.CODPRODFOR)\n" +
+                    "order by\n" +
+                    "	pf.codfornec, pf.codprod")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setCodigoExterno(rs.getString("referencia"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtd"));
 
                     result.add(imp);
                 }
