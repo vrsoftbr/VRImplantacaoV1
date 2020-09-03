@@ -16,7 +16,7 @@ public class ConexaoDBF {
     private static String dataBase = "";
     private static String usuario = "";
     private static String senha = "";
-    public static boolean usarOdbc = false;
+    public static boolean usarOdbc = true;
 
     public static void abrirConexao(String i_database) throws Exception {
         

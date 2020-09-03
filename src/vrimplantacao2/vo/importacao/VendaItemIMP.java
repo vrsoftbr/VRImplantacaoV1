@@ -220,5 +220,5 @@ public class VendaItemIMP {
 
     public void setOferta(boolean oferta) {
         this.oferta = oferta;
-    }
+    }        
 }

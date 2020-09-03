@@ -7,6 +7,20 @@ import java.util.Date;
  * @author Leandro
  */
 public class PagarFornecedorVO {
+
+    /**
+     * @return the datavencimento
+     */
+    public Date getDatavencimento() {
+        return datavencimento;
+    }
+
+    /**
+     * @param datavencimento the datavencimento to set
+     */
+    public void setDatavencimento(Date datavencimento) {
+        this.datavencimento = datavencimento;
+    }
     
     private int id;// integer NOT NULL DEFAULT nextval('pagarfornecedor_id_seq'::regclass),
     private int id_loja;// integer NOT NULL,
@@ -22,6 +36,7 @@ public class PagarFornecedorVO {
     private long id_pagaroutrasdespesas = -1;// bigint,
     private int id_geracaoretencaotributo = -1;// integer,
     private int id_escritasaldo = -1;// integer,
+    private Date datavencimento;
 
     public int getId() {
         return id;

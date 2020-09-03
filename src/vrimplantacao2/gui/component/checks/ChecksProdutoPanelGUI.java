@@ -254,6 +254,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkVolumeEmbalagem.setVisible(opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM));
             chkVolumeQtd.setVisible(opt.contains(OpcaoProduto.VOLUME_QTD));
             chkVendaControlada.setVisible(opt.contains(OpcaoProduto.VENDA_CONTROLADA));
+            chkDataCadastro.setVisible(opt.contains(OpcaoProduto.DATA_CADASTRO));
             tabImportacao.add(pnlImpInfoAdic);
         }
         
@@ -431,6 +432,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkVolumeEmbalagem = new vrframework.bean.checkBox.VRCheckBox();
         chkVolumeQtd = new vrframework.bean.checkBox.VRCheckBox();
         chkVendaControlada = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpOutrosDados = new vrframework.bean.panel.VRPanel();
         jLabel9 = new javax.swing.JLabel();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -1150,6 +1152,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkVendaControlada, "Venda Controlada");
         chkVendaControlada.setToolTipText("Produtos alcoólicos ou de controle especial");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkDataCadastro, "Data Cadastro");
+
         javax.swing.GroupLayout pnlImpInfoAdicLayout = new javax.swing.GroupLayout(pnlImpInfoAdic);
         pnlImpInfoAdic.setLayout(pnlImpInfoAdicLayout);
         pnlImpInfoAdicLayout.setHorizontalGroup(
@@ -1197,7 +1201,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkVolumeQtd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlImpInfoAdicLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(chkVendaControlada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkVendaControlada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkDataCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(5, 5, 5))
         );
         pnlImpInfoAdicLayout.setVerticalGroup(
@@ -1229,7 +1235,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkVolumeEmbalagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(chkVolumeQtd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkVendaControlada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlImpInfoAdicLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkVendaControlada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1354,6 +1362,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkCusto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
+    public vrframework.bean.checkBox.VRCheckBox chkDataCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkDescCompleta;
     public vrframework.bean.checkBox.VRCheckBox chkDescGondola;
     public vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
@@ -1780,6 +1789,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkVendaControlada.isSelected()) {
                     opcoes.add(OpcaoProduto.VENDA_CONTROLADA);
+                }
+                if (chkDataCadastro.isSelected()) {
+                    opcoes.add(OpcaoProduto.DATA_CADASTRO);
                 }
                 if (chkNumeroParcela.isSelected()) {
                     opcoes.add(OpcaoProduto.NUMERO_PARCELA);

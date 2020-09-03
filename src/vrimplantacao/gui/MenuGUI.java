@@ -101,6 +101,7 @@ import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AtenasGUI;
 import vrimplantacao2.gui.interfaces.AtenasSQLSERVERGUI;
 import vrimplantacao2.gui.interfaces.AtmaGUI;
+import vrimplantacao2.gui.interfaces.AutoAdmGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AutomaqGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
@@ -202,6 +203,7 @@ import vrimplantacao2.gui.interfaces.RensoftwareGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
+import vrimplantacao2.gui.interfaces.STIGUI;
 import vrimplantacao2.gui.interfaces.SabTechGUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SambaNetV2GUI;
@@ -638,6 +640,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuRKSoftware = new javax.swing.JMenuItem();
         mnuTecnosoft = new javax.swing.JMenuItem();
         mnuInterData = new javax.swing.JMenuItem();
+        mnuAutoADM = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -772,6 +775,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSiit = new javax.swing.JMenuItem();
         mnuMobnePdv = new javax.swing.JMenuItem();
         mnuLinear = new javax.swing.JMenuItem();
+        mnuSTI = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1475,6 +1479,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuInterData);
+
+        mnuAutoADM.setText("AutoADM");
+        mnuAutoADM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoADMActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuAutoADM);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -2521,6 +2533,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuLinear);
+
+        mnuSTI.setText("STI");
+        mnuSTI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTIActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuSTI);
 
         mnuDatabase.add(jMenu10);
 
@@ -4714,6 +4734,15 @@ public final class MenuGUI extends VRMdiFrame {
         InterDataGUI.exibir(this);
     }//GEN-LAST:event_mnuInterDataActionPerformed
 
+    private void mnuSTIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTIActionPerformed
+        STIGUI.exibir(this);
+    }//GEN-LAST:event_mnuSTIActionPerformed
+
+    private void mnuAutoADMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoADMActionPerformed
+        // TODO add your handling code here:
+        AutoAdmGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutoADMActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4816,6 +4845,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAtenas;
     private javax.swing.JMenuItem mnuAtenasSQLServer;
     private javax.swing.JMenuItem mnuAtma;
+    private javax.swing.JMenuItem mnuAutoADM;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenuItem mnuAutomaq;
@@ -4940,6 +4970,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSDInformatica;
     private javax.swing.JMenu mnuSQLite;
     private javax.swing.JMenuItem mnuSQLiteSophyx;
+    private javax.swing.JMenuItem mnuSTI;
     private javax.swing.JMenuItem mnuSTI3;
     private javax.swing.JMenuItem mnuSaac;
     private javax.swing.JMenuItem mnuSambaNet;

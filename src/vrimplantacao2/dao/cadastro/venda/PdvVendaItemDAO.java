@@ -64,8 +64,12 @@ public class PdvVendaItemDAO {
                     sql.put("tipoDesconto", item.getTipoDesconto().getId());
                 }
             }
-            sql.put("custoComImposto", item.getCustoComImposto(), 0);
-            sql.put("custoSemImposto", item.getCustoSemImposto(), 0);
+            
+            System.out.println("Custo Com Imposto Gravar " + item.getCustoComImposto());
+            System.out.println("Custo Sem Imposto Gravar " + item.getCustoSemImposto());
+            
+            sql.put("custoComImposto", item.getCustoComImposto());
+            sql.put("custoSemImposto", item.getCustoSemImposto());
             sql.put("custoMedioComimposto", item.getCustoMedioComimposto(), 0);
             sql.put("custoMedioSemImposto", item.getCustoMedioSemImposto(), 0);
             sql.put("aplicaDescontoPromocao", item.isAplicaDescontoPromocao());

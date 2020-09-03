@@ -6,6 +6,7 @@
 package vrimplantacao2.vo.cadastro.financeiro;
 
 import java.util.Date;
+import vrimplantacao.utils.Utils;
 
 /**
  *
@@ -144,7 +145,7 @@ public class ReceberVendaPrazoVO {
      * @param observacao the observacao to set
      */
     public void setObservacao(String observacao) {
-        this.observacao = observacao;
+        this.observacao = Utils.acertarTexto(observacao);
     }
 
     /**
