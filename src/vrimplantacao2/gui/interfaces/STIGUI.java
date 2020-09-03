@@ -99,7 +99,7 @@ public class STIGUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "sti";
+        conexaoMySQL.database = "sti3database";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "consulta";
         conexaoMySQL.pass = "#usuarioconsulta2020$";
@@ -128,7 +128,7 @@ public class STIGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaVR.setSelectedIndex(index);
     }
 
-    public void carregarLojaCliente() throws Exception {
+    public void carregarLojaCliente() throws Exception { 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
