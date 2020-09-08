@@ -21,8 +21,10 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -386,12 +388,29 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "order by\n" +
                     "	id"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
+                    if (bal != null) {
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setQtdEmbalagem(1);
+                        imp.seteBalanca(true);
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.setTipoEmbalagem(rs.getString("embalagem"));
+                        imp.setQtdEmbalagem(1);
+                        imp.seteBalanca("S".equals(rs.getString("pesavel")));
+                        imp.setValidade(rs.getInt("validade"));                        
+                    }
+                    
+                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
@@ -406,8 +425,6 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("venda"));
-                    imp.setTipoEmbalagem(rs.getString("embalagem"));
-                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
@@ -432,8 +449,6 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("pis_cst_s"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("pis_natrec"));
                     imp.setCest(rs.getString("cest"));
-                    imp.seteBalanca("S".equals(rs.getString("pesavel")));
-                    imp.setValidade(rs.getInt("validade"));
                     
                     imp.setIdComprador(rs.getString("comprador"));
                     imp.setFornecedorFabricante(rs.getString("fabricante"));
