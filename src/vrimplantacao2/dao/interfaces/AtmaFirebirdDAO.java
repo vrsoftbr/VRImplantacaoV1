@@ -14,6 +14,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -231,6 +233,7 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setIcmsDebitoForaEstadoNfId(icmsId);
                 imp.setIcmsCreditoId(icmsId);
                 imp.setIcmsCreditoForaEstadoId(icmsId);
+                imp.setIcmsConsumidorId(icmsId);
                 
                 imp.setFornecedorFabricante(rs.getString("fabricante"));
                 imp.setCodigoAnp(rs.getString("CODIGO_ANP"));
@@ -425,6 +428,114 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setIdProduto(rs.getString("id_produto"));
                 imp.setCodigoExterno(rs.getString("codigoexterno"));
                 imp.setCustoTabela(rs.getDouble("custotabela"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	c.codigo id,\n" +
+                        "	c.cpf,\n" +
+                        "	c.rg,\n" +
+                        "	c.rg_orgao,	\n" +
+                        "	c.nome razao,\n" +
+                        "	c.apelido fantasia,\n" +
+                        "	c.situacao ativo,\n" +
+                        "	c.endereco,\n" +
+                        "	c.numero,\n" +
+                        "	c.complemento,\n" +
+                        "	c.bairro,\n" +
+                        "	c.cod_municipio_ibge,\n" +
+                        "	c.cidade,\n" +
+                        "	c.uf,\n" +
+                        "	c.cep,\n" +
+                        "	c.ESTADOCIVIL,\n" +
+                        "	c.NASCIMENTO,\n" +
+                        "	c.DATA_CADASTRO,\n" +
+                        "	c.SEXO,\n" +
+                        "	c.EMPRESA,\n" +
+                        "	c.PROFISSAO,\n" +
+                        "	c.RENDA,\n" +
+                        "	c.LIMITE,\n" +
+                        "	c.CONJUGE,\n" +
+                        "	c.OBS1,\n" +
+                        "	c.OBS2,\n" +
+                        "	c.OBS3,\n" +
+                        "	c.OBS4,\n" +
+                        "	c.OBS5,\n" +
+                        "	c.OBS6,\n" +
+                        "	c.DIA_VENC,\n" +
+                        "	c.DIAS_PRAZO,\n" +
+                        "	c.telefone1,\n" +
+                        "	c.telefone2,\n" +
+                        "	c.telefone3,\n" +
+                        "	c.celular,\n" +
+                        "	c.email,\n" +
+                        "	TIPO_IE\n" +
+                        "from\n" +
+                        "	c000007 c \n" +
+                        "where\n" +
+                        "	not c.nome is NULL\n" +
+                        "ORDER BY\n" +
+                        "	id"
+                )
+                ) {
+            while (rs.next()) {
+                ClienteIMP imp = new ClienteIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setCnpj(rs.getString("cpf"));
+                imp.setInscricaoestadual(rs.getString("rg"));
+                imp.setOrgaoemissor(rs.getString("rg_orgao"));
+                imp.setRazao(rs.getString("razao"));
+                imp.setFantasia(rs.getString("fantasia"));
+                imp.setAtivo(rs.getBoolean("ativo"));
+                imp.setEndereco(rs.getString("endereco"));
+                imp.setNumero(rs.getString("numero"));
+                imp.setComplemento(rs.getString("complemento"));
+                imp.setBairro(rs.getString("bairro"));
+                imp.setMunicipioIBGE(rs.getString("cod_municipio_ibge"));
+                imp.setMunicipio(rs.getString("cidade"));
+                imp.setUf(rs.getString("uf"));
+                imp.setCep(rs.getString("cep"));
+                imp.setEstadoCivil(rs.getString("ESTADOCIVIL"));
+                //imp.set(rs.getString("NASCIMENTO"));
+                imp.setDataCadastro(rs.getDate("DATA_CADASTRO"));
+                imp.setSexo(rs.getString("SEXO"));
+                imp.setEmpresa(rs.getString("EMPRESA"));
+                imp.setCargo(rs.getString("PROFISSAO"));
+                imp.setSalario(rs.getDouble("RENDA"));
+                imp.setValorLimite(rs.getDouble("LIMITE"));
+                imp.setNomeConjuge(rs.getString("CONJUGE"));
+                imp.setObservacao2(
+                        String.format(
+                                "(OBS1) %s (OBS2) %s (OBS3) %s (OBS4) %s (OBS5) %s (OBS6) %s",
+                                rs.getString("obs1"),
+                                rs.getString("obs2"),
+                                rs.getString("obs3"),
+                                rs.getString("obs4"),
+                                rs.getString("obs5"),
+                                rs.getString("obs6")
+                        )
+                );
+                imp.setDiaVencimento(rs.getInt("DIA_VENC"));
+                imp.setPrazoPagamento(rs.getInt("DIAS_PRAZO"));
+                imp.setTelefone(rs.getString("telefone1"));
+                imp.addTelefone("FONE2", rs.getString("telefone2"));
+                imp.addTelefone("FONE3", rs.getString("telefone3"));
+                imp.setCelular(rs.getString("celular"));
+                imp.setEmail(rs.getString("email"));
+                imp.setTipoIndicadorIe("CONTRIBUINTE".equals(rs.getString("TIPO_IE")) ? TipoIndicadorIE.CONTRIBUINTE_ICMS : TipoIndicadorIE.NAO_CONTRIBUINTE);
                 
                 result.add(imp);
             }

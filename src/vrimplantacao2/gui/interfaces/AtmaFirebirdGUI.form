@@ -149,16 +149,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="chkClienteBloqueado" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkClienteBloqueado" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="202" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -172,9 +167,7 @@
                               <Component id="chkClienteBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="194" max="32767" attributes="0"/>
+                          <EmptySpace pref="216" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -183,11 +176,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClientePreferencial">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente Preferencial"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteBloqueado">
@@ -199,83 +187,6 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Valor Limite"/>
                   </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
-            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Vendas">
-                    <Property name="tabTitle" type="java.lang.String" value="Vendas"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout>
-                <DimensionLayout dim="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="txtDataIniVenda" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
-                                      <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtDataFimVenda" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <Component id="chkVenda" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="297" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-                <DimensionLayout dim="1">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkVenda" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtDataIniVenda" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtDataFimVenda" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="170" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-              </Layout>
-              <SubComponents>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVenda">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Venda"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkVendaActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Data In&#xed;cio"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Data Fim"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDataFimVenda">
-                </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDataIniVenda">
                 </Component>
               </SubComponents>
             </Container>
@@ -352,15 +263,6 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Balan&#xe7;a">
-                <Property name="tabTitle" type="java.lang.String" value="Balan&#xe7;a"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-        </Component>
       </SubComponents>
     </Container>
     <Container class="vrframework.bean.panel.VRPanel" name="pnlLoja">

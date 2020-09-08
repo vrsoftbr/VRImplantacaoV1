@@ -14,6 +14,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.AtmaFirebirdDAO;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -201,6 +202,21 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
+                        
+                        if (chkClientePreferencial.isSelected()) {
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+
+                        List<OpcaoCliente> opt = new ArrayList<>();
+                        if (chkClienteBloqueado.isSelected()) {
+                            opt.add(OpcaoCliente.BLOQUEADO);
+                        }
+                        if (chkClienteValorLimite.isSelected()) {
+                            opt.add(OpcaoCliente.VALOR_LIMITE);
+                        }
+                        if (!opt.isEmpty()) {
+                            importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
+                        }
 
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -257,22 +273,14 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteValorLimite = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkVenda = new vrframework.bean.checkBox.VRCheckBox();
-        vRLabel2 = new vrframework.bean.label.VRLabel();
-        vRLabel3 = new vrframework.bean.label.VRLabel();
-        txtDataFimVenda = new vrframework.bean.textField.VRTextField();
-        txtDataIniVenda = new vrframework.bean.textField.VRTextField();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -302,8 +310,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
 
         chkClientePreferencial.setText("Cliente Preferencial");
 
-        chkCreditoRotativo.setText("Crédito Rotativo");
-
         chkClienteBloqueado.setText("Bloqueado");
 
         chkClienteValorLimite.setText("Valor Limite");
@@ -314,14 +320,11 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabClientesLayout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(202, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -332,59 +335,10 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addContainerGap(216, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
-
-        chkVenda.setText("Venda");
-        chkVenda.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkVendaActionPerformed(evt);
-            }
-        });
-
-        vRLabel2.setText("Data Início");
-
-        vRLabel3.setText("Data Fim");
-
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(297, Short.MAX_VALUE))
-        );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(170, Short.MAX_VALUE))
-        );
-
-        tabImportacao.addTab("Vendas", vRPanel1);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -429,7 +383,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
         );
 
         tabOperacoes.addTab("Unificação", vRPanel2);
-        tabOperacoes.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMigrar.setText("Migrar");
@@ -529,23 +482,11 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void chkVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendaActionPerformed
-        // TODO add your handling code here:
-        if (chkVenda.isSelected()) {
-            txtDataIniVenda.setEnabled(true);
-            txtDataFimVenda.setEnabled(true);
-        } else {
-            txtDataIniVenda.setEnabled(false);
-            txtDataFimVenda.setEnabled(false);
-        }
-    }//GEN-LAST:event_chkVendaActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClienteBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
-    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
@@ -553,7 +494,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
@@ -567,13 +507,7 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.textField.VRTextField txtComplemento;
-    private vrframework.bean.textField.VRTextField txtDataFimVenda;
-    private vrframework.bean.textField.VRTextField txtDataIniVenda;
-    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
-    private vrframework.bean.label.VRLabel vRLabel2;
-    private vrframework.bean.label.VRLabel vRLabel3;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
 
