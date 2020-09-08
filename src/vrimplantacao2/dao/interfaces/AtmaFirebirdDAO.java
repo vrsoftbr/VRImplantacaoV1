@@ -1,9 +1,21 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -24,11 +36,257 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT distinct\n" +
+                        "	p.CST icms_cst,\n" +
+                        "	p.ALIQUOTA icms_aliquota,\n" +
+                        "	COALESCE(p.REDUCAO, 0) icms_reducao\n" +
+                        "FROM\n" +
+                        "	C000025 p\n" +
+                        "ORDER BY\n" +
+                        "	icms_cst, icms_aliquota, icms_reducao"
+                )
+                ) {
+            while (rs.next()) {
+                final String idIcms = formataIdTributacao(
+                        rs.getString("icms_cst"),
+                        rs.getDouble("icms_aliquota"),
+                        rs.getDouble("icms_reducao")
+                );
+                result.add(new MapaTributoIMP(
+                        idIcms,
+                        idIcms,
+                        Utils.stringToInt(rs.getString("icms_cst")),
+                        rs.getDouble("icms_aliquota"),
+                        rs.getDouble("icms_reducao")
+                ));
+            }
+        }
+        
+        return result;
     }
 
-    public Iterable<Estabelecimento> getLojasCliente() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<Estabelecimento> getLojasCliente() throws SQLException {
+        List<Estabelecimento> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT\n" +
+                        "	c.CODIGO id,\n" +
+                        "	c.FILIAL razao,\n" +
+                        "	c.CNPJ\n" +
+                        "FROM\n" +
+                        "	C000004 c\n" +
+                        "ORDER BY\n" +
+                        "	id"
+                )
+        ) {
+            while (rs.next()) {
+                result.add(new Estabelecimento(rs.getString("id"), rs.getString("razao") + " - " + rs.getString("cnpj")));
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT\n" +
+                        "	m1.CODIGO merc1,\n" +
+                        "	m1.GRUPO merc1_desc,\n" +
+                        "	m2.CODIGO merc2,\n" +
+                        "	m2.SUBGRUPO merc2_desc\n" +
+                        "FROM\n" +
+                        "	C000017 m1\n" +
+                        "	LEFT JOIN C000018 m2 ON\n" +
+                        "		m1.CODIGO = m2.CODGRUPO \n" +
+                        "ORDER BY\n" +
+                        "	merc1, merc2"
+                )
+        ) {
+            while (rs.next()) {
+                MercadologicoIMP imp = new MercadologicoIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setMerc1ID(rs.getString("merc1"));
+                imp.setMerc1Descricao(rs.getString("merc1_desc"));
+                imp.setMerc2ID(rs.getString("merc2"));
+                imp.setMerc2Descricao(rs.getString("merc2_desc"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT\n" +
+                        "	p.CODIGO id,\n" +
+                        "	p.DATA_CADASTRO datacadastro,\n" +
+                        "	p.CODBARRA ean,\n" +
+                        "	p.QTDE_EMBALAGEM qtdembalagem,\n" +
+                        "	p.UNIDADE unidade,\n" +
+                        "	CASE p.USA_BALANCA\n" +
+                        "		WHEN 1 THEN 1\n" +
+                        "		ELSE 0\n" +
+                        "	END pesavel,\n" +
+                        "	p.VALIDADE,\n" +
+                        "	p.PRODUTO descricaocompleta,\n" +
+                        "	p.CODGRUPO merc1,\n" +
+                        "	p.CODSUBGRUPO merc2,\n" +
+                        "	p.PESO pesobruto,\n" +
+                        "	p.PESO_LIQUIDO pesoliquido,\n" +
+                        "	p.ESTOQUEMINIMO,\n" +
+                        "	p.ESTOQUE,\n" +
+                        "	p.FLAG_EST,\n" +
+                        "	p.PMARGEM1 margem,\n" +
+                        "	p.PRECOCUSTO custocomimposto,\n" +
+                        "	p.CUSTOMEDIO,\n" +
+                        "	p.PRECOCUSTO_ANTERIOR CUSTOCOMIMPOSTOanterior,\n" +
+                        "	p.PRECOVENDA precovenda,\n" +
+                        "	p.SITUACAO,\n" +
+                        "	p.CLASSIFICACAO_FISCAL ncm,\n" +
+                        "	p.\"CEST\" cest,\n" +
+                        "	pc.PIS pisconfins_s,\n" +
+                        "	pc.PIS_ENTRADA piscofins_e,\n" +
+                        "	--natureza da receita,\n" +
+                        "	p.CODALIQUOTA,\n" +
+                        "	p.CST icms_cst,\n" +
+                        "	p.ALIQUOTA icms_aliquota,\n" +
+                        "	COALESCE(p.REDUCAO, 0) icms_reducao,\n" +
+                        "	p.PRECOATACADO1 atacado,\n" +
+                        "	p.QTDE_EMBALAGEMATACADO QTDEMBALAGEMatacado,\n" +
+                        "	p.CODFORNECEDOR fabricante,\n" +
+                        "	CODIGO_ANP\n" +
+                        "FROM\n" +
+                        "	C000025 p\n" +
+                        "	LEFT JOIN C000026 pc ON\n" +
+                        "		pc.CODPRODUTO = p.CODIGO\n" +
+                        "ORDER BY\n" +
+                        "	p.CODIGO"
+                )
+        ) {
+            while (rs.next()) {
+                ProdutoIMP imp = new ProdutoIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportId(rs.getString("id"));
+                imp.setDataCadastro(rs.getDate("datacadastro"));
+                imp.setEan(rs.getString("ean"));
+                imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                imp.setTipoEmbalagem(rs.getString("unidade"));
+                imp.seteBalanca(rs.getBoolean("pesavel"));
+                imp.setValidade(rs.getInt("VALIDADE"));
+                imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                imp.setDescricaoGondola(rs.getString("descricaocompleta"));
+                imp.setDescricaoReduzida(rs.getString("descricaocompleta"));
+                imp.setCodMercadologico1(rs.getString("merc1"));
+                imp.setCodMercadologico2(rs.getString("merc2"));
+                imp.setPesoBruto(rs.getDouble("pesobruto"));
+                imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                imp.setEstoqueMinimo(rs.getDouble("ESTOQUEMINIMO"));
+                imp.setEstoque(rs.getDouble("ESTOQUE"));
+                imp.setMargem(rs.getDouble("margem"));
+                imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                imp.setCustoSemImposto(rs.getDouble("custocomimposto"));
+                imp.setCustoMedio(rs.getDouble("CUSTOMEDIO"));
+                imp.setCustoAnteriorComImposto(rs.getDouble("CUSTOCOMIMPOSTOanterior"));
+                imp.setCustoAnteriorSemImposto(rs.getDouble("CUSTOCOMIMPOSTOanterior"));
+                imp.setPrecovenda(rs.getDouble("precovenda"));
+                imp.setNcm(rs.getString("ncm"));
+                imp.setCest(rs.getString("cest"));
+                imp.setPiscofinsCstDebito(rs.getString("pisconfins_s"));
+                imp.setPiscofinsCstCredito(rs.getString("piscofins_e"));
+                
+                String icmsId = formataIdTributacao(
+                        rs.getString("icms_cst"),
+                        rs.getDouble("icms_aliquota"),
+                        rs.getDouble("icms_reducao")
+                );
+                
+                imp.setIcmsDebitoId(icmsId);
+                imp.setIcmsDebitoForaEstadoId(icmsId);
+                imp.setIcmsDebitoForaEstadoNfId(icmsId);
+                imp.setIcmsCreditoId(icmsId);
+                imp.setIcmsCreditoForaEstadoId(icmsId);
+                
+                imp.setFornecedorFabricante(rs.getString("fabricante"));
+                imp.setCodigoAnp(rs.getString("CODIGO_ANP"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.CUSTO_ANTERIOR,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.CODIGO_ANP
+        ));
+    }
+
+    private String formataIdTributacao(String cst, double aliquota, double reducao) {
+        return String.format("%s-%.2f-%.2f", cst, aliquota, reducao);
     }
     
 }
