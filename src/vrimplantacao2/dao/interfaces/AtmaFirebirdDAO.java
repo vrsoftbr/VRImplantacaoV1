@@ -13,6 +13,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -287,6 +289,103 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
 
     private String formataIdTributacao(String cst, double aliquota, double reducao) {
         return String.format("%s-%.2f-%.2f", cst, aliquota, reducao);
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	f.codigo id,\n" +
+                        "	f.nome razao,\n" +
+                        "	f.fantasia,\n" +
+                        "	f.cnpj,\n" +
+                        "	f.ie,\n" +
+                        "	f.im,\n" +
+                        "	f.endereco,\n" +
+                        "	f.numero,\n" +
+                        "	f.complemento,\n" +
+                        "	f.bairro,\n" +
+                        "	f.cod_municipio_ibge,\n" +
+                        "	f.cidade,\n" +
+                        "	f.uf,\n" +
+                        "	f.cep,\n" +
+                        "	f.contato1,\n" +
+                        "	f.telefone1,\n" +
+                        "	f.celular1,\n" +
+                        "	f.contato2,\n" +
+                        "	f.telefone2,\n" +
+                        "	f.celular2,\n" +
+                        "	f.fax,\n" +
+                        "	f.rep_nome,\n" +
+                        "	f.data,\n" +
+                        "	f.obs1,\n" +
+                        "	f.obs2,\n" +
+                        "	f.obs3,\n" +
+                        "	f.banco,\n" +
+                        "	f.agencia,\n" +
+                        "	f.conta,\n" +
+                        "	f.email\n" +
+                        "from\n" +
+                        "	c000009 f\n" +
+                        "order by\n" +
+                        "	f.codigo"
+                )
+                ) {
+            while (rs.next()) {
+                FornecedorIMP imp = new FornecedorIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportId(rs.getString("id"));
+                imp.setRazao(rs.getString("razao"));
+                imp.setFantasia(rs.getString("fantasia"));
+                imp.setCnpj_cpf(rs.getString("cnpj"));
+                imp.setIe_rg(rs.getString("ie"));
+                imp.setInsc_municipal(rs.getString("im"));
+                imp.setEndereco(rs.getString("endereco"));
+                imp.setNumero(rs.getString("numero"));
+                imp.setComplemento(rs.getString("complemento"));
+                imp.setBairro(rs.getString("bairro"));
+                imp.setIbge_municipio(rs.getInt("cod_municipio_ibge"));
+                imp.setMunicipio(rs.getString("cidade"));
+                imp.setUf(rs.getString("uf"));
+                imp.setCep(rs.getString("cep"));
+                imp.setTel_principal(rs.getString("telefone1"));
+                imp.addContato(
+                        rs.getString("contato1"),
+                        rs.getString("telefone1"),
+                        rs.getString("celular1"),
+                        TipoContato.COMERCIAL,
+                        rs.getString("email")
+                );
+                imp.addContato(
+                        rs.getString("contato2"),
+                        rs.getString("telefone2"),
+                        rs.getString("celular2"),
+                        TipoContato.COMERCIAL,
+                        ""
+                );
+                imp.addTelefone("FAX", rs.getString("fax"));
+                
+                imp.setDatacadastro(rs.getDate("data"));
+                imp.setObservacao(
+                        String.format(
+                                "(OBS1) %s (OBS2) %s (OBS3) %s",
+                                rs.getString("obs1"),
+                                rs.getString("obs2"),
+                                rs.getString("obs3")
+                        )
+                );
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
     }
     
 }

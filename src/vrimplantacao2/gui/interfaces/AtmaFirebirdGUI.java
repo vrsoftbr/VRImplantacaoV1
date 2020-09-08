@@ -257,7 +257,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -298,9 +297,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
 
         chkFornecedor.setText("Fornecedor");
         tabFornecedor.add(chkFornecedor);
-
-        chkCondicaoPagamento.setText("Condiçao Pagamento");
-        tabFornecedor.add(chkCondicaoPagamento);
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
@@ -552,7 +548,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClienteBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
-    private vrframework.bean.checkBox.VRCheckBox chkCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
