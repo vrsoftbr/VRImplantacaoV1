@@ -86,8 +86,6 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
-import vrimplantacao2.dao.interfaces.DevMasterDAO;
-import vrimplantacao2.dao.interfaces.SircomDAO;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -100,6 +98,7 @@ import vrimplantacao2.gui.interfaces.ArtSystemGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AtenasGUI;
 import vrimplantacao2.gui.interfaces.AtenasSQLSERVERGUI;
+import vrimplantacao2.gui.interfaces.AtmaFirebirdGUI;
 import vrimplantacao2.gui.interfaces.AtmaGUI;
 import vrimplantacao2.gui.interfaces.AutoAdmGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
@@ -210,7 +209,6 @@ import vrimplantacao2.gui.interfaces.SambaNetV2GUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.SavGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
-import vrimplantacao2.gui.interfaces.ShiGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI_v2;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
@@ -641,6 +639,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuTecnosoft = new javax.swing.JMenuItem();
         mnuInterData = new javax.swing.JMenuItem();
         mnuAutoADM = new javax.swing.JMenuItem();
+        mnuAtmaFirebird = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1487,6 +1486,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuAutoADM);
+
+        mnuAtmaFirebird.setText("ATMA (Firebird)");
+        mnuAtmaFirebird.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAtmaFirebirdActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuAtmaFirebird);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4739,9 +4746,12 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSTIActionPerformed
 
     private void mnuAutoADMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoADMActionPerformed
-        // TODO add your handling code here:
         AutoAdmGUI.exibir(this);
     }//GEN-LAST:event_mnuAutoADMActionPerformed
+
+    private void mnuAtmaFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAtmaFirebirdActionPerformed
+        AtmaFirebirdGUI.exibir(this);
+    }//GEN-LAST:event_mnuAtmaFirebirdActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4845,6 +4855,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAtenas;
     private javax.swing.JMenuItem mnuAtenasSQLServer;
     private javax.swing.JMenuItem mnuAtma;
+    private javax.swing.JMenuItem mnuAtmaFirebird;
     private javax.swing.JMenuItem mnuAutoADM;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;

@@ -1,9 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
-import vrimplantacao2.dao.interfaces.AtmaDAO;
 import java.awt.Frame;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -17,19 +14,18 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
+import vrimplantacao2.dao.interfaces.AtmaFirebirdDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
+public class AtmaFirebirdGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "Atma";
-    private static AtmaGUI instance;
+    private static final String SISTEMA = "Atma(Firebird)";
+    private static AtmaFirebirdGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -63,25 +59,34 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private AtmaDAO dao = new AtmaDAO();
+    private AtmaFirebirdDAO dao = new AtmaFirebirdDAO();
 
-    private AtmaGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private AtmaFirebirdGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
 
         conexao.host = "localhost";
-        conexao.database = "ansg";
-        conexao.port = "1433";
-        conexao.user = "sa";
-        conexao.pass = "atma123@#$";
+        conexao.database = "/vr/Base.FDB";
+        conexao.port = "3050";
+        conexao.user = "sysdba";
+        conexao.pass = "masterkey";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         tabProdutos.setOpcoesDisponiveis(dao);
 
-        conexao.setOnConectar(this);
+        conexao.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                gravarParametros();
+                carregarLojaVR();
+                carregarLojaCliente();
+
+                tabProdutos.btnMapaTribut.setEnabled(true);
+            }
+        });
 
         carregarParametros();
 
@@ -146,7 +151,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new AtmaGUI(i_mdiFrame);
+                instance = new AtmaFirebirdGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -197,35 +202,6 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarProdutoFornecedor();
                         }
 
-                        if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
-                        }
-
-                        List<OpcaoCliente> opt = new ArrayList<>();
-                        if (chkClienteBloqueado.isSelected()) {
-                            opt.add(OpcaoCliente.BLOQUEADO);
-                        }
-                        if (chkClienteValorLimite.isSelected()) {
-                            opt.add(OpcaoCliente.VALOR_LIMITE);
-                        }
-                        if (!opt.isEmpty()) {
-                            importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
-                        }
-
-                        if (chkCreditoRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
-
-                        if ((chkVenda.isSelected())
-                                && (!txtDataIniVenda.getText().trim().isEmpty())
-                                && (!txtDataFimVenda.getText().trim().isEmpty())) {
-
-                            DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-                            dao.setDataInicioVenda(new java.sql.Date(fmt.parse(txtDataIniVenda.getText()).getTime()));
-                            dao.setDataTerminoVenda(new java.sql.Date(fmt.parse(txtDataFimVenda.getText()).getTime()));
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
-
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -271,7 +247,6 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
     private void initComponents() {
 
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
-        conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
@@ -303,11 +278,10 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
+        conexao = new vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel();
 
         setTitle("Importação Atma");
         setToolTipText("");
-
-        conexao.setSistema("JM2Online");
 
         vRLabel1.setText("Loja (Cliente):");
 
@@ -350,7 +324,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(198, Short.MAX_VALUE))
+                .addContainerGap(153, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -362,7 +336,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkClienteValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(217, Short.MAX_VALUE))
+                .addContainerGap(223, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -394,7 +368,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                             .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(259, Short.MAX_VALUE))
+                .addContainerGap(248, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -409,7 +383,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addContainerGap(199, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Vendas", vRPanel1);
@@ -438,7 +412,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(231, Short.MAX_VALUE))
+                .addContainerGap(192, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -453,7 +427,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(176, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         tabOperacoes.addTab("Unificação", vRPanel2);
@@ -480,7 +454,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -503,7 +477,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                    .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -574,7 +548,7 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
+    private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
     private javax.swing.JLabel jLabel1;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
@@ -592,14 +566,5 @@ public class AtmaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void executar() throws Exception {
-        tabProdutos.btnMapaTribut.setEnabled(true);
-
-        gravarParametros();
-        carregarLojaVR();
-        carregarLojaCliente();
-    }
 
 }
