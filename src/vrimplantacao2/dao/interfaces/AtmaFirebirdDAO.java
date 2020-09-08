@@ -399,20 +399,32 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
                         "select\n" +
                         "	p.codigo id_produto,\n" +
                         "	p.codfornecedor id_fornecedor,\n" +
-                        "	p.referencia_fornecedor codigoexterno\n" +
+                        "	p.referencia_fornecedor codigoexterno,\n" +
+                        "	p.precocusto custotabela\n" +
                         "from\n" +
                         "	c000025 p\n" +
                         "where\n" +
                         "	not p.codfornecedor is null and\n" +
-                        "	not p.referencia_fornecedor is null"
+                        "	not p.referencia_fornecedor is null\n" +
+                        "union\n" +
+                        "select\n" +
+                        "	fc.codproduto id_produto,\n" +
+                        "	fc.codfornecedor id_fornecedor,\n" +
+                        "	fc.codigo codigoexterno,\n" +
+                        "	fc.preco custotabela\n" +
+                        "from\n" +
+                        "	fornecedor_codigo fc"
                 )
                 ) {
             while (rs.next()) {
                 ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                 
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
                 imp.setIdFornecedor(rs.getString("id_fornecedor"));
                 imp.setIdProduto(rs.getString("id_produto"));
                 imp.setCodigoExterno(rs.getString("codigoexterno"));
+                imp.setCustoTabela(rs.getDouble("custotabela"));
                 
                 result.add(imp);
             }
