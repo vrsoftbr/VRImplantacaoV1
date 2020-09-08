@@ -17,6 +17,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -380,6 +381,38 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
                                 rs.getString("obs3")
                         )
                 );
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+                
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	p.codigo id_produto,\n" +
+                        "	p.codfornecedor id_fornecedor,\n" +
+                        "	p.referencia_fornecedor codigoexterno\n" +
+                        "from\n" +
+                        "	c000025 p\n" +
+                        "where\n" +
+                        "	not p.codfornecedor is null and\n" +
+                        "	not p.referencia_fornecedor is null"
+                )
+                ) {
+            while (rs.next()) {
+                ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                
+                imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                imp.setIdProduto(rs.getString("id_produto"));
+                imp.setCodigoExterno(rs.getString("codigoexterno"));
                 
                 result.add(imp);
             }
