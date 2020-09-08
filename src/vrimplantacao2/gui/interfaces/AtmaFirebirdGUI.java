@@ -193,9 +193,6 @@ public class AtmaFirebirdGUI extends VRInternalFrame {
                         }
 
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkCondicaoPagamento.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
-                        }
 
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
