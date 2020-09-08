@@ -994,7 +994,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "    FL400CLI c \n" +
                     "    left join flcgccpf cpf on\n" +
-                    "        c.codcgccpfs = cpf.codigoenti\n" +
+                    "        c.ID_ENTIDADE = cpf.ID_ENTIDADE\n" +
                     "    left join endcom ec on\n" +
                     "        c.codigoenti = ec.CODIGOENTI\n" +
                     "    left join\n" +
@@ -1003,6 +1003,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "            tel.tp_cadastro = 'CLI'\n" +
                     "order by\n" +
                     "    c.codigoenti")) {
+                
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     String id;
@@ -1065,15 +1066,17 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "	FL700FIN cr\n" +
                     "	join FL400CLI c on\n" +
-                    "		cr.CODIGOENTI = c.CODIGOENTI\n" +
+                    "		cr.ID_CLIENTE = c.ID_CLIENTE \n" +
                     "	join FLCGCCPF cpf on\n" +
-                    "		c.CODCGCCPFS = cpf.CODIGOENTI \n" +
+                    "		c.ID_ENTIDADE = cpf.ID_ENTIDADE\n" +
                     "where\n" +
                     "	cr.CODIGOLOJA = '" + getLojaOrigem() + "' and\n" +
-                    "	cr.TIPO_PAGTO = 'VLE' and\n" +
+                    "   cr.TIPO_PAGTO in ('VLE','BOL','A','   ','DH') and\n" +
+                    "	cr.FORMAPAGTO in ('A', 'C') and\n" +
                     "	cr.TIPOLANCAM = 'R' and\n" +
-                    "	cr.TIPOCADAST = 'C' and \n" +
-                    "	datpagto < '2000-01-01'\n" +
+                    "	cr.TIPOCADAST = 'C' and\n" +
+                    "	cr.DATPAGTO <= '2000-01-01' AND \n" +
+                    "	cr.DATENTRADA >= '2019-01-01'\n" +
                     "order by\n" +
                     "	cr.NUMEROLANC")) {
                 
