@@ -98,6 +98,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PAUTA_FISCAL);
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
         result.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        result.add(OpcaoProduto.ATACADO);
+        result.add(OpcaoProduto.PRODUTOS);
+        result.add(OpcaoProduto.EAN);
 
         return result;
     }
@@ -397,6 +400,71 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            
+            Arquivo atacado = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+            ProgressBar.setStatus("Carregando Atacado...");
+            
+            for (LinhaArquivo linha : atacado) {
+                String id = linha.getString("id");
+                if(id != null && !"".equals(id.trim())) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(id);
+                    
+                    imp.setEan(linha.getString("codigobarras"));
+                    String ean_planilha = imp.getEan();
+                    if ((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
+                        imp.setEan(ean_planilha.substring(0, 14));
+                    }
+                    imp.setAtacadoPreco(linha.getDouble("precoatacado"));
+                    imp.setPrecovenda(linha.getDouble("precovenda"));
+                    
+                    vResult.add(imp);
+                }
+            }
+            
+            return vResult;
+        }
+        return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        Arquivo ean = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        ProgressBar.setStatus("Carregando EANs...");
+        
+        for (LinhaArquivo linha : ean) {
+            String id = linha.getString("id");
+            if(id != null && !"".equals(id.trim())) {
+                ProdutoIMP imp = new ProdutoIMP();
+                
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(id);
+                
+                imp.setEan(linha.getString("codigobarras"));
+                String ean_planilha = imp.getEan();
+                if ((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
+                    imp.setEan(ean_planilha.substring(0, 14));
+                }
+                imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
+                imp.setTipoEmbalagem(linha.getString("unidade"));
+                
+                result.add(imp);
+            }
+        }
+        
         return result;
     }
 
