@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -106,8 +107,12 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     "FROM\n" +
                     "  aliquotas_icms")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codigo"), 
-                            rs.getString("aliquota")));
+                    result.add(new MapaTributoIMP(
+                            rs.getString("codigo"), 
+                            rs.getString("descricao"),
+                            0, 
+                            rs.getDouble("aliquota"), 
+                            rs.getDouble("reducao")));
                 }
             }
         }
@@ -200,7 +205,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3("1");
-                    imp.setEan(rs.getString("ean"));
+                    //imp.setEan(rs.getString("ean"));
+                    imp.setEan(imp.getImportId());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
@@ -462,6 +468,47 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setIdCliente(rs.getString("idcliente"));
                     imp.setNumeroCupom(rs.getString("venda"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  cp.codigo,\n" +
+                    "  cc.parcela,\n" +
+                    "  cp.documento,\n" +
+                    "  cp.codfor idfornecedor,\n" +
+                    "  cp.dataemissao,\n" +
+                    "  cc.vencimento,\n" +
+                    "  cp.historico,\n" +
+                    "  cc.valor,\n" +
+                    "  cc.juros,\n" +
+                    "  cc.multa\n" +
+                    "from\n" +
+                    "  cond_pagto_pagar cc\n" +
+                    "join contas_pagar cp on cc.codcontaspagar = cp.codigo\n" +
+                    "where\n" +
+                    "  cp.codemp = " + getLojaOrigem() + " and\n" +
+                    "  cc.datapagto is null\n" +
+                    "order by\n" +
+                    "  cc.vencimento")) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rs.getString("codigo"));
+                    imp.setNumeroDocumento(rs.getString("documento"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
                     
                     result.add(imp);
                 }
