@@ -82,6 +82,7 @@ public class MercadologicoDAO {
     public void salvar(List<MercadologicoIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {
         //Organizaria o mercadologico informado, deixando pronto para incluir;       
         MultiMap<String, MercadologicoAuxiliar> organizados = organizarMercadologico(mercadologicos);
+        boolean manterMercadologico = opt.contains(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);
         
         Conexao.begin();
         try {
@@ -122,7 +123,7 @@ public class MercadologicoDAO {
                                     + "descricao,"
                                     + "nivel"
                                     + ") values ("
-                                    + "(select id from generate_series(1,999) s(id) except select mercadologico1 from mercadologico where nivel = 1 order by id limit 1),"
+                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico1 from mercadologico where nivel = 1 order by id limit 1)," : Utils.stringToInt(chave[2]) + ",")
                                     + "0,"
                                     + "0,"
                                     + "0,"
@@ -146,7 +147,7 @@ public class MercadologicoDAO {
                                     + "nivel"
                                     + ") values ("
                                     + pai.getMercadologico1() + ","
-                                    + "(select id from generate_series(1,999) s(id) except select mercadologico2 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and nivel = 2 order by id limit 1),"
+                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico2 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and nivel = 2 order by id limit 1)," : Utils.stringToInt(chave[3]) + ",")
                                     + "0,"
                                     + "0,"
                                     + "0,"
@@ -170,7 +171,7 @@ public class MercadologicoDAO {
                                     + ") values ("
                                     + pai.getMercadologico1() + ","
                                     + pai.getMercadologico2() + ","
-                                    + "(select id from generate_series(1,999) s(id) except select mercadologico3 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and nivel = 3 order by id limit 1),"
+                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico3 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and nivel = 3 order by id limit 1)," : Utils.stringToInt(chave[4]) + ",")
                                     + "0,"
                                     + "0,"
                                     + Utils.quoteSQL(vo.getDescricao()) + ","
@@ -194,7 +195,7 @@ public class MercadologicoDAO {
                                     + pai.getMercadologico1() + ","
                                     + pai.getMercadologico2() + ","
                                     + pai.getMercadologico3() + ","
-                                    + "(select id from generate_series(1,999) s(id) except select mercadologico4 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and nivel = 4 order by id limit 1),"
+                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico4 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and nivel = 4 order by id limit 1)," : Utils.stringToInt(chave[5]) + ",")
                                     + "0,"
                                     + Utils.quoteSQL(vo.getDescricao()) + ","
                                     + vo.getNivel() + ") returning "
@@ -218,7 +219,7 @@ public class MercadologicoDAO {
                                     + pai.getMercadologico2() + ","
                                     + pai.getMercadologico3() + ","
                                     + pai.getMercadologico4() + ","
-                                    + "(select id from generate_series(1,999) s(id) except select mercadologico5 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and mercadologico4 = " + pai.getMercadologico4() + " and nivel = 5 order by id limit 1),"
+                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico5 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and mercadologico4 = " + pai.getMercadologico4() + " and nivel = 5 order by id limit 1)," : Utils.stringToInt(chave[6]) + ",")
                                     + Utils.quoteSQL(vo.getDescricao()) + ","
                                     + vo.getNivel() + ") returning "
                                     + "id,"

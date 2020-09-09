@@ -335,6 +335,9 @@ public enum OpcaoProduto {
     MERCADOLOGICO_POR_NIVEL_REPLICAR, 
     MERCADOLOGICO_POR_NIVEL, 
     MERCADOLOGICO_NAO_EXCLUIR,
+    /**
+     * Mantem o código do mercadológico ao importar.
+     */
     MANTER_CODIGO_MERCADOLOGICO,
     INVENTARIO, 
     PESO_BRUTO, 

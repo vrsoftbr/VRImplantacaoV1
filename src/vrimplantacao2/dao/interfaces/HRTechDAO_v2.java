@@ -20,6 +20,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -39,6 +40,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -299,6 +301,22 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        ""
+                )
+                ) {
+            
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -495,6 +513,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.PRODUTOS,
