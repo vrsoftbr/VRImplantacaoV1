@@ -307,10 +307,76 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         try (
                 Statement st = ConexaoSqlServer.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        ""
+                        "select\n" +
+                        "	nut.CODIGO id,\n" +
+                        "	coalesce(nullif(rtrim(ltrim(nut.DESCINFO)),''), p.ESTC35DESC) descricao,\n" +
+                        "	p.CODIGOPLU id_produto,\n" +
+                        "	nut.VALOR_CALORICO caloria,\n" +
+                        "	nut.CARBOIDRATOS,\n" +
+                        "	nut.PROTEINAS,\n" +
+                        "	nut.GORDURAS_TOTAIS,\n" +
+                        "	nut.GORDURAS_SATURADAS,\n" +
+                        "	nut.GORDURA_TRANS,\n" +
+                        "	nut.COLESTEROL,\n" +
+                        "	nut.FIBRA_ALIMENTAR,\n" +
+                        "	nut.CALCIO,\n" +
+                        "	nut.FERRO,\n" +
+                        "	nut.SODIO,\n" +
+                        "	nut.VDCALORICO,\n" +
+                        "	nut.VDCARBOIDRATOS,\n" +
+                        "	nut.VDPROTEINAS,\n" +
+                        "	nut.VDGORDURAS_TOTAIS,\n" +
+                        "	nut.VDGORDURAS_SATURADAS,\n" +
+                        "	nut.VDFIBRA_ALIMENTAR,\n" +
+                        "	nut.VDCALCIO,\n" +
+                        "	nut.VDFERRO,\n" +
+                        "	nut.VDSODIO,\n" +
+                        "	nut.PORCAO,\n" +
+                        "	nut.PORCAO_DESC,\n" +
+                        "	nut.UNID_PORC\n" +
+                        "from\n" +
+                        "	FL328NUT n\n" +
+                        "	join FLINFNUT nut on\n" +
+                        "		n.CODIGO = nut.CODIGO\n" +
+                        "	join FL300EST p on\n" +
+                        "		n.CODIGOPLU = p.CODIGOPLU\n" +
+                        "order by\n" +
+                        "	nut.CODIGO"
                 )
                 ) {
-            
+            while (rs.next()) {
+                NutricionalIMP imp = new NutricionalIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setDescricao(rs.getString("descricao"));
+                imp.addProduto(rs.getString("id_produto"));
+                imp.setCaloria(rs.getInt("caloria"));
+                imp.setCarboidrato(rs.getInt("CARBOIDRATOS"));
+                imp.setProteina(rs.getInt("PROTEINAS"));
+                imp.setGordura(rs.getInt("GORDURAS_TOTAIS"));
+                imp.setGorduraSaturada(rs.getInt("GORDURAS_SATURADAS"));
+                imp.setGorduraTrans(rs.getInt("GORDURA_TRANS"));
+                imp.setFibra(rs.getInt("FIBRA_ALIMENTAR"));
+                imp.setCalcio(rs.getInt("CALCIO"));
+                imp.setFerro(rs.getInt("FERRO"));
+                imp.setSodio(rs.getInt("SODIO"));
+                imp.setPercentualCaloria(rs.getInt("VDCALORICO"));
+                imp.setPercentualCarboidrato(rs.getInt("VDCARBOIDRATOS"));
+                imp.setPercentualProteina(rs.getInt("VDPROTEINAS"));
+                imp.setPercentualGordura(rs.getInt("VDGORDURAS_TOTAIS"));
+                imp.setPercentualGorduraSaturada(rs.getInt("VDGORDURAS_SATURADAS"));
+                imp.setPercentualFibra(rs.getInt("VDFIBRA_ALIMENTAR"));
+                imp.setPercentualCalcio(rs.getInt("VDCALCIO"));
+                imp.setPercentualFerro(rs.getInt("VDFERRO"));
+                imp.setPercentualSodio(rs.getInt("VDSODIO"));
+                /*String un;
+                switch (Utils.acertarTexto(rs.getString("PORCAO"))) {
+                    case "40": un = "ft"
+                }*/
+                imp.setPorcao(rs.getString("PORCAO_DESC"));
+                
+                result.add(imp);
+            }
         }
         
         return result;
@@ -550,7 +616,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TIPO_PRODUTO,
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.NUTRICIONAL
         ));
     }
 
