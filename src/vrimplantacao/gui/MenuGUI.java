@@ -798,6 +798,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuBase = new javax.swing.JMenuItem();
         mnuOryon = new javax.swing.JMenuItem();
         mnuW2A = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenu13 = new javax.swing.JMenu();
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
@@ -2716,6 +2717,9 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu12.add(mnuW2A);
+
+        jMenuItem5.setText("LB Software");
+        jMenu12.add(jMenuItem5);
 
         mnuDatabase.add(jMenu12);
 
@@ -4782,6 +4786,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem32;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JMenuItem jMenuItemActive;
