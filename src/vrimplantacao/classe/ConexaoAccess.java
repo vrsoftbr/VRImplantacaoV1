@@ -51,6 +51,44 @@ public class ConexaoAccess {
             throw ex;
         }
     }
+    
+    public static Connection newConnection(String i_database, String i_usuario, String i_senha) throws Exception {
+        Connection connection;
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        /*con = DriverManager.getConnection(
+                        "jdbc:odbc:ORYON",
+                        i_usuario,
+                        i_senha
+                );*/
+        
+        Properties props = new Properties();
+        props.put("charSet", "ISO-8859-1");
+        
+        switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
+            case DRIVER: 
+                connection = DriverManager.getConnection(
+                        "jdbc:odbc:Driver={" + 
+                        Parametros.get().getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC") + 
+                        "};DBQ=" + i_database + ";uid=" + i_usuario + "; pwd=" + i_senha, props
+                );
+                break;
+            default: FONTE_DE_DADOS:
+                connection = DriverManager.getConnection(
+                        "jdbc:odbc:" + i_database,
+                        i_usuario,
+                        i_senha
+                );
+                break;                
+        }
+
+        try {
+            
+        } catch (Exception ex) {
+            throw ex;
+        }
+        
+        return connection;
+    }
 
     public static Connection getConexao() {
         return con;

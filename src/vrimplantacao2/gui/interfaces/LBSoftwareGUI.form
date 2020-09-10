@@ -27,12 +27,11 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRPanel3" max="32767" attributes="0"/>
-                  <Component id="tabs" pref="0" max="32767" attributes="0"/>
+                  <Component id="tabs" pref="698" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="vRPanel6" alignment="0" pref="554" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -43,12 +42,10 @@
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRPanel6" min="-2" pref="152" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="280" max="32767" attributes="0"/>
+              <Component id="tabs" min="-2" pref="388" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -125,6 +122,305 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
+        <Container class="javax.swing.JPanel" name="pnlConexao">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Conex&#xe3;o">
+                <Property name="tabTitle" type="java.lang.String" value="Conex&#xe3;o"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRPanel6" pref="673" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRPanel6" min="-2" pref="341" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel6">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Dados Origem - MS ACCESS"/>
+                  </Border>
+                </Property>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[350, 350]"/>
+                </Property>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="tabsConn" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtUsuario" min="-2" pref="69" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="txtSenha" alignment="0" min="-2" pref="72" max="-2" attributes="0"/>
+                                      <Component id="vRLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      </Group>
+                                      <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnConectar" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="tabsConn" min="-2" pref="256" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="vRLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
+                  <Properties>
+                    <Property name="caixaAlta" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenha">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="gwuniao"/>
+                    <Property name="caixaAlta" type="boolean" value="false"/>
+                    <Property name="mascara" type="java.lang.String" value=""/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel20">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Usu&#xe1;rio:"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel21">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Senha:"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JToggleButton" name="btnConectar">
+                  <Properties>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="3" name="/vrframework/img/chat/desconectado.png"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Conectar"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarActionPerformed"/>
+                  </Events>
+                </Component>
+                <Container class="javax.swing.JTabbedPane" name="tabsConn">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+                  <SubComponents>
+                    <Container class="javax.swing.JPanel" name="pnlConn">
+                      <Constraints>
+                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                          <JTabbedPaneConstraints tabName="Dados da conex&#xe3;o">
+                            <Property name="tabTitle" type="java.lang.String" value="Dados da conex&#xe3;o"/>
+                          </JTabbedPaneConstraints>
+                        </Constraint>
+                      </Constraints>
+
+                      <Layout>
+                        <DimensionLayout dim="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="lblArquivos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                                          <Group type="102" attributes="0">
+                                              <Component id="lblRotativo" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                              <Component id="txtRotativo" min="-2" pref="418" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" attributes="0">
+                                              <Group type="103" groupAlignment="1" attributes="0">
+                                                  <Component id="lblMercadologico" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lblProduto" min="-2" pref="111" max="-2" attributes="0"/>
+                                                  <Component id="lblFornecedor" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lblCliente" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lblEmpresa" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="txtEmpresa" min="-2" pref="418" max="-2" attributes="0"/>
+                                                  <Component id="txtProduto" min="-2" pref="418" max="-2" attributes="0"/>
+                                                  <Component id="txtMercadologico" min="-2" pref="418" max="-2" attributes="0"/>
+                                                  <Component id="txtForn" alignment="0" min="-2" pref="418" max="-2" attributes="0"/>
+                                                  <Component id="txtCliente" alignment="0" min="-2" pref="418" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace pref="60" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                        </DimensionLayout>
+                        <DimensionLayout dim="1">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                                  <Component id="lblArquivos" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Component id="lblEmpresa" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtEmpresa" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Group type="103" groupAlignment="1" attributes="0">
+                                              <Component id="lblMercadologico" min="-2" max="-2" attributes="0"/>
+                                              <Component id="txtMercadologico" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" attributes="0">
+                                              <Component id="txtProduto" min="-2" max="-2" attributes="0"/>
+                                              <Component id="lblProduto" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" attributes="0">
+                                              <Component id="txtForn" min="-2" max="-2" attributes="0"/>
+                                              <Component id="lblFornecedor" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace max="32767" attributes="0"/>
+                                          <Component id="lblCliente" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="1" attributes="0">
+                                          <EmptySpace min="-2" pref="84" max="-2" attributes="0"/>
+                                          <Component id="txtCliente" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
+                                          <Component id="lblRotativo" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="txtRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                        </DimensionLayout>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="vrframework.bean.label.VRLabel" name="lblEmpresa">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Empresa (EMPFIL.MDB)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtEmpresa">
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="lblArquivos">
+                          <Properties>
+                            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                              <Font name="Tahoma" size="14" style="1"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="Arquivos LB Software"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.label.VRLabel" name="lblProduto">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Produto (ZPROD.MDB)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtProduto">
+                        </Component>
+                        <Component class="vrframework.bean.label.VRLabel" name="lblFornecedor">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Fornecedor (FORN.MDB)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtForn">
+                        </Component>
+                        <Component class="vrframework.bean.label.VRLabel" name="lblCliente">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Cliente (CLICONV.MDB)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtCliente">
+                        </Component>
+                        <Component class="vrframework.bean.label.VRLabel" name="lblRotativo">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Rotativo (PAGREC.MDB)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtRotativo">
+                        </Component>
+                        <Component class="vrframework.bean.label.VRLabel" name="lblMercadologico">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Mercadologico (SECAO.MDB)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtMercadologico">
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                  </SubComponents>
+                </Container>
+                <Component class="javax.swing.JLabel" name="jLabel2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Loja Origem"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
+                  <Properties>
+                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="new DefaultComboBoxModel()" type="code"/>
+                    </Property>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="vRTabbedPane2">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -180,7 +476,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="312" max="32767" attributes="0"/>
+                          <EmptySpace pref="456" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -201,7 +497,7 @@
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="147" max="32767" attributes="0"/>
+                          <EmptySpace pref="251" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -280,7 +576,7 @@
                               <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="332" max="32767" attributes="0"/>
+                          <EmptySpace pref="476" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -306,7 +602,7 @@
                           <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="52" max="32767" attributes="0"/>
+                          <EmptySpace pref="156" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -392,7 +688,7 @@
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="292" max="32767" attributes="0"/>
+                      <EmptySpace pref="436" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -409,7 +705,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="125" max="32767" attributes="0"/>
+                      <EmptySpace pref="233" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -442,208 +738,6 @@
             </Component>
           </SubComponents>
         </Container>
-        <Container class="vrframework.bean.panel.VRPanel" name="vRPanel4">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Adicionais">
-                <Property name="tabTitle" type="java.lang.String" value="Adicionais"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkCodAntProduto" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="314" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkCodAntProduto" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="221" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-          <SubComponents>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCodAntProduto">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Gravar Icms implantacao.codant_produto"/>
-              </Properties>
-            </Component>
-          </SubComponents>
-        </Container>
-      </SubComponents>
-    </Container>
-    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel6">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Dados Origem - MS ACCESS"/>
-          </Border>
-        </Property>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[350, 350]"/>
-        </Property>
-      </Properties>
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="tabsConn" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtUsuario" min="-2" pref="69" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtSenha" alignment="0" min="-2" pref="72" max="-2" attributes="0"/>
-                              <Component id="vRLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                              <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnConectar" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Component id="tabsConn" min="-2" pref="67" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="vRLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="vRLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
-          <Properties>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenha">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="gwuniao"/>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-            <Property name="mascara" type="java.lang.String" value=""/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel20">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Usu&#xe1;rio:"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel21">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Senha:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JToggleButton" name="btnConectar">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/vrframework/img/chat/desconectado.png"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Conectar"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarActionPerformed"/>
-          </Events>
-        </Component>
-        <Container class="javax.swing.JTabbedPane" name="tabsConn">
-
-          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
-          <SubComponents>
-            <Container class="javax.swing.JPanel" name="jPanel4">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Dados da conex&#xe3;o">
-                    <Property name="tabTitle" type="java.lang.String" value="Dados da conex&#xe3;o"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout>
-                <DimensionLayout dim="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
-                          <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDatabase" pref="419" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-                <DimensionLayout dim="1">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="2" attributes="0">
-                              <Component id="txtDatabase" alignment="2" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel25" alignment="2" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-              </Layout>
-              <SubComponents>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel25">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Banco de Dados"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtDatabase">
-                </Component>
-              </SubComponents>
-            </Container>
-          </SubComponents>
-        </Container>
-        <Component class="javax.swing.JLabel" name="jLabel2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Loja Origem"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new DefaultComboBoxModel()" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
       </SubComponents>
     </Container>
   </SubComponents>

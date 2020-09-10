@@ -1,27 +1,23 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
-import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -31,6 +27,37 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private Connection empresa;
+    private Connection mercadologico;
+    private Connection produto;
+    private Connection fornecedor;
+    private Connection cliente;
+    private Connection rotativo;
+
+    public void setEmpresa(Connection empresa) {
+        this.empresa = empresa;
+    }
+
+    public void setMercadologico(Connection mercadologico) {
+        this.mercadologico = mercadologico;
+    }
+
+    public void setProduto(Connection produto) {
+        this.produto = produto;
+    }
+
+    public void setFornecedor(Connection fornecedor) {
+        this.fornecedor = fornecedor;
+    }
+
+    public void setCliente(Connection cliente) {
+        this.cliente = cliente;
+    }
+
+    public void setRotativo(Connection rotativo) {
+        this.rotativo = rotativo;
+    }
+    
     @Override
     public String getSistema() {
         return "LB Software";
@@ -82,7 +109,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try(Statement stm = produto.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "  codigo,\n" +
@@ -109,7 +136,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try (Statement stm = empresa.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n" +
                     "   codigo,\n" +
@@ -130,7 +157,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try (Statement stm = mercadologico.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "   nome as codmerc1,\n" +
@@ -162,7 +189,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try(Statement stm = produto.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "   p.codigo as id,\n" +
@@ -179,7 +206,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   p.custoat as custoanterior,\n" +
                     "   p.preco,\n" +
                     "   p.lucro0,\n" +
-                    "   p.margem,\n" +
+                    "   p.margem as margembruta,\n" +
                     "   p.ml as margemliq,\n" +
                     "   p.e as estoque,\n" +
                     "   p.icms,\n" +
@@ -211,6 +238,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setCustoComImposto(rs.getDouble("custoanterior"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     
@@ -280,10 +308,9 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("datacad"));
                     imp.setValidade(rs.getInt("validade"));
                     imp.setNcm(rs.getString("ncm"));
-                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofins"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    imp.setCest(rs.getString("cest"));
                     
                     result.add(imp);
                 }
@@ -296,7 +323,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try(Statement stm = fornecedor.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "   codigo as id,\n" +
@@ -376,7 +403,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try(Statement stm = produto.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "  codigo as idproduto,\n" +
@@ -405,7 +432,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try(Statement stm = cliente.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "  codigo,\n" +
@@ -475,7 +502,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+        try(Statement stm = rotativo.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "   numero,\n" +
