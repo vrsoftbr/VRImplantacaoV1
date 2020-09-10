@@ -166,6 +166,7 @@ import vrimplantacao2.gui.interfaces.JacsysGUI;
 import vrimplantacao2.gui.interfaces.JrfGUI;
 import vrimplantacao2.gui.interfaces.KairosGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
+import vrimplantacao2.gui.interfaces.LBSoftwareGUI;
 import vrimplantacao2.gui.interfaces.LiderNetWorkGUI;
 import vrimplantacao2.gui.interfaces.LinceGUI;
 import vrimplantacao2.gui.interfaces.LinearGUI;
@@ -798,6 +799,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuBase = new javax.swing.JMenuItem();
         mnuOryon = new javax.swing.JMenuItem();
         mnuW2A = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenu13 = new javax.swing.JMenu();
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
@@ -2716,6 +2718,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu12.add(mnuW2A);
+
+        jMenuItem5.setText("LB Software");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu12.add(jMenuItem5);
 
         mnuDatabase.add(jMenu12);
 
@@ -4753,6 +4763,10 @@ public final class MenuGUI extends VRMdiFrame {
         AtmaFirebirdGUI.exibir(this);
     }//GEN-LAST:event_mnuAtmaFirebirdActionPerformed
 
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        LBSoftwareGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4782,6 +4796,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem32;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JMenuItem jMenuItemActive;
