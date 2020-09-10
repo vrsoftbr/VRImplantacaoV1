@@ -14,6 +14,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -82,48 +85,19 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    " codigo_do_icms as id,\n" +
-                    " descricao_do_icms as descricao,\n" +
-                    " aliquota,\n" +
-                    " situacao_tributaria_tab_b as cst,\n" +
-                    " percentual_base as reducao,\n" +
-                    " percentual_base_st,\n" +
-                    " aliquota_st \n" +
+                    "  codigo,\n" +
+                    "  descricao,\n" +
+                    "  st as cst,\n" +
+                    "  aicm as icms,\n" +
+                    "  bcr as reducao\n" +
                     "from \n" +
-                    " icms \n" +
-                    "where \n" +
-                    " codigo_do_icms in \n" +
-                    "    (select distinct codigo_do_icms from produtos)")) {
+                    "  tributacao")) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(
-                            rs.getString("id"), 
+                            rs.getString("codigo"), 
                             rs.getString("descricao"), 
                             rs.getInt("cst"), 
-                            rs.getDouble("aliquota"), 
-                            rs.getDouble("reducao")));
-                }
-            }
-            
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    " codigo_do_icms as id,\n" +
-                    " descricao_do_icms as descricao,\n" +
-                    " aliquota,\n" +
-                    " situacao_tributaria_tab_b as cst,\n" +
-                    " percentual_base as reducao,\n" +
-                    " percentual_base_st,\n" +
-                    " aliquota_st \n" +
-                    "from \n" +
-                    " icms \n" +
-                    "where \n" +
-                    " codigo_do_icms in \n" +
-                    "    (select distinct codigo_icms_compra from produtos)")) {
-                while(rs.next()) {
-                    result.add(new MapaTributoIMP(
-                            rs.getString("id"),
-                            rs.getString("descricao"), 
-                            rs.getInt("cst"),
-                            rs.getDouble("aliquota"),
+                            rs.getDouble("icms"), 
                             rs.getDouble("reducao")));
                 }
             }
@@ -138,13 +112,13 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n" +
-                    " codigo_da_empresa as id,\n" +
-                    " nome_fantasia\n" +
-                    "from \n" +
-                    " empresas"
+                    "   codigo,\n" +
+                    "   nome\n" +
+                    "from\n" +
+                    "   empresa"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("nome_fantasia")));
+                    result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("nome")));
                 }
             }
         }
@@ -159,32 +133,22 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    " distinct\n" +
-                    " p.codigo_do_grupo as merc1,\n" +
-                    " g.nome_do_grupo as descmerc1,\n" +
-                    " s.codigo_subgrupo as merc2,\n" +
-                    " s.nome_subgrupo as descmerc2\n" +
+                    "   nome as codmerc1,\n" +
+                    "   nome as descmerc1\n" +
                     "from\n" +
-                    " produtos p,\n" +
-                    " grupos_de_produtos g,\n" +
-                    " subgrupo s\n" +
-                    "where\n" +
-                    "  p.codigo_do_grupo = g.codigo_do_grupo and\n" +
-                    "  p.codigo_subgrupo = s.codigo_subgrupo\n" +
-                    "order by\n" +
-                    "  2, 4"
+                    "   secao"
             )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());                   
-                    imp.setMerc1ID(rs.getString("merc1"));
+                    imp.setMerc1ID(rs.getString("codmerc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
-                    imp.setMerc2ID(rs.getString("merc2"));
-                    imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+                    imp.setMerc2ID(imp.getMerc1ID());
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID(imp.getMerc1ID());
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());
                     
                     result.add(imp);
                 }
@@ -200,43 +164,36 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    " CInt(p.codigo_do_produto) as id,\n" +
-                    " p.codigo_de_barras as ean,\n" +
-                    " p.descricao_do_produto as descricaocompleta,\n" +
-                    " p.descricao_abreviada as descricaoreduzida,\n" +
-                    " p.codigo_do_grupo as merc1,\n" +
-                    " p.codigo_subgrupo as merc2,\n" +
-                    " p.unidade_de_medida as embalagem,\n" +
-                    " p.valor_custo as custocomimposto,\n" +
-                    " p.valor_custo_total as custototal,\n" +
-                    " p.valor_venda as precovenda,\n" +
-                    " p.preco_real_ant as precovendaant,\n" +
-                    " p.valor_atacado as precoatacado,\n" +
-                    " p.quantidade_estoque as estoque,\n" +
-                    " p.codigo_do_icms as idicms_debito,\n" +
-                    " p.codigo_icms_compra as idicms_credito,\n" +
-                    " p.ativo as situacaocadastro,\n" +
-                    " p.data_inclusao as datacadastro,\n" +
-                    " p.balanca,\n" +
-                    " p.validade1,\n" +
-                    " p.codigo_da_classificacao as ncm,\n" +
-                    " p.markup as margem,\n" +
-                    " p.peso_bruto,\n" +
-                    " p.peso_liquido,\n" +
-                    " p.codigo_do_pis as idpis_debito,\n" +
-                    " ps.situacao_tributaria_pis as pis_debito,\n" +
-                    " p.codigo_pis_compra as pis_credito,\n" +
-                    " p.codigo_do_cofins as idcofins_debito,\n" +
-                    " p.codigo_cofins_compra as cofins_credito,\n" +
-                    " p.mva_st as mva,\n" +
-                    " p.aliquotastret as icms_st,\n" +
-                    " p.codigo_do_cest as cest\n" +
+                    "select \n" +
+                    "   p.codigo as id,\n" +
+                    "   p.nome as descricaocompleta,\n" +
+                    "   p.etqdescricao as descricaogondola,\n" +
+                    "   p.nome_reduz as descricaoreduzida,\n" +
+                    "   p.balanca,\n" +
+                    "   p.balancavalidade as validade,\n" +        
+                    "   p.ean,\n" +
+                    "   p.unidade,\n" +
+                    "   p.secao as merc1,\n" +
+                    "   p.datacad,\n" +
+                    "   p.embalagem as qtdembalagem,\n" +
+                    "   p.custoat as custoanterior,\n" +
+                    "   p.preco,\n" +
+                    "   p.lucro0,\n" +
+                    "   p.margem,\n" +
+                    "   p.ml as margemliq,\n" +
+                    "   p.e as estoque,\n" +
+                    "   p.icms,\n" +
+                    "   p.icme,\n" +
+                    "   p.codpiscofins as piscofins,\n" +
+                    "   p.piscofinsnatrec as naturezareceita,\n" +
+                    "   p.ncm,\n" +
+                    "   p.cest,\n" +
+                    "   p.bloqueadoparavenda as bloqueado\n" +        
                     "from\n" +
-                    " produtos as p\n" +
-                    "left join pis as ps on p.codigo_do_pis = ps.codigo_do_pis\n" +
+                    "   produtos p\n" +
+                    "left join piscofins pc on p.codpiscofins = pc.codigo\n" +
                     "order by\n" +
-                    " 3")) {
+                    "   p.codigo")) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -244,74 +201,89 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(String.valueOf(rs.getInt("id")));
                     imp.setEan(String.valueOf(rs.getLong("ean")));
-                    imp.seteBalanca(rs.getBoolean("balanca"));
+                    imp.seteBalanca(rs.getInt("balanca") > 0);
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaogondola")));
                     imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3("1");
-                    imp.setTipoEmbalagem(rs.getString("embalagem"));
-                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCodMercadologico2(imp.getCodMercadologico1());
+                    imp.setCodMercadologico3(imp.getCodMercadologico1());
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setCustoComImposto(rs.getDouble("custoanterior"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     
-                    imp.setIcmsDebitoId(rs.getString("idicms_debito"));
-                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(rs.getString("idicms_credito"));
+                    String icms = rs.getString("icms");
                     
-                    imp.setSituacaoCadastro(rs.getBoolean("situacaocadastro") == true ? 1 : 0);
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setValidade(rs.getInt("validade1"));
-                    imp.setNcm(rs.getString("ncm"));
-                    imp.setMargem(rs.getDouble("margem"));
-                    imp.setPesoBruto(rs.getDouble("peso_bruto"));
-                    imp.setPesoLiquido(rs.getDouble("peso_liquido"));
-                    imp.setPiscofinsCstDebito(rs.getString("pis_debito"));
-                    imp.setCest(rs.getString("cest"));
-                    imp.setPautaFiscalId(imp.getImportId());
-                    
-                    if(imp.getEan().length() < 7) {
-                        imp.setManterEAN(true);
+                    if(icms != null && !"".equals(icms)) {
+                        switch(icms.trim()) {
+                            case "FF":
+                                imp.setIcmsAliqSaida(0);
+                                imp.setIcmsCstSaida(60);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                            case "II":
+                                imp.setIcmsAliqSaida(0);
+                                imp.setIcmsCstSaida(40);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                            case "T01":
+                                imp.setIcmsAliqSaida(7);
+                                imp.setIcmsCstSaida(0);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                            case "T02":
+                                imp.setIcmsAliqSaida(12);
+                                imp.setIcmsCstSaida(0);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                            case "T03":
+                                imp.setIcmsAliqSaida(18);
+                                imp.setIcmsCstSaida(0);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                            case "T04":
+                                imp.setIcmsAliqSaida(25);
+                                imp.setIcmsCstSaida(0);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                            default:    
+                                imp.setIcmsAliqSaida(0);
+                                imp.setIcmsCstSaida(40);
+                                imp.setIcmsReducaoSaida(0);
+                                break;
+                        }
                     }
                     
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
-        List<PautaFiscalIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    " p.codigo_do_produto as id,\n" +
-                    " p.codigo_de_barras as ean,\n" +
-                    " p.codigo_do_icms as idicms_debito,\n" +
-                    " p.codigo_icms_compra as idicms_credito,\n" +
-                    " p.codigo_da_classificacao as ncm,\n" +
-                    " p.mva_st as mva,\n" +
-                    " p.codigo_do_cest as cest\n" +
-                    "from\n" +
-                    " produtos as p\n" +
-                    "where\n" +
-                    " p.mva_st > 0")) {
-                while(rs.next()) {
-                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoConsumidor(imp.getIcmsReducaoSaida());
                     
-                    imp.setId(rs.getString("id"));
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsAliqEntrada(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstEntrada(imp.getIcmsCstEntrada());
+                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
+                    
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntradaForaEstado());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
+                    
+                    imp.setSituacaoCadastro(rs.getBoolean("bloqueado") == true ? 0 : 1);
+                    imp.setDataCadastro(rs.getDate("datacad"));
+                    imp.setValidade(rs.getInt("validade"));
                     imp.setNcm(rs.getString("ncm"));
-                    imp.setIva(rs.getDouble("mva"));
-                    imp.setIvaAjustado(imp.getIva());
-                    imp.setAliquotaDebitoId(rs.getString("idicms_debito"));
-                    imp.setAliquotaDebitoForaEstadoId(imp.getAliquotaDebitoId());
-                    imp.setAliquotaCreditoId(rs.getString("idicms_credito"));
-                    imp.setAliquotaCreditoForaEstadoId(imp.getAliquotaCreditoId());
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setPiscofinsCstDebito(rs.getString("piscofins"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setCest(rs.getString("cest"));
                     
                     result.add(imp);
                 }
@@ -326,31 +298,28 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    " f.codigo_do_fornecedor as id,\n" +
-                    " f.nome,\n" +
-                    " f.nome_fantasia,\n" +
-                    " f.fone,\n" +
-                    " f.endereco,\n" +
-                    " f.numero,\n" +
-                    " f.complemento,\n" +
-                    " f.bairro,\n" +
-                    " c.nome_da_cidade as municipio,\n" +
-                    " c.uf,\n" +
-                    " f.cep,\n" +
-                    " f.cgc,\n" +
-                    " f.inscricao_estadual,\n" +
-                    " f.contato,\n" +
-                    " f.fax,\n" +
-                    " f.website,\n" +
-                    " f.cpf,\n" +
-                    " f.rg,\n" +
-                    " f.email_fiscal,\n" +
-                    " f.inscricao_suframa\n" +
+                    "select \n" +
+                    "   codigo as id,\n" +
+                    "   nome,\n" +
+                    "   fantasia,\n" +
+                    "   cgc,\n" +
+                    "   ie,\n" +
+                    "   bairro,\n" +
+                    "   endereco,\n" +
+                    "   numero, \n" +
+                    "   cidade,\n" +
+                    "   estado,\n" +
+                    "   cep,\n" +
+                    "   fone1,\n" +
+                    "   fone2,\n" +
+                    "   fone3,\n" +
+                    "   celular,\n" +
+                    "   fax,\n" +
+                    "   contato,\n" +
+                    "   obs,\n" +
+                    "   email\n" +
                     "from\n" +
-                    " fornecedores f\n" +
-                    "left join cidades c on \n" +
-                    "    f.codigo_da_cidade = c.codigo_da_cidade")) {
+                    "   fornecedores")) {
                 while(rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     
@@ -358,20 +327,43 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(Utils.acertarTexto(rs.getString("nome")));
-                    imp.setFantasia(Utils.acertarTexto(rs.getString("nome_fantasia")));
-                    imp.setTel_principal(rs.getString("fone"));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
+                    imp.setTel_principal(rs.getString("fone1"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("municipio"));
-                    imp.setUf(rs.getString("uf"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
                     imp.setCep(rs.getString("cep"));
                     imp.setCnpj_cpf(rs.getString("cgc"));
-                    if(imp.getCnpj_cpf() == null && "".equals(imp.getCnpj_cpf())) {
-                        imp.setCnpj_cpf(rs.getString("rg"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    
+                    String fax = rs.getString("fax"), 
+                            celular = rs.getString("celular"),
+                            email = rs.getString("email"),
+                            contato = rs.getString("contato"),
+                            fone3 = rs.getString("fon3");
+                    
+                    if(fax != null && !"".equals(fax)) {
+                        imp.addContato("1", "FAX", fax, null, TipoContato.NFE, null);
                     }
-                    imp.setIe_rg(rs.getString("inscricao_estadual"));
+                    
+                    if(celular != null && !"".equals(celular)) {
+                        imp.addContato("2", "CELULAR", null, celular, TipoContato.NFE, null);
+                    }
+                    
+                    if(email != null && !"".equals(email)) {
+                        imp.addContato("3", rs.getString("contato"), null, null, TipoContato.NFE, email);
+                    }
+                    
+                    if(contato != null && !"".equals(contato)) {
+                        imp.addContato("4", contato, null, null, TipoContato.NFE, null);
+                    }
+                    
+                    if(fone3 != null && !"".equals(fone3)) {
+                        imp.addContato("5", "FONE3", fone3, null, TipoContato.NFE, null);
+                    }
                     
                     result.add(imp);
                 }
@@ -387,11 +379,12 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    " codigo_do_produto as idproduto,\n" +
-                    " codigo_do_fornecedor as idfornecedor,\n" +
-                    " fornecedor_codigo as codigoexterno \n" +
+                    "  codigo as idproduto,\n" +
+                    "  codfor as idfornecedor,\n" +
+                    "  codigoexterno,\n" +
+                    "  embalagem \n" +
                     "from \n" +
-                    " fornecedores_do_produto")) {
+                    "  CodigosExternos")) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
@@ -409,37 +402,113 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
-        List<OfertaIMP> result = new ArrayList<>();
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
         
         try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    " data_inicial_promo as datainicio,\n" +
-                    " data_final_promo as datatermino,\n" +
-                    " codigo_do_produto as idproduto,\n" +
-                    " valor_promo as precooferta,\n" +
-                    " valor_venda as preconormal\n" +
+                    "select\n" +
+                    "  codigo,\n" +
+                    "  nome,\n" +
+                    "  rg,\n" +
+                    "  cpf,\n" +
+                    "  datanasc,\n" +
+                    "  endereco,\n" +
+                    "  numero,\n" +
+                    "  cidade,\n" +
+                    "  referencia,\n" +
+                    "  bairro,\n" +
+                    "  cep,\n" +
+                    "  uf,\n" +
+                    "  telefone,\n" +
+                    "  limite,\n" +
+                    "  motivo,\n" +
+                    "  salario,\n" +
+                    "  empresa,\n" +
+                    "  cargo,\n" +
+                    "  foner,\n" +
+                    "  email,\n" +
+                    "  pai,\n" +
+                    "  mae,\n" +
+                    "  conjuge,\n" +
+                    "  datareg,\n" +
+                    "  inativo\n" +
                     "from\n" +
-                    " produtos\n" +
-                    "where\n" +
-                    " data_inicial_promo is not null and\n" +
-                    " data_final_promo > Date()\n" +
-                    "order by\n" +
-                    " data_final_promo")) {
+                    "  clientes")) {
                 while(rs.next()) {
-                    OfertaIMP imp = new OfertaIMP();
+                    ClienteIMP imp = new ClienteIMP();
                     
-                    imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setDataInicio(rs.getDate("datainicio"));
-                    imp.setDataFim(rs.getDate("datatermino"));
-                    imp.setPrecoNormal(rs.getDouble("preconormal"));
-                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+                    imp.setId(rs.getString("codigo"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setInscricaoestadual(rs.getString("rg"));
+                    imp.setCnpj(rs.getString("cpf"));
+                    imp.setDataNascimento(rs.getDate("datanasc"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setComplemento(rs.getString("referencia"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setObservacao(rs.getString("motivo"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setCargo(rs.getString("cargo"));
+                    imp.setTelefone(rs.getString("foner"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setNomePai(rs.getString("pai"));
+                    imp.setNomeMae(rs.getString("mae"));
+                    imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setDataCadastro(rs.getDate("datareg"));
+                    imp.setAtivo(rs.getBoolean("inativo") == false);
                     
                     result.add(imp);
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "   numero,\n" +
+                    "   data,\n" +
+                    "   ecf,\n" +
+                    "   historico,\n" +
+                    "   vencimento,\n" +
+                    "   referencia,\n" +
+                    "   codigo as idcliente,\n" +
+                    "   movimento - valorr as valor \n" +
+                    "from \n" +
+                    "   crr \n" +
+                    "where \n" +
+                    "  loja = " + getLojaOrigem() + " and \n" +
+                    "  valorr < movimento\n" +
+                    "  order by data")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("numero"));
+                    imp.setNumeroCupom(imp.getId());
+                    imp.setDataEmissao(rs.getDate("data"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setObservacao(rs.getString("historico"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setValor(rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 }

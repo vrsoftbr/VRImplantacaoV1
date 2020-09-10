@@ -166,6 +166,7 @@ import vrimplantacao2.gui.interfaces.JacsysGUI;
 import vrimplantacao2.gui.interfaces.JrfGUI;
 import vrimplantacao2.gui.interfaces.KairosGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
+import vrimplantacao2.gui.interfaces.LBSoftwareGUI;
 import vrimplantacao2.gui.interfaces.LiderNetWorkGUI;
 import vrimplantacao2.gui.interfaces.LinceGUI;
 import vrimplantacao2.gui.interfaces.LinearGUI;
@@ -2719,6 +2720,11 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu12.add(mnuW2A);
 
         jMenuItem5.setText("LB Software");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
         jMenu12.add(jMenuItem5);
 
         mnuDatabase.add(jMenu12);
@@ -4756,6 +4762,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuAtmaFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAtmaFirebirdActionPerformed
         AtmaFirebirdGUI.exibir(this);
     }//GEN-LAST:event_mnuAtmaFirebirdActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        LBSoftwareGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
