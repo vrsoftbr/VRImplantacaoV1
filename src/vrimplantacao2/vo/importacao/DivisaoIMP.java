@@ -9,6 +9,13 @@ public class DivisaoIMP {
     private String id;
     private String descricao = "SEM DESCRICAO";
 
+    public DivisaoIMP(){}
+
+    public DivisaoIMP(String id, String descricao) {
+        this.id = id;
+        this.descricao = descricao;
+    }
+
     public String getId() {
         return id;
     }
