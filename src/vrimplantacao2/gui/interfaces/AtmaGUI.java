@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import vrimplantacao2.dao.interfaces.AtmaDAO;
 import java.awt.Frame;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

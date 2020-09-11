@@ -19,6 +19,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.PlanoContasVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -26,6 +27,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -36,7 +38,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Importacao
  */
-public class CefasDAO extends InterfaceDAO {
+public class CefasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String vPlanoContas;
     public boolean vBalanca = false;
@@ -142,6 +144,8 @@ public class CefasDAO extends InterfaceDAO {
                     + "    pisentrada.cstpis pisentrada,\n"
                     + "    pissaida.cstpis pissaida,\n"
                     + "    pissaida.cest,\n"
+                    + "    pissaida.codnatpis naturezareceita,\n"        
+                    + "    t.codtribut idaliquota,\n"        
                     + "    t.aliqicms icmsdebito,\n"
                     + "    t.sittribut cst,\n"
                     + "    t.perbasered redicms,\n"
@@ -173,7 +177,8 @@ public class CefasDAO extends InterfaceDAO {
                     + "    (select\n"
                     + "        pis.cstpis,\n"
                     + "        pis.cest,\n"
-                    + "        pis.codprod\n"
+                    + "        pis.codprod,\n"
+                    + "        pis.codnatpis\n"        
                     + "    from\n"
                     + "        cadncmpiscofins pis\n"
                     + "    where\n"
@@ -210,8 +215,9 @@ public class CefasDAO extends InterfaceDAO {
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstCredito(rs.getString("pisentrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pissaida"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     
-                    imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
+                    /*imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
                     imp.setIcmsCstSaida(rs.getInt("cst"));
                     
@@ -222,6 +228,25 @@ public class CefasDAO extends InterfaceDAO {
                     imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
                     imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
                     imp.setIcmsReducaoConsumidor(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());*/
+                    
+                    imp.setIcmsDebitoId(rs.getString("idaliquota"));
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
@@ -300,23 +325,48 @@ public class CefasDAO extends InterfaceDAO {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "    codfornec idfornecedor,\n"
-                    + "    codprod idproduto,\n"
-                    + "    codprodfor referencia\n"
-                    + "from \n"
-                    + "    prodfornec\n"
-                    + "where\n"
-                    + "    codprod != 0\n"
-                    + "order by\n"
-                    + "    codprod, codfornec")) {
+                    "SELECT\n" +
+                    "	distinct\n" +
+                    "	pf.CODPROD idproduto,\n" +
+                    "	pf.CODFORNEC idfornecedor,\n" +
+                    "	pf.CODPRODFOR codigoexterno,\n" +
+                    "	ent.unidade,\n" +
+                    "	COALESCE(ent.qtd, 0) AS qtd\n" +
+                    "from \n" +
+                    "	prodfornec pf\n" +
+                    "LEFT JOIN \n" +
+                    "	(SELECT \n" +
+                    "		itemxml.QTUNITCX qtd,\n" +
+                    "		nfent.CODFORNEC,\n" +
+                    "		itemxml.CODPROD,\n" +
+                    "		itemxml.UNIDADE,\n" +
+                    "		itemxml.CODPRODFOR,\n" +
+                    "		itemxml.DTMOV\n" +
+                    "	FROM \n" +
+                    "		itemxml\n" +
+                    "	JOIN NFENT ON itemxml.NUMNOTA = nfent.NUMNOTA \n" +
+                    "	WHERE nfent.CODFILIAL = '" + getLojaOrigem() + "') ent ON pf.CODPROD = ent.codprod AND \n" +
+                    "		pf.CODFORNEC = ent.codfornec AND \n" +
+                    "		ent.codprodfor = pf.CODPRODFOR\n" +
+                    "where\n" +
+                    "	pf.codprod != 0 AND \n" +
+                    "	to_date(ent.dtmov, 'dd/MM/yyyy') = (SELECT \n" +
+                    "					max(to_date(ent.dtmov, 'dd/MM/yyyy'))\n" +
+                    "				FROM \n" +
+                    "					itemxml JOIN NFENT ON itemxml.NUMNOTA = nfent.NUMNOTA \n" +
+                    "				WHERE ent.codprod = itemxml.codprod AND \n" +
+                    "					ent.codfornec = NFENT.codfornec AND \n" +
+                    "					ent.codprodfor = itemxml.CODPRODFOR)\n" +
+                    "order by\n" +
+                    "	pf.codfornec, pf.codprod")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setCodigoExterno(rs.getString("referencia"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtd"));
 
                     result.add(imp);
                 }
@@ -651,6 +701,35 @@ public class CefasDAO extends InterfaceDAO {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	CODTRIBUT id,\n" +
+                    "	obs descricao,\n" +
+                    "	ALIQICMS icms, \n" +
+                    "	SITTRIBUT cst,\n" +
+                    "	PERBASERED reducao\n" +
+                    "FROM 	\n" +
+                    "	tributacao\n" +
+                    "ORDER BY \n" +
+                    "	1")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"), 
+                            rs.getString("descricao"), 
+                            rs.getInt("cst"),
+                            rs.getDouble("icms"), 
+                            rs.getDouble("reducao")));
+                }
+            }
+        }
+        return result;
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
