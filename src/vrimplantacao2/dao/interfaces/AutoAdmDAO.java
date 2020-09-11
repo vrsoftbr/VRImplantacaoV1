@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -21,11 +23,19 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoProduto;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 
 /**
  *
@@ -38,7 +48,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
         return "AutoADM";
     }
 
-    private String getAliquotaCreditoKey(String cst, double aliq, double red) throws SQLException {
+    private String getAliquotaForaEstadoKey(String cst, double aliq, double red) throws SQLException {
         return String.format(
                 "%s-%.2f-%.2f",
                 cst,
@@ -47,7 +57,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
         );
     }
 
-    private String getAliquotaDebitoKey(String cst, double aliq, double red) throws SQLException {
+    private String getAliquotaDentroEstadoKey(String cst, double aliq, double red) throws SQLException {
         return String.format(
                 "%s-%.2f-%.2f",
                 cst,
@@ -81,30 +91,24 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "/* mapa tributacao */\n"
-                    + "select distinct\n"
-                    + "    icms.cd_governo as icmscst,\n"
-                    + "    coalesce(tpro.pe_icms_dentro_estado, 0) as icmsaliq,\n"
-                    + "    coalesce(tpro.pe_reducao_base_icms, 0) as icmsreducao,\n"
-                    + "    icms.fg_isento as isento,\n"
-                    + "    icms.fg_naotributado as naotributado,\n"
-                    + "    icms.fg_substituicao_tributaria as subst,\n"
-                    + "    icms.fg_reducao_base_calculo as temreducao\n"
-                    + "from tb_produto p\n"
-                    + "left join tb_tributacao_produto tpro\n"
-                    + "    on tpro.cd_tributacao_produto = p.cd_tributacao_produto\n"
-                    + "left join tb_tributacao_icms icms\n"
-                    + "    on icms.cd_tributacao_icms = tpro.cd_tributacao_icms\n"
-                    + "order by 1"
+                    "select\n"
+                    + "    distinct\n"
+                    + "    icms.ds_tributacao_icms descricao,\n"
+                    + "    icms.cd_governo icmscst,\n"
+                    + "    g_imp.pe_icms_fora_estado icmsaliq,\n"
+                    + "    coalesce(g_imp.pe_icms_reducao, 0) icmsreducao\n"
+                    + "from tb_produto pro\n"
+                    + "join tb_grupo_imposto g_imp on g_imp.cd_grupo_imposto = pro.cd_grupo_imposto\n"
+                    + "join tb_tributacao_icms icms on icms.cd_tributacao_icms = g_imp.cd_tributacao_icms"
             )) {
                 while (rst.next()) {
-                    String id = getAliquotaDebitoKey(
+                    String id = getAliquotaForaEstadoKey(
                             rst.getString("icmscst"),
                             rst.getDouble("icmsaliq"),
                             rst.getDouble("icmsreducao"));
                     result.add(new MapaTributoIMP(
                             id,
-                            id,
+                            rst.getString("descricao"),
                             rst.getInt("icmscst"),
                             rst.getDouble("icmsaliq"),
                             rst.getDouble("icmsreducao")
@@ -113,37 +117,30 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "/* mapa tributacao */\n"
-                    + "select distinct\n"
-                    + "    icms.cd_governo as icmscst,\n"
-                    + "    coalesce(tpro.pe_icms_fora_estado, 0) as icmsaliqforaestado,\n"
-                    + "    coalesce(tpro.pe_reducao_base_icms, 0) as icmsreducao,\n"
-                    + "    icms.fg_isento as isento,\n"
-                    + "    icms.fg_naotributado as naotributado,\n"
-                    + "    icms.fg_substituicao_tributaria as subst,\n"
-                    + "    icms.fg_reducao_base_calculo as temreducao\n"
-                    + "from tb_produto p\n"
-                    + "left join tb_tributacao_produto tpro\n"
-                    + "    on tpro.cd_tributacao_produto = p.cd_tributacao_produto\n"
-                    + "left join tb_tributacao_icms icms\n"
-                    + "    on icms.cd_tributacao_icms = tpro.cd_tributacao_icms\n"
-                    + "order by 1"
+                    "select\n"
+                    + "    distinct\n"
+                    + "    icms.ds_tributacao_icms descricao,\n"
+                    + "    icms.cd_governo icmscst,\n"
+                    + "    g_imp.pe_icms_dentro_estado icmsaliq,\n"
+                    + "    coalesce(g_imp.pe_icms_reducao, 0) icmsreducao\n"
+                    + "from tb_produto pro\n"
+                    + "join tb_grupo_imposto g_imp on g_imp.cd_grupo_imposto = pro.cd_grupo_imposto\n"
+                    + "join tb_tributacao_icms icms on icms.cd_tributacao_icms = g_imp.cd_tributacao_icms"
             )) {
                 while (rst.next()) {
-                    String id = getAliquotaCreditoKey(
+                    String id = getAliquotaDentroEstadoKey(
                             rst.getString("icmscst"),
-                            rst.getDouble("icmsaliqforaestado"),
+                            rst.getDouble("icmsaliq"),
                             rst.getDouble("icmsreducao"));
                     result.add(new MapaTributoIMP(
                             id,
-                            id,
+                            rst.getString("descricao"),
                             rst.getInt("icmscst"),
-                            rst.getDouble("icmsaliqforaestado"),
+                            rst.getDouble("icmsaliq"),
                             rst.getDouble("icmsreducao")
                     ));
                 }
             }
-
         }
         return result;
     }
@@ -190,9 +187,32 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.EXCECAO
+                    OpcaoProduto.EXCECAO,
+                    OpcaoProduto.TIPO_PRODUTO
                 }
         ));
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery("  select\n"
+                    + "    fam.cd_produto_grupo, fam.nm_produto_grupo\n"
+                    + "from tb_produto_grupo fam\n"
+                    + "order by 1")) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("cd_produto_grupo"));
+                    imp.setDescricao(rst.getString("nm_produto_grupo"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -211,6 +231,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.fg_unidade_peso as pesavel,\n"
                     + "    p.vl_validade as validade,\n"
                     + "    p.nr_dias_validade,\n"
+                    + "    p.cd_produto_grupo as familiaproduto,\n"
                     + "    p.nm_produto as descricaocompleta,\n"
                     + "    p.nm_produto_reduzido as descricaoreduzida,\n"
                     + "    p.vl_venda as precovenda,\n"
@@ -221,25 +242,19 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.fg_situacao as situacaocadastro,\n"
                     + "    p.nr_ncm as ncm,\n"
                     + "    cest.nr_cest as cest,\n"
-                    + "    tp.cd_produto_tipo as tipoproduto,\n"
+                    + "    tp.cd_governo as tipoproduto,\n"
                     + "    tp.ds_tipo_produto as descricaotipoproduto,\n"
                     + "    pis_e.cd_governo as pisentrada,\n"
                     + "    pis_s.cd_governo as pissaida,\n"
                     + "    cof_e.cd_governo as cofinsentrada,\n"
                     + "    cof_s.cd_governo as cofinssaida,\n"
                     + "    nat.nr_natureza_receita as naturezareita,\n"
-                    + "    tpg.nm_tributacao_produto_grupo,\n"
+                    + "    icms.ds_tributacao_icms,\n"
                     + "    icms.cd_governo as icmscst,\n"
-                    + "    coalesce(tpro.pe_icms_dentro_estado, 0) as icmsaliq,\n"
-                    + "    coalesce(tpro.pe_icms_fora_estado, 0) as icmsaliqforaestado,\n"
-                    + "    coalesce(tpro.pe_reducao_base_icms, 0) as icmsreducao,\n"
-                    + "    icms.fg_icms_obrigatorio,\n"
-                    + "    icms.fg_isento,\n"
-                    + "    icms.fg_naotributado,\n"
-                    + "    icms.fg_substituicao_tributaria,\n"
-                    + "    icms.fg_reducao_base_calculo,\n"
-                    + "    icms.fg_st_embutido,\n"
-                    + "    icms.fg_icms_simples\n"
+                    + "    g_imp.pe_icms_dentro_estado as aliqdentroestado,\n"
+                    + "    g_imp.pe_icms_fora_estado as aliqforaestado,\n"
+                    + "    coalesce(g_imp.pe_icms_reducao, 0) as reducao,\n"
+                    + "    coalesce(g_imp.pe_reducao_base_icms, 0) pe_reducao_base_icms\n"
                     + "from tb_produto p\n"
                     + "left join tb_produto_tipo tp on\n"
                     + "    tp.cd_produto_tipo = p.cd_produto_tipo\n"
@@ -249,12 +264,6 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    on b.cd_produto_unidade_medida = pm.cd_produto_unidade_medida\n"
                     + "left join tb_unidade_medida um\n"
                     + "    on um.cd_unidade_medida = pm.cd_unidade_medida\n"
-                    + "left join tb_tributacao_produto tpro\n"
-                    + "    on tpro.cd_tributacao_produto = p.cd_tributacao_produto\n"
-                    + "left join tb_tributacao_icms icms\n"
-                    + "    on icms.cd_tributacao_icms = tpro.cd_tributacao_icms\n"
-                    + "left join tb_tributacao_produto_grupo tpg\n"
-                    + "    on tpg.cd_tributacao_produto_grupo = tpro.cd_tributacao_produto_grupo\n"
                     + "left join tb_cest cest\n"
                     + "    on cest.cd_cest = p.cd_cest\n"
                     + "left join tb_tributacao_pis_cofins pis_e\n"
@@ -266,7 +275,11 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tb_tributacao_pis_cofins cof_s\n"
                     + "    on cof_s.cd_tributacao_pis_cofins = p.cd_tributacao_cofins_s\n"
                     + "left join tb_natureza_receita nat\n"
-                    + "    on nat.cd_natureza_receita = p.cd_natureza_receita"
+                    + "    on nat.cd_natureza_receita = p.cd_natureza_receita\n"
+                    + "left join tb_grupo_imposto g_imp\n"
+                    + "    on g_imp.cd_grupo_imposto = p.cd_grupo_imposto\n"
+                    + "left join tb_tributacao_icms icms\n"
+                    + "    on icms.cd_tributacao_icms = g_imp.cd_tributacao_icms"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -292,6 +305,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    imp.setTipoProduto(rst.getInt("tipoproduto"));
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -299,6 +313,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
@@ -310,24 +325,22 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getInt("cofinsentrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareita"));
 
-                    String icmsDeb = getAliquotaDebitoKey(
+                    String aliqDentroEstado = getAliquotaDentroEstadoKey(
                             rst.getString("icmscst"),
-                            rst.getDouble("icmsaliq"),
-                            rst.getDouble("icmsreducao")
-                    );
+                            rst.getDouble("aliqdentroestado"),
+                            rst.getDouble("reducao"));
 
-                    String icmsCre = getAliquotaCreditoKey(
+                    String aliqForaEstado = getAliquotaForaEstadoKey(
                             rst.getString("icmscst"),
-                            rst.getDouble("icmsaliqforaestado"),
-                            rst.getDouble("icmsreducao")
-                    );
+                            rst.getDouble("aliqforaestado"),
+                            rst.getDouble("reducao"));
 
-                    imp.setIcmsDebitoId(icmsDeb);
-                    imp.setIcmsDebitoForaEstadoId(icmsDeb);
-                    imp.setIcmsDebitoForaEstadoNfId(icmsDeb);
-                    imp.setIcmsCreditoId(icmsCre);
-                    imp.setIcmsCreditoForaEstadoId(icmsCre);
-                    imp.setIcmsConsumidorId(icmsDeb);
+                    imp.setIcmsDebitoId(aliqDentroEstado);
+                    imp.setIcmsDebitoForaEstadoId(aliqForaEstado);
+                    imp.setIcmsDebitoForaEstadoNfId(aliqForaEstado);
+                    imp.setIcmsCreditoId(aliqDentroEstado);
+                    imp.setIcmsCreditoForaEstadoId(aliqForaEstado);
+                    imp.setIcmsConsumidorId(aliqDentroEstado);
 
                     result.add(imp);
                 }
@@ -387,6 +400,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pe.nr_rg as rg,\n"
                     + "    pe.nr_cnpj as cnpj,\n"
                     + "    pe.nr_cpf_cnpj as cpfcnpj,\n"
+                    + "    pe.fg_fisica_juridica,\n"
                     + "    pe.nr_ie as inscricaoestadual,\n"
                     + "    pe.nr_im as inscricaomunicipal,\n"
                     + "    pe.dt_inclusao as datacadastro,\n"
@@ -407,7 +421,8 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    cp.ds_condicao_pagamento as condicaopagamento,\n"
                     + "    f.fg_situacao as situacaocadastro,\n"
                     + "    f.fg_produtor_rural,\n"
-                    + "    f.fg_atacado\n"
+                    + "    f.fg_atacado,\n"
+                    + "    f.fg_optante_simples\n"
                     + "from tb_pessoa pe\n"
                     + "join tb_fornecedor f\n"
                     + "    on f.cd_pessoa_fornecedor = pe.cd_pessoa\n"
@@ -432,7 +447,14 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setCnpj_cpf(rst.getString("cpfcnpj"));
-                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+
+                    if ((rst.getString("rg") != null)
+                            && (!rst.getString("rg").trim().isEmpty())) {
+                        imp.setIe_rg(rst.getString("rg"));
+                    } else {
+                        imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    }
+
                     imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -449,11 +471,34 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao("COND PAGTO - " + rst.getString("condicaopagamento"));
                     imp.setAtivo("A".equals(rst.getString("situacaocadastro").trim()));
 
+                    if ("S".equals(rst.getString("fg_produtor_rural").trim())) {
+
+                        if ("F".equals(rst.getString("fg_fisica_juridica").trim())) {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                        } else {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                        }
+                    }
+
+                    if ((imp.getTipoEmpresa() != TipoEmpresa.PRODUTOR_RURAL_FISICA)
+                            && (imp.getTipoEmpresa() != TipoEmpresa.PRODUTOR_RURAL_JURIDICO)) {
+
+                        if ("S".equals(rst.getString("fg_optante_simples").trim())) {
+                            imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
+                        }
+                    }
+
+                    if ("S".equals(rst.getString("fg_atacado").trim())) {
+                        imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                    }
+
                     try (ResultSet rst2 = stm.executeQuery(
                             "select\n"
                             + "    pe.cd_pessoa as id,\n"
                             + "    ct.ds_contato_tipo as tipocontato,\n"
-                            + "    pc.ds_pessoa_contato as contato\n"
+                            + "    pc.ds_pessoa_contato as contato,\n"
+                            + "    pc.nm_contato as nome,\n"
+                            + "    pc.fg_principal as principal\n"
                             + "from tb_pessoa pe\n"
                             + "join tb_fornecedor f\n"
                             + "    on f.cd_pessoa_fornecedor = pe.cd_pessoa\n"
@@ -465,28 +510,96 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     )) {
                         while (rst2.next()) {
 
+                            String nome = rst2.getString("nome");
+
                             if ("Fone Comercial".equals(rst2.getString("tipocontato"))) {
                                 imp.setTel_principal(rst2.getString("contato"));
-                            } else {
+                            }
 
-                                if ("Celular".equals(rst2.getString("tipocontato"))) {
+                            if ("Fone Comercial".equals(rst2.getString("tipocontato"))) {
+
+                                if (nome != null && !nome.trim().isEmpty()) {
+                                    imp.addTelefone(nome, rst2.getString("contato"));
+                                } else {
+                                    imp.addTelefone("TELEFONE", rst2.getString("contato"));
+                                }
+                            }
+
+                            if ("Celular".equals(rst2.getString("tipocontato"))) {
+
+                                if (nome != null && !nome.trim().isEmpty()) {
+                                    imp.addCelular(nome, rst2.getString("contato"));
+                                } else {
                                     imp.addCelular("CELULAR", rst2.getString("contato"));
                                 }
-                                if ("Email".equals(rst2.getString("tipocontato"))) {
+                            }
+
+                            if ("Email".equals(rst2.getString("tipocontato"))) {
+
+                                if (nome != null && !nome.trim().isEmpty()) {
+                                    imp.addEmail(nome, rst2.getString("contato"), TipoContato.COMERCIAL);
+                                } else {
                                     imp.addEmail("EMAIL", rst2.getString("contato"), TipoContato.COMERCIAL);
                                 }
-                                if ("Email NFe".equals(rst2.getString("tipocontato"))) {
+                            }
+
+                            if ("Email NFe".equals(rst2.getString("tipocontato"))) {
+
+                                if (nome != null && !nome.trim().isEmpty()) {
+                                    imp.addEmail(nome, rst2.getString("contato"), TipoContato.NFE);
+                                } else {
                                     imp.addEmail("EMAIL NFE", rst2.getString("contato"), TipoContato.NFE);
                                 }
-                                if ("Fax".equals(rst2.getString("tipocontato"))) {
+                            }
+
+                            if ("Fax".equals(rst2.getString("tipocontato"))) {
+
+                                if (nome != null && !nome.trim().isEmpty()) {
+                                    imp.addTelefone(nome, rst2.getString("contato"));
+                                } else {
                                     imp.addTelefone("FAX", rst2.getString("contato"));
                                 }
-                                if ("Fone Residencial".equals(rst2.getString("tipocontato"))) {
+                            }
+
+                            if ("Fone Residencial".equals(rst2.getString("tipocontato"))) {
+
+                                if (nome != null && !nome.trim().isEmpty()) {
+                                    imp.addTelefone(nome, rst2.getString("contato"));
+                                } else {
                                     imp.addTelefone("TEL RESIDENCIAL", rst2.getString("contato"));
                                 }
                             }
                         }
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    pf.cd_pessoa_fornecedor as idfornecedor,\n"
+                    + "    pf.cd_produto as idproduto,\n"
+                    + "    pf.dt_alteracao as dataalteracao,\n"
+                    + "    pf.cd_codigo_fornecedor as codigoexterno\n"
+                    + "from tb_produto_fornecedor pf\n"
+                    + "order by 1, 2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
                     result.add(imp);
                 }
             }
@@ -527,6 +640,7 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.fg_situacao as situacaocadastro,\n"
                     + "    c.ds_obs,\n"
                     + "    c.fg_estado_civil as estadocivil,\n"
+                    + "    c.tp_sexo as sexo,\n"
                     + "    c.nm_empresa as empresa,\n"
                     + "    c.dt_admissao as dataadmissao,\n"
                     + "    c.ds_profissao as cargo,\n"
@@ -538,16 +652,10 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ba_cob.nm_bairro as bairrocobranca,\n"
                     + "    cid_cob.nm_cidade as municipiocobranca,\n"
                     + "    cid_cob.cd_municipio_ibge as municipioibgecobranca,\n"
-                    + "    uf_cob.sg_estado as ufcobranca,\n"
-                    + "    car.nm_carteira as tipovalorlimite,\n"
-                    + "    coalesce(cc.vl_limite, 0) as valorlimite\n"
+                    + "    uf_cob.sg_estado as ufcobranca\n"
                     + "from tb_pessoa pe\n"
                     + "join tb_cliente c\n"
                     + "    on c.cd_pessoa_cliente = pe.cd_pessoa\n"
-                    + "left join tb_cliente_carteira cc\n"
-                    + "    on cc.cd_pessoa_cliente = c.cd_pessoa_cliente\n"
-                    + "left join tb_carteira car\n"
-                    + "    on car.cd_carteira = cc.cd_carteira\n"
                     + "left join tb_logradouro_bairro lb\n"
                     + "    on lb.cd_logradouro_bairro = pe.cd_logradouro_bairro\n"
                     + "left join tb_logradouro l\n"
@@ -577,7 +685,14 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cpfcnpj"));
-                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+
+                    if ((rst.getString("rg") != null)
+                            && (!rst.getString("rg").trim().isEmpty())) {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    } else {
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    }
+
                     imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -603,7 +718,28 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setObservacao(rst.getString("ds_obs") + " " + rst.getString("observacao"));
                     imp.setAtivo("A".equals(rst.getString("situacaocadastro").trim()));
-                    imp.setValorLimite(rst.getDouble("valorlimite"));
+
+                    try (ResultSet rst3 = stm.executeQuery(
+                            "select\n"
+                            + "    car.nm_carteira as tipovalorlimite,\n"
+                            + "    coalesce(cc.vl_limite, 0) as valorlimite\n"
+                            + "from tb_pessoa pe\n"
+                            + "join tb_cliente c\n"
+                            + "    on c.cd_pessoa_cliente = pe.cd_pessoa\n"
+                            + "left join tb_cliente_carteira cc\n"
+                            + "    on cc.cd_pessoa_cliente = c.cd_pessoa_cliente\n"
+                            + "left join tb_carteira car\n"
+                            + "    on car.cd_carteira = cc.cd_carteira\n"
+                            + "where pe.cd_pessoa = " + imp.getId() + "\n"
+                            + "and car.cd_carteira = 3"
+                    )) {
+                        if (rst3.next()) {
+                            imp.setValorLimite(rst3.getDouble("valorlimite"));
+                        }
+                    }
+
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
 
                     imp.setEmpresa(rst.getString("empresa"));
                     imp.setDataAdmissao(rst.getDate("dataadmissao"));
@@ -612,6 +748,28 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setNomePai(rst.getString("pai"));
+
+                    if ("C".equals(rst.getString("estadocivil").trim())) {
+                        imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                    } else if ("D".equals(rst.getString("estadocivil").trim())) {
+                        imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                    } else if ("O".equals(rst.getString("estadocivil").trim())) {
+                        imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                    } else if ("S".equals(rst.getString("estadocivil").trim())) {
+                        imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                    }
+
+                    if ((rst.getString("sexo") != null)
+                            && (!rst.getString("sexo").trim().isEmpty())) {
+
+                        if ("F".equals(rst.getString("sexo").trim())) {
+                            imp.setSexo(TipoSexo.FEMININO);
+                        } else {
+                            imp.setSexo(TipoSexo.MASCULINO);
+                        }
+                    }
 
                     try (ResultSet rst2 = stm.executeQuery(
                             "select\n"
@@ -666,10 +824,11 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.nr_documento as numerocupom,\n"
                     + "    r.dt_emissao as dataemissao,\n"
                     + "    i.dt_vencimento as datavencimento,\n"
-                    + "    r.vl_receber as valor,\n"
-                    + "    i.vl_parcela,\n"
-                    + "    i.vl_juros,\n"
+                    + "    r.vl_receber as valortotal,\n"
+                    + "    i.vl_parcela as valorparcela,\n"
+                    + "    i.vl_juros as valorjuros,\n"
                     + "    i.vl_saldo,\n"
+                    + "    i.nr_parcela as numeroparcela,\n"
                     + "    r.fg_situacao as situacao_r,\n"
                     + "    i.fg_situacao as situacao_i,\n"
                     + "    r.ds_historico as historico,\n"
@@ -683,22 +842,148 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join tb_tipo_documento doc\n"
                     + "    on doc.cd_tipo_documento = r.cd_tipo_documento\n"
                     + "where r.fg_situacao = 'A' \n"
-                    + "and i.fg_situacao = 'A'"
+                    + "and i.fg_situacao = 'P'\n"
+                    + "and r.cd_carteira = 3"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rst.getString("id"));
+                    imp.setId(rst.getString("idcliente")
+                            + rst.getString("numerocupom")
+                            + rst.getString("datavencimento")
+                            + rst.getString("numeroparcela")
+                            + rst.getString("valorparcela"));
                     imp.setIdCliente(rst.getString("idcliente"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setParcela(rst.getInt("vl_parcela"));
-                    imp.setObservacao(rst.getString("historico") + " " + rst.getString("observacao"));
+                    imp.setValor(rst.getDouble("vl_saldo"));
+                    imp.setJuros(rst.getDouble("valorjuros"));
+                    imp.setParcela(rst.getInt("numeroparcela"));
+                    imp.setObservacao("VALOR TOTAL CONTA " + rst.getString("valortotal") + " PARCELA " + rst.getString("numeroparcela")
+                            + "..." + rst.getString("historico") + " " + rst.getString("observacao") + " - SITUACAO " + rst.getString("situacao_i"));
                     result.add(imp);
                 }
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    ch.cd_cheque_terceiro as id,\n"
+                    + "    ch.nr_cheque as numerocheque,\n"
+                    + "    ch.vl_cheque as valor,\n"
+                    + "    ch.dt_emissao as dataemissao,\n"
+                    + "    ch.dt_deposito as datadeposito,\n"
+                    + "    ch.dt_alteracao as dataalteracao,\n"
+                    + "    ch.ds_cmc7 as cmc7,\n"
+                    + "    ch.ds_observacao as observacao,\n"
+                    + "    ch.cd_alinea as alinea,\n"
+                    + "    ch.cd_pessoa_conta_terceiro,\n"
+                    + "    pct.cd_banco as banco,\n"
+                    + "    bc.nr_banco as idbanco,\n"
+                    + "    bc.nm_banco as nomebanco,\n"
+                    + "    pct.nr_conta as numeroconta,\n"
+                    + "    pct.dg_conta as digitoconta,\n"
+                    + "    pct.nr_agencia as numeroagencia,\n"
+                    + "    pct.dg_agencia as digitoagencia,\n"
+                    + "    p.nm_pessoa as nome,\n"
+                    + "    p.nr_cpf_cnpj as cnpjcpf,\n"
+                    + "    p.nr_rg as rg,\n"
+                    + "    p.nr_ie as inscricaoestadual,\n"
+                    + "    ch.fg_baixado,\n"
+                    + "    ch.fg_situacao\n"
+                    + "from tb_cheque_terceiro ch\n"
+                    + "left join tb_pessoa_conta_terceiro pct\n"
+                    + "    on pct.cd_pessoa_conta_terceiro = ch.cd_pessoa_conta_terceiro\n"
+                    + "left join tb_pessoa p\n"
+                    + "    on p.cd_pessoa = pct.cd_pessoa\n"
+                    + "left join tb_banco bc\n"
+                    + "    on bc.cd_banco = pct.cd_banco\n"
+                    + "where ch.fg_baixado = 'N'\n"
+                    + "and ch.fg_situacao = 'A'"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDate(rst.getDate("dataemissao"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
+                    imp.setCmc7(rst.getString("cmc7"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setBanco(rst.getInt("idbanco"));
+                    imp.setAgencia(rst.getString("numeroagencia") + " " + rst.getString("digitoagencia"));
+                    imp.setConta(rst.getString("numeroconta") + " " + rst.getString("digitoconta"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setCpf(rst.getString("cnpjcpf"));
+
+                    if ((rst.getString("rg") != null)
+                            && (!rst.getString("rg").trim().isEmpty())) {
+                        imp.setRg(rst.getString("rg"));
+                    } else {
+                        imp.setRg(rst.getString("inscricaoestadual"));
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public void importarIcmsCodAntProduto() throws Exception {        
+        List<ProdutoIMP> result = new ArrayList<>();
+        result = getProdutos();
+
+        if (!result.isEmpty()) {
+            gravarIcmsCodAntProduto(result);
+        }
+    }
+
+    public void gravarIcmsCodAntProduto(List<ProdutoIMP> imp) throws Exception {
+
+        Conexao.begin();
+        Statement stm;
+        String sql = "";
+
+        ProgressBar.setStatus("Gravando Icms implantacao.codant_produto...");
+        ProgressBar.setMaximum(imp.size());
+
+        try {
+            stm = Conexao.createStatement();
+
+            for (ProdutoIMP i_imp : imp) {
+
+                sql = "update implantacao.codant_produto set \n"
+                        + "icmsdebitoid = '" + i_imp.getIcmsDebitoId() + "', \n"
+                        + "icmsdebitoforaestadoid = '" + i_imp.getIcmsDebitoForaEstadoId() + "', \n"
+                        + "icmsdebitoforaestadonfid = '" + i_imp.getIcmsDebitoForaEstadoNfId() + "', \n"
+                        + "icmscreditoid = '" + i_imp.getIcmsCreditoId() + "', \n"
+                        + "icmscreditoforaestadoid = '" + i_imp.getIcmsCreditoForaEstadoId() + "',\n"
+                        + "icmsconsumidorid = '" + i_imp.getIcmsConsumidorId() + "' \n"
+                        + "where impid = '" + i_imp.getImportId() + "' \n"
+                        + "and impsistema = '" + getSistema() + "' \n"
+                        + "and imploja = '" + getLojaOrigem() + "';";
+
+                stm.execute(sql);
+
+                ProgressBar.next();
+
+            }
+
+            stm.close();
+            Conexao.commit();
+
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
     }
 }

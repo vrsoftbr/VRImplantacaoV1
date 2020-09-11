@@ -1539,10 +1539,13 @@ public class NotaSaidaDAO {
             //salva nota
             sql = new StringBuilder();
             sql.append("SELECT id, id_situacaonotasaida FROM notasaida WHERE id = " + i_notaSaida.id);
-
+            
             rst = stm.executeQuery(sql.toString());
 
             if (rst.next()) {
+                
+                System.out.println("Nota Existe");
+                
                 sql = new StringBuilder();
                 sql.append("UPDATE notasaida SET");
                 sql.append(" numeronota = " + i_notaSaida.numeroNota + ",");
@@ -1595,6 +1598,9 @@ public class NotaSaidaDAO {
                 new LogTransacaoDAO().gerar(Formulario.NOTAFISCAL_SAIDA, TipoTransacao.ALTERACAO, i_notaSaida.numeroNota, "", i_notaSaida.id);
 
             } else {
+                
+                System.out.println("Nota Não Existe");
+                
                 sql = new StringBuilder();
                 sql.append("INSERT INTO notasaida (id_loja, numeronota, id_tiponota, id_fornecedordestinatario, id_clienteeventualdestinatario,");
                 sql.append(" id_tiposaida, datahoraemissao, datasaida, valoripi, valorbaseipi, valorfrete, valoroutrasdespesas, valorproduto, valortotal,");

@@ -309,9 +309,9 @@ public class SQLEditor extends VRInternalFrame {
             if (txtDatabase.getArquivo().isEmpty()) {
                 throw new VRException("Favor informar nome do banco de dados!");
             }
-            if (txtSenha.getText().isEmpty()) {
+            /*if (txtSenha.getText().isEmpty()) {
                 throw new VRException("Favor informar a senha do banco de dados!");
-            }
+            }*/
             if (txtUsuario.getText().isEmpty()) {
                 throw new VRException("Favor informar o usuário do banco de dados !");
             }

@@ -41,6 +41,10 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         this.dao = new ImportarNotaSaidaImportacaoDAO();
         initComponents();
 
+        chkVerificarCodigoAnterior.setSelected(true);
+        chkReimportarNotasExistentes.setSelected(true);
+        chkCriarEventual.setSelected(true);
+        
         carregarLojaV2();
         
         centralizarForm();

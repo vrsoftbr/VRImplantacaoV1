@@ -331,13 +331,18 @@ public class ImportarNotaSaidaImportacaoDAO {
 
                 Element uCom = (Element) prod.getElementsByTagName("uCom").item(0);
 
-                if (uCom.getTextContent().isEmpty() || !Util.isNumero(uCom.getTextContent().substring(2))) {
+                if (uCom.getTextContent().isEmpty() || !Util.isNumero(
+                        uCom.getTextContent().length() == 1 ? uCom.getTextContent().substring(1)
+                                : uCom.getTextContent().substring(2)
+                )) {
                     oItem.qtdEmbalagem = 1;
                 } else {
                     oItem.qtdEmbalagem = Integer.parseInt(uCom.getTextContent().substring(2));
                 }
 
-                if (!Util.isTipoEmbalagemFracionado(uCom.getTextContent().substring(0, 2))) {
+                if (!Util.isTipoEmbalagemFracionado(
+                    uCom.getTextContent().length() == 1 ? uCom.getTextContent().substring(0, 1)
+                            : uCom.getTextContent().substring(0, 2))) {
                     oItem.quantidade = Util.round(oItem.quantidade, 0);
                 } else {
                     oItem.quantidade = Double.parseDouble(Util.formatDecimal3(oItem.quantidade).replace(".", "").replace(",", "."));

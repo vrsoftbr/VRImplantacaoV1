@@ -150,7 +150,7 @@ public class PdvVendaVO {
     }
 
     public void setChaveCfe(String chaveCfe) {
-        this.chaveCfe = Utils.formataEmail(chaveCfe, 44);
+        this.chaveCfe = Utils.acertarTexto(chaveCfe, 44);
     }
 
     public void setCpfCrm(long cpfCrm) {
