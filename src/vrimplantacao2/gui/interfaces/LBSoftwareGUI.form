@@ -26,7 +26,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRPanel3" max="32767" attributes="0"/>
+                  <Component id="pnlMigrar" max="32767" attributes="0"/>
                   <Component id="tabs" pref="698" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
@@ -41,11 +41,11 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" min="-2" pref="388" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="tabs" pref="388" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="pnlMigrar" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -62,14 +62,14 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
     </Container>
-    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel3">
+    <Container class="vrframework.bean.panel.VRPanel" name="pnlMigrar">
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblLoja" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="cmbLojaVR" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
@@ -85,7 +85,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="cmbLojaVR" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -109,7 +109,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMigrarActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel1">
+        <Component class="javax.swing.JLabel" name="lblLoja">
           <Properties>
             <Property name="text" type="java.lang.String" value="Loja:"/>
           </Properties>
@@ -136,7 +136,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRPanel6" pref="673" max="32767" attributes="0"/>
+                      <Component id="pnlDadosConexao" pref="673" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -145,14 +145,14 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRPanel6" min="-2" pref="341" max="-2" attributes="0"/>
+                      <Component id="pnlDadosConexao" min="-2" pref="341" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel6">
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlDadosConexao">
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
@@ -173,18 +173,18 @@
                               <Component id="tabsConn" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lblUsuario" min="-2" max="-2" attributes="0"/>
                                       <Component id="txtUsuario" min="-2" pref="69" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="txtSenha" alignment="0" min="-2" pref="72" max="-2" attributes="0"/>
-                                      <Component id="vRLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lblSenha" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" attributes="0">
-                                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lblLojaOrigem" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                       </Group>
                                       <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
@@ -200,21 +200,21 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="tabsConn" min="-2" pref="256" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="tabsConn" pref="256" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblSenha" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -232,12 +232,12 @@
                     <Property name="mascara" type="java.lang.String" value=""/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel20">
+                <Component class="vrframework.bean.label.VRLabel" name="lblUsuario">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Usu&#xe1;rio:"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel21">
+                <Component class="vrframework.bean.label.VRLabel" name="lblSenha">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Senha:"/>
                   </Properties>
@@ -405,7 +405,7 @@
                     </Container>
                   </SubComponents>
                 </Container>
-                <Component class="javax.swing.JLabel" name="jLabel2">
+                <Component class="javax.swing.JLabel" name="lblLojaOrigem">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Loja Origem"/>
                   </Properties>

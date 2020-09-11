@@ -186,6 +186,34 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = produto.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  codigo,\n" +
+                    "  ean,\n" +
+                    "  embalagem\n" +
+                    "from\n" +
+                    "  ean")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setQtdEmbalagem(rs.getInt("embalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
@@ -227,7 +255,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(String.valueOf(rs.getInt("id")));
-                    imp.setEan(String.valueOf(rs.getLong("ean")));
+                    imp.setEan(rs.getString("ean"));
                     imp.seteBalanca(rs.getInt("balanca") > 0);
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
@@ -238,7 +266,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setCustoComImposto(rs.getDouble("custoanterior"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setMargem(rs.getDouble("margembruta"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     
@@ -297,12 +325,12 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
                     
                     imp.setIcmsAliqEntrada(imp.getIcmsAliqSaida());
-                    imp.setIcmsCstEntrada(imp.getIcmsCstEntrada());
-                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
+                    imp.setIcmsCstEntrada(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoSaida());
                     
                     imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
-                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntradaForaEstado());
-                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
                     
                     imp.setSituacaoCadastro(rs.getBoolean("bloqueado") == true ? 0 : 1);
                     imp.setDataCadastro(rs.getDate("datacad"));
@@ -358,7 +386,6 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rs.getString("fone1"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("estado"));
@@ -370,7 +397,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                             celular = rs.getString("celular"),
                             email = rs.getString("email"),
                             contato = rs.getString("contato"),
-                            fone3 = rs.getString("fon3");
+                            fone3 = rs.getString("fone3");
                     
                     if(fax != null && !"".equals(fax)) {
                         imp.addContato("1", "FAX", fax, null, TipoContato.NFE, null);
@@ -381,7 +408,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     if(email != null && !"".equals(email)) {
-                        imp.addContato("3", rs.getString("contato"), null, null, TipoContato.NFE, email);
+                        imp.addContato("3", "EMAIL", null, null, TipoContato.NFE, email);
                     }
                     
                     if(contato != null && !"".equals(contato)) {

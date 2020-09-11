@@ -146,7 +146,6 @@ public class LBSoftwareGUI extends VRInternalFrame {
                         txtUsuario.getText(), 
                         txtSenha.getText()));
             }
-            
         }
         
         gravarParametros();
@@ -323,17 +322,17 @@ public class LBSoftwareGUI extends VRInternalFrame {
     private void initComponents() {
 
         vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
-        vRPanel3 = new vrframework.bean.panel.VRPanel();
+        pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
-        jLabel1 = new javax.swing.JLabel();
+        lblLoja = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new javax.swing.JPanel();
-        vRPanel6 = new vrframework.bean.panel.VRPanel();
+        pnlDadosConexao = new vrframework.bean.panel.VRPanel();
         txtUsuario = new vrframework.bean.textField.VRTextField();
         txtSenha = new vrframework.bean.passwordField.VRPasswordField();
-        vRLabel20 = new vrframework.bean.label.VRLabel();
-        vRLabel21 = new vrframework.bean.label.VRLabel();
+        lblUsuario = new vrframework.bean.label.VRLabel();
+        lblSenha = new vrframework.bean.label.VRLabel();
         btnConectar = new javax.swing.JToggleButton();
         tabsConn = new javax.swing.JTabbedPane();
         pnlConn = new javax.swing.JPanel();
@@ -350,7 +349,7 @@ public class LBSoftwareGUI extends VRInternalFrame {
         txtRotativo = new vrframework.bean.fileChooser.VRFileChooser();
         lblMercadologico = new vrframework.bean.label.VRLabel();
         txtMercadologico = new vrframework.bean.fileChooser.VRFileChooser();
-        jLabel2 = new javax.swing.JLabel();
+        lblLojaOrigem = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -393,35 +392,35 @@ public class LBSoftwareGUI extends VRInternalFrame {
             }
         });
 
-        jLabel1.setText("Loja:");
+        lblLoja.setText("Loja:");
 
-        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
-        vRPanel3.setLayout(vRPanel3Layout);
-        vRPanel3Layout.setHorizontalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
+        pnlMigrar.setLayout(pnlMigrarLayout);
+        pnlMigrarLayout.setHorizontalGroup(
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(lblLoja)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
+        pnlMigrarLayout.setVerticalGroup(
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMigrarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
+                    .addGroup(pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblLoja)
                         .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        vRPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - MS ACCESS"));
-        vRPanel6.setPreferredSize(new java.awt.Dimension(350, 350));
+        pnlDadosConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - MS ACCESS"));
+        pnlDadosConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
         txtUsuario.setCaixaAlta(false);
 
@@ -429,9 +428,9 @@ public class LBSoftwareGUI extends VRInternalFrame {
         txtSenha.setCaixaAlta(false);
         txtSenha.setMascara("");
 
-        vRLabel20.setText("Usuário:");
+        lblUsuario.setText("Usuário:");
 
-        vRLabel21.setText("Senha:");
+        lblSenha.setText("Senha:");
 
         btnConectar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
         btnConectar.setText("Conectar");
@@ -524,52 +523,52 @@ public class LBSoftwareGUI extends VRInternalFrame {
 
         tabsConn.addTab("Dados da conexão", pnlConn);
 
-        jLabel2.setText("Loja Origem");
+        lblLojaOrigem.setText("Loja Origem");
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
-        javax.swing.GroupLayout vRPanel6Layout = new javax.swing.GroupLayout(vRPanel6);
-        vRPanel6.setLayout(vRPanel6Layout);
-        vRPanel6Layout.setHorizontalGroup(
-            vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel6Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlDadosConexaoLayout = new javax.swing.GroupLayout(pnlDadosConexao);
+        pnlDadosConexao.setLayout(pnlDadosConexaoLayout);
+        pnlDadosConexaoLayout.setHorizontalGroup(
+            pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosConexaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabsConn)
-                    .addGroup(vRPanel6Layout.createSequentialGroup()
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pnlDadosConexaoLayout.createSequentialGroup()
+                        .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(vRPanel6Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
+                        .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlDadosConexaoLayout.createSequentialGroup()
+                                .addComponent(lblLojaOrigem)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConectar)))
                 .addContainerGap())
         );
-        vRPanel6Layout.setVerticalGroup(
-            vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel6Layout.createSequentialGroup()
-                .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+        pnlDadosConexaoLayout.setVerticalGroup(
+            pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosConexaoLayout.createSequentialGroup()
+                .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 256, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLojaOrigem))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(pnlDadosConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar)
                     .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
@@ -578,14 +577,14 @@ public class LBSoftwareGUI extends VRInternalFrame {
             pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlConexaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                .addComponent(pnlDadosConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
                 .addContainerGap())
         );
         pnlConexaoLayout.setVerticalGroup(
             pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlConexaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlDadosConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -764,7 +763,7 @@ public class LBSoftwareGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 698, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -776,10 +775,10 @@ public class LBSoftwareGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 388, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -840,17 +839,21 @@ public class LBSoftwareGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblArquivos;
     private vrframework.bean.label.VRLabel lblCliente;
     private vrframework.bean.label.VRLabel lblEmpresa;
     private vrframework.bean.label.VRLabel lblFornecedor;
+    private javax.swing.JLabel lblLoja;
+    private javax.swing.JLabel lblLojaOrigem;
     private vrframework.bean.label.VRLabel lblMercadologico;
     private vrframework.bean.label.VRLabel lblProduto;
     private vrframework.bean.label.VRLabel lblRotativo;
+    private vrframework.bean.label.VRLabel lblSenha;
+    private vrframework.bean.label.VRLabel lblUsuario;
     private javax.swing.JPanel pnlConexao;
     private javax.swing.JPanel pnlConn;
+    private vrframework.bean.panel.VRPanel pnlDadosConexao;
+    private vrframework.bean.panel.VRPanel pnlMigrar;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
@@ -862,11 +865,7 @@ public class LBSoftwareGUI extends VRInternalFrame {
     private vrframework.bean.fileChooser.VRFileChooser txtRotativo;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtUsuario;
-    private vrframework.bean.label.VRLabel vRLabel20;
-    private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.panel.VRPanel vRPanel2;
-    private vrframework.bean.panel.VRPanel vRPanel3;
-    private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.panel.VRPanel vRPanel9;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
