@@ -45,6 +45,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
+import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -1731,6 +1732,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
+    
+    public String dataInicioPdvVenda;
+    public String dataTerminoPdvVenda;
 
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
@@ -2019,6 +2023,100 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+    
+    public List<PdvVendaVO> carregarVendasChaveCfe() throws Exception {
+        List<PdvVendaVO> result = new ArrayList<>();
+        SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + " 	v.DATA as datavenda, \n"
+                    + " 	cast(v.NUM_PDV as bigint) as ecf, \n"
+                    + " 	cast(v.NUM_CUPOM as bigint) as numerocupom, \n"
+                    + " 	nfe.CHAVE as chaveCfe\n"
+                    + " from dbo.Sint_total_Cupom v \n"
+                    + " left join dbo.SINT_NFCE nfe on  \n"
+                    + " 	nfe.DATA = v.DATA and  \n"
+                    + " 	nfe.NUM_PDV = v.NUM_PDV and  \n"
+                    + " 	nfe.NUM_CUPOM = v.NUM_CUPOM and \n"
+                    + " 	nfe.LOJA = v.LOJA \n"
+                    + " where v.loja = " + getLojaOrigem() + "\n"
+                    + " and v.data between '" + dataInicioPdvVenda + "' and '" + dataTerminoPdvVenda + "'\n"
+            )) {
+                int cont = 0;
+                while (rst.next()) {
+                    PdvVendaVO vo = new PdvVendaVO();
+                    vo.setData(rst.getDate("datavenda"));
+                    vo.setEcf(rst.getInt("ecf"));
+                    vo.setNumeroCupom(rst.getInt("numerocupom"));
+                    vo.setChaveCfe(rst.getString("chavecfe"));
+                    result.add(vo);
+
+                    ProgressBar.setStatus("Carregando vendas loja " + getLojaOrigem() + "..." + cont++);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public void importarChaveCfe(int idLoja) throws Exception {
+        List<PdvVendaVO> result = new ArrayList<>();
+        try {
+            result = carregarVendasChaveCfe();
+            
+            if (!result.isEmpty()) {
+                gravarChaveCfe(result, idLoja);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public void gravarChaveCfe(List<PdvVendaVO> vo, int idLoja) throws Exception {
+        Statement stm = null;
+        ResultSet rst = null;
+        String sql = "";
+        
+        try {
+            Conexao.begin();
+            
+            ProgressBar.setMaximum(vo.size());
+            ProgressBar.setStatus("Gravando ChaveCfe...");
+            
+            stm = Conexao.createStatement();
+            
+            for (PdvVendaVO i_vo : vo) {
+                sql = "update pdv.venda set "
+                        + "chavecfe = '" + i_vo.getChaveCfe() + "' "
+                        + "where data = '" + i_vo.getData() + "' "
+                        + "and ecf = " + i_vo.getEcf() + " "
+                        + "and numerocupom = " + i_vo.getNumeroCupom() + " "
+                        + "and chavecfe = '' "
+                        + "and id_loja = " + idLoja + "; \n"
+                        + "\n\n"
+                        + "update escrita set "
+                        + "chavecfe = '"+ i_vo.getChaveCfe()+"', "
+                        + "especie = 'CFE', "
+                        + "modelo = '59' "
+                        + "where data = '" + i_vo.getData() + "' "
+                        + "and ecf = " + i_vo.getEcf() + " "
+                        + "and numeronota = " + i_vo.getNumeroCupom() + " "
+                        + "and chavecfe = '' "
+                        + "and id_loja = " + idLoja + "; \n";
+                stm.execute(sql);
+                
+                ProgressBar.next();
+            }
+            
+            stm.close();
+            Conexao.commit();
+            
+        } catch (Exception ex) {            
+            Conexao.rollback();
+            throw ex;
         }
     }
 }
