@@ -401,8 +401,8 @@ public class FornecedorRepository {
         for (FornecedorDivisaoIMP impDiv : imp.getDivisoes()) {
 
             Map.Entry<String, Integer> divisao = divisoes.get(impDiv.getImportId());
-            int idDivisao = 0;
-            if (divisoes != null && !divisoes.isEmpty()) {
+            int idDivisao;
+            if (divisao != null) {
                 idDivisao = divisao.getValue();
             } else {
                 idDivisao = 0;
