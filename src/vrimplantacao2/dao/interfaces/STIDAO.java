@@ -581,21 +581,21 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setSubTotalImpressora(rst.getDouble("valortotal"));
-                        //next.setCpf(rst.getString("cpf"));
+                        next.setCpf(rst.getString("cnpj_cpf"));
                         //next.setValorDesconto(rst.getDouble("desconto"));
                         //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         //next.setNumeroSerie(rst.getString("numeroserie"));
                         //next.setModeloImpressora(rst.getString("modelo"));
-                       //next.setNomeCliente(rst.getString("nomecliente"));
-                        /*String endereco
+                        next.setNomeCliente(rst.getString("nome"));
+                        String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
                                 + Utils.acertarTexto(rst.getString("complemento")) + ","
                                 + Utils.acertarTexto(rst.getString("bairro")) + ","
                                 + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado")) + ","
+                                + Utils.acertarTexto(rst.getString("uf")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);*/
+                        next.setEnderecoCliente(endereco);
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -616,7 +616,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  v.status,\n" +
                         "  v.numcaixa ecf,\n" +
                         "  c.nome,\n" +
-                        "  c.logradouro,\n" +
+                        "  c.cnpj_cpf,\n" +
+                        "  c.logradouro endereco,\n" +
                         "  c.numero,\n" +
                         "  c.complemento,\n" +
                         "  c.bairro,\n" +
@@ -664,23 +665,22 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
+                        next.setVenda(rst.getString("idvenda"));
+                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setProduto(rst.getString("idproduto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
 
-                        String trib = rst.getString("codaliq_venda");
+                        String trib = rst.getString("icms");
                         if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
+                            trib = rst.getString("icms");
                         }
 
                         obterAliquota(next, trib);
@@ -700,44 +700,40 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
             /*
-             TA	7.00	ALIQUOTA 07%
-             TB	12.00	ALIQUOTA 12%
-             TC	18.00	ALIQUOTA 18%
-             TD	25.00	ALIQUOTA 25%
-             TE	11.00	ALIQUOTA 11%
-             I	0.00	ISENTO
-             F	0.00	SUBST TRIBUTARIA
-             N	0.00	NAO INCIDENTE
+             07	- ALIQUOTA 07%
+             11	- ALIQUOTA 11%
+             12	- ALIQUOTA 12%
+             18	- ALIQUOTA 18%
+             25	- ALIQUOTA 25%
+             ST - SUBSTITUIDO
+             II	- ISENTO
+             
              */
             int cst;
             double aliq;
             switch (icms) {
-                case "TA":
+                case "07":
                     cst = 0;
                     aliq = 7;
                     break;
-                case "TB":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "TC":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "TD":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "TE":
+                case "11":
                     cst = 0;
                     aliq = 11;
                     break;
-                case "F":
-                    cst = 60;
-                    aliq = 0;
+                case "12":
+                    cst = 0;
+                    aliq = 12;
                     break;
-                case "N":
-                    cst = 41;
+                case "18":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "25":
+                    cst = 0;
+                    aliq = 25;
+                    break;
+                case "ST":
+                    cst = 60;
                     aliq = 0;
                     break;
                 default:
@@ -752,19 +748,30 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     =   "select\n" +
-                        "  codigo id,\n" +
-                        "  item sequencia,\n" +
-                        "  codvenda idvenda,\n" +
-                        "  codprod idproduto,\n" +
-                        "  quantidade,\n" +
-                        "  valoravista precovenda,\n" +
-                        "  valortotalitem total,\n" +
-                        "  desconto,\n" +
-                        "  codigoaliquotaecf idaliquota\n" +
+                        "  i.codigo id,\n" +
+                        "  i.item sequencia,\n" +
+                        "  i.codvenda idvenda,\n" +
+                        "  i.codprod idproduto,\n" +
+                        "  (select\n" +
+                        "    codigobarras\n" +
+                        "  from\n" +
+                        "    estoque\n" +
+                        "  where\n" +
+                        "    codprod = i.codprod limit 1) codigobarras,\n" +
+                        "  p.unidade,\n" +
+                        "  p.descricao,\n" +
+                        "  i.quantidade,\n" +
+                        "  i.valoravista precovenda,\n" +
+                        "  i.valortotalitem total,\n" +
+                        "  i.desconto,\n" +
+                        "  i.codigoaliquotaecf idaliquota,\n" +
+                        "  al.aliquota icms,\n" +
+                        "  i.cancelado\n" +
                         "from\n" +
-                        "  itens_vendas\n" +
+                        "  itens_vendas i join produtos p on i.codprod = p.codpro\n" +
+                        "  left join aliquotas_ecf al on i.codigoaliquotaecf = al.codigo\n" +
                         "where\n" +
-                        "  dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'";
+                        "  dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and codempresa = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
