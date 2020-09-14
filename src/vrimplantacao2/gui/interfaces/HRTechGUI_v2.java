@@ -217,10 +217,9 @@ public class HRTechGUI_v2 extends VRInternalFrame {
                         }
                         if(chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
-                        }
-                        
+                        }                        
                         if (chkClienteEventual.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
+                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.ENDERECO_COMPLETO);
                         }
                         if(chkCreditoRotativo.isSelected()) {

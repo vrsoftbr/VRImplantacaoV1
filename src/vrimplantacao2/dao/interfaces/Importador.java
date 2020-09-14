@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.sqlite.SQLiteException;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
@@ -915,6 +916,9 @@ public class Importador {
                 new VendaItemImpDao(source).persistir(getInterfaceDAO().getVendaItemIterator());
                 System.gc();
             } catch (Exception ex) {
+                if (ex.getCause() instanceof SQLiteException) {
+                    ex = (Exception) ex.getCause();
+                }
                 LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 throw ex;
             }
