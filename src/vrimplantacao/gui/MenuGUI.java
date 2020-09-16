@@ -716,6 +716,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCefas = new javax.swing.JMenuItem();
         mnuViaSoft = new javax.swing.JMenuItem();
         mnuProton = new javax.swing.JMenuItem();
+        jMenuItemCupermax = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -2086,6 +2087,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuProton);
+
+        jMenuItemCupermax.setText("Cupermax");
+        jMenuItemCupermax.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemCupermaxActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemCupermax);
 
         mnuDatabase.add(jMenu7);
 
@@ -4767,6 +4776,10 @@ public final class MenuGUI extends VRMdiFrame {
         LBSoftwareGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
+    private void jMenuItemCupermaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCupermaxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemCupermaxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4806,6 +4819,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItemCISS;
     private javax.swing.JMenuItem jMenuItemConcretize;
     private javax.swing.JMenuItem jMenuItemControlWare;
+    private javax.swing.JMenuItem jMenuItemCupermax;
     private javax.swing.JMenuItem jMenuItemDestro;
     private javax.swing.JMenuItem jMenuItemDirector;
     private javax.swing.JMenuItem jMenuItemEcosInformatica;

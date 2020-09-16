@@ -13,10 +13,25 @@ import vrimplantacao2.vo.enums.TipoDesconto;
  * @author Leandro
  */
 public class PdvVendaVO {
+
+    /**
+     * @return the numeronota
+     */
+    public int getNumeronota() {
+        return numeronota;
+    }
+
+    /**
+     * @param numeronota the numeronota to set
+     */
+    public void setNumeronota(int numeronota) {
+        this.numeronota = numeronota;
+    }
     
     private long id;// serial NOT NULL,
     private int id_loja;// integer NOT NULL,
     private int numeroCupom;// integer NOT NULL,
+    private int numeronota;
     private int ecf;// integer NOT NULL,
     private Date data = new Date();// date NOT NULL,
     private int id_clientePreferencial;// integer,

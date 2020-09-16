@@ -157,6 +157,35 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         }
     }
 
+    public void identificarFornNF() throws Exception {
+        Thread thread = new Thread() {
+            int idLojaVR;
+            
+            @Override
+            public void run() {
+                try {
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    
+                    ProgressBar.show();
+                    ProgressBar.setCancel(true);
+                    
+                    dao.i_arquivo = txtFile.getArquivo();
+                    dao.dataVirada = txtDtVirada.getText();
+                    dao.importarProdutosNotaEntradaLogEstoque(idLojaVR);                    
+                    
+                    ProgressBar.dispose();
+                    
+                    Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
+                } catch (Exception ex) {
+                    ProgressBar.dispose();
+                    Util.exibirMensagemErro(ex, getTitle());
+                }
+            }
+        };
+        
+        thread.start();
+    }
+    
     public void importarTabelas() throws Exception {
         
         Thread thread = new Thread() {
@@ -316,7 +345,6 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                             
                         }
-                        
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -411,6 +439,13 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         txtDtVendaInicio = new vrframework.bean.textField.VRTextField();
         txtDtVendaFim = new vrframework.bean.textField.VRTextField();
         chkImportarChavrCFE = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel3 = new vrframework.bean.panel.VRPanel();
+        txtFile = new vrframework.bean.fileChooser.VRFileChooser();
+        chkIdentificarFornNF = new vrframework.bean.checkBox.VRCheckBox();
+        btnMigrar1 = new vrframework.bean.button.VRButton();
+        txtDtVirada = new vrframework.bean.textField.VRTextField();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -730,6 +765,63 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabImportacao.addTab("Vendas", vRPanel1);
 
+        chkIdentificarFornNF.setText("Identificar Fornecedor/NF");
+
+        btnMigrar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
+        btnMigrar1.setText("Identificar");
+        btnMigrar1.setFocusable(false);
+        btnMigrar1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnMigrar1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnMigrar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMigrar1ActionPerformed(evt);
+            }
+        });
+
+        vRLabel1.setText("Data Virada: ");
+
+        vRLabel2.setText("Arquivo com as Notas");
+
+        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
+        vRPanel3.setLayout(vRPanel3Layout);
+        vRPanel3Layout.setHorizontalGroup(
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnMigrar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(vRPanel3Layout.createSequentialGroup()
+                        .addComponent(chkIdentificarFornNF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(vRPanel3Layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtVirada, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtFile, javax.swing.GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        vRPanel3Layout.setVerticalGroup(
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkIdentificarFornNF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtDtVirada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnMigrar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(148, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Especiais", vRPanel3);
+
         tabOperacoes.addTab("Importação", tabImportacao);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -894,8 +986,24 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkImportarChavrCFEActionPerformed
 
+    private void btnMigrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrar1ActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            identificarFornNF();
+
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+
+        } finally {
+            this.setDefaultCursor();
+        }
+        
+    }//GEN-LAST:event_btnMigrar1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.button.VRButton btnMigrar1;
     private vrframework.bean.checkBox.VRCheckBox chkCliBairroEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkCliCargoEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkCliCepEmpresa;
@@ -922,6 +1030,7 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFornReceberDevolucaoPartir0108;
     private vrframework.bean.checkBox.VRCheckBox chkFornTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkIdentificarFornNF;
     private vrframework.bean.checkBox.VRCheckBox chkImportarChavrCFE;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
@@ -952,10 +1061,15 @@ public class VisualMixGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTextField txtCompLoja;
     private vrframework.bean.textField.VRTextField txtDtVendaFim;
     private vrframework.bean.textField.VRTextField txtDtVendaInicio;
+    private vrframework.bean.textField.VRTextField txtDtVirada;
+    private vrframework.bean.fileChooser.VRFileChooser txtFile;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
+    private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
+    private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel5;
     // End of variables declaration//GEN-END:variables

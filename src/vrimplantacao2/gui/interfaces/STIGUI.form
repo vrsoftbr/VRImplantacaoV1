@@ -38,11 +38,11 @@
     </Container>
   </NonVisualComponents>
   <Properties>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Linear"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o STI"/>
     <Property name="toolTipText" type="java.lang.String" value=""/>
   </Properties>
   <AccessibilityProperties>
-    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Linear"/>
+    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="STI"/>
   </AccessibilityProperties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>

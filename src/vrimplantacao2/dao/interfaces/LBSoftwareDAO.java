@@ -532,20 +532,17 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = rotativo.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "   numero,\n" +
-                    "   data,\n" +
-                    "   ecf,\n" +
-                    "   historico,\n" +
-                    "   vencimento,\n" +
-                    "   referencia,\n" +
-                    "   codigo as idcliente,\n" +
-                    "   movimento - valorr as valor \n" +
+                    "  numero,\n" +
+                    "  data,\n" +
+                    "  historico,\n" +
+                    "  movimento as valor,\n" +
+                    "  vencimento,\n" +
+                    "  codigo as idcliente,\n" +
+                    "  ecf\n" +
                     "from \n" +
-                    "   crr \n" +
+                    "  contrec \n" +
                     "where \n" +
-                    "  loja = " + getLojaOrigem() + " and \n" +
-                    "  valorr < movimento\n" +
-                    "  order by data")) {
+                    "  loja = '" + getLojaOrigem() + "'")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     

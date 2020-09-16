@@ -211,7 +211,7 @@ public class ImportarNotaSaidaImportacaoDAO {
                     oNotaSaida.idFornecedorDestinatario = new FornecedorDAO().getId(Long.parseLong(dCNPJ.getTextContent()));
                 }
             } catch (Exception ex) {
-                if (ex.getMessage().contains("O cnpj")) {
+                if (ex.getMessage().contains("O cnpj") || ex.getMessage().contains("O cpf")) {
                     if (incluirClienteEventual) {
                         ClienteEventualVO cliente = converterClienteEventual(oNotaSaida.destinatarioNfe);                        
                         new ClienteEventualDAO()
