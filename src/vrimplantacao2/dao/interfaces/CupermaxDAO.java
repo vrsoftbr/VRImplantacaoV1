@@ -5,10 +5,14 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -23,7 +27,6 @@ import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -51,7 +54,7 @@ public class CupermaxDAO extends InterfaceDAO {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select l.codigo id, l.codigo || ' - ' || p.nome descricao from pessoas p join loja l on l.codigo = p.codigo order by l.codigo"
+                    "SELECT ID, RAZAO_SOCIAL AS descricao FROM CUPERMAX.EMPRESA ORDER BY 1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
@@ -61,6 +64,7 @@ public class CupermaxDAO extends InterfaceDAO {
         return result;
     }
 
+    /*
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
@@ -91,7 +95,57 @@ public class CupermaxDAO extends InterfaceDAO {
 
         return result;
     }
+    */
+    
+        @Override
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
 
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao = 0 and grupo = 0 and subgrupo = 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descritivo"));
+                    merc.put(imp.getId(), imp);
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo = 0 and subgrupo = 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
+                    pai.addFilho(rst.getString("secao"), rst.getString("descritivo"));
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo != 0 and subgrupo = 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
+                    pai = pai.getNiveis().get(rst.getString("secao"));
+                    pai.addFilho(rst.getString("grupo"), rst.getString("descritivo"));
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo != 0 and subgrupo != 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
+                    pai = pai.getNiveis().get(rst.getString("secao"));
+                    pai = pai.getNiveis().get(rst.getString("grupo"));
+                    pai.addFilho(rst.getString("subgrupo"), rst.getString("descritivo"));
+                }
+            }
+        }
+
+        return new ArrayList<>(merc.values());
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
