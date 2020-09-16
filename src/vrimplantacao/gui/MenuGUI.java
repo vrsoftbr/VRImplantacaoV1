@@ -33,6 +33,7 @@ import vrimplantacao.gui.interfaces.BoechatSoftGUI;
 import vrimplantacao.gui.interfaces.ConcretizeGUI;
 import vrimplantacao2.gui.interfaces.ControlWareGUI;
 import vrimplantacao.gui.interfaces.ControllGUI;
+import vrimplantacao.gui.interfaces.CupermaxGUI;
 import vrimplantacao.gui.interfaces.DGComGUI;
 import vrimplantacao2.gui.interfaces.DelphiGUI;
 import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
@@ -4777,7 +4778,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void jMenuItemCupermaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCupermaxActionPerformed
-        // TODO add your handling code here:
+        CupermaxGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemCupermaxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
