@@ -5,6 +5,7 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,6 +23,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -29,6 +34,9 @@ import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.notafiscal.NotaEntradaItemVO;
+import vrimplantacao.vo.notafiscal.NotaEntradaVO;
+import vrimplantacao.vo.notafiscal.NotaSaidaItemVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
@@ -83,6 +91,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean i_contaAbertaVendaPrazo = false;
     public String dataEmissaoVendaPr;
+    
+    public String i_arquivo;
 
     @Override
     public String getSistema() {
@@ -1799,7 +1809,6 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setChaveCfe(rst.getString("ChaveCfe"));
-                        next.setChaveNfCe(rst.getString("chaveNfce"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -1837,7 +1846,29 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	nfe.LOJA = v.LOJA\n"
                     + "where v.loja = " + idLojaCliente + "\n"
                     + "and v.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and "
-                    + "convert(datetime,'" + FORMAT.format(dataTermino) + "', 103)";
+                    + "convert(datetime,'" + FORMAT.format(dataTermino) + "', 103) "
+                    + " and nfe.CHAVE in (\n"
+                    + "'35200860186376000164590000161125078202719711'\n"
+                    + ", '35200860186376000164590000161125078217618797'\n"
+                    + ", '35200860186376000164590000161125078227178722'\n"
+                    + ", '35200860186376000164590000161125078239778231'\n"
+                    + ", '35200860186376000164590000161125078249246836'\n"
+                    + ", '35200860186376000164590000161125078251749092'\n"
+                    + ", '35200860186376000164590000161125078268543450'\n"
+                    + ", '35200860186376000164590000161125078277362640'\n"
+                    + ", '35200860186376000164590000161125078289659686'\n"
+                    + ", '35200860186376000164590000161125078290324951'\n"
+                    + ", '35200860186376000164590000161125078307984920'\n"
+                    + ", '35200860186376000164590000161125078311014999'\n"
+                    + ", '35200860186376000164590000161125078322740726'\n"
+                    + ", '35200860186376000164590000161125078338719349'\n"
+                    + ", '35200860186376000164590004040501259763905780'\n"
+                    + ", '35200860186376000164590004040501259776116283'\n"
+                    + ", '35200860186376000164590004040501259783911352'\n"
+                    + ", '35200860186376000164590004040501259797081780'\n"
+                    + ", '35200860186376000164590004040501259808128281'\n"
+                    + ", '35200860186376000164590004040501259812811853'\n"
+                    + ", '35200860186376000164590004040501259820961214')";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1998,9 +2029,42 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from dbo.Sint_item_venda i \n"
                     + "join dbo.Produtos p on p.Produto_Id = i.Cod_Interno\n"
                     + "join dbo.Aliquotas a on a.Codigo = i.Aliquota\n"
+                    + "join dbo.Sint_total_Cupom v "
+                    + "      on v.loja = i.loja"
+                    + "     and cast(v.NUM_CUPOM as bigint) = cast(i.Num_Cupom as bigint) \n"
+                    + "     and cast(v.NUM_PDV as bigint) = cast(i.Num_Pdv as bigint) \n"
+                    + "     and convert(varchar, v.DATA, 23) = convert(varchar, i.DATA, 23) \n"
+                    + "join dbo.SINT_NFCE nfe on \n"
+                    + "	nfe.DATA = v.DATA and \n"
+                    + "	nfe.NUM_PDV = v.NUM_PDV and \n"
+                    + "	nfe.NUM_CUPOM = v.NUM_CUPOM and\n"
+                    + "	nfe.LOJA = v.LOJA\n"                    
                     + "where i.Loja = " + idLojaCliente + "\n"
                     + "and i.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
-                    + "and convert(datetime,'" + FORMAT.format(dataTermino) + "', 103)";
+                    + "and convert(datetime,'" + FORMAT.format(dataTermino) + "', 103) \n"
+                    + " and nfe.CHAVE in (\n"
+                    + "'35200860186376000164590000161125078202719711'\n"
+                    + ", '35200860186376000164590000161125078217618797'\n"
+                    + ", '35200860186376000164590000161125078227178722'\n"
+                    + ", '35200860186376000164590000161125078239778231'\n"
+                    + ", '35200860186376000164590000161125078249246836'\n"
+                    + ", '35200860186376000164590000161125078251749092'\n"
+                    + ", '35200860186376000164590000161125078268543450'\n"
+                    + ", '35200860186376000164590000161125078277362640'\n"
+                    + ", '35200860186376000164590000161125078289659686'\n"
+                    + ", '35200860186376000164590000161125078290324951'\n"
+                    + ", '35200860186376000164590000161125078307984920'\n"
+                    + ", '35200860186376000164590000161125078311014999'\n"
+                    + ", '35200860186376000164590000161125078322740726'\n"
+                    + ", '35200860186376000164590000161125078338719349'\n"
+                    + ", '35200860186376000164590004040501259763905780'\n"
+                    + ", '35200860186376000164590004040501259776116283'\n"
+                    + ", '35200860186376000164590004040501259783911352'\n"
+                    + ", '35200860186376000164590004040501259797081780'\n"
+                    + ", '35200860186376000164590004040501259808128281'\n"
+                    + ", '35200860186376000164590004040501259812811853'\n"
+                    + ", '35200860186376000164590004040501259820961214')";
+
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -2036,9 +2100,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " 	v.DATA as datavenda, \n"
                     + " 	cast(v.NUM_PDV as bigint) as ecf, \n"
                     + " 	cast(v.NUM_CUPOM as bigint) as numerocupom, \n"
+                    + "         cast(nfe.NUMERONOTA as bigint) as numeronota, \n"
+                    + "         v.CPFCNPJCLIENTE as cpf_cliente, \n"        
                     + " 	nfe.CHAVE as chaveCfe\n"
                     + " from dbo.Sint_total_Cupom v \n"
-                    + " left join dbo.SINT_NFCE nfe on  \n"
+                    + " join dbo.SINT_NFCE nfe on  \n"
                     + " 	nfe.DATA = v.DATA and  \n"
                     + " 	nfe.NUM_PDV = v.NUM_PDV and  \n"
                     + " 	nfe.NUM_CUPOM = v.NUM_CUPOM and \n"
@@ -2052,7 +2118,9 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     vo.setData(rst.getDate("datavenda"));
                     vo.setEcf(rst.getInt("ecf"));
                     vo.setNumeroCupom(rst.getInt("numerocupom"));
+                    vo.setNumeronota(rst.getInt("numeronota"));
                     vo.setChaveCfe(rst.getString("chavecfe"));
+                    vo.setCpf(rst.getLong("cpf_cliente"));
                     result.add(vo);
 
                     ProgressBar.setStatus("Carregando vendas loja " + getLojaOrigem() + "..." + cont++);
@@ -2084,20 +2152,42 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             Conexao.begin();
             
             ProgressBar.setMaximum(vo.size());
-            ProgressBar.setStatus("Gravando ChaveCfe...");
+            ProgressBar.setStatus("Acertando NumeroCupom e Cpf...");
             
             stm = Conexao.createStatement();
             
             for (PdvVendaVO i_vo : vo) {
                 sql = "update pdv.venda set "
-                        + "chavecfe = '" + i_vo.getChaveCfe() + "' "
+                        + "numerocupom = " + i_vo.getNumeronota() + ", "
+                        + "cpf = " + i_vo.getCpf() + ","
+                        + "bkp_numerocupom = " + i_vo.getNumeroCupom() + " "
                         + "where data = '" + i_vo.getData() + "' "
                         + "and ecf = " + i_vo.getEcf() + " "
                         + "and numerocupom = " + i_vo.getNumeroCupom() + " "
-                        + "and chavecfe = '' "
-                        + "and id_loja = " + idLoja + "; \n"
+                        + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
+                        + "and id_loja = " + idLoja + ""
+                        + "and numerocupom not in (select numerocupom from pdv.venda where "
+                        + "     ecf = "+i_vo.getEcf()+" "
+                        + "     and chavecfe = '"+i_vo.getChaveCfe()+"' "
+                        + "     and data = '"+i_vo.getData()+"' "
+                        + "     and id_loja = " +idLoja+ "); \n"
                         + "\n\n"
                         + "update escrita set "
+                        + "numeronota = " + i_vo.getNumeronota() + ", "
+                        + "cpfadquirente = " + i_vo.getCpf() + ", "
+                        + "bkp_numerocupom = " + i_vo.getNumeroCupom() + " "
+                        + "where data = '" + i_vo.getData() + "' "
+                        + "and ecf = " + i_vo.getEcf() + " "
+                        + "and numeronota = " + i_vo.getNumeroCupom() + " "
+                        + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
+                        + "and id_loja = " + idLoja + " "
+                        + "and numeronota not in (select numeronota from escrita where "
+                        + "     ecf = "+i_vo.getEcf()+" "
+                        + "     and chavecfe = '"+i_vo.getChaveCfe()+"' "
+                        + "     and data = '"+i_vo.getData()+"' "
+                        + "     and id_loja = " +idLoja+ ");";
+                        
+                /*sql = "update escrita set "
                         + "chavecfe = '"+ i_vo.getChaveCfe()+"', "
                         + "especie = 'CFE', "
                         + "modelo = '59' "
@@ -2105,7 +2195,10 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and ecf = " + i_vo.getEcf() + " "
                         + "and numeronota = " + i_vo.getNumeroCupom() + " "
                         + "and chavecfe = '' "
-                        + "and id_loja = " + idLoja + "; \n";
+                        + "and especie = 'ECF' "
+                        + "and modelo = '2D' "
+                        + "and id_loja = " + idLoja + "; \n";*/
+                
                 stm.execute(sql);
                 
                 ProgressBar.next();
@@ -2115,6 +2208,115 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             Conexao.commit();
             
         } catch (Exception ex) {            
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+    
+    public List<NotaEntradaItemVO> getProdutosNotaEntrada(int idLojaVR) throws Exception {
+        List<NotaEntradaItemVO> result = new ArrayList<>();
+        int linha, numeronota, idfornecedor;
+        
+        try {
+            WorkbookSettings settings = new WorkbookSettings();
+            settings.setEncoding("CP1250");
+            Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            
+            linha = 0;
+            
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha ++;
+                    
+                    if (linha == 1) {
+                        continue;
+                    }
+                    
+                    Cell cellNF = sheet.getCell(0, i);
+                    
+                    idfornecedor = Integer.parseInt(cellNF.getContents().substring(1, cellNF.getContents().indexOf("N")));
+                    numeronota = Integer.parseInt(cellNF.getContents().substring(cellNF.getContents().indexOf("N") + 2));
+                    
+                    try (Statement stm = Conexao.createStatement()) {
+                        try (ResultSet rst = stm.executeQuery(
+                                "select "
+                                + "n.id_loja, "
+                                + "n.numeronota, "
+                                + "i.id_produto, "
+                                + "i.quantidade "
+                                + "from notaentradaitem i "
+                                + "join notaentrada n on "
+                                + " n.id = i.id_notaentrada "
+                                + "and n.numeronota = " + numeronota + " "
+                                + "and n.id_fornecedor = " + idfornecedor + " "
+                                + "and n.id_loja = " + idLojaVR
+                        )) {
+                            while (rst.next()) {
+                                NotaEntradaItemVO vo = new NotaEntradaItemVO();
+                                vo.setIdProduto(rst.getInt("id_produto"));
+                                vo.setQuantidade(rst.getDouble("quantidade"));
+                                result.add(vo);
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public void importarProdutosNotaEntrada(int idLoja) throws Exception {
+        List<NotaEntradaItemVO> result = new ArrayList<>();
+        try {
+            ProgressBar.setStatus("Carregando quantidade das notas de entrada...");
+            result = getProdutosNotaEntrada(idLoja);
+            
+            if (!result.isEmpty()) {
+                gravarProdutosNotaEntrada(result, idLoja);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public void gravarProdutosNotaEntrada(List<NotaEntradaItemVO> vo, int idLoja) throws Exception {
+        
+        Statement stm = null;
+        String sql;
+        
+        try {
+            Conexao.begin();
+            
+            ProgressBar.setStatus("Gravando quantidade dos produtos das notas de entrada...");
+            ProgressBar.setMaximum(vo.size());
+            
+            stm = Conexao.createStatement();
+            
+            for (NotaEntradaItemVO i_vo : vo) {
+                
+                sql = "insert into implantacao.notaentradaitem_quantidade("
+                        + "id_loja, "
+                        + "id_produto, "
+                        + "quantidade) "
+                        + "values ("
+                        + idLoja + ", "
+                        + i_vo.getIdProduto() + ", "
+                        + i_vo.getQuantidade() + ");";
+                
+                stm.execute(sql);
+                
+                ProgressBar.next();
+            }
+            
+            stm.close();            
+            Conexao.commit();
+        } catch (Exception ex) {
             Conexao.rollback();
             throw ex;
         }
