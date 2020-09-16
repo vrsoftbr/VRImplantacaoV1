@@ -36,7 +36,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class CupermaxDAO extends InterfaceDAO {
-    
+
     public static final String HOST = "localhost";
     public static final String PORT = "1521";
     public static final String USER = "SYSTEM";
@@ -44,7 +44,7 @@ public class CupermaxDAO extends InterfaceDAO {
     public static final String PASSWORD = "cup204468";
 
     public String v_codEmpresaConv;
-    
+
     @Override
     public String getSistema() {
         return "Cupermax";
@@ -65,46 +65,58 @@ public class CupermaxDAO extends InterfaceDAO {
     }
 
     /*
+     @Override
+     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+     List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+     try (Statement stm = ConexaoOracle.createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select\n"
+     + "  p.codigorea id,\n"
+     + "  p2.nome1 descricao\n"
+     + "from\n"
+     + "(select p.codigorea from produtos p where p.codigorea > 0 group by codigorea) p\n"
+     + "join produtos p2 on p2.codigo = p.codigorea\n"
+     + "order by\n"
+     + "  p.codigorea"
+     )) {
+     while (rst.next()) {
+     FamiliaProdutoIMP familiaVO = new FamiliaProdutoIMP();
+
+     familiaVO.setImportSistema(getSistema());
+     familiaVO.setImportLoja(getLojaOrigem());
+     familiaVO.setImportId(rst.getString("id"));
+     familiaVO.setDescricao(rst.getString("descricao"));
+
+     result.add(familiaVO);
+     }
+     }
+     }
+
+     return result;
+     }
+     */
     @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "  p.codigorea id,\n"
-                    + "  p2.nome1 descricao\n"
-                    + "from\n"
-                    + "(select p.codigorea from produtos p where p.codigorea > 0 group by codigorea) p\n"
-                    + "join produtos p2 on p2.codigo = p.codigorea\n"
-                    + "order by\n"
-                    + "  p.codigorea"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoIMP familiaVO = new FamiliaProdutoIMP();
-
-                    familiaVO.setImportSistema(getSistema());
-                    familiaVO.setImportLoja(getLojaOrigem());
-                    familiaVO.setImportId(rst.getString("id"));
-                    familiaVO.setDescricao(rst.getString("descricao"));
-
-                    result.add(familiaVO);
-                }
-            }
-        }
-
-        return result;
-    }
-    */
-    
-        @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
 
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao = 0 and grupo = 0 and subgrupo = 0 order by 1,2,3,4"
+                    "WITH merc AS (\n"
+                    + "SELECT\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
+                    + "	DESCRICAO descritivo\n"
+                    + "FROM\n"
+                    + "	CUPERMAX.nivel_mercadologico\n"
+                    + "	)\n"
+                    + "	SELECT depto,DESCRITIVO \n"
+                    + "FROM MERC \n"
+                    + "	WHERE secao IS NULL AND grupo IS NULL \n"
+                    + "ORDER BY\n"
+                    + "	1"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descritivo"));
@@ -113,7 +125,20 @@ public class CupermaxDAO extends InterfaceDAO {
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo = 0 and subgrupo = 0 order by 1,2,3,4"
+                    "	WITH merc AS (\n"
+                    + "SELECT\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
+                    + "	DESCRICAO descritivo\n"
+                    + "FROM\n"
+                    + "	CUPERMAX.nivel_mercadologico\n"
+                    + "	)\n"
+                    + "	SELECT secao,DESCRITIVO \n"
+                    + "FROM MERC \n"
+                    + "	WHERE secao IS NOT NULL AND grupo IS NULL \n"
+                    + "ORDER BY\n"
+                    + "	1"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
@@ -122,7 +147,20 @@ public class CupermaxDAO extends InterfaceDAO {
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo != 0 and subgrupo = 0 order by 1,2,3,4"
+                    "	WITH merc AS (\n"
+                    + "SELECT\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
+                    + "	DESCRICAO descritivo\n"
+                    + "FROM\n"
+                    + "	CUPERMAX.nivel_mercadologico\n"
+                    + "	)\n"
+                    + "	SELECT grupo,DESCRITIVO \n"
+                    + "FROM MERC \n"
+                    + "	WHERE grupo IS NOT NULL \n"
+                    + "ORDER BY\n"
+                    + "	1"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
@@ -130,22 +168,11 @@ public class CupermaxDAO extends InterfaceDAO {
                     pai.addFilho(rst.getString("grupo"), rst.getString("descritivo"));
                 }
             }
-
-            try (ResultSet rst = stm.executeQuery(
-                    "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo != 0 and subgrupo != 0 order by 1,2,3,4"
-            )) {
-                while (rst.next()) {
-                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
-                    pai = pai.getNiveis().get(rst.getString("secao"));
-                    pai = pai.getNiveis().get(rst.getString("grupo"));
-                    pai.addFilho(rst.getString("subgrupo"), rst.getString("descritivo"));
-                }
-            }
         }
 
         return new ArrayList<>(merc.values());
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -340,7 +367,7 @@ public class CupermaxDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -487,7 +514,7 @@ public class CupermaxDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "  p.codigo id,\n"
-                  /*+ "  p.NOME nome,\n"    alterado para LOBAO*/
+                    /*+ "  p.NOME nome,\n"    alterado para LOBAO*/
                     + "  p.RAZAO nome,\n"
                     + "  p.ENDERECO res_endereco,\n"
                     + "  p.NRO res_numero,\n"
@@ -523,7 +550,7 @@ public class CupermaxDAO extends InterfaceDAO {
                     + "  PESSOAS p\n"
                     + "  left join CLIENTES c on p.codigo = c.codigo\n"
                     + "  where cliente = 'S'\n"
-                 // + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv+ ")\n") 
+                    // + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv+ ")\n") 
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
@@ -569,19 +596,25 @@ public class CupermaxDAO extends InterfaceDAO {
                     cli.setEmpresaTelefone(rst.getString("telEmpresa"));
                     cli.setCargo(rst.getString("cargo"));
                     cli.setSalario(rst.getDouble("salario"));
-                    if(rst.getString("estadoCivil") != null && !"".equals(rst.getString("estadoCivil"))) {
-                        switch(rst.getInt("estadoCivil")) {
-                            case 1 : cli.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                    if (rst.getString("estadoCivil") != null && !"".equals(rst.getString("estadoCivil"))) {
+                        switch (rst.getInt("estadoCivil")) {
+                            case 1:
+                                cli.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
                                 break;
-                            case 2 : cli.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                            case 2:
+                                cli.setEstadoCivil(TipoEstadoCivil.VIUVO);
                                 break;
-                            case 3 : cli.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
+                            case 3:
+                                cli.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
                                 break;
-                            case 4 : cli.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                            case 4:
+                                cli.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
                                 break;
-                            case 5 : cli.setEstadoCivil(TipoEstadoCivil.CASADO);
+                            case 5:
+                                cli.setEstadoCivil(TipoEstadoCivil.CASADO);
                                 break;
-                            default : cli.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                            default:
+                                cli.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
                         }
                     }
                     //cli.setEstadoCivil(TipoEstadoCivil.getById(rst.getInt("estadoCivil")));
@@ -781,27 +814,27 @@ public class CupermaxDAO extends InterfaceDAO {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
                     imp.setId(rst.getString("codigo"));
                     imp.setRazao(rst.getString("razao"));
-                    
-                    if ((rst.getString("cpf") != null) &&
-                            (!rst.getString("cpf").trim().isEmpty())) {
+
+                    if ((rst.getString("cpf") != null)
+                            && (!rst.getString("cpf").trim().isEmpty())) {
                         imp.setCnpj(rst.getString("cpf"));
-                    } else if ((rst.getString("cnpj") != null) &&
-                            (!rst.getString("cnpj").trim().isEmpty())) {
+                    } else if ((rst.getString("cnpj") != null)
+                            && (!rst.getString("cnpj").trim().isEmpty())) {
                         imp.setCnpj(rst.getString("cnpj"));
                     } else {
                         imp.setCnpj("");
                     }
-                    
-                    if ((rst.getString("rg") != null) &&
-                            (!rst.getString("rg").trim().isEmpty())) {
+
+                    if ((rst.getString("rg") != null)
+                            && (!rst.getString("rg").trim().isEmpty())) {
                         imp.setInscricaoEstadual(rst.getString("rg"));
-                    } else if ((rst.getString("ie") != null) &&
-                            (!rst.getString("ie").trim().isEmpty())) {
+                    } else if ((rst.getString("ie") != null)
+                            && (!rst.getString("ie").trim().isEmpty())) {
                         imp.setInscricaoEstadual(rst.getString("ie"));
                     } else {
                         imp.setInscricaoEstadual("");
                     }
-                    
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero("0");
                     imp.setBairro(rst.getString("bairro"));
