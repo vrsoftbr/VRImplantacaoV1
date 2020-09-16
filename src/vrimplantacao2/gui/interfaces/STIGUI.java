@@ -320,7 +320,7 @@ public class STIGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        setTitle("Importação Linear");
+        setTitle("Importação STI");
         setToolTipText("");
 
         vRLabel1.setText("Loja (Cliente):");
@@ -586,7 +586,7 @@ public class STIGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap())
         );
 
-        getAccessibleContext().setAccessibleName("Linear");
+        getAccessibleContext().setAccessibleName("STI");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
