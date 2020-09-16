@@ -543,7 +543,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from \n" +
                     "   crr \n" +
                     "where \n" +
-                    "  loja = " + getLojaOrigem() + " and \n" +
+                    "  loja = '" + getLojaOrigem() + "' and \n" +
                     "  valorr < movimento\n" +
                     "  order by data")) {
                 while(rs.next()) {
