@@ -34,9 +34,7 @@ import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.notafiscal.NotaEntradaItemVO;
-import vrimplantacao.vo.notafiscal.NotaEntradaVO;
-import vrimplantacao.vo.notafiscal.NotaSaidaItemVO;
+import vrimplantacao.vo.vrimplantacao.LogEstoqueVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
@@ -93,6 +91,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
     public String dataEmissaoVendaPr;
     
     public String i_arquivo;
+    
+    public String dataVirada;
 
     @Override
     public String getSistema() {
@@ -2213,51 +2213,58 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
     
-    public List<NotaEntradaItemVO> getProdutosNotaEntrada(int idLojaVR) throws Exception {
-        List<NotaEntradaItemVO> result = new ArrayList<>();
+    public List<LogEstoqueVO> getProdutosNotaEntradaLogEstoque(int idLojaVR) throws Exception {
+        List<LogEstoqueVO> result = new ArrayList<>();
         int linha, numeronota, idfornecedor;
-        
+
         try {
             WorkbookSettings settings = new WorkbookSettings();
             settings.setEncoding("CP1250");
             Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
             Sheet[] sheets = arquivo.getSheets();
-            
+
             linha = 0;
-            
+
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
 
                 for (int i = 0; i < sheet.getRows(); i++) {
-                    linha ++;
-                    
+                    linha++;
+
                     if (linha == 1) {
                         continue;
                     }
-                    
+
                     Cell cellNF = sheet.getCell(0, i);
-                    
+
                     idfornecedor = Integer.parseInt(cellNF.getContents().substring(1, cellNF.getContents().indexOf("N")));
                     numeronota = Integer.parseInt(cellNF.getContents().substring(cellNF.getContents().indexOf("N") + 2));
+
+                    
+                    System.out.println(
+                                "select "
+                                + "id_produto, "
+                                + "quantidade "
+                                + "from logestoque "
+                                + "where id_loja = " + idLojaVR + " "
+                                + "and datahora::date >= '" + dataVirada + "' "
+                                + "and observacao like '%NOTA: ' ||" + numeronota + "||', FORNECEDOR: '||" + idfornecedor + "||'%' "                    
+                    );
                     
                     try (Statement stm = Conexao.createStatement()) {
                         try (ResultSet rst = stm.executeQuery(
                                 "select "
-                                + "n.id_loja, "
-                                + "n.numeronota, "
-                                + "i.id_produto, "
-                                + "i.quantidade "
-                                + "from notaentradaitem i "
-                                + "join notaentrada n on "
-                                + " n.id = i.id_notaentrada "
-                                + "and n.numeronota = " + numeronota + " "
-                                + "and n.id_fornecedor = " + idfornecedor + " "
-                                + "and n.id_loja = " + idLojaVR
+                                + "id_produto, "
+                                + "quantidade "
+                                + "from logestoque "
+                                + "where id_loja = " + idLojaVR + " "
+                                + "and datahora::date >= '" + dataVirada + "' "
+                                + "and observacao like '%NOTA: ' ||" + numeronota + "||', FORNECEDOR: '||" + idfornecedor + "||'%' "
                         )) {
                             while (rst.next()) {
-                                NotaEntradaItemVO vo = new NotaEntradaItemVO();
-                                vo.setIdProduto(rst.getInt("id_produto"));
+                                LogEstoqueVO vo = new LogEstoqueVO();
+                                vo.setId_produto(rst.getInt("id_produto"));
                                 vo.setQuantidade(rst.getDouble("quantidade"));
                                 result.add(vo);
                             }
@@ -2271,11 +2278,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
     
-    public void importarProdutosNotaEntrada(int idLoja) throws Exception {
-        List<NotaEntradaItemVO> result = new ArrayList<>();
+    public void importarProdutosNotaEntradaLogEstoque(int idLoja) throws Exception {
+        List<LogEstoqueVO> result = new ArrayList<>();
         try {
             ProgressBar.setStatus("Carregando quantidade das notas de entrada...");
-            result = getProdutosNotaEntrada(idLoja);
+            result = getProdutosNotaEntradaLogEstoque(idLoja);
             
             if (!result.isEmpty()) {
                 gravarProdutosNotaEntrada(result, idLoja);
@@ -2285,7 +2292,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
     
-    public void gravarProdutosNotaEntrada(List<NotaEntradaItemVO> vo, int idLoja) throws Exception {
+    public void gravarProdutosNotaEntrada(List<LogEstoqueVO> vo, int idLoja) throws Exception {
         
         Statement stm = null;
         String sql;
@@ -2298,7 +2305,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             
             stm = Conexao.createStatement();
             
-            for (NotaEntradaItemVO i_vo : vo) {
+            for (LogEstoqueVO i_vo : vo) {
                 
                 sql = "insert into implantacao.notaentradaitem_quantidade("
                         + "id_loja, "
@@ -2306,7 +2313,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "quantidade) "
                         + "values ("
                         + idLoja + ", "
-                        + i_vo.getIdProduto() + ", "
+                        + i_vo.getId_produto() + ", "
                         + i_vo.getQuantidade() + ");";
                 
                 stm.execute(sql);
