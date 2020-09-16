@@ -45,6 +45,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -637,6 +638,44 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	o.CODIGOPLU id_produto,\n" +
+                        "	o.DATINICOFE datainicio,\n" +
+                        "	o.DATFINAOFE datatermino,\n" +
+                        "	o.VENDAOFERT precooferta,\n" +
+                        "	o.VENDAATUA preconormal\n" +
+                        "from\n" +
+                        "	fl311ofe o \n" +
+                        "where\n" +
+                        "	o.CODIGOLOJA = " + getLojaOrigem() + "\n" +
+                        "	and o.DATFINAOFE >= cast(CURRENT_TIMESTAMP as date)\n" +
+                        "order by\n" +
+                        "	o.CODIGOPLU"
+                )
+                ) {
+            while (rs.next()) {
+                OfertaIMP imp = new OfertaIMP();
+                
+                imp.setIdProduto(rs.getString("id_produto"));
+                imp.setDataInicio(rs.getDate("datainicio"));
+                imp.setDataFim(rs.getDate("datatermino"));
+                imp.setPrecoOferta(rs.getDouble("precooferta"));
+                imp.setPrecoNormal(rs.getDouble("preconormal"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<CompradorIMP> getCompradores() throws Exception {
         List<CompradorIMP> result= new ArrayList<>();
         
@@ -695,6 +734,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
+                OpcaoProduto.OFERTA,
                 OpcaoProduto.ESTOQUE_MINIMO,
                 OpcaoProduto.ESTOQUE_MAXIMO,
                 OpcaoProduto.ESTOQUE,
