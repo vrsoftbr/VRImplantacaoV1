@@ -45,6 +45,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -230,7 +231,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     String id = rs.getString("idproduto");
-                    id = id.substring(0, id.length() - 1);
+                    //id = id.substring(0, id.length() - 1);
                     imp.setImportId(id);
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("quantidade"));
@@ -481,7 +482,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "		when p.estc13codi = '' then p.codigoplu  \n" +
                     "		else p.estc13codi \n" +
                     "	end ean,\n" +
-                    "	p.estc35desc descricaocompleta,\n" +
+                    "   p.estc35desc + ext.COMPDESCRI descricaocompleta,\n" +
+                    "	p.estc35desc descricaogondola,\n" +
                     "	p.descreduzi descricaoreduzida,\n" +
                     "	p.dtcadastro,\n" +
                     "	p.ESTC01LINH ativo,\n" +
@@ -587,7 +589,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaProduto(familia.get(imp.getImportId()));                    
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
-                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaogondola")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
                     imp.setSituacaoCadastro("N".equals(rs.getString("ativo")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
@@ -634,6 +636,50 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "declare @dat date = cast(CURRENT_TIMESTAMP as date);\n" +
+                        "declare @id_loja integer = " + getLojaOrigem() + ";\n" +
+                        "select\n" +
+                        "	o.CODIGOPLU id_produto,\n" +
+                        "	o.DATINICOFE datainicio,\n" +
+                        "	o.DATFINAOFE datatermino,\n" +
+                        "	o.VENDAOFERT precooferta,\n" +
+                        "	o.VENDAATUA preconormal,\n" +
+                        "	o.*\n" +
+                        "from\n" +
+                        "	fl311ofe o\n" +
+                        "	join FLOFEBLO b on\n" +
+                        "		o.BLOCO = b.BLOCO \n" +
+                        "where\n" +
+                        "	b.DATFINAOFE >= @dat\n" +
+                        "	and b.GRUPOLOJAS like '%,' + cast(@id_loja as varchar(8)) + ',%'\n" +
+                        "	and o.CODIGOLOJA = @id_loja\n" +
+                        "order by\n" +
+                        "	cast(o.CODIGOPLU as integer)"
+                )
+                ) {
+            while (rs.next()) {
+                OfertaIMP imp = new OfertaIMP();
+                
+                imp.setIdProduto(rs.getString("id_produto"));
+                imp.setDataInicio(rs.getDate("datainicio"));
+                imp.setDataFim(rs.getDate("datatermino"));
+                imp.setPrecoOferta(rs.getDouble("precooferta"));
+                imp.setPrecoNormal(rs.getDouble("preconormal"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
     }
 
     @Override
@@ -695,6 +741,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.CUSTO,
+                OpcaoProduto.OFERTA,
                 OpcaoProduto.ESTOQUE_MINIMO,
                 OpcaoProduto.ESTOQUE_MAXIMO,
                 OpcaoProduto.ESTOQUE,
