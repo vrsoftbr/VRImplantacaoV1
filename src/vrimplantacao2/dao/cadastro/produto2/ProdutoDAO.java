@@ -227,13 +227,17 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.MERCADOLOGICO)) {
             MercadologicoVO mercadologico = vo.getMercadologico();
             sql.put("mercadologico1", mercadologico.getMercadologico1());
-            LOG.fine("Prod: " + vo.getId() + " Merc1: " + mercadologico.getMercadologico1());
             sql.put("mercadologico2", mercadologico.getMercadologico2());
-            LOG.fine("Prod: " + vo.getId() + " Merc2: " + mercadologico.getMercadologico2());
             sql.put("mercadologico3", mercadologico.getMercadologico3());
-            LOG.fine("Prod: " + vo.getId() + " Merc3: " + mercadologico.getMercadologico3());
             sql.put("mercadologico4", mercadologico.getMercadologico4());
             sql.put("mercadologico5", mercadologico.getMercadologico5());
+            
+            LOG.fine("Prod: " + vo.getId() + 
+                    " Merc1: " + mercadologico.getMercadologico1() + 
+                    " Merc2: " + mercadologico.getMercadologico2() + 
+                    " Merc3: " + mercadologico.getMercadologico3() + 
+                    " Merc4: " + mercadologico.getMercadologico4() + 
+                    " Merc5: " + mercadologico.getMercadologico5());
         }
         if (opt.contains(OpcaoProduto.CEST)) {
             sql.put("id_cest", (vo.getCest() == null ? null : vo.getCest().getId()));
