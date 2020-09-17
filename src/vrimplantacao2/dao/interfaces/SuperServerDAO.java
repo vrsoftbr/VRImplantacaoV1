@@ -192,13 +192,13 @@ public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
 
+                    String plu = String.valueOf(Utils.stringToLong(rst.getString("ean")));
+                    
                     if (rst.getInt("balanca") == 1) {
-                        String plu = String.valueOf(Utils.stringToLong(rst.getString("ean")));
-
-                        if (plu.startsWith("2") && plu.endsWith("0") && plu.length() == 6) {
+                        if (plu.startsWith("2") && plu.endsWith("0") && plu.length() == 7) {
                             imp.seteBalanca(true);
 
-                            imp.setEan(plu.substring(1, 5));
+                            imp.setEan(plu.substring(1, 6));
 
                             if (rst.getInt("e_unitario_pesavel") == 1) {
                                 imp.setTipoEmbalagem("UN");
@@ -208,6 +208,10 @@ public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider 
                         } else {
                             imp.seteBalanca(false);
                         }
+                    }
+                    
+                    if(plu != null && !"".equals(plu) && plu.length() < 7 && !imp.isBalanca()) {
+                        imp.setManterEAN(true);
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
