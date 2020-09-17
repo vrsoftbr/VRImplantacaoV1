@@ -1594,7 +1594,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    p.sequen id,\n"
-                    + "    e.idfornec id_fornecedor,\n"
+                    + "    e.codigo id_fornecedor,\n"
+                    + "    e.ciccgc as cnpj, \n"
                     + "    p.docume documento,\n"
                     + "    p.dataxx dataemissao,\n"
                     + "    p.dataentra dataentrada,\n"
@@ -1608,8 +1609,10 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join entidade e on\n"
                     + "        p.entidade = e.codigo\n"
                     + "where\n"
-                            + "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
+                    + "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
                     + "    and p.datapago is null\n"
+                    + "    and e.ciccgc is not null \n"
+                    + "    and e.ciccgc != 0 \n"
                     + "order by\n"
                     + "    p.sequen"
             )) {
@@ -1618,12 +1621,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     
-                    if ((rst.getString("id_fornecedor") != null)
-                            && (!rst.getString("id_fornecedor").trim().isEmpty())) {
-                        imp.setIdFornecedor(Utils.stringLong(rst.getString("id_fornecedor")));
-                    } else {
-                        imp.setIdFornecedor("1");
-                    }
+                    imp.setIdFornecedor(Utils.stringLong(rst.getString("id_fornecedor")));
+                    imp.setCnpj(rst.getString("cnpj"));
                                         
                     String numerodocumento = Utils.formataNumero(rst.getString("documento"));
                     

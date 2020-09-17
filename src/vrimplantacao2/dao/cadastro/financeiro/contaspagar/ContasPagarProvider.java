@@ -7,6 +7,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.RepositoryProvider;
 import vrimplantacao2.dao.cadastro.diversos.BancoDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.fornecedor.FornecedorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorParcelaVO;
@@ -14,6 +15,7 @@ import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVencimentoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
+import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 
 /**
  *
@@ -23,6 +25,7 @@ public class ContasPagarProvider implements RepositoryProvider {
     private String sistema;
     private String agrupador;
     private int lojaVR;
+    private FornecedorDAO fornecDAO;
     private FornecedorAnteriorDAO fornecedorDAO;
     private ContaPagarAnteriorDAO anteriorDAO;
     private PagarOutrasDespesasDAO despesaDAO;
@@ -35,6 +38,7 @@ public class ContasPagarProvider implements RepositoryProvider {
         this.sistema = sistema;
         this.agrupador = agrupador;
         this.lojaVR = lojaVR;
+        this.fornecDAO = new FornecedorDAO();
         this.fornecedorDAO = new FornecedorAnteriorDAO();
         this.despesaDAO = new PagarOutrasDespesasDAO();
         this.vencimentoDAO = new PagarOutrasDespesasVencimentoDAO();
@@ -60,6 +64,10 @@ public class ContasPagarProvider implements RepositoryProvider {
         return this.lojaVR;
     }
 
+    public MultiMap<Long, FornecedorVO> getCnpjFornecedor() throws Exception {
+        return this.fornecDAO.getCnpjExistente();
+    }
+            
     public MultiMap<String, FornecedorAnteriorVO> getFornecedores() throws Exception {
         return this.fornecedorDAO.getAnteriores();
     }

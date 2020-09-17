@@ -5,5 +5,5 @@ package vrimplantacao2.dao.cadastro.financeiro.contaspagar;
  * @author Leandro
  */
 public enum OpcaoContaPagar {
-    NOVOS, IMPORTAR_SEM_FORNECEDOR, IMPORTAR_OUTRASDESPESAS
+    NOVOS, IMPORTAR_SEM_FORNECEDOR, IMPORTAR_OUTRASDESPESAS, IMPORTAR_POR_CNPJ
 }

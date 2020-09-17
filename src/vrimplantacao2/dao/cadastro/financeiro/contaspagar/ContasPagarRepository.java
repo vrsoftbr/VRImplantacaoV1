@@ -42,6 +42,7 @@ public class ContasPagarRepository {
         Set<OpcaoContaPagar> opt = new HashSet<>(Arrays.asList(opcoes));
         MultiMap<String, ContaPagarIMP> organizados = organizar(contas);
         provider.notificar("Contas à Pagar - Preparando a importação...");
+        MultiMap<Long, FornecedorVO> cnpjFornecedor = provider.getCnpjFornecedor();
         MultiMap<String, FornecedorAnteriorVO> fornecedores = provider.getFornecedores();
         MultiMap<String, ContaPagarAnteriorVO> anteriores = provider.getAnteriores();
         MultiMap<String, PagarFornecedorVO> pagarFornecedor;
@@ -71,34 +72,60 @@ public class ContasPagarRepository {
                 );
                 FornecedorVO fornecedor = null;
                 {
-                    FornecedorAnteriorVO fornecedorAnterior = fornecedores.get(
-                            provider.getSistema(),
-                            provider.getAgrupador(),
-                            imp.getIdFornecedor()
-                    );
-                    if (fornecedorAnterior != null) {
-                        if (fornecedorAnterior.getCodigoAtual() != null) {
-                            fornecedor = fornecedorAnterior.getCodigoAtual();
-                                                        
+                    if (!opt.contains(OpcaoContaPagar.IMPORTAR_POR_CNPJ)) {
+                        FornecedorAnteriorVO fornecedorAnterior = fornecedores.get(
+                                provider.getSistema(),
+                                provider.getAgrupador(),
+                                imp.getIdFornecedor()
+                        );
+                        if (fornecedorAnterior != null) {
+                            if (fornecedorAnterior.getCodigoAtual() != null) {
+                                fornecedor = fornecedorAnterior.getCodigoAtual();
+
+                                pagarFornecedor = provider.getPagarFornecedores(
+                                        provider.getLojaVR(),
+                                        fornecedorAnterior.getCodigoAtual().getId(),
+                                        Integer.parseInt(imp.getNumeroDocumento()),
+                                        imp.getDataEmissao()
+                                );
+
+                                if (!pagarFornecedor.isEmpty()) {
+                                    System.out.println(String.valueOf(imp.getNumeroDocumento()) + " -- " + String.valueOf(imp.getDataEmissao()));
+                                    continue;
+                                }
+                            }
+                        } else {
+                            System.out.println(String.format("FORN. NAO ENCONTRADO: %s %s %s",
+                                    provider.getSistema(),
+                                    provider.getAgrupador(),
+                                    imp.getIdFornecedor()
+                            ));
+                            cont++;
+                        }
+                    } else {
+                        FornecedorVO cnpjfornecedor = cnpjFornecedor.get(
+                            Long.parseLong(imp.getCnpj())
+                        );
+                        
+                        if (cnpjfornecedor != null) {
+                            fornecedor = cnpjfornecedor;
+
                             pagarFornecedor = provider.getPagarFornecedores(
-                                    provider.getLojaVR(), 
-                                    fornecedorAnterior.getCodigoAtual().getId(), 
-                                    Integer.parseInt(imp.getNumeroDocumento()), 
+                                    provider.getLojaVR(),
+                                    cnpjfornecedor.getId(),
+                                    Integer.parseInt(imp.getNumeroDocumento()),
                                     imp.getDataEmissao()
                             );
-                            
+
                             if (!pagarFornecedor.isEmpty()) {
                                 System.out.println(String.valueOf(imp.getNumeroDocumento()) + " -- " + String.valueOf(imp.getDataEmissao()));
                                 continue;
                             }
+
+                        } else {
+                            System.out.println(String.format("FORN. NAO ENCONTRADO: %s ", imp.getCnpj()));
+                            cont++;
                         }
-                    } else {
-                        System.out.println(String.format("FORN. NAO ENCONTRADO: %s %s %s", 
-                                provider.getSistema(),
-                                provider.getAgrupador(),
-                                imp.getIdFornecedor()
-                                ));
-                        cont++;
                     }
                 }
                 

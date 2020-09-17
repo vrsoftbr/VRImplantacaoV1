@@ -2152,40 +2152,28 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             Conexao.begin();
             
             ProgressBar.setMaximum(vo.size());
-            ProgressBar.setStatus("Acertando NumeroCupom e Cpf...");
+            ProgressBar.setStatus("Acertando Cpf...");
             
             stm = Conexao.createStatement();
             
             for (PdvVendaVO i_vo : vo) {
-                sql = "update pdv.venda set "
-                        + "numerocupom = " + i_vo.getNumeronota() + ", "
-                        + "cpf = " + i_vo.getCpf() + ","
-                        + "bkp_numerocupom = " + i_vo.getNumeroCupom() + " "
+                sql = /*"update pdv.venda set "
+                        + "cpf = " + i_vo.getCpf() + " "
                         + "where data = '" + i_vo.getData() + "' "
                         + "and ecf = " + i_vo.getEcf() + " "
-                        + "and numerocupom = " + i_vo.getNumeroCupom() + " "
+                        //+ "and chavecfe != '' "
                         + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
-                        + "and id_loja = " + idLoja + ""
-                        + "and numerocupom not in (select numerocupom from pdv.venda where "
-                        + "     ecf = "+i_vo.getEcf()+" "
-                        + "     and chavecfe = '"+i_vo.getChaveCfe()+"' "
-                        + "     and data = '"+i_vo.getData()+"' "
-                        + "     and id_loja = " +idLoja+ "); \n"
-                        + "\n\n"
-                        + "update escrita set "
-                        + "numeronota = " + i_vo.getNumeronota() + ", "
-                        + "cpfadquirente = " + i_vo.getCpf() + ", "
-                        + "bkp_numerocupom = " + i_vo.getNumeroCupom() + " "
+                        + "and id_loja = " + idLoja + ";";
+                        /*+ "\n\n"*/
+                        "update escrita set "
+                        + "cpfadquirente = " + i_vo.getCpf() + " "
                         + "where data = '" + i_vo.getData() + "' "
                         + "and ecf = " + i_vo.getEcf() + " "
-                        + "and numeronota = " + i_vo.getNumeroCupom() + " "
+                        + "and chavecfe != '' "
                         + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
-                        + "and id_loja = " + idLoja + " "
-                        + "and numeronota not in (select numeronota from escrita where "
-                        + "     ecf = "+i_vo.getEcf()+" "
-                        + "     and chavecfe = '"+i_vo.getChaveCfe()+"' "
-                        + "     and data = '"+i_vo.getData()+"' "
-                        + "     and id_loja = " +idLoja+ ");";
+                        + "and especie = 'CFE' "
+                        + "and modelo = '59' "
+                        + "and id_loja = " + idLoja + ";";
                         
                 /*sql = "update escrita set "
                         + "chavecfe = '"+ i_vo.getChaveCfe()+"', "
@@ -2305,6 +2293,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             
             stm = Conexao.createStatement();
             
+            sql = "delete from implantacao.notaentradaitem_quantidade where id_loja = " + idLoja + ";\n"
+                    + "delete from implantacao.acertoestoque where id_loja = " + idLoja + ";";
+            
+            stm.execute(sql);
+            
             for (LogEstoqueVO i_vo : vo) {
                 
                 sql = "insert into implantacao.notaentradaitem_quantidade("
@@ -2320,6 +2313,11 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                 
                 ProgressBar.next();
             }
+            
+            sql = "insert into implantacao.acertoestoque(select "+idLoja+", id_produto, coalesce(sum(quantidade), 0) "
+                    + "from implantacao.notaentradaitem_quantidade where id_loja = "+idLoja+" group by id_produto);";
+            
+            stm.execute(sql);
             
             stm.close();            
             Conexao.commit();
