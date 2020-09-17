@@ -540,9 +540,7 @@ public class LBSoftwareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  codigo as idcliente,\n" +
                     "  ecf\n" +
                     "from \n" +
-                    "  contrec \n" +
-                    "where \n" +
-                    "  loja = '" + getLojaOrigem() + "'")) {
+                    "  contrec")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
