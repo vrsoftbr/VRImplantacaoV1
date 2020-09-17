@@ -231,7 +231,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     String id = rs.getString("idproduto");
-                    id = id.substring(0, id.length() - 1);
+                    //id = id.substring(0, id.length() - 1);
                     imp.setImportId(id);
                     imp.setEan(rs.getString("ean"));
                     imp.setQtdEmbalagem(rs.getInt("quantidade"));
@@ -482,7 +482,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "		when p.estc13codi = '' then p.codigoplu  \n" +
                     "		else p.estc13codi \n" +
                     "	end ean,\n" +
-                    "	p.estc35desc descricaocompleta,\n" +
+                    "   p.estc35desc + ext.COMPDESCRI descricaocompleta,\n" +
+                    "	p.estc35desc descricaogondola,\n" +
                     "	p.descreduzi descricaoreduzida,\n" +
                     "	p.dtcadastro,\n" +
                     "	p.ESTC01LINH ativo,\n" +
@@ -588,7 +589,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaProduto(familia.get(imp.getImportId()));                    
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
-                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaogondola")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
                     imp.setSituacaoCadastro("N".equals(rs.getString("ativo")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
@@ -644,19 +645,25 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         try (
                 Statement st = ConexaoSqlServer.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
+                        "declare @dat date = cast(CURRENT_TIMESTAMP as date);\n" +
+                        "declare @id_loja integer = " + getLojaOrigem() + ";\n" +
                         "select\n" +
                         "	o.CODIGOPLU id_produto,\n" +
                         "	o.DATINICOFE datainicio,\n" +
                         "	o.DATFINAOFE datatermino,\n" +
                         "	o.VENDAOFERT precooferta,\n" +
-                        "	o.VENDAATUA preconormal\n" +
+                        "	o.VENDAATUA preconormal,\n" +
+                        "	o.*\n" +
                         "from\n" +
-                        "	fl311ofe o \n" +
+                        "	fl311ofe o\n" +
+                        "	join FLOFEBLO b on\n" +
+                        "		o.BLOCO = b.BLOCO \n" +
                         "where\n" +
-                        "	o.CODIGOLOJA = " + getLojaOrigem() + "\n" +
-                        "	and o.DATFINAOFE >= cast(CURRENT_TIMESTAMP as date)\n" +
+                        "	b.DATFINAOFE >= @dat\n" +
+                        "	and b.GRUPOLOJAS like '%,' + cast(@id_loja as varchar(8)) + ',%'\n" +
+                        "	and o.CODIGOLOJA = @id_loja\n" +
                         "order by\n" +
-                        "	o.CODIGOPLU"
+                        "	cast(o.CODIGOPLU as integer)"
                 )
                 ) {
             while (rs.next()) {
