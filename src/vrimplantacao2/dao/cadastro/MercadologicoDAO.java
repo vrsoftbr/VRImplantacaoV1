@@ -114,6 +114,7 @@ public class MercadologicoDAO {
                                 "");
 
                         if (vo.getNivel() == 1) {
+                            boolean validId = Utils.stringToInt(chave[2]) <= 999;
                             sql = "insert into mercadologico ("
                                     + "mercadologico1,"
                                     + "mercadologico2,"
@@ -123,7 +124,7 @@ public class MercadologicoDAO {
                                     + "descricao,"
                                     + "nivel"
                                     + ") values ("
-                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico1 from mercadologico where nivel = 1 order by id limit 1)," : Utils.stringToInt(chave[2]) + ",")
+                                    + (!manterMercadologico || !validId ? "(select id from generate_series(1,999) s(id) except select mercadologico1 from mercadologico where nivel = 1 order by id limit 1)," : Utils.stringToInt(chave[2]) + ",")
                                     + "0,"
                                     + "0,"
                                     + "0,"
@@ -137,6 +138,7 @@ public class MercadologicoDAO {
                                     + "mercadologico4,"
                                     + "mercadologico5;";
                         } else if (vo.getNivel() == 2) {
+                            boolean validId = Utils.stringToInt(chave[3]) <= 999;
                             sql = "insert into mercadologico ("
                                     + "mercadologico1,"
                                     + "mercadologico2,"
@@ -147,7 +149,7 @@ public class MercadologicoDAO {
                                     + "nivel"
                                     + ") values ("
                                     + pai.getMercadologico1() + ","
-                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico2 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and nivel = 2 order by id limit 1)," : Utils.stringToInt(chave[3]) + ",")
+                                    + (!manterMercadologico || !validId ? "(select id from generate_series(1,999) s(id) except select mercadologico2 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and nivel = 2 order by id limit 1)," : Utils.stringToInt(chave[3]) + ",")
                                     + "0,"
                                     + "0,"
                                     + "0,"
@@ -160,6 +162,7 @@ public class MercadologicoDAO {
                                     + "mercadologico4,"
                                     + "mercadologico5;";
                         } else if (vo.getNivel() == 3) {
+                            boolean validId = Utils.stringToInt(chave[4]) <= 999;
                             sql = "insert into mercadologico ("
                                     + "mercadologico1,"
                                     + "mercadologico2,"
@@ -171,7 +174,7 @@ public class MercadologicoDAO {
                                     + ") values ("
                                     + pai.getMercadologico1() + ","
                                     + pai.getMercadologico2() + ","
-                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico3 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and nivel = 3 order by id limit 1)," : Utils.stringToInt(chave[4]) + ",")
+                                    + (!manterMercadologico || !validId ? "(select id from generate_series(1,999) s(id) except select mercadologico3 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and nivel = 3 order by id limit 1)," : Utils.stringToInt(chave[4]) + ",")
                                     + "0,"
                                     + "0,"
                                     + Utils.quoteSQL(vo.getDescricao()) + ","
@@ -183,6 +186,7 @@ public class MercadologicoDAO {
                                     + "mercadologico4,"
                                     + "mercadologico5;";
                         } else if (vo.getNivel() == 4 && nivelMax > 3) {
+                            boolean validId = Utils.stringToInt(chave[5]) <= 999;
                             sql = "insert into mercadologico ("
                                     + "mercadologico1,"
                                     + "mercadologico2,"
@@ -195,7 +199,7 @@ public class MercadologicoDAO {
                                     + pai.getMercadologico1() + ","
                                     + pai.getMercadologico2() + ","
                                     + pai.getMercadologico3() + ","
-                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico4 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and nivel = 4 order by id limit 1)," : Utils.stringToInt(chave[5]) + ",")
+                                    + (!manterMercadologico || !validId ? "(select id from generate_series(1,999) s(id) except select mercadologico4 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and nivel = 4 order by id limit 1)," : Utils.stringToInt(chave[5]) + ",")
                                     + "0,"
                                     + Utils.quoteSQL(vo.getDescricao()) + ","
                                     + vo.getNivel() + ") returning "
@@ -206,6 +210,7 @@ public class MercadologicoDAO {
                                     + "mercadologico4,"
                                     + "mercadologico5;";
                         } else if (vo.getNivel() == 5 && nivelMax > 4) {
+                            boolean validId = Utils.stringToInt(chave[6]) <= 999;
                             sql = "insert into mercadologico ("
                                     + "mercadologico1,"
                                     + "mercadologico2,"
@@ -219,7 +224,7 @@ public class MercadologicoDAO {
                                     + pai.getMercadologico2() + ","
                                     + pai.getMercadologico3() + ","
                                     + pai.getMercadologico4() + ","
-                                    + (!manterMercadologico ? "(select id from generate_series(1,999) s(id) except select mercadologico5 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and mercadologico4 = " + pai.getMercadologico4() + " and nivel = 5 order by id limit 1)," : Utils.stringToInt(chave[6]) + ",")
+                                    + (!manterMercadologico || !validId ? "(select id from generate_series(1,999) s(id) except select mercadologico5 from mercadologico where mercadologico1 = " + pai.getMercadologico1() + " and mercadologico2 = " + pai.getMercadologico2() + " and mercadologico3 = " + pai.getMercadologico3() + " and mercadologico4 = " + pai.getMercadologico4() + " and nivel = 5 order by id limit 1)," : Utils.stringToInt(chave[6]) + ",")
                                     + Utils.quoteSQL(vo.getDescricao()) + ","
                                     + vo.getNivel() + ") returning "
                                     + "id,"
