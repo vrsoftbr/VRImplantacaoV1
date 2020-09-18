@@ -87,7 +87,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean copiarIcmsDebitoNaEntrada = false;
     public boolean utilizaMetodoAjustaAliquota = false;
     public boolean copiarDescricaoCompletaParaGondola = false;
-    public boolean manterEAN = false;
     public boolean removerCodigoCliente = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
@@ -487,10 +486,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPautaFiscalId(imp.getImportId());
                     imp.setCodigoAnp(rst.getString("codigoanp") != null ? rst.getString("codigoanp").trim()
                             : "");
-
-                    if (manterEAN && !imp.isBalanca() && imp.getEan() != null && imp.getEan().length() < 7) {
-                        imp.setManterEAN(true);
-                    }
 
                     imp.setPrateleira(String.valueOf(Utils.stringToInt(rst.getString("corredor"))));
 

@@ -255,7 +255,6 @@ public class GetWayGUI extends VRInternalFrame {
                     getWayDAO.apenasProdutoAtivo = chkProdutoAtivo.isSelected();
                     getWayDAO.utilizaMetodoAjustaAliquota = chkMetodoAliquota.isSelected();
                     getWayDAO.copiarDescricaoCompletaParaGondola = chkCopiaDescComplGondola.isSelected();
-                    getWayDAO.manterEAN = chkManterEAN.isSelected();
                     getWayDAO.removerCodigoCliente = chkRemoverIDCliente.isSelected();
 
                     if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
@@ -291,7 +290,17 @@ public class GetWayGUI extends VRInternalFrame {
                         if (chkProdutos.isSelected()) {
                             getWayDAO.setDesconsiderarSetorBalanca(chkDesconsiderarSetorBalanca.isSelected());
                             getWayDAO.setPesquisarKGnaDescricao(chkPesquisarKG.isSelected());
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            {
+                                ArrayList<OpcaoProduto> opcoes = new ArrayList<>();
+                                if (chkManterBalanca.isSelected()) {
+                                    opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                                }
+                                if (chkManterEAN.isSelected()) {
+                                    opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                                }
+                                importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
+                            }
+                            //importador.importarProduto(chkManterBalanca.isSelected());
                         }
 
                         {
