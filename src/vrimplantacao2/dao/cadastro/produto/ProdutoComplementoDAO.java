@@ -1,11 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto;
 
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -376,13 +371,6 @@ public class ProdutoComplementoDAO {
                         "id_produto = " + complemento.getProduto().getId() + " and "
                         + "id_loja = " + complemento.getIdLoja()
                 );
-            } if (opt.contains(OpcaoProduto.MARGEM)) {
-                sql.setWhere(
-                        "id_produto = " + complemento.getProduto().getId() + " and "
-                        + "id_loja = " + complemento.getIdLoja() + " and "
-                        + "coalesce(margem, 0) = 0 "
-                );
-                
             } else {
                 sql.setWhere(
                         "id_produto = " + complemento.getProduto().getId() + " and "

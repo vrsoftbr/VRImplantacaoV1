@@ -411,6 +411,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setIcmsAliqEntrada(0);
                             imp.setIcmsReducaoEntrada(0);
                         }
+                        
+                        imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                        imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntradaForaEstado());
+                        imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
 
                         String str = (imp.getImportId() + " - ICMS Entrada: "
                                 + imp.getIcmsCstEntrada() + " - "
@@ -423,6 +427,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                 MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
                         )) {
                             imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                            imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                         } else {
                             imp.setIcmsCreditoId(null);
                             str += " - Encontrou";
