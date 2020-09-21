@@ -121,6 +121,7 @@ public class CreditoRotativoRepository {
             Map<String, CreditoRotativoAnteriorVO> anteriores = provider.getAnteriores();
             MultiMap<String, CreditoRotativoItemAnteriorVO> baixas = provider.getBaixasAnteriores();
             MultiMap<String, ClientePreferencialAnteriorVO> clientes = provider.getClientesAnteriores();
+            MultiMap<String, CreditoRotativoVO> getCreditoRotativo;
             
             provider.setStatus("Importando crédito rotativo...Gravando", filtrados.size());
             for (CreditoRotativoIMP imp: filtrados.values()) {
@@ -138,8 +139,18 @@ public class CreditoRotativoRepository {
                     if (preferencial != null && preferencial.getCodigoAtual() != null) {
                         CreditoRotativoVO cred = converterRotativo(imp);
                         cred.setId_clientePreferencial(preferencial.getCodigoAtual().getId());
-                        provider.gravarRotativo(cred);
-                        anterior.setCodigoAtual(cred);
+
+                        getCreditoRotativo = provider.getCreditoRotativo(
+                                provider.getLojaVR(), 
+                                cred.getId_clientePreferencial(), 
+                                cred.getNumeroCupom(), 
+                                cred.getDataEmissao()
+                        );
+
+                        if (getCreditoRotativo.isEmpty()) {
+                            provider.gravarRotativo(cred);
+                            anterior.setCodigoAtual(cred);                            
+                        }
                     } else {
                         LOG.warning("Cliente '" + imp.getIdCliente() + "' não encontrado!");
                     }

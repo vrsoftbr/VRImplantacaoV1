@@ -3,9 +3,11 @@ package vrimplantacao2.dao.cadastro.financeiro.creditorotativo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoVO;
 
@@ -132,5 +134,39 @@ public class CreditoRotativoDAO {
                     "$$;\n" +
                     "commit;");
             }
+    }
+    
+    public MultiMap<String, CreditoRotativoVO> getCreditoRotativo(int idLoja, int idClientePreferenecial, int numeroCupom, Date dataEmissao) throws Exception {
+        MultiMap<String, CreditoRotativoVO> result = new MultiMap<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id_loja, \n"
+                    + "id_clientepreferencial, \n"
+                    + "dataemissao, \n"
+                    + "numerocupom \n"
+                    + "from recebercreditorotativo \n"
+                    + "where id_loja = " + idLoja + " \n"
+                    + "and id_clientepreferencial = " + idClientePreferenecial + " \n"
+                    + "and dataemissao = '" + dataEmissao + "' \n"
+                    + "and numerocupom = " + numeroCupom
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoVO vo = new CreditoRotativoVO();
+                    vo.setId_loja(rst.getInt("id_loja"));
+                    vo.setId_clientePreferencial(rst.getInt("id_clientepreferencial"));
+                    vo.setDataEmissao(rst.getDate("dataemissao"));
+                    vo.setNumeroCupom(rst.getInt("numerocupom"));
+                    result.put(vo,
+                            String.valueOf(vo.getId_loja()),
+                            String.valueOf(vo.getId_clientePreferencial()),
+                            String.valueOf(vo.getDataEmissao()),
+                            String.valueOf(vo.getNumeroCupom())
+                    );
+                }
+            }
+        }
+        return result;
     }
 }

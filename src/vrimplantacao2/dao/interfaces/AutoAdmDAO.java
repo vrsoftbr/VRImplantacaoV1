@@ -842,8 +842,8 @@ public class AutoAdmDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join tb_tipo_documento doc\n"
                     + "    on doc.cd_tipo_documento = r.cd_tipo_documento\n"
                     + "where r.fg_situacao = 'A' \n"
-                    + "and i.fg_situacao = 'P'\n"
-                    + "and r.cd_carteira = 3"
+                    + "and i.fg_situacao in ('A', 'P')\n"
+                    + "and r.cd_carteira in (2, 3, 15)"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
