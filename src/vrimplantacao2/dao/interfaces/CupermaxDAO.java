@@ -103,20 +103,17 @@ public class CupermaxDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "WITH merc AS (\n"
-                    + "SELECT\n"
+                    "SELECT\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
                     + "	DESCRICAO descritivo\n"
-                    + "FROM\n"
+                    + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
-                    + "	)\n"
-                    + "	SELECT depto,DESCRITIVO \n"
-                    + "FROM MERC \n"
-                    + "	WHERE secao IS NULL AND grupo IS NULL \n"
-                    + "ORDER BY\n"
-                    + "	1"
+                    + "WHERE\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NULL \n"
+                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
+                    + "	ORDER BY 1,2,3"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descritivo"));
@@ -125,20 +122,17 @@ public class CupermaxDAO extends InterfaceDAO {
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "	WITH merc AS (\n"
-                    + "SELECT\n"
+                    "SELECT\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
                     + "	DESCRICAO descritivo\n"
-                    + "FROM\n"
+                    + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
-                    + "	)\n"
-                    + "	SELECT secao,DESCRITIVO \n"
-                    + "FROM MERC \n"
-                    + "	WHERE secao IS NOT NULL AND grupo IS NULL \n"
-                    + "ORDER BY\n"
-                    + "	1"
+                    + "WHERE\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NOT NULL \n"
+                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
+                    + "	ORDER BY 1,2,3"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
@@ -147,20 +141,17 @@ public class CupermaxDAO extends InterfaceDAO {
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "	WITH merc AS (\n"
-                    + "SELECT\n"
+                    "SELECT\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
                     + "	DESCRICAO descritivo\n"
-                    + "FROM\n"
+                    + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
-                    + "	)\n"
-                    + "	SELECT grupo,DESCRITIVO \n"
-                    + "FROM MERC \n"
-                    + "	WHERE grupo IS NOT NULL \n"
-                    + "ORDER BY\n"
-                    + "	1"
+                    + "WHERE\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NOT NULL\n"
+                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NOT NULL \n"
+                    + "ORDER BY 1,2,3"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
@@ -217,61 +208,36 @@ public class CupermaxDAO extends InterfaceDAO {
         List<ProdutoIMP> vProduto = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "  p.codigo id,\n"
-                    + "  ean.codbarra ean,\n"
-                    + "  ean.quantidade qtdEmbalagem,\n"
-                    + "  case p.pesvar when 'S' then 1 else 0 end as e_balanca,\n"
-                    + "  case when p.pesvar = 'S' and p.tipo = 'P' then 'KG' else 'UN' end as tipoembalagem,\n"
-                    + "  val.validade,  \n"
-                    + "  p.nome descricaocompleta,\n"
-                    + "  p.nome2 descricaoreduzida,\n"
-                    + "  p.nome1 descricaogondola,\n"
-                    + "  case p.inativo when 'S' then 0 else 1 end as id_situacaocadastro,\n"
-                    + "  p.flaginc datacadastro,\n"
-                    + "  p.setor mercadologico1,\n"
-                    + "  p.grupo mercadologico2,\n"
-                    + "  p.subgrupo mercadologico3,\n"
-                    + "  c.nome ncm,\n"
-                    + "  c.cest cest,\n"
-                    + "  case p.CODIGOREA when 0 then null else p.CODIGOREA end as id_familia,\n"
-                    + "  preco.lucro margem,\n"
-                    + "  p.pesoliquido,\n"
-                    + "  p.peso pesobruto,\n"
-                    + "  tp.cst_pis piscofins_cst_sai,\n"
-                    + "  tp.cstpisent piscofins_cst_ent,\n"
-                    + "  tc.codigo piscofins_natrec,\n"
-                    + "  preco.precovenda preco,\n"
-                    + "  preco.custobruto custosemimposto,\n"
-                    + "  preco.custoliquido custocomimposto,\n"
-                    + "  estoq.quantidade estoque,\n"
-                    + "  estoq.minimo,\n"
-                    + "  estoq.maximo,\n"
-                    + "  icms.cst icms_cst,\n"
-                    + "  icms.ALIQUOTA icms_aliq,\n"
-                    + "  icms.REDUCAO icms_reducao\n"
-                    + "from\n"
-                    + "  produtos p\n"
-                    + "  join produtos_impostos imp on p.codigo = imp.codigo and imp.loja = " + getLojaOrigem() + "\n"
-                    + "  join classificacao c on imp.classificacao = c.codigo\n"
-                    + "  left join produtos_ean ean on p.codigo = ean.codigo and ean.codbarra > 0 \n"
-                    + "  and ean.vendapadrao = 'S'\n"
-                    + "  left join classificacao ncm on imp.classificacao = ncm.codigo\n"
-                    + "  join produtos_precos preco on p.codigo = preco.codigo and preco.loja = " + getLojaOrigem() + "\n"
-                    + "  left join (select a.codigoprodutostipos, a.cstpisent, a.cst_pis, a.TabelaCodigo from \n"
-                    + "          produtos_tipos_vigencia a\n"
-                    + "          join (select \n"
-                    + "              codigoprodutostipos, \n"
-                    + "              max(iniciovigencia) iniciovigencia\n"
-                    + "            from produtos_tipos_vigencia group by codigoprodutostipos) b\n"
-                    + "            on a.codigoprodutostipos = b.codigoprodutostipos and\n"
-                    + "            a.iniciovigencia = b.iniciovigencia) tp on p.tipoproduto = tp.codigoprodutostipos\n"
-                    + "  left join tabela_codigo tc on tp.TabelaCodigo = tc.Chave\n"
-                    + "  join produtos_estoque estoq on estoq.CODIGO = p.codigo and estoq.loja = " + getLojaOrigem() + "\n"
-                    + "  join aliquota icms on imp.icms = icms.codigo\n"
-                    + "  left join produtos_loja val on p.codigo = val.codigo and val.loja = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "  e_balanca desc, p.codigo"
+                    "SELECT\n"
+                    + "	p.id importId,\n"
+                    + "	P.data_cadastro dataCadastro,\n"
+                    + "	codigo_barra ean,\n"
+                    + "	CASE WHEN lengthb (codigo_barra) < 8 AND u.sigla = 'KG' THEN  1 ELSE 0 END ebalanca,\n"
+                    + "	fator_conversao qtdEmbalagem,\n"
+                    + "	u.sigla tipoEmbalagem,\n"
+                    + "	P.descricao AS descricaoCompleta,\n"
+                    + "	P.descricao AS descricaoReduzida,\n"
+                    + "	P.descricao AS descricaoGondola,\n"
+                    + "	peso_bruto pesoBruto,\n"
+                    + "	peso_liquido pesoLiquido,\n"
+                    + "	P.estoque_minimo estoqueMinimo,\n"
+                    + "	estoque_geral estoque,\n"
+                    + " perc_margem_lucro margem,\n"
+                    + "	preco_compra custoSemImposto,\n"
+                    + "	preco_venda_anterior custoAnteriorSemImposto,\n"
+                    + "	preco_venda_final precovenda,\n"
+                    + " CASE WHEN status = 'A' THEN 1 ELSE 0 END status,\n"
+                    + "	nomenclatura_com_mercosul ncm,\n"
+                    + "	cest,\n"
+                    + "	cst_pis_entrada piscofinsCstDebito,\n"
+                    + "	cst_pis piscofinsCstCredito\n"
+                    + "FROM\n"
+                    + "	CUPERMAX.PRODUTO p\n"
+                    + "		JOIN CUPERMAX.PRODUTO_EMBALAGEM pe\n"
+                    + "			ON p.ID = pe.ID_PRODUTO \n"
+                    + "		JOIN CUPERMAX.UNIDADE u \n"
+                    + "			ON U.ID = PE.ID_UNIDADE\n"
+                    + "ORDER BY 1\n"
             )) {
 
                 while (rst.next()) {
@@ -280,47 +246,37 @@ public class CupermaxDAO extends InterfaceDAO {
                     //Prepara as variáveis
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
+                    imp.setImportId(rst.getString("importId"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEan(rst.getString("ean"));
+                    imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-
+                    imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
-                    imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("id_Situacaocadastro")));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
+                    imp.setCustoAnteriorSemImposto(rst.getDouble("custoAnteriorSemImposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
 
-                    imp.setCodMercadologico1(String.valueOf(rst.getInt("mercadologico1") == 0 ? 1 : rst.getInt("mercadologico1")));
-                    imp.setCodMercadologico2(String.valueOf(rst.getInt("mercadologico2") == 0 ? 1 : rst.getInt("mercadologico2")));
-                    imp.setCodMercadologico3(String.valueOf(rst.getInt("mercadologico3") == 0 ? 1 : rst.getInt("mercadologico3")));
+                    imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
 
-                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
-                    imp.setMargem(rst.getDouble("margem"));
-
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-
-                    imp.setPiscofinsCstDebito(rst.getInt("piscofins_cst_sai"));
-                    imp.setPiscofinsCstCredito(rst.getInt("piscofins_cst_ent"));
-                    imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofins_natrec")));
-
-                    imp.setPrecovenda(rst.getDouble("preco"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rst.getDouble("minimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("maximo"));
-
-                    imp.setIcmsCst(rst.getInt("icms_cst"));
-                    imp.setIcmsAliq(rst.getDouble("icms_aliq"));
-                    imp.setIcmsReducao(rst.getDouble("icms_reducao"));
-
+                    imp.setPiscofinsCstDebito(rst.getInt("piscofinsCstDebito"));
+                    imp.setPiscofinsCstCredito(rst.getInt("piscofinsCstCredito"));
+                    
+                    /*
+                     imp.setCodMercadologico1();
+                     imp.setCodMercadologico2();
+                     imp.setCodMercadologico3();
+                     */
                     vProduto.add(imp);
                 }
             }
@@ -341,9 +297,9 @@ public class CupermaxDAO extends InterfaceDAO {
                     + "FROM CUPERMAX.PRODUTO_EMBALAGEM"
             )) {
                 while (rst.next()) {
-                    if ((rst.getString("codbarra") != null)
-                            && (!rst.getString("codbarra").trim().isEmpty())
-                            && (Long.parseLong(Utils.formataNumero(rst.getString("codbarra"))) > 999999)) {
+                    if ((rst.getString("ean") != null)
+                            && (!rst.getString("ean").trim().isEmpty())
+                            && (Long.parseLong(Utils.formataNumero(rst.getString("ean"))) > 999999)) {
 
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
@@ -750,161 +706,161 @@ public class CupermaxDAO extends InterfaceDAO {
         }
         return result;
     }
+    /*
+     @Override
+     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+     List<ConvenioEmpresaIMP> result = new ArrayList<>();
 
-    @Override
-    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
-        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoOracle.createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "SELECT \n"
+     + "p.codigo, \n"
+     + "p.razao,\n"
+     + "p.nome, \n"
+     + "p.estado,\n"
+     + "p.cpf,\n"
+     + "p.cnpj,\n"
+     + "p.bairro,\n"
+     + "p.cep,\n"
+     + "p.cidade,\n"
+     + "p.endereco,\n"
+     + "p.estado,\n"
+     + "p.ie,\n"
+     + "p.rg,\n"
+     + "p.flaginc,\n"
+     + "c.dataencerramento,\n"
+     + "c.datarecebimento,\n"
+     + "c.prazodias,\n"
+     + "c.ultimofechamento,\n"
+     + "  trim((select case when coalesce(trim(ddd),'') = '' then telefone else ddd||telefone end as asd "
+     + "from telefones "
+     + "where codigo = p.codigo "
+     + "and lower(tipo) = 'residencial' "
+     + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
+     + "FROM pessoas p,convenios c\n"
+     + "WHERE p.codigo = c.codigo "
+     + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo in (" + v_codEmpresaConv) + ")"
+     )) {
+     SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+     while (rst.next()) {
+     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+     imp.setId(rst.getString("codigo"));
+     imp.setRazao(rst.getString("razao"));
 
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "p.codigo, \n"
-                    + "p.razao,\n"
-                    + "p.nome, \n"
-                    + "p.estado,\n"
-                    + "p.cpf,\n"
-                    + "p.cnpj,\n"
-                    + "p.bairro,\n"
-                    + "p.cep,\n"
-                    + "p.cidade,\n"
-                    + "p.endereco,\n"
-                    + "p.estado,\n"
-                    + "p.ie,\n"
-                    + "p.rg,\n"
-                    + "p.flaginc,\n"
-                    + "c.dataencerramento,\n"
-                    + "c.datarecebimento,\n"
-                    + "c.prazodias,\n"
-                    + "c.ultimofechamento,\n"
-                    + "  trim((select case when coalesce(trim(ddd),'') = '' then telefone else ddd||telefone end as asd "
-                    + "from telefones "
-                    + "where codigo = p.codigo "
-                    + "and lower(tipo) = 'residencial' "
-                    + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
-                    + "FROM pessoas p,convenios c\n"
-                    + "WHERE p.codigo = c.codigo "
-                    + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo in (" + v_codEmpresaConv) + ")"
-            )) {
-                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-                while (rst.next()) {
-                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-                    imp.setId(rst.getString("codigo"));
-                    imp.setRazao(rst.getString("razao"));
+     if ((rst.getString("cpf") != null)
+     && (!rst.getString("cpf").trim().isEmpty())) {
+     imp.setCnpj(rst.getString("cpf"));
+     } else if ((rst.getString("cnpj") != null)
+     && (!rst.getString("cnpj").trim().isEmpty())) {
+     imp.setCnpj(rst.getString("cnpj"));
+     } else {
+     imp.setCnpj("");
+     }
 
-                    if ((rst.getString("cpf") != null)
-                            && (!rst.getString("cpf").trim().isEmpty())) {
-                        imp.setCnpj(rst.getString("cpf"));
-                    } else if ((rst.getString("cnpj") != null)
-                            && (!rst.getString("cnpj").trim().isEmpty())) {
-                        imp.setCnpj(rst.getString("cnpj"));
-                    } else {
-                        imp.setCnpj("");
-                    }
+     if ((rst.getString("rg") != null)
+     && (!rst.getString("rg").trim().isEmpty())) {
+     imp.setInscricaoEstadual(rst.getString("rg"));
+     } else if ((rst.getString("ie") != null)
+     && (!rst.getString("ie").trim().isEmpty())) {
+     imp.setInscricaoEstadual(rst.getString("ie"));
+     } else {
+     imp.setInscricaoEstadual("");
+     }
 
-                    if ((rst.getString("rg") != null)
-                            && (!rst.getString("rg").trim().isEmpty())) {
-                        imp.setInscricaoEstadual(rst.getString("rg"));
-                    } else if ((rst.getString("ie") != null)
-                            && (!rst.getString("ie").trim().isEmpty())) {
-                        imp.setInscricaoEstadual(rst.getString("ie"));
-                    } else {
-                        imp.setInscricaoEstadual("");
-                    }
+     imp.setEndereco(rst.getString("endereco"));
+     imp.setNumero("0");
+     imp.setBairro(rst.getString("bairro"));
+     imp.setMunicipio(rst.getString("cidade"));
+     imp.setUf(rst.getString("estado"));
+     imp.setTelefone(rst.getString("fone1"));
+     imp.setDataInicio(rst.getDate("datainicio_atual"));
+     imp.setDataTermino(rst.getDate("datafinal_atual"));
+     imp.setDesconto(0);
+     imp.setDiaPagamento(rst.getInt("prazodias"));
+     imp.setDiaInicioRenovacao(1);
+     imp.setBloqueado(false);
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }
 
-                    imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero("0");
-                    imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("cidade"));
-                    imp.setUf(rst.getString("estado"));
-                    imp.setTelefone(rst.getString("fone1"));
-                    imp.setDataInicio(rst.getDate("datainicio_atual"));
-                    imp.setDataTermino(rst.getDate("datafinal_atual"));
-                    imp.setDesconto(0);
-                    imp.setDiaPagamento(rst.getInt("prazodias"));
-                    imp.setDiaInicioRenovacao(1);
-                    imp.setBloqueado(false);
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
+     @Override
+     public List<ConveniadoIMP> getConveniado() throws Exception {
+     List<ConveniadoIMP> result = new ArrayList<>();
 
-    @Override
-    public List<ConveniadoIMP> getConveniado() throws Exception {
-        List<ConveniadoIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoOracle.createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select \n"
+     + "p.codigo,\n"
+     + "p.cpf,\n"
+     + "p.nome,\n"
+     + "p.razao,\n"
+     + "p.cnpj,\n"
+     + "p.ie,\n"
+     + "p.rg,\n"
+     + "c.bloqueado,\n"
+     + "c.codigoconvenio,\n"
+     + "c.limite    \n"
+     + "from pessoas p\n"
+     + "inner join clientes c on c.codigo = p.codigo\n"
+     + "where p.cliente = 'S'\n"
+     + "and p.convenio = 'N'\n"
+     + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio in (" + v_codEmpresaConv) + ")"
+     )) {
+     while (rst.next()) {
+     ConveniadoIMP imp = new ConveniadoIMP();
+     imp.setId(rst.getString("codigo"));
+     imp.setCnpj(rst.getString("cnpj"));
+     imp.setNome(rst.getString("razao"));
+     imp.setIdEmpresa(rst.getString("codigoconvenio"));
+     imp.setBloqueado(rst.getBoolean("bloqueado"));
+     imp.setConvenioLimite(rst.getDouble("limite"));
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }
 
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "p.codigo,\n"
-                    + "p.cpf,\n"
-                    + "p.nome,\n"
-                    + "p.razao,\n"
-                    + "p.cnpj,\n"
-                    + "p.ie,\n"
-                    + "p.rg,\n"
-                    + "c.bloqueado,\n"
-                    + "c.codigoconvenio,\n"
-                    + "c.limite    \n"
-                    + "from pessoas p\n"
-                    + "inner join clientes c on c.codigo = p.codigo\n"
-                    + "where p.cliente = 'S'\n"
-                    + "and p.convenio = 'N'\n"
-                    + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio in (" + v_codEmpresaConv) + ")"
-            )) {
-                while (rst.next()) {
-                    ConveniadoIMP imp = new ConveniadoIMP();
-                    imp.setId(rst.getString("codigo"));
-                    imp.setCnpj(rst.getString("cnpj"));
-                    imp.setNome(rst.getString("razao"));
-                    imp.setIdEmpresa(rst.getString("codigoconvenio"));
-                    imp.setBloqueado(rst.getBoolean("bloqueado"));
-                    imp.setConvenioLimite(rst.getDouble("limite"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
-        List<ConvenioTransacaoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "  rot.chave id,\n"
-                    + "  ROT.CODIGO id_cliente,\n"
-                    + "  coalesce(c.cnpj, c.cpf) cnpj,\n"
-                    + "  ROT.LOJA id_loja,\n"
-                    + "  ROT.EMISSAO dataemissao,\n"
-                    + "  rot.cupom,\n"
-                    + "  ROT.VALOR,\n"
-                    + "  round((((rot.taxa / 30) * floor(current_date - rot.vencimento)) / 100) * rot.valor, 2) juros,\n"
-                    + "  ROT.HISTORICO observacao,\n"
-                    + "  ROT.VENCIMENTO,\n"
-                    + "  ROT.PDV ecf\n"
-                    + "FROM RECEBER_CONTAS  ROT  \n"
-                    + "INNER JOIN PESSOAS C ON C.CODIGO = ROT.CODIGO\n"
-                    + "INNER JOIN CLIENTES CLI ON CLI.CODIGO = C.CODIGO\n"
-                    + "where rot.chaverecebimento = 0 and rot.loja = " + getLojaOrigem()
-                    + " and CLI.codigoconvenio > 0"
-            )) {
-                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-                while (rst.next()) {
-                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-                    imp.setId(rst.getString("id"));
-                    imp.setIdConveniado(rst.getString("id_cliente"));
-                    imp.setEcf(rst.getString("ecf"));
-                    imp.setNumeroCupom(rst.getString("cupom"));
-                    imp.setDataHora(rst.getTimestamp("dataemissao"));
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setObservacao(rst.getString("observacao"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
+     @Override
+     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+     List<ConvenioTransacaoIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoOracle.createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select\n"
+     + "  rot.chave id,\n"
+     + "  ROT.CODIGO id_cliente,\n"
+     + "  coalesce(c.cnpj, c.cpf) cnpj,\n"
+     + "  ROT.LOJA id_loja,\n"
+     + "  ROT.EMISSAO dataemissao,\n"
+     + "  rot.cupom,\n"
+     + "  ROT.VALOR,\n"
+     + "  round((((rot.taxa / 30) * floor(current_date - rot.vencimento)) / 100) * rot.valor, 2) juros,\n"
+     + "  ROT.HISTORICO observacao,\n"
+     + "  ROT.VENCIMENTO,\n"
+     + "  ROT.PDV ecf\n"
+     + "FROM RECEBER_CONTAS  ROT  \n"
+     + "INNER JOIN PESSOAS C ON C.CODIGO = ROT.CODIGO\n"
+     + "INNER JOIN CLIENTES CLI ON CLI.CODIGO = C.CODIGO\n"
+     + "where rot.chaverecebimento = 0 and rot.loja = " + getLojaOrigem()
+     + " and CLI.codigoconvenio > 0"
+     )) {
+     SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+     while (rst.next()) {
+     ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+     imp.setId(rst.getString("id"));
+     imp.setIdConveniado(rst.getString("id_cliente"));
+     imp.setEcf(rst.getString("ecf"));
+     imp.setNumeroCupom(rst.getString("cupom"));
+     imp.setDataHora(rst.getTimestamp("dataemissao"));
+     imp.setValor(rst.getDouble("valor"));
+     imp.setObservacao(rst.getString("observacao"));
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
 }
