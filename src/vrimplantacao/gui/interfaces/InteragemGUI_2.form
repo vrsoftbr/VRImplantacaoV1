@@ -23,28 +23,42 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="conexao" max="32767" attributes="0"/>
                   <Component id="vRPanel3" max="32767" attributes="0"/>
-                  <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="tabs" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRPanel1" alignment="0" pref="526" max="32767" attributes="0"/>
+                  <Component id="pnlBalanca" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Component id="txtComplemento" min="-2" pref="108" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="vRPanel1" min="-2" pref="119" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="conexao" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="pnlBalanca" min="-2" pref="96" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="tabs" pref="308" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
@@ -54,217 +68,23 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="vrframework.bean.toolBarPadrao.VRToolBarPadrao" name="vRToolBarPadrao3">
+    <Component class="vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel" name="conexao">
+    </Component>
+    <Component class="vrframework.bean.textField.VRTextField" name="txtComplemento">
       <Properties>
-        <Property name="rollover" type="boolean" value="true"/>
-        <Property name="visibleImportar" type="boolean" value="true"/>
+        <Property name="caixaAlta" type="boolean" value="false"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this)"/>
-      </AuxValues>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
-    </Container>
-    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtComplementoActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
       <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Dados Origem - Firebird"/>
-          </Border>
-        </Property>
-        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[350, 350]"/>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new DefaultComboBoxModel()" type="code"/>
         </Property>
       </Properties>
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtUsuario" min="-2" pref="65" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSenha" min="-2" pref="74" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtPorta" alignment="0" min="-2" pref="45" max="-2" attributes="0"/>
-                              <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="txtLojaID" min="-2" pref="45" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="btnConectarFirebird" min="-2" pref="114" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtHost" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtDatabase" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                  </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtHost" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                          <Component id="txtDatabase" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="vRLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="vRLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtPorta" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtLojaID" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnConectarFirebird" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="SYSDBA"/>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Usu&#xe1;rio:"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenha">
-          <Properties>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-            <Property name="mascara" type="java.lang.String" value=""/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Senha:"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtPorta">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="3050"/>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Porta"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Banco de Dados"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtHost">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="127.0.0.1"/>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Host:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JToggleButton" name="btnConectarFirebird">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/vrframework/img/chat/desconectado.png"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="Conectar"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarFirebirdActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtDatabase">
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Loja (Cliente):"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new DefaultComboBoxModel()" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtLojaID">
-          <Properties>
-            <Property name="caixaAlta" type="boolean" value="false"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtLojaIDActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="ID Loja"/>
-          </Properties>
-        </Component>
-      </SubComponents>
-    </Container>
+    </Component>
     <Container class="vrframework.bean.panel.VRPanel" name="vRPanel3">
 
       <Layout>
@@ -355,7 +175,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRTabbedPane1" alignment="0" max="32767" attributes="0"/>
+                  <Component id="vRTabbedPane1" alignment="0" pref="576" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -369,350 +189,15 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
-                <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">
+                <Component class="vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI" name="tabProduto">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Produto">
-                        <Property name="tabTitle" type="java.lang.String" value="Produto"/>
+                      <JTabbedPaneConstraints tabName="Produtos">
+                        <Property name="tabTitle" type="java.lang.String" value="Produtos"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
-
-                  <Layout>
-                    <DimensionLayout dim="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkT1Estoque" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkQtdEmbCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkT1EAN" min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="103" alignment="1" groupAlignment="0" attributes="0">
-                                          <Component id="chkT1EANemBranco" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1PisCofins" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1NatReceita" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1ICMS" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1Margem" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Component id="chkEanAtacado" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="chkValidade" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="chkT1DescReduzida" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1ProdMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkNutricionalFilizola" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkNutricionalToledo" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkOfertas" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkAtacado" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkOfertaFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                              </Group>
-                              <EmptySpace pref="13" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                    <DimensionLayout dim="1">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="1" attributes="0">
-                                          <Component id="chkEanAtacado" alignment="1" min="-2" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="1" attributes="0">
-                                              <Component id="chkT1EAN" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
-                                              <Component id="chkT1PisCofins" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Component id="chkT1EANemBranco" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkT1NatReceita" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkT1ICMS" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="chkT1Margem" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="chkT1DescCompleta" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkValidade" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="chkT1DescGondola" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkFamilia" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="chkFamiliaProduto" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="chkMercadologico" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
-                                              <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
-                                              <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
-                                              <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkTipoEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="chkNutricionalFilizola" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkQtdEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="3" attributes="0">
-                                                  <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkNutricionalToledo" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkQtdEmbCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                                              <Component id="chkOfertaFamilia" alignment="3" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                  </Group>
-                              </Group>
-                              <EmptySpace pref="48" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                  </Layout>
-                  <SubComponents>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFamiliaProduto">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Familia Produto"/>
-                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="true" type="code"/>
-                        </Property>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFamiliaProdutoActionPerformed"/>
-                      </Events>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Mercadologico"/>
-                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="true" type="code"/>
-                        </Property>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutos">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Produtos"/>
-                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="true" type="code"/>
-                        </Property>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterBalanca">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Manter Balan&#xe7;a"/>
-                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="true" type="code"/>
-                        </Property>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Custo">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Custo"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Preco">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Pre&#xe7;o"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Estoque">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Estoque"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbCotacao">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Qtd. Emb. (Cota&#xe7;&#xe3;o)"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1AtivoInativo">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Ativo/Inativo"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1ICMS">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="ICMS"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1NatReceita">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Nat. Receita"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1PisCofins">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="PIS/COFINS"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EANemBranco">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="EAN em branco"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EAN">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="EAN"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1DescCompleta">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Descri&#xe7;&#xe3;o Completa"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1DescReduzida">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Descri&#xe7;&#xe3;o Reduzida"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1DescGondola">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Descri&#xe7;&#xe3;o Gondola"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1ProdMercadologico">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Prod. Mercadol&#xf3;gico"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNutricionalFilizola">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Nutricional Filizola"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNutricionalToledo">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Nutricional Toledo"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBalanca">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Balanca"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOfertaFamilia">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Oferta Familia"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOfertas">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Ofertas"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagemEAN">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemEAN">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Emb. EAN"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFamilia">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Fam&#xed;lia"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Atacado"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValidade">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Validade"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Margem">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Margem"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEanAtacado">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="EAN Atacado"/>
-                      </Properties>
-                    </Component>
-                  </SubComponents>
-                </Container>
+                </Component>
                 <Container class="vrframework.bean.panel.VRPanel" name="vRPanel10">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -739,7 +224,7 @@
                                   <Component id="chkFContasAPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkreceberDevolucao" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="300" max="32767" attributes="0"/>
+                              <EmptySpace pref="335" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -763,7 +248,7 @@
                               <Component id="chkFContasAPagar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkreceberDevolucao" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="97" max="32767" attributes="0"/>
+                              <EmptySpace pref="111" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -871,7 +356,7 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="280" max="32767" attributes="0"/>
+                              <EmptySpace pref="309" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -894,7 +379,7 @@
                                   </Group>
                                   <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="147" max="32767" attributes="0"/>
+                              <EmptySpace pref="155" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -987,7 +472,7 @@
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="264" max="32767" attributes="0"/>
+                      <EmptySpace pref="285" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1004,7 +489,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="153" max="32767" attributes="0"/>
+                      <EmptySpace pref="161" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1056,7 +541,7 @@
                               <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="flcAcertarEstoque" pref="497" max="32767" attributes="0"/>
+                          <Component id="flcAcertarEstoque" pref="552" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1069,7 +554,7 @@
                       <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="flcAcertarEstoque" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="223" max="32767" attributes="0"/>
+                      <EmptySpace pref="226" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1086,7 +571,17 @@
         </Container>
       </SubComponents>
     </Container>
-    <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
+    <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">
+    </Component>
+    <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Loja (Cliente):"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Complemento"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

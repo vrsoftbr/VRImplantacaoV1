@@ -26,7 +26,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class InteragemDAO extends InterfaceDAO {
 
     public String i_arquivoXLS;
-    public String id_loja;
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -47,10 +51,10 @@ public class InteragemDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
-            return "Interagem" + id_loja;
-        } else {
+        if (complemento.isEmpty()) {
             return "Interagem";
+        } else {
+            return "Interagem - " + complemento;
         }
     }
 
