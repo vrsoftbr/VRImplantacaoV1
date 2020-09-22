@@ -72,6 +72,9 @@ public class SuperServerGUI extends VRInternalFrame {
         
         this.title = "Importação " + SISTEMA;
         
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(vLojaCliente);
+        
         carregarParametros();
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
