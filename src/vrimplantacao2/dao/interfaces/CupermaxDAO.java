@@ -104,48 +104,48 @@ public class CupermaxDAO extends InterfaceDAO {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
-                    + "	DESCRICAO descritivo\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
+                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
+                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
+                    + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NULL \n"
                     + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
-                    + "	ORDER BY 1,2,3"
+                    + "	ORDER BY 1"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descritivo"));
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("m1"), rst.getString("descricao"));
                     merc.put(imp.getId(), imp);
                 }
             }
 
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
-                    + "	DESCRICAO descritivo\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
+                    + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NOT NULL \n"
-                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
-                    + "	ORDER BY 1,2,3"
+                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL\n"
+                    + "	AND COD_GRUPO IN (SELECT ID FROM CUPERMAX.NIVEL_MERCADOLOGICO) \n"
+                    + "ORDER BY 1,2"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
-                    pai.addFilho(rst.getString("secao"), rst.getString("descritivo"));
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("m1"));
+                    pai.addFilho(rst.getString("m2"), rst.getString("descricao"));
                 }
             }
 
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
-                    + "	DESCRICAO descritivo\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
+                    + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
@@ -154,9 +154,9 @@ public class CupermaxDAO extends InterfaceDAO {
                     + "ORDER BY 1,2,3"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
-                    pai = pai.getNiveis().get(rst.getString("secao"));
-                    pai.addFilho(rst.getString("grupo"), rst.getString("descritivo"));
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("m1"));
+                    pai = pai.getNiveis().get(rst.getString("m2"));
+                    pai.addFilho(rst.getString("m3"), rst.getString("descricao"));
                 }
             }
         }
@@ -164,7 +164,8 @@ public class CupermaxDAO extends InterfaceDAO {
         return new ArrayList<>(merc.values());
     }
 
-    /*@Override
+    /*
+     @Override
      public List<MercadologicoIMP> getMercadologicos() throws Exception {
      List<MercadologicoIMP> result = new ArrayList<>();
 
@@ -271,7 +272,7 @@ public class CupermaxDAO extends InterfaceDAO {
 
                     imp.setPiscofinsCstDebito(rst.getInt("piscofinsCstDebito"));
                     imp.setPiscofinsCstCredito(rst.getInt("piscofinsCstCredito"));
-                    
+
                     /*
                      imp.setCodMercadologico1();
                      imp.setCodMercadologico2();
