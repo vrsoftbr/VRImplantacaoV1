@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.financeiro.creditorotativo;
 
+import java.util.Date;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -93,6 +94,10 @@ public class CreditoRotativoProvider {
     
     public MultiMap<String, CreditoRotativoItemAnteriorVO> getTodaBaixaAnterior() throws Exception {
         return this.rotativoItemAnteriorDAO.getBaixasAnteriores(null, null);
+    }
+    
+    public MultiMap<String, CreditoRotativoVO> getCreditoRotativo(int idLoja, int idClientePreferencial, int numeroCupom, Date dataEmissao) throws Exception {
+        return this.rotativoDAO.getCreditoRotativo(idLoja, idClientePreferencial, numeroCupom, dataEmissao);
     }
 
     public void gravarRotativo(CreditoRotativoVO cred) throws Exception {

@@ -68,6 +68,7 @@ public class PagarFornecedorDAO {
             )) {
                 while (rst.next()) {
                     PagarFornecedorVO vo = new PagarFornecedorVO();
+                    vo.setId_loja(rst.getInt("id_loja"));
                     vo.setId_fornecedor(rst.getInt("id_fornecedor"));
                     vo.setDataemissao(rst.getDate("dataemissao"));
                     vo.setNumerodocumento(rst.getInt("numerodocumento"));

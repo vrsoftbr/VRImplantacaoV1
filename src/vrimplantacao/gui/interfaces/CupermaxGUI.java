@@ -200,7 +200,7 @@ public class CupermaxGUI extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
+                            importador.importarMercadologicoPorNiveis();
                         }
 
                         if (chkProdutos.isSelected()) {
