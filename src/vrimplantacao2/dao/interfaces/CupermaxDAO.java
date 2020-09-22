@@ -125,14 +125,14 @@ public class CupermaxDAO extends InterfaceDAO {
                     "SELECT\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
-                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
                     + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NOT NULL \n"
-                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
-                    + "	ORDER BY 1,2"
+                    + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL\n"
+                    + "	AND COD_GRUPO IN (SELECT ID FROM CUPERMAX.NIVEL_MERCADOLOGICO) \n"
+                    + "ORDER BY 1,2"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP pai = merc.get(rst.getString("m1"));
@@ -164,45 +164,46 @@ public class CupermaxDAO extends InterfaceDAO {
         return new ArrayList<>(merc.values());
     }
 
-    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
+    /*
+     @Override
+     public List<MercadologicoIMP> getMercadologicos() throws Exception {
+     List<MercadologicoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "  s.codigo merc1,\n"
-                    + "  s.nome merc1_desc,\n"
-                    + "  coalesce(g.codigo,1) merc2,\n"
-                    + "  coalesce(g.nome, s.nome) merc2_desc,\n"
-                    + "  coalesce(sg.CODIGO,1) merc3,\n"
-                    + "  coalesce(sg.nome, coalesce(g.nome, s.nome)) merc3_desc\n"
-                    + "from \n"
-                    + "  SETOR s\n"
-                    + "  left join GRUPO g on g.SETOR = s.CODIGO\n"
-                    + "  left join SUBGRUPO sg on g.CODIGO = sg.GRUPO and s.CODIGO = sg.SETOR\n"
-                    + "order by\n"
-                    + "  s.codigo"
-            )) {
-                while (rst.next()) {
-                    MercadologicoIMP merc = new MercadologicoIMP();
-                    merc.setImportSistema(getSistema());
-                    merc.setImportLoja(getLojaOrigem());
-                    merc.setMerc1ID(Utils.acertarTexto(rst.getString("merc1")));
-                    merc.setMerc1Descricao(Utils.acertarTexto(rst.getString("merc1_desc")));
-                    merc.setMerc2ID(Utils.acertarTexto(rst.getString("merc2")));
-                    merc.setMerc2Descricao(Utils.acertarTexto(rst.getString("merc2_desc")));
-                    merc.setMerc3ID(Utils.acertarTexto(rst.getString("merc3")));
-                    merc.setMerc3Descricao(Utils.acertarTexto(rst.getString("merc3_desc")));
+     try (Statement stm = ConexaoOracle.createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select\n"
+     + "  s.codigo merc1,\n"
+     + "  s.nome merc1_desc,\n"
+     + "  coalesce(g.codigo,1) merc2,\n"
+     + "  coalesce(g.nome, s.nome) merc2_desc,\n"
+     + "  coalesce(sg.CODIGO,1) merc3,\n"
+     + "  coalesce(sg.nome, coalesce(g.nome, s.nome)) merc3_desc\n"
+     + "from \n"
+     + "  SETOR s\n"
+     + "  left join GRUPO g on g.SETOR = s.CODIGO\n"
+     + "  left join SUBGRUPO sg on g.CODIGO = sg.GRUPO and s.CODIGO = sg.SETOR\n"
+     + "order by\n"
+     + "  s.codigo"
+     )) {
+     while (rst.next()) {
+     MercadologicoIMP merc = new MercadologicoIMP();
+     merc.setImportSistema(getSistema());
+     merc.setImportLoja(getLojaOrigem());
+     merc.setMerc1ID(Utils.acertarTexto(rst.getString("merc1")));
+     merc.setMerc1Descricao(Utils.acertarTexto(rst.getString("merc1_desc")));
+     merc.setMerc2ID(Utils.acertarTexto(rst.getString("merc2")));
+     merc.setMerc2Descricao(Utils.acertarTexto(rst.getString("merc2_desc")));
+     merc.setMerc3ID(Utils.acertarTexto(rst.getString("merc3")));
+     merc.setMerc3Descricao(Utils.acertarTexto(rst.getString("merc3_desc")));
 
-                    result.add(merc);
-                }
-            }
-        }
+     result.add(merc);
+     }
+     }
+     }
 
-        return result;
-    }
-
+     return result;
+     }
+     */
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vProduto = new ArrayList<>();
