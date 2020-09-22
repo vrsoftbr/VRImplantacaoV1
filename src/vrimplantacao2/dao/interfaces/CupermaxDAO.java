@@ -104,48 +104,48 @@ public class CupermaxDAO extends InterfaceDAO {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
-                    + "	DESCRICAO descritivo\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
+                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
+                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
+                    + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NULL \n"
                     + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
-                    + "	ORDER BY 1,2,3"
+                    + "	ORDER BY 1"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descritivo"));
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("m1"), rst.getString("descricao"));
                     merc.put(imp.getId(), imp);
                 }
             }
 
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
-                    + "	DESCRICAO descritivo\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
+                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
+                    + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) IS NOT NULL \n"
                     + "	AND SUBSTRB (CODIGO_ESTRUTURADO,9,3) IS NULL \n"
-                    + "	ORDER BY 1,2,3"
+                    + "	ORDER BY 1,2"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
-                    pai.addFilho(rst.getString("secao"), rst.getString("descritivo"));
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("m1"));
+                    pai.addFilho(rst.getString("m2"), rst.getString("descricao"));
                 }
             }
 
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) depto,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) secao,\n"
-                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) grupo,\n"
-                    + "	DESCRICAO descritivo\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
+                    + "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
+                    + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
                     + "WHERE\n"
@@ -154,9 +154,9 @@ public class CupermaxDAO extends InterfaceDAO {
                     + "ORDER BY 1,2,3"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
-                    pai = pai.getNiveis().get(rst.getString("secao"));
-                    pai.addFilho(rst.getString("grupo"), rst.getString("descritivo"));
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("m1"));
+                    pai = pai.getNiveis().get(rst.getString("m2"));
+                    pai.addFilho(rst.getString("m3"), rst.getString("descricao"));
                 }
             }
         }
@@ -164,45 +164,45 @@ public class CupermaxDAO extends InterfaceDAO {
         return new ArrayList<>(merc.values());
     }
 
-    /*@Override
-     public List<MercadologicoIMP> getMercadologicos() throws Exception {
-     List<MercadologicoIMP> result = new ArrayList<>();
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
 
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "  s.codigo merc1,\n"
-     + "  s.nome merc1_desc,\n"
-     + "  coalesce(g.codigo,1) merc2,\n"
-     + "  coalesce(g.nome, s.nome) merc2_desc,\n"
-     + "  coalesce(sg.CODIGO,1) merc3,\n"
-     + "  coalesce(sg.nome, coalesce(g.nome, s.nome)) merc3_desc\n"
-     + "from \n"
-     + "  SETOR s\n"
-     + "  left join GRUPO g on g.SETOR = s.CODIGO\n"
-     + "  left join SUBGRUPO sg on g.CODIGO = sg.GRUPO and s.CODIGO = sg.SETOR\n"
-     + "order by\n"
-     + "  s.codigo"
-     )) {
-     while (rst.next()) {
-     MercadologicoIMP merc = new MercadologicoIMP();
-     merc.setImportSistema(getSistema());
-     merc.setImportLoja(getLojaOrigem());
-     merc.setMerc1ID(Utils.acertarTexto(rst.getString("merc1")));
-     merc.setMerc1Descricao(Utils.acertarTexto(rst.getString("merc1_desc")));
-     merc.setMerc2ID(Utils.acertarTexto(rst.getString("merc2")));
-     merc.setMerc2Descricao(Utils.acertarTexto(rst.getString("merc2_desc")));
-     merc.setMerc3ID(Utils.acertarTexto(rst.getString("merc3")));
-     merc.setMerc3Descricao(Utils.acertarTexto(rst.getString("merc3_desc")));
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "  s.codigo merc1,\n"
+                    + "  s.nome merc1_desc,\n"
+                    + "  coalesce(g.codigo,1) merc2,\n"
+                    + "  coalesce(g.nome, s.nome) merc2_desc,\n"
+                    + "  coalesce(sg.CODIGO,1) merc3,\n"
+                    + "  coalesce(sg.nome, coalesce(g.nome, s.nome)) merc3_desc\n"
+                    + "from \n"
+                    + "  SETOR s\n"
+                    + "  left join GRUPO g on g.SETOR = s.CODIGO\n"
+                    + "  left join SUBGRUPO sg on g.CODIGO = sg.GRUPO and s.CODIGO = sg.SETOR\n"
+                    + "order by\n"
+                    + "  s.codigo"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP merc = new MercadologicoIMP();
+                    merc.setImportSistema(getSistema());
+                    merc.setImportLoja(getLojaOrigem());
+                    merc.setMerc1ID(Utils.acertarTexto(rst.getString("merc1")));
+                    merc.setMerc1Descricao(Utils.acertarTexto(rst.getString("merc1_desc")));
+                    merc.setMerc2ID(Utils.acertarTexto(rst.getString("merc2")));
+                    merc.setMerc2Descricao(Utils.acertarTexto(rst.getString("merc2_desc")));
+                    merc.setMerc3ID(Utils.acertarTexto(rst.getString("merc3")));
+                    merc.setMerc3Descricao(Utils.acertarTexto(rst.getString("merc3_desc")));
 
-     result.add(merc);
-     }
-     }
-     }
+                    result.add(merc);
+                }
+            }
+        }
 
-     return result;
-     }
-     */
+        return result;
+    }
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vProduto = new ArrayList<>();
@@ -271,7 +271,7 @@ public class CupermaxDAO extends InterfaceDAO {
 
                     imp.setPiscofinsCstDebito(rst.getInt("piscofinsCstDebito"));
                     imp.setPiscofinsCstCredito(rst.getInt("piscofinsCstCredito"));
-                    
+
                     /*
                      imp.setCodMercadologico1();
                      imp.setCodMercadologico2();
