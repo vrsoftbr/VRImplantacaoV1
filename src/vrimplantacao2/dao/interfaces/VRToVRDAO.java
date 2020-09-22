@@ -210,18 +210,35 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	id,\n"
-                    + "	descricao,\n"
-                    + "	situacaotributaria,\n"
-                    + "	porcentagem,\n"
-                    + "	reduzido\n"
-                    + "from 	\n"
-                    + "	aliquota\n"
-                    + "where \n"
-                    + "	id_situacaocadastro = 1\n"
-                    + "order by\n"
-                    + "	descricao")) {
+                    "with aliquotasusadas as (\n" +
+                    "	select p.id_aliquotadebito id from produtoaliquota p\n" +
+                    "	union\n" +
+                    "	select p.id_aliquotadebitoforaestado from produtoaliquota p\n" +
+                    "	union\n" +
+                    "	select p.id_aliquotadebitoforaestadonf from produtoaliquota p\n" +
+                    "	union\n" +
+                    "	select p.id_aliquotaconsumidor from produtoaliquota p\n" +
+                    "	union\n" +
+                    "	select p.id_aliquotacredito from produtoaliquota p\n" +
+                    "	union\n" +
+                    "	select p.id_aliquotacreditocusto from produtoaliquota p\n" +
+                    "	union\n" +
+                    "	select p.id_aliquotadebitoforaestadonf from produtoaliquota p\n" +
+                    ")\n" +
+                    "select \n" +
+                    "	id,\n" +
+                    "	descricao,\n" +
+                    "	situacaotributaria,\n" +
+                    "	porcentagem,\n" +
+                    "	reduzido\n" +
+                    "from 	\n" +
+                    "	aliquota\n" +
+                    "where \n" +
+                    "	id_situacaocadastro = 1 and\n" +
+                    "	id in (select id from aliquotasusadas)\n" +
+                    "order by\n" +
+                    "	descricao"
+            )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("id"),
                             rs.getString("descricao"),
