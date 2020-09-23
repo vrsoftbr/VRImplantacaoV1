@@ -225,6 +225,7 @@ import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SnSistemaGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
+import vrimplantacao2.gui.interfaces.SolidoGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SolutionSuperaGUI;
 import vrimplantacao2.gui.interfaces.SophyxGUI;
@@ -642,6 +643,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuInterData = new javax.swing.JMenuItem();
         mnuAutoADM = new javax.swing.JMenuItem();
         mnuAtmaFirebird = new javax.swing.JMenuItem();
+        mnuSolido = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1498,6 +1500,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuAtmaFirebird);
+
+        mnuSolido.setText("Solido");
+        mnuSolido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSolidoActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuSolido);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4781,6 +4791,10 @@ public final class MenuGUI extends VRMdiFrame {
         CupermaxGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemCupermaxActionPerformed
 
+    private void mnuSolidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSolidoActionPerformed
+        SolidoGUI.exibir(this);
+    }//GEN-LAST:event_mnuSolidoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -5029,6 +5043,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSistemaLogin;
     private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSofttech;
+    private javax.swing.JMenuItem mnuSolido;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenuItem mnuSolutionSupera;
     private javax.swing.JMenu mnuSqlServer2;
