@@ -287,6 +287,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pl.preco_cust custocomimposto,\n"
                     + "	pl.preco_cust custosemimposto,\n"
                     + "	pl.preco_unit precovenda,\n"
+                    + " prod.preco_unit as precovenda_produto, \n"
+                    + " prod.preco_cust as custo_produto, \n"
+                    + " prod.estoque as estoque_produto, \n"        
                     + "	prod.margem_bruta margem_bruta,\n"
                     + "	prod.margem_param margem_param,\n"
                     + "	prod.lucroliq margemliquidapraticada,\n"
@@ -324,7 +327,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join TROCACOMPRA trc on prod.CODPROD = trc.CODPROD\n"
                     + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
                     + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"      
-                    + "where pl.codloja = " + getLojaOrigem() + "\n"
+                    + "and pl.codloja = " + getLojaOrigem() + "\n"
                     + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S'\n" : "")        
                     + "order by\n"
                     + "	id"
@@ -357,11 +360,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoque(rst.getDouble("estoque") == 0 ? rst.getDouble("estoque_produto") : rst.getDouble("estoque"));
                     imp.setTroca(rst.getDouble("estoquetroca"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto") == 0 ? rst.getDouble("custo_produto") : rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto") == 0 ? rst.getDouble("custo_produto") : rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda") == 0 ? rst.getDouble("precovenda_produto") : rst.getDouble("precovenda"));
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));
                     } else if (usaMargemLiquidaPraticada) {
