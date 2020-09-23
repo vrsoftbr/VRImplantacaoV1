@@ -106,9 +106,9 @@ public class InteragemDAO extends InterfaceDAO {
                     + "0 as icms_reduzido\n"
                     + "from tabpro p\n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro\n"
-                    + "where p.stprod = 'A'\n"
-                    + "and f.codfil = " + getLojaOrigem()
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem() + "\n"
+                    + "order by p.codpro"
+                    //+ "where p.stprod = 'A'\n"
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -117,7 +117,14 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(Utils.formataNumero(rst.getString("id")));
-                    imp.setEan(Utils.formataNumero(rst.getString("ean")));
+                    
+                    if ((rst.getString("ean") != null)
+                            && (!rst.getString("ean").trim().isEmpty())) {
+                        imp.setEan(Utils.formataNumero(rst.getString("ean")));
+                    } else {
+                        imp.setEan(imp.getImportId());
+                    }
+                    
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
