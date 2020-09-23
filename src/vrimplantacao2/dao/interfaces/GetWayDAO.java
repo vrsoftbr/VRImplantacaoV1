@@ -351,7 +351,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (copiarDescricaoCompletaParaGondola) {
                         imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     }
-
+                    
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
