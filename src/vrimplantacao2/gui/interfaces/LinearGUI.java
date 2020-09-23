@@ -99,10 +99,10 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "consinco";
+        conexaoMySQL.database = "sglinx";
         conexaoMySQL.port = "3306";
-        conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "consinco";
+        conexaoMySQL.user = "adminlinear";
+        conexaoMySQL.pass = "@2013linear";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
