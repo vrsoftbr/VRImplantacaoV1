@@ -39,6 +39,7 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
@@ -1273,6 +1274,59 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDiaInicioRenovacao(rs.getInt("diainiciorenovacao"));
                 imp.setDiaFimRenovacao(rs.getInt("diaterminorenovacao"));
                 imp.setObservacoes(rs.getString("observacao"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	c.id,\n" +
+                        "	c.nome,\n" +
+                        "	c.id_empresa,\n" +
+                        "	c.bloqueado,\n" +
+                        "	c.id_situacaocadastro,\n" +
+                        "	c.senha,\n" +
+                        "	c.cnpj,\n" +
+                        "	c.observacao,\n" +
+                        "	c.datavalidadecartao,\n" +
+                        "	c.datadesbloqueio,\n" +
+                        "	c.visualizasaldo,\n" +
+                        "	c.databloqueio,\n" +
+                        "	c.id_loja\n" +
+                        "from\n" +
+                        "	conveniado c\n" +
+                        "where\n" +
+                        "	c.id_loja = 1\n" +
+                        "order by\n" +
+                        "	c.id"
+                )
+                ) {
+            while (rs.next()) {
+                ConveniadoIMP imp = new ConveniadoIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setNome(rs.getString("nome"));
+                imp.setIdEmpresa(rs.getString("id_empresa"));
+                imp.setBloqueado(rs.getBoolean("bloqueado"));
+                imp.setSituacaoCadastro(SituacaoCadastro.getById(rs.getInt("id_situacaocadastro")));
+                imp.setSenha(rs.getInt("senha"));
+                imp.setCnpj(rs.getString("cnpj"));
+                imp.setObservacao(rs.getString("observacao"));
+                imp.setValidadeCartao(rs.getDate("datavalidadecartao"));
+                imp.setDataDesbloqueio(rs.getDate("datadesbloqueio"));
+                imp.setVisualizaSaldo(rs.getBoolean("visualizasaldo"));
+                imp.setDataBloqueio(rs.getDate("databloqueio"));
+                imp.setLojaCadastro(rs.getInt("id_loja"));
                 
                 result.add(imp);
             }
