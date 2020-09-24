@@ -28,12 +28,15 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -1132,6 +1135,79 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	c.id,\n" +
+                        "	c.cpf,\n" +
+                        "	c.numerocheque,\n" +
+                        "	c.id_banco,\n" +
+                        "	c.agencia,\n" +
+                        "	c.conta,\n" +
+                        "	c.data,\n" +
+                        "	c.datadeposito,\n" +
+                        "	c.numerocupom,\n" +
+                        "	c.ecf,\n" +
+                        "	c.valor,\n" +
+                        "	c.rg,\n" +
+                        "	c.telefone,\n" +
+                        "	c.nome,\n" +
+                        "	c.observacao,\n" +
+                        "	c.id_situacaorecebercheque,\n" +
+                        "	c.cmc7,\n" +
+                        "	c.id_tipoalinea,\n" +
+                        "	c.valorjuros,\n" +
+                        "	c.valoracrescimo,\n" +
+                        "	c.id_tipolocalcobranca,\n" +
+                        "	c.datahoraalteracao,\n" +
+                        "	c.id_tipovistaprazo\n" +
+                        "from\n" +
+                        "	recebercheque c\n" +
+                        "where\n" +
+                        "	c.id_loja = " + getLojaOrigem() + "\n" +
+                        "order by\n" +
+                        "	c.id"
+                )
+                ) {
+            while (rs.next()) {
+                ChequeIMP imp = new ChequeIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setCpf(rs.getString("cpf"));
+                imp.setNumeroCheque(rs.getString("numerocheque"));
+                imp.setBanco(rs.getInt("id_banco"));
+                imp.setAgencia(rs.getString("agencia"));
+                imp.setConta(rs.getString("conta"));
+                imp.setDate(rs.getDate("data"));
+                imp.setDataDeposito(rs.getDate("datadeposito"));
+                imp.setNumeroCupom(rs.getString("numerocupom"));
+                imp.setEcf(rs.getString("ecf"));
+                imp.setValor(rs.getDouble("valor"));
+                imp.setRg(rs.getString("rg"));
+                imp.setTelefone(rs.getString("telefone"));
+                imp.setNome(rs.getString("nome"));
+                imp.setObservacao(rs.getString("observacao"));
+                imp.setSituacaoCheque(SituacaoCheque.getById(rs.getInt("id_situacaorecebercheque")));
+                imp.setCmc7(rs.getString("cmc7"));
+                imp.setAlinea(rs.getInt("id_tipoalinea"));
+                imp.setValorJuros(rs.getDouble("valorjuros"));
+                imp.setValorAcrescimo(rs.getDouble("valoracrescimo"));
+                //imp.setIdLocalCobranca(rs.getInt("id_tipolocalcobranca"));
+                imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
+                imp.setVistaPrazo(TipoVistaPrazo.getById(rs.getInt("id_tipovistaprazo")));
+                
+                result.add(imp);
+            }
+        }
+        
         return result;
     }
 
