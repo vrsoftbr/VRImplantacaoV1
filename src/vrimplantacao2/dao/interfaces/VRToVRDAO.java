@@ -92,6 +92,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.CUSTO,
                     OpcaoProduto.ESTOQUE,
                     OpcaoProduto.ATIVO,
+                    OpcaoProduto.DESCONTINUADO,
                     OpcaoProduto.NCM,
                     OpcaoProduto.CEST,
                     OpcaoProduto.PIS_COFINS,
@@ -501,7 +502,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.precovenda,\n"
                     + " p.margem,\n"
                     + "	vend.id_situacaocadastro,\n"
-                    + "	case when vend.descontinuado then 'S' else 'N' end as descontinuado,\n"
+                    + "	vend.descontinuado,\n"
                     + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
                     + "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n"
                     + "	piscofdeb.cst piscofins_cst_debito,\n"
@@ -581,7 +582,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
-                    imp.setDescontinuado("S".equals(rs.getString("descontinuado")));
+                    imp.setDescontinuado(rs.getBoolean("descontinuado"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_cst_credito"));

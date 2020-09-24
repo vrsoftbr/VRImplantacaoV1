@@ -134,8 +134,9 @@
                               <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFContasAPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="289" max="32767" attributes="0"/>
+                          <EmptySpace pref="265" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -163,9 +164,11 @@
                           <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFPrazo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="43" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFContasAPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="35" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -249,6 +252,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFPrazo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Prazos"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFContasAPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas a pagar em aberto"/>
                   </Properties>
                 </Component>
               </SubComponents>
