@@ -35,4 +35,13 @@ public enum SituacaoTransacaoConveniado {
         }
         return null;
     }
+    
+    public static SituacaoTransacaoConveniado getById(int id) {
+        for (SituacaoTransacaoConveniado conv: values()) {
+            if (conv.getId() == id) {
+                return conv;
+            }
+        }
+        return null;
+    }
 }

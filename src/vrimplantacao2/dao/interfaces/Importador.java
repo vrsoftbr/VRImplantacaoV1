@@ -27,6 +27,7 @@ import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryProvider;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.comprador.CompradorRepository;
 import vrimplantacao2.dao.cadastro.comprador.CompradorRepositoryProvider;
+import vrimplantacao2.dao.cadastro.convenio.OpcaoConvenio;
 import vrimplantacao2.dao.cadastro.convenio.conveniado.ConvenioConveniadoRepository;
 import vrimplantacao2.dao.cadastro.convenio.conveniado.ConvenioConveniadoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.convenio.empresa.ConvenioEmpresaRepository;
@@ -791,7 +792,7 @@ public class Importador {
         rep.salvar(empresas);
     }
 
-    public void importarConvenioConveniado() throws Exception {
+    public void importarConvenioConveniado(OpcaoConvenio... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando conveniados (Convênio)...");
         List<ConveniadoIMP> conveniados = getInterfaceDAO().getConveniado();
         ConvenioConveniadoRepositoryProvider provider = new ConvenioConveniadoRepositoryProvider(
@@ -800,7 +801,7 @@ public class Importador {
                 getLojaVR()
         );
         ConvenioConveniadoRepository rep = new ConvenioConveniadoRepository(provider);
-        rep.salvar(conveniados);
+        rep.salvar(conveniados, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     public void importarConvenioTransacao() throws Exception {

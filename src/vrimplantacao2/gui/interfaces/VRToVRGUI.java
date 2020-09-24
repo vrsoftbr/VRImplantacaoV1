@@ -18,6 +18,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.convenio.OpcaoConvenio;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
@@ -271,7 +272,7 @@ public class VRToVRGUI extends VRInternalFrame {
                             importador.importarConvenioEmpresa();
                         }
                         if (chkCvConveniado.isSelected()) {
-                            importador.importarConvenioConveniado();
+                            importador.importarConvenioConveniado(OpcaoConvenio.IMPORTACAO_NAO_FILTRAR_CPF);
                         }
                         if (chkCvTransacao.isSelected()) {
                             importador.importarConvenioTransacao();

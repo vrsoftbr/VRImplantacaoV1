@@ -25,6 +25,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -41,6 +42,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -1305,8 +1307,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         "	c.id_loja\n" +
                         "from\n" +
                         "	conveniado c\n" +
-                        "where\n" +
-                        "	c.id_loja = 1\n" +
                         "order by\n" +
                         "	c.id"
                 )
@@ -1327,6 +1327,53 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setVisualizaSaldo(rs.getBoolean("visualizasaldo"));
                 imp.setDataBloqueio(rs.getDate("databloqueio"));
                 imp.setLojaCadastro(rs.getInt("id_loja"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	t.id,\n" +
+                        "	t.id_conveniado,\n" +
+                        "	t.ecf,\n" +
+                        "	t.numerocupom,\n" +
+                        "	t.datahora,\n" +
+                        "	t.valor,\n" +
+                        "	t.id_situacaotransacaoconveniado,\n" +
+                        "	t.datamovimento,\n" +
+                        "	t.finalizado,\n" +
+                        "	t.observacao\n" +
+                        "from\n" +
+                        "	conveniadotransacao t\n" +
+                        "where\n" +
+                        "	t.id_loja = " + getLojaOrigem() + "\n" +
+                        "order by\n" +
+                        "	t.id"
+                )
+                ) {
+            while (rs.next()) {
+                ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setIdConveniado(rs.getString("id_conveniado"));
+                imp.setEcf(rs.getString("ecf"));
+                imp.setNumeroCupom(rs.getString("numerocupom"));
+                imp.setDataHora(rs.getTimestamp("datahora"));
+                imp.setValor(rs.getDouble("valor"));
+                imp.setSituacaoTransacaoConveniado(SituacaoTransacaoConveniado.getById(rs.getInt("id_situacaotransacaoconveniado")));
+                imp.setDataMovimento(rs.getDate("datamovimento"));
+                imp.setFinalizado(rs.getBoolean("finalizado"));
+                imp.setObservacao(rs.getString("observacao"));
                 
                 result.add(imp);
             }
