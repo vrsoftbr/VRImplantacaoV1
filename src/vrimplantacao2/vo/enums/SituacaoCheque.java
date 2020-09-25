@@ -7,6 +7,15 @@ package vrimplantacao2.vo.enums;
 public enum SituacaoCheque {
     ABERTO (0),
     BAIXADO (1);
+
+    public static SituacaoCheque getById(int id) {
+        for (SituacaoCheque s: values()) {
+            if (s.getId() == id) {
+                return s;
+            }
+        }
+        return null;
+    }
     
     private int id;
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.convenio.OpcaoConvenio;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoAnteriorVO;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoServicoVO;
@@ -28,7 +29,9 @@ public class ConvenioConveniadoRepository {
         this.provider = provider;
     }
 
-    public void salvar(List<ConveniadoIMP> conveniados) throws Exception {
+    public void salvar(List<ConveniadoIMP> conveniados, Set<OpcaoConvenio> opcoes) throws Exception {
+        boolean naoUnificarCpfRepetido = opcoes.contains(OpcaoConvenio.IMPORTACAO_NAO_FILTRAR_CPF);
+        
         provider.setStatus("Gravando conveniados (Convênio)...");
         provider.begin();
         try {
@@ -60,12 +63,12 @@ public class ConvenioConveniadoRepository {
                     }
                     long id_empresa = (long) empresa.getCodigoAtual();
                     
-                    Integer idByCnpj = cnpjCadastrados.get(id_empresa, cnpj);
+                    Integer idByCnpj = naoUnificarCpfRepetido ? null : cnpjCadastrados.get(id_empresa, cnpj);
                     
                     anterior = converterConveniadoAnterior(imp);
                     
                     if (idByCnpj != null) {
-                        anterior.setCodigoAtual(id);
+                        anterior.setCodigoAtual(idByCnpj);
                     } else {                    
                         ConveniadoVO vo = converterConveniado(imp);
                         vo.setId(id);

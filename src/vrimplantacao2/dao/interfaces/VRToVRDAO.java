@@ -25,17 +25,24 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -92,6 +99,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.CUSTO,
                     OpcaoProduto.ESTOQUE,
                     OpcaoProduto.ATIVO,
+                    OpcaoProduto.DESCONTINUADO,
                     OpcaoProduto.NCM,
                     OpcaoProduto.CEST,
                     OpcaoProduto.PIS_COFINS,
@@ -501,7 +509,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vend.precovenda,\n"
                     + " p.margem,\n"
                     + "	vend.id_situacaocadastro,\n"
-                    + "	case when vend.descontinuado then 'S' else 'N' end as descontinuado,\n"
+                    + "	vend.descontinuado,\n"
                     + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
                     + "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n"
                     + "	piscofdeb.cst piscofins_cst_debito,\n"
@@ -581,7 +589,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
-                    imp.setDescontinuado("S".equals(rs.getString("descontinuado")));
+                    imp.setDescontinuado(rs.getBoolean("descontinuado"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_cst_credito"));
@@ -1131,6 +1139,246 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	c.id,\n" +
+                        "	c.cpf,\n" +
+                        "	c.numerocheque,\n" +
+                        "	c.id_banco,\n" +
+                        "	c.agencia,\n" +
+                        "	c.conta,\n" +
+                        "	c.data,\n" +
+                        "	c.datadeposito,\n" +
+                        "	c.numerocupom,\n" +
+                        "	c.ecf,\n" +
+                        "	c.valor,\n" +
+                        "	c.rg,\n" +
+                        "	c.telefone,\n" +
+                        "	c.nome,\n" +
+                        "	c.observacao,\n" +
+                        "	c.id_situacaorecebercheque,\n" +
+                        "	c.cmc7,\n" +
+                        "	c.id_tipoalinea,\n" +
+                        "	c.valorjuros,\n" +
+                        "	c.valoracrescimo,\n" +
+                        "	c.id_tipolocalcobranca,\n" +
+                        "	c.datahoraalteracao,\n" +
+                        "	c.id_tipovistaprazo\n" +
+                        "from\n" +
+                        "	recebercheque c\n" +
+                        "where\n" +
+                        "	c.id_loja = " + getLojaOrigem() + "\n" +
+                        "order by\n" +
+                        "	c.id"
+                )
+                ) {
+            while (rs.next()) {
+                ChequeIMP imp = new ChequeIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setCpf(rs.getString("cpf"));
+                imp.setNumeroCheque(rs.getString("numerocheque"));
+                imp.setBanco(rs.getInt("id_banco"));
+                imp.setAgencia(rs.getString("agencia"));
+                imp.setConta(rs.getString("conta"));
+                imp.setDate(rs.getDate("data"));
+                imp.setDataDeposito(rs.getDate("datadeposito"));
+                imp.setNumeroCupom(rs.getString("numerocupom"));
+                imp.setEcf(rs.getString("ecf"));
+                imp.setValor(rs.getDouble("valor"));
+                imp.setRg(rs.getString("rg"));
+                imp.setTelefone(rs.getString("telefone"));
+                imp.setNome(rs.getString("nome"));
+                imp.setObservacao(rs.getString("observacao"));
+                imp.setSituacaoCheque(SituacaoCheque.getById(rs.getInt("id_situacaorecebercheque")));
+                imp.setCmc7(rs.getString("cmc7"));
+                imp.setAlinea(rs.getInt("id_tipoalinea"));
+                imp.setValorJuros(rs.getDouble("valorjuros"));
+                imp.setValorAcrescimo(rs.getDouble("valoracrescimo"));
+                //imp.setIdLocalCobranca(rs.getInt("id_tipolocalcobranca"));
+                imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
+                imp.setVistaPrazo(TipoVistaPrazo.getById(rs.getInt("id_tipovistaprazo")));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	e.id,\n" +
+                        "	e.razaosocial,\n" +
+                        "	e.cnpj,\n" +
+                        "	e.inscricaoestadual,\n" +
+                        "	e.endereco,\n" +
+                        "	e.numero,\n" +
+                        "	e.complemento,\n" +
+                        "	e.bairro,\n" +
+                        "	e.id_municipio,\n" +
+                        "	e.cep,\n" +
+                        "	e.telefone,\n" +
+                        "	e.datainicio,\n" +
+                        "	e.datatermino,\n" +
+                        "	e.id_situacaocadastro,\n" +
+                        "	e.percentualdesconto,\n" +
+                        "	e.renovacaoautomatica,\n" +
+                        "	e.diapagamento,\n" +
+                        "	e.bloqueado,\n" +
+                        "	e.databloqueio,\n" +
+                        "	e.diainiciorenovacao,\n" +
+                        "	e.diaterminorenovacao,\n" +
+                        "	e.observacao\n" +
+                        "from\n" +
+                        "	empresa e\n" +
+                        "order by\n" +
+                        "	e.id"
+                )
+                ) {
+            while (rs.next()) {
+                ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setRazao(rs.getString("razaosocial"));
+                imp.setCnpj(rs.getString("cnpj"));
+                imp.setInscricaoEstadual(rs.getString("inscricaoestadual"));
+                imp.setEndereco(rs.getString("endereco"));
+                imp.setNumero(rs.getString("numero"));
+                imp.setComplemento(rs.getString("complemento"));
+                imp.setBairro(rs.getString("bairro"));
+                imp.setIbgeMunicipio(rs.getInt("id_municipio"));
+                imp.setCep(rs.getString("cep"));
+                imp.setTelefone(rs.getString("telefone"));
+                imp.setDataInicio(rs.getDate("datainicio"));
+                imp.setDataTermino(rs.getDate("datatermino"));
+                imp.setSituacaoCadastro(SituacaoCadastro.getById(rs.getInt("id_situacaocadastro")));
+                imp.setDesconto(rs.getDouble("percentualdesconto"));
+                imp.setRenovacaoAutomatica(rs.getBoolean("renovacaoautomatica"));
+                imp.setDiaPagamento(rs.getInt("diapagamento"));
+                imp.setBloqueado(rs.getBoolean("bloqueado"));
+                imp.setDataBloqueio(rs.getDate("databloqueio"));
+                imp.setDiaInicioRenovacao(rs.getInt("diainiciorenovacao"));
+                imp.setDiaFimRenovacao(rs.getInt("diaterminorenovacao"));
+                imp.setObservacoes(rs.getString("observacao"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	c.id,\n" +
+                        "	c.nome,\n" +
+                        "	c.id_empresa,\n" +
+                        "	c.bloqueado,\n" +
+                        "	c.id_situacaocadastro,\n" +
+                        "	c.senha,\n" +
+                        "	c.cnpj,\n" +
+                        "	c.observacao,\n" +
+                        "	c.datavalidadecartao,\n" +
+                        "	c.datadesbloqueio,\n" +
+                        "	c.visualizasaldo,\n" +
+                        "	c.databloqueio,\n" +
+                        "	c.id_loja\n" +
+                        "from\n" +
+                        "	conveniado c\n" +
+                        "order by\n" +
+                        "	c.id"
+                )
+                ) {
+            while (rs.next()) {
+                ConveniadoIMP imp = new ConveniadoIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setNome(rs.getString("nome"));
+                imp.setIdEmpresa(rs.getString("id_empresa"));
+                imp.setBloqueado(rs.getBoolean("bloqueado"));
+                imp.setSituacaoCadastro(SituacaoCadastro.getById(rs.getInt("id_situacaocadastro")));
+                imp.setSenha(rs.getInt("senha"));
+                imp.setCnpj(rs.getString("cnpj"));
+                imp.setObservacao(rs.getString("observacao"));
+                imp.setValidadeCartao(rs.getDate("datavalidadecartao"));
+                imp.setDataDesbloqueio(rs.getDate("datadesbloqueio"));
+                imp.setVisualizaSaldo(rs.getBoolean("visualizasaldo"));
+                imp.setDataBloqueio(rs.getDate("databloqueio"));
+                imp.setLojaCadastro(rs.getInt("id_loja"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoPostgres.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select\n" +
+                        "	t.id,\n" +
+                        "	t.id_conveniado,\n" +
+                        "	t.ecf,\n" +
+                        "	t.numerocupom,\n" +
+                        "	t.datahora,\n" +
+                        "	t.valor,\n" +
+                        "	t.id_situacaotransacaoconveniado,\n" +
+                        "	t.datamovimento,\n" +
+                        "	t.finalizado,\n" +
+                        "	t.observacao\n" +
+                        "from\n" +
+                        "	conveniadotransacao t\n" +
+                        "where\n" +
+                        "	t.id_loja = " + getLojaOrigem() + "\n" +
+                        "order by\n" +
+                        "	t.id"
+                )
+                ) {
+            while (rs.next()) {
+                ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setIdConveniado(rs.getString("id_conveniado"));
+                imp.setEcf(rs.getString("ecf"));
+                imp.setNumeroCupom(rs.getString("numerocupom"));
+                imp.setDataHora(rs.getTimestamp("datahora"));
+                imp.setValor(rs.getDouble("valor"));
+                imp.setSituacaoTransacaoConveniado(SituacaoTransacaoConveniado.getById(rs.getInt("id_situacaotransacaoconveniado")));
+                imp.setDataMovimento(rs.getDate("datamovimento"));
+                imp.setFinalizado(rs.getBoolean("finalizado"));
+                imp.setObservacao(rs.getString("observacao"));
+                
+                result.add(imp);
+            }
+        }
+        
         return result;
     }
 
