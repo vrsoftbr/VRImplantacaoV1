@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -40,7 +41,26 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private Connection mvcupom;
+    private Connection bcodados;
+    
     private static final Logger LOG = Logger.getLogger(IntelliCashDAO.class.getName());
+
+    public Connection getMvcupom() {
+        return mvcupom;
+    }
+
+    public void setMvcupom(Connection mvcupom) {
+        this.mvcupom = mvcupom;
+    }
+
+    public Connection getBcodados() {
+        return bcodados;
+    }
+
+    public void setBcodados(Connection bcodados) {
+        this.bcodados = bcodados;
+    }
     
     @Override
     public String getSistema() {
@@ -91,7 +111,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	id_empresa_tributacao id,\n" +
@@ -116,7 +136,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bcodados.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n" +
                     "	id_empresa id,\n" +
@@ -136,7 +156,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = bcodados.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	id_produto_familia id,\n" +
@@ -164,7 +184,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "	p.id_produto id,\n" +
@@ -254,7 +274,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "	f.id_fornecedor id,\n" +
@@ -331,7 +351,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	pc.id_fornecedor,\n" +
@@ -364,7 +384,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	c.id_cliente id,\n" +
@@ -479,7 +499,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "	rv.id_receber_vale id,\n" +
@@ -518,7 +538,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	rc.id_receber_cheque id,\n" +
@@ -582,7 +602,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
                     "	pf.id_pagar_financeiro id,\n" +
@@ -634,19 +654,19 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new SolidoDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new SolidoDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, mvcupom);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new SolidoDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new SolidoDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, mvcupom);
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private Statement stm;
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -655,34 +675,22 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                SimpleDateFormat timestamp = new SimpleDateFormat("hh:mm");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("emissao");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("emissao"));
-                        next.setIdClientePreferencial(rst.getString("idcliente"));
-                        String horaInicio = rst.getString("horainicio");
-                        String horaTermino = rst.getString("horatermino");
+                        next.setData(rst.getDate("data"));
+                        String horaInicio = rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setHoraTermino(next.getHoraInicio());
                         next.setSubTotalImpressora(rst.getDouble("valor"));
-                        next.setCpf(rst.getString("cnpj"));
-                        next.setNomeCliente(rst.getString("nome"));
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado")) + ","
-                                + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -691,20 +699,30 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
+            this.stm = con.createStatement();
             this.sql
-                    = "SELECT \n" +
-                    "	c.ID_MVCUPOM id,\n" +
-                    "	c.DATA,\n" +
+                    = "SELECT\n" +
+                    "	c.id_mvcupom id,\n" +
+                    "	c.data,\n" +
                     "	c.hora,\n" +
-                    "	c.MAQUINA ecf,\n" +
-                    "	c.NUMERO_CUPOM coo,\n" +
-                    "	c.TOTAL_VENDA,\n" +
-                    "	c.CANCELADO,\n" +
-                    "	c.CHAVE_ACESSO,\n" +
-                    "	c.ID_CLIENTE_IDENTIFICADO idcliente\n" +
-                    "FROM \n" +
+                    "	c.maquina ecf,\n" +
+                    "	c.numero_cupom coo,\n" +
+                    "	c.total_venda valor,\n" +
+                    "	c.cancelado,\n" +
+                    "	c.chave_acesso,\n" +
+                    "	c.id_cliente_identificado idcliente\n" +
+                    "from \n" +
                     "	mvcupom c\n" +
+                    "INNER JOIN\n" +
+                    "	(SELECT \n" +
+                    "		max(id_mvcupom) id,\n" +
+                    "		NUMERO_CUPOM\n" +
+                    "	FROM \n" +
+                    "		mvcupom\n" +
+                    "	GROUP BY\n" +
+                    "		NUMERO_CUPOM) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
+                    "		c.NUMERO_CUPOM = maxid.numero_cupom\n" +
                     "WHERE\n" +
                     "	c.ID_EMPRESA = " + idLojaCliente + " AND \n" +
                     "	c.DATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
@@ -734,7 +752,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoFirebird.getConexao().createStatement();
+        private Statement stm;
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
@@ -744,31 +762,25 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("emissao");
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(idVenda);
+                        next.setVenda(rst.getString("idvenda"));
                         next.setProduto(rst.getString("id_produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setSequencia(rst.getInt("seq"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("valor"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("ean"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
-                        int trib;
-                        switch(rst.getString("trib")) {
-                            case "F": trib = 0; break;
-                            case "I": trib = 0; break;    
-                            case "N": trib = 41; break;
-                            case "T07": trib = 7; break;
-                            case "T12": trib = 12; break;
-                            case "T18": trib = 18; break;
-                            case "T25": trib = 25; break;
-                            default: trib = 0;
+                        next.setTotalBruto(rst.getDouble("VALOR_TOTAL"));
+                        
+                        String cancelado = rst.getString("cancelado");
+                        
+                        if(cancelado != null && "S".equals(cancelado)) {
+                            next.setCancelado(true);
                         }
-                        next.setIcmsAliq(trib);
-                        next.setIcmsCst(rst.getInt("icmscst"));
-                        next.setSequencia(rst.getInt("sequencia"));
+                        
+                        next.setCodigoBarras(rst.getString("ean"));
+                        next.setUnidadeMedida(rst.getString("embalagem"));
+                        next.setIdAliquota(rst.getInt("idaliquota"));
+                        
                     }
                 }
             } catch (Exception ex) {
@@ -777,10 +789,9 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = 
-                    "select \n" +
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
+            this.stm = con.createStatement();
+            this.sql = "select \n" +
                     "	i.ID_MVCUPOM_ITENS id,\n" +
                     "	i.ID_MVCUPOM idvenda,\n" +
                     "	i.ID_PRODUTO,\n" +
@@ -792,7 +803,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	i.VALOR_TOTAL,\n" +
                     "	i.DESCONTO,\n" +
                     "	i.ALIQUOTA,\n" +
-                    "	i.ID_EMPRESA_TRIBUTACAO,\n" +
+                    "	i.ID_EMPRESA_TRIBUTACAO idaliquota,\n" +
                     "	i.CANCELADO\n" +
                     "from\n" +
                     "	mvcupom_itens i\n" +
