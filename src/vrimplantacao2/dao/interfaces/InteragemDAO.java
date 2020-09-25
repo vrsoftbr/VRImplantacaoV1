@@ -3,8 +3,11 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -13,6 +16,7 @@ import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -20,10 +24,11 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class InteragemDAO extends InterfaceDAO {
+public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String i_arquivoXLS;
     private String complemento = "";
@@ -37,12 +42,16 @@ public class InteragemDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
-                    + "f.CODFIL,"
+                    + "f.CODFIL, \n"
+                    + "f.CNPJFIL, \n"
                     + "f.NOMFIL \n"
-                    + "FROM TABFIL f"
+                    + "FROM TABFIL f \n"
+                    + "ORDER BY f.CODFIL"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("CODFIL"), "LOJA " + rst.getString("NOMFIL")));
+                    result.add(new Estabelecimento(
+                            rst.getString("CODFIL") + " - " + rst.getString("CNPJFIL"),
+                            rst.getString("NOMFIL")));
                 }
             }
         }
@@ -51,21 +60,113 @@ public class InteragemDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        if (complemento.isEmpty()) {
-            return "Interagem";
+        if (complemento.trim().isEmpty()) {
+            return "Interage";
         } else {
-            return "Interagem - " + complemento;
+            return "Interage - " + complemento.trim();
         }
     }
 
+    private String getAliquotaKey(String cst, double aliq, double red) throws Exception {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "    coalesce(p.cst, 0) as icms_cst,\n"
+                    + "    coalesce(p.icms, 0) as icms_aliquota, \n"
+                    + "    0 as icms_reduzido \n"
+                    + "from tabpro p"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            "".equals(rst.getString("icms_cst")) ? "0" : rst.getString("icms_cst"),
+                            rst.getDouble("icms_aliquota"),
+                            rst.getDouble("icms_reduzido")
+                    );
+                    
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            "".equals(rst.getString("icms_cst").trim()) ? 0 : rst.getInt("icms_cst"),
+                            rst.getDouble("icms_aliquota"),
+                            rst.getDouble("icms_reduzido")
+                    ));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.MANTER_DESCRICAO_PRODUTO,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                    OpcaoProduto.QTD_EMBALAGEM_EAN,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.EXCECAO,
+                    OpcaoProduto.TIPO_PRODUTO,
+                    OpcaoProduto.ATACADO
+                }
+        ));
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
+        
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "distinct p.codpro as id,\n"
-                    + "coalesce(p.codbarun, p.codpro) as ean,\n"
+                    + "p.codbarun as ean,\n"
                     + "1 as qtdembalagem,\n"
                     + "p.unidade as unidade,\n"
                     + "p.balanca as balanca,\n"
@@ -106,9 +207,8 @@ public class InteragemDAO extends InterfaceDAO {
                     + "0 as icms_reduzido\n"
                     + "from tabpro p\n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem() + "\n"
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")) + "\n"
                     + "order by p.codpro"
-                    //+ "where p.stprod = 'A'\n"
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -117,12 +217,27 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(Utils.formataNumero(rst.getString("id")));
+                    imp.setEan(Utils.formataNumero(rst.getString("ean")));
                     
-                    if ((rst.getString("ean") != null)
-                            && (!rst.getString("ean").trim().isEmpty())) {
-                        imp.setEan(Utils.formataNumero(rst.getString("ean")));
-                    } else {
-                        imp.setEan(imp.getImportId());
+                    if ((imp.getEan() != null)
+                            && (!imp.getEan().trim().isEmpty())
+                            && (imp.getEan().trim().length() <= 6)) {
+                        ProdutoBalancaVO produtoBalanca;
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(imp.getImportId());
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                        } else {
+                            imp.setValidade(rst.getInt("validade"));
+                            imp.seteBalanca(false);
+                            imp.setManterEAN(true);
+                        }
                     }
                     
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -150,31 +265,19 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setCustoComImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setEstoque(MathUtils.trunc(rst.getDouble("estoque"), 2));
-                    imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("icms_cst"))));
-                    imp.setIcmsCstSaida(Integer.parseInt(Utils.formataNumero(rst.getString("icms_cst"))));
-                    imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
-
-                    if ((rst.getString("ean") != null)
-                            && (!rst.getString("ean").trim().isEmpty())
-                            && (rst.getString("ean").trim().length() <= 6)) {
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
-                        }
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
-                        } else {
-                            imp.setValidade(rst.getInt("validade"));
-                            imp.seteBalanca(true);
-                        }
-                    }
+                    
+                    
+                    String aliqIcmsId = getAliquotaKey(
+                            rst.getString("icms_cst"),
+                            rst.getDouble("icms_aliquota"),
+                            rst.getDouble("icms_reduzido"));
+                    
+                    imp.setIcmsDebitoId(aliqIcmsId);
+                    imp.setIcmsDebitoForaEstadoId(aliqIcmsId);
+                    imp.setIcmsDebitoForaEstadoNfId(aliqIcmsId);
+                    imp.setIcmsCreditoId(aliqIcmsId);
+                    imp.setIcmsCreditoForaEstadoId(aliqIcmsId);
+                    imp.setIcmsConsumidorId(aliqIcmsId);
 
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados...Produtos..." + contador);
@@ -210,7 +313,7 @@ public class InteragemDAO extends InterfaceDAO {
         return vResult;
     }
 
-    @Override
+    /*@Override
     public List<ProdutoIMP> getEANsAtacado() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         String codigoBarras;
@@ -247,7 +350,7 @@ public class InteragemDAO extends InterfaceDAO {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
@@ -267,7 +370,7 @@ public class InteragemDAO extends InterfaceDAO {
                         + "inner join tabprofil p on p.codpro = a.codprod\n"
                         + "where a.quantmin > 1\n"
                         + "and a.prvapro < p.prvapro\n"
-                        + "and p.codfil = " + getLojaOrigem() + "\n"
+                        + "and p.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-"))+ "\n"
                         + "order by a.codprod"
                 )) {
                     while (rst.next()) {
@@ -412,8 +515,8 @@ public class InteragemDAO extends InterfaceDAO {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "    c.codcli id,\n" +
                     "    c.nomcli razao,\n" +
@@ -445,7 +548,7 @@ public class InteragemDAO extends InterfaceDAO {
                     "from\n" +
                     "    tabcli c\n" +
                     "order by\n" +
-                    "    cast(c.codcli as integer)")) {
+                    "    c.codcli" )) {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));

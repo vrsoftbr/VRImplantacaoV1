@@ -153,7 +153,7 @@ public class PdvVendaVO {
     }
 
     public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = Utils.acertarTexto(chaveCfe, 50);
+        this.nomeCliente = Utils.acertarTexto(nomeCliente, 50);
     }
 
     public void setEnderecoCliente(String enderecoCliente) {

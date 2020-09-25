@@ -65,9 +65,6 @@ public class PdvVendaItemDAO {
                 }
             }
             
-            System.out.println("Custo Com Imposto Gravar " + item.getCustoComImposto());
-            System.out.println("Custo Sem Imposto Gravar " + item.getCustoSemImposto());
-            
             sql.put("custoComImposto", item.getCustoComImposto());
             sql.put("custoSemImposto", item.getCustoSemImposto());
             sql.put("custoMedioComimposto", item.getCustoMedioComimposto(), 0);

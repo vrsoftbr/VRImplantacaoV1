@@ -1161,7 +1161,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird.add(mnuSigma);
 
-        mnuInteragem.setText("Interagem");
+        mnuInteragem.setText("Interage");
         mnuInteragem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuInteragemActionPerformed(evt);

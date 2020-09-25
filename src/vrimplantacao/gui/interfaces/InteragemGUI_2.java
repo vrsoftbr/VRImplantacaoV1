@@ -1,5 +1,6 @@
 package vrimplantacao.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -8,6 +9,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -17,11 +19,13 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InteragemDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class InteragemGUI_2 extends VRInternalFrame {
 
-    private static final String SISTEMA = "Interagem";
+    private static final String SISTEMA = "Interage";
     private static final String SERVIDOR_SQL = "Firebird";
     private static InteragemGUI_2 instance;
 
@@ -56,7 +60,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
     public InteragemGUI_2(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-
+        ConexaoFirebird.encoding = "WIN1252";
         conexao.setSistema(SISTEMA);
         conexao.setOnConectar(new ConexaoEvent() {
             @Override
@@ -67,9 +71,40 @@ public class InteragemGUI_2 extends VRInternalFrame {
             }
         });
         
-        this.title = "Importação " + SISTEMA + " 2";
+        this.title = "Importação " + SISTEMA;
         carregarParametros();
 
+        tabProduto.setOpcoesDisponiveis(dao);
+        
+        tabProduto.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                if (!txtComplemento.getText().isEmpty()) {
+                    return dao.getSistema() + " - " + txtComplemento.getText().trim();
+                } else {
+                    return dao.getSistema();
+                }
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+            
+        });
+        
         centralizarForm();
         this.setMaximum(false);
     }
@@ -118,7 +153,9 @@ public class InteragemGUI_2 extends VRInternalFrame {
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);                   
+                    importador.setLojaVR(idLojaVR);
+                    
+                    dao.setComplemento(txtComplemento.getText().trim());
                     
                     tabProduto.setImportador(importador);
                     if (tabs.getSelectedIndex() == 0) {
@@ -167,15 +204,6 @@ public class InteragemGUI_2 extends VRInternalFrame {
                         }
                         if (chkUnifCreditoRotativo.isSelected()) {
                             importador.unificarCreditoRotativo();
-                        }
-                    } else if (tabs.getSelectedIndex() == 2) {
-                        dao.i_arquivoXLS = flcAcertarEstoque.getArquivo();
-                        List<OpcaoProduto> opcoes2 = new ArrayList<>();
-                        if (!dao.i_arquivoXLS.isEmpty()) {
-                            opcoes2.add(OpcaoProduto.ESTOQUE);
-                        }
-                        if (!opcoes2.isEmpty()) {
-                            importador.atualizarProdutos(opcoes2);
                         }
                     }
 
@@ -227,14 +255,11 @@ public class InteragemGUI_2 extends VRInternalFrame {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel8 = new vrframework.bean.panel.VRPanel();
-        vRLabel6 = new vrframework.bean.label.VRLabel();
-        flcAcertarEstoque = new vrframework.bean.fileChooser.VRFileChooser();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         vRLabel8 = new vrframework.bean.label.VRLabel();
 
-        setTitle("Importação Interagem 2");
+        setTitle("Importação Interage");
         setToolTipText("");
 
         txtComplemento.setCaixaAlta(false);
@@ -361,7 +386,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
                     .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkreceberDevolucao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(335, Short.MAX_VALUE))
+                .addContainerGap(395, Short.MAX_VALUE))
         );
         vRPanel10Layout.setVerticalGroup(
             vRPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -445,7 +470,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
                         .addGroup(vRPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(309, Short.MAX_VALUE))
+                .addContainerGap(375, Short.MAX_VALUE))
         );
         vRPanel11Layout.setVerticalGroup(
             vRPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -472,7 +497,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+            .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 612, Short.MAX_VALUE)
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -503,7 +528,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(285, Short.MAX_VALUE))
+                .addContainerGap(359, Short.MAX_VALUE))
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -522,33 +547,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
         );
 
         tabs.addTab("Unificação", vRPanel4);
-
-        vRLabel6.setText("Acertar Estoque");
-
-        javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
-        vRPanel8.setLayout(vRPanel8Layout);
-        vRPanel8Layout.setHorizontalGroup(
-            vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel8Layout.createSequentialGroup()
-                        .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(flcAcertarEstoque, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        vRPanel8Layout.setVerticalGroup(
-            vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(flcAcertarEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(226, Short.MAX_VALUE))
-        );
-
-        tabs.addTab("Especiais", vRPanel8);
+        tabs.addTab("Balança", pnlBalanca);
 
         vRLabel1.setText("Loja (Cliente):");
 
@@ -563,16 +562,16 @@ public class InteragemGUI_2 extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabs)
-                    .addComponent(pnlBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6)
                         .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -580,16 +579,14 @@ public class InteragemGUI_2 extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(9, 9, 9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnlBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
@@ -686,21 +683,18 @@ public class InteragemGUI_2 extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private javax.swing.JComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
-    private vrframework.bean.fileChooser.VRFileChooser flcAcertarEstoque;
     private javax.swing.JLabel jLabel1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProduto;
     private javax.swing.JTabbedPane tabs;
     private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.label.VRLabel vRLabel1;
-    private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.panel.VRPanel vRPanel10;
     private vrframework.bean.panel.VRPanel vRPanel11;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
-    private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     // End of variables declaration//GEN-END:variables
 

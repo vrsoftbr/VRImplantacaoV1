@@ -164,7 +164,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuInteragem">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Interagem"/>
+                            <Property name="text" type="java.lang.String" value="Interage"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuInteragemActionPerformed"/>

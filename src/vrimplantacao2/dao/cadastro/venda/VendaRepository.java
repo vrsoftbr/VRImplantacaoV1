@@ -560,20 +560,23 @@ public class VendaRepository {
              * Se a chave estiver preenchida, trata ela para obter o número de 
              * série da impressora.
              */            
-            vo.setNumeroSerie(vo.getChaveCfe().substring(22, 31));/**
+            vo.setNumeroSerie(vo.getChaveCfe().substring(22, 31));
+            /**
              * Se houver número de série, tenta vincular com a impressora correta.
              * Caso não encontre dispara uma exceção.
              */
             EcfVO ecf = provider.getEcf(vo.getNumeroSerie());
-            if (ecf == null) {                
+            if (ecf == null) {
+                //System.out.println("SAT-CF-e | Chave: '" + vo.getChaveCfe() + "' NºSerie: " + vo.getNumeroSerie());                
                 String msg = "O numero de série " + vo.getNumeroSerie() + " não está cadastrado para nenhuma ECF!\n";
                 msg += strVenda(venda);                
                 LOG.log(Level.SEVERE, msg);                
-                throw new Exception(msg);
+                //throw new Exception(msg);
             }            
             
-            vo.setModeloImpressora("SAT-CF-e " + ecf.getMarca());
-            vo.setEcf(ecf.getId());
+            //vo.setModeloImpressora("SAT-CF-e " + ecf.getMarca() == null ? "" : ecf.getMarca());
+            vo.setModeloImpressora("SAT-CF-e");
+            //vo.setEcf(ecf.getId());
             
             LOG.finest("SAT-CF-e | Chave: '" + vo.getChaveCfe() + "' NºSerie: " + vo.getNumeroSerie());
         } else if (vo.getChaveNfce() != null && vo.getChaveNfce().length() == 44) {
@@ -601,13 +604,13 @@ public class VendaRepository {
         Icms aliquota = provider.getAliquota(imp.getIcmsCst(), imp.getIcmsAliq(), imp.getIcmsReduzido());
         if (aliquota != null) {
             
-            if ((aliquota.getId() == 28) || (aliquota.getId() == 34)) {
-                item.setId_aliquota(7); // SUBSTITUIDO
-            } else if ((aliquota.getId() == 33) || (aliquota.getId() == 45)) {
-                item.setId_aliquota(6); // ISENTO
-            } else { //ISSO FOI FEITO POR MERCADINHO PIRATINGA, POR EXISTEM 3 CADASTROS DE SUBS E ISENTO
-                item.setId_aliquota(aliquota.getId());
-            }
+            //if ((aliquota.getId() == 28) || (aliquota.getId() == 34)) {
+            //    item.setId_aliquota(7); // SUBSTITUIDO
+            //} else if ((aliquota.getId() == 33) || (aliquota.getId() == 45)) {
+            //    item.setId_aliquota(6); // ISENTO
+            //} else { //ISSO FOI FEITO POR MERCADINHO PIRATINGA, POR EXISTEM 3 CADASTROS DE SUBS E ISENTO
+            item.setId_aliquota(aliquota.getId());
+            //}
             
         } else {
             LOG.warning(String.format(

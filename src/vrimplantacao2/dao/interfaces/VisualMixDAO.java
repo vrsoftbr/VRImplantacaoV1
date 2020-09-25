@@ -2225,10 +2225,10 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     Cell cellNF = sheet.getCell(0, i);
+                    Cell cellForncedor = sheet.getCell(1, i);
 
-                    idfornecedor = Integer.parseInt(cellNF.getContents().substring(1, cellNF.getContents().indexOf("N")));
-                    numeronota = Integer.parseInt(cellNF.getContents().substring(cellNF.getContents().indexOf("N") + 2));
-
+                    numeronota = Integer.parseInt(cellNF.getContents().trim());
+                    idfornecedor = Integer.parseInt(cellForncedor.getContents().trim());
                     
                     System.out.println(
                                 "select "
@@ -2316,6 +2316,8 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             
             sql = "insert into implantacao.acertoestoque(select "+idLoja+", id_produto, coalesce(sum(quantidade), 0) "
                     + "from implantacao.notaentradaitem_quantidade where id_loja = "+idLoja+" group by id_produto);";
+            
+            
             
             stm.execute(sql);
             
