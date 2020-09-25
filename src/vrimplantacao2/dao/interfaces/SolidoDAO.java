@@ -15,7 +15,10 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -259,8 +262,8 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.fornecedor_ativo,\n" +
                     "	f.data_cadastro\n" +
                     "from \n" +
-                    "	fornecedor f where f.empresa_id = " + getLojaOrigem())) {
-                while(rs.next()) {
+                    "	fornecedor f where f.id_empresa = " + getLojaOrigem())) {
+                while(rs.next()) {  
                     FornecedorIMP imp = new FornecedorIMP();
                     
                     imp.setImportSistema(getSistema());
@@ -287,6 +290,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     int i = 1;
+                   
                     try(ResultSet rs1 = stm.executeQuery(
                             "select\n" +
                             "	ft.id_fornecedor idfornecedor,\n" +
@@ -295,16 +299,12 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                             "	ft.contato,\n" +
                             "	ft.e_mail \n" +
                             "from\n" +
-                            "	fornecedor_telefone where ft.id_fornecedor = " + imp.getImportId())) {
-                        while(rs.next()) {
-                            String contato = rs.getString("contato"),
-                                    telefone = rs.getString("ddd") + rs.getString("telefone");
+                            "	fornecedor_telefone ft where ft.id_fornecedor = " + imp.getImportId())) {
+                        while(rs1.next()) {
+                            String contato = rs1.getString("contato"),
+                                    telefone = rs1.getString("ddd") + rs1.getString("telefone");
                             
-                            if(contato == null && "".equals(contato)) {
-                                contato = "SEM CONTATO";
-                            }
-                            
-                            imp.addContato(String.valueOf(i), contato, telefone, null, TipoContato.NFE, rs.getString("e_mail"));
+                            imp.addContato(String.valueOf(i), contato == null ? "SEM CONTATO" : contato, telefone, null, TipoContato.NFE, rs1.getString("e_mail"));
                             i++;
                         }
                     }
@@ -335,6 +335,8 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setCodigoExterno(rs.getString("codigo_fornecedor"));
@@ -353,7 +355,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    "select\n" +
                     "	c.id_cliente id,\n" +
                     "	c.nome,\n" +
                     "	c.endereco,\n" +
@@ -376,9 +378,17 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cliente_ativo,\n" +
                     "	c.estado_civil,\n" +
                     "	c.id_cliente_grupo,\n" +
-                    "	c.id_cliente_status \n" +
-                    "from \n" +
-                    "	cliente c")) {
+                    "	cg.nome grupo,\n" +
+                    "	c.id_cliente_status,\n" +
+                    "	cv.dia_vencimento\n" +
+                    "from\n" +
+                    "	cliente c\n" +
+                    "left join cliente_vencimento cv\n" +
+                    "	on c.id_cliente_vencimento = cv.id_cliente_vencimento\n" +
+                    "left join cliente_grupo cg\n" +
+                    "	on c.id_cliente_grupo = cg.id_cliente_grupo\n" +
+                    "where\n" +
+                    "	c.id_empresa = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
@@ -395,7 +405,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setMunicipio(Utils.acertarTexto(rs.getString("cidade")));
                     imp.setUf(rs.getString("estado"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setCep(rs.getString("cep"));
@@ -407,6 +417,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSalario(rs.getDouble("salario"));
                     imp.setValorLimite(rs.getDouble("limite_compra"));
                     imp.setAtivo("S".equals(rs.getString("cliente_ativo")));
+                    imp.setDiaVencimento(rs.getInt("dia_vencimento"));
                     
                     String estCivil = rs.getString("estado_civil");
                     
@@ -425,11 +436,177 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                     
+                    int i = 1;
+                    try(ResultSet rs2 = stm.executeQuery(
+                            "SELECT \n" +
+                            "	id_cliente,\n" +
+                            "	ddd,\n" +
+                            "	telefone,\n" +
+                            "	contato\n" +
+                            "FROM \n" +
+                            "	CLIENTE_TELEFONE where id_cliente = " + imp.getId())) {
+                        while(rs2.next()) {
+                            
+                            imp.addContato(String.valueOf(i), 
+                                    rs2.getString("contato") == null ? "SEM CONTATO" : rs2.getString("contato"),
+                                    rs2.getString("ddd") + 
+                                    rs2.getString("telefone"), 
+                                    null, null);
+                            i++;
+                        }
+                    }
+                    
                     result.add(imp);
                 }
             }
         }
         
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	rv.id_receber_vale id,\n" +
+                    "	rv.id_cliente idcliente,\n" +
+                    "	rv.data_compra emissao,\n" +
+                    "	rv.numero_caixa ecf,\n" +
+                    "	rv.numero_cupom coo,\n" +
+                    "	rv.valor,\n" +
+                    "	rv.vencimento,\n" +
+                    "	rv.observacao \n" +
+                    "from \n" +
+                    "	receber_vale rv\n" +
+                    "where \n" +
+                    "	rv.id_empresa = " + getLojaOrigem() + " and \n" +
+                    "	rv.historico = 'I'")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	rc.id_receber_cheque id,\n" +
+                    "	rc.id_cliente,\n" +
+                    "	rc.data_compra emissao,\n" +
+                    "	rc.vencimento,\n" +
+                    "	rc.cpf_cheque, \n" +
+                    "	c.CNPJ_CPF,\n" +
+                    "	rc.nome_cheque,\n" +
+                    "	c.NOME,\n" +
+                    "	c.RG,\n" +
+                    "	c.INSCRICAO_ESTADUAL,\n" +
+                    "	rc.numero_caixa ecf,\n" +
+                    "	rc.numero_cupom coo,\n" +
+                    "	rc.numero_cheque cheque,\n" +
+                    "	rc.agencia,\n" +
+                    "	rc.id_banco,\n" +
+                    "	rc.conta,\n" +
+                    "	rc.valor,\n" +
+                    "	rc.juros,\n" +
+                    "	rc.desconto\n" +
+                    "from\n" +
+                    "	receber_cheque rc \n" +
+                    "INNER JOIN cliente c ON rc.ID_CLIENTE = c.ID_CLIENTE\n" +
+                    "where\n" +
+                    "	rc.id_empresa = " + getLojaOrigem() + " and\n" +
+                    "	rc.historico = 'I'")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setCpf(rs.getString("cpf_cheque"));
+                    
+                    String rg = rs.getString("rg");
+                    
+                    imp.setRg(rs.getString("INSCRICAO_ESTADUAL"));
+                    
+                    if(rg != null && !"".equals(rg)) {
+                        imp.setRg(rg);
+                    }
+                    
+                    imp.setDate(rs.getDate("emissao"));
+                    imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setNumeroCheque(rs.getString("cheque"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setBanco(rs.getInt("id_banco"));
+                    imp.setConta(rs.getString("conta"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	pf.id_pagar_financeiro id,\n" +
+                    "	p.id_fornecedor idfornecedor,\n" +
+                    "	p.nota,\n" +
+                    "	p.data_lancamento lancamento,\n" +
+                    "	p.data_emissao emissao,\n" +
+                    "	pf.vencimento,\n" +
+                    "	pf.descontos,\n" +
+                    "	p.valor_nota valor,\n" +
+                    "	pf.duplicata parcela,\n" +
+                    "	pf.valor valorparcela,\n" +
+                    "	pf.observacao\n" +
+                    "from \n" +
+                    "	pagar p\n" +
+                    "inner join pagar_financeiro pf on p.id_pagar = pf.id_pagar \n" +
+                    "where \n" +
+                    "	pf.historico = 'I' and \n" +
+                    "	p.id_empresa = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setNumeroDocumento(rs.getString("nota"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataEntrada(rs.getDate("lancamento"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valorparcela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 }
