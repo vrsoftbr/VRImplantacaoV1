@@ -2,9 +2,8 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,22 +11,15 @@ import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
-import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+//import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+//import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ConveniadoIMP;
-import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
-import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 //import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
+//import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -64,38 +56,6 @@ public class CupermaxDAO extends InterfaceDAO {
         return result;
     }
 
-    /*
-     @Override
-     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-     List<FamiliaProdutoIMP> result = new ArrayList<>();
-
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "  p.codigorea id,\n"
-     + "  p2.nome1 descricao\n"
-     + "from\n"
-     + "(select p.codigorea from produtos p where p.codigorea > 0 group by codigorea) p\n"
-     + "join produtos p2 on p2.codigo = p.codigorea\n"
-     + "order by\n"
-     + "  p.codigorea"
-     )) {
-     while (rst.next()) {
-     FamiliaProdutoIMP familiaVO = new FamiliaProdutoIMP();
-
-     familiaVO.setImportSistema(getSistema());
-     familiaVO.setImportLoja(getLojaOrigem());
-     familiaVO.setImportId(rst.getString("id"));
-     familiaVO.setDescricao(rst.getString("descricao"));
-
-     result.add(familiaVO);
-     }
-     }
-     }
-
-     return result;
-     }
-     */
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
 
@@ -105,8 +65,6 @@ public class CupermaxDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + "	SUBSTRB (CODIGO_ESTRUTURADO,1,3) m1,\n"
-                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,5,3) m2,\n"
-                    //+ "	SUBSTRB (CODIGO_ESTRUTURADO,9,3) m3,\n"
                     + "	DESCRICAO descricao\n"
                     + "FROM \n"
                     + "	CUPERMAX.nivel_mercadologico\n"
@@ -342,41 +300,6 @@ public class CupermaxDAO extends InterfaceDAO {
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao("IMPORTADO VR");
 
-                    /*
-                     if (rst.getString("fone1") != null && !"".equals(rst.getString("fone1"))) {
-                     imp.setTel_principal(rst.getString("fone1"));
-                     imp.addContato(
-                     "1",
-                     "FONE 2",
-                     rst.getString("fone2"),
-                     "",
-                     TipoContato.COMERCIAL,
-                     ""
-                     );
-                     } else {
-                     imp.setTel_principal(rst.getString("fone2"));
-                     }
-                     if (!"".equals(Utils.acertarTexto(rst.getString("celular")))) {
-                     imp.addContato(
-                     "2",
-                     "CELULAR",
-                     "",
-                     rst.getString("celular"),
-                     TipoContato.COMERCIAL,
-                     ""
-                     );
-                     }
-                     if (!"".equals(Utils.acertarTexto(rst.getString("email")))) {
-                     imp.addContato(
-                     "3",
-                     "EMAIL",
-                     "",
-                     "",
-                     TipoContato.COMERCIAL,
-                     rst.getString("email")
-                     );
-                     }
-                     */
                     result.add(imp);
                 }
             }
@@ -567,266 +490,4 @@ public class CupermaxDAO extends InterfaceDAO {
 
         return result;
     }
-    /*
-     @Override
-     public List<ChequeIMP> getCheques() throws Exception {
-     List<ChequeIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "ch.chave id,\n"
-     + "ch.codigo as id_cliente, \n"
-     + "p.nome,\n"
-     + "p.ie, \n"
-     + "p.rg, \n"
-     + "trim((select case when coalesce(trim(ddd),'') = '' then telefone else ddd||telefone end as asd from telefones where codigo = p.codigo and lower(tipo) = 'residencial' and rownum = 1 )) fone,\n"
-     + "ch.agencia, \n"
-     + "ch.cheque, \n"
-     + "ch.cpf, \n"
-     + "ch.cnpj, \n"
-     + "ch.emissao,\n"
-     + "ch.chave, \n"
-     + "ch.vencimento, \n"
-     + "ch.serie, \n"
-     + "ch.banco, \n"
-     + "ch.valor, \n"
-     + "ch.pagamento,\n"
-     + "ch.observacao, \n"
-     + "ch.loja, \n"
-     + "ch.conta, \n"
-     + "ch.pdv, \n"
-     + "ch.cupom, \n"
-     + "ch.status, \n"
-     + "ch.cmc7, \n"
-     + "ch.flagalt, \n"
-     + "ch.historico\n"
-     + "from CHEQUESRECEBER ch\n"
-     + "left join pessoas p on p.codigo = ch.codigo\n"
-     + "inner join clientes c on c.codigo = p.codigo\n"
-     + "where ch.pagamento = 'N'\n"
-     + "and ch.loja = " + getLojaOrigem()
-     )) {
-     while (rst.next()) {
-     ChequeIMP imp = new ChequeIMP();
-     imp.setId(rst.getString("id"));
-     if ((rst.getString("cpf") != null)
-     && (!rst.getString("cpf").trim().isEmpty())) {
-     imp.setCpf(rst.getString("cpf"));
-     } else if ((rst.getString("cnpj") != null)
-     && (!rst.getString("cnpj").trim().isEmpty())) {
-     imp.setCpf(rst.getString("cnpj"));
-     } else {
-     imp.setCpf("");
-     }
-
-     imp.setNome(rst.getString("nome"));
-     imp.setTelefone(rst.getString("fone"));
-     imp.setDate(rst.getDate("emissao"));
-     imp.setDataDeposito(rst.getDate("vencimento"));
-     imp.setDataHoraAlteracao(rst.getTimestamp("flagalt"));
-     imp.setBanco(rst.getInt("banco"));
-     imp.setAgencia(rst.getString("agencia"));
-     imp.setConta(rst.getString("conta"));
-     imp.setValor(rst.getDouble("valor"));
-     imp.setEcf(rst.getString("pdv"));
-     imp.setNumeroCupom(rst.getString("cupom"));
-     imp.setNumeroCheque(rst.getString("cheque"));
-     imp.setObservacao("IMPORTADO VR " + rst.getString("observacao") + " " + rst.getString("historico"));
-     imp.setAlinea(0);
-     imp.setCmc7(rst.getString("cmc7"));
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }
-     */
-
-    @Override
-    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
-        List<OfertaIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + " loja,\n"
-                    + " codigo,\n"
-                    + " datainicial,\n"
-                    + " datafinal,\n"
-                    + " precopromocao \n"
-                    + "from PROMOCAO \n"
-                    + "where loja = " + getLojaOrigem() + "\n"
-                    + "and datafinal > sysdate \n"
-                    + "order by datafinal desc"
-            )) {
-                while (rst.next()) {
-                    OfertaIMP imp = new OfertaIMP();
-                    imp.setIdProduto(rst.getString("codigo"));
-                    imp.setDataInicio(rst.getDate("datainicial"));
-                    imp.setDataFim(rst.getDate("datafinal"));
-                    imp.setPrecoOferta(rst.getDouble("precopromocao"));
-                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
-                    imp.setTipoOferta(TipoOfertaVO.CAPA);
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-    /*
-     @Override
-     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
-     List<ConvenioEmpresaIMP> result = new ArrayList<>();
-
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "SELECT \n"
-     + "p.codigo, \n"
-     + "p.razao,\n"
-     + "p.nome, \n"
-     + "p.estado,\n"
-     + "p.cpf,\n"
-     + "p.cnpj,\n"
-     + "p.bairro,\n"
-     + "p.cep,\n"
-     + "p.cidade,\n"
-     + "p.endereco,\n"
-     + "p.estado,\n"
-     + "p.ie,\n"
-     + "p.rg,\n"
-     + "p.flaginc,\n"
-     + "c.dataencerramento,\n"
-     + "c.datarecebimento,\n"
-     + "c.prazodias,\n"
-     + "c.ultimofechamento,\n"
-     + "  trim((select case when coalesce(trim(ddd),'') = '' then telefone else ddd||telefone end as asd "
-     + "from telefones "
-     + "where codigo = p.codigo "
-     + "and lower(tipo) = 'residencial' "
-     + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
-     + "FROM pessoas p,convenios c\n"
-     + "WHERE p.codigo = c.codigo "
-     + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo in (" + v_codEmpresaConv) + ")"
-     )) {
-     SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-     while (rst.next()) {
-     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-     imp.setId(rst.getString("codigo"));
-     imp.setRazao(rst.getString("razao"));
-
-     if ((rst.getString("cpf") != null)
-     && (!rst.getString("cpf").trim().isEmpty())) {
-     imp.setCnpj(rst.getString("cpf"));
-     } else if ((rst.getString("cnpj") != null)
-     && (!rst.getString("cnpj").trim().isEmpty())) {
-     imp.setCnpj(rst.getString("cnpj"));
-     } else {
-     imp.setCnpj("");
-     }
-
-     if ((rst.getString("rg") != null)
-     && (!rst.getString("rg").trim().isEmpty())) {
-     imp.setInscricaoEstadual(rst.getString("rg"));
-     } else if ((rst.getString("ie") != null)
-     && (!rst.getString("ie").trim().isEmpty())) {
-     imp.setInscricaoEstadual(rst.getString("ie"));
-     } else {
-     imp.setInscricaoEstadual("");
-     }
-
-     imp.setEndereco(rst.getString("endereco"));
-     imp.setNumero("0");
-     imp.setBairro(rst.getString("bairro"));
-     imp.setMunicipio(rst.getString("cidade"));
-     imp.setUf(rst.getString("estado"));
-     imp.setTelefone(rst.getString("fone1"));
-     imp.setDataInicio(rst.getDate("datainicio_atual"));
-     imp.setDataTermino(rst.getDate("datafinal_atual"));
-     imp.setDesconto(0);
-     imp.setDiaPagamento(rst.getInt("prazodias"));
-     imp.setDiaInicioRenovacao(1);
-     imp.setBloqueado(false);
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }
-
-     @Override
-     public List<ConveniadoIMP> getConveniado() throws Exception {
-     List<ConveniadoIMP> result = new ArrayList<>();
-
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select \n"
-     + "p.codigo,\n"
-     + "p.cpf,\n"
-     + "p.nome,\n"
-     + "p.razao,\n"
-     + "p.cnpj,\n"
-     + "p.ie,\n"
-     + "p.rg,\n"
-     + "c.bloqueado,\n"
-     + "c.codigoconvenio,\n"
-     + "c.limite    \n"
-     + "from pessoas p\n"
-     + "inner join clientes c on c.codigo = p.codigo\n"
-     + "where p.cliente = 'S'\n"
-     + "and p.convenio = 'N'\n"
-     + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio in (" + v_codEmpresaConv) + ")"
-     )) {
-     while (rst.next()) {
-     ConveniadoIMP imp = new ConveniadoIMP();
-     imp.setId(rst.getString("codigo"));
-     imp.setCnpj(rst.getString("cnpj"));
-     imp.setNome(rst.getString("razao"));
-     imp.setIdEmpresa(rst.getString("codigoconvenio"));
-     imp.setBloqueado(rst.getBoolean("bloqueado"));
-     imp.setConvenioLimite(rst.getDouble("limite"));
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }
-
-     @Override
-     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
-     List<ConvenioTransacaoIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoOracle.createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "  rot.chave id,\n"
-     + "  ROT.CODIGO id_cliente,\n"
-     + "  coalesce(c.cnpj, c.cpf) cnpj,\n"
-     + "  ROT.LOJA id_loja,\n"
-     + "  ROT.EMISSAO dataemissao,\n"
-     + "  rot.cupom,\n"
-     + "  ROT.VALOR,\n"
-     + "  round((((rot.taxa / 30) * floor(current_date - rot.vencimento)) / 100) * rot.valor, 2) juros,\n"
-     + "  ROT.HISTORICO observacao,\n"
-     + "  ROT.VENCIMENTO,\n"
-     + "  ROT.PDV ecf\n"
-     + "FROM RECEBER_CONTAS  ROT  \n"
-     + "INNER JOIN PESSOAS C ON C.CODIGO = ROT.CODIGO\n"
-     + "INNER JOIN CLIENTES CLI ON CLI.CODIGO = C.CODIGO\n"
-     + "where rot.chaverecebimento = 0 and rot.loja = " + getLojaOrigem()
-     + " and CLI.codigoconvenio > 0"
-     )) {
-     SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
-     while (rst.next()) {
-     ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-     imp.setId(rst.getString("id"));
-     imp.setIdConveniado(rst.getString("id_cliente"));
-     imp.setEcf(rst.getString("ecf"));
-     imp.setNumeroCupom(rst.getString("cupom"));
-     imp.setDataHora(rst.getTimestamp("dataemissao"));
-     imp.setValor(rst.getDouble("valor"));
-     imp.setObservacao(rst.getString("observacao"));
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }*/
 }
