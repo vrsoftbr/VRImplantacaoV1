@@ -5,6 +5,7 @@ import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,8 @@ public class VendaRepository {
             Map<String, ClientePreferencialVO> cliPreferencialAnterior = provider.getClientesPreferenciaisAnteriores();
             Map<Long, ClientePreferencialVO> cliPreferencialCnpj = provider.getClientesPorCnpj();
             Map<String, ClienteEventualVO> cliEventualAnterior = provider.getClientesEventuaisAnteriores();
-            Map<Long, ClienteEventualVO> cliEventualCnpj = provider.getClientesEventuaisPorCnpj();   
+            Map<Long, ClienteEventualVO> cliEventualCnpj = provider.getClientesEventuaisPorCnpj();
+            Set<String> produtosNaoExistentes = new HashSet<>();
             
             System.gc();
             
@@ -197,14 +199,14 @@ public class VendaRepository {
                         if (!forcarCadastroProdutoNaoExistente) {
                             
                             haDivergencia = true;
-                            LOG.warning(
-                                    String.format(
-                                            "Produto não encontrado - código:%s ean:%s descricao:%s",
-                                            impItem.getProduto(),
-                                            impItem.getCodigoBarras(),
-                                            impItem.getDescricaoReduzida()
-                                    )
+                            final String msg = String.format(
+                                    "Produto não encontrado - código:%s ean:%s descricao:%s",
+                                    impItem.getProduto(),
+                                    impItem.getCodigoBarras(),
+                                    impItem.getDescricaoReduzida()
                             );
+                            LOG.warning(msg);
+                            produtosNaoExistentes.add(msg);
                             
                             divergentes.add(impItem);
                             
@@ -565,14 +567,14 @@ public class VendaRepository {
              * Se houver número de série, tenta vincular com a impressora correta.
              * Caso não encontre dispara uma exceção.
              */
-            EcfVO ecf = provider.getEcf(vo.getNumeroSerie());
+            /*EcfVO ecf = provider.getEcf(vo.getNumeroSerie());
             if (ecf == null) {
                 //System.out.println("SAT-CF-e | Chave: '" + vo.getChaveCfe() + "' NºSerie: " + vo.getNumeroSerie());                
                 String msg = "O numero de série " + vo.getNumeroSerie() + " não está cadastrado para nenhuma ECF!\n";
                 msg += strVenda(venda);                
                 LOG.log(Level.SEVERE, msg);                
                 //throw new Exception(msg);
-            }            
+            }            */
             
             //vo.setModeloImpressora("SAT-CF-e " + ecf.getMarca() == null ? "" : ecf.getMarca());
             vo.setModeloImpressora("SAT-CF-e");

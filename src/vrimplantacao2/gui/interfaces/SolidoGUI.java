@@ -43,7 +43,7 @@ public class SolidoGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, NOME_SISTEMA);
         txtHostFirebird.setText(params.getWithNull("192.168.0.200", NOME_SISTEMA, "HOST"));
-        txtBancoDadosFirebird.setArquivo(params.getWithNull("dados", NOME_SISTEMA, "DATABASE"));
+        txtBCODADOS.setArquivo(params.getWithNull("dados", NOME_SISTEMA, "DATABASE"));
         txtPortaFirebird.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioFirebird.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
         txtSenhaFirebird.setText(params.getWithNull("L$5a7*(B", NOME_SISTEMA, "SENHA"));
@@ -56,7 +56,7 @@ public class SolidoGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, NOME_SISTEMA);
         params.put(txtHostFirebird.getText(), NOME_SISTEMA, "HOST");
-        params.put(txtBancoDadosFirebird.getArquivo(), NOME_SISTEMA, "DATABASE");
+        params.put(txtBCODADOS.getArquivo(), NOME_SISTEMA, "DATABASE");
         params.put(txtPortaFirebird.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioFirebird.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaFirebird.getText(), NOME_SISTEMA, "SENHA");
@@ -116,7 +116,7 @@ public class SolidoGUI extends VRInternalFrame {
         if (txtHostFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL);
         }
-        if (txtBancoDadosFirebird.getArquivo().isEmpty()) {
+        if (txtBCODADOS.getArquivo().isEmpty()) {
             throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL);
         }
 
@@ -127,9 +127,32 @@ public class SolidoGUI extends VRInternalFrame {
         if (txtUsuarioFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
         }
+        
+        if (tabsConn.getSelectedIndex() == 0) {
+            if (!txtBCODADOS.getArquivo().isEmpty()) {
+                dao.setBcodados(ConexaoFirebird.getNewConnection(
+                        txtHostFirebird.getText(),
+                        txtPortaFirebird.getInt(),
+                        txtBCODADOS.getArquivo(),
+                        txtUsuarioFirebird.getText(),
+                        txtSenhaFirebird.getText(),
+                        null
+                ));
+            }
+            if (!txtMVCUPOM.getArquivo().isEmpty()) {
+                dao.setMvcupom(ConexaoFirebird.getNewConnection(
+                        txtHostFirebird.getText(),
+                        txtPortaFirebird.getInt(),
+                        txtMVCUPOM.getArquivo(),
+                        txtUsuarioFirebird.getText(),
+                        txtSenhaFirebird.getText(),
+                        null
+                ));
+            }
+        }
 
         connSQL.abrirConexao(txtHostFirebird.getText(), txtPortaFirebird.getInt(),
-                txtBancoDadosFirebird.getArquivo(), txtUsuarioFirebird.getText(), txtSenhaFirebird.getText());
+                txtBCODADOS.getArquivo(), txtUsuarioFirebird.getText(), txtSenhaFirebird.getText());
 
         carregarLojaVR();
         carregarLojaCliente();
@@ -235,8 +258,8 @@ public class SolidoGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         if(chkPdvVendas.isSelected()) {
-                            //dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tab.getSelectedIndex() == 3) {
@@ -319,7 +342,7 @@ public class SolidoGUI extends VRInternalFrame {
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabsConn = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioFirebird = new vrframework.bean.textField.VRTextField();
         vRLabel4 = new vrframework.bean.label.VRLabel();
@@ -333,7 +356,9 @@ public class SolidoGUI extends VRInternalFrame {
         btnConectarFirebird = new javax.swing.JToggleButton();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
-        txtBancoDadosFirebird = new vrframework.bean.fileChooser.VRFileChooser();
+        txtBCODADOS = new vrframework.bean.fileChooser.VRFileChooser();
+        txtMVCUPOM = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel8 = new vrframework.bean.label.VRLabel();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setResizable(true);
@@ -423,7 +448,7 @@ public class SolidoGUI extends VRInternalFrame {
                         .addComponent(chkContFornecedor))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkContaPagar))
-                .addContainerGap(290, Short.MAX_VALUE))
+                .addContainerGap(262, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -436,7 +461,7 @@ public class SolidoGUI extends VRInternalFrame {
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkContaPagar)
-                .addContainerGap(217, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -465,7 +490,7 @@ public class SolidoGUI extends VRInternalFrame {
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(432, Short.MAX_VALUE))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -476,7 +501,7 @@ public class SolidoGUI extends VRInternalFrame {
                 .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(192, Short.MAX_VALUE))
+                .addContainerGap(129, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
@@ -490,14 +515,14 @@ public class SolidoGUI extends VRInternalFrame {
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(450, Short.MAX_VALUE))
+                .addContainerGap(422, Short.MAX_VALUE))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(238, Short.MAX_VALUE))
+                .addContainerGap(177, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
@@ -511,14 +536,14 @@ public class SolidoGUI extends VRInternalFrame {
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(488, Short.MAX_VALUE))
+                .addContainerGap(460, Short.MAX_VALUE))
         );
         tabChequeLayout.setVerticalGroup(
             tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(236, Short.MAX_VALUE))
+                .addContainerGap(175, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Cheque", tabCheque);
@@ -587,14 +612,14 @@ public class SolidoGUI extends VRInternalFrame {
             .addGroup(tabVendaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(250, Short.MAX_VALUE))
+                .addContainerGap(222, Short.MAX_VALUE))
         );
         tabVendaLayout.setVerticalGroup(
             tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabVendaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Venda", tabVenda);
@@ -617,7 +642,7 @@ public class SolidoGUI extends VRInternalFrame {
                     .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(259, Short.MAX_VALUE))
+                .addContainerGap(231, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -628,7 +653,7 @@ public class SolidoGUI extends VRInternalFrame {
                 .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(218, Short.MAX_VALUE))
+                .addContainerGap(157, Short.MAX_VALUE))
         );
 
         tab.addTab("Unificação", tabUnificacao);
@@ -665,7 +690,7 @@ public class SolidoGUI extends VRInternalFrame {
 
         vRLabel7.setText("Porta");
 
-        vRLabel3.setText("Banco de Dados");
+        vRLabel3.setText("Banco de Dados Retaguarda (BCODADOS.FDB)");
 
         txtHostFirebird.setCaixaAlta(false);
 
@@ -681,6 +706,8 @@ public class SolidoGUI extends VRInternalFrame {
 
         vRLabel1.setText("Loja (Cliente):");
 
+        vRLabel8.setText("Banco de Dados Cupom (MVCUPOM.FDB)");
+
         javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
         pnlConexao.setLayout(pnlConexaoLayout);
         pnlConexaoLayout.setHorizontalGroup(
@@ -688,35 +715,39 @@ public class SolidoGUI extends VRInternalFrame {
             .addGroup(pnlConexaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
+                    .addGroup(pnlConexaoLayout.createSequentialGroup()
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtBancoDadosFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtUsuarioFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(pnlConexaoLayout.createSequentialGroup()
-                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPortaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(pnlConexaoLayout.createSequentialGroup()
-                                .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnConectarFirebird)))))
-                .addContainerGap())
+                            .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(pnlConexaoLayout.createSequentialGroup()
+                            .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtPortaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(pnlConexaoLayout.createSequentialGroup()
+                                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnConectarFirebird))))
+                        .addGroup(pnlConexaoLayout.createSequentialGroup()
+                            .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtBCODADOS, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtMVCUPOM, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlConexaoLayout.setVerticalGroup(
             pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -724,15 +755,23 @@ public class SolidoGUI extends VRInternalFrame {
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtUsuarioFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBancoDadosFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
+                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnlConexaoLayout.createSequentialGroup()
+                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsuarioFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtBCODADOS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlConexaoLayout.createSequentialGroup()
+                        .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtMVCUPOM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -740,11 +779,12 @@ public class SolidoGUI extends VRInternalFrame {
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(txtPortaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectarFirebird)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
-        vRTabbedPane1.addTab("Conexão", pnlConexao);
-        vRTabbedPane1.addTab("Importar Balança", pnlBalanca);
+        tabsConn.addTab("Conexão", pnlConexao);
+        tabsConn.addTab("Importar Balança", pnlBalanca);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -752,22 +792,22 @@ public class SolidoGUI extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tab, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(vRTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(vRPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(tab, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(tabsConn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 543, Short.MAX_VALUE)))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+                .addComponent(tab, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -882,8 +922,10 @@ public class SolidoGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.panel.VRPanel tabVenda;
     private javax.swing.JPanel tablCreditoRotativo;
-    private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabsConn;
+    private vrframework.bean.fileChooser.VRFileChooser txtBCODADOS;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
+    private vrframework.bean.fileChooser.VRFileChooser txtMVCUPOM;
     private vrframework.bean.textField.VRTextField txtPortaFirebird;
     private vrframework.bean.passwordField.VRPasswordField txtSenhaFirebird;
     private vrframework.bean.textField.VRTextField txtUsuarioFirebird;
@@ -895,8 +937,8 @@ public class SolidoGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
+    private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.panel.VRPanel vRPanel3;
-    private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
 
