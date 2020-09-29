@@ -11,6 +11,7 @@ import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorParcelaVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 
@@ -86,6 +87,33 @@ public class PagarFornecedorDAO {
         return result;
     }
 
+    public MultiMap<String, PagarFornecedorParcelaVO> getPagarFornecedoresParcela(int idPagarFornecedor, int numeroParcela) throws Exception {
+        MultiMap<String, PagarFornecedorParcelaVO> result = new MultiMap<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id_pagarfornecedor,\n"
+                    + "numeroparcela\n"
+                    + "from pagarfornecedorparcela\n"
+                    + "where id_pagarfornecedor = " + idPagarFornecedor + "\n"
+                    + "and numeroparcela = " + numeroParcela
+            )) {
+                while (rst.next()) {
+                    PagarFornecedorParcelaVO vo = new PagarFornecedorParcelaVO();
+                    vo.setId_pagarfornecedor(rst.getInt("id_pagarfornecedor"));
+                    vo.setNumeroparcela(rst.getInt("numeroparcela"));
+                    result.put(
+                            vo,
+                            String.valueOf(vo.getId_pagarfornecedor()),
+                            String.valueOf(vo.getNumeroparcela())
+                    );
+                }
+            }
+        }
+        return result;
+    }
+    
     public void gravarIdPagarFornecedorDuplicado(List<PagarFornecedorVO> v_list, int idLoja) throws Exception {
         Statement stm = null;
         StringBuilder sql = null;

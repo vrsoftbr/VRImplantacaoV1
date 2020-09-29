@@ -79,6 +79,10 @@ public class ContasPagarProvider implements RepositoryProvider {
     public MultiMap<String, PagarFornecedorVO> getPagarFornecedores(int idLoja, int idFornecedor, int numeroDocumento, Date dataemissao) throws Exception {
         return this.pagarFornecedorDAO.getPagarFornecedores(idLoja, idFornecedor, numeroDocumento, dataemissao);
     }
+
+    public MultiMap<String, PagarFornecedorParcelaVO> getPagarFornecedoresParcela(int idPagarFornecedor, int numeroParcela) throws Exception {
+        return this.pagarFornecedorDAO.getPagarFornecedoresParcela(idPagarFornecedor, numeroParcela);
+    }
     
     public void notificar(String mensagem) throws Exception {
         ProgressBar.setStatus(mensagem);

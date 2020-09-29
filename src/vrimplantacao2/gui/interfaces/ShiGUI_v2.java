@@ -249,8 +249,14 @@ public class ShiGUI_v2 extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 1) {
 
                         tabProdutos.executarImportacao();
+
+                        if (chkFornecedorSfi_Entidade.isSelected() || chkFContasPagar.isSelected()) {
+                            dao.setBancoSfi(true);
+                        } else {
+                            dao.setBancoSfi(false);
+                        }
                         
-                        if (chkFornecedor.isSelected()) {
+                        if (chkFornecedor.isSelected() || chkFornecedorSfi_Entidade.isSelected()) {
                             importador.importarFornecedor();
                         }
 
@@ -292,7 +298,10 @@ public class ShiGUI_v2 extends VRInternalFrame {
                         }
 
                         if (chkFContasPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_POR_CNPJ);
+                            dao.setBancoSfi(true);
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);
+                        } else {
+                            dao.setBancoSfi(false);
                         }
 
                         if (chkClientePreferencial.isSelected()) {
@@ -344,10 +353,13 @@ public class ShiGUI_v2 extends VRInternalFrame {
                         }
                         
                     } else if (tabs.getSelectedIndex() == 2) {
+                        
+                        dao.setBancoSfi(chkUnifFornecedorSFI.isSelected());
+                        
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }
-                        if (chkUnifFornecedor.isSelected()) {
+                        if (chkUnifFornecedor.isSelected() || chkUnifFornecedorSFI.isSelected()) {
                             importador.unificarFornecedor();
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
@@ -419,6 +431,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
         chkFornTelefone = new vrframework.bean.checkBox.VRCheckBox();
         chkFornRazaoSocial = new vrframework.bean.checkBox.VRCheckBox();
         chkFornNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornecedorSfi_Entidade = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -442,6 +455,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifFornecedorSFI = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -608,8 +622,13 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         tabFornecedores.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        chkFornecedor.setText("Fornecedor");
+        chkFornecedor.setText("Fornecedor - SCO");
         chkFornecedor.setEnabled(true);
+        chkFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFornecedorActionPerformed(evt);
+            }
+        });
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
         chkProdutoFornecedor.setEnabled(true);
@@ -660,6 +679,13 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         chkFornNomeFantasia.setText("Nome Fantasia");
 
+        chkFornecedorSfi_Entidade.setText("Fornecedor - SFI (Entidade)");
+        chkFornecedorSfi_Entidade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFornecedorSfi_EntidadeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabFornecedoresLayout = new javax.swing.GroupLayout(tabFornecedores);
         tabFornecedores.setLayout(tabFornecedoresLayout);
         tabFornecedoresLayout.setHorizontalGroup(
@@ -676,12 +702,13 @@ public class ShiGUI_v2 extends VRInternalFrame {
                     .addGroup(tabFornecedoresLayout.createSequentialGroup()
                         .addGroup(tabFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFornecedorSfi_Entidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(69, 69, 69)
                         .addGroup(tabFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkFContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(482, Short.MAX_VALUE))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
         tabFornecedoresLayout.setVerticalGroup(
             tabFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -692,8 +719,10 @@ public class ShiGUI_v2 extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornecedorSfi_Entidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -706,7 +735,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addComponent(chkFornRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFornNomeFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(136, Short.MAX_VALUE))
+                .addContainerGap(113, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedores);
@@ -865,13 +894,25 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
-        chkUnifFornecedor.setText("Fornecedor (Somente com CPF/CNPJ)");
+        chkUnifFornecedor.setText("Fornecedor - SCO (Somente com CPF/CNPJ)");
+        chkUnifFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkUnifFornecedorActionPerformed(evt);
+            }
+        });
 
         chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
 
         chkUnifClientePreferencial.setText("Cliente Preferencial (Somente com CPF/CNPJ)");
 
         chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
+
+        chkUnifFornecedorSFI.setText("Fornecedor - SFI (Somente com CPF/CNPJ)");
+        chkUnifFornecedorSFI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkUnifFornecedorSFIActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
         tabUnificacao.setLayout(tabUnificacaoLayout);
@@ -884,8 +925,9 @@ public class ShiGUI_v2 extends VRInternalFrame {
                     .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifFornecedorSFI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(549, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -895,12 +937,14 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifFornecedorSFI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(229, Short.MAX_VALUE))
+                .addContainerGap(210, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", tabUnificacao);
@@ -1030,6 +1074,34 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private void chkFContasPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContasPagarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFContasPagarActionPerformed
+
+    private void chkFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorActionPerformed
+        // TODO add your handling code here:
+        if (chkFornecedor.isSelected()) {
+            chkFornecedorSfi_Entidade.setSelected(false);
+        }
+    }//GEN-LAST:event_chkFornecedorActionPerformed
+
+    private void chkFornecedorSfi_EntidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorSfi_EntidadeActionPerformed
+        // TODO add your handling code here:
+        if (chkFornecedorSfi_Entidade.isSelected()) {
+            chkFornecedor.setSelected(false);
+        }
+    }//GEN-LAST:event_chkFornecedorSfi_EntidadeActionPerformed
+
+    private void chkUnifFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUnifFornecedorActionPerformed
+        // TODO add your handling code here:
+        if (chkUnifFornecedor.isSelected()) {
+            chkUnifFornecedorSFI.setSelected(false);
+        }
+    }//GEN-LAST:event_chkUnifFornecedorActionPerformed
+
+    private void chkUnifFornecedorSFIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkUnifFornecedorSFIActionPerformed
+        // TODO add your handling code here:
+        if (chkUnifFornecedorSFI.isSelected()) {
+            chkUnifFornecedor.setSelected(false);
+        }
+    }//GEN-LAST:event_chkUnifFornecedorSFIActionPerformed
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1049,6 +1121,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornRazaoSocial;
     private vrframework.bean.checkBox.VRCheckBox chkFornTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedorSfi_Entidade;
     private vrframework.bean.checkBox.VRCheckBox chkHistoricoVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
@@ -1057,6 +1130,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedorSFI;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkVendas;
