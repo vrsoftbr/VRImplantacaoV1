@@ -27,18 +27,18 @@ import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
  * @author Leandro
  */
 public class ContasPagarRepository {
-    
+
     private static final SimpleDateFormat FORMATER = new SimpleDateFormat("yyyy-MM-dd");
-    
+
     private final ContasPagarProvider provider;
     private boolean importarOutrasDespesas;
 
     public ContasPagarRepository(ContasPagarProvider provider) {
-        this.provider = provider;        
+        this.provider = provider;
     }
 
     public void salvar(List<ContaPagarIMP> contas, OpcaoContaPagar... opcoes) throws Exception {
-        
+
         Set<OpcaoContaPagar> opt = new HashSet<>(Arrays.asList(opcoes));
         MultiMap<String, ContaPagarIMP> organizados = organizar(contas);
         provider.notificar("Contas à Pagar - Preparando a importação...");
@@ -46,25 +46,26 @@ public class ContasPagarRepository {
         MultiMap<String, FornecedorAnteriorVO> fornecedores = provider.getFornecedores();
         MultiMap<String, ContaPagarAnteriorVO> anteriores = provider.getAnteriores();
         MultiMap<String, PagarFornecedorVO> pagarFornecedor;
+        MultiMap<String, PagarFornecedorParcelaVO> pagarFornecedorParcela;
         Set<Integer> bancosExistentes = provider.getBancosExistentes();
-        
+
         provider.notificar("Contas à Pagar - Importando...", organizados.size());
         provider.begin();
         int fornecedorLoja = provider.getFornecedorLoja();
         try {
             int cont = 0;
             this.importarOutrasDespesas = opt.contains(OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
-            boolean importarSemFornecedor = opt.contains(OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);            
-            
+            boolean importarSemFornecedor = opt.contains(OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);
+
             MultiMap<String, Void> pagamentos = provider.getPagamentos(importarOutrasDespesas);
-            
+
             System.out.println(String.format("SISTEMA: %s; LOJA: %s;", provider.getSistema(), provider.getAgrupador()));
             System.out.println(String.format(" forn_ant: %d; ant: %d; pagamentos: %d; organizados: %d", fornecedores.size(), anteriores.size(), pagamentos.size(), organizados.size()));
-            
-            for (ContaPagarIMP imp: organizados.values()) {
-                
+
+            for (ContaPagarIMP imp : organizados.values()) {
+
                 pagarFornecedor = null;
-                
+
                 ContaPagarAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
                         provider.getAgrupador(),
@@ -72,37 +73,37 @@ public class ContasPagarRepository {
                 );
                 FornecedorVO fornecedor = null;
                 {
-                    if (!opt.contains(OpcaoContaPagar.IMPORTAR_POR_CNPJ)) {
-                        FornecedorAnteriorVO fornecedorAnterior = fornecedores.get(
+                    //if (!opt.contains(OpcaoContaPagar.IMPORTAR_POR_CNPJ)) {
+                    FornecedorAnteriorVO fornecedorAnterior = fornecedores.get(
+                            provider.getSistema(),
+                            provider.getAgrupador(),
+                            imp.getIdFornecedor()
+                    );
+                    if (fornecedorAnterior != null) {
+                        if (fornecedorAnterior.getCodigoAtual() != null) {
+                            fornecedor = fornecedorAnterior.getCodigoAtual();
+
+                            /*pagarFornecedor = provider.getPagarFornecedores(
+                                    provider.getLojaVR(),
+                                    fornecedorAnterior.getCodigoAtual().getId(),
+                                    Integer.parseInt(imp.getNumeroDocumento()),
+                                    imp.getDataEmissao()
+                            );
+
+                            if (!pagarFornecedor.isEmpty()) {
+                                System.out.println(String.valueOf(imp.getNumeroDocumento()) + " -- " + String.valueOf(imp.getDataEmissao()));
+                                continue;
+                            }*/
+                        }
+                    } else {
+                        System.out.println(String.format("FORN. NAO ENCONTRADO: %s %s %s",
                                 provider.getSistema(),
                                 provider.getAgrupador(),
                                 imp.getIdFornecedor()
-                        );
-                        if (fornecedorAnterior != null) {
-                            if (fornecedorAnterior.getCodigoAtual() != null) {
-                                fornecedor = fornecedorAnterior.getCodigoAtual();
-
-                                pagarFornecedor = provider.getPagarFornecedores(
-                                        provider.getLojaVR(),
-                                        fornecedorAnterior.getCodigoAtual().getId(),
-                                        Integer.parseInt(imp.getNumeroDocumento()),
-                                        imp.getDataEmissao()
-                                );
-
-                                if (!pagarFornecedor.isEmpty()) {
-                                    System.out.println(String.valueOf(imp.getNumeroDocumento()) + " -- " + String.valueOf(imp.getDataEmissao()));
-                                    continue;
-                                }
-                            }
-                        } else {
-                            System.out.println(String.format("FORN. NAO ENCONTRADO: %s %s %s",
-                                    provider.getSistema(),
-                                    provider.getAgrupador(),
-                                    imp.getIdFornecedor()
-                            ));
-                            cont++;
-                        }
-                    } else {
+                        ));
+                        cont++;
+                    }
+                    /*} else {
                         FornecedorVO cnpjfornecedor = cnpjFornecedor.get(
                             Long.parseLong(imp.getCnpj())
                         );
@@ -126,15 +127,15 @@ public class ContasPagarRepository {
                             System.out.println(String.format("FORN. NAO ENCONTRADO: %s ", imp.getCnpj()));
                             cont++;
                         }
-                    }
+                    }*/
                 }
-                
+
                 if (fornecedor == null && importarSemFornecedor) {
                     fornecedor = new FornecedorVO();
                     fornecedor.setId(fornecedorLoja);
                 }
-                
-                if (fornecedor == null) {                    
+
+                if (fornecedor == null) {
                     provider.notificar();
                     continue;
                 }
@@ -143,11 +144,11 @@ public class ContasPagarRepository {
                 if (anterior == null || anterior.getCodigoAtual() == null) {
                     if (opt.contains(OpcaoContaPagar.NOVOS)) {
                         boolean anteriorExistente = anterior != null;
-                        
+
                         if (!anteriorExistente) {
                             anterior = converterAnterior(imp);
                         }
-                        
+
                         if (importarOutrasDespesas) {
                             anterior.setTipo(ContaPagarAnteriorTipo.OUTRASDESPESAS);
                             System.out.println("OUTRASDESPESAS");
@@ -155,7 +156,7 @@ public class ContasPagarRepository {
                             System.out.println("PAGARFORNECEDOR");
                             anterior.setTipo(ContaPagarAnteriorTipo.PAGARFORNECEDOR);
                         }
-                        
+
                         //Se o fornecedor existir no cadastro
                         if (fornecedor != null) {
                             if (importarOutrasDespesas) {
@@ -187,8 +188,8 @@ public class ContasPagarRepository {
                         );
                     }
                 }
-                
-                for (ContaPagarVencimentoIMP cp: imp.getVencimentos()) {
+
+                for (ContaPagarVencimentoIMP cp : imp.getVencimentos()) {
                     KeyList<String> keys = getKeys(
                             anterior.getCodigoAtual(),
                             cp.getVencimento(),
@@ -206,16 +207,22 @@ public class ContasPagarRepository {
                             if (!bancosExistentes.contains(parc.getId_banco())) {
                                 parc.setId_banco(804);
                             }
-                            
+
+                            /*pagarFornecedorParcela = provider.getPagarFornecedoresParcela(
+                                    anterior.getCodigoAtual(), 
+                                    parc.getNumeroparcela()
+                            );*/
+                            //if (pagarFornecedorParcela != null) {
                             parc.setId_pagarfornecedor(anterior.getCodigoAtual());
                             provider.gravarVencimento(parc);
+                            //}
                         }
 
                         //Inclui na listagem de parcelas (UK)
                         pagamentos.put(null, keys);
                     }
                 }
-                
+
                 provider.notificar();
             }
             System.out.println("Contagem: " + cont);
@@ -224,11 +231,11 @@ public class ContasPagarRepository {
             provider.rollback();
             throw e;
         }
-        
+
     }
-    
+
     private KeyList<String> getKeys(int id, Date vencimento, double valor) {
-        return new KeyList<> (
+        return new KeyList<>(
                 String.valueOf(id),
                 FORMATER.format(vencimento),
                 String.format("%.2f", valor)
@@ -237,23 +244,23 @@ public class ContasPagarRepository {
 
     private MultiMap<String, ContaPagarIMP> organizar(List<ContaPagarIMP> pagamentos) throws Exception {
         MultiMap<String, ContaPagarIMP> result = new MultiMap<>();
-        
-        for (ContaPagarIMP imp: pagamentos) {
+
+        for (ContaPagarIMP imp : pagamentos) {
             result.put(imp, imp.getId());
         }
-        
+
         pagamentos.clear();
         System.gc();
-        
+
         result = result.getSortedMap();
         System.gc();
-        
+
         return result;
     }
 
     public PagarOutrasDespesasVO converterEmOutrasDispesas(ContaPagarIMP imp) {
         PagarOutrasDespesasVO vo = new PagarOutrasDespesasVO();
-        
+
         vo.setId(-1);
         vo.setIdFornecedor(-1);
         vo.setDataEmissao(imp.getDataEmissao());
@@ -266,13 +273,13 @@ public class ContasPagarRepository {
         vo.setSituacaoPagarOutrasDespesas(SituacaoPagarOutrasDespesas.NAO_FINALIZADO);
         vo.setIdTipoEntrada(imp.getIdTipoEntradaVR() == null ? 210 : imp.getIdTipoEntradaVR());
         vo.setValor(imp.getValor());
-        
+
         return vo;
     }
 
     public ContaPagarAnteriorVO converterAnterior(ContaPagarIMP imp) {
         ContaPagarAnteriorVO vo = new ContaPagarAnteriorVO();
-        
+
         vo.setSistema(provider.getSistema());
         vo.setAgrupador(provider.getAgrupador());
         vo.setId(imp.getId());
@@ -280,30 +287,30 @@ public class ContasPagarRepository {
         vo.setDocumento(imp.getNumeroDocumento());
         vo.setId_fornecedor(imp.getIdFornecedor());
         vo.setValor(imp.getValor());
-        
+
         return vo;
     }
 
     public PagarOutrasDespesasVO atualizarConta(int id, ContaPagarIMP imp, int idFornecedor, Set<OpcaoContaPagar> opt) throws Exception {
-        
+
         PagarOutrasDespesasVO vo = converterEmOutrasDispesas(imp);
         vo.setId(id);
         vo.setIdFornecedor(idFornecedor);
         provider.atualizar(vo, opt);
-        
+
         return vo;
-        
+
     }
 
     private PagarFornecedorVO converterPagarFornecedor(ContaPagarIMP imp) {
         PagarFornecedorVO vo = new PagarFornecedorVO();
-        
+
         vo.setId_loja(provider.getLojaVR());
         vo.setId_tipoentrada(imp.getIdTipoEntradaVR() == null ? 210 : imp.getIdTipoEntradaVR());
         vo.setDataemissao(imp.getDataEmissao());
         vo.setDataentrada(imp.getDataEntrada() == null ? imp.getDataEmissao() : imp.getDataEntrada());
         vo.setNumerodocumento(Utils.stringToInt(imp.getNumeroDocumento()));
-        
+
         if (imp.getValor() == 0) {
 
             double total = 0;
@@ -315,13 +322,13 @@ public class ContasPagarRepository {
         } else {
             vo.setValor(imp.getValor());
         }
-        
-        return vo;        
+
+        return vo;
     }
 
     private PagarFornecedorParcelaVO converterPagarFornecedorParcela(ContaPagarVencimentoIMP cp) {
         PagarFornecedorParcelaVO vo = new PagarFornecedorParcelaVO();
-        
+
         vo.setAgencia(cp.getAgencia());
         vo.setConferido(cp.isConferido());
         vo.setConta(cp.getConta());
@@ -335,16 +342,16 @@ public class ContasPagarRepository {
         vo.setSituacaopagarfornecedorparcela(cp.isPago() ? SituacaoPagarFornecedorParcela.PAGO : SituacaoPagarFornecedorParcela.ABERTO);
         vo.setValor(cp.getValor());
         vo.setDatahoraalteracao(new Date());
-        
+
         return vo;
     }
 
     private PagarOutrasDespesasVencimentoVO converterEmOutrasDespesasVencimento(ContaPagarVencimentoIMP cp) {
         PagarOutrasDespesasVencimentoVO venc = new PagarOutrasDespesasVencimentoVO();
-        
+
         venc.setDataVencimento(cp.getVencimento());
         venc.setValor(cp.getValor());
-        
+
         return venc;
     }
 }

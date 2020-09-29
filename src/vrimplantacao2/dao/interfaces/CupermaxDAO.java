@@ -25,7 +25,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
- * @author Leandro
+ * @author Alan
  */
 public class CupermaxDAO extends InterfaceDAO {
 

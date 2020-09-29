@@ -199,8 +199,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "case p.stprod when 'A' then 'S' else 'N' end ativo,\n"
                     + "coalesce(p.clasfiscal, '') as ncm,\n"
                     + "coalesce(p.cest, '') as cest,\n"
-                    + "coalesce(i.piscst, 1) as piscofins_cst_debito,\n"
-                    + "coalesce(i.piscst, 1) as piscofins_cst_credito,\n"
+                    + "coalesce(i.piscst, 0) as piscofins_cst_debito,\n"
+                    + "coalesce(i.piscst, 0) as piscofins_cst_credito,\n"
                     + "'' as piscofins_natureza_receita,\n"
                     + "coalesce(p.cst, 0) as icms_cst,\n"
                     + "coalesce(p.icms, 0) as icms_aliquota,\n"
@@ -361,31 +361,28 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "a.codpreco, "
-                        + "a.codprod, "
-                        + "a.quantmin, "
-                        + "a.prvapro precoatacao, "
-                        + "p.prvapro precovenda\n"
-                        + "from tabpreitem a\n"
-                        + "inner join tabprofil p on p.codpro = a.codprod\n"
-                        + "where a.quantmin > 1\n"
-                        + "and a.prvapro < p.prvapro\n"
-                        + "and p.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-"))+ "\n"
-                        + "order by a.codprod"
+                        + "    pa.codpro as idproduto,\n"
+                        + "    pa.qtddesco as quantidade,\n"
+                        + "    pa.prvapro as precovenda,\n"
+                        + "    pa.percdescco as percentualdesconto\n"
+                        + "from TABPROFIL pa\n"
+                        + "where pa.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")) + "\n"
+                        + "and pa.qtddesco > 1\n"
+                        + "and pa.percdescco > 0"
                 )) {
                     while (rst.next()) {
-                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codprod"));
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("idproduto"));
 
-                        codigoBarras = rst.getString("codpreco") + "999999" + String.valueOf(codigoAtual);
-                        
+                        codigoBarras = "999999" + String.valueOf(codigoAtual);
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("codprod"));
+                        imp.setImportId(rst.getString("idproduto"));
                         imp.setEan(codigoBarras);
-                        imp.setQtdEmbalagem(rst.getInt("quantmin"));
+                        imp.setQtdEmbalagem(rst.getInt("quantidade"));
                         imp.setPrecovenda(rst.getDouble("precovenda"));
-                        imp.setAtacadoPreco(rst.getDouble("precoatacao"));
+                        imp.setAtacadoPorcentagem(rst.getDouble("percentualdesconto"));
                         result.add(imp);
                     }
                 }
