@@ -79,6 +79,7 @@ public class IntelliCashGUI extends VRInternalFrame {
         carregarParametros();
 
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.btnMapaTribut.setEnabled(false);
         
         centralizarForm();
         this.setMaximum(false);

@@ -96,7 +96,8 @@ public class IntelliCashDAO extends InterfaceDAO {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.MARGEM
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
                 }
         ));
     }
