@@ -1602,7 +1602,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         next.setVenda(rst.getString("id_venda"));
                         String id = rst.getString("id_produto");
                         next.setCancelado(rst.getInt("cancelado") == 1);
-                        id = id.substring(0, id.length() - 1);
+                        //id = id.substring(0, id.length() - 1);
                         next.setProduto(id);
                         if (rst.getString("id_produto").equals(rst.getString("codigobarras"))) {
                             next.setCodigoBarras(next.getProduto());
@@ -1627,7 +1627,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) id,\n"
+                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) + '-' + cast(it.codigoplu as varchar) id,\n"
                     + "	it.codi_relacio id_venda,\n"
                     + "	it.codigoplu id_produto,\n"
                     + "	pr.estc35desc descricao,\n"
