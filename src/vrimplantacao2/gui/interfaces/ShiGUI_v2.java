@@ -352,6 +352,11 @@ public class ShiGUI_v2 extends VRInternalFrame {
                             }
                         }
                         
+                        if (!txtArquivo.getArquivo().trim().isEmpty()) {
+                            dao.setArquivo(txtArquivo.getArquivo().trim());
+                            dao.importarTipoEntradaPagarFornecedor(idLojaVR);
+                        }
+                        
                     } else if (tabs.getSelectedIndex() == 2) {
                         
                         dao.setBancoSfi(chkUnifFornecedorSFI.isSelected());
@@ -449,6 +454,9 @@ public class ShiGUI_v2 extends VRInternalFrame {
         edtVendaDtIni = new org.jdesktop.swingx.JXDatePicker();
         edtVendaDtFim = new org.jdesktop.swingx.JXDatePicker();
         chkVendas = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel2 = new vrframework.bean.panel.VRPanel();
+        vRLabel3 = new vrframework.bean.label.VRLabel();
+        txtArquivo = new vrframework.bean.fileChooser.VRFileChooser();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -890,6 +898,33 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         tabImportacao.addTab("Vendas", vRPanel1);
 
+        vRLabel3.setText("Gravar Tipo Entrada - Pagar Fornecedor");
+
+        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel2Layout.createSequentialGroup()
+                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txtArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, 777, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel2Layout.setVerticalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(275, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Especiais", vRPanel2);
+
         tabs.addTab("Importação", tabImportacao);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -1150,6 +1185,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
+    private vrframework.bean.fileChooser.VRFileChooser txtArquivo;
     private vrframework.bean.fileChooser.VRFileChooser txtCLI;
     private vrframework.bean.fileChooser.VRFileChooser txtCUPOM;
     private vrframework.bean.textField.VRTextField txtHost;
@@ -1169,7 +1205,9 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel27;
     private vrframework.bean.label.VRLabel vRLabel28;
     private vrframework.bean.label.VRLabel vRLabel29;
+    private vrframework.bean.label.VRLabel vRLabel3;
     private vrframework.bean.panel.VRPanel vRPanel1;
+    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 

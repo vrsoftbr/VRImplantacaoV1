@@ -1,9 +1,11 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +19,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
@@ -34,6 +40,7 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
@@ -78,6 +85,11 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date dataTerminoVenda;
     private Boolean temArquivoBalanca = true;
     private Boolean bancoSfi = false;
+    private String i_arquivo;
+    
+    public void setArquivo(String i_arquivo) {
+        this.i_arquivo = i_arquivo;
+    }
     
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
@@ -1727,6 +1739,96 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    private List<PagarFornecedorVO> getTipoEntradaPagarFornecedor() throws Exception {
+        List<PagarFornecedorVO> result = new ArrayList<>();
+        int linha;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        Date dataEntrada;
+        
+        try {
+            WorkbookSettings settings = new WorkbookSettings();
+            settings.setEncoding("CP1250");
+            Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+                
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha ++;
+                    
+                    if (linha == 1) {
+                        continue;
+                    }
+                    
+                    Cell cellIdFornecedor = sheet.getCell(3, i);
+                    Cell cellTipoEntrada = sheet.getCell(5, i);
+                    Cell cellNumeroDocumento = sheet.getCell(7, i);
+                    Cell cellDataEntrada = sheet.getCell(8, i);
+                    
+                    PagarFornecedorVO vo = new PagarFornecedorVO();
+                    vo.setId_fornecedor(Integer.parseInt(cellIdFornecedor.getContents().trim()));
+                    vo.setId_tipoentrada(Integer.parseInt(cellTipoEntrada.getContents().substring(0, cellTipoEntrada.getContents().indexOf("-")).trim()));
+                    vo.setNumerodocumento(Integer.parseInt(cellNumeroDocumento.getContents().trim()));
+                    vo.setDataentrada(fmt.parse(cellDataEntrada.getContents().substring(0, cellDataEntrada.getContents().indexOf("-")).trim()));
+                    result.add(vo);
+                }            
+            }
+            
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public void importarTipoEntradaPagarFornecedor(int idLoja) throws Exception {
+        List<PagarFornecedorVO> result = new ArrayList<>();
+        try {
+            
+            ProgressBar.setStatus("Carregando Contas a Pagar...");
+            result = getTipoEntradaPagarFornecedor();
+            
+            if (!result.isEmpty()) {
+                gravarTipoEntradaPagarFornecedor(result, idLoja);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public void gravarTipoEntradaPagarFornecedor(List<PagarFornecedorVO> vo, int idLoja) throws Exception {
+        Statement stm;
+        String sql;
+        try {            
+            Conexao.begin();
+            
+            stm = Conexao.createStatement();
+            
+            ProgressBar.setMaximum(vo.size());
+            ProgressBar.setStatus("Gravando Tipo Entrada...");
+            
+            for (PagarFornecedorVO i_vo : vo) {
+                
+                sql = "update pagarfornecedor \n"
+                        + "set id_tipoentrada = " + i_vo.getId_tipoentrada() + "\n"
+                        + "where id_fornecedor = " + i_vo.getId_fornecedor() + "\n"
+                        + "and numerodocumento = " + i_vo.getNumerodocumento() + "\n"
+                        + "and dataentrada = '" + i_vo.getDataentrada() + "' \n"
+                        + "and id_loja = " + idLoja + ";";
+                stm.execute(sql);
+                
+                ProgressBar.next();
+            }
+            
+            stm.close();
+            Conexao.commit();            
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
 
     private class ProdutoComplementoParcial {
 
@@ -1831,36 +1933,6 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = cupom.createStatement()) {
             SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-
-            System.out.println(
-                    "select\n"
-                    + "m.data as data,\n"
-                    + "m.ecf,\n"
-                    + "m.venda as totaldia,\n"
-                    + "m.serie as numeroserie,\n"
-                    + "m.pdv,\n"
-                    + "m.vlcanc,\n"
-                    + "m.gtinicial,\n"
-                    + "m.gtfinal,\n"
-                    + "m.valorz,\n"
-                    + "i.cupom, \n"
-                    + "i.item as sequencia,\n"
-                    + "p.codpro as id_produto,\n"
-                    + "i.produto as ean,\n"
-                    + "i.preuni as precovenda,\n"
-                    + "i.quanti as quantidade,\n"
-                    + "i.valor as valortotalitem,\n"
-                    + "i.sittri as icms,\n"
-                    + "i.vlicms as valor_icms,\n"
-                    + "i.vpis, \n"
-                    + "i.vcofins\n"
-                    + "from movdia m\n"
-                    + "join item i on i.idmovdia = m.id\n"
-                    + "join prod p on p.barras = i.produto\n"
-                    + "where m.filial = '" + getLojaOrigem() + "'\n"
-                    + "and m.data >= '" + fmt.format(dataInicioVenda) + "'\n"
-                    + "and m.data <= '" + fmt.format(dataTerminoVenda) + "'"
-            );
 
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -2255,58 +2327,5 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-        
-        public double getCustoComImposto(String id_produto, String id_loja) throws Exception {
-                try (ResultSet rst = this. stm2.executeQuery(
-                        "select\n"
-                        + "    ri.codpro,\n"
-                        + "    ri.cusmed as custocomimposto\n"
-                        + "from recitem ri\n"
-                        + "join(\n"
-                        + "select\n"
-                        + "    codpro,\n"
-                        + "    filial,\n"
-                        + "    max(data) data\n"
-                        + "from recitem\n"
-                        + "group by\n"
-                        + "    codpro, filial) a using (codpro, filial, data)\n"
-                        + "where ri.tipmov = 1\n"
-                        + "and ri.filial = " + id_loja + "\n"
-                        + "and ri.codpro = " + id_produto
-                )) {
-                    if (rst.next()) {
-                        return rst.getDouble("custocomimposto");
-                    } else {
-                        return 0;
-                    }
-                }
-        }
-        
-        public double getCustoSemImposto(String id_produto, String id_loja) throws Exception {
-                try (ResultSet rst = this.stm2.executeQuery(
-                        "select\n"
-                        + "    pc.codpro,\n"
-                        + "    pc.custo as custosemimposto\n"
-                        + "from\n"
-                        + "    precocusto pc\n"
-                        + "    join(select\n"
-                        + "             codpro,\n"
-                        + "             filial,\n"
-                        + "             max(data) data\n"
-                        + "         from\n"
-                        + "             precocusto\n"
-                        + "         group by\n"
-                        + "             codpro, filial) a using (codpro, filial, data)\n"
-                        + "where\n"
-                        + "    pc.filial = " + id_loja + "\n"
-                        + "and pc.codpro = " + id_produto
-                )) {
-                    if (rst.next()) {
-                        return rst.getDouble("custosemimposto");
-                    } else {
-                        return 0;
-                    }
-                }
-        }           
     }
 }
