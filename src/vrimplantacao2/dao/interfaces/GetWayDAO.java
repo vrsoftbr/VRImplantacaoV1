@@ -911,6 +911,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join ALIQUOTA_ICMS aliq_s_c on p.CODALIQ = aliq_s_c.CODALIQ\n"
                     + "where CODPROD = " + imp.getImportId())) {
                 if (rs.next()) {
+                    
                     //Aliquota Débito
                     imp.setIcmsAliqSaida(rs.getDouble("icms_debito_nf"));
                     imp.setIcmsCstSaida(rs.getInt("cst_debito_nf"));
@@ -1814,6 +1815,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rst.getDouble("VALOR"));
                     imp.setNumeroCupom(rst.getString("NOTAECF"));
                     imp.setObservacao(rst.getString("OBS"));
+                    imp.setJuros(rst.getDouble("VALORJUROS"));
+                    
                     vResult.add(imp);
                 }
             }
@@ -1856,8 +1859,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by DTEMISSAO "
             )) {
                 while (rst.next()) {
-                    int idBanco = new BancoDAO().getId(rst.getInt("CODBANCO"));
+                    //int idBanco = new BancoDAO().getId(rst.getInt("CODBANCO"));
                     ChequeIMP imp = new ChequeIMP();
+                    
                     imp.setId(rst.getString("ID"));
                     imp.setDate(rst.getDate("DTEMISSAO"));
                     imp.setDataDeposito(rst.getDate("DTVENCTO"));
@@ -1868,10 +1872,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("TELEFONE"));
                     imp.setCpf(rst.getString("CNPJ_CPF"));
                     imp.setNome(rst.getString("RAZAO"));
-                    imp.setTelefone(rst.getString("RG"));
+                    imp.setRg(rst.getString("RG"));
                     imp.setObservacao(rst.getString("OBS"));
                     imp.setValor(rst.getDouble("VALOR"));
-                    imp.setBanco(idBanco);
+                    imp.setBanco(rst.getInt("CODBANCO"));
 
                     if ((v_tipoDocumentoCheque == 5)
                             || (v_tipoDocumentoCheque == 13)) {
@@ -1916,7 +1920,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT "
                     + "CODPAGAR, "
                     + "CODFORNEC, "
-                    + "NOTA, "
+                    + "coalesce(NOTA, '0') NOTA, "
                     + "VALOR, "
                     + "DTVENCTO, "
                     + "DTEMISSAO, "
@@ -1935,7 +1939,17 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rst.getString("CODPAGAR"));
                     imp.setIdFornecedor(rst.getString("CODFORNEC"));
-                    imp.setNumeroDocumento(rst.getString("NOTA"));
+                    
+                    String doc = Utils.formataNumero(rst.getString("NOTA"));
+                    
+                    imp.setNumeroDocumento(doc);
+                    
+                    if(doc != null && !"".equals(doc)) {
+                        if(doc.length() > 6) {
+                            imp.setNumeroDocumento(doc.substring(0, 6));
+                        }
+                    }
+                    
                     imp.setValor(rst.getDouble("VALOR"));
                     imp.setDataEmissao(rst.getDate("DTEMISSAO"));
                     imp.setDataEntrada(rst.getDate("DTENTRADA"));

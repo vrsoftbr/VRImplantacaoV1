@@ -248,11 +248,17 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="404" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkCliContato" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliBairro" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliRazao" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="321" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -260,11 +266,20 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliRazao" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCliIERG" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliBairro" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliContato" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="129" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -290,6 +305,21 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliIERG">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="IE/RG"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCliRazao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Raz&#xe3;o"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCliBairro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bairro"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCliContato">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contato"/>
                   </Properties>
                 </Component>
               </SubComponents>

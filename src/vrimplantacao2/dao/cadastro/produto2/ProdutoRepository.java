@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,12 +13,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
@@ -558,6 +561,8 @@ public class ProdutoRepository {
                                     provider.getLoja(),
                                     keys.get(2)
                             ).getCodigoAtual();
+                            
+                            obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                         }
                         /**
                          * Cadastra o EAN no sistema.
@@ -566,13 +571,17 @@ public class ProdutoRepository {
                             ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
+                            
+                            gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
                         }
                     } else {
-                            id = idProdutoExistente;
-                            codigoAtual = new ProdutoVO();
-                            codigoAtual.setId(id);
-                            obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
-                            
+                        id = idProdutoExistente;
+                        codigoAtual = new ProdutoVO();
+                        codigoAtual.setId(id);
+                        obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+
+                        // gravar codigo atual se for null
+                        gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), id, obsImportacao);
                     }
                 }
 
@@ -603,6 +612,34 @@ public class ProdutoRepository {
         } catch (Exception e) {
             provider.rollback();
             throw e;
+        }
+    }
+    
+    
+    public void gravarCodigoAtual(String impsistema, String imploja, String impid, int codigoatual, String obsimportacao) throws Exception {
+        try {
+            Conexao.begin();
+
+            try (Statement stm = Conexao.createStatement()) {
+                SQLBuilder sql = new SQLBuilder();
+
+                sql.setSchema("implantacao");
+                sql.setTableName("codant_produto");
+                sql.setWhere("impid = " + Utils.quoteSQL(impid)
+                        + " and imploja = '" + imploja + "'"
+                        + " and impsistema = '" + impsistema + "'"
+                        + " and codigoatual is null"
+                );
+                sql.put("codigoatual", codigoatual);
+                sql.put("obsimportacao", obsimportacao);
+
+                stm.execute(sql.getUpdate());
+
+            }
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
         }
     }
 
