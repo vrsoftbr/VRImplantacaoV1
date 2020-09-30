@@ -465,97 +465,77 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with \n"
-                    + "	lj as (select loja.id, f.id_estado from loja join fornecedor f on loja.id_fornecedor = f.id where loja.id = " + getLojaOrigem() + "),\n"
-                    + "	merc as (\n"
-                    + "	select\n"
-                    + "		m.mercadologico1 cod_mercadologico1,\n"
-                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and nivel = 1) mercadologico1,\n"
-                    + "		m.mercadologico2 cod_mercadologico2,\n"
-                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and nivel = 2) mercadologico2,\n"
-                    + "		m.mercadologico3 cod_mercadologico3,\n"
-                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and nivel = 3) mercadologico3,\n"
-                    + "		m.mercadologico4 cod_mercadologico4,\n"
-                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and nivel = 4) mercadologico4,\n"
-                    + "		m.mercadologico5 cod_mercadologico5,\n"
-                    + "		(select descricao from mercadologico where mercadologico1 = m.mercadologico1 and mercadologico2 = m.mercadologico2 and mercadologico3 = m.mercadologico3 and mercadologico4 = m.mercadologico4 and mercadologico5 = m.mercadologico5 and nivel = 5) mercadologico5\n"
-                    + "	from\n"
-                    + "		mercadologico m\n"
-                    + "	where \n"
-                    + "		nivel = (select valor::integer from public.parametrovalor where id_loja = " + getLojaOrigem() + " and id_parametro = 1)\n"
-                    + "	)\n"
-                    + "select\n"
-                    + "	p.id,\n"
-                    + "	p.datacadastro,\n"
-                    + "	ean.codigobarras,\n"
-                    + "	p.qtdembalagem qtdembalagemcotacao,\n"
-                    + "	ean.qtdembalagem,\n"
-                    + "	ean_un.descricao unidade,\n"
-                    + "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n"
-                    + "	p.validade,\n"
-                    + "	p.descricaocompleta,\n"
-                    + "	p.descricaoreduzida,\n"
-                    + "	p.descricaogondola,\n"
-                    + "	merc.*,\n"
-                    + "	p.id_familiaproduto,\n"
-                    + "	fam.descricao familiaproduto,\n"
-                    + "	p.pesobruto,\n"
-                    + "	p.pesoliquido,\n"
-                    + "	vend.estoquemaximo,\n"
-                    + "	vend.estoqueminimo,\n"
-                    + "	vend.estoque,\n"
-                    + "	vend.custosemimposto,\n"
-                    + "	vend.custocomimposto,\n"
-                    + "	vend.precovenda,\n"
-                    + " p.margem,\n"
-                    + "	vend.id_situacaocadastro,\n"
-                    + "	vend.descontinuado,\n"
-                    + "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n"
-                    + "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n"
-                    + "	piscofdeb.cst piscofins_cst_debito,\n"
-                    + "	piscofcred.cst piscofins_cst_credito,\n"
-                    + "	p.tiponaturezareceita piscofins_natureza_receita,\n"
-                    + " icms.id idicms_debito,\n"
-                    + "	icms.situacaotributaria icms_cst,\n"
-                    + "	icms.porcentagem icms_aliquota,\n"
-                    + "	icms.reduzido icms_reduzido,\n"
-                    + " icms_cred.id idicms_credito,\n"
-                    + "	icms_cred.situacaotributaria icms_cst_credito,\n"
-                    + "	icms_cred.porcentagem icms_aliquota_credito,\n"
-                    + "	icms_cred.reduzido icms_reduzido_credito,\n"
-                    + "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n"
-                    + "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n"
-                    + "	pad.desconto atacadodesconto,\n"
-                    + "	pf.id id_pautafiscal\n"
-                    + "from\n"
-                    + "	produto p\n"
-                    + "	join lj on true\n"
-                    + "	left join produtoautomacao ean on ean.id_produto = p.id\n"
-                    + "	left join tipoembalagem ean_un on ean_un.id = ean.id_tipoembalagem\n"
-                    + "	left join merc on\n"
-                    + "		merc.cod_mercadologico1 = p.mercadologico1 and\n"
-                    + "		merc.cod_mercadologico2 = p.mercadologico2 and\n"
-                    + "		merc.cod_mercadologico3 = p.mercadologico3 and\n"
-                    + "		merc.cod_mercadologico4 = p.mercadologico4 and\n"
-                    + "		merc.cod_mercadologico5 = p.mercadologico5\n"
-                    + "	left join familiaproduto fam on p.id_familiaproduto = fam.id\n"
-                    + "	join produtocomplemento vend on p.id = vend.id_produto and vend.id_loja = lj.id\n"
-                    + "	left join cest on cest.id = p.id_cest\n"
-                    + "	left join tipopiscofins piscofcred on \n"
-                    + "		p.id_tipopiscofinscredito = piscofcred.id\n"
-                    + "	left join tipopiscofins piscofdeb on \n"
-                    + "		p.id_tipopiscofins = piscofdeb.id\n"
-                    + "	join produtoaliquota aliq on p.id = aliq.id_produto and aliq.id_estado = lj.id_estado\n"
-                    + "	join aliquota icms on icms.id = aliq.id_aliquotadebito\n"
-                    + "	join aliquota icms_cred on icms_cred.id = aliq.id_aliquotacredito\n"
-                    + "	left join produtoautomacaodesconto pad on pad.codigobarras = ean.codigobarras and pad.id_loja = lj.id\n"
-                    + "	left join pautafiscal pf on\n"
-                    + "		p.ncm1 = pf.ncm1 and\n"
-                    + "		p.ncm2 = pf.ncm2 and\n"
-                    + "		p.ncm3 = pf.ncm3 and\n"
-                    + "		aliq.excecao = pf.excecao\n"
-                    + "order by\n"
-                    + "	p.id")) {
+                    "with \n" +
+                    "	lj as (select loja.id, f.id_estado from loja join fornecedor f on loja.id_fornecedor = f.id where loja.id = " + getLojaOrigem() + ")\n" +
+                    "select\n" +
+                    "	p.id,\n" +
+                    "	p.datacadastro,\n" +
+                    "	ean.codigobarras,\n" +
+                    "	p.qtdembalagem qtdembalagemcotacao,\n" +
+                    "	ean.qtdembalagem,\n" +
+                    "	ean_un.descricao unidade,\n" +
+                    "	case when p.id_tipoembalagem = 4 or p.pesavel then 'S' else 'N' end balanca,\n" +
+                    "	p.validade,\n" +
+                    "	p.descricaocompleta,\n" +
+                    "	p.descricaoreduzida,\n" +
+                    "	p.descricaogondola,\n" +
+                    "	p.id_familiaproduto,\n" +
+                    "	p.pesobruto,\n" +
+                    "	p.pesoliquido,\n" +
+                    "	vend.estoquemaximo,\n" +
+                    "	vend.estoqueminimo,\n" +
+                    "	vend.estoque,\n" +
+                    "	vend.custosemimposto,\n" +
+                    "	vend.custocomimposto,\n" +
+                    "	vend.precovenda,\n" +
+                    " 	p.margem,\n" +
+                    "	vend.id_situacaocadastro,\n" +
+                    "	vend.descontinuado,\n" +
+                    "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n" +
+                    "	lpad(cest.cest1::varchar,2,'0') || lpad(cest.cest2::varchar,3,'0') || lpad(cest.cest3::varchar,2,'0') cest,\n" +
+                    "	piscofdeb.cst piscofins_cst_debito,\n" +
+                    "	piscofcred.cst piscofins_cst_credito,\n" +
+                    "	p.tiponaturezareceita piscofins_natureza_receita,\n" +
+                    " 	aliq.id_aliquotadebito,\n" +
+                    " 	aliq.id_aliquotadebitoforaestado,\n" +
+                    " 	aliq.id_aliquotadebitoforaestadonf,\n" +
+                    " 	aliq.id_aliquotaconsumidor,\n" +
+                    " 	aliq.id_aliquotacredito,\n" +
+                    " 	aliq.id_aliquotacreditocusto,\n" +
+                    " 	aliq.id_aliquotacreditoforaestado,\n" +
+                    "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n" +
+                    "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n" +
+                    "	pad.desconto atacadodesconto,\n" +
+                    "	pf.id id_pautafiscal\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "	join lj on true\n" +
+                    "	left join produtoautomacao ean on\n" +
+                    "		ean.id_produto = p.id\n" +
+                    "	left join tipoembalagem ean_un on\n" +
+                    "		ean_un.id = ean.id_tipoembalagem\n" +
+                    "	join produtocomplemento vend on\n" +
+                    "		p.id = vend.id_produto and vend.id_loja = lj.id\n" +
+                    "	left join cest on\n" +
+                    "		cest.id = p.id_cest\n" +
+                    "	left join tipopiscofins piscofcred on \n" +
+                    "		p.id_tipopiscofinscredito = piscofcred.id\n" +
+                    "	left join tipopiscofins piscofdeb on \n" +
+                    "		p.id_tipopiscofins = piscofdeb.id\n" +
+                    "	join produtoaliquota aliq on \n" +
+                    "		p.id = aliq.id_produto and \n" +
+                    "		aliq.id_estado = lj.id_estado\n" +
+                    "	left join produtoautomacaodesconto pad on\n" +
+                    "		pad.codigobarras = ean.codigobarras and\n" +
+                    "		pad.id_loja = lj.id\n" +
+                    "	left join pautafiscal pf on\n" +
+                    "		p.ncm1 = pf.ncm1 and\n" +
+                    "		p.ncm2 = pf.ncm2 and\n" +
+                    "		p.ncm3 = pf.ncm3 and\n" +
+                    "		aliq.excecao = pf.excecao\n" +
+                    "order by\n" +
+                    "	p.id"
+            )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -598,26 +578,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSugestaoCotacao("S".equals(rs.getString("sugestaocotacao")));
                     imp.setSugestaoPedido("S".equals(rs.getString("sugestaopedido")));
                     imp.setPautaFiscalId(rs.getString("id_pautafiscal"));
-
-                    //Aliquota Debito
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_aliquota"));
-                    imp.setIcmsCstSaida(rs.getInt("icms_cst"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icms_reduzido"));
-                    
-                    //Aliquota Consumidor
-                    imp.setIcmsAliqConsumidor(rs.getDouble("icms_aliquota"));
-                    imp.setIcmsCstConsumidor(rs.getInt("icms_cst"));
-                    imp.setIcmsReducaoConsumidor(rs.getDouble("icms_reduzido"));
-
-                    //Aliquota Credito
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_aliquota_credito"));
-                    imp.setIcmsCstEntrada(rs.getInt("icms_cst_credito"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_reduzido_credito"));
-                    
-                    //Aliquota Credito
-                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_aliquota_credito"));
-                    imp.setIcmsCstEntradaForaEstado(rs.getInt("icms_cst_credito"));
-                    imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("icms_reduzido_credito"));
+                    imp.setIcmsDebitoId(rs.getString("id_aliquotadebito"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("id_aliquotadebitoforaestado"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_aliquotadebitoforaestadonf"));
+                    imp.setIcmsConsumidorId(rs.getString("id_aliquotaconsumidor"));
+                    imp.setIcmsCreditoId(rs.getString("id_aliquotacredito"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
 
                     result.add(imp);
                 }
