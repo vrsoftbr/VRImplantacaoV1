@@ -1688,8 +1688,6 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
                     + "    and p.datapago is null\n"
-                    + "    and e.ciccgc is not null \n"
-                    + "    and e.ciccgc != 0 \n"
                     + "order by\n"
                     + "    p.sequen"
             )) {
