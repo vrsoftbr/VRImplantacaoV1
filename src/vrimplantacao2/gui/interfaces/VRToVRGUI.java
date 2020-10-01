@@ -272,7 +272,7 @@ public class VRToVRGUI extends VRInternalFrame {
                             importador.importarConvenioEmpresa();
                         }
                         if (chkCvConveniado.isSelected()) {
-                            importador.importarConvenioConveniado(OpcaoConvenio.IMPORTACAO_NAO_FILTRAR_CPF);
+                            importador.importarConvenioConveniado();
                         }
                         if (chkCvTransacao.isSelected()) {
                             importador.importarConvenioTransacao();
