@@ -27,10 +27,13 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
@@ -46,6 +49,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -630,6 +634,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdComprador(rs.getString("comprador"));
                     imp.setFornecedorFabricante(rs.getString("fabricante"));
                     imp.setDivisao(rs.getString("id_divisao"));
+                    
+                    imp.setPautaFiscalId(rs.getString("id"));
 
                     result.add(imp);
                 }
@@ -638,6 +644,109 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "declare @loja integer = " + getLojaOrigem() + ";\n" +
+                        "with trib as (\n" +
+                        "	select distinct\n" +
+                        "		ts.CODIGOTRIB id,\n" +
+                        "		ts.DESCRICAO,\n" +
+                        "		ts.situatribu icms_cst,\n" +
+                        "		ts.VALORICM icms_aliq,\n" +
+                        "		ts.mrger icms_red\n" +
+                        "	from\n" +
+                        "		fl301est est\n" +
+                        "		join fltribut ts on \n" +
+                        "			est.codtribsai = ts.codigotrib and\n" +
+                        "			ts.codigoloja = @loja\n" +
+                        "	where\n" +
+                        "		ts.situatribu = '60'\n" +
+                        "	union\n" +
+                        "	select distinct\n" +
+                        "		te.CODIGOTRIB id,\n" +
+                        "		te.descricao,\n" +
+                        "		te.situatribu icms_cst,\n" +
+                        "		te.VALORICM icms_aliq,\n" +
+                        "		te.mrger icms_red\n" +
+                        "	from\n" +
+                        "		fl301est est\n" +
+                        "		join fltribut te on \n" +
+                        "			est.codtribent = te.codigotrib and\n" +
+                        "			te.codigoloja = @loja\n" +
+                        "	where\n" +
+                        "		te.situatribu = '60'\n" +
+                        ")\n" +
+                        "SELECT \n" +
+                        "	prod.Codigoplu id,\n" +
+                        "	ncm.COD_NCM ncm,\n" +
+                        "	ESTA.origem uf,\n" +
+                        "	ESTA.iva,\n" +
+                        "	esta.pauta,\n" +
+                        "	est.codtribent,\n" +
+                        "	case trib.icms_red \n" +
+                        "		when 0 then 0 \n" +
+                        "		else 20 \n" +
+                        "	end as icms_cst,\n" +
+                        "	trib.icms_aliq,\n" +
+                        "	trib.icms_red\n" +
+                        "FROM\n" +
+                        "	FLGRUSUB_ESTA ESTA\n" +
+                        "	INNER JOIN FLTRIBUT TRIB1 ON\n" +
+                        "		ESTA.CODTRIBENT=TRIB1.CODIGOTRIB AND\n" +
+                        "		TRIB1.CODIGOLOJA=@loja\n" +
+                        "	INNER JOIN FLTRIBUT TRIB2 ON\n" +
+                        "		ESTA.CODTRIBSAI=TRIB2.CODIGOTRIB AND\n" +
+                        "		TRIB2.CODIGOLOJA=@loja\n" +
+                        "	join flgrusub_prod prod on\n" +
+                        "		esta.id_Grupo = prod.Id_Grupo and\n" +
+                        "		prod.Id_Estado = 0\n" +
+                        "	join fl301est est on\n" +
+                        "		est.CODIGOLOJA = @loja and\n" +
+                        "		est.CODIGOPLU = prod.Codigoplu\n" +
+                        "	join fltabncm_pro ncm on\n" +
+                        "		est.codigoplu = ncm.codigoplu\n" +
+                        "	join trib on\n" +
+                        "		trib.id = est.codtribent\n" +
+                        "where\n" +
+                        "	ESTA.origem = 'PB' and\n" +
+                        "	ESTA.destino = 'PB' and\n" +
+                        "	(esta.iva != 0 or esta.pauta != 0)\n" +
+                        "ORDER BY\n" +
+                        "	ESTA.ORIGEM,ESTA.DESTINO"
+                )
+                ) {
+            while (rs.next()) {
+                PautaFiscalIMP imp = new PautaFiscalIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setNcm(rs.getString("ncm"));
+                imp.setUf(rs.getString("uf"));
+                if (rs.getDouble("iva") > 0) {
+                    imp.setIva(rs.getDouble("iva"));
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                } else {
+                    imp.setIva(rs.getDouble("pauta"));
+                    imp.setTipoIva(TipoIva.VALOR);
+                }
+                
+                AliquotaVO a = new AliquotaVO(rs.getInt("icms_cst"), rs.getDouble("icms_aliq"), rs.getDouble("icms_red"));
+                imp.setAliquotaCredito(a);
+                imp.setAliquotaCreditoForaEstado(a);
+                imp.setAliquotaDebito(a);
+                imp.setAliquotaDebitoForaEstado(a);
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+    
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
@@ -760,7 +869,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.FABRICANTE,
-                OpcaoProduto.NUTRICIONAL
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO
         ));
     }
 
