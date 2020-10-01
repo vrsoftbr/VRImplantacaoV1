@@ -38,7 +38,7 @@ public class ConveniadoDAO {
             sql.put("id_empresa", vo.getId_empresa());
             sql.put("bloqueado", vo.isBloqueado());
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
-            sql.put("senha", 0);
+            sql.put("senha", vo.getSenha());
             sql.put("id_loja", vo.getId_loja());
             sql.put("cnpj", vo.getCnpj());
             sql.put("observacao", vo.getObservacao());

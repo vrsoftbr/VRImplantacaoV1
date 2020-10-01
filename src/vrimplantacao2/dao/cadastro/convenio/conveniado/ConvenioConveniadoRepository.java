@@ -68,7 +68,9 @@ public class ConvenioConveniadoRepository {
                     anterior = converterConveniadoAnterior(imp);
                     
                     if (idByCnpj != null) {
-                        anterior.setCodigoAtual(idByCnpj);
+                        if (cnpj > 999999) {
+                            anterior.setCodigoAtual(idByCnpj);
+                        }
                     } else {                    
                         ConveniadoVO vo = converterConveniado(imp);
                         vo.setId(id);
@@ -143,6 +145,7 @@ public class ConvenioConveniadoRepository {
         vo.setDataDesbloqueio(imp.getDataDesbloqueio());
         vo.setVisualizaSaldo(true);
         vo.setDataBloqueio(imp.getDataBloqueio());
+        vo.setSenha(imp.getSenha());
         return vo;
     }
 

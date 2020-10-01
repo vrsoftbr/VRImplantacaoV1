@@ -25,7 +25,8 @@ public class ConveniadoVO {
     private Date dataDesbloqueio;// date,
     private boolean visualizaSaldo = true;// boolean NOT NULL,
     private Date dataBloqueio;// date
-
+    private int senha = 0;
+    
     public void setId(int id) {
         this.id = id;
     }
@@ -136,6 +137,13 @@ public class ConveniadoVO {
     public TipoInscricao getTipoInscricao() {
         return getCnpj() > 99999999999L ? TipoInscricao.JURIDICA : TipoInscricao.FISICA;
     }
-    
-    
+
+    public int getSenha() {
+        return senha;
+    }
+
+    public void setSenha(int senha) {
+        this.senha = senha;
+    }
+
 }
