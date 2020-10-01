@@ -754,25 +754,16 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         try (
                 Statement st = ConexaoSqlServer.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        "declare @dat date = cast(CURRENT_TIMESTAMP as date);\n" +
-                        "declare @id_loja integer = " + getLojaOrigem() + ";\n" +
                         "select\n" +
                         "	o.CODIGOPLU id_produto,\n" +
                         "	o.DATINICOFE datainicio,\n" +
                         "	o.DATFINAOFE datatermino,\n" +
                         "	o.VENDAOFERT precooferta,\n" +
-                        "	o.VENDAATUA preconormal,\n" +
-                        "	o.*\n" +
+                        "	o.VENDAATUA preconormal\n" +
                         "from\n" +
-                        "	fl311ofe o\n" +
-                        "	join FLOFEBLO b on\n" +
-                        "		o.BLOCO = b.BLOCO \n" +
+                        "	HRTECH.dbo.fl304ven o\n" +
                         "where\n" +
-                        "	b.DATFINAOFE >= @dat\n" +
-                        "	and b.GRUPOLOJAS like '%,' + cast(@id_loja as varchar(8)) + ',%'\n" +
-                        "	and o.CODIGOLOJA = @id_loja\n" +
-                        "order by\n" +
-                        "	cast(o.CODIGOPLU as integer)"
+                        "	codigoloja=" + getLojaOrigem() + " and DATFINAOFE >= cast(current_timestamp as date)"
                 )
                 ) {
             while (rs.next()) {
