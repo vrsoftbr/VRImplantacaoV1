@@ -326,17 +326,34 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     try(ResultSet rs1 = stm.executeQuery(
                             "select\n" +
                             "	ft.id_fornecedor idfornecedor,\n" +
-                            "	ft.ddd,\n" +
-                            "	ft.telefone,\n" +
+                            "	ft.ddd || '' || ft.telefone telefone,\n" +
                             "	ft.contato,\n" +
                             "	ft.e_mail \n" +
                             "from\n" +
                             "	fornecedor_telefone ft where ft.id_fornecedor = " + imp.getImportId())) {
                         while(rs1.next()) {
                             String contato = rs1.getString("contato"),
-                                    telefone = rs1.getString("ddd") + rs1.getString("telefone");
+                                    telefone = rs1.getString("telefone");
                             
                             imp.addContato(String.valueOf(i), contato == null ? "SEM CONTATO" : contato, telefone, null, TipoContato.NFE, rs1.getString("e_mail"));
+                            i++;
+                        }
+                    }
+                    
+                    try(ResultSet rs2 = stm.executeQuery(
+                            "select \n" +
+                            "	fv.id_fornecedor,\n" +
+                            "	v.telefone1,\n" +
+                            "	v.nome contato,\n" +
+                            "	v.e_mail \n" +
+                            "from \n" +
+                            "	fornecedor_vendedores fv\n" +
+                            "inner join vendedores v on fv.id_vendedor = v.id_vendedor WHERE fv.id_fornecedor =" + imp.getImportId())) {
+                        while(rs2.next()) {
+                            String contato = rs2.getString("contato"),
+                                    telefone = rs2.getString("telefone1");
+                            
+                            imp.addContato(String.valueOf(i), contato == null ? "SEM CONTATO" : contato, telefone, null, TipoContato.NFE, rs2.getString("e_mail"));
                             i++;
                         }
                     }
