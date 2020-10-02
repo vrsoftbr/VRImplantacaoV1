@@ -33,8 +33,8 @@ public class ProdutoAliquotaDAO {
             if (!Versao.menorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
             }
-            if (Versao.maiorQue(3, 19,1, 64)) {
-                    sql.put("excecao", vo.getExcecao());
+            if (Versao.maiorQue(3, 19, 1, 64)) {
+                sql.put("excecao", vo.getExcecao());
             }
 
             sql.getReturning().add("id");
@@ -48,22 +48,28 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
-    
+
     public void salvarAliquotaBeneficio(ProdutoAliquotaVO vo) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            SQLBuilder sql = new SQLBuilder();
-            sql.setTableName("produtoaliquotabeneficio");
-            sql.put("id_produtoaliquota", vo.getId());
-            sql.put("id_aliquota", vo.getAliquotaDebito().getId());
-            sql.put("id_beneficio", vo.getBeneficio());
 
-            sql.getReturning().add("id");
+        if (vo.getId() == 0) {
+            System.out.println("Produto Alíquota não localizada!" + " Beneficio ID: " + vo.getBeneficio()
+            + " Aliquota ID: " +  vo.getAliquotaDebito().getId());
+        } else {
+            try (Statement stm = Conexao.createStatement()) {
+                SQLBuilder sql = new SQLBuilder();
+                sql.setTableName("produtoaliquotabeneficio");
+                sql.put("id_produtoaliquota", vo.getId());
+                sql.put("id_aliquota", vo.getAliquotaDebito().getId());
+                sql.put("id_beneficio", vo.getBeneficio());
 
-            try (ResultSet rst = stm.executeQuery(
-                    sql.getInsert()
-            )) {
-                if (rst.next()) {
-                    vo.setId(rst.getInt("id"));
+                sql.getReturning().add("id");
+
+                try (ResultSet rst = stm.executeQuery(
+                        sql.getInsert()
+                )) {
+                    if (rst.next()) {
+                        vo.setId(rst.getInt("id"));
+                    }
                 }
             }
         }
@@ -107,7 +113,7 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 }
                 if (opt.contains(OpcaoProduto.EXCECAO)) {
-                    if (Versao.maiorQue(3, 19,1, 64)) {
+                    if (Versao.maiorQue(3, 19, 1, 64)) {
                         sql.put("excecao", vo.getExcecao());
                     }
                 }
@@ -139,7 +145,7 @@ public class ProdutoAliquotaDAO {
                 }
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
-                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaDebitoForaEstado().getId());               
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaDebitoForaEstado().getId());
             } else if (opt.contains(OpcaoProduto.ICMS_LOJA)) {
                 sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
@@ -171,7 +177,7 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
             }
             if (opt.contains(OpcaoProduto.EXCECAO)) {
-                if (Versao.maiorQue(3, 19,1, 64)) {
+                if (Versao.maiorQue(3, 19, 1, 64)) {
                     sql.put("excecao", vo.getExcecao());
                 }
             }
@@ -184,16 +190,16 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
-    
+
     public void atualizarBeneficio(ProdutoAliquotaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             sql.setTableName("produtoaliquotabeneficio");
-            
+
             sql.put("id_aliquota", vo.getAliquotaDebito().getId());
             sql.put("id_beneficio", vo.getBeneficio());
-            
+
             if (!sql.isEmpty()) {
                 sql.setWhere(
                         "id_produtoaliquota = " + vo.getId());
@@ -218,7 +224,7 @@ public class ProdutoAliquotaDAO {
 
         return result;
     }
-    
+
     public int getProdutoAliquotaByProduto(int idProduto) throws Exception {
         int result = 0;
 
@@ -234,34 +240,36 @@ public class ProdutoAliquotaDAO {
 
         return result;
     }
-    
+
     public int getBeneficio(String beneficio) throws Exception {
         int idBeneficio = 0;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select id from codigobeneficiocst where codigo = '" + beneficio + "'"
             )) {
-                if(rst.next()) 
+                if (rst.next()) {
                     idBeneficio = rst.getInt("id");
-                
+                }
+
             }
         }
         return idBeneficio;
     }
-    
+
     public int getProdutoAliquotaBeneficio(int idProdutoAliquota) throws Exception {
         int id = 0;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"+
-                    "   id\n"+        
-                    "from\n"+
-                        "produtoaliquotabeneficio\n"+
-                    "where\n"+
-                         "id_produtoaliquota = " + idProdutoAliquota
+                    "select\n"
+                    + "   id\n"
+                    + "from\n"
+                    + "produtoaliquotabeneficio\n"
+                    + "where\n"
+                    + "id_produtoaliquota = " + idProdutoAliquota
             )) {
-                if(rst.next()) 
-                    id = rst.getInt("id");                
+                if (rst.next()) {
+                    id = rst.getInt("id");
+                }
             }
         }
         return id;
