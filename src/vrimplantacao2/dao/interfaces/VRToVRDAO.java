@@ -40,6 +40,7 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -1402,24 +1403,20 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
+                    "select\n" +
+                    "	distinct\n" +
                     "	p.id,\n" +
                     "	p.id_fornecedor,\n" +
                     "	p.numerodocumento,\n" +
                     " 	p.id_tipoentrada,\n" +
                     "	p.dataentrada,\n" +
-                    "	p.dataemissao,\n" +
-                    " 	pp.datahoraalteracao,\n" +
-                    "	p.valor,\n" +
-                    "	pp.numeroparcela,\n" +
-                    "	pp.datavencimento,\n" +
-                    "	pp.observacao,\n" +
-                    "	'TE '||t2.id || ' - ' || t2.descricao tipoentrada\n" +
+                    "	p.dataemissao\n" +
                     "from \n" +
                     "	pagarfornecedor p \n" +
-                    "join pagarfornecedorparcela pp on p.id = pp.id_pagarfornecedor\n" +
-                    "join tipoentrada t2 on\n" +
-                    "	p.id_tipoentrada = t2.id\n" +
+                    "    join pagarfornecedorparcela pp\n" +
+                    "       on p.id = pp.id_pagarfornecedor\n" +
+                    "    join tipoentrada t2 on\n" +
+                    "       p.id_tipoentrada = t2.id\n" +
                     "where\n" +
                     "	pp.id_situacaopagarfornecedorparcela = 0 and \n" +
                     "	p.id_loja = " + getLojaOrigem())) {
@@ -1430,11 +1427,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setDataEntrada(rs.getDate("dataentrada"));
-                    imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
                     //imp.setIdTipoEntradaVR(rs.getInt("id_tipoentrada"));
-                    imp.setNumeroDocumento(rs.getString("numerodocumento"));                    
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));             
+                    //imp.setValor(rs.getDouble("valor"));
 
-                    imp.addVencimento(rs.getDate("datavencimento"), rs.getDouble("valor")).setObservacao(rs.getString("tipoentrada") + " " + rs.getString("observacao"));
+                    incluirVencimentos(imp);
 
                     result.add(imp);
                 }
@@ -1442,6 +1439,55 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+        
+    private void incluirVencimentos(ContaPagarIMP imp) throws Exception {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	pp.id,\n" +
+                    "	pp.id_pagarfornecedor,\n" +
+                    "	pp.numeroparcela,\n" +
+                    "	pp.datavencimento,\n" +
+                    "	pp.datapagamento,\n" +
+                    "	pp.valor,\n" +
+                    "	pp.observacao,\n" +
+                    "	pp.id_banco,\n" +
+                    "	pp.agencia,\n" +
+                    "	pp.conta,\n" +
+                    "	pp.conferido,\n" +
+                    "	'TE '||t2.id || ' - ' || t2.descricao tipoentrada\n" +
+                    "from \n" +
+                    "	pagarfornecedor p \n" +
+                    "    join pagarfornecedorparcela pp\n" +
+                    "       on p.id = pp.id_pagarfornecedor\n" +
+                    "    join tipoentrada t2 on\n" +
+                    "       p.id_tipoentrada = t2.id\n" +
+                    "where\n" +
+                    "	pp.id_situacaopagarfornecedorparcela = 0 and \n" +
+                    "	pp.id_pagarfornecedor = " + imp.getId()
+            )) {
+                while (rs.next()) {
+                    ContaPagarVencimentoIMP i = imp.addVencimento(rs.getDate("datavencimento"), rs.getDouble("valor"));
+                    i.setId(rs.getString("id"));
+                    i.setNumeroParcela(rs.getInt("numeroparcela"));
+                    i.setDataPagamento(rs.getDate("datavencimento"));
+                    i.setValor(rs.getDouble("valor"));
+                    i.setObservacao(
+                            String.format(
+                                    "BANCO (%d) TIPO ENTRADA (%s) OBS (%s)",
+                                    rs.getInt("id_banco"),
+                                    rs.getString("tipoentrada"),
+                                    rs.getString("observacao")
+                            )
+                    );
+                    i.setAgencia(rs.getString("agencia"));
+                    i.setConta(rs.getString("conta"));
+                    i.setConferido(rs.getBoolean("conferido"));
+                }
+            }
+        }
+    }    
+    
 
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
