@@ -855,7 +855,7 @@ public class DirectorDAO extends InterfaceDAO {
         return result;
     }
 
-      private Date dataInicioVenda;
+    private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
     public void setDataInicioVenda(Date dataInicioVenda) {
@@ -875,7 +875,7 @@ public class DirectorDAO extends InterfaceDAO {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new DirectorDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-    
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -910,7 +910,7 @@ public class DirectorDAO extends InterfaceDAO {
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
                         next.setNomeCliente(rst.getString("nomecliente"));
-                                                
+
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
@@ -960,7 +960,7 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	left join TBtipo_logradouro tl on tl.DFcod_tipo_logradouro = l.DFcod_tipo_logradouro\n"
                     + "	left join TBbairro b on l.DFid_bairro = b.DFcod_bairro\n"
                     + "	left join TBlocalidade c on l.DFcod_localidade = c.DFcod_localidade\n"
-                    + "where data between convert(data, '" + FORMAT.format(dataInicio) + "', 23) and convert(data, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
+                    + "where data between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
                     + "	DFcod_empresa_emitente = " + idLojaCliente + " \n"
                     + "group by \n"
                     + "	cfe.dfnumero,\n"
@@ -1022,19 +1022,20 @@ public class DirectorDAO extends InterfaceDAO {
                         next.setId(rst.getString("id"));
                         next.setVenda(id);
                         next.setProduto(rst.getString("produto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        //next.setValorDesconto(rst.getDouble("desconto"));
+                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
+                        
 
                         String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
+                        /*if (trib == null || "".equals(trib)) {
                             trib = rst.getString("codaliq_produto");
-                        }
+                        }*/
 
                         obterAliquota(next, trib);
                     }
@@ -1105,37 +1106,31 @@ public class DirectorDAO extends InterfaceDAO {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "    cx.id,\n"
-                    + "    cx.coo as numerocupom,\n"
-                    + "    cx.codcaixa as ecf,\n"
-                    + "    cx.data as data,\n"
-                    + "    cx.codprod as produto,\n"
-                    + "    pr.DESC_PDV as descricao,    \n"
-                    + "    isnull(cx.qtd, 0) as quantidade,\n"
-                    + "    isnull(cx.totitem, 0) as total,\n"
-                    + "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n"
-                    + "    isnull(cx.descitem, 0) as desconto,\n"
-                    + "    isnull(cx.acrescitem, 0) as acrescimo,\n"
-                    + "    case\n"
-                    + "     when LEN(cx.barra) > 14 \n"
-                    + "     then SUBSTRING(cx.BARRA, 4, LEN(cx.barra))\n"
-                    + "    else cx.BARRA end as codigobarras,\n"
-                    + "    pr.unidade,\n"
-                    + "    cx.codaliq codaliq_venda,\n"
-                    + "    pr.codaliq codaliq_produto,\n"
-                    + "    ic.DESCRICAO trib_desc\n"
+                    //+ "icfe.dfid_item_nota_fiscal_saida_nfce as id,\n"
+                    + "	dfnumero as numerocupom,\n"
+                    + "	dfserie as ecf,\n"
+                    + "	dfdata_emissao as data,\n"
+                    + "	ie.DFcod_item_estoque as produto,\n"
+                    + "	un.dfdescricao unidade,\n"
+                    + "	ie.dfdescricao as descricao,    \n"
+                    + "	isnull(dfqtde, 0) as quantidade,\n"
+                    + "	isnull(icfe.dfvalor_total, 0) as total,\n"
+                    + "	case\n"
+                    + "		when LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque)) > 14 \n"
+                    + "		then SUBSTRING((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque), 4, LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) ))\n"
+                    + "	else (select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) end as codigobarras,\n"
+                    + "	icfe.dfaliquota_icms codaliq_venda\n"
                     + "from\n"
-                    + "    caixageral as cx\n"
-                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
-                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
-                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
-                    + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
-                    + "where\n"
-                    + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
-                    + "    cx.codloja = " + idLojaCliente + " and\n"
-                    + "    cx.atualizado = 'S' and\n"
-                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
+                    + "	TBitem_nota_fiscal_saida_nfce icfe\n"
+                    + "	left join TBnota_fiscal_saida_nfce cfe on icfe.DFid_nota_fiscal_saida_nfce = cfe.DFid_nota_fiscal_saida_nfce\n"
+                    + "	left join TBunidade_item_estoque uie on icfe.DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque\n"
+                    + "	left join tbitem_estoque ie on ie.DFcod_item_estoque = uie.DFcod_item_estoque\n"
+                    + "	left join TBunidade un on uie.DFcod_unidade = un.DFcod_unidade\n"
+                    + "	left join TBtipo_tributacao tt on icfe.dftipo_tributacao = tt.dftipo_tributacao\n"
+                    + "where \n"
+                    + "	cfe.DFdata_emissao convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
+                    + "	and DFcod_empresa_emitente = " + idLojaCliente + "\n"
+                    + "	order by data, numerocupom";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
