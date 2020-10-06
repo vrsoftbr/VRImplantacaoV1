@@ -128,7 +128,11 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rst.getString("cstPis"));
                     imp.setPiscofinsCstCredito(rst.getString("cstPis"));
                     imp.setIcmsDebitoId(rst.getString("id_aliquota"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("id_aliquota"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_aliquota"));
                     imp.setIcmsCreditoId(rst.getString("id_aliquota"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("id_aliquota"));
+                    imp.setIcmsConsumidorId(rst.getString("id_aliquota"));
                     result.add(imp);
                 }
             }

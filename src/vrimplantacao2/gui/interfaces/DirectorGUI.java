@@ -245,11 +245,11 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarCheque();
                         }
                         
-                        if (chkPdvVendas.isSelected()) {
-                            DirectorDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            DirectorDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                        /*if (chkPdvVendas.isSelected()) {
+                            //DirectorDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                            //DirectorDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
+                        }*/
                         
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
