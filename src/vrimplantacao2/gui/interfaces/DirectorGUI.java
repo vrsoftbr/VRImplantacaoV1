@@ -28,7 +28,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
     private static final String SISTEMA = "Director";
     private static DirectorGUI instance;
-
+    
     public static String getSISTEMA() {
         return SISTEMA;
     }
@@ -73,7 +73,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.database = "DBdirector";
         conexao.port = "1433";
         conexao.user = "sa";
-        conexao.pass = "";
+        conexao.pass = "#1qwer0987";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
@@ -245,11 +245,12 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarCheque();
                         }
                         
-                        /*if (chkPdvVendas.isSelected()) {
-                            //DirectorDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //DirectorDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                        if (chkPdvVendas.isSelected()) {
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }*/
+                        }
                         
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
