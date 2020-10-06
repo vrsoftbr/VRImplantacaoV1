@@ -28,8 +28,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
     private static final String SISTEMA = "Director";
     private static DirectorGUI instance;
-    private DirectorDAO directorDAO = new DirectorDAO();
-
+    
     public static String getSISTEMA() {
         return SISTEMA;
     }
@@ -74,7 +73,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.database = "DBdirector";
         conexao.port = "1433";
         conexao.user = "sa";
-        conexao.pass = "";
+        conexao.pass = "#1qwer0987";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
@@ -247,8 +246,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkPdvVendas.isSelected()) {
-                            directorDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            directorDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         
