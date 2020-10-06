@@ -246,8 +246,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkPdvVendas.isSelected()) {
-                            DirectorDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            DirectorDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            //DirectorDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                            //DirectorDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         
