@@ -51,6 +51,7 @@ import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -1921,6 +1922,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "CODPAGAR, "
                     + "CODFORNEC, "
                     + "coalesce(NOTA, '0') NOTA, "
+                    + "DESD PARCELA, "        
                     + "VALOR, "
                     + "DTVENCTO, "
                     + "DTEMISSAO, "
@@ -1933,7 +1935,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where CODLOJA = " + getLojaOrigem() + " "
                     + "and DTPAGTO IS NULL and DTVENCTO IS NOT NULL AND\n"
                     + " SITUACAO != 'CA'\n"
-                    + "order by DTEMISSAO "
+                    + "order by DTEMISSAO"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
@@ -1956,7 +1958,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataHoraAlteracao(rst.getTimestamp("DTENTRADA"));
                     imp.setObservacao((rst.getString("OBS") == null ? "" : rst.getString("OBS")) + " "
                             + (rst.getString("OBS2") == null ? "" : rst.getString("OBS2")));
-                    imp.addVencimento(rst.getDate("DTVENCTO"), imp.getValor());
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("DTVENCTO"), imp.getValor());
+                    parc.setNumeroParcela(rst.getInt("PARCELA"));
+                    
                     vResult.add(imp);
                 }
             }
