@@ -960,7 +960,7 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	left join TBtipo_logradouro tl on tl.DFcod_tipo_logradouro = l.DFcod_tipo_logradouro\n"
                     + "	left join TBbairro b on l.DFid_bairro = b.DFcod_bairro\n"
                     + "	left join TBlocalidade c on l.DFcod_localidade = c.DFcod_localidade\n"
-                    + "where data between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
+                    + "where dfdata_emissao between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23) and\n"
                     + "	DFcod_empresa_emitente = " + idLojaCliente + " \n"
                     + "group by \n"
                     + "	cfe.dfnumero,\n"
@@ -979,7 +979,7 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	c.dfcod_uf ,\n"
                     + "	dfcod_cep,\n"
                     + "	dfcod_empresa_emitente\n"
-                    + "order by numerocupom, data\n";
+                    + "order by numerocupom, dfdata_emissao";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

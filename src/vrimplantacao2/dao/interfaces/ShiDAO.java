@@ -1763,10 +1763,10 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         continue;
                     }
                     
-                    Cell cellIdFornecedor = sheet.getCell(3, i);
-                    Cell cellTipoEntrada = sheet.getCell(5, i);
-                    Cell cellNumeroDocumento = sheet.getCell(7, i);
-                    Cell cellDataEntrada = sheet.getCell(8, i);
+                    Cell cellIdFornecedor = sheet.getCell(0, i);
+                    Cell cellTipoEntrada = sheet.getCell(1, i);
+                    Cell cellNumeroDocumento = sheet.getCell(2, i);
+                    Cell cellDataEntrada = sheet.getCell(3, i);
                     
                     PagarFornecedorVO vo = new PagarFornecedorVO();
                     vo.setId_fornecedor(Integer.parseInt(cellIdFornecedor.getContents().trim()));
