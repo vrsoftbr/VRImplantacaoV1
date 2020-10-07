@@ -164,7 +164,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.EXCECAO
+                    OpcaoProduto.EXCECAO,
+                    OpcaoProduto.DESCONTINUADO
                 }
         ));
     }
@@ -271,6 +272,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.peso,\n"
                     + "    pv.estmin,\n"
                     + "    pv.estmax,\n"
+                    + "    case p.compra when 'S' then 1 else 0 end descontinuado, \n"        
                     + "    0 as estoque,\n"
                     + "    pv.lucro,\n"
                     + "    0 custo,\n"
@@ -340,6 +342,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setIdFamiliaProduto(rst.getString("altern"));
+                    imp.setDescontinuado(rst.getInt("descontinuado") == 1);
 
                     String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
                     String[] cods = merc.split("\\.");
@@ -420,6 +423,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.peso,\n"
                     + "    pv.estmin,\n"
                     + "    pv.estmax,\n"
+                    + "    case p.compra when 'S' then 1 else 0 end descontinuado, \n"
                     + "    0 as estoque,\n"
                     + "    pv.lucro,\n"
                     + "    0 custo,\n"
@@ -461,6 +465,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setIdFamiliaProduto(rst.getString("altern"));
+                    imp.setDescontinuado(rst.getInt("descontinuado") == 1);
 
                     String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
                     String[] cods = merc.split("\\.");
