@@ -6,8 +6,13 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -28,6 +33,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -42,10 +48,59 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String i_arquivoOferta;
+    
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento != null ? complemento.trim() : "";
+    }
 
     @Override
     public String getSistema() {
-        return "SDInformatica";
+        return "SDInformatica" + (!complemento.equals("") ? " - " + complemento : "");
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF
+        ));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -214,7 +269,11 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setPiscofinsCstDebito(rst.getInt("piscofins_cst"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_nat"));
                     imp.setIcmsCreditoId(rst.getString("icms_id"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("icms_id"));
                     imp.setIcmsDebitoId(rst.getString("icms_id"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_id"));
+                    imp.setIcmsConsumidorId(rst.getString("icms_id"));
 
                     result.add(imp);
                 }
@@ -349,6 +408,38 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
         List<FornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            Map<String, List<FornecedorContatoIMP>> contatos = new HashMap<>();
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "    c.widfornecedor id_fornecedor,\n"
+                    + "    c.widfornecedorvendedor id,\n"
+                    + "    c.wnomefornecedorvendedor nome,\n"
+                    + "    c.wtelefonefornecedorvendedor telefone,\n"
+                    + "    c.wcelularfornecedorvendedor celular,\n"
+                    + "    c.wemailfornecedorvendedor email\n"
+                    + "from\n"
+                    + "    fornecedoresvendedores c\n"
+                    + "order by\n"
+                    + "    id_fornecedor, id"
+            )) {
+                while (rs.next()) {
+                    List<FornecedorContatoIMP> ct = contatos.get(rs.getString("id_fornecedor"));
+                    if (ct == null) {
+                        ct = new ArrayList<>();
+                        contatos.put(rs.getString("id_fornecedor"), ct);
+                    }
+                    FornecedorContatoIMP imp = new FornecedorContatoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setImportFornecedorId(rs.getString("id_fornecedor"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email"));
+                    ct.add(imp);
+                }
+            }
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    f.widfornecedor id,\n"
@@ -425,31 +516,17 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
 
-                    try (Statement stm2 = ConexaoFirebird.getConexao().createStatement()) {
-                        try (ResultSet rst2 = stm2.executeQuery(
-                                "select\n"
-                                + "    c.widfornecedorvendedor id,\n"
-                                + "    c.wnomefornecedorvendedor nome,\n"
-                                + "    c.wtelefonefornecedorvendedor telefone,\n"
-                                + "    c.wcelularfornecedorvendedor celular,\n"
-                                + "    c.wemailfornecedorvendedor email\n"
-                                + "from\n"
-                                + "    fornecedoresvendedores c\n"
-                                + "where\n"
-                                + "    c.widfornecedor = " + imp.getImportId() + "\n"
-                                + "order by\n"
-                                + "    id"
-                        )) {
-                            while (rst2.next()) {
-                                imp.addContato(
-                                        rst2.getString("id"),
-                                        "VEND - " + rst2.getString("nome"),
-                                        rst2.getString("telefone"),
-                                        rst2.getString("celular"),
-                                        TipoContato.COMERCIAL,
-                                        rst2.getString("email")
-                                );
-                            }
+                    List<FornecedorContatoIMP> cts = contatos.get(imp.getImportId());
+                    if (cts != null) {
+                        for (FornecedorContatoIMP ct: cts) {
+                            imp.addContato(
+                                    ct.getImportId(),
+                                    ct.getNome(),
+                                    ct.getTelefone(),
+                                    ct.getCelular(),
+                                    TipoContato.COMERCIAL,
+                                    ct.getEmail()
+                            );
                         }
                     }
 
