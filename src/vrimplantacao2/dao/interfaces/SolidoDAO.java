@@ -531,7 +531,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	rv.data_compra emissao, \n" +
                     "	rv.numero_caixa ecf, \n" +
                     "	rv.numero_cupom coo, \n" +
-                    "	rv.valor, \n" +
+                    "	rv.valor - coalesce(rv.valor_pago, 0) valor,\n" +
                     "	rv.vencimento, \n" +
                     "	rv.observacao,\n" +
                     "	rv.codigo_operador,\n" +
@@ -557,8 +557,8 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rs.getDouble("valor"));
                     
                     String dados = String.format("Operador: %s, Usuario: %s", 
-                            rs.getString("operador"),
-                            rs.getString("usuario"));
+                            rs.getString("operador") == null ? "" : rs.getString("operador"),
+                            rs.getString("usuario") == null ? "" : rs.getString("usuario"));
                     
                     imp.setObservacao(rs.getString("observacao") + " " + dados);
                     
