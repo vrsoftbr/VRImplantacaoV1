@@ -21,19 +21,19 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.AtenasSQLSERVERDAO;
+import vrimplantacao2.dao.interfaces.SaefDAO;
 import vrimplantacao2.parametro.Parametros;
 
-public class AtenasSQLSERVERGUI extends VRInternalFrame {
+public class SaefGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "AtenasSQLSERVER";
+    private static final String SISTEMA = "SAEF";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static AtenasSQLSERVERGUI instance;
+    private static SaefGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private AtenasSQLSERVERDAO atenasSqlServerDAO = new AtenasSQLSERVERDAO();
+    private SaefDAO saefDAO = new SaefDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
-    private Object AtenasSQLSERVERDAO;
+    private Object SaefDAO;
 
     
     private void carregarParametros() throws Exception {
@@ -71,7 +71,7 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private AtenasSQLSERVERGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private SaefGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "WIN1252";        
@@ -121,7 +121,7 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : atenasSqlServerDAO.getLojas()) {
+        for (Estabelecimento loja : saefDAO.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -149,7 +149,7 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new AtenasSQLSERVERGUI(i_mdiFrame);
+                instance = new SaefGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -186,9 +186,9 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
                         lojaMesmoId = "";
                     }
                      
-                    atenasSqlServerDAO.v_lojaMesmoId = lojaMesmoId;
+                    saefDAO.v_lojaMesmoId = lojaMesmoId;
                     
-                    Importador importador = new Importador(atenasSqlServerDAO);
+                    Importador importador = new Importador(saefDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     
@@ -535,7 +535,7 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
         vRTextArea1.setRows(5);
         jScrollPane1.setViewportView(vRTextArea1);
 
-        setTitle("Importação Atenas");
+        setTitle("Importação SAEF");
         setToolTipText("");
 
         vRToolBarPadrao3.setRollover(true);
@@ -1070,6 +1070,11 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
 
         txtHost.setText("192.168.1.100");
         txtHost.setCaixaAlta(false);
+        txtHost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtHostActionPerformed(evt);
+            }
+        });
 
         vRLabel23.setText("Porta");
 
@@ -1338,6 +1343,10 @@ public class AtenasSQLSERVERGUI extends VRInternalFrame {
     private void chkPermiteRotativoChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPermiteRotativoChequeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkPermiteRotativoChequeActionPerformed
+
+    private void txtHostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHostActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtHostActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;

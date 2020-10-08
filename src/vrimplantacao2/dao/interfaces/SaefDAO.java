@@ -12,8 +12,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
-//import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 //import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -25,25 +24,26 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Alan
  */
-public class AtenasSQLSERVERDAO extends InterfaceDAO {
+public class SaefDAO extends InterfaceDAO {
 
     public String v_lojaMesmoId;
 
     @Override
     public String getSistema() {
-        return "Atenas" + v_lojaMesmoId;
+        return "Saef" + v_lojaMesmoId;
     }
 
     public List<Estabelecimento> getLojas() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "     codigo cod_empresa,\n"
-                    + "     nomefantasia descricao\n"
-                    + "from CADempresa")) {
+                    "select \n"
+                    + "	cdConfiguracao id,\n"
+                    + "	nmEmpresa razao\n"
+                    + "from\n"
+                    + "	Configuracao")) {
                 while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("cod_empresa"), rs.getString("descricao")));
+                    result.add(new Estabelecimento(rs.getInt("id") + "", rs.getString("razao")));
                 }
             }
         }
@@ -56,23 +56,27 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "     codcategoria Merc1ID, \n"
-                    + "     descricaocategoria Merc1Descricao,\n"
-                    + "     CodSubCategoria Merc2ID, \n"
-                    + "     DescricaoSubCategoria Merc2Descricao,\n"
-                    + "     CodMarca Merc3ID,\n"
-                    + "     DescricaoMarca Merc3Descricao\n"
-                    + "from CadProdutos")) {
+                    + "     g.cdgrupo as m1,\n"
+                    + "     nmgrupo as m1desc,\n"
+                    + "     cdsubgrupo as m2,\n"
+                    + "     nmsubgrupo as m2desc,\n"
+                    + "     cdsubgrupo as m3,\n"
+                    + "     nmsubgrupo as m3desc\n"
+                    + "from\n"
+                    + "     Grupo g\n"
+                    + "     left join SubGrupo sg\n"
+                    + "		on g.cdgrupo = sg.cdgrupo \n"
+                    + "order by 1,3,5")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rs.getString("Merc1ID"));
-                    imp.setMerc1Descricao(rs.getString("Merc1Descricao"));
-                    imp.setMerc2ID(rs.getString("Merc2ID"));
-                    imp.setMerc2Descricao(rs.getString("Merc2Descricao"));
-                    imp.setMerc3ID(rs.getString("Merc3ID"));
-                    imp.setMerc3Descricao(rs.getString("Merc3Descricao"));
+                    imp.setMerc1ID(rs.getString("m1"));
+                    imp.setMerc1Descricao(rs.getString("m1desc"));
+                    imp.setMerc2ID(rs.getString("m2"));
+                    imp.setMerc2Descricao(rs.getString("m2desc"));
+                    imp.setMerc3ID(rs.getString("m3"));
+                    imp.setMerc3Descricao(rs.getString("M3desc"));
 
                     result.add(imp);
                 }
@@ -236,26 +240,83 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "     p.codigo idproduto,\n"
-                    + "     f.codigo CodigoFornecedor,\n"
-                    + "     COD_PROD_FORN codigoexterno,\n"
-                    + "     QTD_EMBALAGEM_PROD_FORN qtdEmbalagem\n"
-                    + "from CADCOMPRAS_COD_PROD_FORN pf\n"
-                    + "     left join CadProdutos p\n"
-                    + "     on pf.codigo_barras = p.codigobarras\n"
-                    + "     left join CADFORNECEDORES f\n"
-                    + "     on pf.CNPF_FORN = f.cnpjcpf\n"
-                    + "where p.codigo is not null\n"
-                    + "     order by 2,1")) {
+                    + "     cdFornecedor idfornecedor,\n"
+                    + "     cdProduto idproduto,\n"
+                    + "     codigo codigoexterno\n"
+                    + "from codFornecedor cf")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setIdFornecedor(rs.getString("CodigoFornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdEmbalagem"));
+                    //imp.setQtdEmbalagem(rs.getDouble("qtdEmbalagem"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    // SOMENTE CLIENTES COM CPF/CNPJ VÁLIDOS
+                    "select\n"
+                    + "	pf.cdPessoa id,\n"
+                    + "	dsCPF cpf,\n"
+                    + "	nmpessoa razao,\n"
+                    + "	nmpessoa fantasia,\n"
+                    + "	case when dsativo = 'S' then 1 else 0 end ativo,\n"
+                    + "	nmLogradouro endereco,\n"
+                    + "	nrNumero numero,\n"
+                    + "	dsComplemento complemento,\n"
+                    + "	dsbairro bairro,\n"
+                    + "	cdmunicipio municipioIBGE,\n"
+                    + "	dscidade cidade,\n"
+                    + "	dsuf uf,\n"
+                    + "	dsCEP cep,\n"
+                    + "	dtNascimento dataNascimento,\n"
+                    + "	dtcadastro dataCadastro,\n"
+                    + "	dslimcredito valorLimite,\n"
+                    + "	nrdiavenc diaVencimento,\n"
+                    + "	nmtelefone telefone,\n"
+                    + "	dsemail email\n"
+                    + "from\n"
+                    + "	P_Fisica pf\n"
+                    + "	left join Pessoa p on p.cdPessoa = pf.cdPessoa \n"
+                    + "	left join Endereco e on e.cdPessoa = p.cdpessoa\n"
+                    + "	left join Cliente c on c.cdpessoa = p.cdpessoa\n"
+                    + "	left join Telefone t on t.cdPessoa  = p.cdPessoa \n"
+                    + "where\n"
+                    + "	pf.dsCPF <> '' and pf.dsCPF is not NULL \n")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cpf"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioIBGE(rs.getString("municipioIBGE"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setValorLimite(rs.getDouble("valorlimite"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setEmail(rs.getString("email"));
 
                     result.add(imp);
                 }
@@ -269,31 +330,31 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "     codigo importId,\n"
-                    + "     rasaosocialnome razao,\n"
-                    + "     nomefantasia fantasia,\n"
-                    + "     cnpjcpf cnpj_cpf,\n"
-                    + "     ierg ie_rg,\n"
-                    + "     endereco,\n"
-                    + "     numero,\n"
-                    + "     complementoendereco,\n"
-                    + "     bairro,\n"
-                    //+ "     coalesce(codigo_municipio,0) ibge_municipio,\n"
-                    + "     cidade municipio,\n"
-                    + "     uf,\n"
-                    + "     cep,\n"
-                    + "     telefone tel_principal,\n"
-                    + "     datacadastro,\n"
-                    + "     coalesce (prazo,'0') condicoesPagamentos,\n"
-                    + "     coalesce(prazoEntrega,0) prazoEntrega,\n"
-                    + "     obs observacao,\n"
-                    + "     VENDEDORNOME,\n"
-                    + "     VENDEDORTELEFONE,\n"
-                    + "     VENDEDORCELULAR,\n"
-                    + "     VENDEDOREMAIL\n"
-                    + "from CADFORNECEDORES\n"
-                    + "     order by 1")) {
+                    "select  \n"
+                    + "	pj.cdPessoa importId,\n"
+                    + "	nmRazao razao,\n"
+                    + "	nmpessoa fantasia,\n"
+                    + "	CGC cnpj_cpf,\n"
+                    + "	dsInscricaoEstadual ie_rg,\n"
+                    + "	dssuframa suframa,\n"
+                    + "	case when dsativo = 'S' then 1 else 0 end ativo,\n"
+                    + "	nmLogradouro endereco,\n"
+                    + "	nrNumero numero,\n"
+                    + "	dsComplemento complemento,\n"
+                    + "	dsbairro bairro,\n"
+                    + "	cdmunicipio ibge_municipio,\n"
+                    + "	dscidade municipio,\n"
+                    + "	dsuf uf,\n"
+                    + "	dsCEP cep,\n"
+                    + "	nmtelefone tel_principal,\n"
+                    + "	dtcadastro datacadastro\n"
+                    + "from\n"
+                    + "	P_Juridica pj \n"
+                    + "	left join Pessoa p on p.cdPessoa = pj.cdPessoa \n"
+                    + "	left join Endereco e on e.cdPessoa = p.cdpessoa\n"
+                    + "	left join Cliente c on c.cdpessoa = p.cdpessoa\n"
+                    + "	left join Telefone t on t.cdPessoa  = p.cdPessoa\n"
+                    + "order by 1")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -304,22 +365,18 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
                     imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
                     imp.setIe_rg(rs.getString("ie_rg"));
+                    imp.setSuframa(rs.getString("suframa"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setComplemento(rs.getString("complementoendereco"));
+                    imp.setComplemento(rs.getString("complemento"));
                     imp.setBairro(rs.getString("bairro"));
+                    imp.setIbge_municipio(rs.getInt("ibge_municipio"));
                     imp.setMunicipio(rs.getString("municipio"));
-                    //imp.setIbge_municipio(rs.getInt("ibge_municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(rs.getString("tel_principal"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setCondicaoPagamento(Integer.parseInt(Utils.formataNumero(rs.getString("condicoesPagamentos"))));
-                    imp.setObservacao(rs.getString("observacao"));
-
-                    imp.addDivisao(imp.getImportId(), 0, rs.getInt("prazoentrega"), 0);
-
-                    imp.addContato("1", (rs.getString("VENDEDORNOME")), (rs.getString("VENDEDORTELEFONE")), (rs.getString("VENDEDORCELULAR")), TipoContato.COMERCIAL, rs.getString("VENDEDOREMAIL"));
 
                     result.add(imp);
                 }
@@ -329,113 +386,41 @@ public class AtenasSQLSERVERDAO extends InterfaceDAO {
     }
 
     /*@Override
-    public List<ClienteIMP> getClientes() throws Exception {
-        List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    codigo,\n"
-                    + "    nome,\n"
-                    + "    rg,\n"
-                    + "    cpf,\n"
-                    + "    estadocivil,\n"
-                    + "    profissao,\n"
-                    + "    empresa,\n"
-                    + "    renda,\n"
-                    + "    limite,\n"
-                    + "    data_cadastro,\n"
-                    + "    ref2,\n"
-                    + "    nascimento,\n"
-                    + "    sexo,\n"
-                    + "    apelido,\n"
-                    + "    endereco,\n"
-                    + "    bairro,\n"
-                    + "    cidade,\n"
-                    + "    numero,\n"
-                    + "    uf,\n"
-                    + "    cep,\n"
-                    + "    complemento,\n"
-                    + "    situacao,\n"
-                    + "    telefone1,\n"
-                    + "    telefone2,\n"
-                    + "    telefone3,\n"
-                    + "    celular,\n"
-                    + "    email,\n"
-                    + "    condpgto\n"
-                    + "from\n"
-                    + "    c000007\n"
-                    + "order by\n"
-                    + "    nome")) {
-                while (rs.next()) {
-                    ClienteIMP imp = new ClienteIMP();
+     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+     List<CreditoRotativoIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+     try (ResultSet rs = stm.executeQuery(
+     "select\n"
+     + "    codigo,\n"
+     + "    codvenda,\n"
+     + "    codcaixa,\n"
+     + "    codcliente,\n"
+     + "    data_emissao,\n"
+     + "    data_vencimento,\n"
+     + "    valor_original,\n"
+     + "    documento\n"
+     + "from\n"
+     + "    c000049\n"
+     + "where\n"
+     + "    situacao = 1 and\n"
+     + "    data_pagamento is null\n"
+     + "order by\n"
+     + "    data_emissao")) {
+     while (rs.next()) {
+     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+     imp.setId(rs.getString("codigo"));
+     imp.setNumeroCupom(rs.getString("codvenda"));
+     imp.setEcf(rs.getString("codcaixa"));
+     imp.setIdCliente(rs.getString("codcliente"));
+     imp.setDataEmissao(rs.getDate("data_emissao"));
+     imp.setDataVencimento(rs.getDate("data_vencimento"));
+     imp.setValor(rs.getDouble("valor_original"));
+     imp.setObservacao("Doc.: " + rs.getString("documento"));
 
-                    imp.setId(rs.getString("codigo"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setFantasia(rs.getString("apelido"));
-                    imp.setInscricaoestadual(rs.getString("rg"));
-                    imp.setCnpj(rs.getString("cpf"));
-                    imp.setValorLimite(rs.getDouble("limite"));
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    // String data = rs.getString("nascimento").trim();
-                    // if(data.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
-                    // imp.setDataNascimento(rs.getDate("nascimento"));
-                    // }
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setUf(rs.getString("uf"));
-                    imp.setCep(rs.getString("cep"));
-                    imp.setComplemento(rs.getString("complemento"));
-                    imp.setAtivo(rs.getInt("situacao") == 1);
-                    imp.setTelefone(rs.getString("telefone1"));
-                    imp.setCelular(rs.getString("celular"));
-                    imp.setEmail(rs.getString("email") == null ? "" : rs.getString("email"));
-                    imp.setObservacao(rs.getString("condpgto") == null ? "" : "Cond. Pagto: " + rs.getString("condpgto"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
-    /*@Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    codigo,\n"
-                    + "    codvenda,\n"
-                    + "    codcaixa,\n"
-                    + "    codcliente,\n"
-                    + "    data_emissao,\n"
-                    + "    data_vencimento,\n"
-                    + "    valor_original,\n"
-                    + "    documento\n"
-                    + "from\n"
-                    + "    c000049\n"
-                    + "where\n"
-                    + "    situacao = 1 and\n"
-                    + "    data_pagamento is null\n"
-                    + "order by\n"
-                    + "    data_emissao")) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rs.getString("codigo"));
-                    imp.setNumeroCupom(rs.getString("codvenda"));
-                    imp.setEcf(rs.getString("codcaixa"));
-                    imp.setIdCliente(rs.getString("codcliente"));
-                    imp.setDataEmissao(rs.getDate("data_emissao"));
-                    imp.setDataVencimento(rs.getDate("data_vencimento"));
-                    imp.setValor(rs.getDouble("valor_original"));
-                    imp.setObservacao("Doc.: " + rs.getString("documento"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
+     result.add(imp);
+     }
+     }
+     }
+     return result;
+     }*/
 }
