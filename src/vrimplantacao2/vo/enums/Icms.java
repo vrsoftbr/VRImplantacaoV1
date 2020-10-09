@@ -82,8 +82,8 @@ public class Icms {
         if (icms == null) {
             atualizaIcms();
         }
-        aliquota = MathUtils.trunc(aliquota, 1);
-        reduzido = MathUtils.trunc(reduzido, 1);
+        aliquota = MathUtils.trunc(aliquota, 2);
+        reduzido = MathUtils.trunc(reduzido, 2);
         if (cst != 20 && cst != 0) {
             aliquota = 0;
             reduzido = 0;
@@ -137,8 +137,8 @@ public class Icms {
                             aliq, 
                             red);
                     
-                    aliq = MathUtils.trunc(aliq, 1);
-                    red = MathUtils.trunc(red, 1);
+                    aliq = MathUtils.trunc(aliq, 2);
+                    red = MathUtils.trunc(red, 2);
                     
                     icms.put(icm, cst, aliq, red);
                 }

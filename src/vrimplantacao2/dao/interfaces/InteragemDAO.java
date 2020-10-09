@@ -75,7 +75,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                 red
         );
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -94,7 +94,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("icms_aliquota"),
                             rst.getDouble("icms_reduzido")
                     );
-                    
+
                     result.add(new MapaTributoIMP(
                             id,
                             id,
@@ -157,11 +157,11 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
         ));
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -193,8 +193,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as estoquemaximo,\n"
                     + "0 as estoqueminimo,\n"
                     + "coalesce(f.qtdpro, 0) as estoque,\n"
-                    + "coalesce(f.ultprcompra, 0) as custocomimposto,\n"
-                    + "coalesce(f.ultprcompra, 0) as custosemimposto,\n"
+                    + "coalesce(p.ultprcom01, 0) as custocomimposto,\n"
+                    + "coalesce(p.ultprcom01, 0) as custosemimposto,\n"
                     + "coalesce(f.prvapro, 0) as precovenda,\n"
                     + "case p.stprod when 'A' then 'S' else 'N' end ativo,\n"
                     + "coalesce(p.clasfiscal, '') as ncm,\n"
@@ -207,7 +207,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as icms_reduzido\n"
                     + "from tabpro p\n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")) + "\n"
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + " \n"
                     + "union all \n"
                     + "select\n"
                     + "distinct p.codpro as id,\n"
@@ -220,7 +220,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(p.descpro, '') as descricaogondola,\n"
                     + "0 as cod_mercadologico1,\n"
                     + "'ACERTAR' as mercadologico1,\n"
-                    + "0 as cod_mercadologico2,\n"
+                    + "0 as cod_mercadologico2,"
                     + "'ACERTAR' as mercadologico2,\n"
                     + "0 as cod_mercadologico3,\n"
                     + "'ACERTAR' as mercadologico3,\n"
@@ -238,8 +238,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as estoquemaximo,\n"
                     + "0 as estoqueminimo,\n"
                     + "coalesce(f.qtdpro, 0) as estoque,\n"
-                    + "coalesce(f.ultprcompra, 0) as custocomimposto,\n"
-                    + "coalesce(f.ultprcompra, 0) as custosemimposto,\n"
+                    + "coalesce(p.ultprcom01, 0) as custocomimposto,\n"
+                    + "coalesce(p.ultprcom01, 0) as custosemimposto,\n"
                     + "coalesce(f.prvapro, 0) as precovenda,\n"
                     + "case p.stprod when 'A' then 'S' else 'N' end ativo,\n"
                     + "coalesce(p.clasfiscal, '') as ncm,\n"
@@ -251,9 +251,9 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(p.icms, 0) as icms_aliquota,\n"
                     + "0 as icms_reduzido\n"
                     + "from tabpro p\n"
-                    + "join tabprocod ean on ean.codpro = p.codpro \n"        
+                    + "join tabprocod ean on ean.codpro = p.codpro \n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")) + ""
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + ""
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -264,9 +264,12 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(Utils.formataNumero(rst.getString("id")));
                     imp.setEan(Utils.formataNumero(rst.getString("ean")));
                     
+                    if ("7599".equals(imp.getImportId())) {
+                        System.out.println(imp.getEan());
+                    }
+
                     if ((imp.getEan() != null)
-                            && (!imp.getEan().trim().isEmpty())
-                            && (imp.getEan().trim().length() <= 6)) {
+                            && (!imp.getEan().trim().isEmpty())) {
                         ProdutoBalancaVO produtoBalanca;
                         long codigoProduto;
                         codigoProduto = Long.parseLong(imp.getImportId());
@@ -284,7 +287,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setManterEAN(true);
                         }
                     }
-                    
+
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
@@ -300,8 +303,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("piscofins_cst_credito"))));
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     String venda = rst.getString("precovenda");
-                    
-                    if(venda.length() > 11) {
+
+                    if (venda.length() > 11) {
                         imp.setPrecovenda(0);
                     } else {
                         imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -310,13 +313,12 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setEstoque(MathUtils.trunc(rst.getDouble("estoque"), 2));
-                    
-                    
+
                     String aliqIcmsId = getAliquotaKey(
                             rst.getString("icms_cst"),
                             rst.getDouble("icms_aliquota"),
                             rst.getDouble("icms_reduzido"));
-                    
+
                     imp.setIcmsDebitoId(aliqIcmsId);
                     imp.setIcmsDebitoForaEstadoId(aliqIcmsId);
                     imp.setIcmsDebitoForaEstadoNfId(aliqIcmsId);
@@ -358,45 +360,6 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
 
-    /*@Override
-    public List<ProdutoIMP> getEANsAtacado() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        String codigoBarras;
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                        "select\n"
-                        + "a.codpreco, "
-                        + "a.codprod, "
-                        + "a.quantmin, "
-                        + "a.prvapro precoatacao, "
-                        + "p.prvapro precovenda\n"
-                        + "from tabpreitem a\n"
-                        + "inner join tabprofil p on p.codpro = a.codprod\n"
-                        + "where a.quantmin > 1\n"
-                        + "and a.prvapro < p.prvapro\n"
-                        + "and p.codfil = " + getLojaOrigem() + "\n"
-                        + "order by a.codprod"
-            )) {
-                while (rst.next()) {
-                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codprod"));
-                    
-                    codigoBarras = rst.getString("codpreco") + "999999" + String.valueOf(codigoAtual);
-                    
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("codprod"));
-                    imp.setEan(codigoBarras);
-                    imp.setQtdEmbalagem(rst.getInt("quantmin"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setAtacadoPreco(rst.getDouble("precoatacao"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -411,7 +374,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    pa.prvapro as precovenda,\n"
                         + "    pa.percdescco as percentualdesconto\n"
                         + "from TABPROFIL pa\n"
-                        + "where pa.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")) + "\n"
+                        + "where pa.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + "\n"
                         + "and pa.qtddesco > 1\n"
                         + "and pa.percdescco > 0"
                 )) {
@@ -517,27 +480,27 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    distinct pf.codfor,\n" +
-                    "    pf.codpro,\n" +
-                    "    pf.codigo,\n" +
-                    "    coalesce(fator.unidade, 'UN') unidade,\n" +
-                    "    coalesce(fator.fator, 1) qtd\n" +
-                    "from\n" +
-                    "    tabprofor pf\n" +
-                    "left join\n" +
-                    "    (select\n" +
-                    "        codpro,\n" +
-                    "        codfor,\n" +
-                    "        fator,\n" +
-                    "        unidade\n" +
-                    "    from\n" +
-                    "        tabproforund\n" +
-                    "    where\n" +
-                    "        fator > 1) fator on (pf.codpro = fator.codpro) and\n" +
-                    "        pf.codfor = fator.codfor\n" +
-                    "order by\n" +
-                    "    pf.codfor, pf.codpro"
+                    "select\n"
+                    + "    distinct pf.codfor,\n"
+                    + "    pf.codpro,\n"
+                    + "    pf.codigo,\n"
+                    + "    coalesce(fator.unidade, 'UN') unidade,\n"
+                    + "    coalesce(fator.fator, 1) qtd\n"
+                    + "from\n"
+                    + "    tabprofor pf\n"
+                    + "left join\n"
+                    + "    (select\n"
+                    + "        codpro,\n"
+                    + "        codfor,\n"
+                    + "        fator,\n"
+                    + "        unidade\n"
+                    + "    from\n"
+                    + "        tabproforund\n"
+                    + "    where\n"
+                    + "        fator > 1) fator on (pf.codpro = fator.codpro) and\n"
+                    + "        pf.codfor = fator.codfor\n"
+                    + "order by\n"
+                    + "    pf.codfor, pf.codpro"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -553,51 +516,51 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return vResult;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    c.codcli id,\n" +
-                    "    c.nomcli razao,\n" +
-                    "    c.fancli fantasia,\n" +
-                    "    c.dtcadastro,\n" +
-                    "    c.dtnasc dtnascimento,\n" +
-                    "    c.endcli endereco,\n" +
-                    "    c.baicli bairro,\n" +
-                    "    c.nrendcli numero,\n" +
-                    "    c.cep,\n" +
-                    "    c.cidade,\n" +
-                    "    case when uf = '' then 'PA' else uf end as uf,\n" +
-                    "    c.pontoref referencia,\n" +
-                    "    c.fone1,\n" +
-                    "    c.fone2,\n" +
-                    "    c.fax,\n" +
-                    "    c.email,\n" +
-                    "    c.contato,\n" +
-                    "    c.cgc cnpj,\n" +
-                    "    c.inscest ie,\n" +
-                    "    c.estcivil estadocivil,\n" +
-                    "    cast((case sexo when '' then 0 else sexo end) as integer) sexo,\n" +
-                    "    c.nmpai nomepai,\n" +
-                    "    c.nmmae nomemae,\n" +
-                    "    c.vlmtcli limite,\n" +
-                    "    c.obs,\n" +
-                    "    c.diaspag,\n" +
-                    "    c.nmconjuge\n" +        
-                    "from\n" +
-                    "    tabcli c\n" +
-                    "order by\n" +
-                    "    c.codcli" )) {
-                while(rs.next()) {
+                    "select\n"
+                    + "    c.codcli id,\n"
+                    + "    c.nomcli razao,\n"
+                    + "    c.fancli fantasia,\n"
+                    + "    c.dtcadastro,\n"
+                    + "    c.dtnasc dtnascimento,\n"
+                    + "    c.endcli endereco,\n"
+                    + "    c.baicli bairro,\n"
+                    + "    c.nrendcli numero,\n"
+                    + "    c.cep,\n"
+                    + "    c.cidade,\n"
+                    + "    c.uf,\n"
+                    + "    c.pontoref referencia,\n"
+                    + "    c.fone1,\n"
+                    + "    c.fone2,\n"
+                    + "    c.fax,\n"
+                    + "    c.email,\n"
+                    + "    c.contato,\n"
+                    + "    c.cgc cnpj,\n"
+                    + "    c.inscest ie,\n"
+                    + "    c.estcivil estadocivil,\n"
+                    + "    cast((case sexo when '' then 0 else sexo end) as integer) sexo,\n"
+                    + "    c.nmpai nomepai,\n"
+                    + "    c.nmmae nomemae,\n"
+                    + "    c.vlmtcli limite,\n"
+                    + "    c.obs,\n"
+                    + "    c.diaspag,\n"
+                    + "    c.nmconjuge\n"
+                    + "from\n"
+                    + "    tabcli c\n"
+                    + "order by\n"
+                    + "    c.codcli")) {
+                while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("ie"));
-                    if(rs.getString("fantasia") == null && "".equals(rs.getString("fantasia"))) {
+                    if (rs.getString("fantasia") == null && "".equals(rs.getString("fantasia"))) {
                         imp.setFantasia(rs.getString("razao"));
                     } else {
                         imp.setFantasia(rs.getString("fantasia"));
@@ -611,19 +574,19 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setTelefone(rs.getString("fone1"));
-                    if(rs.getString("fone2") != null && !"".equals(rs.getString("fone2").trim())) {
+                    if (rs.getString("fone2") != null && !"".equals(rs.getString("fone2").trim())) {
                         imp.addContato("1", "TELEFONE 2", rs.getString("fone2"), "", "");
                     }
                     imp.setFax(rs.getString("fax"));
                     imp.setEmail(rs.getString("email"));
-                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato").trim())) {
+                    if (rs.getString("contato") != null && !"".equals(rs.getString("contato").trim())) {
                         imp.addContato("2", "CONTATO", rs.getString("contato"), "", "");
                     }
                     imp.setSexo(rs.getInt("sexo") == 0 ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setValorLimite(rs.getDouble("limite"));
-                    if(rs.getString("obs") != null && !"".equals(rs.getString("obs").trim())) {
+                    if (rs.getString("obs") != null && !"".equals(rs.getString("obs").trim())) {
                         imp.setObservacao(rs.getString("obs"));
                     }
                     imp.copiarEnderecoParaCobranca();
@@ -631,40 +594,40 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPrazoPagamento(rs.getInt("diaspag"));
                     imp.setNomeConjuge(rs.getString("nmconjuge"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    r.codtit id,\n" +
-                    "    r.codcli idcliente,\n" +
-                    "    c.cgc cnpj,\n" +
-                    "    r.nrnota documento,\n" +
-                    "    r.nomcli razao,\n" +
-                    "    r.dtemitit emissao,\n" +
-                    "    r.dtventit vencimento,\n" +
-                    "    r.dtpagtit pagamento,\n" +
-                    "    r.vlduptit valor,\n" +
-                    "    r.vlabatit valorabatido,\n" +
-                    "    r.vlpagtit valorpago,\n" +
-                    "    r.obstit observacao\n" +
-                    "from\n" +
-                    "    titulor r\n" +
-                    "join tabcli c on r.codcli = c.codcli\n" +
-                    "where\n" +
-                    "    r.dtpagtit is null or (r.vlpagtit < r.vlduptit)\n" +
-                    "order by\n" +
-                    "    r.dtemitit")) {
-                while(rs.next()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "    r.codtit id,\n"
+                    + "    r.codcli idcliente,\n"
+                    + "    c.cgc cnpj,\n"
+                    + "    r.nrnota documento,\n"
+                    + "    r.nomcli razao,\n"
+                    + "    r.dtemitit emissao,\n"
+                    + "    r.dtventit vencimento,\n"
+                    + "    r.dtpagtit pagamento,\n"
+                    + "    r.vlduptit valor,\n"
+                    + "    r.vlabatit valorabatido,\n"
+                    + "    r.vlpagtit valorpago,\n"
+                    + "    r.obstit observacao\n"
+                    + "from\n"
+                    + "    titulor r\n"
+                    + "join tabcli c on r.codcli = c.codcli\n"
+                    + "where\n"
+                    + "    r.dtpagtit is null or (r.vlpagtit < r.vlduptit)\n"
+                    + "order by\n"
+                    + "    r.dtemitit")) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("idcliente"));
@@ -674,7 +637,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rs.getString("documento"));
                     imp.setValor(rs.getDouble("valorabatido"));
                     imp.setObservacao(rs.getString("observacao"));
-                    
+
                     result.add(imp);
                 }
             }

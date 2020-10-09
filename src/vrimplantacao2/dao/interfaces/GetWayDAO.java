@@ -901,9 +901,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	codtrib cst_debito_nf,\n"
                     + "	aliq_s_nf.VALORTRIB icms_debito_nf,\n"
                     + "	PER_REDUC icms_debito_red_nf,\n"
-                    + "	PER_REDUC_ENT icms_credito_red_nf,\n"
+                    + "	CAST(PER_REDUC_ENT as numeric(15, 2)) icms_credito_red_nf,\n"
+                    + " aliq_s_nf.VALORTRIB icms_credito_nf,"        
                     + "	CODTRIB_ENT cst_credito_nf,\n"
-                    + "	ULTICMSCRED icms_credito_nf,\n"
+                    //+ "	ULTICMSCRED icms_credito_nf,\n"
                     + " p.ALIQICMS_INTER aliq_interna,\n"
                     + "	p.PERMVA mva\n"
                     + "from\n"
@@ -919,9 +920,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_debito_red_nf"));
 
                     //Aliquota Crédito
-                    imp.setIcmsAliqEntrada(rs.getInt("aliq_interna"));
+                    imp.setIcmsAliqEntrada(rs.getInt("icms_credito_nf"));
                     imp.setIcmsCstEntrada(rs.getInt("cst_credito_nf"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_credito_red_nf"));
+                    
+                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito_nf"));
+                    imp.setIcmsCstEntradaForaEstado(rs.getInt("cst_credito_nf"));
+                    imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("icms_credito_red_nf"));
 
                     imp.setIcmsDebitoId(null);
                     imp.setIcmsCreditoId(null);
