@@ -193,8 +193,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as estoquemaximo,\n"
                     + "0 as estoqueminimo,\n"
                     + "coalesce(f.qtdpro, 0) as estoque,\n"
-                    + "coalesce(p.ultprcom01, 0) as custocomimposto,\n"
-                    + "coalesce(p.ultprcom01, 0) as custosemimposto,\n"
+                    + "coalesce(f.prcusvar, 0) as custo,\n"
                     + "coalesce(f.prvapro, 0) as precovenda,\n"
                     + "case p.stprod when 'A' then 'S' else 'N' end ativo,\n"
                     + "coalesce(p.clasfiscal, '') as ncm,\n"
@@ -238,8 +237,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as estoquemaximo,\n"
                     + "0 as estoqueminimo,\n"
                     + "coalesce(f.qtdpro, 0) as estoque,\n"
-                    + "coalesce(p.ultprcom01, 0) as custocomimposto,\n"
-                    + "coalesce(p.ultprcom01, 0) as custosemimposto,\n"
+                    + "coalesce(f.prcusvar, 0) as custo,\n"
                     + "coalesce(f.prvapro, 0) as precovenda,\n"
                     + "case p.stprod when 'A' then 'S' else 'N' end ativo,\n"
                     + "coalesce(p.clasfiscal, '') as ncm,\n"
@@ -310,8 +308,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPrecovenda(rst.getDouble("precovenda"));
                     }
 
-                    imp.setCustoComImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
-                    imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
+                    imp.setCustoComImposto(MathUtils.trunc(rst.getDouble("custo"), 2));
+                    imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custo"), 2));
                     imp.setEstoque(MathUtils.trunc(rst.getDouble("estoque"), 2));
 
                     String aliqIcmsId = getAliquotaKey(
