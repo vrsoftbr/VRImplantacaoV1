@@ -846,7 +846,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                                     next.setIcmsCst(40);
                                     next.setIcmsReduzido(0);
                                     break;
-                                    
+
                             }
                         }
                         
