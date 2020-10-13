@@ -753,12 +753,14 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	(SELECT \n" +
                     "		max(id_mvcupom) id,\n" +
                     "		NUMERO_CUPOM,\n" +
-                    "           data\n" +
+                    "           data,\n" +
+                    "           maquina\n" +
                     "	FROM \n" +
                     "		mvcupom\n" +
                     "	GROUP BY\n" +
-                    "		NUMERO_CUPOM, data) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
-                    "		c.NUMERO_CUPOM = maxid.numero_cupom and c.data = maxid.data\n" +
+                    "		NUMERO_CUPOM, data, maquina) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
+                    "		c.NUMERO_CUPOM = maxid.numero_cupom and c.data = maxid.data and\n" +
+                    "           c.maquina = maxid.maquina\n" +
                     "WHERE\n" +
                     "	c.ID_EMPRESA = " + idLojaCliente + " AND\n" +
                     "	c.DATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
