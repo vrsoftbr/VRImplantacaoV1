@@ -817,7 +817,38 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                         
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("embalagem"));
-                        next.setIdAliquota(rst.getInt("idaliquota"));
+                        
+                        String icms = rst.getString("ALIQUOTA");
+                        
+                        if(icms != null && !"".equals(icms)) {
+                            switch(icms.trim()) {
+                                case "0450": next.setIcmsAliq(4.50);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "0700": next.setIcmsAliq(7);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "1200": next.setIcmsAliq(12);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "1800": next.setIcmsAliq(18);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "F": next.setIcmsAliq(0);
+                                    next.setIcmsCst(60);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                default: next.setIcmsAliq(0);
+                                    next.setIcmsCst(40);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                    
+                            }
+                        }
                         
                     }
                 }
