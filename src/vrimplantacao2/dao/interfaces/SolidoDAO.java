@@ -753,12 +753,14 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	(SELECT \n" +
                     "		max(id_mvcupom) id,\n" +
                     "		NUMERO_CUPOM,\n" +
-                    "           data\n" +
+                    "           data,\n" +
+                    "           maquina\n" +
                     "	FROM \n" +
                     "		mvcupom\n" +
                     "	GROUP BY\n" +
-                    "		NUMERO_CUPOM, data) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
-                    "		c.NUMERO_CUPOM = maxid.numero_cupom and c.data = maxid.data\n" +
+                    "		NUMERO_CUPOM, data, maquina) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
+                    "		c.NUMERO_CUPOM = maxid.numero_cupom and c.data = maxid.data and\n" +
+                    "           c.maquina = maxid.maquina\n" +
                     "WHERE\n" +
                     "	c.ID_EMPRESA = " + idLojaCliente + " AND\n" +
                     "	c.DATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
@@ -815,7 +817,38 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                         
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("embalagem"));
-                        next.setIdAliquota(rst.getInt("idaliquota"));
+                        
+                        String icms = rst.getString("ALIQUOTA");
+                        
+                        if(icms != null && !"".equals(icms)) {
+                            switch(icms.trim()) {
+                                case "0450": next.setIcmsAliq(4.50);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "0700": next.setIcmsAliq(7);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "1200": next.setIcmsAliq(12);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "1800": next.setIcmsAliq(18);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "F": next.setIcmsAliq(0);
+                                    next.setIcmsCst(60);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                default: next.setIcmsAliq(0);
+                                    next.setIcmsCst(40);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                            }
+                        }
                         
                     }
                 }

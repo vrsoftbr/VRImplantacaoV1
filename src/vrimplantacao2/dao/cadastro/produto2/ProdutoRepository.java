@@ -491,6 +491,8 @@ public class ProdutoRepository {
             for (KeyList<String> keys : organizados.keySet()) {
                 ProdutoIMP imp = organizados.get(keys);
 
+                imp.setManterEAN(false);
+
                 //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
                 int id;
                 long ean;
@@ -634,7 +636,7 @@ public class ProdutoRepository {
                 sql.put("obsimportacao", obsimportacao);
 
                 stm.execute(sql.getUpdate());
-
+                
             }
             Conexao.commit();
         } catch (Exception ex) {

@@ -205,7 +205,9 @@ import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
 import vrimplantacao2.gui.interfaces.STIGUI;
+import vrimplantacao2.gui.interfaces.STSistemasGUI;
 import vrimplantacao2.gui.interfaces.SabTechGUI;
+import vrimplantacao2.gui.interfaces.SaefGUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SambaNetV2GUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
@@ -701,6 +703,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPhixa = new javax.swing.JMenuItem();
         mnuTpaRootac = new javax.swing.JMenuItem();
         mnuAvistate = new javax.swing.JMenuItem();
+        mnuSaef = new javax.swing.JMenuItem();
+        mnuSTSistemas = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1957,6 +1961,22 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuAvistate);
+
+        mnuSaef.setText("Saef Sistemas");
+        mnuSaef.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSaefActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuSaef);
+
+        mnuSTSistemas.setText("ST Sistemas");
+        mnuSTSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTSistemasActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuSTSistemas);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4795,6 +4815,15 @@ public final class MenuGUI extends VRMdiFrame {
         SolidoGUI.exibir(this);
     }//GEN-LAST:event_mnuSolidoActionPerformed
 
+    private void mnuSaefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaefActionPerformed
+        SaefGUI.exibir(this);
+    }//GEN-LAST:event_mnuSaefActionPerformed
+
+    private void mnuSTSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTSistemasActionPerformed
+        // TODO add your handling code here:
+        STSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuSTSistemasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -5027,7 +5056,9 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSQLiteSophyx;
     private javax.swing.JMenuItem mnuSTI;
     private javax.swing.JMenuItem mnuSTI3;
+    private javax.swing.JMenuItem mnuSTSistemas;
     private javax.swing.JMenuItem mnuSaac;
+    private javax.swing.JMenuItem mnuSaef;
     private javax.swing.JMenuItem mnuSambaNet;
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuSav;
