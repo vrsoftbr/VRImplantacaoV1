@@ -11,8 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
@@ -217,13 +220,31 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where p.ITEM != 0\n"
                     + "order by 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
 
+                    long codigoProduto;
+                    codigoProduto = Long.parseLong(imp.getImportId());
+                    if (codigoProduto <= Integer.MAX_VALUE) {
+                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                    } else {
+                        produtoBalanca = null;
+                    }
+
+                    if (produtoBalanca != null) {
+                        imp.seteBalanca(true);
+                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                    } else {
+                        imp.setValidade(0);
+                        imp.seteBalanca(false);
+                    }
+                    
                     if ((imp.getEan() != null)
                             && (!imp.getEan().trim().isEmpty())
                             && (imp.getEan().trim().length() <= 6)) {
@@ -269,6 +290,32 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p.ITEM as idproduto,\n"
+                    + "	p.CODBARRASCAIXA as ean\n"
+                    + "from ITENS p\n"
+                    + "where p.CODBARRASCAIXA != ''"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(1);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
@@ -290,7 +337,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("idproduto"));
 
                         codigoBarras = "999999" + String.valueOf(codigoAtual);
-                        
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
@@ -306,7 +353,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return null;
     }
-            
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -623,25 +670,26 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	r.SEQUENCIAL as id,\n"
                     + "	r.CLIENTE as idcliente,\n"
-                    + "	r.NUMDOC as numerodocumento,\n"
+                    + "	r.NUMDOC as numerocupom,\n"
                     + "	r.EMISSAO as dataemissao,\n"
                     + "	r.VENCTO as datavencimento,\n"
                     + "	r.VALOR as valor,\n"
-                    + "	r.VALPAG as valor_pagar,\n"
-                    + "	r.OBS as observacao\n"
-                    + "from TITLREC r\n"
-                    + "where r.DATAPAG is null"
+                    + "	r.OBS as observacao,\n"
+                    + "	r.NUMSP as parcela\n"
+                    + "from TITLRECH r\n"
+                    + "where r.DATAPAG is null\n"
+                    + "and r.LOCAL = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rst.getString("id"));
+                    imp.setId(rst.getString("idcliente") + rst.getString("numerocupom") + rst.getString("dataemissao"));
                     imp.setIdCliente(rst.getString("idcliente"));
-                    imp.setNumeroCupom(rst.getString("numerodocumento"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
                     imp.setValor(rst.getDouble("valor"));
+                    imp.setParcela(rst.getInt("parcela"));
                     imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
                 }
