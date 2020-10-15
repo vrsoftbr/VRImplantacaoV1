@@ -533,7 +533,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("hh:mm");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -574,8 +574,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "	venda v\n" +
                     "where\n" +
-                    "	cod_empresa = " + idLojaCliente + " and\n" +
-                    "	dt_emissao '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
+                    "	v.cod_empresa = " + idLojaCliente + " and\n" +
+                    "	v.dt_emissao between '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "' and v.sn_sat_enviado = 'S'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -703,7 +703,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "inner join venda v on vp.cod_venda = v.cod_venda\n" +
                     "inner join produto p on vp.cod_produto = p.cod_produto\n" +
                     "where" +
-                    "	v.dt_emissao '" + MasterDAO.VendaIterator.FORMAT.format(dataInicio) + "' and '" + MasterDAO.VendaIterator.FORMAT.format(dataTermino) + "' AND \n" +
+                    "	v.dt_emissao between '" + MasterDAO.VendaIterator.FORMAT.format(dataInicio) + "' and '" + MasterDAO.VendaIterator.FORMAT.format(dataTermino) + "' AND \n" +
                     "	v.cod_empresa = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
