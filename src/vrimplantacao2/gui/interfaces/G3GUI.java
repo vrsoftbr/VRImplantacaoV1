@@ -11,6 +11,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.interfaces.G3DAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -158,7 +159,7 @@ public class G3GUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkContaPagar.isSelected()){
-                            importador.importarContasPagar();
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
 
                         if (chkProdutoFornecedor.isSelected()) {

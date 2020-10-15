@@ -244,6 +244,7 @@ public class ProdutoComplementoDAO {
     }
 
     Set<Integer> custoAjustadoPeloUsuario = null;
+    Set<Integer> precoAjustadoPeloUsuario = null;
 
     public void atualizar(ProdutoComplementoVO complemento, Set<OpcaoProduto> opt) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -260,11 +261,28 @@ public class ProdutoComplementoDAO {
                     }
                 }
             }
+            
+            if (precoAjustadoPeloUsuario == null) {
+                precoAjustadoPeloUsuario = new HashSet<>();
+                try (ResultSet rst = stm.executeQuery(
+                        "select distinct id_produto from logpreco where id_loja = " + complemento.getIdLoja() + " and observacao not like '%VRIMPLANTACAO%'"
+                )) {
+                    while (rst.next()) {
+                        precoAjustadoPeloUsuario.add(rst.getInt("id_produto"));
+                    }
+                }
+            }
 
             SQLBuilder sql = new SQLBuilder();
             String oft = "";
             sql.setTableName("produtocomplemento");
-            if (opt.contains(OpcaoProduto.PRECO)) {
+            
+            boolean atualizarPreco = !precoAjustadoPeloUsuario.contains(complemento.getProduto().getId())
+                    || opt.contains(OpcaoProduto.FORCAR_ATUALIZACAO);
+            if (!atualizarPreco) {
+                log("PRECO ATUALIZANDO PELO USUARIO","ID:" + complemento.getProduto().getId());
+            }
+            if (opt.contains(OpcaoProduto.PRECO) && atualizarPreco) {
                 OfertaVO oferta = getOfertas().get(complemento.getIdLoja(), complemento.getProduto().getId());
                 if (oferta == null) {
                     sql.put("precovenda", complemento.getPrecoVenda());
@@ -279,13 +297,13 @@ public class ProdutoComplementoDAO {
                     oft = "update oferta set preconormal = " + MathUtils.round(complemento.getPrecoVenda(), 2) + " where id = " + oferta.getId();
                 }
             }
-            boolean atualizar
+            boolean atualizarCusto
                     = !custoAjustadoPeloUsuario.contains(complemento.getProduto().getId())
                     || opt.contains(OpcaoProduto.FORCAR_ATUALIZACAO);
-            if (!atualizar) {
+            if (!atualizarCusto) {
                 log("PRODUTO ATUALIZADO PELO USUARIO", "ID:" + complemento.getProduto().getId());
             }
-            if (opt.contains(OpcaoProduto.CUSTO) && atualizar) {
+            if (opt.contains(OpcaoProduto.CUSTO) && atualizarCusto) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
@@ -295,17 +313,17 @@ public class ProdutoComplementoDAO {
                 
                 gerarLogCusto(complemento);
             }
-            if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) && atualizar) {
+            if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) && atualizarCusto) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
                 
                 gerarLogCusto(complemento);
             }
-            if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) && atualizar) {
+            if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) && atualizarCusto) {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
                 
                 gerarLogCusto(complemento);
             }
-            if (opt.contains(OpcaoProduto.CUSTO_ANTERIOR) && atualizar) {
+            if (opt.contains(OpcaoProduto.CUSTO_ANTERIOR) && atualizarCusto) {
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
