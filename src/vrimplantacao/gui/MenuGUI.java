@@ -937,7 +937,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuContaPagar1 = new javax.swing.JMenuItem();
         mnuVarejoFacil = new javax.swing.JMenuItem();
         mnuGeneric = new javax.swing.JMenuItem();
->>>>>>> cdafa2b7680860265d4156d2b28b05bb712f636e
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -2332,7 +2331,6 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItemSuperus.setText("Superus");
         jMenuItemSuperus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
->>>>>>> cdafa2b7680860265d4156d2b28b05bb712f636e
                 jMenuItemSuperusActionPerformed(evt);
             }
         });
