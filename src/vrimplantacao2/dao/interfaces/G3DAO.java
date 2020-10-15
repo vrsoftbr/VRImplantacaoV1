@@ -6,6 +6,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,10 +18,13 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -44,6 +48,23 @@ public class G3DAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "G3";
+    }
+
+    public List<Estabelecimento> getLojas() throws SQLException {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "   idempresa id,\n"
+                    + "	  RazaoSocial razao\n"
+                    + "from\n"
+                    + "	  empresa e ")) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getInt("id") + "", rs.getString("razao")));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -271,35 +292,34 @@ public class G3DAO extends InterfaceDAO {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setSituacaoCadastro("ATIVO".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    
+
                     // PIS COFINS
                     imp.setPiscofinsCstDebito(rst.getString("PiscofinsCstDebito"));
                     imp.setPiscofinsCstCredito(rst.getString("PiscofinsCstCredito"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
 
-                    
                     // ICMS SAIDA DENTRO ESTADO
                     imp.setIcmsCstSaida(rst.getInt("icmsCstSaida"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsAliqSaida"));
                     imp.setIcmsReducaoSaida(rst.getDouble("icmsReducaoSaida"));
                     /*
-                    imp.setIcmsCstEntrada(rst.getInt("COD_CST_DENTRO"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("ALIQUOTA_ICMS_DENTRO"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("REDUCAO_BC_DENTRO"));
+                     imp.setIcmsCstEntrada(rst.getInt("COD_CST_DENTRO"));
+                     imp.setIcmsAliqEntrada(rst.getDouble("ALIQUOTA_ICMS_DENTRO"));
+                     imp.setIcmsReducaoEntrada(rst.getDouble("REDUCAO_BC_DENTRO"));
 
-                    // ICMS FORA ESTADO
-                    imp.setIcmsCstSaidaForaEstado(rst.getInt("COD_CST_FORA"));
-                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("COD_CST_FORA"));
-                    imp.setIcmsCstEntradaForaEstado(rst.getInt("COD_CST_FORA"));
+                     // ICMS FORA ESTADO
+                     imp.setIcmsCstSaidaForaEstado(rst.getInt("COD_CST_FORA"));
+                     imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("COD_CST_FORA"));
+                     imp.setIcmsCstEntradaForaEstado(rst.getInt("COD_CST_FORA"));
 
-                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("ALIQUOTA_ICMS_FORA"));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("ALIQUOTA_ICMS_FORA"));
-                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("ALIQUOTA_ICMS_FORA"));
+                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("ALIQUOTA_ICMS_FORA"));
+                     imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("ALIQUOTA_ICMS_FORA"));
+                     imp.setIcmsAliqEntradaForaEstado(rst.getDouble("ALIQUOTA_ICMS_FORA"));
 
-                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("REDUCAO_BC_FORA"));
-                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
-*/
+                     imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
+                     imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("REDUCAO_BC_FORA"));
+                     imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
+                     */
                     if (rst.getString("aliquotaconsumidor").contains("18")) {
                         imp.setIcmsCstConsumidor(0);
                         imp.setIcmsAliqConsumidor(18);
@@ -339,45 +359,45 @@ public class G3DAO extends InterfaceDAO {
         return result;
     }
 
-    /*@Override
-     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
-     List<ProdutoIMP> result = new ArrayList<>();
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
 
-     if (opt == OpcaoProduto.ATACADO) {
-     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "SELECT \n"
-     + "	id, \n"
-     + "	qtd_atacado,\n"
-     + "	TRUNCATE(valor_venda_atacado, 2) precoatacado,\n"
-     + "	truncate(valor_venda, 2) precovenda\n"
-     + "FROM produto \n"
-     + "WHERE qtd_atacado > 1\n"
-     + "AND coalesce(valor_venda_atacado, 0) > 0"
-     )) {
-     while (rst.next()) {
-     int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id"));
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n"
+                        + "	id, \n"
+                        + "	qtd_atacado,\n"
+                        + "	TRUNCATE(valor_venda_atacado, 2) precoatacado,\n"
+                        + "	truncate(valor_venda, 2) precovenda\n"
+                        + "FROM produto \n"
+                        + "WHERE qtd_atacado > 1\n"
+                        + "AND coalesce(valor_venda_atacado, 0) > 0"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id"));
 
-     if (codigoAtual > 0) {
+                        if (codigoAtual > 0) {
 
-     ProdutoIMP imp = new ProdutoIMP();
-     imp.setImportLoja(getLojaOrigem());
-     imp.setImportSistema(getSistema());
-     imp.setImportId(rst.getString("id"));
-     imp.setEan("999999" + String.valueOf(codigoAtual));
-     imp.setQtdEmbalagem(rst.getInt("qtd_atacado"));
-     imp.setPrecovenda(rst.getDouble("precovenda"));
-     imp.setAtacadoPreco(rst.getDouble("precoatacado"));
-     result.add(imp);
-     }
-     }
-     }
-     }
-     return result;
-     }
-     return null;
-     }*/
-    
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("id"));
+                            imp.setEan("999999" + String.valueOf(codigoAtual));
+                            imp.setQtdEmbalagem(rst.getInt("qtd_atacado"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -505,6 +525,64 @@ public class G3DAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    " \n"
+                    + "select\n"
+                    + "	idchequepre id,\n"
+                    + "	cgc_cpf cpf,\n"
+                    + "	cheque numerocheque,\n"
+                    + "	banco,\n"
+                    + "	ch.agencia,\n"
+                    + "	ch.conta,\n"
+                    + "	emissao,\n"
+                    + "	dt_baixa datadeposito,\n"
+                    + "	cupom numerocupom,\n"
+                    + "	ecf,\n"
+                    + "	valor,\n"
+                    + "	c.rg,\n"
+                    + "	c.fone telefone,\n"
+                    + "	c.nome,\n"
+                    + "	ch.obs observacao,\n"
+                    + "	situacao situacaocheque,\n"
+                    + "	datahora_alteracao alteracao\n"
+                    + "from\n"
+                    + "	chequepre ch\n"
+                    + "	left join cliente c\n"
+                    + "		on c.idCliente = ch.idCliente \n"
+                    + "where Situacao != 'P'\n"
+                    + "and ch.loja = " + getLojaOrigem() + ""
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
+                    imp.setDate(rst.getDate("datadeposito"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setSituacaoCheque(("A".equals(rst.getString("situacaocheque")) ? SituacaoCheque.ABERTO : SituacaoCheque.BAIXADO));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("alteracao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -529,7 +607,7 @@ public class G3DAO extends InterfaceDAO {
                     + "	f.fax,\n"
                     + "	f.telefone,\n"
                     + "	f.DTCADASTRO,\n"
-                    + " f.obs"
+                    + " f.obs\n"
                     + "FROM fornecedor f\n"
                     + "ORDER BY f.idfornecedor"
             )) {
@@ -537,6 +615,7 @@ public class G3DAO extends InterfaceDAO {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("idfornecedor"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setFantasia(rst.getString("fantasia"));
