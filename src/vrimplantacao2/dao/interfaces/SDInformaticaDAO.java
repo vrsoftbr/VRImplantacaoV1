@@ -22,7 +22,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -193,51 +195,82 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
 
         return result;
     }
-
+    
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "p.widproduto id,\n"
-                    + "p.wdatacadastro datacadastro,\n"
-                    + "ean.wcodigopro ean,\n"
-                    + "coalesce(u.wsiglaunidade, 'UN') unidade,\n"
-                    + "case when (ean.wbalanca = 'S' or p.wfracionado = 'S') then 1 else 0 end balanca,\n"
-                    + "coalesce(p.wvalidade, 0) validade,\n"
-                    + "p.wnomeproduto descricaocompleta,\n"
-                    + "p.wnomefiscal descricaoreduzida,\n"
-                    + "p.wnomegondola descricaogondola,\n"
-                    + "p.widsecao id_mercadologico1,\n"
-                    + "p.widprodutogrupo id_mercadologico2,\n"
-                    + "p.widprodutosubgrupo id_mercadologico3,\n"
-                    + "p.wpeso peso,\n"
-                    + "coalesce(e.wquantidade, 0) estoque,\n"
-                    + "coalesce(p.wlucro, 0) margem,\n"
-                    + "coalesce(c.wpreco, 0) custo,\n"
-                    + "coalesce(v.wpreco, 0) preco,\n"
-                    + "p.widvinculo as id_familia,\n"
-                    + "p.wstatus as situacao,\n"
-                    + "p.wncm ncm,\n"
-                    + "p.wcest cest,\n"
-                    + "p.wcstpiscofins piscofins_cst,\n"
-                    + "p.wnaturezapis piscofins_nat,\n"
-                    + "a.wsigla icms_id\n"
-                    + "from\n"
-                    + "produtos p\n"
-                    + "join filiais f on f.widfilial = " + getLojaOrigem() + "\n"
-                    + "left join (select * from codigospro where wnaoreverter is null and wstatus is null) ean on ean.widproduto = p.widproduto\n"
-                    + "left join unidades u on p.widunidade = u.widunidade\n"
-                    + "left join estoque e on e.widproduto = p.widproduto and e.widfilial = f.widfilial\n"
-                    + "left join precoscusto c on c.widproduto = p.widproduto and c.widfilial = f.widfilial\n"
-                    + "left join precosvenda v on v.widproduto = p.widproduto and v.widfilial = f.widfilial\n"
-                    + "left join aliquotas a on a.widaliquota = p.widaliquotaicms\n"
-                    + "where p.wstatus is null\n"
-                    + "order by\n"
-                    + "p.widproduto"
+                    "SELECT\n" +
+                    "	p.widproduto id,\n" +
+                    "	p.wdatacadastro datacadastro,\n" +
+                    "	ean.wcodigopro ean,\n" +
+                    "	COALESCE(u.wsiglaunidade,'UN') unidade,\n" +
+                    "	CASE\n" +
+                    "		WHEN (ean.wbalanca = 'S' OR p.wfracionado = 'S') THEN 1\n" +
+                    "		ELSE 0\n" +
+                    "	END balanca,\n" +
+                    "	COALESCE(p.wvalidade,\n" +
+                    "	0) validade,\n" +
+                    "	COALESCE(ean.wnomepro, p.wnomeproduto) descricaocompleta,\n" +
+                    "	COALESCE(ean.wnomeprofiscal, p.wnomefiscal) descricaoreduzida,\n" +
+                    "	COALESCE(ean.wnomeprogondola, p.wnomegondola) descricaogondola,\n" +
+                    "	p.widsecao id_mercadologico1,\n" +
+                    "	p.widprodutogrupo id_mercadologico2,\n" +
+                    "	p.widprodutosubgrupo id_mercadologico3,\n" +
+                    "	p.wpeso peso,\n" +
+                    "	COALESCE(e.wquantidade,\n" +
+                    "	0) estoque,\n" +
+                    "	COALESCE(p.wlucro,\n" +
+                    "	0) margem,\n" +
+                    "	COALESCE(c.wpreco,\n" +
+                    "	0) custo,\n" +
+                    "	COALESCE(v.wpreco,\n" +
+                    "	0) preco,\n" +
+                    "	p.widvinculo AS id_familia,\n" +
+                    "	p.wstatus AS situacao,\n" +
+                    "	p.wncm ncm,\n" +
+                    "	p.wcest cest,\n" +
+                    "	p.wcstpiscofins piscofins_cst,\n" +
+                    "	p.wnaturezapis piscofins_nat,\n" +
+                    "	a.wsigla icms_id\n" +
+                    "FROM\n" +
+                    "	produtos p\n" +
+                    "	JOIN filiais f ON\n" +
+                    "		f.widfilial = " + getLojaOrigem() + "\n" +
+                    "	LEFT JOIN (\n" +
+                    "		SELECT\n" +
+                    "			*\n" +
+                    "		FROM\n" +
+                    "			codigospro\n" +
+                    "		WHERE\n" +
+                    "			wnaoreverter IS NULL\n" +
+                    "			AND wstatus IS NULL) ean ON\n" +
+                    "		ean.widproduto = p.widproduto\n" +
+                    "	LEFT JOIN unidades u ON\n" +
+                    "		p.widunidade = u.widunidade\n" +
+                    "	LEFT JOIN estoque e ON\n" +
+                    "		e.widproduto = p.widproduto\n" +
+                    "		AND e.widfilial = f.widfilial\n" +
+                    "		AND e.WTIPO = 1\n" +
+                    "	LEFT JOIN precoscusto c ON\n" +
+                    "		c.widproduto = p.widproduto\n" +
+                    "		AND c.widfilial = f.widfilial\n" +
+                    "	LEFT JOIN precosvenda v ON\n" +
+                    "		v.widproduto = p.widproduto\n" +
+                    "		AND v.widfilial = f.widfilial\n" +
+                    "		AND v.WIDTABPRECO = 1\n" +
+                    "		AND v.wstatus IS NULL\n" +
+                    "	LEFT JOIN aliquotas a ON\n" +
+                    "		a.widaliquota = p.widaliquotaicms\n" +
+                    "WHERE\n" +
+                    "	p.wstatus IS NULL\n" +
+                    "ORDER BY\n" +
+                    "	p.WIDPRODUTO, ean.wcodigopro"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -245,10 +278,21 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.seteBalanca(rst.getBoolean("balanca"));
-                    imp.setValidade(rst.getInt("validade"));
+                    
+                    Integer ean = Utils.stringToInt(rst.getString("ean"), -2);
+                    ProdutoBalancaVO bal = balanca.get(ean);
+                    if (bal != null) {
+                        imp.setImportId("000" + bal.getCodigo());
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                    } else {
+                        imp.seteBalanca(rst.getBoolean("balanca"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(rst.getInt("validade"));
+                        imp.setEan(rst.getString("ean"));                        
+                    }                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
@@ -283,6 +327,7 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
         return result;
     }
 
+    /*
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opc) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -315,7 +360,7 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
             }
         }
         return null;
-    }
+    }*/
 
     @Override
     public List<ProdutoIMP> getProdutosComplemento() throws Exception {

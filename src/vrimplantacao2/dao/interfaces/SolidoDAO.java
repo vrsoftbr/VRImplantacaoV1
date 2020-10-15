@@ -44,7 +44,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     private Connection mvcupom;
     private Connection bcodados;
     
-    private static final Logger LOG = Logger.getLogger(IntelliCashDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(SolidoDAO.class.getName());
 
     public Connection getMvcupom() {
         return mvcupom;
