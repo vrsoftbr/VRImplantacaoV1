@@ -206,8 +206,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as icms_reduzido\n"
                     + "from tabpro p\n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + " \n"
-                    + "union all \n"
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + " "
+                    /*+ "union all \n"
                     + "select\n"
                     + "distinct p.codpro as id,\n"
                     + "ean.codigo as ean,\n"
@@ -251,7 +251,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from tabpro p\n"
                     + "join tabprocod ean on ean.codpro = p.codpro \n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
-                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + ""
+                    + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + ""*/
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -342,7 +342,13 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.codpro id_produto,\n"
                     + "p.codigo codigobarras,\n"
                     + "p.qtdun qtdembalagem\n"
-                    + "from tabprocod p"
+                    + "from tabprocod p\n"
+                    + "union all\n"
+                    + "select "
+                    + "p1.codpro id_produto, \n"
+                    + "p1.codbarun codigobarras, \n"
+                    + "1 qtdembalagem \n"
+                    + "from tabpro p1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
