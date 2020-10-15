@@ -62,7 +62,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel6" min="-2" pref="152" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabs" pref="352" max="32767" attributes="0"/>
+              <Component id="tabs" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -182,7 +182,8 @@
                                           <Component id="chkUtilizarEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkDesconsiderarSetorBalanca" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkManterEAN" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkNaoExcluirMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkManterEAN" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <Group type="102" alignment="0" attributes="0">
@@ -191,7 +192,7 @@
                                       <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="7" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -223,6 +224,11 @@
                               <Component id="chkCopiaDescComplGondola" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="chkPesquisarKG" min="-2" max="-2" attributes="0"/>
@@ -236,14 +242,11 @@
                               <Component id="chkMetodoAliquota" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkManterEAN" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="chkNaoExcluirMercadologico" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="15" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -358,6 +361,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterEAN">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Manter EAN"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="chkNaoExcluirMercadologico">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="N&#xe3;o excluir Mercadol&#xf3;gico"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -1317,7 +1325,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="tabsConn" pref="516" max="32767" attributes="0"/>
+                      <Component id="tabsConn" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
