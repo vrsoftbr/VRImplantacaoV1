@@ -192,7 +192,14 @@ public class LogTECGUI extends VRInternalFrame {
                         }
 
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            List<OpcaoProduto> opcoes = new ArrayList<>();
+                            if (chkManterBalanca.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                            }
+                            if (chkManterEansMenores.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                            }
+                            importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
                         }
 
                         {

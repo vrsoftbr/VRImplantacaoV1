@@ -235,21 +235,21 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rs.getString("ean"));
                     imp.setImportId(rs.getString("importId"));
 
-                        ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(imp.getEan(), -2));
-                if (bal != null) {
-                    imp.setQtdEmbalagem(1);
-                    imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
-                    imp.seteBalanca(true);
-                    imp.setValidade(bal.getValidade());
-                } else {
-                    if (this.importarSomenteBalanca) {
-                        continue;
+                    ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(imp.getEan(), -2));
+                    if (bal != null) {
+                        imp.setQtdEmbalagem(1);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.seteBalanca(true);
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        if (this.importarSomenteBalanca) {
+                            continue;
+                        }
+                        //imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.seteBalanca(rs.getBoolean("pesavel"));
+                        imp.setValidade(rs.getInt("validade"));
                     }
-                    //imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.seteBalanca(rs.getBoolean("pesavel"));
-                    imp.setValidade(rs.getInt("validade"));
-                }
 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
