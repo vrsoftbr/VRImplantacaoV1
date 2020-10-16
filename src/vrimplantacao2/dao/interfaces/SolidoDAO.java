@@ -44,7 +44,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     private Connection mvcupom;
     private Connection bcodados;
     
-    private static final Logger LOG = Logger.getLogger(IntelliCashDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(SolidoDAO.class.getName());
 
     public Connection getMvcupom() {
         return mvcupom;
@@ -220,7 +220,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.peso_liquido \n" +
                     "from \n" +
                     "	produto p\n" +
-                    "inner join produto_codigo_pdv ean on p.id_produto = ean.id_produto\n" +
+                    "left join produto_codigo_pdv ean on p.id_produto = ean.id_produto\n" +
                     "inner join produto_loja pl on p.id_produto = pl.id_produto\n" +
                     "left join pis_entrada pe on p.id_pis_entrada = pe.id_pis_entrada\n" +
                     "left join pis_saida ps on p.id_pis_saida = ps.id_pis_saida \n" +

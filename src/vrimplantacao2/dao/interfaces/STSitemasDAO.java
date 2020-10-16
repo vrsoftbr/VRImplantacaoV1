@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -211,7 +212,8 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.GRFATURA as icms_id,"
                     + "	pis.CST_Pis,\n"
                     + "	pis.Cst_Pis_Ent,\n"
-                    + "	pis.Nat_Rec\n"
+                    + "	pis.Nat_Rec,\n"
+                    + " p.ITEMVAREJO\n"
                     + "from ITENS p\n"
                     + "left join ESTOQUE e on e.ITEM = p.ITEM\n"
                     + "	and e.LOCAL = " + getLojaOrigem() + "\n"
@@ -227,7 +229,12 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
+                    
+                    if ("S".equals(rst.getString("ITEMVAREJO").trim())) {
+                        imp.setEan("");
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                    }
 
                     long codigoProduto;
                     codigoProduto = Long.parseLong(imp.getImportId());
@@ -256,7 +263,15 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    
+                    if ((rst.getInt("situacaocadastro") == 0)
+                            || ("S".equals(rst.getString("ITEMVAREJO").trim()))) {
+
+                        imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                    } else {
+                        imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -301,7 +316,13 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.ITEM as idproduto,\n"
                     + "	p.CODBARRASCAIXA as ean\n"
                     + "from ITENS p\n"
-                    + "where p.CODBARRASCAIXA != ''"
+                    + "where p.ITEMVAREJO != 'S'\n"
+                    + "union all \n"
+                    + "select \n"
+                    + " p.ITEM as idproduto,\n"
+                    + " p.REFERENCIA as ean\n"
+                    + "from ITENS p\n"
+                    + "where p.ITEMVAREJO != 'S'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -328,7 +349,8 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         "select\n"
                         + "	e.ITEM as idproduto,\n"
                         + "	coalesce(e.PrcVenda, 0) as precoatacado, \n"
-                        + "	coalesce(e.PrcFuturo1, 0) as precovenda \n"
+                        + "	coalesce(e.PrcFuturo1, 0) as precovenda, \n"
+                        + "     cast((100 - ((coalesce(e.PrcVenda, 0) / coalesce(e.PrcFuturo1, 0)) * 100)) as numeric(15, 2)) as porcentagemdesconto\n"
                         + "from ESTOQUE e\n"
                         + "where coalesce(e.PrcVenda, 0) < coalesce(e.PrcFuturo1, 0) \n"
                         + "and e.LOCAL = " + getLojaOrigem()
@@ -342,6 +364,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("idproduto"));
+                        imp.setEan(codigoBarras);
                         imp.setPrecovenda(rst.getDouble("precovenda"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setQtdEmbalagem(6);
