@@ -623,12 +623,13 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.vlduptit valor,\n"
                     + "    r.vlabatit valorabatido,\n"
                     + "    r.vlpagtit valorpago,\n"
-                    + "    r.obstit observacao\n"
+                    + "    r.obstit observacao,\n"
+                    + "    r.parcela as parcela\n"        
                     + "from\n"
                     + "    titulor r\n"
                     + "join tabcli c on r.codcli = c.codcli\n"
                     + "where\n"
-                    + "    r.dtpagtit is null or (r.vlpagtit < r.vlduptit)\n"
+                    + "    r.dtpagtit is null\n"
                     + "order by\n"
                     + "    r.dtemitit")) {
                 while (rs.next()) {
@@ -640,6 +641,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setNumeroCupom(rs.getString("documento"));
                     imp.setValor(rs.getDouble("valorabatido"));
+                    imp.setParcela(Integer.parseInt(rs.getString("parcela").substring(0, rs.getString("parcela").indexOf("/"))));
                     imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);

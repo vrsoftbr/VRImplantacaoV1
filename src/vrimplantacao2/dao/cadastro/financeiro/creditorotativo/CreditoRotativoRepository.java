@@ -140,7 +140,10 @@ public class CreditoRotativoRepository {
                         CreditoRotativoVO cred = converterRotativo(imp);
                         cred.setId_clientePreferencial(preferencial.getCodigoAtual().getId());
 
-                        getCreditoRotativo = provider.getCreditoRotativo(
+                        provider.gravarRotativo(cred);
+                        anterior.setCodigoAtual(cred);
+                        
+                        /*getCreditoRotativo = provider.getCreditoRotativo(
                                 provider.getLojaVR(), 
                                 cred.getId_clientePreferencial(), 
                                 cred.getNumeroCupom(), 
@@ -150,7 +153,7 @@ public class CreditoRotativoRepository {
                         if (getCreditoRotativo.isEmpty()) {
                             provider.gravarRotativo(cred);
                             anterior.setCodigoAtual(cred);                            
-                        }
+                        }*/
                     } else {
                         LOG.warning("Cliente '" + imp.getIdCliente() + "' não encontrado!");
                     }

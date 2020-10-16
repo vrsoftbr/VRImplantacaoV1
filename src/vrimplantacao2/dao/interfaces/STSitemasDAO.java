@@ -601,7 +601,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("cep_fis"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setBloqueado(rst.getInt("bloqueado") == 1);
-                    imp.setAtivo(rst.getInt("situacao") == 1);
+                    imp.setAtivo(rst.getInt("bloqueado") == 1 ? false : true);
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setFax(rst.getString("fax"));
                     imp.setCelular(rst.getString("celular"));

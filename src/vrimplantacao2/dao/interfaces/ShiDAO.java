@@ -643,9 +643,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n"
+                        /*"select\n"
                         + "    ri.codpro,\n"
-                        + "    ri.cusmed\n"
+                        + "    ri.cusmed as custocomimposto\n"
                         + "from recitem ri\n"
                         + "join(\n"
                         + "select\n"
@@ -656,14 +656,31 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "group by\n"
                         + "    codpro, filial) a using (codpro, filial, data)\n"
                         + "where ri.tipmov = 1\n"
-                        + "and ri.filial = " + getLojaOrigem()
+                        + "and ri.filial = " + getLojaOrigem()*/
+                        
+                        "select\n"
+                        + "    pc.codpro,\n"
+                        + "    pc.custo as custocomimposto\n"
+                        + "from\n"
+                        + "    precocusto pc\n"
+                        + "    join(select\n"
+                        + "             codpro,\n"
+                        + "             filial,\n"
+                        + "             max(data) data\n"
+                        + "         from\n"
+                        + "             precocusto\n"
+                        + "         group by\n"
+                        + "             codpro, filial) a using (codpro, filial, data)\n"
+                        + "where\n"
+                        + "    pc.filial = " + getLojaOrigem()
+                        
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rst.getString("codpro"));
-                        imp.setCustoComImposto(rst.getDouble("cusmed"));
+                        imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                         result.add(imp);
                     }
                 }
