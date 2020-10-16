@@ -159,26 +159,6 @@
                     <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContasPagar">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Contas &#xe0; Pagar"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornReceberDevolucaoPartir0108">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Receber Devolu&#xe7;&#xe3;o (Vencimento &#xe0; partir de 01/08)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornReceberDevolucaoAnterior0108">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Receber Devolu&#xe7;&#xe3;o (Vencimento anterior 01/08)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberDevolucaoDuplicadas">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Receber Devolu&#xe7;&#xe3;o Duplicados"/>
-                  </Properties>
-                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
@@ -232,13 +212,10 @@
                                   <Component id="chkCliDataAdmissaoEmpresa" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCliSalarioEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliAtivo" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="chkReceberVendaPrazoPartir0108" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkReceberVendaPrazoAnterior0108" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="63" max="32767" attributes="0"/>
                       </Group>
@@ -274,17 +251,13 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkCliDataAdmissaoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliSalarioEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliAtivo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkReceberVendaPrazoPartir0108" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkReceberVendaPrazoAnterior0108" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="69" max="32767" attributes="0"/>
+                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="96" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -383,14 +356,9 @@
                     <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberVendaPrazoPartir0108">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliAtivo">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Receber Venda Prazo (Vencimento &#xe0; partir 01/08)"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberVendaPrazoAnterior0108">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Receber Venda Prazo (Vencimento  anterior 01/08)"/>
+                    <Property name="text" type="java.lang.String" value="Ativo"/>
                   </Properties>
                 </Component>
               </SubComponents>

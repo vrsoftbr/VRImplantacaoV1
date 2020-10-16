@@ -217,10 +217,6 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarProdutoFornecedor();
                         }
 
-                        if (chkContasPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }
-                                                
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
@@ -271,6 +267,9 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         if (chkCliSalarioEmpresa.isSelected()) {
                             opt.add(OpcaoCliente.SALARIO);
+                        }
+                        if (chkCliAtivo.isSelected()) {
+                            opt.add(OpcaoCliente.SITUACAO_CADASTRO);
                         }
                         
                         if (!opt.isEmpty()) {
@@ -342,10 +341,6 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         chkFornPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFornPrazoPedido = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
-        chkFornReceberDevolucaoPartir0108 = new vrframework.bean.checkBox.VRCheckBox();
-        chkFornReceberDevolucaoAnterior0108 = new vrframework.bean.checkBox.VRCheckBox();
-        chkReceberDevolucaoDuplicadas = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
@@ -365,8 +360,7 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         chkCliDataAdmissaoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkCliSalarioEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        chkReceberVendaPrazoPartir0108 = new vrframework.bean.checkBox.VRCheckBox();
-        chkReceberVendaPrazoAnterior0108 = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliAtivo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -414,18 +408,6 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
 
-        chkContasPagar.setText("Contas à Pagar");
-        tabFornecedor.add(chkContasPagar);
-
-        chkFornReceberDevolucaoPartir0108.setText("Receber Devolução (Vencimento à partir de 01/08)");
-        tabFornecedor.add(chkFornReceberDevolucaoPartir0108);
-
-        chkFornReceberDevolucaoAnterior0108.setText("Receber Devolução (Vencimento anterior 01/08)");
-        tabFornecedor.add(chkFornReceberDevolucaoAnterior0108);
-
-        chkReceberDevolucaoDuplicadas.setText("Receber Devolução Duplicados");
-        tabFornecedor.add(chkReceberDevolucaoDuplicadas);
-
         tabImportacao.addTab("Fornecedores", tabFornecedor);
 
         chkClientePreferencial.setText("Cliente Preferencial");
@@ -469,9 +451,7 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkClienteEventual.setText("Cliente Eventual");
 
-        chkReceberVendaPrazoPartir0108.setText("Receber Venda Prazo (Vencimento à partir 01/08)");
-
-        chkReceberVendaPrazoAnterior0108.setText("Receber Venda Prazo (Vencimento  anterior 01/08)");
+        chkCliAtivo.setText("Ativo");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -512,12 +492,10 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(tabClientesLayout.createSequentialGroup()
                         .addComponent(chkCliDataAdmissaoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tabClientesLayout.createSequentialGroup()
-                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkReceberVendaPrazoPartir0108, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkReceberVendaPrazoAnterior0108, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -546,16 +524,13 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkCliDataAdmissaoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCliSalarioEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkReceberVendaPrazoPartir0108, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkReceberVendaPrazoAnterior0108, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(69, Short.MAX_VALUE))
+                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(96, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -706,6 +681,7 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCliAtivo;
     private vrframework.bean.checkBox.VRCheckBox chkCliBairroEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkCliCargoEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkCliCepEmpresa;
@@ -722,20 +698,14 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteValorLimite;
-    private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkDataNascimentoConjuge;
     private vrframework.bean.checkBox.VRCheckBox chkFornNumeroEnd;
     private vrframework.bean.checkBox.VRCheckBox chkFornPrazoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornPrazoPedido;
-    private vrframework.bean.checkBox.VRCheckBox chkFornReceberDevolucaoAnterior0108;
-    private vrframework.bean.checkBox.VRCheckBox chkFornReceberDevolucaoPartir0108;
     private vrframework.bean.checkBox.VRCheckBox chkFornTelefone;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkReceberDevolucaoDuplicadas;
-    private vrframework.bean.checkBox.VRCheckBox chkReceberVendaPrazoAnterior0108;
-    private vrframework.bean.checkBox.VRCheckBox chkReceberVendaPrazoPartir0108;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
