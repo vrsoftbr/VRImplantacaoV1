@@ -175,7 +175,7 @@ public class ProdutoRepository {
                                 }
                             } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
                                 strID = String.valueOf(ean);
-                            } else if (imp.isManterEAN() && ean >= 1 && ean <= 999999) {
+                            } else if ((importarMenoresQue7Digitos || imp.isManterEAN()) && ean >= 1 && ean <= 999999) {
                                 strID = String.valueOf(ean);
                             }
 
