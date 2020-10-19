@@ -207,7 +207,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from tabpro p\n"
                     + "left join tabproimp i on i.codpro = p.codpro\n"
                     + "left join TABPROFIL f on f.codpro = p.codpro and f.codfil = " + getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() + " "
-                    /*+ "union all \n"
+            /*+ "union all \n"
                     + "select\n"
                     + "distinct p.codpro as id,\n"
                     + "ean.codigo as ean,\n"
@@ -261,7 +261,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(Utils.formataNumero(rst.getString("id")));
                     imp.setEan(Utils.formataNumero(rst.getString("ean")));
-                    
+
                     if ("7599".equals(imp.getImportId())) {
                         System.out.println(imp.getEan());
                     }
@@ -611,7 +611,25 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select \n"
+                    + "    r.codtit id,\n"
+                    + "    r.codcli idcliente, \n"
+                    + "    --c.cgc cnpj,\n"
+                    + "    r.nrnota documento, \n"
+                    + "    r.nomcli razao,\n"
+                    + "    r.dtemitit emissao,\n"
+                    + "    r.dtventit vencimento,\n"
+                    + "    --r.dtpagtit pagamento,\n"
+                    + "    r.vlduptit valor,\n"
+                    + "    --r.vlabatit valorabatido,\n"
+                    + "    --r.vlpagtit valorpago,\n"
+                    + "    r.obstit observacao,\n"
+                    + "    r.parcela as parcela\n"
+                    + "    --mov.vlduptit as valorconta\n"
+                    + " from MOVIINCR r\n"
+                    + "where r.codfil = "+ getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() +"\n"
+                    + "and r.sttit = 'E'"
+            /*"select\n"
                     + "    r.codtit id,\n"
                     + "    r.codcli idcliente,\n"
                     + "    c.cgc cnpj,\n"
@@ -631,16 +649,17 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    r.dtpagtit is null\n"
                     + "order by\n"
-                    + "    r.dtemitit")) {
+                    + "    r.dtemitit"*/
+            )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    //imp.setCnpjCliente(rs.getString("cnpj"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setNumeroCupom(rs.getString("documento"));
-                    imp.setValor(rs.getDouble("valorabatido"));
+                    imp.setValor(rs.getDouble("valor"));
                     imp.setParcela(Integer.parseInt(rs.getString("parcela").substring(0, rs.getString("parcela").indexOf("/"))));
                     imp.setObservacao(rs.getString("observacao"));
 

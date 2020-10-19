@@ -261,9 +261,6 @@ public class LogTECGUI extends VRInternalFrame {
                             if (chkEmbalagemVolume.isSelected()) {
                                 opcoes.add(OpcaoProduto.VOLUME_TIPO_EMBALAGEM);
                             }
-                            if (chkManterEansMenores.isSelected()) {
-                                opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
-                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -441,6 +438,8 @@ public class LogTECGUI extends VRInternalFrame {
         cbxUnifProdutoForn = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliEventual = new vrframework.bean.checkBox.VRCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioPostgres = new vrframework.bean.textField.VRTextField();
@@ -459,20 +458,20 @@ public class LogTECGUI extends VRInternalFrame {
 
         setTitle("Lyncis");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -830,6 +829,25 @@ public class LogTECGUI extends VRInternalFrame {
 
         tab.addTab("Unificação", tabUnificacao);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(147, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(108, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Balança", jPanel1);
+
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Postgres"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
@@ -1098,6 +1116,7 @@ public class LogTECGUI extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.comboBox.VRComboBox cmbPlanoContas;
+    private javax.swing.JPanel jPanel1;
     private vrframework.bean.label.VRLabel lblPlanoContas;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private javax.swing.JPanel pnlImpProd;
@@ -1114,6 +1133,7 @@ public class LogTECGUI extends VRInternalFrame {
     private vrframework.bean.passwordField.VRPasswordField txtSenhaPostgres;
     private vrframework.bean.textField.VRTextField txtUsuarioPostgres;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;
