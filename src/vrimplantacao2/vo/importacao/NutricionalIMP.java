@@ -39,8 +39,10 @@ public class NutricionalIMP {
     private int percentualFerro;// integer NOT NULL,
     private int percentualSodio;// integer NOT NULL,
     private String porcao;// character varying(35) NOT NULL,
-    private List<String> mensagemAlergico = new ArrayList<>();// character varying(168),
-    private Set<String> produtos = new HashSet<>();
+    private int idTipoMedida = -1;
+    private int medidaInteira = 1;
+    private final List<String> mensagemAlergico = new ArrayList<>();// character varying(168),
+    private final Set<String> produtos = new HashSet<>();
     
     /**
      * Executa um cálculo para definir as porcentagens do nutricional.
@@ -285,6 +287,22 @@ public class NutricionalIMP {
 
     public Set<String> getProdutos() {
         return produtos;
+    }
+
+    public int getIdTipoMedida() {
+        return idTipoMedida;
+    }
+
+    public void setIdTipoMedida(int idTipoMedida) {
+        this.idTipoMedida = idTipoMedida;
+    }
+
+    public int getMedidaInteira() {
+        return medidaInteira;
+    }
+
+    public void setMedidaInteira(int medidaInteira) {
+        this.medidaInteira = medidaInteira;
     }
     
     public void addMensagemAlergico(String mensagem) {

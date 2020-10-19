@@ -20,6 +20,7 @@ import jxl.WorkbookSettings;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
@@ -39,6 +40,7 @@ import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -91,6 +93,7 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.ATIVO,
+                OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
@@ -449,6 +452,108 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
     }
 
     @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoFirebird.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "WITH nut AS (\n" +
+                        "SELECT\n" +
+                        "	n.WIDNUTRICIONAL,\n" +
+                        "	n.WNOMENUTRICIONAL nome,\n" +
+                        "	n.WVALORENERGETICO caloria,\n" +
+                        "	n.WVALORCARBOIDRATOS carboidrato,\n" +
+                        "	n.WVALORPROTEINAS proteina,\n" +
+                        "	n.WVALORGORDURASSATURADAS gordurasaturada,\n" +
+                        "	n.WVALORGORDURASTRANS gorduratrans,\n" +
+                        "	n.WVALORGORDURASTOTAIS gorduratotal,\n" +
+                        "	n.WVALORFIBRAALIMENTAR fibras,\n" +
+                        "	n.WVALORSODIO sodio,\n" +
+                        "	n.WQTDFRACIONADA qtd,\n" +
+                        "	n.WQTDUNIDADE tipomedida,\n" +
+                        "	n.WQTDINTEIRA qtdinteira,\n" +
+                        "	n.WPORCAO porcao\n" +
+                        "FROM\n" +
+                        "	NUTRICIONAIS n\n" +
+                        "WHERE\n" +
+                        "	n.WSTATUS IS NULL\n" +
+                        "), prod AS (\n" +
+                        "SELECT\n" +
+                        "	p.WIDPRODUTO id,\n" +
+                        "	ean.wcodigopro ean,\n" +
+                        "	CASE\n" +
+                        "		WHEN (ean.wbalanca = 'S' OR p.wfracionado = 'S') THEN 1\n" +
+                        "		ELSE 0\n" +
+                        "	END pesavel,\n" +
+                        "	p.WIDNUTRICIONAL \n" +
+                        "FROM\n" +
+                        "	PRODUTOS p\n" +
+                        "	LEFT JOIN (\n" +
+                        "	    SELECT\n" +
+                        "	    	*\n" +
+                        "	    FROM\n" +
+                        "	    	codigospro\n" +
+                        "	    WHERE\n" +
+                        "	    	wnaoreverter IS NULL\n" +
+                        "	    	AND wstatus IS NULL\n" +
+                        "	 ) ean ON\n" +
+                        "	 	ean.widproduto = p.widproduto \n" +
+                        "WHERE\n" +
+                        "	p.WSTATUS IS null\n" +
+                        "	AND NOT WIDNUTRICIONAL IS NULL\n" +
+                        ")\n" +
+                        "SELECT\n" +
+                        "	CASE \n" +
+                        "		WHEN pesavel = 1 THEN '000' || ean\n" +
+                        "		ELSE id\n" +
+                        "	END id_produto,\n" +
+                        "	nut.WIDNUTRICIONAL,\n" +
+                        "	nut.nome,\n" +
+                        "	nut.caloria,\n" +
+                        "	nut.carboidrato,\n" +
+                        "	nut.proteina,\n" +
+                        "	nut.gordurasaturada,\n" +
+                        "	nut.gorduratrans,\n" +
+                        "	nut.gorduratotal,\n" +
+                        "	nut.fibras,\n" +
+                        "	nut.sodio,\n" +
+                        "	nut.tipomedida,\n" +
+                        "	nut.qtdinteira,\n" +
+                        "	nut.qtd,\n" +
+                        "	nut.porcao\n" +
+                        "FROM \n" +
+                        "	prod\n" +
+                        "	JOIN nut ON\n" +
+                        "		prod.widnutricional = nut.widnutricional"
+                )
+                ) {
+            while (rs.next()) {
+                NutricionalIMP imp = new NutricionalIMP();
+                
+                imp.setId(rs.getString("WIDNUTRICIONAL"));
+                imp.addProduto(rs.getString("id_produto"));
+                imp.setDescricao(rs.getString("nome"));
+                imp.setCaloria(rs.getInt("caloria"));
+                imp.setCarboidrato(rs.getDouble("carboidrato"));
+                imp.setProteina(rs.getDouble("proteina"));
+                imp.setGorduraSaturada(rs.getDouble("gordurasaturada"));
+                imp.setGorduraTrans(rs.getDouble("gorduratrans"));
+                imp.setGordura(rs.getDouble("gorduratotal"));
+                imp.setFibra(rs.getDouble("fibras"));
+                imp.setSodio(rs.getDouble("sodio"));
+                imp.setIdTipoMedida(rs.getInt("tipomedida"));
+                imp.setMedidaInteira(rs.getInt("qtdinteira"));
+                imp.setPorcao(rs.getString("porcao"));
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -669,7 +774,8 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setId(rst.getString("id"));
                     long cpfCnpj = Utils.stringToLong(rst.getString("wcnpj"), -2);
                     if (cpfCnpj < 999999) {
-                        cpfCnpj = Utils.stringToLong(rst.getString("wcpf"), -2);
+                        continue;
+                        //cpfCnpj = Utils.stringToLong(rst.getString("wcpf"), -2);
                     }
                     imp.setCnpj(String.valueOf(cpfCnpj));
                     imp.setInscricaoestadual(rst.getString("insc_estadual"));
