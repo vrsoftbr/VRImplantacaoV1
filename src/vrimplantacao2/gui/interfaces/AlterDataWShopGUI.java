@@ -12,16 +12,16 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WShopDAO;
+import vrimplantacao2.dao.interfaces.AlterDataWShopDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
 
-public class WShopGUI extends VRInternalFrame {    
+public class AlterDataWShopGUI extends VRInternalFrame {    
     
     private static final String SISTEMA = "WSoft";
-    private static WShopGUI instance;
+    private static AlterDataWShopGUI instance;
     
-    private final WShopDAO dao = new WShopDAO();
+    private final AlterDataWShopDAO dao = new AlterDataWShopDAO();
     private final ConexaoPostgres connSQL = new ConexaoPostgres();
     
     private int vLojaVR = -1;
@@ -49,7 +49,7 @@ public class WShopGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private WShopGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private AlterDataWShopGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -185,7 +185,7 @@ public class WShopGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new WShopGUI(i_mdiFrame);
+                instance = new AlterDataWShopGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -231,20 +231,20 @@ public class WShopGUI extends VRInternalFrame {
 
         setTitle("Sysmo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
