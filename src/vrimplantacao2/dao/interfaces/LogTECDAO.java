@@ -312,17 +312,21 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n"
-                    + "     pf.cod_fornece fornecedor,\n"
-                    + "     p.cod_produto produto,\n"
-                    + "     pf.cod_barras codexterno\n"
-                    + " from\n"
-                    + "     produto_fornecedor pf\n"
-                    + "     left join produto p\n"
-                    + "     on p.cod_produto = pf.cod_produto\n"
-                    + "     and p.cod_empresa = pf.cod_empresa\n"
-                    + " where pf.cod_empresa = " + getLojaOrigem() + "\n"
-                    + " order by 1,2")) {
+                    "select\n" +
+                    "	pf.cod_fornece fornecedor,\n" +
+                    "	p.cod_produto produto,\n" +
+                    "	pf.cod_barras codexterno,\n" +
+                    "	um.des_unidade unidade,\n" +
+                    "	um.qtd\n" +
+                    "from\n" +
+                    "	produto_fornecedor pf\n" +
+                    "left join produto p on p.cod_produto = pf.cod_produto and \n" +
+                    "	p.cod_empresa = pf.cod_empresa\n" +
+                    "left join unidade_medida um on pf.cod_unidade = um.cod_unidade\n" +
+                    "where \n" +
+                    "	pf.cod_empresa = " + getLojaOrigem() + "\n" +
+                    "order by \n" +
+                    "1,2")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -330,6 +334,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("fornecedor"));
                     imp.setIdProduto(rs.getString("produto"));
                     imp.setCodigoExterno(rs.getString("codexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtd"));
 
                     result.add(imp);
                 }
