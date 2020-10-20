@@ -201,36 +201,42 @@ public class G3DAO extends InterfaceDAO {
                     + "	p.idgrupo AS mercadologico1,\n"
                     + "	p.idsubgrupo as mercadologico2,\n"
                     + "	p.idsubgrupo1 as mercadologico3,\n"
-                    + "	margem,\n"
-                    + "	custo custosemimposto,\n"
-                    + "	custo custocomimposto,\n"
-                    + "	venda1 precovenda,\n"
+                    + "	pp.margem,\n"
+                    + "	pp.custo custosemimposto,\n"
+                    + "	pp.custo custocomimposto,\n"
+                    + "	pp.venda1 precovenda,\n"
                     + "	dtcadastro datacadastro,\n"
                     + "	coalesce(pesoproduto,0) pesobruto,\n"
                     + "	coalesce(pesovariavel,0) pesoliquido,\n"
                     + "	estmax estoquemaximo,\n"
                     + "	estmin estoqueminimo,\n"
                     + "	estoque_atual AS estoque,\n"
-                    + "	ean.CodigoEan ean,\n"
+                    + "	ean,\n"
                     + "	unidsaida tipoembalagem,\n"
                     + "	classfiscal AS ncm,\n"
                     + "	p.cest as cest,\n"
                     + "	case p.idsituacao when 1 then 'ATIVO' ELSE 'INATIVO' end situacaocadastro,\n"
+                    + "	substring(tabIcmsProdEntrada,1,2) as icmscstentrada,\n"
+                    + "	icmscompra icmsaliqentrada,\n"
+                    + "	redbase icmsreducaoentrada,\n"
                     + "	substring(tabicmsprod,1,2) as icmsCstSaida,\n"
-                    + " p.icms icmsAliqSaida,\n"
-                    + "	redbase icmsReducaoSaida,\n"
+                    + "	ct.aliquotaIcms icmsAliqSaida,\n"
+                    + "	RedBaseVenda icmsReducaoSaida,\n"
                     + "	substring(tabicmsprod,1,2) as icmsCstConsumidor,\n"
-                    + " p.icms aliquotaconsumidor,\n"
-                    + " redbase icmsReducaoConsumidor,\n"
+                    + "	ct.aliquotaIcms aliquotaconsumidor,\n"
+                    + "	redbasevenda icmsReducaoConsumidor,\n"
                     + "	substring(cst_pis,1,2) as piscofinsCstCredito,\n"
                     + "	substring(cst_pis_saida,1,2) as piscofinsCstDebito,\n"
-                    + " coalesce(nat_receita,'') naturezareceita \n"
+                    + "	coalesce(nat_receita,'') naturezareceita\n"
                     + "FROM produto p \n"
                     + "	left join produto_estoque pe\n"
                     + "		on pe.idproduto = p.idproduto\n"
-                    + " left join produto_ean ean\n"
-                    + "         on ean.idproduto = p.idproduto \n"
-                    + "group by p.idProduto\n"
+                    + "	left join produto_preco pp\n"
+                    + "		on pp.idproduto = p.idproduto and pe.id_loja = pp.id_loja\n"
+                    + " left join cadtributacao ct\n"
+                    + "		on p.SitTrib = ct.idCadTributacao\n"
+                    + "where pe.id_loja = " + getLojaOrigem() + "\n"
+                    + "	group by p.idProduto"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -302,6 +308,12 @@ public class G3DAO extends InterfaceDAO {
                     imp.setIcmsCstSaida(rst.getInt("icmsCstSaida"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsAliqSaida"));
                     imp.setIcmsReducaoSaida(rst.getDouble("icmsReducaoSaida"));
+
+                    // ICMS ENTRADA DENTRO ESTADO
+                    imp.setIcmsCstEntrada(rst.getInt("icmscstentrada"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icmsaliqentrada"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("icmsreducaoentrada"));
+
                     /*
                      imp.setIcmsCstEntrada(rst.getInt("COD_CST_DENTRO"));
                      imp.setIcmsAliqEntrada(rst.getDouble("ALIQUOTA_ICMS_DENTRO"));
@@ -557,7 +569,7 @@ public class G3DAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCpf(rst.getString("cpf"));
                     imp.setNumeroCheque(rst.getString("numerocheque"));
@@ -574,7 +586,7 @@ public class G3DAO extends InterfaceDAO {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setSituacaoCheque(("A".equals(rst.getString("situacaocheque")) ? SituacaoCheque.ABERTO : SituacaoCheque.BAIXADO));
                     imp.setDataHoraAlteracao(rst.getTimestamp("alteracao"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -615,7 +627,7 @@ public class G3DAO extends InterfaceDAO {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rst.getString("idfornecedor"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -675,7 +687,7 @@ public class G3DAO extends InterfaceDAO {
                     + "from\n"
                     + "  itensfornecedor\n"
                     + "order by \n"
-                    + "	fornecedor "
+                    + "	idfornecedor "
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();

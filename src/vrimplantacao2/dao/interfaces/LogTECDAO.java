@@ -58,7 +58,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stmt.executeQuery(
                     "select distinct\n" +
                     "	'SAIDA' tipo,\n" +
-                    "	cod_taxa id,\n" +
+                    "	cod_taxa || '' || cod_sit_tributaria id,\n" +
                     "	cod_taxa descricao,\n" +
                     "	cod_sit_tributaria cst,\n" +
                     "	aliq_ecf aliquota,\n" +
@@ -202,7 +202,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	pis.cod_st_saida piscofinsCstDebito,\n" +
                 "	pis.cod_st_entrada piscofinsCstCredito,\n" +
                 "	pis.nat_receita	natrec,\n" +
-                "	cp.cod_taxa id_icms_s,\n" +
+                "	cp.cod_taxa || '' || cp.cod_sit_tributaria id_icms_s,\n" +
                 "	cp.cod_sit_tributaria icms_cst_s,\n" +
                 "	cp.aliq_ecf icms_aliq_s,\n" +
                 "	0 icms_red_s,\n" +

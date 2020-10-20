@@ -31,9 +31,9 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class WShopDAO extends InterfaceDAO {
+public class AlterDataWShopDAO extends InterfaceDAO {
 
-    private static final Logger LOG = Logger.getLogger(WShopDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(AlterDataWShopDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -66,6 +66,7 @@ public class WShopDAO extends InterfaceDAO {
                     OpcaoProduto.CUSTO,
                     OpcaoProduto.CUSTO_COM_IMPOSTO,
                     OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.ESTOQUE,
                     OpcaoProduto.ATIVO,
                     OpcaoProduto.NCM,

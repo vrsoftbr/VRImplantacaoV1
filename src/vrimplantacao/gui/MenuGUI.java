@@ -260,7 +260,7 @@ import vrimplantacao2.gui.interfaces.ViggoGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
-import vrimplantacao2.gui.interfaces.WShopGUI;
+import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -4647,7 +4647,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSriActionPerformed
 
     private void mnuAlterDataWShopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAlterDataWShopActionPerformed
-        WShopGUI.exibir(this);
+        AlterDataWShopGUI.exibir(this);
     }//GEN-LAST:event_mnuAlterDataWShopActionPerformed
 
     private void mnuCadastraFacilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastraFacilActionPerformed
