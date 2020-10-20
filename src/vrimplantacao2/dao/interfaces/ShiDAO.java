@@ -25,12 +25,14 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.dao.LogCustoDAO;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao.vo.vrimplantacao.ProdutoComplementoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -40,6 +42,7 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.LogCustoVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
@@ -86,11 +89,11 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private Boolean temArquivoBalanca = true;
     private Boolean bancoSfi = false;
     private String i_arquivo;
-    
+
     public void setArquivo(String i_arquivo) {
         this.i_arquivo = i_arquivo;
     }
-    
+
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
     }
@@ -106,7 +109,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public Boolean isTemArquivoBalanca() {
         return this.temArquivoBalanca;
     }
-    
+
     public void setBancoSfi(Boolean bancoSfi) {
         this.bancoSfi = bancoSfi;
     }
@@ -117,7 +120,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         if (bancoSfi) {
             sistema = "SHI - SFI";
         }
-        
+
         return sistema;
     }
 
@@ -272,7 +275,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.peso,\n"
                     + "    pv.estmin,\n"
                     + "    pv.estmax,\n"
-                    + "    case p.compra when 'S' then 1 else 0 end descontinuado, \n"        
+                    + "    case p.compra when 'S' then 1 else 0 end descontinuado, \n"
                     + "    0 as estoque,\n"
                     + "    pv.lucro,\n"
                     + "    0 custo,\n"
@@ -288,7 +291,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    icm.icms,\n"
                     + "    icm.cst as icms_cst_credito,\n"
                     + "    icm.icmbas_e as icms_credito,\n"
-                    + "    icm.reduzi_e as icms_reducao_credito\n"        
+                    + "    icm.reduzi_e as icms_reducao_credito\n"
                     + "from\n"
                     + "    produtos p\n"
                     + "    join filial f on f.codigo = " + getLojaOrigem() + "\n"
@@ -298,7 +301,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join icmsprod icm on icm.codpro = p.codigo and icm.estado = f.estado\n"
                     + "where p.balanc = 'S'\n"
                     + "and p.inativ = 'N'\n"
-                    + "and ean.barras <= 99999\n"        
+                    + "and ean.barras <= 99999\n"
                     + "order by\n"
                     + "    p.codigo"
             )) {
@@ -310,7 +313,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    
+
                     long codigoProduto;
                     codigoProduto = Long.parseLong(imp.getEan());
                     if (codigoProduto <= Integer.MAX_VALUE) {
@@ -326,7 +329,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(rst.getInt("validade"));
                         imp.seteBalanca(false);
                     }
-                        
+
                     if ((imp.getEan() != null)
                             && (!imp.getEan().trim().isEmpty())
                             && (Long.parseLong(imp.getEan()) <= 999999)) {
@@ -334,7 +337,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setManterEAN(false);
                     }
-                    
+
                     imp.setTipoEmbalagemCotacao(rst.getString("unidadecotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdEmbalagemCx"));
@@ -379,11 +382,11 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("cstpis")));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("cstpiscr")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("natrec")));
-                    
+
                     imp.setIcmsDebitoId(rst.getString("icms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("icms"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms"));
-                    
+
                     String icmsCre = getAliquotaCreditoKey(
                             rst.getString("icms_cst_credito"),
                             rst.getDouble("icms_credito"),
@@ -391,16 +394,16 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     );
                     imp.setIcmsCreditoId(icmsCre);
                     imp.setIcmsCreditoForaEstadoId(icmsCre);
-                    
+
                     imp.setIcmsConsumidorId(rst.getString("icms"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -439,7 +442,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    icm.icms,\n"
                     + "    icm.cst as icms_cst_credito,\n"
                     + "    icm.icmbas_e as icms_credito,\n"
-                    + "    icm.reduzi_e as icms_reducao_credito\n"        
+                    + "    icm.reduzi_e as icms_reducao_credito\n"
                     + "from\n"
                     + "    produtos p\n"
                     + "    join filial f on f.codigo = " + getLojaOrigem() + "\n"
@@ -506,7 +509,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("icms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("icms"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms"));
-                    
+
                     String icmsCre = getAliquotaCreditoKey(
                             rst.getString("icms_cst_credito"),
                             rst.getDouble("icms_credito"),
@@ -514,9 +517,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     );
                     imp.setIcmsCreditoId(icmsCre);
                     imp.setIcmsCreditoForaEstadoId(icmsCre);
-                    
+
                     imp.setIcmsConsumidorId(rst.getString("icms"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -561,14 +564,13 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         } else if (opcao == OpcaoProduto.ESTOQUE) {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = sco.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(                        
+                try (ResultSet rst = stm.executeQuery(
                         "select "
                         + "codigo, "
                         + "codassoc, "
                         + "qtdassoc "
-                        + "from produtos "                        
-                        
-                        /*"select\n"
+                        + "from produtos "
+                /*"select\n"
                         + "    e.codpro,\n"
                         + "    e.saldoatu,\n"
                         + "    e.saldoant,\n"
@@ -591,7 +593,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rst.getString("codigo"));
-                        
+
                         try (ResultSet rst2 = stm.executeQuery(
                                 "SELECT first 1 saldoatu\n"
                                 + "  FROM ESTOQUE\n"
@@ -602,7 +604,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         )) {
                             if (rst2.next()) {
                                 imp.setEstoque(rst2.getDouble("saldoatu") / rst.getDouble("qtdassoc"));
-                                result.add(imp);                                
+                                result.add(imp);
                             }
                         }
                     }
@@ -657,7 +659,6 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "    codpro, filial) a using (codpro, filial, data)\n"
                         + "where ri.tipmov = 1\n"
                         + "and ri.filial = " + getLojaOrigem()*/
-                        
                         "select\n"
                         + "    pc.codpro,\n"
                         + "    pc.custo as custocomimposto\n"
@@ -673,7 +674,6 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "             codpro, filial) a using (codpro, filial, data)\n"
                         + "where\n"
                         + "    pc.filial = " + getLojaOrigem()
-                        
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -747,17 +747,17 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id"));
-                        
+
                         String id_pautafiscal = rst.getString("ncm")
-                            + rst.getString("iva")
-                            + rst.getString("icms_cst")
-                            + rst.getString("icms_debito")
-                            + rst.getString("icms_reducao_debito")
-                            + rst.getString("icms_credito")
-                            + rst.getString("icms_reducao_credito");
-                        
+                                + rst.getString("iva")
+                                + rst.getString("icms_cst")
+                                + rst.getString("icms_debito")
+                                + rst.getString("icms_reducao_debito")
+                                + rst.getString("icms_credito")
+                                + rst.getString("icms_reducao_credito");
+
                         imp.setPautaFiscalId(id_pautafiscal);
-                        
+
                         result.add(imp);
                     }
                 }
@@ -775,7 +775,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                 red
         );
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -794,7 +794,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descri")));
                 }
             }
-            
+
             try (ResultSet rs = stm.executeQuery(
                     "select distinct "
                     + "cst as icms_cst_credito, "
@@ -821,7 +821,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
@@ -831,7 +831,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "     p.codigo id, \n"
                     + "     icm.icms,\n"
-                    + "     ncm.clafis as ncm,\n"        
+                    + "     ncm.clafis as ncm,\n"
                     + "     icm.ivast as iva,\n"
                     + "     icm.cst as icms_cst,\n"
                     + "     icm.icmbas as icms_debito,\n"
@@ -860,38 +860,38 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                             + rst.getString("icms_credito")
                             + rst.getString("icms_reducao_credito")
                     );
-                    
+
                     imp.setNcm(rst.getString("ncm"));
                     imp.setIva(rst.getDouble("iva"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setUf(Parametros.get().getUfPadraoV2().getSigla());
-                    
+
                     int cstSaida = rst.getInt("icms_cst");
                     double aliquotaSaida = rst.getDouble("icms_debito");
                     double reduzidoSaida = rst.getDouble("icms_reducao_debito");
                     int cstEntrada = rst.getInt("icms_cst");
                     double aliquotaEntrada = rst.getDouble("icms_credito");
                     double reduzidoEntrada = rst.getDouble("icms_reducao_credito");
-                    
+
                     if (aliquotaSaida > 0 && reduzidoSaida == 0) {
                         cstSaida = 0;
                     }
                     if (aliquotaEntrada > 0 && reduzidoEntrada == 0) {
                         cstEntrada = 0;
                     }
-                    
+
                     if (aliquotaSaida > 0 && reduzidoSaida > 0) {
                         cstSaida = 20;
                     }
                     if (aliquotaEntrada > 0 && reduzidoEntrada > 0) {
                         cstEntrada = 20;
                     }
-                    
+
                     imp.setAliquotaDebito(cstSaida, aliquotaSaida, reduzidoSaida);
                     imp.setAliquotaDebitoForaEstado(cstSaida, aliquotaSaida, reduzidoSaida);
                     imp.setAliquotaCredito(cstEntrada, aliquotaEntrada, reduzidoEntrada);
                     imp.setAliquotaCreditoForaEstado(cstEntrada, aliquotaEntrada, reduzidoEntrada);
-                    
+
                     result.add(imp);
                 }
             }
@@ -962,7 +962,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                         }
-                        
+
                         result.add(imp);
                     }
                 }
@@ -1719,18 +1719,18 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
                     imp.setId(rst.getString("id"));
-                    
+
                     imp.setIdFornecedor(Utils.stringLong(rst.getString("id_fornecedor")));
                     imp.setCnpj(rst.getString("cnpj"));
-                                        
+
                     String numerodocumento = Utils.formataNumero(rst.getString("documento"));
-                    
+
                     if (Long.parseLong(numerodocumento) <= Integer.MAX_VALUE) {
                         imp.setNumeroDocumento(numerodocumento);
                     } else {
                         imp.setNumeroDocumento("0");
                     }
-                                        
+
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataEntrada(rst.getDate("dataentrada"));
                     imp.setObservacao(rst.getString("observacao") == null ? "" : rst.getString("observacao")
@@ -1761,57 +1761,57 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     private List<PagarFornecedorVO> getTipoEntradaPagarFornecedor() throws Exception {
         List<PagarFornecedorVO> result = new ArrayList<>();
         int linha;
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
         Date dataEntrada;
-        
+
         try {
             WorkbookSettings settings = new WorkbookSettings();
             settings.setEncoding("CP1250");
             Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
             Sheet[] sheets = arquivo.getSheets();
-            
+
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
-                
+
                 for (int i = 0; i < sheet.getRows(); i++) {
-                    linha ++;
-                    
+                    linha++;
+
                     if (linha == 1) {
                         continue;
                     }
-                    
+
                     Cell cellIdFornecedor = sheet.getCell(0, i);
                     Cell cellTipoEntrada = sheet.getCell(1, i);
                     Cell cellNumeroDocumento = sheet.getCell(2, i);
                     Cell cellDataEntrada = sheet.getCell(3, i);
-                    
+
                     PagarFornecedorVO vo = new PagarFornecedorVO();
                     vo.setId_fornecedor(Integer.parseInt(cellIdFornecedor.getContents().trim()));
                     vo.setId_tipoentrada(Integer.parseInt(cellTipoEntrada.getContents().substring(0, cellTipoEntrada.getContents().indexOf("-")).trim()));
                     vo.setNumerodocumento(Integer.parseInt(cellNumeroDocumento.getContents().trim()));
                     vo.setDataentrada(fmt.parse(cellDataEntrada.getContents().substring(0, cellDataEntrada.getContents().indexOf("-")).trim()));
                     result.add(vo);
-                }            
+                }
             }
-            
+
             return result;
         } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public void importarTipoEntradaPagarFornecedor(int idLoja) throws Exception {
         List<PagarFornecedorVO> result = new ArrayList<>();
         try {
-            
+
             ProgressBar.setStatus("Carregando Contas a Pagar...");
             result = getTipoEntradaPagarFornecedor();
-            
+
             if (!result.isEmpty()) {
                 gravarTipoEntradaPagarFornecedor(result, idLoja);
             }
@@ -1819,20 +1819,20 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
-    
+
     public void gravarTipoEntradaPagarFornecedor(List<PagarFornecedorVO> vo, int idLoja) throws Exception {
         Statement stm;
         String sql;
-        try {            
+        try {
             Conexao.begin();
-            
+
             stm = Conexao.createStatement();
-            
+
             ProgressBar.setMaximum(vo.size());
             ProgressBar.setStatus("Gravando Tipo Entrada...");
-            
+
             for (PagarFornecedorVO i_vo : vo) {
-                
+
                 sql = "update pagarfornecedor \n"
                         + "set id_tipoentrada = " + i_vo.getId_tipoentrada() + "\n"
                         + "where id_fornecedor = " + i_vo.getId_fornecedor() + "\n"
@@ -1840,12 +1840,12 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and dataentrada = '" + i_vo.getDataentrada() + "' \n"
                         + "and id_loja = " + idLoja + ";";
                 stm.execute(sql);
-                
+
                 ProgressBar.next();
             }
-            
+
             stm.close();
-            Conexao.commit();            
+            Conexao.commit();
         } catch (Exception ex) {
             Conexao.rollback();
             throw ex;
@@ -2168,7 +2168,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private static class VendaItemIterator extends ShiDAO implements Iterator<VendaItemIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-        
+
         private Statement stm;
         private Statement stm2;
         private ResultSet rst;
@@ -2212,7 +2212,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCancelado("C".equals(rst.getString("status")));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setSequencia(rst.getInt("sequencia"));
-                        
+
                         String trib = Utils.acertarTexto(rst.getString("codaliq_produto"));
                         if (trib == null || "".equals(trib)) {
                             trib = "I";
@@ -2298,7 +2298,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con, Connection con2) throws Exception {
             this.stm2 = con2.createStatement();
-            
+
             this.sql
                     = "select distinct\n"
                     + "m.filial as idloja,\n"
@@ -2348,6 +2348,94 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private List<LogCustoVO> getCustosComImposto() throws Exception {
+        List<LogCustoVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id_produto, \n"
+                    + "custocomimposto \n"
+                    + "from implantacao.custocomimposto_shi \n"
+                    + "where id_produto is not null"
+            )) {
+                while (rst.next()) {
+
+                    LogCustoVO vo = new LogCustoVO();
+                    vo.setId_produto(rst.getInt("id_produto"));
+                    vo.setCustocomimposto(rst.getDouble("custocomimposto"));
+                    result.add(vo);
+                }
+            }
+
+            for (LogCustoVO vo2 : result) {
+                try (ResultSet rst2 = stm.executeQuery(
+                        "select "
+                        + "id_produto, \n"
+                        + "custocomimposto, \n"
+                        + "datamovimento \n"
+                        + "from implantacao.menordatalogcusto \n"
+                        + "where id_produto = " + vo2.getId_produto()
+                )) {
+                    if (rst2.next()) {
+                        LogCustoVO vo = new LogCustoVO();
+                        vo.setId_produto(rst2.getInt("id_produto"));
+                        vo.setCustocomimposto(rst2.getDouble("custocomimposto"));
+                        vo.setDatamovimento(rst2.getDate("datamovimento"));
+                        result.add(vo);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public void importarCustoComImpostoVenda(int idLoja) throws Exception {
+        List<LogCustoVO> result = null;
+        try {
+            ProgressBar.setStatus("Carregando dados...Custos...");
+            result = getCustosComImposto();
+            if (!result.isEmpty()) {
+                updateCustoComImpostoVenda(result, idLoja);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    private void updateCustoComImpostoVenda(List<LogCustoVO> vo, int idLoja) throws Exception {
+
+        Conexao.begin();
+        Statement stm = Conexao.createStatement();
+        String sql = null;
+
+        ProgressBar.setMaximum(vo.size());
+        ProgressBar.setStatus("Atualizando Custo das Vendas...");
+
+        try {
+
+            for (LogCustoVO i_vo : vo) {
+
+                sql = "update venda \n"
+                        + "set \n"
+                        + "custocomimposto = " + i_vo.getCustocomimposto() + " \n"
+                        + "where id_loja = " + idLoja + " \n"
+                        + "and id_produto = " + i_vo.getId_produto() + "\n"
+                        + "and data between '2020-10-01' and '2020-10-15' \n"
+                        + (i_vo.getDatamovimento() != null ? " and data < '" + i_vo.getDatamovimento() + "'" : "");
+
+                stm.execute(sql);
+                ProgressBar.next();
+            }
+
+            stm.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
         }
     }
 }
