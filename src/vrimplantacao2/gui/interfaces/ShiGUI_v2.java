@@ -357,6 +357,10 @@ public class ShiGUI_v2 extends VRInternalFrame {
                             dao.importarTipoEntradaPagarFornecedor(idLojaVR);
                         }
                         
+                        if (chkCorrigirCustoVenda.isSelected()) {
+                            dao.importarCustoComImpostoVenda(idLojaVR);
+                        }
+                        
                     } else if (tabs.getSelectedIndex() == 2) {
                         
                         dao.setBancoSfi(chkUnifFornecedorSFI.isSelected());
@@ -457,6 +461,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         vRLabel3 = new vrframework.bean.label.VRLabel();
         txtArquivo = new vrframework.bean.fileChooser.VRFileChooser();
+        chkCorrigirCustoVenda = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -900,6 +905,8 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
         vRLabel3.setText("Gravar Tipo Entrada - Pagar Fornecedor");
 
+        chkCorrigirCustoVenda.setText("Corrigir Custo Com Imposto das Vendas");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -907,10 +914,12 @@ public class ShiGUI_v2 extends VRInternalFrame {
             .addGroup(vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, 777, Short.MAX_VALUE)
                     .addGroup(vRPanel2Layout.createSequentialGroup()
-                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txtArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, 777, Short.MAX_VALUE))
+                        .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCorrigirCustoVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         vRPanel2Layout.setVerticalGroup(
@@ -920,7 +929,9 @@ public class ShiGUI_v2 extends VRInternalFrame {
                 .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(275, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkCorrigirCustoVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(245, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Especiais", vRPanel2);
@@ -1148,6 +1159,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
+    private vrframework.bean.checkBox.VRCheckBox chkCorrigirCustoVenda;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
