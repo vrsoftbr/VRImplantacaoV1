@@ -202,7 +202,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	g.DESCRICAO as descricaomercadologico,\n"
                     + " p.ESTMIN as estoqueminimo, \n"
                     + " p.ESTMAX as estoquemaximo, \n"
-                    + "	e.ULTESTOQUE as estoque,\n"
+                    + "	e.QtEst as estoque,\n"
                     + "	coalesce(e.MargemPrcFututo1, 0) as margem,\n"
                     + "	coalesce(e.PrcFuturo1, 0) as precovenda,\n"
                     + "	coalesce(e.CustoRep, 0) as custo,\n"
