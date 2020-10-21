@@ -38,6 +38,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String compLoja = "";
+    public int idLojaVR = 1;
 
     @Override
     public String getSistema() {
@@ -205,6 +206,9 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	e.QtEst as estoque,\n"
                     + "	coalesce(e.MargemPrcFututo1, 0) as margem,\n"
                     + "	coalesce(e.PrcFuturo1, 0) as precovenda,\n"
+                    + " 0.03 * coalesce(e.PrcFuturo1, 0) + coalesce(e.PrcVenda, 0) as precovenda_virtual, \n"
+                    + " coalesce(prcvendaweb, 0), \n"
+                    + " coalesce(e.PrcVenda, 0),"        
                     + "	coalesce(e.CustoRep, 0) as custo,\n"
                     + "	p.COD_NCM as ncm,\n"
                     + "	p.cest as cest,\n"
@@ -213,7 +217,19 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pis.CST_Pis,\n"
                     + "	pis.Cst_Pis_Ent,\n"
                     + "	pis.Nat_Rec,\n"
-                    + " p.ITEMVAREJO\n"
+                    + " p.ITEMVAREJO, \n"
+                    + "	(coalesce(QTDENTMC, 0) - coalesce(QTDSAIMC, 0)) as qtd_deposito, \n"
+                    + "	((coalesce(QTDENTMC, 0) - coalesce(QTDSAIMC, 0)) + \n"
+                    + "		coalesce(QTDBloqueado, 0) + \n"
+                    + "		coalesce(QTDRESERVA, 0) + \n"
+                    + "		coalesce(qtgondola, 0) + \n"
+                    + "		coalesce(QtdLoja, 0) + \n"
+                    + "		coalesce(QtdWeb, 0)) as saldo_real,\n"
+                    + "	coalesce(QTDBloqueado, 0) as qtd_bloqueado, \n"
+                    + "	coalesce(QTDRESERVA, 0) as qtd_reserva,\n"
+                    + "	coalesce(qtgondola, 0) as qtd_gondola,\n"
+                    + "	coalesce(QtdLoja, 0) as qtd_loja, \n"
+                    + "	coalesce(QtdWeb, 0) as qtd_web  \n"
                     + "from ITENS p\n"
                     + "left join ESTOQUE e on e.ITEM = p.ITEM\n"
                     + "	and e.LOCAL = " + getLojaOrigem() + "\n"
@@ -229,7 +245,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    
+
                     if ("S".equals(rst.getString("ITEMVAREJO").trim())) {
                         imp.setEan("");
                     } else {
@@ -251,7 +267,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(0);
                         imp.seteBalanca(false);
                     }
-                    
+
                     if ((imp.getEan() != null)
                             && (!imp.getEan().trim().isEmpty())
                             && (imp.getEan().trim().length() <= 6)) {
@@ -263,7 +279,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
-                    
+
                     if ((rst.getInt("situacaocadastro") == 0)
                             || ("S".equals(rst.getString("ITEMVAREJO").trim()))) {
 
@@ -271,7 +287,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -281,10 +297,21 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
+                    if (idLojaVR == 6) {
+                        imp.setPrecovenda(rst.getDouble("precovenda_virtual"));
+                    } else {
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                    }
+                                        
+                    if (idLojaVR == 3) {
+                        imp.setEstoque(rst.getDouble("qtd_web"));
+                    } else {
+                        imp.setEstoque(rst.getDouble("saldo_real"));
+                    }
+                    
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(rst.getDouble("custo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setNcm(rst.getString("ncm"));
@@ -305,7 +332,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -350,7 +377,8 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	e.ITEM as idproduto,\n"
                         + "	coalesce(e.PrcVenda, 0) as precoatacado, \n"
                         + "	coalesce(e.PrcFuturo1, 0) as precovenda, \n"
-                        + "     cast((100 - ((coalesce(e.PrcVenda, 0) / coalesce(e.PrcFuturo1, 0)) * 100)) as numeric(15, 2)) as porcentagemdesconto\n"
+                        + "     0.03 * coalesce(e.PrcFuturo1, 0) + coalesce(e.PrcVenda, 0) as precovenda_virtual, \n"        
+                        + "     cast((100 - ((coalesce(e.PrcVenda, 0) / coalesce(e.PrcFuturo1, 0)) * 100)) as numeric(15, 4)) as porcentagemdesconto\n"
                         + "from ESTOQUE e\n"
                         + "where coalesce(e.PrcVenda, 0) < coalesce(e.PrcFuturo1, 0) \n"
                         + "and e.LOCAL = " + getLojaOrigem()
@@ -365,7 +393,13 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("idproduto"));
                         imp.setEan(codigoBarras);
-                        imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                        if (idLojaVR == 6) {
+                            imp.setPrecovenda(rst.getDouble("precovenda_virtual"));
+                        } else {
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                        }
+                        
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setQtdEmbalagem(6);
                         result.add(imp);
