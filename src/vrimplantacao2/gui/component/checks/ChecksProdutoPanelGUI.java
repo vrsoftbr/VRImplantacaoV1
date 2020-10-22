@@ -102,7 +102,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
             }
             
-            
             chkFamilia.setVisible(opt.contains(OpcaoProduto.FAMILIA));
             chkFamiliaProduto.setVisible(opt.contains(OpcaoProduto.FAMILIA_PRODUTO));
             tabImportacao.add(pnlImpMercadologico);            
@@ -286,6 +285,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
             chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             chkNumeroParcela.setVisible(opt.contains(OpcaoProduto.NUMERO_PARCELA));
+            if (
+                    chkNutricionalFilizola.isVisible() || 
+                    chkNutricionalToledo.isVisible()
+                    ) {
+                tabParametros.add(pnlOptOptNutricional);
+            }
             tabImportacao.add(pnlImpOutrosDados);
         }
         
@@ -352,6 +357,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         pnlOptIcms = new vrframework.bean.panel.VRPanel();
         jLabel11 = new javax.swing.JLabel();
         chkCopiarIcmsDebitoNaEntrada = new vrframework.bean.checkBox.VRCheckBox();
+        pnlOptOptNutricional = new vrframework.bean.panel.VRPanel();
+        jLabel13 = new javax.swing.JLabel();
+        chkNutricionalResetarIDs = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -711,6 +719,38 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         );
 
         tabParametros.add(pnlOptIcms);
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel13, "NUTRICIONAL");
+        jLabel13.setPreferredSize(new java.awt.Dimension(132, 14));
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkNutricionalResetarIDs, "Resetar os IDs dos Nutricionais");
+        chkNutricionalResetarIDs.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
+        chkNutricionalResetarIDs.setEnabled(true);
+
+        javax.swing.GroupLayout pnlOptOptNutricionalLayout = new javax.swing.GroupLayout(pnlOptOptNutricional);
+        pnlOptOptNutricional.setLayout(pnlOptOptNutricionalLayout);
+        pnlOptOptNutricionalLayout.setHorizontalGroup(
+            pnlOptOptNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOptOptNutricionalLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNutricionalResetarIDs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(340, Short.MAX_VALUE))
+        );
+        pnlOptOptNutricionalLayout.setVerticalGroup(
+            pnlOptOptNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOptOptNutricionalLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(pnlOptOptNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNutricionalResetarIDs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabParametros.add(pnlOptOptNutricional);
 
         scrollParametros.setViewportView(tabParametros);
 
@@ -1402,6 +1442,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkNormaReposicao;
     public vrframework.bean.checkBox.VRCheckBox chkNumeroParcela;
     public vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
+    public vrframework.bean.checkBox.VRCheckBox chkNutricionalResetarIDs;
     public vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     public vrframework.bean.checkBox.VRCheckBox chkOferta;
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
@@ -1447,6 +1488,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
+    public javax.swing.JLabel jLabel13;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1465,6 +1507,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlOptAssociado;
     public vrframework.bean.panel.VRPanel pnlOptIcms;
     public vrframework.bean.panel.VRPanel pnlOptMercadologico;
+    public vrframework.bean.panel.VRPanel pnlOptOptNutricional;
     public vrframework.bean.panel.VRPanel pnlOptPautaFiscal;
     public vrframework.bean.panel.VRPanel pnlOptProduto;
     public vrframework.bean.radioButton.VRRadioButton rdbPautaEan;
@@ -1818,6 +1861,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkNutricionalToledo.isSelected()) {
                     opcoes.add(OpcaoNutricional.TOLEDO);
+                }
+                if (chkNutricionalResetarIDs.isSelected()) {
+                    opcoes.add(OpcaoNutricional.RESETAR_IDS);
                 }
                 if (!opcoes.isEmpty()) {
                     importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));

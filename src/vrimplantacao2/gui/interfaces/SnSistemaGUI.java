@@ -40,6 +40,7 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
         conexao.carregarParametros();
+        txtCompLoja.setText(params.get(SISTEMA, "COMPLEMENTO"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -48,6 +49,7 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
         conexao.atualizarParametros();
+        params.put(txtCompLoja.getText(), SISTEMA, "COMPLEMENTO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -87,6 +89,7 @@ public class SnSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
             @Override
             public String getSistema() {
+                dao.setComplemento(txtCompLoja.getText());
                 return dao.getSistema();
             }
 

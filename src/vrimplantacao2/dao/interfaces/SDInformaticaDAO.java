@@ -545,6 +545,7 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                 imp.setIdTipoMedida(rs.getInt("tipomedida"));
                 imp.setMedidaInteira(rs.getInt("qtdinteira"));
                 imp.setPorcao(rs.getString("porcao"));
+                imp.calcularPorcentagens();
                 
                 result.add(imp);
             }

@@ -453,14 +453,14 @@ public class GCFDAO extends InterfaceDAO {
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        WorkbookSettings settings = new WorkbookSettings();
-        settings.setEncoding("CP1250");
-        Workbook arquivo = Workbook.getWorkbook(new File(fileAtacado), settings);
-        Sheet[] sheets = arquivo.getSheets();
-        int linha = 0;
-
         if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            settings.setEncoding("CP1250");
+            Workbook arquivo = Workbook.getWorkbook(new File(fileAtacado), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha = 0;
+            
             try {
 
                 for (int sh = 0; sh < sheets.length; sh++) {
@@ -502,8 +502,8 @@ public class GCFDAO extends InterfaceDAO {
             }
         }
         
-        if (opt == OpcaoProduto.ESTOQUE) {
-
+        if (opt == OpcaoProduto.ESTOQUE) {            
+            List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"

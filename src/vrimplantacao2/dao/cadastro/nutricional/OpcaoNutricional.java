@@ -9,7 +9,8 @@ import java.util.Map;
  */
 public enum OpcaoNutricional {
     FILIZOLA,
-    TOLEDO;
+    TOLEDO,
+    RESETAR_IDS;
     
     /**
      * Parâmetros de importação.
