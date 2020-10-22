@@ -216,7 +216,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	join produto p\n" +
                 "		on p.cod_produto = cp.cod_produto\n" +
                 "		and p.cod_empresa = cp.cod_empresa\n" +
-                "	join pis_cofins pis\n" +
+                "	left join pis_cofins pis\n" +
                 "		on pis.codigo = p.cod_pis_cofins\n" +
                 "	join produto_estoque e\n" +
                 "		on e.cod_produto = p.cod_produto\n" +

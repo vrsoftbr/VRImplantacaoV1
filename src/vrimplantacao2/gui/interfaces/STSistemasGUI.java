@@ -180,6 +180,7 @@ public class STSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
                     dao.compLoja = txtCompLoja.getText().trim();
+                    dao.idLojaVR = idLojaVR;
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
