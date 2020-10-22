@@ -66,6 +66,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
+    public boolean apenasAtivo = false;
 
     @Override
     public String getSistema() {
@@ -555,7 +556,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		p.ncm2 = pf.ncm2 and\n"
                     + "		p.ncm3 = pf.ncm3 and\n"
                     + "		aliq.excecao = pf.excecao\n"
-                    + "where vend.id_situacaocadastro = 1\n"
+                    + (apenasAtivo == true ? "where vend.id_situacaocadastro = 1\n" : "")      
                     + "order by\n"
                     + "	p.id")) {
                 while (rs.next()) {

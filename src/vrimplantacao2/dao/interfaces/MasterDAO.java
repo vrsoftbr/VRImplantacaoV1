@@ -40,10 +40,11 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(MasterDAO.class.getName());
+    public String complemento = "";
     
     @Override
     public String getSistema() {
-        return "Master";
+        return "Master" + complemento;
     }
     
     @Override
@@ -173,7 +174,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n" +
                     "	p.cod_produto id,\n" +
                     "	p.cod_externo,\n" +
-                    "	p.cod_balanca,\n" +
+                    "	--p.cod_balanca,\n" +
                     "	pe.cod_barra ean,\n" +
                     "	p.sn_balanca balanca,\n" +
                     "	pc.validade,\n" +
@@ -219,11 +220,11 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     if(balanca != null && !"".equals(balanca) && "S".equals(balanca.trim())) {
                         imp.seteBalanca(true);
-                        imp.setEan(rs.getString("cod_balanca"));
+                        imp.setEan(rs.getString("ean"));
                     }
                     
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setDescricaoCompleta(rs.getString("descricao"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricao")));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
@@ -242,6 +243,11 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsCstDebito(rs.getString("cst_cofins"));
+                    imp.setIcmsDebitoId(rs.getString("aliquota"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     
                     result.add(imp);
                 }
@@ -266,13 +272,14 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.cpf_cnpj,\n" +
                     "	p.rg_insc,\n" +
                     "	p.bairro,\n" +
-                    "	p.cep,\n" +
+                    "	c.cep,\n" +
                     "	p.complemento,\n" +
                     "	p.endereco,\n" +
                     "	p.numero,\n" +
                     "	p.referencia,\n" +
                     "	c.nome cidade,\n" +
-                    "	p.cod_cidade,\n" +
+                    "	c.cod_ibge cidadeibge,\n" +
+                    "	e.COD_ESTADO uf,\n" +
                     "	p.celular,\n" +
                     "	p.celular2,\n" +
                     "	p.fax,\n" +
@@ -282,6 +289,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pessoa p \n" +
                     "join fornecedor f on f.cod_pessoa = p.cod_pessoa\n" +
                     "left join cidade c on p.cod_cidade = c.cod_cidade\n" +
+                    "LEFT JOIN estado e ON c.COD_ESTADO = e.COD_ESTADO \n" +
                     "order by \n" +
                     "	p.cod_pessoa")) {
                 while(rs.next()) {
@@ -292,8 +300,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setAtivo("A".equals(rs.getString("situacao")));
                     imp.setDatacadastro(rs.getDate("cadastro"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("nome")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
                     imp.setIe_rg(rs.getString("rg_insc"));
                     imp.setBairro(rs.getString("bairro"));
@@ -302,6 +310,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setMunicipio(rs.getString("cidade"));
+                    imp.setIbge_municipio(rs.getInt("cidadeibge"));
+                    imp.setUf(rs.getString("uf"));
                     imp.setTel_principal(rs.getString("fone"));
                     imp.setObservacao(rs.getString("obs"));
                     
@@ -357,7 +367,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n" +
                     "	p.cod_pessoa id,\n" +
                     "	p.ativo_inativo situacao,\n" +
-                    "	c.dh_inclusao cadastro,\n" +
+                    "	p.DT_CADASTRO cadastro,\n" +
                     "	c.contato,\n" +
                     "	c.limite,\n" +
                     "	p.nome,\n" +
@@ -394,8 +404,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtivo("A".equals(rs.getString("situacao")));
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setValorLimite(rs.getDouble("limite"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("nome")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     imp.setCnpj(rs.getString("cpf_cnpj"));
                     imp.setInscricaoestadual(rs.getString("rg_insc"));
                     imp.setBairro(rs.getString("bairro"));
