@@ -100,7 +100,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from \n" +
                     "	aliquota")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("percentual"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(rs.getString("percentual").trim(), rs.getString("descricao")));
                 }
             }
         }
@@ -243,8 +243,10 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsCstDebito(rs.getString("cst_cofins"));
-                    imp.setIcmsDebitoId(rs.getString("aliquota"));
+                    
+                    imp.setIcmsDebitoId(rs.getString("aliquota").trim());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
