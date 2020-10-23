@@ -235,7 +235,6 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and e.LOCAL = " + getLojaOrigem() + "\n"
                     + "left join GRUPOS g on g.GRUPO = p.GRUPO\n"
                     + "left join ProTools_PisCofins pis on pis.Codigo = p.PisCofins\n"
-                    + "where p.ITEM != 0\n"
                     + "order by 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -667,6 +666,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setLimiteCompra(imp.getValorLimite());
 
                     if ((rst.getString("estadocivil") != null)
                             && (!rst.getString("estadocivil").trim().isEmpty())) {

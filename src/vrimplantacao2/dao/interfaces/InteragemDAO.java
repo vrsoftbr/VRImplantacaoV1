@@ -519,7 +519,52 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
+            
+            try (ResultSet rst = stm.executeQuery(
+                    " select\n"
+                    + "    fun.codprof as id,\n"
+                    + "    fun.nomprof as nome,\n"
+                    + "    fun.endprof as endereco,\n"
+                    + "    fun.cidprof as municipio,\n"
+                    + "    fun.bairro as bairro,\n"
+                    + "    fun.cpfprof as cpf,\n"
+                    + "    fun.rgprof as rg,\n"
+                    + "    fun.telprof as telefone,\n"
+                    + "    fun.rgdata as datacadastro,\n"
+                    + "    fun.cargo,\n"
+                    + "    fun.funcao,\n"
+                    + "    fun.dtadmissao as dataadmissao,\n"
+                    + "    fun.salprof as salario\n"
+                    + " from tabprof fun\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(imp.getRazao());
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    
+                    if ((rst.getString("cargo") != null)
+                            && (!rst.getString("cargo").trim().isEmpty())) {
+                        imp.setCargo(rst.getString("cargo"));
+                    } else {
+                        imp.setCargo(rst.getString("funcao"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+            
+            /*try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    c.codcli id,\n"
                     + "    c.nomcli razao,\n"
@@ -595,7 +640,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     result.add(imp);
                 }
-            }
+            }*/
         }
         return result;
     }
@@ -605,7 +650,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    /*"select \n"
                     + "    r.codtit id,\n"
                     + "    r.codcli idcliente, \n"
                     + "    --c.cgc cnpj,\n"
@@ -622,8 +667,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    --mov.vlduptit as valorconta\n"
                     + " from MOVIINCR r\n"
                     + "where r.codfil = "+ getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() +"\n"
-                    + "and r.sttit = 'E'"
-            /*"select\n"
+                    + "and r.sttit = 'E'"*/
+                    "select\n"
                     + "    r.codtit id,\n"
                     + "    r.codcli idcliente,\n"
                     + "    c.cgc cnpj,\n"
@@ -643,7 +688,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    r.dtpagtit is null\n"
                     + "order by\n"
-                    + "    r.dtemitit"*/
+                    + "    r.dtemitit"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
