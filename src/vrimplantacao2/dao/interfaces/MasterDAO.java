@@ -349,6 +349,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("referencia"));

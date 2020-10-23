@@ -596,8 +596,9 @@
                           <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
+                          <Component id="cbxUnifProdForn" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="173" max="32767" attributes="0"/>
+                      <EmptySpace pref="169" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -610,7 +611,9 @@
                       <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="229" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="cbxUnifProdForn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="207" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -629,6 +632,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliPreferencial">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Unificar Cliente Preferencial (Somente CPF/CNPJ v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdForn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar Produto Fornecedor (Somente CPF/CNPJ v&#xe1;lidos)"/>
               </Properties>
             </Component>
           </SubComponents>
