@@ -168,8 +168,26 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        Set<String> eanValidoBalanca = new HashSet<>();
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            
+            try(ResultSet rs1 = stm.executeQuery(
+                    "select\n" +
+                    "	p.cod_produto id,\n" +
+                    "	pe.cod_barra ean\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "left join produto_custo pc on p.cod_produto = pc.cod_produto\n" +
+                    "left join produto_codbarra pe on p.cod_produto = pe.cod_produto\n" +
+                    "where\n" +
+                    "	pc.cod_empresa = " + getLojaOrigem() + " and\n" +
+                    "	p.sn_balanca = 'S'")) {
+                while(rs1.next()) {
+                    eanValidoBalanca.add(rs1.getString("id"));
+                }
+            }
+            
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	p.cod_produto id,\n" +
@@ -220,7 +238,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     if(balanca != null && !"".equals(balanca) && "S".equals(balanca.trim())) {
                         imp.seteBalanca(true);
-                        imp.setEan(rs.getString("ean"));
+                        imp.setEan(imp.getImportId());
                     }
                     
                     imp.setValidade(rs.getInt("validade"));
@@ -250,6 +268,12 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
+                    if(eanValidoBalanca.contains(imp.getImportId()) && 
+                            imp.getEan() != null && 
+                                !"".equals(imp.getEan()) && imp.getEan().length() > 6) {
+                        continue;
+                    }
                     
                     result.add(imp);
                 }
