@@ -16,6 +16,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.G3DAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -182,9 +183,13 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
-
+                        
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
+                        }
+                        
+                        if (chkContaPagar.isSelected()){
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
 
                         if (chkClientePreferencial.isSelected()) {
@@ -272,6 +277,7 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkContaPagar = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
@@ -318,6 +324,11 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
         vRLabel1.setText("Loja (Cliente):");
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -328,6 +339,9 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
         jPanel3.add(chkProdutoFornecedor);
+
+        chkContaPagar.setText("Contas a Pagar");
+        jPanel3.add(chkContaPagar);
 
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
@@ -547,11 +561,16 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
 
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteDados;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkContaPagar;
     private javax.swing.JCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;

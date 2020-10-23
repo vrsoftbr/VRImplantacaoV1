@@ -109,6 +109,9 @@
           <Connection code="new javax.swing.DefaultComboBoxModel()" type="code"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbLojaOrigemActionPerformed"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JTabbedPane" name="tabOperacoes">
 
@@ -178,6 +181,11 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContaPagar">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Contas a Pagar"/>
                       </Properties>
                     </Component>
                   </SubComponents>

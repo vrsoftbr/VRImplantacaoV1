@@ -897,11 +897,11 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "   vl_docto valor,\n"
                     + "   dt_vencto dtvencto,\n"
                     + "   p.obs,\n"
-                    + "   historico ob2"
+                    + "   historico ob2\n"
                     + " from pagar p\n"
                     + "     join fornecedor f\n"
                     + "     on f.IDFORNECEDOR = p.idFornecedor \n"
-                    + "  where dt_pagto is null \n"
+                    + "  where situacao is null \n"
                     + "  and loja = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
