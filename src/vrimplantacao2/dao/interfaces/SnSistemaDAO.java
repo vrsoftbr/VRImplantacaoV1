@@ -7,11 +7,15 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -113,7 +117,8 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                 OpcaoProduto.ICMS_CONSUMIDOR,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.OFERTA
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         ));
     }
 
@@ -342,6 +347,7 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "order by\n" +
                     "	p.CODIGO "
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -350,12 +356,23 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataultimaalteracao"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setTipoEmbalagem(rs.getString("UNIDADE"));
+                    
+                    int ean = Utils.stringToInt(rs.getString("ean"), -2);
+                    ProdutoBalancaVO bal = balanca.get(ean);
+                    if (bal != null) {
+                        imp.setEan(bal.getCodigo() + "");
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(bal.getValidade());
+                        imp.seteBalanca(true);
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                        imp.setTipoEmbalagem(rs.getString("UNIDADE"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.seteBalanca(rs.getBoolean("pesavel"));
+                        imp.setValidade(rs.getInt("validade"));                    
+                    }                    
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.seteBalanca(rs.getBoolean("pesavel"));
-                    imp.setValidade(rs.getInt("validade"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaocompleta"));
@@ -381,42 +398,24 @@ public class SnSistemaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofins_e"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofins_s"));
-                    imp.setIcmsDebitoId(getTributacaoKey(
+                    String aliqDebito = getTributacaoKey(
                             rs.getString("CODGRUPOICMS"),
                             true,
                             true,
                             true
-                    ));
-                    imp.setIcmsDebitoForaEstadoId(getTributacaoKey(
-                            rs.getString("CODGRUPOICMS"),
-                            true,
-                            true,
-                            false
-                    ));
-                    imp.setIcmsDebitoForaEstadoId(getTributacaoKey(
-                            rs.getString("CODGRUPOICMS"),
-                            true,
-                            true,
-                            false
-                    ));
-                    imp.setIcmsConsumidorId(getTributacaoKey(
-                            rs.getString("CODGRUPOICMS"),
-                            true,
-                            true,
-                            true
-                    ));
-                    imp.setIcmsCreditoId(getTributacaoKey(
+                    );
+                    imp.setIcmsDebitoId(aliqDebito);
+                    imp.setIcmsDebitoForaEstadoId(aliqDebito);
+                    imp.setIcmsDebitoForaEstadoNfId(aliqDebito);
+                    imp.setIcmsConsumidorId(aliqDebito);
+                    final String aliqCredito = getTributacaoKey(
                             rs.getString("CODGRUPOICMS"),
                             false,
                             true,
                             true
-                    ));
-                    imp.setIcmsCreditoId(getTributacaoKey(
-                            rs.getString("CODGRUPOICMS"),
-                            false,
-                            true,
-                            false
-                    ));                    
+                    );
+                    imp.setIcmsCreditoId(aliqCredito);
+                    imp.setIcmsCreditoForaEstadoId(aliqCredito);                    
                     
                     result.add(imp);
                 }
