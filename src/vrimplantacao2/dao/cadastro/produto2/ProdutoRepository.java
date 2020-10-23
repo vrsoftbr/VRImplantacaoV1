@@ -492,7 +492,7 @@ public class ProdutoRepository {
                 ProdutoIMP imp = organizados.get(keys);
 
                 imp.setManterEAN(false);
-
+                
                 //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
                 int id;
                 long ean;
@@ -515,7 +515,7 @@ public class ProdutoRepository {
                 int idProdutoExistente = provider.automacao().getIdProdutoPorEAN(ean);
                 boolean eanExistente = idProdutoExistente > 0;
                 ProdutoVO codigoAtual = null;
-
+                
                 if (eanValido) {
                     if (!eanExistente) {
                         /**
@@ -559,13 +559,48 @@ public class ProdutoRepository {
                             }
                             provider.aliquota().salvar(aliquota);
                         } else {
+                            
                             codigoAtual = provider.anterior().get(
                                     provider.getSistema(),
                                     provider.getLoja(),
                                     keys.get(2)
                             ).getCodigoAtual();
 
-                            obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                            if (codigoAtual == null) {
+
+                                if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
+                                    strID = String.valueOf(ean);
+                                }
+
+                                id = idStack.obterID(strID, eBalanca);
+
+                                codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
+
+                                ProdutoAliquotaVO aliquota = converterAliquota(imp);
+                                aliquota.setProduto(codigoAtual);
+
+                                ProdutoComplementoVO complemento = converterComplemento(imp);
+                                complemento.setProduto(codigoAtual);
+                                complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
+
+                                provider.salvar(codigoAtual);
+                                obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                                //provider.anterior().salvar(anterior);
+                                double estoque = complemento.getEstoque();
+                                for (LojaVO loja : provider.getLojas()) {
+                                    complemento.setIdLoja(loja.getId());
+                                    if (loja.getId() == getLojaVR()) {
+                                        complemento.setEstoque(estoque);
+                                    } else {
+                                        complemento.setEstoque(0);
+                                    }
+                                    provider.complemento().salvar(complemento, false);
+
+                                }
+                                provider.aliquota().salvar(aliquota);
+                            } else {
+                                obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                            }
                         }
                         /**
                          * Cadastra o EAN no sistema.
