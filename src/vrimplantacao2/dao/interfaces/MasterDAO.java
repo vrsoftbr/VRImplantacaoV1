@@ -214,7 +214,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.dh_inclusao cadastro,\n" +
                     "	cf.ncm,\n" +
                     "   p.cod_class_fiscal_cest,\n" +        
-                    "	pc.aliquota,\n" +
+                    "	pce.pe_aliquota aliquota,\n" +
                     "	pc.margem_lucro margem,\n" +
                     "	pc.cst_cofins,\n" +
                     "	pc.cst_pis\n" +
@@ -223,6 +223,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "left join class_fiscal cf on p.cod_class_fiscal = cf.cod_class_fiscal \n" +
                     "left join produto_custo pc on p.cod_produto = pc.cod_produto\n" +
                     "left join produto_codbarra pe on p.cod_produto = pe.cod_produto\n" +
+                    "left join produto_custo_estado pce on p.cod_produto = pce.cod_produto and\n" +
+                    "    pc.cod_empresa = pce.cod_empresa\n" +        
                     "where\n" +
                     "	pc.cod_empresa = " + getLojaOrigem())) {
                 while(rs.next()) {
