@@ -131,7 +131,7 @@ public class SaefDAO extends InterfaceDAO {
                     + "	cdproduto importId,\n"
                     + "	dtalteracao dataCadastro,\n"
                     + "	dtalteracao dataAlteracao,\n"
-                    + "	cdFabricante ean,\n"
+                    + "	coalesce(nullif(ltrim(rtrim(cdFabricante)),''), 'P' + cast(cdproduto as varchar(20))) ean,\n"
                     + "	cean ean2,\n"
                     + "	dsunidade tipoEmbalagem,\n"
                     + "	CASE WHEN LEN(cdFabricante) <= 7 and cdFabricante != '' and dsunidade = 'KG' THEN 1 else 0 END ebalanca,\n"
@@ -167,9 +167,9 @@ public class SaefDAO extends InterfaceDAO {
                     + "	 left join Aliquotas a on p.dsCodtributacao = a.dsCodtributacao\n"
                     + "	 left join ClFiscal cf on cf.cdclassificacao = p.dsmercosul\n"
                     + "	 left join tb_cest cest on cf.idcest = cest.idcest"
-                    //+ "where\n"
-                    //+ " p.dsAtivo = 'S'\n"
-                    //+ " and cdFabricante != ''"
+            //+ "where\n"
+            //+ " p.dsAtivo = 'S'\n"
+            //+ " and cdFabricante != ''"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -180,27 +180,28 @@ public class SaefDAO extends InterfaceDAO {
                     imp.setImportId(rs.getString("importid"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setEan(rs.getString("ean"));
 
                     long longEAN = Utils.stringToLong(imp.getEan(), -2);
                     String strEAN = String.valueOf(longEAN);
 
-                    if (strEAN.startsWith("2") && strEAN.length() == 6) {
+                    if (strEAN.startsWith("2") && strEAN.length() == 7) {
                         final String eanBal = strEAN.substring(1);
-                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(eanBal, -2));
+                        final int plu = Utils.stringToInt(eanBal, -2);
+                        ProdutoBalancaVO bal = produtosBalanca.get(plu);
                         if (bal != null) {
                             imp.setEan(String.valueOf(bal.getCodigo()));
                             imp.seteBalanca(true);
-                            imp.setValidade(bal.getValidade());
                             imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
+                            imp.setValidade(bal.getValidade());
                         } else {
-                            imp.setEan(rs.getString("ean"));
-                            imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                            imp.setEan(eanBal);
+                            imp.seteBalanca(rs.getBoolean("ebalanca"));
                             imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                             imp.setValidade(rs.getInt("validade"));
                         }
                     } else {
-                        imp.setEan(rs.getString("ean"));
-                        imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                        imp.seteBalanca(rs.getBoolean("ebalanca"));
                         imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                         imp.setValidade(rs.getInt("validade"));
                     }
@@ -234,7 +235,7 @@ public class SaefDAO extends InterfaceDAO {
                     imp.setIcmsCstEntrada(rs.getInt("icmsCstSaida"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsAliqSaida"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducaosaida"));
-                    
+
                     imp.setIcmsCstConsumidor(rs.getInt("icmsCstConsumidor"));
                     imp.setIcmsAliqConsumidor(rs.getDouble("icmsAliqConsumidor"));
                     imp.setIcmsReducaoConsumidor(rs.getDouble("icmsReducaoConsumidor"));
@@ -259,7 +260,7 @@ public class SaefDAO extends InterfaceDAO {
                     + "  cdProduto idproduto,\n"
                     + "  codigo codigoexterno\n"
                     + "from codFornecedor cf"
-                    + "  where codigo != ''\n" 
+                    + "  where codigo != ''\n"
                     + "  and codigo is NOT NULL ")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
