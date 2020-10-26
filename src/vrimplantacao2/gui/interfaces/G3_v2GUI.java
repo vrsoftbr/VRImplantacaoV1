@@ -100,10 +100,10 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
         });
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "sglinx";
+        conexaoMySQL.database = "db_rmscontrol";
         conexaoMySQL.port = "3306";
-        conexaoMySQL.user = "adminlinear";
-        conexaoMySQL.pass = "@2013linear";
+        conexaoMySQL.user = "retaguarda";
+        conexaoMySQL.pass = "@Retaguarda00";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -188,7 +188,7 @@ public class G3_v2GUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarProdutoFornecedor();
                         }
                         
-                        if (chkContaPagar.isSelected()){
+                        if (chkContaPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
 
