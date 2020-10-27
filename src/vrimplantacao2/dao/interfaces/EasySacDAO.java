@@ -302,19 +302,17 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(rst.getInt("ativos") == 1);
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie"));
                     imp.setInsc_municipal(rst.getString("im"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
-                    //imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setIbge_municipio(rst.getInt("cidadeibge"));
                     imp.setUf(rst.getString("estado"));
                     imp.setTel_principal(rst.getString("tel1"));
-                    //imp.setDatacadastro(rst.getDate("datacadastro"));
-                    //imp.setObservacao(rst.getString("observacao"));
 
                     if ((rst.getString("email") != null)
                             && (!rst.getString("email").trim().isEmpty())) {
