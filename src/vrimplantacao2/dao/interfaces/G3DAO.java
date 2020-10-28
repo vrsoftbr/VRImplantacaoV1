@@ -520,21 +520,21 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-                if (opt == OpcaoProduto.EXCECAO) {
+        if (opt == OpcaoProduto.EXCECAO) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                    + "     p.idproduto importid,\n"
-                    + "     p.ClassFiscal ncm,\n"
-                    + "     p.iva per_iva,\n"
-                    + "     substring(tabicmsprod,1,2) cst_debito,\n"
-                    + "     p.icms aliquota_debito,\n"
-                    + "     redbasevenda reducao_debito,\n"
-                    + "     substring(tabicmsprodentrada,1,2) cst_credito,\n"
-                    + "     icmscompra aliquota_credito,\n"
-                    + "     p.redbase reducao_credito\n"
-                    + "from produto p\n"
-                    + "     where p.iva > 0 and  p.ClassFiscal is not null and p.ClassFiscal != ''"
+                        + "     p.idproduto importid,\n"
+                        + "     p.ClassFiscal ncm,\n"
+                        + "     p.iva per_iva,\n"
+                        + "     substring(tabicmsprod,1,2) cst_debito,\n"
+                        + "     p.icms aliquota_debito,\n"
+                        + "     redbasevenda reducao_debito,\n"
+                        + "     substring(tabicmsprodentrada,1,2) cst_credito,\n"
+                        + "     icmscompra aliquota_credito,\n"
+                        + "     p.redbase reducao_credito\n"
+                        + "from produto p\n"
+                        + "     where p.iva > 0 and  p.ClassFiscal is not null and p.ClassFiscal != ''"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -548,7 +548,7 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
-               
+
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -886,7 +886,7 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    " select\n"
+                    "select\n"
                     + "   idPagar,\n"
                     + "   p.idFornecedor,\n"
                     + "   f.CPF_CGC cnpj,\n"
@@ -898,11 +898,10 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
                     + "   dt_vencto dtvencto,\n"
                     + "   p.obs,\n"
                     + "   historico ob2\n"
-                    + " from pagar p\n"
+                    + "from pagar p\n"
                     + "     join fornecedor f\n"
                     + "     on f.IDFORNECEDOR = p.idFornecedor \n"
-                    + "  where situacao is null \n"
-                    + "  and loja = " + getLojaOrigem() + ""
+                    + "where p.situacao is null and loja =  " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();

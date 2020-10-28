@@ -261,6 +261,7 @@ import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
+import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -825,6 +826,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSaef = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
+        mnuEasySac = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -2867,6 +2869,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuSaef);
 
+        mnuEasySac.setText("EasySac");
+        mnuEasySac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEasySacActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuEasySac);
+
         mnuDatabase.add(mnuSqlServer2);
 
         jMenu1.setText("SQL Server 3");
@@ -4857,6 +4867,10 @@ public final class MenuGUI extends VRMdiFrame {
         STSistemasGUI.exibir(this);
     }//GEN-LAST:event_mnuSTSistemas_v2ActionPerformed
 
+    private void mnuEasySacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEasySacActionPerformed
+        EasySacGUI.exibir(this);
+    }//GEN-LAST:event_mnuEasySacActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4998,6 +5012,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDevMaster;
     private javax.swing.JMenuItem mnuDirector;
     private javax.swing.JMenuItem mnuDtCom;
+    private javax.swing.JMenuItem mnuEasySac;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuEtica;
