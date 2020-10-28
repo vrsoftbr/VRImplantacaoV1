@@ -6,12 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -32,9 +28,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public String complemento = "";
+    
     @Override
     public String getSistema() {
-        return "EasySac";
+        return "EasySac" + complemento;
     }
 
     @Override
@@ -210,18 +208,16 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.pcusto custocomimposto,\n" +
                     "	p.lucros margem,\n" +
                     "	p.pvenda precovenda,\n" +
-                    "	p.cdttri tributacao,\n" +
                     "   p.cdimpo aliquota,\n" +        
                     "	p.cdcest cest,\n" +
-                    "	p.mdicms,\n" +
                     "	p.codpis pis,\n" +
                     "	p.codcof cofins\n" +
                     "from\n" +
                     "	sac441 p\n" +
                     "left join sac714 e on p.cdprod = e.cdprod\n" +
                     "where\n" +
-                    "	e.cdloja = " + getLojaOrigem()
-             )) {
+                    "	e.cdloja = " + getLojaOrigem())) 
+            {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -230,6 +226,14 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
+                    
+                    if(imp.isBalanca() && 
+                            imp.getEan() != null &&
+                                !"".equals(imp.getEan().trim()) &&
+                                        imp.getEan().length() <= 6) {
+                        imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 2));
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -250,7 +254,7 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("pis"));
-                    //imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    
                     imp.setIcmsDebitoId(rst.getString("aliquota"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
@@ -430,7 +434,6 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCelular(rst.getString("cel"));
                     imp.setFax(rst.getString("fax"));
                     imp.setEmail(rst.getString("emails"));
-                    imp.setObservacao(rst.getString("observacao"));
                     imp.setValorLimite(rst.getDouble("limite"));
                     
                     String estcivil = rst.getString("estcivil").trim();
@@ -502,7 +505,7 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "left outer join sac251 loja on\n" +
                     "	rece.cdloja = loja.cdloja\n" +
                     "left outer join sac999 para on\n" +
-                    "	1 = para.cdloja\n" +
+                    "	" + getLojaOrigem() + " = para.cdloja\n" +
                     "where\n" +
                     "	rece.dtrcto is null and \n" +
                     "	rece.status = 0 and \n" +
@@ -511,16 +514,14 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
-                    imp.setId(rst.getString("id"));
-                    imp.setDataEmissao(rst.getDate(null));
-                    imp.setNumeroCupom(rst.getString(null));
-                    imp.setEcf(rst.getString(null));
-                    imp.setValor(rst.getDouble(null));
-                    imp.setObservacao(rst.getString(null));
-                    imp.setIdCliente(rst.getString(null));
-                    imp.setDataVencimento(rst.getDate(null));
-                    imp.setJuros(rst.getDouble(null));
-                    imp.setCnpjCliente(rst.getString(null));
+                    imp.setId(rst.getString("lancam"));
+                    imp.setDataEmissao(rst.getDate("dtemis"));
+                    imp.setNumeroCupom(rst.getString("vendas"));
+                    imp.setValor(rst.getDouble("vlrdoc"));
+                    imp.setIdCliente(rst.getString("cdclie"));
+                    imp.setDataVencimento(rst.getDate("dtvenc"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setObservacao("Func.: " + rst.getString("cdfunc") + " Forma:" + rst.getString("cdform"));
                     
                     result.add(imp);
                 }
@@ -538,8 +539,11 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n" +
                     "	rece.cdloja,\n" +
                     "	rece.cdclie,\n" +
+                    "   rece.lancam,\n" +        
                     "	rece.docume,\n" +
                     "	rece.bancos,\n" +
+                    "   rece.dtemis,\n" +
+                    "	rece.dtvenc,\n" +        
                     "	rece.agenci,\n" +
                     "	rece.contas,\n" +
                     "	rece.cheque,\n" +
@@ -547,6 +551,9 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	rece.vendas,\n" +
                     "	round(coalesce(rece.vlrchq, 0), 2) as vlrrec,\n" +
                     "	clie.nomcli,\n" +
+                    "   clie.cpfcgc,\n" +
+                    "   clie.telefo,\n" +        
+                    "	clie.numdrg,\n" +        
                     "	form.formas\n" +
                     "from\n" +
                     "	sac511 rece with (nolock)\n" +
@@ -562,35 +569,17 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     
-                    imp.setId(rs.getString("id"));
-                    imp.setDataDeposito(rs.getDate("vencimento"));
-                    imp.setNumeroCheque(rs.getString("documento"));
-                    imp.setDate(rs.getDate("emissao"));
-                    imp.setCmc7(rs.getString("cmc7"));
-                    imp.setBanco(rs.getInt("banco"));
-                    imp.setAgencia(rs.getString("agencia"));
-                    imp.setConta(rs.getString("conta"));
-                    imp.setNome(rs.getString("razao"));
-                    imp.setTelefone(rs.getString("telefone"));
-                    
-                    String cpf = rs.getString("cpf"), cnpj = rs.getString("cnpj"),
-                            ie = rs.getString("ie"), rg = rs.getString("rg");
-                    if(cpf != null && !"".equals(cpf)) {
-                        imp.setCpf(cpf);
-                    } else {
-                        imp.setCpf(cnpj);
-                    }
-                    
-                    if(rg != null && !"".equals(rg)) {
-                        imp.setRg(rg);
-                    } else {
-                        imp.setRg(ie);
-                    }
-                    
-                    imp.setValor(rs.getDouble("valor"));
-                    imp.setNumeroCupom(rs.getString("cupom"));
-                    imp.setEcf(rs.getString("caixa"));
-                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setId(rs.getString("lancam"));
+                    imp.setDataDeposito(rs.getDate("dtvenc"));
+                    imp.setNumeroCheque(rs.getString("docume"));
+                    imp.setDate(rs.getDate("dtemis"));
+                    imp.setBanco(rs.getInt("bancos"));
+                    imp.setAgencia(rs.getString("agenci"));
+                    imp.setConta(rs.getString("contas"));
+                    imp.setNome(rs.getString("nomcli"));
+                    imp.setTelefone(rs.getString("telefo"));
+                    imp.setValor(rs.getDouble("vlrrec"));
+                    imp.setNumeroCupom(rs.getString("vendas"));
                     
                     result.add(imp);
                 }

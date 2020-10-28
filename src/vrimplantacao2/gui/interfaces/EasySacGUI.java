@@ -26,7 +26,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "EasySAC";
+    private static final String SISTEMA = "EasySac";
     private static EasySacGUI instance;
 
     public static String getSISTEMA() {
@@ -88,8 +88,8 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
 
             @Override
             public String getLoja() {                
-                dao.setLojaOrigem(txtLojaCliente.getText());
-                return dao.getLojaOrigem();
+                vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                return vLojaCliente;
             }
 
             @Override
@@ -155,7 +155,7 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
         
         Thread thread = new Thread() {
             int idLojaVR;
-            String idLojaCliente;
+            String idLojaCliente, lojaMesmoId = "";
 
             @Override
             public void run() {
@@ -164,13 +164,19 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
                     ProgressBar.setCancel(true);
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = txtLojaCliente.getText();
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
 
+                    if (!"".equals(txtLojaCliente.getText().trim()) && !txtLojaCliente.getText().isEmpty()) {
+                        lojaMesmoId = " - " + txtLojaCliente.getText();
+                    }
+                    
+                    dao.complemento = lojaMesmoId;
+                    
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
                         tabProdutos.executarImportacao();
@@ -213,6 +219,10 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
                         
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
                         }
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
