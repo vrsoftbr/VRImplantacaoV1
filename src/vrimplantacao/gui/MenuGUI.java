@@ -261,6 +261,7 @@ import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
+import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
@@ -766,6 +767,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCronos20 = new javax.swing.JMenuItem();
         jMenu15 = new javax.swing.JMenu();
         mnuViggo = new javax.swing.JMenuItem();
+        mnuAthos = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -824,9 +826,9 @@ public final class MenuGUI extends VRMdiFrame {
         mnuTpaRootac = new javax.swing.JMenuItem();
         mnuAvistate = new javax.swing.JMenuItem();
         mnuSaef = new javax.swing.JMenuItem();
+        mnuEasySac = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
-        mnuEasySac = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -2411,6 +2413,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuViggo);
+
+        mnuAthos.setText("Athos");
+        mnuAthos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAthosActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuAthos);
 
         mnuDatabase.add(jMenu15);
 
@@ -4871,6 +4881,11 @@ public final class MenuGUI extends VRMdiFrame {
         EasySacGUI.exibir(this);
     }//GEN-LAST:event_mnuEasySacActionPerformed
 
+    private void mnuAthosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAthosActionPerformed
+        // TODO add your handling code here:
+        AthosGUI.exibir(this);
+    }//GEN-LAST:event_mnuAthosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4975,6 +4990,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
     private javax.swing.JMenuItem mnuAtenasSQLServer;
+    private javax.swing.JMenuItem mnuAthos;
     private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAtmaFirebird;
     private javax.swing.JMenuItem mnuAutoADM;

@@ -23,6 +23,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -595,6 +596,44 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             imp.setSexo(TipoSexo.FEMININO);
                         }
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "	idcontareceber as id,\n"
+                    + "	idcliente,\n"
+                    + "	numerotitulo as numerocupom,\n"
+                    + "	dataemissao,\n"
+                    + "	datavencimento, \n"
+                    + "	valor\n"
+                    + "from conta_receber \n"
+                    + "where statusconta in ('VEN', 'AVC')"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+
+                    if ((rst.getString("numerocupom") != null)
+                            && (!rst.getString("numerocupom").trim().isEmpty())
+                            && (rst.getString("numerocupom").contains("-"))) {
+
+                        imp.setNumeroCupom(rst.getString("numerocupom").substring(0, rst.getString("numerocupom").indexOf("-")));
                     }
 
                     result.add(imp);
