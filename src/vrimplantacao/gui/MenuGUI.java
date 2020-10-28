@@ -823,6 +823,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuTpaRootac = new javax.swing.JMenuItem();
         mnuAvistate = new javax.swing.JMenuItem();
         mnuSaef = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -2867,6 +2869,18 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuDatabase.add(mnuSqlServer2);
 
+        jMenu1.setText("SQL Server 3");
+
+        mnuSTSistemas_v2.setText("ST Sistemas");
+        mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTSistemas_v2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mnuSTSistemas_v2);
+
+        mnuDatabase.add(jMenu1);
+
         mnuSQLite.setText("SQLite");
 
         mnuSQLiteSophyx.setText("Sophyx");
@@ -4838,8 +4852,14 @@ public final class MenuGUI extends VRMdiFrame {
         STSistemasGUI.exibir(this);
     }//GEN-LAST:event_mnuSTSistemasActionPerformed
 
+    private void mnuSTSistemas_v2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTSistemas_v2ActionPerformed
+        // TODO add your handling code here:
+        STSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuSTSistemas_v2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
     private javax.swing.JMenu jMenu12;
@@ -5072,6 +5092,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSTI;
     private javax.swing.JMenuItem mnuSTI3;
     private javax.swing.JMenuItem mnuSTSistemas;
+    private javax.swing.JMenuItem mnuSTSistemas_v2;
     private javax.swing.JMenuItem mnuSaac;
     private javax.swing.JMenuItem mnuSaef;
     private javax.swing.JMenuItem mnuSambaNet;

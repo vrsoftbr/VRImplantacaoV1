@@ -208,7 +208,8 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(e.PrcFuturo1, 0) as precovenda,\n"
                     + " 0.03 * coalesce(e.PrcFuturo1, 0) + coalesce(e.PrcVenda, 0) as precovenda_virtual, \n"
                     + " coalesce(prcvendaweb, 0), \n"
-                    + " coalesce(e.PrcVenda, 0),"        
+                    + " coalesce(e.PrcVenda, 0),\n"        
+                    + " coalesce(e.PrcVenda, 0) as precoatacado, \n"        
                     + "	coalesce(e.CustoRep, 0) as custo,\n"
                     + "	p.COD_NCM as ncm,\n"
                     + "	p.cest as cest,\n"
@@ -297,13 +298,17 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setMargem(rst.getDouble("margem"));
                     
-                    if (idLojaVR == 6) {
+                    if (idLojaVR == 2) {
+                        imp.setPrecovenda(rst.getDouble("precoatacado"));
+                    } else if (idLojaVR == 6) {
                         imp.setPrecovenda(rst.getDouble("precovenda_virtual"));
                     } else {
                         imp.setPrecovenda(rst.getDouble("precovenda"));
                     }
-                                        
-                    if (idLojaVR == 3) {
+                    
+                    if (idLojaVR == 2) {
+                        imp.setEstoque(rst.getDouble("qtd_deposito"));
+                    } else if (idLojaVR == 3) {
                         imp.setEstoque(rst.getDouble("qtd_web"));
                     } else {
                         imp.setEstoque(rst.getDouble("saldo_real"));
