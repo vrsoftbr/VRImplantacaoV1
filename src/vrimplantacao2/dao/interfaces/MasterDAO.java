@@ -257,7 +257,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rs.getDouble("estq_maximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estq_minimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setSituacaoCadastro("A".equals(rs.getString("situacao")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro("A".equals(rs.getString("situacao").trim()) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
                     imp.setDataCadastro(rs.getDate("cadastro"));

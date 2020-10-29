@@ -261,6 +261,8 @@ import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
+import vrimplantacao2.gui.interfaces.AthosGUI;
+import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -765,6 +767,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCronos20 = new javax.swing.JMenuItem();
         jMenu15 = new javax.swing.JMenu();
         mnuViggo = new javax.swing.JMenuItem();
+        mnuAthos = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -823,6 +826,9 @@ public final class MenuGUI extends VRMdiFrame {
         mnuTpaRootac = new javax.swing.JMenuItem();
         mnuAvistate = new javax.swing.JMenuItem();
         mnuSaef = new javax.swing.JMenuItem();
+        mnuEasySac = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -2408,6 +2414,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu15.add(mnuViggo);
 
+        mnuAthos.setText("Athos");
+        mnuAthos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAthosActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuAthos);
+
         mnuDatabase.add(jMenu15);
 
         jMenu6.setText("SQL Server");
@@ -2865,7 +2879,27 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuSaef);
 
+        mnuEasySac.setText("EasySac");
+        mnuEasySac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEasySacActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuEasySac);
+
         mnuDatabase.add(mnuSqlServer2);
+
+        jMenu1.setText("SQL Server 3");
+
+        mnuSTSistemas_v2.setText("ST Sistemas");
+        mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTSistemas_v2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mnuSTSistemas_v2);
+
+        mnuDatabase.add(jMenu1);
 
         mnuSQLite.setText("SQLite");
 
@@ -4838,8 +4872,23 @@ public final class MenuGUI extends VRMdiFrame {
         STSistemasGUI.exibir(this);
     }//GEN-LAST:event_mnuSTSistemasActionPerformed
 
+    private void mnuSTSistemas_v2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTSistemas_v2ActionPerformed
+        // TODO add your handling code here:
+        STSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuSTSistemas_v2ActionPerformed
+
+    private void mnuEasySacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEasySacActionPerformed
+        EasySacGUI.exibir(this);
+    }//GEN-LAST:event_mnuEasySacActionPerformed
+
+    private void mnuAthosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAthosActionPerformed
+        // TODO add your handling code here:
+        AthosGUI.exibir(this);
+    }//GEN-LAST:event_mnuAthosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
     private javax.swing.JMenu jMenu12;
@@ -4941,6 +4990,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
     private javax.swing.JMenuItem mnuAtenasSQLServer;
+    private javax.swing.JMenuItem mnuAthos;
     private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAtmaFirebird;
     private javax.swing.JMenuItem mnuAutoADM;
@@ -4978,6 +5028,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDevMaster;
     private javax.swing.JMenuItem mnuDirector;
     private javax.swing.JMenuItem mnuDtCom;
+    private javax.swing.JMenuItem mnuEasySac;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuEtica;
@@ -5072,6 +5123,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSTI;
     private javax.swing.JMenuItem mnuSTI3;
     private javax.swing.JMenuItem mnuSTSistemas;
+    private javax.swing.JMenuItem mnuSTSistemas_v2;
     private javax.swing.JMenuItem mnuSaac;
     private javax.swing.JMenuItem mnuSaef;
     private javax.swing.JMenuItem mnuSambaNet;

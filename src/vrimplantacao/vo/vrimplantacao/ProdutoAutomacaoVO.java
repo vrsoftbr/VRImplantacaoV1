@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class ProdutoAutomacaoVO {
 
+    private int idproduto;
     public long codigoBarras = 0;
     public int idTipoEmbalagem = -1;
     public String tipoEmbalagem = "";
@@ -21,6 +22,20 @@ public class ProdutoAutomacaoVO {
     public double precoVenda = 0;
     public List<ProdutoAutomacaoDescontoVO> vDesconto = new ArrayList();
 
+    /**
+     * @return the idproduto
+     */
+    public int getIdproduto() {
+        return idproduto;
+    }
+
+    /**
+     * @param idproduto the idproduto to set
+     */
+    public void setIdproduto(int idproduto) {
+        this.idproduto = idproduto;
+    }
+    
     public long getCodigoBarras() {
         return codigoBarras;
     }
