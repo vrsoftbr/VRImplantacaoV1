@@ -887,21 +887,21 @@ public class G3DAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "   idPagar,\n"
+                    + "   idParcelaPagar idPagar,\n"
                     + "   p.idFornecedor,\n"
                     + "   f.CPF_CGC cnpj,\n"
-                    + "   nr_docto documento,\n"
-                    + "   dt_entrada dtentrada,\n"
-                    + "   dt_emissao dtemissao,\n"
-                    + "   dt_entrada dtalteracao,\n"
-                    + "   vl_docto valor,\n"
-                    + "   dt_vencto dtvencto,\n"
+                    + "   doc documento,\n"
+                    + "   p.dt_entrada dtentrada,\n"
+                    + "   p.dt_emissao dtemissao,\n"
+                    + "   p.dt_entrada dtalteracao,\n"
+                    + "   valor,\n"
+                    + "   venc dtvencto,\n"
                     + "   p.obs,\n"
-                    + "   historico ob2\n"
-                    + "from pagar p\n"
-                    + "     join fornecedor f\n"
-                    + "     on f.IDFORNECEDOR = p.idFornecedor \n"
-                    + "where p.situacao is null and loja =  " + getLojaOrigem() + ""
+                    + "   p.historico ob2\n"
+                    + "from parcelapagar pp\n"
+                    + "	left join pagar p on p.idPagar = pp.idPagar \n"
+                    + "	left join fornecedor f on f.IDFORNECEDOR = p.idFornecedor \n"
+                    + "where p.situacao is null and loja = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
