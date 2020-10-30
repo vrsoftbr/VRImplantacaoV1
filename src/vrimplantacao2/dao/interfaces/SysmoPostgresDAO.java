@@ -264,7 +264,8 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "      proest.emn as estoquemin,\n"
                     + "      proest.emx as estoquemax,\n"
                     + "      prod.cd_especificadorst as cest,\n"
-                    + "      prod.fpc::integer as piscofins,\n"
+                    + "      pis.ctp as piscofins,\n"
+                    + "      pis.nrp as naturezareceita,\n"        
                     + "      prod.ffs idaliquota\n"        
                     + "from\n"
                     + "      gcepro02 as prod\n"
@@ -275,11 +276,12 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "left join gcepro06 val on emp.cod = val.emp and\n"
                     + "     val.cod = prod.cod\n"
                     + "join tb_produtoestoque est on prod.cod = est.cd_produto\n"
+                    + "left join gceffs02 pis on prod.fpc = pis.cod\n"        
                     + "join gcepro03 as proest on prod.cod = proest.cod and\n"
                     + "     proest.emp = emp.cod and\n"
                     + "     est.cd_empresa = emp.cod and\n"
-                    + "     emp.cod = preco.emp and\n"
-                    + "     emp.cod = " + getLojaOrigem() + "\n"
+                    + "     emp.cod = preco.emp\n"
+                    + "where pis.nop = 5102.00 and emp.cod = " + getLojaOrigem() + "\n"        
                     + "order by\n"
                     + "      prod.cod::integer")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -347,6 +349,7 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
 
                     imp.setPiscofinsCstDebito(rs.getString("piscofins"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     
                     result.add(imp);
                 }
