@@ -323,7 +323,7 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                             }
                         }
                     } else {
-                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG") ? true : false);
+                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG"));
                         imp.setValidade(rs.getInt("validade"));
                     }
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
