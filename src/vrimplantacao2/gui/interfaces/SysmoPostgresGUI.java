@@ -78,7 +78,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
 
         carregarParametros();
         
-        btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
                 return sysmoDAO;
@@ -91,6 +91,8 @@ public class SysmoPostgresGUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
+                vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                sysmoDAO.setLojaOrigem(vLojaCliente);
                 return vLojaCliente;
             }
 
@@ -99,6 +101,8 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
+        
+        tabProdutos.setOpcoesDisponiveis(sysmoDAO);
         
         centralizarForm();
         this.setMaximum(false);  
@@ -123,7 +127,6 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         connSQL.abrirConexao(txtHostPostgres.getText(), txtPortaPostgres.getInt(), 
                 txtBancoDadosPostgres.getText(), txtUsuarioPostgres.getText(), txtSenhaPostgres.getText());
         
-        btnMapaTrib.setEnabled(true);
         carregarLojaVR();
         carregarLojaCliente();
         gravarParametros();
@@ -167,8 +170,9 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);                   
                     
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                      
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    
                     sysmoDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
                     
                     if((!"".equals(txtLojaMesmoID.getText())) && (!txtLojaMesmoID.getText().isEmpty())) {
@@ -180,84 +184,8 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     
                     if (tab.getSelectedIndex() == 0) {
-                        if (chkFamiliaProduto.isSelected()) {                        
-                            importador.importarFamiliaProduto();
-                        }
-
-                        if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
-                        }
-
-                        if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
-                        }
-
-                        {
-                            List<OpcaoProduto> opcoes = new ArrayList<>();
-                            if (chkT1Custo.isSelected()) {
-                                opcoes.add(OpcaoProduto.CUSTO);
-                            }
-                            if (chkT1Preco.isSelected()) {
-                                opcoes.add(OpcaoProduto.PRECO);
-                            }
-                            if (chkT1Estoque.isSelected()) {
-                                opcoes.add(OpcaoProduto.ESTOQUE);
-                            }
-                            if (chkT1PisCofins.isSelected()) {
-                                opcoes.add(OpcaoProduto.PIS_COFINS);
-                            }
-                            if (chkT1NatReceita.isSelected()) {
-                                opcoes.add(OpcaoProduto.NATUREZA_RECEITA);
-                            }
-                            if (chkT1ICMS.isSelected()) {
-                                opcoes.add(OpcaoProduto.ICMS);
-                            }
-                            if (chkT1AtivoInativo.isSelected()) {
-                                opcoes.add(OpcaoProduto.ATIVO);
-                            }    
-                            if (chkT1DescCompleta.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESC_COMPLETA);
-                            }
-                            if (chkT1DescReduzida.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESC_REDUZIDA);
-                            }
-                            if (chkT1DescGondola.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESC_GONDOLA);
-                            }
-                            if (chkT1ProdMercadologico.isSelected()) {
-                                opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
-                            if (chkFamilia.isSelected()) {
-                                opcoes.add(OpcaoProduto.FAMILIA);
-                            }
-                            if (chkTipoEmbalagemEAN.isSelected()) {
-                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
-                            }
-                            if (chkQtdEmbalagemEAN.isSelected()) {
-                                opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
-                            }
-                            if (chkQtdEmbCotacao.isSelected()) {
-                                opcoes.add(OpcaoProduto.QTD_EMBALAGEM_COTACAO);
-                            }
-                            if (chkMargem.isSelected()) {
-                                opcoes.add(OpcaoProduto.MARGEM);
-                            }
-                            if (chkTipoEmbalagem.isSelected()) {
-                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.atualizarProdutos(opcoes);
-                            }
-                        }
-
-                        if (chkT1EAN.isSelected()) {
-                            importador.importarEAN();
-                        }
-
-                        if (chkT1EANemBranco.isSelected()) {
-                            importador.importarEANemBranco();
-                        }
-                        
+                        tabProdutos.setImportador(importador);
+                        tabProdutos.executarImportacao();
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
@@ -340,32 +268,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tab = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabDados = new vrframework.bean.panel.VRPanel();
-        chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
-        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
-        chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1PisCofins = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1NatReceita = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1ICMS = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1AtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1DescCompleta = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
-        chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
-        chkTipoEmbalagem = new vrframework.bean.checkBox.VRCheckBox();
-        btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
-        pnlImpProd = new javax.swing.JPanel();
-        chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
-        chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
-        chkTemBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -382,6 +285,8 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         cbxUnifProdutoForn = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliEventual = new vrframework.bean.checkBox.VRCheckBox();
+        tabParametroExtra = new javax.swing.JPanel();
+        chkTemBalanca = new javax.swing.JCheckBox();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioPostgres = new vrframework.bean.textField.VRTextField();
@@ -456,184 +361,25 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        chkFamiliaProduto.setText("Familia Produto");
-        chkFamiliaProduto.setEnabled(true);
-        chkFamiliaProduto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFamiliaProdutoActionPerformed(evt);
-            }
-        });
-
-        chkMercadologico.setText("Mercadologico");
-        chkMercadologico.setEnabled(true);
-
-        chkT1Custo.setText("Custo");
-
-        chkT1Preco.setText("Preço");
-
-        chkT1Estoque.setText("Estoque");
-
-        chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
-
-        chkT1EAN.setText("EAN");
-
-        chkT1EANemBranco.setText("EAN em branco");
-
-        chkT1PisCofins.setText("PIS/COFINS");
-
-        chkT1NatReceita.setText("Nat. Receita");
-
-        chkT1ICMS.setText("ICMS");
-
-        chkT1AtivoInativo.setText("Ativo/Inativo");
-
-        chkT1DescCompleta.setText("Descrição Completa");
-
-        chkT1DescReduzida.setText("Descrição Reduzida");
-
-        chkT1DescGondola.setText("Descrição Gondola");
-
-        chkT1ProdMercadologico.setText("Prod. Mercadológico");
-
-        chkFamilia.setText("Família");
-
-        chkTipoEmbalagemEAN.setText("Tipo Emb. EAN");
-
-        chkQtdEmbalagemEAN.setText("Qtd. Emb. EAN");
-
-        chkMargem.setText("Margem");
-
-        chkTipoEmbalagem.setText("Tp. Emb. (Produto)");
-
-        btnMapaTrib.setEnabled(false);
-        btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapaTribActionPerformed(evt);
-            }
-        });
-
-        pnlImpProd.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        chkProdutos.setText("Produtos");
-        chkProdutos.setEnabled(true);
-        pnlImpProd.add(chkProdutos);
-
-        chkManterBalanca.setText("Manter Balança");
-        chkManterBalanca.setEnabled(true);
-        pnlImpProd.add(chkManterBalanca);
-
-        chkTemBalanca.setText("Tem Balanca");
-
         javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
         tabDados.setLayout(tabDadosLayout);
         tabDadosLayout.setHorizontalGroup(
             tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabDadosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabDadosLayout.createSequentialGroup()
-                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pnlImpProd, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tabDadosLayout.createSequentialGroup()
-                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(2, 2, 2)
-                                .addComponent(chkT1EAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkT1Custo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(44, 44, 44)
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkT1EANemBranco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkT1ICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkT1PisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkMargem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkTipoEmbalagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(23, 23, 23)
-                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkT1DescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkT1NatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkTemBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGap(0, 536, Short.MAX_VALUE)
+            .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(tabDadosLayout.createSequentialGroup()
+                    .addGap(0, 0, 0)
+                    .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
+                    .addGap(0, 0, 0)))
         );
         tabDadosLayout.setVerticalGroup(
             tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabDadosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlImpProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(tabDadosLayout.createSequentialGroup()
-                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(tabDadosLayout.createSequentialGroup()
-                                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                            .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(chkT1EAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                            .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(chkT1EANemBranco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(chkT1Custo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(chkT1ICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                                .addGap(26, 26, 26)
-                                                .addComponent(chkT1NatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(chkT1DescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                    .addGroup(tabDadosLayout.createSequentialGroup()
-                                        .addGap(72, 72, 72)
-                                        .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkT1PisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(chkMargem, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(tabDadosLayout.createSequentialGroup()
-                                .addGap(49, 49, 49)
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(23, 23, 23)
-                                .addComponent(chkTipoEmbalagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkTemBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGap(0, 179, Short.MAX_VALUE)
+            .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(tabDadosLayout.createSequentialGroup()
+                    .addGap(8, 8, 8)
+                    .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                    .addGap(8, 8, 8)))
         );
 
         tab.addTab("Dados", tabDados);
@@ -733,7 +479,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(362, Short.MAX_VALUE))
+                .addContainerGap(424, Short.MAX_VALUE))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -742,7 +488,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(159, Short.MAX_VALUE))
+                .addContainerGap(100, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
@@ -790,6 +536,27 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         );
 
         tab.addTab("Unificação", tabUnificacao);
+
+        chkTemBalanca.setText("Tem Arquivo Balança");
+
+        javax.swing.GroupLayout tabParametroExtraLayout = new javax.swing.GroupLayout(tabParametroExtra);
+        tabParametroExtra.setLayout(tabParametroExtraLayout);
+        tabParametroExtraLayout.setHorizontalGroup(
+            tabParametroExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroExtraLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(chkTemBalanca)
+                .addContainerGap(401, Short.MAX_VALUE))
+        );
+        tabParametroExtraLayout.setVerticalGroup(
+            tabParametroExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabParametroExtraLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkTemBalanca)
+                .addContainerGap(154, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Parâmetro Extra", tabParametroExtra);
 
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Postgres"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
@@ -871,7 +638,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(pnlConexaoLayout.createSequentialGroup()
                                         .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 96, Short.MAX_VALUE))
+                                        .addGap(0, 158, Short.MAX_VALUE))
                                     .addComponent(txtHostPostgres, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -924,7 +691,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -939,7 +706,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1012,17 +779,8 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
-    private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
-        
-    }//GEN-LAST:event_btnMapaTribActionPerformed
-
-    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarPostgres;
-    private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifCliEventual;
@@ -1033,43 +791,21 @@ public class SysmoPostgresGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkFamilia;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMargem;
-    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
-    private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
-    private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
-    private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
-    private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;
-    private vrframework.bean.checkBox.VRCheckBox chkT1DescGondola;
-    private vrframework.bean.checkBox.VRCheckBox chkT1DescReduzida;
-    private vrframework.bean.checkBox.VRCheckBox chkT1EAN;
-    private vrframework.bean.checkBox.VRCheckBox chkT1EANemBranco;
-    private vrframework.bean.checkBox.VRCheckBox chkT1Estoque;
-    private vrframework.bean.checkBox.VRCheckBox chkT1ICMS;
-    private vrframework.bean.checkBox.VRCheckBox chkT1NatReceita;
-    private vrframework.bean.checkBox.VRCheckBox chkT1PisCofins;
-    private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
-    private vrframework.bean.checkBox.VRCheckBox chkT1ProdMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkTemBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
-    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    private javax.swing.JCheckBox chkTemBalanca;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
-    private javax.swing.JPanel pnlImpProd;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;
+    private javax.swing.JPanel tabParametroExtra;
+    private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.textField.VRTextField txtBancoDadosPostgres;
