@@ -188,6 +188,10 @@ public class InteragemGUI_2 extends VRInternalFrame {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
+                        
+                        if (chkAjustarDigitoVerificador.isSelected()) {
+                            dao.importarDigitoVerificador();
+                        }
 
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -249,6 +253,8 @@ public class InteragemGUI_2 extends VRInternalFrame {
         chkPagamentoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkEndereco = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -493,6 +499,27 @@ public class InteragemGUI_2 extends VRInternalFrame {
 
         vRTabbedPane1.addTab("Clientes", vRPanel11);
 
+        chkAjustarDigitoVerificador.setText("Ajustar Código de Barras (Digito Verificador)");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(360, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAjustarDigitoVerificador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(220, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane1.addTab("Especiais", vRPanel1);
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -662,6 +689,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -690,6 +718,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel8;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel10;
     private vrframework.bean.panel.VRPanel vRPanel11;
     private vrframework.bean.panel.VRPanel vRPanel2;

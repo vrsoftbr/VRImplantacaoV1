@@ -208,7 +208,8 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(e.PrcFuturo1, 0) as precovenda,\n"
                     + " 0.03 * coalesce(e.PrcFuturo1, 0) + coalesce(e.PrcVenda, 0) as precovenda_virtual, \n"
                     + " coalesce(prcvendaweb, 0), \n"
-                    + " coalesce(e.PrcVenda, 0),"        
+                    + " coalesce(e.PrcVenda, 0),\n"        
+                    + " coalesce(e.PrcVenda, 0) as precoatacado, \n"        
                     + "	coalesce(e.CustoRep, 0) as custo,\n"
                     + "	p.COD_NCM as ncm,\n"
                     + "	p.cest as cest,\n"
@@ -235,7 +236,6 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and e.LOCAL = " + getLojaOrigem() + "\n"
                     + "left join GRUPOS g on g.GRUPO = p.GRUPO\n"
                     + "left join ProTools_PisCofins pis on pis.Codigo = p.PisCofins\n"
-                    + "where p.ITEM != 0\n"
                     + "order by 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -298,13 +298,17 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setMargem(rst.getDouble("margem"));
                     
-                    if (idLojaVR == 6) {
+                    if (idLojaVR == 2) {
+                        imp.setPrecovenda(rst.getDouble("precoatacado"));
+                    } else if (idLojaVR == 6) {
                         imp.setPrecovenda(rst.getDouble("precovenda_virtual"));
                     } else {
                         imp.setPrecovenda(rst.getDouble("precovenda"));
                     }
-                                        
-                    if (idLojaVR == 3) {
+                    
+                    if (idLojaVR == 2) {
+                        imp.setEstoque(rst.getDouble("qtd_deposito"));
+                    } else if (idLojaVR == 3) {
                         imp.setEstoque(rst.getDouble("qtd_web"));
                     } else {
                         imp.setEstoque(rst.getDouble("saldo_real"));
@@ -667,6 +671,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setLimiteCompra(imp.getValorLimite());
 
                     if ((rst.getString("estadocivil") != null)
                             && (!rst.getString("estadocivil").trim().isEmpty())) {
@@ -736,6 +741,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.NUMSP as parcela\n"
                     + "from TITLRECH r\n"
                     + "where r.DATAPAG is null\n"
+                    + "and r.SITUACAO != 3\n"        
                     + "and r.LOCAL = " + getLojaOrigem()
             )) {
                 while (rst.next()) {

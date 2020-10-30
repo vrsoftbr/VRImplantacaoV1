@@ -12,6 +12,7 @@ import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.parametro.Versao;
 
 public class LojaDAO {
@@ -471,5 +472,28 @@ public class LojaDAO {
         } else {
             return 0;
         }
+    }
+
+    public List<Estabelecimento> getLojasVR() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	l.id,\n"
+                    + "	l.descricao,\n"
+                    + "	f.nomefantasia,\n"
+                    + "	f.razaosocial \n"
+                    + "from \n"
+                    + "	loja l \n"
+                    + "inner join fornecedor f on l.id_fornecedor = f.id where l.id_situacaocadastro = 1\n"
+                    + "order by\n"
+                    + "	l.id")) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
     }
 }

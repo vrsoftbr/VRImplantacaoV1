@@ -1,8 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -16,45 +14,45 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.interfaces.AthosDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.SysmoPostgresDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class SysmoPostgresGUI extends VRInternalFrame {    
+public class AthosGUI extends VRInternalFrame {    
     
-    private static final String NOME_SISTEMA = "Sysmo";
-    private static final String SERVIDOR_SQL = "Firebird";
-    private static SysmoPostgresGUI instance;
+    private static final String NOME_SISTEMA = "Athos";
+    private static final String SERVIDOR_SQL = "Postgres";
+    private static AthosGUI instance;
     
-    private final SysmoPostgresDAO sysmoDAO = new SysmoPostgresDAO();
+    private final AthosDAO dao = new AthosDAO();
     private final ConexaoPostgres connSQL = new ConexaoPostgres();
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private int vTipoVenda = -1;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHostPostgres.setText(params.getWithNull("192.168.0.200", NOME_SISTEMA, "HOST"));
-        txtBancoDadosPostgres.setText(params.getWithNull("dados", NOME_SISTEMA, "DATABASE"));
-        txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
-        txtUsuarioPostgres.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
-        txtSenhaPostgres.setText(params.getWithNull("L$5a7*(B", NOME_SISTEMA, "SENHA"));
+        tabProdutos.carregarParametros(params, NOME_SISTEMA);
+        txtHostPostgres.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
+        txtBancoDadosPostgres.setText(params.getWithNull("cronos20", NOME_SISTEMA, "DATABASE"));
+        txtPortaPostgres.setText(params.getWithNull("8745", NOME_SISTEMA, "PORTA"));
+        txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
+        txtSenhaPostgres.setText(params.getWithNull("VrPost@Server", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
-        vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
     }
     
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
+        tabProdutos.gravarParametros(params, NOME_SISTEMA);
         params.put(txtHostPostgres.getText(), NOME_SISTEMA, "HOST");
         params.put(txtBancoDadosPostgres.getText(), NOME_SISTEMA, "DATABASE");
         params.put(txtPortaPostgres.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioPostgres.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaPostgres.getText(), NOME_SISTEMA, "SENHA");
+        
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
@@ -68,7 +66,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private SysmoPostgresGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private AthosGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -76,24 +74,26 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
-        carregarParametros();
-        
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return sysmoDAO;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                return NOME_SISTEMA;
+                if (!txtLojaID.getText().trim().isEmpty()) {
+                    return dao.getSistema() + " - " + txtLojaID.getText().trim();
+                } else {
+                    return dao.getSistema();
+                }
+                
             }
 
             @Override
-            public String getLoja() {
-                vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                sysmoDAO.setLojaOrigem(vLojaCliente);
-                return vLojaCliente;
+            public String getLoja() {                
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -102,7 +102,9 @@ public class SysmoPostgresGUI extends VRInternalFrame {
             }
         });
         
-        tabProdutos.setOpcoesDisponiveis(sysmoDAO);
+        carregarParametros();
+        
+        tabProdutos.setOpcoesDisponiveis(dao);
         
         centralizarForm();
         this.setMaximum(false);  
@@ -150,7 +152,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: sysmoDAO.getLojas()) {
+        for (Estabelecimento loja: dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -164,49 +166,39 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
             String idLojaCliente;
+            String lojaMesmoID;
+            
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);                   
                     
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                      
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                     
                     
-                    sysmoDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
+                    Importador importador = new Importador(dao);
                     
-                    if((!"".equals(txtLojaMesmoID.getText())) && (!txtLojaMesmoID.getText().isEmpty())) {
-                        sysmoDAO.lojaMesmoID = " - " + txtLojaMesmoID.getText();
-                    }
-                    
-                    Importador importador = new Importador(sysmoDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
+                    tabProdutos.setImportador(importador);
                     
                     if (tab.getSelectedIndex() == 0) {
-                        tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
-                    } else if (tab.getSelectedIndex() == 1) {
+
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
-
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                    } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {                            
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
                         }
-                        if (chkClienteEventual.isSelected()) {                            
-                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
-                        }
-                        
-                         if(chkRotativo.isSelected()){
+                        if(chkRotativo.isSelected()){
                             importador.importarCreditoRotativo();
                         }
-                        
-                    } else if (tab.getSelectedIndex() == 3) {
+                    } else if (tab.getSelectedIndex() == 1) {
                         if (cbxUnifProdutos.isSelected()) {  
                             importador.unificarProdutos();
                         }
@@ -244,7 +236,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new SysmoPostgresGUI(i_mdiFrame);
+                instance = new AthosGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -261,13 +253,20 @@ public class SysmoPostgresGUI extends VRInternalFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
+        pnlCustom = new vrframework.bean.panel.VRPanel();
+        txtIDAtacado = new javax.swing.JTextField();
+        lblAtacadoID = new vrframework.bean.label.VRLabel();
+        chkForcarIdProdutoQuandoPesavel = new vrframework.bean.checkBox.VRCheckBox();
+        pnlOutras = new vrframework.bean.panel.VRPanel();
+        chkVendas = new vrframework.bean.checkBox.VRCheckBox();
+        edtVendaDtIni = new org.jdesktop.swingx.JXDatePicker();
         vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         vRLabel6 = new vrframework.bean.label.VRLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tab = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabDados = new vrframework.bean.panel.VRPanel();
+        tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -275,18 +274,13 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifProdutoForn = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliEventual = new vrframework.bean.checkBox.VRCheckBox();
-        tabParametroExtra = new javax.swing.JPanel();
-        chkTemBalanca = new javax.swing.JCheckBox();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioPostgres = new vrframework.bean.textField.VRTextField();
@@ -302,11 +296,72 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         vRLabel1 = new vrframework.bean.label.VRLabel();
         txtBancoDadosPostgres = new vrframework.bean.textField.VRTextField();
         cmbLojaOrigem = new javax.swing.JComboBox();
-        txtLojaMesmoID = new vrframework.bean.textField.VRTextField();
         vRLabel8 = new vrframework.bean.label.VRLabel();
+        txtLojaID = new vrframework.bean.textField.VRTextField();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
-        setTitle("Sysmo");
+        txtIDAtacado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtIDAtacado.setText("999");
+
+        lblAtacadoID.setText("Prefixo Atacado");
+
+        chkForcarIdProdutoQuandoPesavel.setText("Forçar ID como PLU nos produtos pesáveis");
+
+        javax.swing.GroupLayout pnlCustomLayout = new javax.swing.GroupLayout(pnlCustom);
+        pnlCustom.setLayout(pnlCustomLayout);
+        pnlCustomLayout.setHorizontalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblAtacadoID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtIDAtacado))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkForcarIdProdutoQuandoPesavel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(72, Short.MAX_VALUE))
+        );
+        pnlCustomLayout.setVerticalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblAtacadoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtIDAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkForcarIdProdutoQuandoPesavel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        chkVendas.setText("Vendas");
+        chkVendas.setEnabled(true);
+        chkVendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkVendasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlOutrasLayout = new javax.swing.GroupLayout(pnlOutras);
+        pnlOutras.setLayout(pnlOutrasLayout);
+        pnlOutrasLayout.setHorizontalGroup(
+            pnlOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOutrasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtVendaDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(395, Short.MAX_VALUE))
+        );
+        pnlOutrasLayout.setVerticalGroup(
+            pnlOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOutrasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(edtVendaDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(157, Short.MAX_VALUE))
+        );
+
+        setTitle("Sistema WEB - Cronos 20");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -361,28 +416,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
-        tabDados.setLayout(tabDadosLayout);
-        tabDadosLayout.setHorizontalGroup(
-            tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 536, Short.MAX_VALUE)
-            .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(tabDadosLayout.createSequentialGroup()
-                    .addGap(0, 0, 0)
-                    .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
-                    .addGap(0, 0, 0)))
-        );
-        tabDadosLayout.setVerticalGroup(
-            tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 179, Short.MAX_VALUE)
-            .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(tabDadosLayout.createSequentialGroup()
-                    .addGap(8, 8, 8)
-                    .addComponent(tabProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
-                    .addGap(8, 8, 8)))
-        );
-
-        tab.addTab("Dados", tabDados);
+        tabImportacao.addTab("Produtos", tabProdutos);
 
         tabFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -411,7 +445,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(462, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -420,10 +454,10 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
 
-        tab.addTab("Fornecedores", tabFornecedor);
+        tabImportacao.addTab("Fornecedores", tabFornecedor);
 
         tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -435,13 +469,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
             }
         });
 
-        chkClienteEventual.setText("Cliente Eventual");
-        chkClienteEventual.setEnabled(true);
-        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClienteEventualActionPerformed(evt);
-            }
-        });
+        chkRotativo.setText("Crédito Rotativo");
 
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
@@ -451,8 +479,8 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(459, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -460,40 +488,15 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(218, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
 
-        chkRotativo.setText("Crédito Rotativo");
+        tabImportacao.addTab("Clientes", tabCliente);
 
-        chkCheque.setText("Cheque");
-
-        javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
-        tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
-        tablCreditoRotativoLayout.setHorizontalGroup(
-            tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(424, Short.MAX_VALUE))
-        );
-        tablCreditoRotativoLayout.setVerticalGroup(
-            tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(100, Short.MAX_VALUE))
-        );
-
-        tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
-
-        tab.addTab("Clientes", tabCliente);
+        tab.addTab("Importação", tabImportacao);
 
         cbxUnifProdutos.setText("Unificar produtos (Somente EANs válidos)");
 
@@ -536,27 +539,6 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         );
 
         tab.addTab("Unificação", tabUnificacao);
-
-        chkTemBalanca.setText("Tem Arquivo Balança");
-
-        javax.swing.GroupLayout tabParametroExtraLayout = new javax.swing.GroupLayout(tabParametroExtra);
-        tabParametroExtra.setLayout(tabParametroExtraLayout);
-        tabParametroExtraLayout.setHorizontalGroup(
-            tabParametroExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabParametroExtraLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(chkTemBalanca)
-                .addContainerGap(401, Short.MAX_VALUE))
-        );
-        tabParametroExtraLayout.setVerticalGroup(
-            tabParametroExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabParametroExtraLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkTemBalanca)
-                .addContainerGap(154, Short.MAX_VALUE))
-        );
-
-        tab.addTab("Parâmetro Extra", tabParametroExtra);
 
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Postgres"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
@@ -608,7 +590,20 @@ public class SysmoPostgresGUI extends VRInternalFrame {
 
         txtBancoDadosPostgres.setCaixaAlta(false);
 
-        vRLabel8.setText("Loja Mesmo ID");
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
+
+        vRLabel8.setText("Loja ID");
+
+        txtLojaID.setCaixaAlta(false);
+        txtLojaID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtLojaIDActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
         pnlConexao.setLayout(pnlConexaoLayout);
@@ -616,43 +611,40 @@ public class SysmoPostgresGUI extends VRInternalFrame {
             pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlConexaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(pnlConexaoLayout.createSequentialGroup()
                         .addComponent(txtPortaPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtLojaID, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConectarPostgres))
                     .addGroup(pnlConexaoLayout.createSequentialGroup()
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(pnlConexaoLayout.createSequentialGroup()
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlConexaoLayout.createSequentialGroup()
                                 .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(25, 25, 25)
-                                .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(txtHostPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlConexaoLayout.createSequentialGroup()
                                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pnlConexaoLayout.createSequentialGroup()
-                                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 158, Short.MAX_VALUE))
-                                    .addComponent(txtHostPostgres, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(txtBancoDadosPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtBancoDadosPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(6, 6, 6)))
-                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtUsuarioPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenhaPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                                    .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtUsuarioPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtSenhaPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(115, Short.MAX_VALUE))
         );
         pnlConexaoLayout.setVerticalGroup(
             pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -678,7 +670,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
                     .addComponent(txtPortaPostgres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectarPostgres)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(txtLojaID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         vRTabbedPane1.addTab("Conexão", pnlConexao);
@@ -691,7 +683,7 @@ public class SysmoPostgresGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+                    .addComponent(tab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -703,16 +695,16 @@ public class SysmoPostgresGUI extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                .addGap(1, 1, 1)
+                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 356, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        pack();
+        setBounds(0, 0, 639, 633);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
@@ -763,10 +755,6 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
-    private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
-        
-    }//GEN-LAST:event_chkClienteEventualActionPerformed
-
     private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
         
     }//GEN-LAST:event_chkClientePreferencialActionPerformed
@@ -779,6 +767,18 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
+    private void chkVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkVendasActionPerformed
+
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        //tabBalanca.setLoja(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
+    private void txtLojaIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLojaIDActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLojaIDActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarPostgres;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -788,29 +788,31 @@ public class SysmoPostgresGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutoForn;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkCheque;
-    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkForcarIdProdutoQuandoPesavel;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
-    private javax.swing.JCheckBox chkTemBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private org.jdesktop.swingx.JXDatePicker edtVendaDtIni;
+    private vrframework.bean.label.VRLabel lblAtacadoID;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
+    private vrframework.bean.panel.VRPanel pnlCustom;
+    private vrframework.bean.panel.VRPanel pnlOutras;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
-    private vrframework.bean.panel.VRPanel tabDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;
-    private javax.swing.JPanel tabParametroExtra;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabImportacao;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
-    private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.textField.VRTextField txtBancoDadosPostgres;
     private vrframework.bean.textField.VRTextField txtHostPostgres;
-    private vrframework.bean.textField.VRTextField txtLojaMesmoID;
+    private javax.swing.JTextField txtIDAtacado;
+    private vrframework.bean.textField.VRTextField txtLojaID;
     private vrframework.bean.textField.VRTextField txtPortaPostgres;
     private vrframework.bean.passwordField.VRPasswordField txtSenhaPostgres;
     private vrframework.bean.textField.VRTextField txtUsuarioPostgres;

@@ -14,7 +14,6 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-//import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -85,26 +84,22 @@ public class SaefDAO extends InterfaceDAO {
         return result;
     }
 
-        @Override
+    @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
 
         if (opt == OpcaoProduto.ATACADO) {
             List<ProdutoIMP> Result = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rs = stm.executeQuery(
-                        "select  \n"
-                        + "	e.codprod id_produto, \n"
-                        + "	rtrim(e.barra_emb) ean, \n"
-                        + "	e.qtd qtdembalagem,\n"
-                        + "	e.preco_unit precoAtacado,\n"
-                        + "	p.PRECO_UNIT precoVenda\n"
-                        + "from \n"
-                        + "	EMBALAGENS e, PRODUTOS p\n"
-                        + "where \n"
-                        + "	e.CODPROD = p.CODPROD and\n"
-                        + "	barra_emb is not null and\n"
-                        + "	coalesce(e.PRECO_UNIT, 0) > 0\n"
-                        + "order by 1"
+                        "select\n"
+                        + "	cdProduto id_produto,\n"
+                        + "	cdFabricante ean,\n"
+                        + "	cEAN ean2,\n"
+                        + "	vlAtacado precoatacado,\n"
+                        + "	vlPreco precoVenda\n"
+                        + "from Produto\n"
+                        + "	where vlAtacado > 0 \n"
+                        + "	and cdFabricante is not null and cdFabricante != ''"
                 )) {
                     while (rs.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -113,9 +108,9 @@ public class SaefDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rs.getString("id_produto"));
                         imp.setEan(rs.getString("ean"));
-                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                        imp.setAtacadoPreco(rs.getDouble("precoAtacado"));
+                        imp.setAtacadoPreco(rs.getDouble("precoatacado"));
                         imp.setPrecovenda(rs.getDouble("precoVenda"));
+                        //imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
 
                         Result.add(imp);
                     }
@@ -126,7 +121,7 @@ public class SaefDAO extends InterfaceDAO {
 
         return null;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -136,7 +131,7 @@ public class SaefDAO extends InterfaceDAO {
                     + "	cdproduto importId,\n"
                     + "	dtalteracao dataCadastro,\n"
                     + "	dtalteracao dataAlteracao,\n"
-                    + "	cdFabricante ean,\n"
+                    + "	coalesce(nullif(ltrim(rtrim(cdFabricante)),''), 'P' + cast(cdproduto as varchar(20))) ean,\n"
                     + "	cean ean2,\n"
                     + "	dsunidade tipoEmbalagem,\n"
                     + "	CASE WHEN LEN(cdFabricante) <= 7 and cdFabricante != '' and dsunidade = 'KG' THEN 1 else 0 END ebalanca,\n"
@@ -151,10 +146,10 @@ public class SaefDAO extends InterfaceDAO {
                     + "	nrqtdminima estoqueMinimo,\n"
                     + "	nrqtdreal estoque,\n"
                     + "	nrmargem margem,\n"
-                    + "	ROUND(vlcompra,2) custoSemImposto,\n"
-                    + "	ROUND(nrcustofinal_v,2) custoComImposto,\n"
+                    + "	vlcompra custoSemImposto,\n"
+                    + "	nrcustofinal_v custoComImposto,\n"
                     + "	vlcustomedio custoMedio,\n"
-                    + "	ROUND(vlpreco,2) precovenda,\n"
+                    + "	vlPreco precovenda,\n"
                     + "	CASE WHEN dsativo = 'S' THEN 1 else 0 end situacaoCadastro,\n"
                     + "	dsmercosul ncm,\n"
                     + "	SUBSTRING(cf.dsPis,1,2) piscofinsCstDebito,\n"
@@ -169,13 +164,13 @@ public class SaefDAO extends InterfaceDAO {
                     + "	vlatacado atacadoPreco,\n"
                     + "	nrmargematacado atacadoPorcentagem\n"
                     + "from produto p\n"
-                    + "     left join Aliquotas a on p.dsCodtributacao = a.dsCodtributacao\n"
-                    + "     left join ClFiscal cf on cf.cdclassificacao = p.dsmercosul\n"
-                    + "     left join tb_cest cest on cf.idcest = cest.idcest\n"
-                    + "where\n"
-                    + "	p.dsAtivo = 'S'\n"
-                    + "	and cdFabricante != ''"
-                )) {
+                    + "	 left join Aliquotas a on p.dsCodtributacao = a.dsCodtributacao\n"
+                    + "	 left join ClFiscal cf on cf.cdclassificacao = p.dsmercosul\n"
+                    + "	 left join tb_cest cest on cf.idcest = cest.idcest"
+            //+ "where\n"
+            //+ " p.dsAtivo = 'S'\n"
+            //+ " and cdFabricante != ''"
+            )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -185,27 +180,28 @@ public class SaefDAO extends InterfaceDAO {
                     imp.setImportId(rs.getString("importid"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setEan(rs.getString("ean"));
 
                     long longEAN = Utils.stringToLong(imp.getEan(), -2);
                     String strEAN = String.valueOf(longEAN);
 
                     if (strEAN.startsWith("2") && strEAN.length() == 7) {
                         final String eanBal = strEAN.substring(1);
-                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(eanBal, -2));
+                        final int plu = Utils.stringToInt(eanBal, -2);
+                        ProdutoBalancaVO bal = produtosBalanca.get(plu);
                         if (bal != null) {
                             imp.setEan(String.valueOf(bal.getCodigo()));
                             imp.seteBalanca(true);
-                            imp.setValidade(bal.getValidade());
                             imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
+                            imp.setValidade(bal.getValidade());
                         } else {
-                            imp.setEan(rs.getString("ean"));
-                            imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                            imp.setEan(eanBal);
+                            imp.seteBalanca(rs.getBoolean("ebalanca"));
                             imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                             imp.setValidade(rs.getInt("validade"));
                         }
                     } else {
-                        imp.setEan(rs.getString("ean"));
-                        imp.seteBalanca(rs.getInt("ebalanca") == 1);
+                        imp.seteBalanca(rs.getBoolean("ebalanca"));
                         imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                         imp.setValidade(rs.getInt("validade"));
                     }
@@ -227,32 +223,26 @@ public class SaefDAO extends InterfaceDAO {
 
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rs.getString("ncm"));
-                    
+
                     imp.setPiscofinsCstCredito(rs.getInt("piscofinscstcredito"));
                     imp.setPiscofinsCstDebito(rs.getInt("piscofinsCstDebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("natreceita"));
-                    
+
                     imp.setIcmsCstSaida(rs.getInt("icmsCstSaida"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsAliqSaida"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icmsreducaosaida"));
-                    
+
+                    imp.setIcmsCstEntrada(rs.getInt("icmsCstSaida"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("icmsAliqSaida"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducaosaida"));
+
                     imp.setIcmsCstConsumidor(rs.getInt("icmsCstConsumidor"));
                     imp.setIcmsAliqConsumidor(rs.getDouble("icmsAliqConsumidor"));
                     imp.setIcmsReducaoConsumidor(rs.getDouble("icmsReducaoConsumidor"));
-                    
+
                     imp.setAtacadoPreco(rs.getDouble("atacadoPreco"));
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadoPorcentagem"));
-                                        
-                    /*
-                    imp.setPesoBruto(rs.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
-                    imp.setCustoAnteriorComImposto(rs.getDouble("custoAnteriorComImposto"));
-                    imp.setCest(rs.getString("cest"));
-                    imp.setIcmsCstEntrada(rs.getInt("icmscstentrada"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmsaliqentrada"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducaoentrada"));
-                    */
-                    
+
                     result.add(imp);
                 }
             }
@@ -260,41 +250,18 @@ public class SaefDAO extends InterfaceDAO {
         return result;
     }
 
-    /*@Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    " select distinct\n"
-                    + "     CodFamilia,\n"
-                    + "     DescricaoFamilia\n"
-                    + " from CadProdutos\n"
-                    + "     order by CodFamilia")) {
-                while (rs.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-
-                    imp.setImportId(rs.getString("CodFamilia"));
-                    imp.setDescricao(rs.getString("DescricaoFamilia"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "     cdFornecedor idfornecedor,\n"
-                    + "     cdProduto idproduto,\n"
-                    + "     codigo codigoexterno\n"
-                    + "from codFornecedor cf")) {
+                    + "  cdFornecedor idfornecedor,\n"
+                    + "  cdProduto idproduto,\n"
+                    + "  codigo codigoexterno\n"
+                    + "from codFornecedor cf"
+                    + "  where codigo != ''\n"
+                    + "  and codigo is NOT NULL ")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -303,7 +270,6 @@ public class SaefDAO extends InterfaceDAO {
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
-                    //imp.setQtdEmbalagem(rs.getDouble("qtdEmbalagem"));
 
                     result.add(imp);
                 }
@@ -435,43 +401,4 @@ public class SaefDAO extends InterfaceDAO {
         }
         return result;
     }
-
-    /*@Override
-     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-     List<CreditoRotativoIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-     try (ResultSet rs = stm.executeQuery(
-     "select\n"
-     + "    codigo,\n"
-     + "    codvenda,\n"
-     + "    codcaixa,\n"
-     + "    codcliente,\n"
-     + "    data_emissao,\n"
-     + "    data_vencimento,\n"
-     + "    valor_original,\n"
-     + "    documento\n"
-     + "from\n"
-     + "    c000049\n"
-     + "where\n"
-     + "    situacao = 1 and\n"
-     + "    data_pagamento is null\n"
-     + "order by\n"
-     + "    data_emissao")) {
-     while (rs.next()) {
-     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-     imp.setId(rs.getString("codigo"));
-     imp.setNumeroCupom(rs.getString("codvenda"));
-     imp.setEcf(rs.getString("codcaixa"));
-     imp.setIdCliente(rs.getString("codcliente"));
-     imp.setDataEmissao(rs.getDate("data_emissao"));
-     imp.setDataVencimento(rs.getDate("data_vencimento"));
-     imp.setValor(rs.getDouble("valor_original"));
-     imp.setObservacao("Doc.: " + rs.getString("documento"));
-
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }*/
 }

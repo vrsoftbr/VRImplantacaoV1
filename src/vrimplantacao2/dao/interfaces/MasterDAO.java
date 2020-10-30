@@ -100,7 +100,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from \n" +
                     "	aliquota")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("percentual"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(rs.getString("percentual").trim(), rs.getString("descricao")));
                 }
             }
         }
@@ -168,8 +168,26 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        Set<String> eanValidoBalanca = new HashSet<>();
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            
+            try(ResultSet rs1 = stm.executeQuery(
+                    "select\n" +
+                    "	p.cod_produto id,\n" +
+                    "	pe.cod_barra ean\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "left join produto_custo pc on p.cod_produto = pc.cod_produto\n" +
+                    "left join produto_codbarra pe on p.cod_produto = pe.cod_produto\n" +
+                    "where\n" +
+                    "	pc.cod_empresa = " + getLojaOrigem() + " and\n" +
+                    "	p.sn_balanca = 'S'")) {
+                while(rs1.next()) {
+                    eanValidoBalanca.add(rs1.getString("id"));
+                }
+            }
+            
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	p.cod_produto id,\n" +
@@ -196,7 +214,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.dh_inclusao cadastro,\n" +
                     "	cf.ncm,\n" +
                     "   p.cod_class_fiscal_cest,\n" +        
-                    "	pc.aliquota,\n" +
+                    "	pce.pe_aliquota aliquota,\n" +
                     "	pc.margem_lucro margem,\n" +
                     "	pc.cst_cofins,\n" +
                     "	pc.cst_pis\n" +
@@ -205,6 +223,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "left join class_fiscal cf on p.cod_class_fiscal = cf.cod_class_fiscal \n" +
                     "left join produto_custo pc on p.cod_produto = pc.cod_produto\n" +
                     "left join produto_codbarra pe on p.cod_produto = pe.cod_produto\n" +
+                    "left join produto_custo_estado pce on p.cod_produto = pce.cod_produto and\n" +
+                    "    pc.cod_empresa = pce.cod_empresa\n" +        
                     "where\n" +
                     "	pc.cod_empresa = " + getLojaOrigem())) {
                 while(rs.next()) {
@@ -220,7 +240,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     if(balanca != null && !"".equals(balanca) && "S".equals(balanca.trim())) {
                         imp.seteBalanca(true);
-                        imp.setEan(rs.getString("ean"));
+                        imp.setEan(imp.getImportId());
                     }
                     
                     imp.setValidade(rs.getInt("validade"));
@@ -237,17 +257,25 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rs.getDouble("estq_maximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estq_minimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setSituacaoCadastro("A".equals(rs.getString("situacao")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro("A".equals(rs.getString("situacao").trim()) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsCstDebito(rs.getString("cst_cofins"));
-                    imp.setIcmsDebitoId(rs.getString("aliquota"));
+                    
+                    imp.setIcmsDebitoId(rs.getString("aliquota").trim());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
+                    if(eanValidoBalanca.contains(imp.getImportId()) && 
+                            imp.getEan() != null && 
+                                !"".equals(imp.getEan()) && imp.getEan().length() > 6) {
+                        continue;
+                    }
                     
                     result.add(imp);
                 }
@@ -347,6 +375,8 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("referencia"));

@@ -201,7 +201,12 @@ public class SaefGUI extends VRInternalFrame {
                             importador.importarMercadologico();
                         }
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            List<OpcaoProduto> opt = new ArrayList<>();
+                            if (chkManterBalanca.isSelected()) {
+                                opt.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                            }
+                            opt.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                            importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
                         }
 
                         {

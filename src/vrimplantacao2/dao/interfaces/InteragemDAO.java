@@ -8,10 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -519,7 +521,52 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
+            
+            try (ResultSet rst = stm.executeQuery(
+                    " select\n"
+                    + "    fun.codprof as id,\n"
+                    + "    fun.nomprof as nome,\n"
+                    + "    fun.endprof as endereco,\n"
+                    + "    fun.cidprof as municipio,\n"
+                    + "    fun.bairro as bairro,\n"
+                    + "    fun.cpfprof as cpf,\n"
+                    + "    fun.rgprof as rg,\n"
+                    + "    fun.telprof as telefone,\n"
+                    + "    fun.rgdata as datacadastro,\n"
+                    + "    fun.cargo,\n"
+                    + "    fun.funcao,\n"
+                    + "    fun.dtadmissao as dataadmissao,\n"
+                    + "    fun.salprof as salario\n"
+                    + " from tabprof fun\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(imp.getRazao());
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    
+                    if ((rst.getString("cargo") != null)
+                            && (!rst.getString("cargo").trim().isEmpty())) {
+                        imp.setCargo(rst.getString("cargo"));
+                    } else {
+                        imp.setCargo(rst.getString("funcao"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+            
+            /*try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    c.codcli id,\n"
                     + "    c.nomcli razao,\n"
@@ -595,7 +642,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     result.add(imp);
                 }
-            }
+            }*/
         }
         return result;
     }
@@ -623,7 +670,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " from MOVIINCR r\n"
                     + "where r.codfil = "+ getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() +"\n"
                     + "and r.sttit = 'E'"
-            /*"select\n"
+                    /*"select\n"
                     + "    r.codtit id,\n"
                     + "    r.codcli idcliente,\n"
                     + "    c.cgc cnpj,\n"
@@ -663,4 +710,142 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, id_tipoembalagem from produto \n"
+                    + "where id_tipoembalagem = 0 \n"
+                    + "and pesavel = false\n"
+                    + "and id in (select id_produto from implantacao.bkp_produtoautomacao where codigobarras <= 999999)\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    
+                    String ean = "";
+                    
+                    if (String.valueOf(rst.getInt("id")).length() == 1) {                        
+                        ean = "9000" + rst.getString("id");
+                    } else if (String.valueOf(rst.getInt("id")).length() == 2) {
+                        ean = "900" + rst.getString("id");
+                    } else if (String.valueOf(rst.getInt("id")).length() == 3) {
+                        ean = "90" + rst.getString("id");
+                    } else if (String.valueOf(rst.getInt("id")).length() == 4) {
+                        ean = "9" + rst.getString("id");
+                    } else {
+                        ean = rst.getString("id");
+                    }
+                    
+                    
+                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
+                    vo.setIdproduto(rst.getInt("id"));
+                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
+                    vo.setCodigoBarras(gerarEan13(Long.parseLong(ean), true));
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
+    
+    public void importarDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+        ProgressBar.setStatus("Carregar Produtos...");
+        try {
+            result = getDigitoVerificador();
+            
+            if (!result.isEmpty()) {
+                gravarCodigoBarrasDigitoVerificador(result);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
+        
+        Conexao.begin();
+        Statement stm, stm2 = null;
+        ResultSet rst = null;
+        
+        stm = Conexao.createStatement();
+        stm2 = Conexao.createStatement();
+        
+        String sql = "";
+        ProgressBar.setStatus("Gravando Código de Barras...");
+        ProgressBar.setMaximum(vo.size());
+        
+        try {
+            
+            for (ProdutoAutomacaoVO i_vo : vo) {
+                
+                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
+                rst = stm.executeQuery(sql);
+
+                if (!rst.next()) {
+                    sql = "insert into produtoautomacao ("
+                            + "id_produto, "
+                            + "codigobarras, "
+                            + "id_tipoembalagem, "
+                            + "qtdembalagem) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ", "
+                            + i_vo.getIdTipoEmbalagem() + ", 1);";
+                    stm2.execute(sql);
+                } else {                    
+                    sql = "insert into implantacao.produtonaogerado ("
+                            + "id_produto, "
+                            + "codigobarras) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ");";
+                    stm2.execute(sql);
+                }
+                ProgressBar.next();
+            }
+            
+            stm.close();
+            stm2.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+    
+    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
+        String codigo = String.format("%012d", i_codigo);
+
+        int somaPar = 0;
+        int somaImpar = 0;
+
+        for (int i = 0; i < 12; i += 2) {
+            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
+            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
+        }
+
+        int soma = somaImpar + (3 * somaPar);
+        int digito = 0;
+        boolean verifica = false;
+        int calculo = 0;
+
+        do {
+            calculo = soma % 10;
+
+            if (calculo != 0) {
+                digito += 1;
+                soma += 1;
+            }
+        } while (calculo != 0);
+
+        if (i_digito) {
+            return Long.parseLong(codigo + digito);
+        } else {
+            return Long.parseLong(codigo);
+        }
+    }        
 }

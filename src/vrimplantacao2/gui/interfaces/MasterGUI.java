@@ -22,7 +22,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.MasterDAO;
-import vrimplantacao2.dao.interfaces.SolidoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -280,6 +279,9 @@ public class MasterGUI extends VRInternalFrame {
                         if (cbxUnifCliPreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
                         }
+                        if (cbxUnifProdForn.isSelected()) {
+                            importador.unificarProdutoFornecedor();
+                        }
                     }
                     gravarParametros();
 
@@ -357,6 +359,7 @@ public class MasterGUI extends VRInternalFrame {
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        cbxUnifProdForn = new vrframework.bean.checkBox.VRCheckBox();
         tabsConn = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioFirebird = new vrframework.bean.textField.VRTextField();
@@ -704,6 +707,8 @@ public class MasterGUI extends VRInternalFrame {
 
         cbxUnifCliPreferencial.setText("Unificar Cliente Preferencial (Somente CPF/CNPJ válidos)");
 
+        cbxUnifProdForn.setText("Unificar Produto Fornecedor (Somente CPF/CNPJ válidos)");
+
         javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
         tabUnificacao.setLayout(tabUnificacaoLayout);
         tabUnificacaoLayout.setHorizontalGroup(
@@ -713,8 +718,9 @@ public class MasterGUI extends VRInternalFrame {
                 .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(173, Short.MAX_VALUE))
+                    .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxUnifProdForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(169, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -725,7 +731,9 @@ public class MasterGUI extends VRInternalFrame {
                 .addComponent(cbxUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(229, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbxUnifProdForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(207, Short.MAX_VALUE))
         );
 
         tab.addTab("Unificação", tabUnificacao);
@@ -993,6 +1001,7 @@ public class MasterGUI extends VRInternalFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifCliPreferencial;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
+    private vrframework.bean.checkBox.VRCheckBox cbxUnifProdForn;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
