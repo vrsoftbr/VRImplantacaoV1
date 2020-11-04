@@ -50,6 +50,7 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.ATACADO,
                     OpcaoProduto.DATA_CADASTRO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
@@ -187,18 +188,9 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.pesbru pesobruto,\n" +
                     "	p.pesliq pesoliquido,\n" +
                     "	p.estmin estoqueminimo,\n" +
-                    "	round(coalesce((\n" +
-                    "		e.balanc +\n" +
-                    "		e.entrad -\n" +
-                    "		e.vendas +\n" +
-                    "		e.trfent -\n" +
-                    "		e.trfsai +\n" +
-                    "		e.devcli -\n" +
-                    "		e.devfor +\n" +
-                    "		e.entace -\n" +
-                    "		e.saiace), 0), 3) as estoque,\n" +
+                    "	em.saldos estoque,\n" +
                     "	p.cdcate categoria,\n" +
-                    "   p.cdloca localidade,\n" +        
+                    "	p.cdloca localidade,\n" +
                     "	p.cdsgru grupo,\n" +
                     "	p.cdmarc marca,\n" +
                     "	p.ativos situacao,\n" +
@@ -208,15 +200,17 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.pcusto custocomimposto,\n" +
                     "	p.lucros margem,\n" +
                     "	p.pvenda precovenda,\n" +
-                    "   p.cdimpo aliquota,\n" +        
+                    "	p.cdimpo aliquota,        \n" +
                     "	p.cdcest cest,\n" +
                     "	p.codpis pis,\n" +
                     "	p.codcof cofins\n" +
                     "from\n" +
                     "	sac441 p\n" +
-                    "left join sac714 e on p.cdprod = e.cdprod\n" +
+                    "left join sac719 em on p.CDPROD = em.cdprod \n" +
                     "where\n" +
-                    "	e.cdloja = " + getLojaOrigem())) 
+                    "	em.cdloja = " + getLojaOrigem() + " and \n" +
+                    "	em.lancam = (select max(lancam) from sac719 where cdprod = p.cdprod and cdloja = em.cdloja)\n" +
+                    "order by p.cdprod")) 
             {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -268,6 +262,95 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n" +
+                        "	ean.cdprod idproduto,\n" +
+                        "	ean.barras ean,\n" +
+                        "	ean.conver qtdembalagem,\n" +
+                        "	ean.pvenda precovendaemb,\n" +
+                        "	pr.pvenda precovenda,\n" +
+                        "	round((ean.pvenda / ean.conver), 2) precoatacado,\n" +
+                        "	ean.cdunid unidade\n" +
+                        "from \n" +
+                        "	sac459 ean\n" +
+                        "inner join sac441 pr on ean.cdprod = pr.cdprod"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        
+                        String ean = rst.getString("ean");
+                    
+                        imp.setEan(ean);
+                        if(ean != null && !"".equals(ean) && ean.length() < 7) {
+                            imp.setEan("99999" + ean);
+                        }
+                        
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        //Tabela atacado SAC459
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	ean.cdprod idproduto,\n" +
+                    "	ean.barras ean,\n" +
+                    "	ean.conver qtdembalagem,\n" +
+                    "	ean.pvenda precovendaemb,\n" +
+                    "	pr.pvenda precovenda,\n" +
+                    "	round((ean.pvenda / ean.conver), 2) precoatacado,\n" +
+                    "	ean.cdunid unidade\n" +
+                    "from \n" +
+                    "	sac459 ean\n" +
+                    "inner join sac441 pr on ean.cdprod = pr.cdprod")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("idproduto"));
+                    
+                    String ean = rs.getString("ean");
+                    
+                    imp.setEan(ean);
+                    if(ean != null && !"".equals(ean) && ean.length() < 7) {
+                        imp.setEan("99999" + ean);
+                    }
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    
+                    result.add(imp);
+                }
+            }
+         }
+        
+        return result;
+    }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
@@ -312,6 +395,7 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInsc_municipal(rst.getString("im"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
+                    imp.setCep(rst.getString("cep"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setIbge_municipio(rst.getInt("cidadeibge"));
@@ -416,6 +500,7 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setAtivo(rst.getInt("ativos") == 1);
+                    imp.setBloqueado("S".equals(rst.getString("bloq")));
                     imp.setFantasia(rst.getString("fantas"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("ie"));
