@@ -548,20 +548,19 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtDatabase" pref="297" max="32767" attributes="0"/>
+                              <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel25" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="txtDatabase" pref="0" max="32767" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnConectar" min="-2" pref="114" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                                   <Component id="vRTextField1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -571,11 +570,13 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel25" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtDatabase" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="vRLabel25" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="vRTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="txtDatabase" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -597,8 +598,6 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="vRTextField1"/>
                   </Properties>
-                </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDatabase">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel2">
                   <Properties>
@@ -625,6 +624,11 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbLojaOrigemActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtDatabase">
+                  <Properties>
+                    <Property name="fileSelectionMode" type="java.lang.String" value="Directories"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

@@ -254,7 +254,9 @@ public class SysPdvGUI extends VRInternalFrame {
     private List<String> getFinalizadorasRotativo() {
         List<String> result = new ArrayList<>();
         for (FinalizadoraRecord f: this.rotativoModel.getItens()) {
-            result.add(f.id);
+            if (f.selected) {
+                result.add(f.id);
+            }
         }
         return result;
     }
@@ -262,7 +264,9 @@ public class SysPdvGUI extends VRInternalFrame {
     private List<String> getFinalizadorasCheque() {
         List<String> result = new ArrayList<>();
         for (FinalizadoraRecord f: this.chequeModel.getItens()) {
-            result.add(f.id);
+            if (f.selected) {
+                result.add(f.id);
+            }
         }
         return result;
     }
@@ -299,8 +303,8 @@ public class SysPdvGUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     dao.setComplementoSistema(txtComplNomeSistema.getText());
-                    //dao.setFinalizadorasRotativo(getFinalizadorasRotativo());
-                    //dao.setFinalizadorasCheque(getFinalizadorasCheque());
+                    dao.setFinalizadorasRotativo(getFinalizadorasRotativo());
+                    dao.setFinalizadorasCheque(getFinalizadorasCheque());
                     dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
                     
                     switch(tabsConexoes.getSelectedIndex()) {
