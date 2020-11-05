@@ -96,6 +96,7 @@ public class MasterGUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
                 vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                 return vLojaCliente;
             }

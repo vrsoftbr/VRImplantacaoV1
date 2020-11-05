@@ -125,12 +125,14 @@ public class SysPdvGUI extends VRInternalFrame {
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         
         String strRotativoSelecionado = params.getWithNull("", SISTEMA, "ROTATIVO_SELECT");
+        this.rotativoSelecionado.clear();
         for (String id: strRotativoSelecionado.split("\\|")) {
             if (!"".equals(id)) {
                 this.rotativoSelecionado.add(id);
             }
         }
         String strChequeSelecionado = params.getWithNull("", SISTEMA, "CHEQUE_SELECT");
+        this.chequeSelecionado.clear();
         for (String id: strChequeSelecionado.split("\\|")) {
             if (!"".equals(id)) {
                 this.chequeSelecionado.add(id);
@@ -254,7 +256,9 @@ public class SysPdvGUI extends VRInternalFrame {
     private List<String> getFinalizadorasRotativo() {
         List<String> result = new ArrayList<>();
         for (FinalizadoraRecord f: this.rotativoModel.getItens()) {
-            result.add(f.id);
+            if (f.selected) {
+                result.add(f.id);
+            }
         }
         return result;
     }
@@ -262,7 +266,9 @@ public class SysPdvGUI extends VRInternalFrame {
     private List<String> getFinalizadorasCheque() {
         List<String> result = new ArrayList<>();
         for (FinalizadoraRecord f: this.chequeModel.getItens()) {
-            result.add(f.id);
+            if (f.selected) {
+                result.add(f.id);
+            }
         }
         return result;
     }
@@ -299,8 +305,8 @@ public class SysPdvGUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     dao.setComplementoSistema(txtComplNomeSistema.getText());
-                    //dao.setFinalizadorasRotativo(getFinalizadorasRotativo());
-                    //dao.setFinalizadorasCheque(getFinalizadorasCheque());
+                    dao.setFinalizadorasRotativo(rotativoSelecionado);
+                    dao.setFinalizadorasCheque(chequeSelecionado);
                     dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
                     
                     switch(tabsConexoes.getSelectedIndex()) {

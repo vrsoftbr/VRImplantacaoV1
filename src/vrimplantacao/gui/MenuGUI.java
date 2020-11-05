@@ -262,6 +262,7 @@ import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
+import vrimplantacao2.gui.interfaces.CervantesGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
@@ -768,6 +769,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu15 = new javax.swing.JMenu();
         mnuViggo = new javax.swing.JMenuItem();
         mnuAthos = new javax.swing.JMenuItem();
+        mnuCervantes = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -2421,6 +2423,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuAthos);
+
+        mnuCervantes.setText("Cervantes");
+        mnuCervantes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCervantesActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuCervantes);
 
         mnuDatabase.add(jMenu15);
 
@@ -4886,6 +4896,10 @@ public final class MenuGUI extends VRMdiFrame {
         AthosGUI.exibir(this);
     }//GEN-LAST:event_mnuAthosActionPerformed
 
+    private void mnuCervantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCervantesActionPerformed
+        CervantesGUI.exibir(this);
+    }//GEN-LAST:event_mnuCervantesActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -5010,6 +5024,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuCaixa;
     private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCerebro;
+    private javax.swing.JMenuItem mnuCervantes;
     private javax.swing.JMenuItem mnuClick;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
