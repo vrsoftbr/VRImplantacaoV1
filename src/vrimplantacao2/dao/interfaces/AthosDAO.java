@@ -13,13 +13,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -27,6 +30,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -113,25 +117,31 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct tributacao as cst, icms as aliquota from produto oder by 1"
+                    "select distinct tributacao as cst, icms as aliquota from produto order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("cst") + " " + rst.getString("aliquota"),
-                            rst.getString("cst") + " " + rst.getString("aliquota")
+                            rst.getString("cst") + " " + rst.getString("aliquota"),
+                            rst.getInt("cst"),
+                            0,
+                            0
                     ));
                 }
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct tributacao as cst, icms as aliquota from produto oder by 1"
+                    "select distinct tributacaonfe as cst, icmsnfe as aliquota from produto order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
                             rst.getString("cst") + " " + rst.getString("aliquota"),
-                            rst.getString("cst") + " " + rst.getString("aliquota")
+                            rst.getString("cst") + " " + rst.getString("aliquota"),
+                            rst.getInt("cst"),
+                            0,
+                            0
                     ));
                 }
             }
@@ -191,7 +201,7 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.statusproduto as situacaocadastro,\n"
                     + "	p.idsetor as merc1,\n"
                     + "	coalesce(p.idgrupo, 1) as merc2,\n"
-                    + "	coalesce(p.idsubgrupo) as merc3,\n"
+                    + "	coalesce(p.idsubgrupo, 1) as merc3,\n"
                     + "	p.controlaestoque,\n"
                     + "	p.vendeproduto,\n"
                     + "	p.valorvenda1 as precovenda,\n"
@@ -232,7 +242,8 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
+                    imp.setEan(rst.getString("ean"));                    
+                    imp.seteBalanca(rst.getBoolean("balanca"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -287,18 +298,106 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where codigobarra2 != ''	\n"
                     + "order by 1"
             )) {
-                ProdutoIMP imp = new ProdutoIMP();
-                imp.setImportLoja(getLojaOrigem());
-                imp.setImportSistema(getSistema());
-                imp.setImportId(rst.getString("id"));
-                imp.setEan(rst.getString("ean"));
-                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                result.add(imp);
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    result.add(imp);
+                }
             }
         }
         return result;
     }
 
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.EXCECAO) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select idproduto, \n"
+                        + "	ncm, \n"
+                        + "	tributacaonfe, \n"
+                        + "	icmsnfe,\n"
+                        + "	iva \n"
+                        + "from produto \n"
+                        + "where coalesce(iva, 0) > 0"
+                )) {
+                    while (rst.next()) {
+                        
+                        String idPautaFiscal = rst.getString("ncm") + "-"
+                            + rst.getString("tributacaonfe") + "-"
+                            + rst.getString("icmsnfe") + "-"
+                            + rst.getString("iva");
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setPautaFiscalId(idPautaFiscal);
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+
+        return null;
+    }
+    
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + "	ncm, \n"
+                    + "	tributacaonfe, \n"
+                    + "	icmsnfe,\n"
+                    + "	iva \n"
+                    + "from produto \n"
+                    + "where coalesce(iva, 0) > 0"
+            )) {
+                while (rst.next()) {
+                    
+                    double aliquotaDebito = 0;
+                    double aliquotaCredito = 0;
+                    
+                    if (!Utils.encontrouLetraCampoNumerico(rst.getString("icmsnfe"))) {
+                        aliquotaDebito = Double.parseDouble(rst.getString("icmsnfe").replace(",", "."));
+                        aliquotaCredito = Double.parseDouble(rst.getString("icmsnfe").replace(",", "."));
+                    }
+                    
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setId(rst.getString("ncm") + "-"
+                            + rst.getString("tributacaonfe") + "-"
+                            + rst.getString("icmsnfe") + "-"
+                            + rst.getString("iva")
+                    );
+
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setIva(rst.getDouble("iva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setUf(Parametros.get().getUfPadraoV2().getSigla());
+                    
+                    imp.setAliquotaDebito(0, aliquotaDebito, 0);
+                    imp.setAliquotaDebitoForaEstado(0, aliquotaDebito, 0);
+                    imp.setAliquotaCredito(0, aliquotaCredito, 0);
+                    imp.setAliquotaCreditoForaEstado(0, aliquotaCredito, 0);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -561,14 +660,14 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaUf(rst.getString("uf_cobranca"));
                     imp.setCobrancaCep(rst.getString("cep_cobranca"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    //imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setValorLimite(rst.getDouble("limitecredito"));
                     imp.setAtivo(rst.getBoolean("statuscliente"));
                     imp.setBloqueado(rst.getBoolean("bloqueaprazo"));
                     imp.setEmail(rst.getString("emailcliente"));
                     imp.setTelefone(rst.getString("telefoneempresa"));
 
-                    if ((rst.getString("estadocivil") != null)
+                    /*if ((rst.getString("estadocivil") != null)
                             && (!rst.getString("estadocivil").trim().isEmpty())) {
 
                         if (null == rst.getString("estadocivil").trim()) {
@@ -596,7 +695,7 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             imp.setSexo(TipoSexo.FEMININO);
                         }
-                    }
+                    }*/
 
                     result.add(imp);
                 }

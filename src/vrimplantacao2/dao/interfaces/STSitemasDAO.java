@@ -741,6 +741,7 @@ public class STSitemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.NUMSP as parcela\n"
                     + "from TITLRECH r\n"
                     + "where r.DATAPAG is null\n"
+                    + "and r.SITUACAO != 3\n"        
                     + "and r.LOCAL = " + getLojaOrigem()
             )) {
                 while (rst.next()) {

@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -15,6 +16,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.AthosDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class AthosGUI extends VRInternalFrame {    
@@ -71,6 +74,34 @@ public class AthosGUI extends VRInternalFrame {
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                if (!txtLojaID.getText().trim().isEmpty()) {
+                    return dao.getSistema() + " - " + txtLojaID.getText().trim();
+                } else {
+                    return dao.getSistema();
+                }
+                
+            }
+
+            @Override
+            public String getLoja() {                
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+        
         carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(dao);

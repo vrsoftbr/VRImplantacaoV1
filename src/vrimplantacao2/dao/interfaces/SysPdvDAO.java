@@ -58,14 +58,14 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean soAtivos = false;
     private Date dtOfertas;
     private boolean ignorarEnviaBalanca = false;
-    private List<String> finalizadorasRotativo;
-    private List<String> finalizadorasCheque;
+    private Set<String> finalizadorasRotativo;
+    private Set<String> finalizadorasCheque;
     
-    public void setFinalizadorasRotativo(List<String> finalizadorasRotativo) {
+    public void setFinalizadorasRotativo(Set<String> finalizadorasRotativo) {
         this.finalizadorasRotativo = finalizadorasRotativo;
     }
 
-    public void setFinalizadorasCheque(List<String> finalizadorasCheque) {
+    public void setFinalizadorasCheque(Set<String> finalizadorasCheque) {
         this.finalizadorasCheque = finalizadorasCheque;
     }
 

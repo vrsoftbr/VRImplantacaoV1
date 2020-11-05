@@ -652,7 +652,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"select \n"
+                    "select \n"
                     + "    r.codtit id,\n"
                     + "    r.codcli idcliente, \n"
                     + "    --c.cgc cnpj,\n"
@@ -669,8 +669,8 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    --mov.vlduptit as valorconta\n"
                     + " from MOVIINCR r\n"
                     + "where r.codfil = "+ getLojaOrigem().substring(0, getLojaOrigem().indexOf("-")).trim() +"\n"
-                    + "and r.sttit = 'E'"*/
-                    "select\n"
+                    + "and r.sttit = 'E'"
+                    /*"select\n"
                     + "    r.codtit id,\n"
                     + "    r.codcli idcliente,\n"
                     + "    c.cgc cnpj,\n"
@@ -690,7 +690,7 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    r.dtpagtit is null\n"
                     + "order by\n"
-                    + "    r.dtemitit"
+                    + "    r.dtemitit"*/
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -723,10 +723,26 @@ public class InteragemDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by id"
             )) {
                 while (rst.next()) {
+                    
+                    String ean = "";
+                    
+                    if (String.valueOf(rst.getInt("id")).length() == 1) {                        
+                        ean = "9000" + rst.getString("id");
+                    } else if (String.valueOf(rst.getInt("id")).length() == 2) {
+                        ean = "900" + rst.getString("id");
+                    } else if (String.valueOf(rst.getInt("id")).length() == 3) {
+                        ean = "90" + rst.getString("id");
+                    } else if (String.valueOf(rst.getInt("id")).length() == 4) {
+                        ean = "9" + rst.getString("id");
+                    } else {
+                        ean = rst.getString("id");
+                    }
+                    
+                    
                     ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
                     vo.setIdproduto(rst.getInt("id"));
                     vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
-                    vo.setCodigoBarras(gerarEan13(rst.getLong("id"), true));
+                    vo.setCodigoBarras(gerarEan13(Long.parseLong(ean), true));
                     result.add(vo);
                 }
             }

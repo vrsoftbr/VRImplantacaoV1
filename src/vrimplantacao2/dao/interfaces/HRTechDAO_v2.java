@@ -286,6 +286,35 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
+        if (opt == OpcaoProduto.DESCONTINUADO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n" +
+                        "	CODIGOPLU,\n" +
+                        "	MIXPRODUTO\n" +
+                        "from\n" +
+                        "	FL302MIX"
+                )) {
+                    while (rs.next()) {
+                        int index = Utils.stringToInt(getLojaOrigem(), -2);
+                        String a = rs.getString("MIXPRODUTO");
+                        boolean descontinuado = a.charAt(index - 1) == '0';
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("CODIGOPLU"));
+                        imp.setDescontinuado(descontinuado);
+                        
+                        if ("052061".equals(rs.getString("CODIGOPLU"))) 
+                            System.out.println("OK");
+                        
+                        result.add(imp);
+                    }
+                }                
+            }
+            return result;
+        }
         return null;
     }
 
@@ -832,6 +861,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_GONDOLA,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.ATIVO,
+                OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.PESAVEL,
                 OpcaoProduto.VALIDADE,
                 OpcaoProduto.MARGEM,
@@ -1629,40 +1659,66 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select\n"
-                    + "	c.codi_relacio id,\n"
-                    + "	coalesce(cl.codigoenti, '') idcliente,\n"
-                    + " case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n"
-                    + "	c.numerocaix ecf,\n"
-                    + "	c.numerocupo coo,\n"
-                    + "	c.datamovime data,\n"
-                    + "	c.vdg_dia subtotalimpressora,\n"
-                    + "	c.numcgc_cpf cnpj,\n"
-                    + "	c.hora_ini horainicio,\n"
-                    + "	c.hora_fin horafim,\n"
-                    + "	c.chave_nfe chavenfe,\n"
-                    + "	coalesce(cpf.nomeentida, '') razao,\n"
-                    + "	coalesce(cep.logradouro, '') endereco,\n"
-                    + "	coalesce(cpf.complocent, '') complemento,\n"
-                    + "	coalesce(cpf.compreside, '') numero,\n"
-                    + "	coalesce(cep.bairro, '') bairro,\n"
-                    + "	coalesce(cep.cidade, '') cidade,\n"
-                    + "	coalesce(cep.estado, '') estado,\n"
-                    + "	coalesce(cpf.codcepresi, '') cep\n"
-                    + "from\n"
-                    + "	FL305CUP c\n"
-                    + "left join flcgccpf cpf on \n"
-                    + "	(case when (cast(c.numcgc_cpf as bigint)) = 0 then 1 \n"
-                    + "		else (cast(c.numcgc_cpf as bigint)) end = cast(cpf.numcgc_cpf as bigint))\n"
-                    + "left join FL400CLI cl on (cl.id_entidade = cpf.id_entidade)\n"
-                    + "left join fl423cep cep on (cl.id_cliente = cep.id_cliente) and\n"
-                    + "	cep.codigocep = cpf.codcepcobr and\n"
-                    + "	cep.tipocadast = 'CLI'\n"
-                    + "where\n"
-                    + "	c.codigoloja = " + idLojaCliente + " and\n"
-                    + "	cast(c.datamovime as date) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                    + "order by\n"
-                    + "	c.datamovime, c.numerocupo";
+                    = 
+                    "declare @loja integer = " + idLojaCliente + ";\n" +
+                    "declare @dataini date = '" + FORMAT.format(dataInicio) + "';\n" +
+                    "declare @datafim date = '" + FORMAT.format(dataTermino) + "';\n" +
+                    "with vend as (\n" +
+                    "select\n" +
+                    "	c.codi_relacio  id,\n" +
+                    "	coalesce(cl.codigoenti, '') idcliente,\n" +
+                    "	case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n" +
+                    "	c.numerocaix ecf,\n" +
+                    "	c.numerocupo coo,\n" +
+                    "	c.datamovime data,\n" +
+                    "	c.vdg_dia subtotalimpressora,\n" +
+                    "	c.numcgc_cpf cnpj,\n" +
+                    "	c.hora_ini horainicio,\n" +
+                    "	c.hora_fin horafim,\n" +
+                    "	c.chave_nfe chavenfe,\n" +
+                    "	coalesce(cpf.nomeentida, '') razao,\n" +
+                    "	coalesce(cep.logradouro, '') endereco,\n" +
+                    "	coalesce(cpf.complocent, '') complemento,\n" +
+                    "	coalesce(cpf.compreside, '') numero,\n" +
+                    "	coalesce(cep.bairro, '') bairro,\n" +
+                    "	coalesce(cep.cidade, '') cidade,\n" +
+                    "	coalesce(cep.estado, '') estado,\n" +
+                    "	coalesce(cpf.codcepresi, '') cep\n" +
+                    "from\n" +
+                    "	FL305CUP c\n" +
+                    "left join flcgccpf cpf on \n" +
+                    "	(case when (cast(c.numcgc_cpf as bigint)) = 0 then 1 \n" +
+                    "		else (cast(c.numcgc_cpf as bigint)) end = cast(cpf.numcgc_cpf as bigint))\n" +
+                    "left join FL400CLI cl on (cl.id_entidade = cpf.id_entidade)\n" +
+                    "left join fl423cep cep on (cl.id_cliente = cep.id_cliente) and\n" +
+                    "	cep.codigocep = cpf.codcepcobr and\n" +
+                    "	cep.tipocadast = 'CLI'\n" +
+                    "where\n" +
+                    "	c.codigoloja = @loja and\n" +
+                    "	cast(c.datamovime as date) between @dataini and @datafim\n" +
+                    "),\n" +
+                    "dupl_aux as (\n" +
+                    "	select id, count(*) cont from vend group by id having count(*) > 1\n" +
+                    "),\n" +
+                    "dupl as (\n" +
+                    "	select * from vend where id in (select id from dupl_aux)\n" +
+                    ")\n" +
+                    "select\n" +
+                    "	v.*\n" +
+                    "from\n" +
+                    "	vend v\n" +
+                    "	left join dupl d on\n" +
+                    "		v.id = d.id and\n" +
+                    "		v.idcliente = d.idcliente\n" +
+                    "where\n" +
+                    "	(\n" +
+                    "		d.id is null or (\n" +
+                    "			coalesce(v.idcliente,'') != '' and\n" +
+                    "			v.endereco != ''\n" +
+                    "		)\n" +
+                    "	) and\n" +
+                    "	not v.id in (select id from dupl)\n" +
+                    "order by v.data, v.coo";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }

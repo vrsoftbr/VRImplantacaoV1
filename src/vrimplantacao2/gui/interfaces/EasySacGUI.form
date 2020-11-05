@@ -142,6 +142,14 @@
                     <Property name="text" type="java.lang.String" value="Contas &#xe0; Pagar"/>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JCheckBox" name="chkFornCep">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Ubuntu" size="11" style="0"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Cep"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
@@ -159,10 +167,14 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkCliBloqueado" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="472" max="32767" attributes="0"/>
+                          <EmptySpace pref="332" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -170,10 +182,13 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCliBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="188" max="32767" attributes="0"/>
+                          <EmptySpace pref="176" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -187,6 +202,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCliBloqueado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bloqueado"/>
                   </Properties>
                 </Component>
               </SubComponents>
