@@ -16,6 +16,9 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -286,18 +289,59 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.conta,\n"
                     + "	f.datacad as datacadastro,\n"
                     + "	f.ativo as situacaodastro,\n"
-                    + "	f.idProdutorRural as produtorrural\n"
+                    + "	f.idProdutorRural as produtorrural,\n"
+                    + " f.obs as observacao\n"
                     + "from Fornecedor f \n"
                     + "left join tbCidade c on c.cdCidade = f.cdCidade\n"
                     + "left join tbUF uf on uf.cdUF = f.cdUF \n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio2"));
+                    imp.setUf(rst.getString("uf2"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo(rst.getBoolean("situacaodastro"));
+                    imp.setTipoFornecedor(rst.getInt("produtorrural") == 1 ? TipoFornecedor.PRODUTORRURAL : TipoFornecedor.DISTRIBUIDOR);
+                    imp.setTel_principal(rst.getString("tefefone"));
+                    imp.setObservacao(rst.getString("observacao"));
 
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
+                    }
+
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+                        imp.addTelefone("CELULAR", rst.getString("celular"));
+                    }
+
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addTelefone("FAX", rst.getString("fax"));
+                    }
+
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.NFE);
+                    }
+
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -313,6 +357,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.endereco,\n"
                     + "	c.Numero as numero,\n"
                     + "	c.Compl as complemento,\n"
+                    + " c.bairro, \n"        
                     + "	cid.dsCidade as municipio,\n"
                     + "	uf.dsUF as uf,\n"
                     + "	c.fone as telefone1,\n"
@@ -340,11 +385,42 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by 1"
             )) {
                 while (rst.next()) {
-
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setOrgaoemissor(rst.getString("orgaoemissor"));
+                    imp.setAtivo(rst.getInt("situacaocadastro") == 1);
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.setFax(rst.getString("fax"));
+                    
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addTelefone("TELEFONE 2 ", rst.getString("telefone2"));
+                    }
+                    
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setNomeConjuge(rst.getString("nomeconjuge"));
+                    imp.setPermiteCreditoRotativo(rst.getInt("permitecreditorotativo") == 1);
+                    imp.setPermiteCheque(rst.getInt("permitecreditorotativo") == 1);
+                    imp.setDiaVencimento(rst.getInt("nuDiasConsultaCredito"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);                    
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -366,10 +442,19 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where pagamento is null"
             )) {
                 while (rst.next()) {
-
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
