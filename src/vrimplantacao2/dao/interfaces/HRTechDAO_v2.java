@@ -1717,12 +1717,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "			v.endereco != ''\n" +
                     "		)\n" +
                     "	) and\n" +
-                    "	not v.id in (\n" +
-                    "		'035328048200424', '035714055200424',\n" +
-                    "		'031370042200820', '031426043200820', '060966056200820', \n" +
-                    "		'041322028200902',\n" +
-                    "		'030082021200922'\n" +
-                    "	)\n" +
+                    "	not v.id in (select id from dupl)\n" +
                     "order by v.data, v.coo";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
