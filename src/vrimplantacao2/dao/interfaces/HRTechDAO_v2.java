@@ -1697,28 +1697,34 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "	c.codigoloja = @loja and\n" +
                     "	cast(c.datamovime as date) between @dataini and @datafim\n" +
                     "),\n" +
-                    "dupl_aux as (\n" +
+                    "dupl_id as (\n" +
                     "	select id, count(*) cont from vend group by id having count(*) > 1\n" +
                     "),\n" +
+                    "dupl_cupom as (\n" +
+                    "	select coo, ecf, data, count(*) cont from vend group by coo, ecf, data having count(*) > 1\n" +
+                    "),\n" +
                     "dupl as (\n" +
-                    "	select * from vend where id in (select id from dupl_aux)\n" +
+                    "	select\n" +
+                    "		id\n" +
+                    "	from\n" +
+                    "		dupl_id\n" +
+                    "	union\n" +
+                    "	select\n" +
+                    "		v.id\n" +
+                    "	from\n" +
+                    "		vend v\n" +
+                    "		join dupl_cupom c on\n" +
+                    "			v.coo = c.coo and\n" +
+                    "			v.ecf = c.ecf and\n" +
+                    "			v.data = c.data\n" +
                     ")\n" +
-                    "select\n" +
+                    "select distinct\n" +
                     "	v.*\n" +
                     "from\n" +
                     "	vend v\n" +
-                    "	left join dupl d on\n" +
-                    "		v.id = d.id and\n" +
-                    "		v.idcliente = d.idcliente\n" +
                     "where\n" +
-                    "	(\n" +
-                    "		d.id is null or (\n" +
-                    "			coalesce(v.idcliente,'') != '' and\n" +
-                    "			v.endereco != ''\n" +
-                    "		)\n" +
-                    "	) and\n" +
                     "	not v.id in (select id from dupl)\n" +
-                    "order by v.data, v.coo";
+                    "order by v.data, v.ecf, v.coo";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
@@ -1782,36 +1788,45 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select\n"
-                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) + '-' + cast(it.codigoplu as varchar) id,\n"
-                    + "	it.codi_relacio id_venda,\n"
-                    + "	it.codigoplu id_produto,\n"
-                    + "	pr.estc35desc descricao,\n"
-                    + " case upper(it.origem) when 'C' then 1 else 0 end cancelado,\n"
-                    + "   case\n"
-                    + "		pr.estc13codi when '' then pr.codigoplu else\n"
-                    + "		pr.estc13codi end as codigobarras,\n"
-                    + "	pr.tip_emb_vd unidade,\n"
-                    + "	it.datamovime data,\n"
-                    + "	it.id_item sequencia,\n"
-                    + "	it.vdg_dia total,\n"
-                    + "	it.qtd_dia quantidade,\n"
-                    + "	tr.valoricm icms,\n"
-                    + "	tr.situatribu cst,\n"
-                    + "	tr.mrger icmsreducao\n"
-                    + "from\n"
-                    + "	FL305DIA it\n"
-                    + "join FLTRIBUT tr on (it.codigoloja = tr.codigoloja) and\n"
-                    + "	it.codtribsai = tr.codigotrib\n"
-                    + "join HRPDV_PREPARA_PRO pr on (it.codigoplu = pr.codigoplu) and\n"
-                    + "	it.codigoloja = pr.codigoloja\n"
-                    + "where \n"
-                    + "	it.codigoloja = " + idLojaCliente + " and\n"
-                    + "	(it.datamovime between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23))\n"
-                    + "order by\n"
-                    + "	it.codi_relacio, it.id_item";
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {                    
+            this.sql = 
+                    "declare @loja integer = " + idLojaCliente + ";\n" +
+                    "declare @dataini date = '" + VendaIterator.FORMAT.format(dataInicio) + "';\n" +
+                    "declare @datafim date = '" + VendaIterator.FORMAT.format(dataTermino) + "';\n" +
+                    "with vend as (\n" +
+                    "	select\n" +
+                    "	 	it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) + '-' + cast(it.codigoplu as varchar) id,\n" +
+                    "		it.codi_relacio id_venda,\n" +
+                    "		it.codigoplu id_produto,\n" +
+                    "		pr.estc35desc descricao,\n" +
+                    "	 case upper(it.origem) when 'C' then 1 else 0 end cancelado,\n" +
+                    "	   case\n" +
+                    "			pr.estc13codi when '' then pr.codigoplu else\n" +
+                    "			pr.estc13codi end as codigobarras,\n" +
+                    "		pr.tip_emb_vd unidade,\n" +
+                    "		it.datamovime data,\n" +
+                    "		it.id_item sequencia,\n" +
+                    "		it.vdg_dia total,\n" +
+                    "		it.qtd_dia quantidade,\n" +
+                    "		tr.valoricm icms,\n" +
+                    "		tr.situatribu cst,\n" +
+                    "		tr.mrger icmsreducao\n" +
+                    "	from\n" +
+                    "		FL305DIA it\n" +
+                    "	join FLTRIBUT tr on (it.codigoloja = tr.codigoloja) and\n" +
+                    "		it.codtribsai = tr.codigotrib\n" +
+                    "	join HRPDV_PREPARA_PRO pr on (it.codigoplu = pr.codigoplu) and\n" +
+                    "		it.codigoloja = pr.codigoloja\n" +
+                    "	where \n" +
+                    "		it.codigoloja = @loja and\n" +
+                    "		(cast(it.datamovime as date) between @dataini and @datafim)\n" +
+                    "),\n" +
+                    "dupl as (\n" +
+                    "	select id from vend group by id having count(*) > 1\n" +
+                    ")\n" +
+                    "select v.* from vend v left join dupl d on v.id = d.id where d.id is null\n" +
+                    "order by\n" +
+                    "	id, sequencia";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
