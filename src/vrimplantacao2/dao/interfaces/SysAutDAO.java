@@ -24,6 +24,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -345,6 +346,34 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "	pf.codpro as idproduto, \n"
+                    + "	pf.codfor as idfornecedor\n"
+                    + "	--p.referencia\n"
+                    + "from Itenscompra pf\n"
+                    + "join Produtos p on p.codigo = pf.codpro \n"
+                    + "join Fornecedor f on f.codigo = pf.codfor\n"
+                    + "order by 2, 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
@@ -357,7 +386,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.endereco,\n"
                     + "	c.Numero as numero,\n"
                     + "	c.Compl as complemento,\n"
-                    + " c.bairro, \n"        
+                    + " c.bairro, \n"
                     + "	cid.dsCidade as municipio,\n"
                     + "	uf.dsUF as uf,\n"
                     + "	c.fone as telefone1,\n"
@@ -403,12 +432,12 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setTelefone(rst.getString("telefone1"));
                     imp.setFax(rst.getString("fax"));
-                    
+
                     if ((rst.getString("telefone2") != null)
                             && (!rst.getString("telefone2").trim().isEmpty())) {
                         imp.addTelefone("TELEFONE 2 ", rst.getString("telefone2"));
                     }
-                    
+
                     imp.setNomePai(rst.getString("nomepai"));
                     imp.setNomeMae(rst.getString("nomemae"));
                     imp.setNomeConjuge(rst.getString("nomeconjuge"));
@@ -416,7 +445,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPermiteCheque(rst.getInt("permitecreditorotativo") == 1);
                     imp.setDiaVencimento(rst.getInt("nuDiasConsultaCredito"));
                     imp.setObservacao(rst.getString("observacao"));
-                    result.add(imp);                    
+                    result.add(imp);
                 }
             }
         }
