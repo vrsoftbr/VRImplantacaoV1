@@ -315,6 +315,33 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
+        if (opt == OpcaoProduto.TROCA) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n" +
+                        "		codigoplu,\n" +
+                        "		sum(QTDEPENDEN) troca\n" +
+                        "	from\n" +
+                        "		FL345TRO\n" +
+                        "	where\n" +
+                        "		ltrim(rtrim(CODIGOPLU)) != ''\n" +
+                        "		and CODIGOLOJA = " + getLojaOrigem() + "\n" +
+                        "	group by\n" +
+                        "		codigoplu"
+                )) {
+                    while (rs.next()) {                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("CODIGOPLU"));
+                        imp.setTroca(rs.getDouble("troca"));
+                        
+                        result.add(imp);
+                    }
+                }                
+            }
+            return result;
+        }
         return null;
     }
 
@@ -848,6 +875,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
                 OpcaoProduto.FAMILIA,
+                OpcaoProduto.TROCA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.DIVISAO,
                 OpcaoProduto.DIVISAO_PRODUTO,
