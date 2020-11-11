@@ -11,6 +11,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -200,7 +201,7 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.pcusto custocomimposto,\n" +
                     "	p.lucros margem,\n" +
                     "	p.pvenda precovenda,\n" +
-                    "	p.cdimpo aliquota,        \n" +
+                    "	p.cdimpo aliquota,\n" +
                     "	p.cdcest cest,\n" +
                     "	p.codpis pis,\n" +
                     "	p.codcof cofins\n" +
@@ -224,12 +225,13 @@ public class EasySacDAO extends InterfaceDAO implements MapaTributoProvider {
                     if(imp.isBalanca() && 
                             imp.getEan() != null &&
                                 !"".equals(imp.getEan().trim()) &&
-                                        imp.getEan().length() <= 6) {
+                                        imp.getEan().length() == 6) {
                         imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 2));
                     }
                     
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setSituacaoCadastro(rst.getInt("situacao") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("localidade"));
                     imp.setCodMercadologico2(rst.getString("grupo"));
