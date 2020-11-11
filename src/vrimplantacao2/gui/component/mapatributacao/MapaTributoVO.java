@@ -14,6 +14,9 @@ public class MapaTributoVO {
     private int origCst;
     private double origAliquota;
     private double origReduzido;
+    private double origFcp;
+    private boolean origDesonerado;
+    private double origPorcentagemDesonerado;
     private Icms aliquota;
 
     public String getSistema() {
@@ -78,6 +81,30 @@ public class MapaTributoVO {
 
     public void setOrigReduzido(double origReduzido) {
         this.origReduzido = origReduzido;
+    }
+
+    public double getOrigFcp() {
+        return origFcp;
+    }
+
+    public void setOrigFcp(double origFcp) {
+        this.origFcp = origFcp;
+    }
+
+    public boolean isOrigDesonerado() {
+        return origDesonerado;
+    }
+
+    public void setOrigDesonerado(boolean origDesonerado) {
+        this.origDesonerado = origDesonerado;
+    }
+
+    public double getOrigPorcentagemDesonerado() {
+        return origPorcentagemDesonerado;
+    }
+
+    public void setOrigPorcentagemDesonerado(double origPorcentagemDesonerado) {
+        this.origPorcentagemDesonerado = origPorcentagemDesonerado;
     }
     
 }

@@ -19,13 +19,23 @@ public class Icms {
     private final int cst;
     private final double aliquota;
     private final double reduzido;
+    private final double fcp;
+    private final boolean desonerado;
+    private final double porcentagemDesonerado;
 
     public Icms(int id, String descricao, int cst, double aliquota, double reduzido) {
+        this(id, descricao, cst, aliquota, reduzido, 0, false, 0);
+    }
+    
+    public Icms(int id, String descricao, int cst, double aliquota, double reduzido, double fcp, boolean desonerado, double porcentegemDesonerado) {
         this.id = id;
         this.descricao = descricao;
         this.cst = cst;
         this.aliquota = aliquota;
         this.reduzido = reduzido;
+        this.fcp = fcp;
+        this.desonerado = desonerado;
+        this.porcentagemDesonerado = porcentegemDesonerado;
     }
 
     public int getId() {
@@ -46,6 +56,18 @@ public class Icms {
 
     public double getReduzido() {
         return reduzido;
+    }
+
+    public double getFcp() {
+        return fcp;
+    }
+
+    public boolean isDesonerado() {
+        return desonerado;
+    }
+
+    public double getPorcentagemDesonerado() {
+        return porcentagemDesonerado;
     }
     
     private static MultiMap<Comparable, Icms> icms;

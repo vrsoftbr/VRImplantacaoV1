@@ -10,6 +10,7 @@ import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.enums.Icms;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 
 /**
  *
@@ -34,6 +35,9 @@ public class MapaTributacaoDAO {
                     + "	orig_cst integer,\n"
                     + "	orig_aliquota numeric(11,2),\n"
                     + "	orig_reduzido numeric(13,3),\n"
+                    + "	orig_fcp numeric(13,3),\n"
+                    + "	orig_desonerado boolean,\n"
+                    + "	orig_porcentagemdesonerado numeric(13,3),\n"
                     + "	primary key (sistema, agrupador, orig_id)\n"
                     + ");"
             );
@@ -64,11 +68,17 @@ public class MapaTributacaoDAO {
                     + "	mp.orig_cst,\n"
                     + "	mp.orig_aliquota,\n"
                     + "	mp.orig_reduzido,\n"
+                    + "	mp.orig_fcp,\n"
+                    + "	mp.orig_desonerado,\n"
+                    + "	mp.orig_porcentagemdesonerado,\n"
                     + "	mp.id_aliquota,\n"
                     + "	a.descricao,\n"
                     + "	a.situacaotributaria,\n"
                     + "	a.porcentagem,\n"
-                    + "	a.reduzido\n"
+                    + "	a.reduzido,\n"
+                    + "	a.porcentagemfcp,\n"
+                    + "	a.icmsdesonerado,\n"
+                    + "	a.percentualicmsdesonerado\n"
                     + "from\n"
                     + "	implantacao.mapatributacao mp\n"
                     + "	left join aliquota a on\n"
@@ -87,6 +97,9 @@ public class MapaTributacaoDAO {
                     vo.setOrigCst(rst.getInt("orig_cst"));
                     vo.setOrigAliquota(rst.getDouble("orig_aliquota"));
                     vo.setOrigReduzido(rst.getDouble("orig_reduzido"));
+                    vo.setOrigFcp(rst.getDouble("orig_fcp"));
+                    vo.setOrigDesonerado(rst.getBoolean("orig_desonerado"));
+                    vo.setOrigPorcentagemDesonerado(rst.getDouble("orig_porcentagemdesonerado"));
                     if (rst.getString("id_aliquota") != null) {
                         vo.setAliquota(
                             new Icms(
@@ -94,7 +107,10 @@ public class MapaTributacaoDAO {
                                 rst.getString("descricao"),
                                 rst.getInt("situacaotributaria"),
                                 rst.getDouble("porcentagem"),
-                                rst.getDouble("reduzido")
+                                rst.getDouble("reduzido"),
+                                rst.getDouble("porcentagemfcp"),
+                                rst.getBoolean("icmsdesonerado"),
+                                rst.getDouble("percentualicmsdesonerado")
                             )
                         );
                     }
@@ -124,6 +140,9 @@ public class MapaTributacaoDAO {
                     sql.put("orig_cst", vo.getOrigCst());
                     sql.put("orig_aliquota", vo.getOrigAliquota());
                     sql.put("orig_reduzido", vo.getOrigReduzido());
+                    sql.put("orig_fcp", vo.getOrigFcp());
+                    sql.put("orig_desonerado", vo.isOrigDesonerado());
+                    sql.put("orig_porcentagemdesonerado", vo.getOrigPorcentagemDesonerado());
                     if (vo.getAliquota() != null) {
                         sql.put("id_aliquota", vo.getAliquota().getId());
                     }
@@ -217,7 +236,10 @@ public class MapaTributacaoDAO {
                     + "	descricao,\n"
                     + "	situacaotributaria,\n"
                     + "	porcentagem,\n"
-                    + "	reduzido	\n"
+                    + "	reduzido,\n"
+                    + "	porcentagemfcp,\n"
+                    + "	icmsdesonerado,\n"
+                    + "	percentualicmsdesonerado\n"
                     + "from \n"
                     + "	aliquota\n"
                     + "where\n"
@@ -234,7 +256,11 @@ public class MapaTributacaoDAO {
                             rst.getString("descricao"),
                             rst.getInt("situacaotributaria"),
                             rst.getDouble("porcentagem"),
-                            rst.getDouble("reduzido"));
+                            rst.getDouble("reduzido"),
+                            rst.getDouble("porcentagemfcp"),
+                            rst.getBoolean("icmsdesonerado"),
+                            rst.getDouble("percentualicmsdesonerado")
+                    );
                     result.add(vo);
                 }
             }
@@ -281,6 +307,70 @@ public class MapaTributacaoDAO {
         }
         
         return result;
+    }
+
+    public void vincularAliquotas(String sistema, String agrupador) throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            st.execute(
+                    "with aliq as (\n" +
+                    "	select\n" +
+                    "		id,\n" +
+                    "		descricao,\n" +
+                    "		id_situacaocadastro,\n" +
+                    "		situacaotributaria,\n" +
+                    "		porcentagem,\n" +
+                    "		case when reduzido = 100 then 0 else reduzido end reduzido,\n" +
+                    "		icmsdesonerado,\n" +
+                    "		porcentagemfcp,\n" +
+                    "		percentualicmsdesonerado\n" +
+                    "	from\n" +
+                    "		aliquota\n" +
+                    "),\n" +
+                    "al2 as (\n" +
+                    "	select\n" +
+                    "		m.*,\n" +
+                    "		(\n" +
+                    "			select id \n" +
+                    "			from aliq where\n" +
+                    "			aliq.id_situacaocadastro = 1 and\n" +
+                    "			aliq.situacaotributaria = \n" +
+                    "				(case\n" +
+                    "					when m.orig_cst in (10,30,70) then 60\n" +
+                    "					else m.orig_cst\n" +
+                    "				end) and\n" +
+                    "			coalesce(aliq.porcentagem,0) =\n" +
+                    "				(case\n" +
+                    "					when m.orig_cst in (10,30,40,60,70) then 0\n" +
+                    "					else m.orig_aliquota\n" +
+                    "				end) and\n" +
+                    "			coalesce(aliq.reduzido,0) = \n" +
+                    "				(case\n" +
+                    "					when m.orig_cst != 20 then 0\n" +
+                    "					else m.orig_reduzido\n" +
+                    "				end) and\n" +
+                    "			coalesce(aliq.porcentagemfcp,0) = m.orig_fcp and\n" +
+                    "			coalesce(aliq.icmsdesonerado,false) = m.orig_desonerado and\n" +
+                    "			coalesce(aliq.percentualicmsdesonerado,0) = m.orig_porcentagemdesonerado\n" +
+                    "			limit 1\n" +
+                    "		)\n" +
+                    "	from\n" +
+                    "		implantacao.mapatributacao m\n" +
+                    ")\n" +
+                    "update implantacao.mapatributacao a set\n" +
+                    "	id_aliquota = b.id\n" +
+                    "from\n" +
+                    "	al2 b\n" +
+                    "where\n" +
+                    "	a.sistema = b.sistema and\n" +
+                    "	a.agrupador = b.agrupador and\n" +
+                    "	a.orig_id = b.orig_id and\n" +
+                    "	a.sistema = '" + sistema + "' and\n" +
+                    "	a.agrupador = '" + agrupador + "' and\n" +
+                    "	a.id_aliquota is null and \n" +
+                    "	not b.id is null\n" +
+                    "		"
+            );
+        }
     }
 
 }

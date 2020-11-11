@@ -64,10 +64,15 @@ public class MapaTributacaoController {
     void atualizarMapa() throws Exception {
         //Cria a tabela do mapeamento se ainda não existir.
         dao.createTable();
+        dao.gravarTributacaoOrigem(converterMapa(provider.getTributacao()));
+        dao.vincularAliquotas(getSistema(), getAgrupador());
+        mapa = dao.getMapa(getSistema(), getAgrupador());
+        /*
         List<MapaTributoVO> convertido = converterMapa(provider.getTributacao());       
         dao.gravarTributacaoOrigem(convertido);
         //Retorna o mapa
         mapa = dao.getMapa(getSistema(), getAgrupador());
+                */
         //Atualiza a view
         view.refresh();
     }
@@ -109,6 +114,9 @@ public class MapaTributacaoController {
             vo.setOrigCst(imp.getCst());
             vo.setOrigAliquota(imp.getAliquota());
             vo.setOrigReduzido(imp.getReduzido());
+            vo.setOrigFcp(imp.getFcp());
+            vo.setOrigDesonerado(imp.isDesonerado());
+            vo.setOrigPorcentagemDesonerado(imp.getPorcentagemDesonerado());
             
             int cst;
             if (imp.getCst() == 10 || imp.getCst() == 30 || imp.getCst() == 70) {
@@ -122,7 +130,7 @@ public class MapaTributacaoController {
                     imp.getAliquota();
             double reduzido = imp.getCst() != 20 ? 0 : imp.getReduzido();
             
-            vo.setAliquota(tributacaoVR.get(cst, aliquota, reduzido));
+            //vo.setAliquota(tributacaoVR.get(cst, aliquota, reduzido));
             
             result.add(vo);
         }
