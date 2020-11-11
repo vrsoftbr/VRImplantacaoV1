@@ -17,7 +17,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -354,7 +353,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select distinct\n"
                     + "	pf.codpro as idproduto, \n"
                     + "	pf.codfor as idfornecedor\n"
-                    + "	--p.referencia\n"
+                    + "	p.referencia\n"
                     + "from Itenscompra pf\n"
                     + "join Produtos p on p.codigo = pf.codpro \n"
                     + "join Fornecedor f on f.codigo = pf.codfor\n"
