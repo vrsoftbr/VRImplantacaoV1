@@ -308,12 +308,18 @@ public class MapaTributacaoView extends JDialog {
         vColunaProduto.add(new VRColumnTable("CST Ant.", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Aliq. Ant.", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Red. Ant", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("FCP", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Des.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("% Des.", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable(" - - ", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Cód. VR", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Descrição VR", true, SwingConstants.LEFT, false, null));      
         vColunaProduto.add(new VRColumnTable("CST VR", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Aliq. VR", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Red. VR", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("FCP", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Des.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("% Des.", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Aliq. Final", true, SwingConstants.LEFT, false, null));
         tblMapa.configurarColuna(vColunaProduto, this, "Mapa", "mapaTributacoes");
         
@@ -326,25 +332,34 @@ public class MapaTributacaoView extends JDialog {
             dados[i][2] = String.format("%02d", row.getOrigCst());
             dados[i][3] = String.format("%.2f", row.getOrigAliquota());
             dados[i][4] = String.format("%.2f", row.getOrigReduzido());
-            dados[i][5] = " >>>> ";
+            dados[i][5] = String.format("%.2f", row.getOrigFcp());
+            dados[i][6] = row.isOrigDesonerado() ? "S" : "";
+            dados[i][7] = String.format("%.2f", row.getOrigPorcentagemDesonerado());
+            dados[i][8] = " >>>> ";
             if (row.getAliquota() == null) {
-                dados[i][6] = "";
-                dados[i][7] = "";
-                dados[i][8] = "";
                 dados[i][9] = "";
                 dados[i][10] = "";
                 dados[i][11] = "";
+                dados[i][12] = "";
+                dados[i][13] = "";
+                dados[i][14] = "";
+                dados[i][15] = "";
+                dados[i][16] = "";
+                dados[i][17] = "";
             } else {
                 double aliq = row.getAliquota().getAliquota();
                 double red = row.getAliquota().getReduzido();
                 double aliqFinal = MathUtils.round(aliq - (aliq * (red / 100)), 2);
                 
-                dados[i][6] = row.getAliquota().getId();
-                dados[i][7] = row.getAliquota().getDescricao();
-                dados[i][8] = String.format("%02d", row.getAliquota().getCst());
-                dados[i][9] = String.format("%.2f", row.getAliquota().getAliquota());
-                dados[i][10] = String.format("%.2f", row.getAliquota().getReduzido());
-                dados[i][11] = String.format("%.2f", aliqFinal);
+                dados[i][9] = row.getAliquota().getId();
+                dados[i][10] = row.getAliquota().getDescricao();
+                dados[i][11] = String.format("%02d", row.getAliquota().getCst());
+                dados[i][12] = String.format("%.2f", row.getAliquota().getAliquota());
+                dados[i][13] = String.format("%.2f", row.getAliquota().getReduzido());
+                dados[i][14] = String.format("%.2f", aliqFinal);
+                dados[i][15] = String.format("%.2f", row.getOrigFcp());
+                dados[i][16] = row.isOrigDesonerado() ? "S" : "";
+                dados[i][17] = String.format("%.2f", row.getOrigPorcentagemDesonerado());
             }
             i++;
         }            
@@ -365,6 +380,9 @@ public class MapaTributacaoView extends JDialog {
         vColunaProduto.add(new VRColumnTable("Aliq.", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Red.", true, SwingConstants.LEFT, false, null));
         vColunaProduto.add(new VRColumnTable("Aliq. Final", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("FCP", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("Des.", true, SwingConstants.LEFT, false, null));
+        vColunaProduto.add(new VRColumnTable("% Des.", true, SwingConstants.LEFT, false, null));
         tblVR.configurarColuna(vColunaProduto, this, "Trib", "tributos");
         
         Object[][] dados = new Object[controller.getAliquotas().size()][tblVR.getvColuna().size()];
@@ -381,6 +399,9 @@ public class MapaTributacaoView extends JDialog {
             dados[i][3] = String.format("%.02f", aliquota.getAliquota());
             dados[i][4] = String.format("%.02f", aliquota.getReduzido());
             dados[i][5] = String.format("%.02f", aliqFinal);
+            dados[i][6] = String.format("%.02f", aliquota.getFcp());
+            dados[i][7] = aliquota.isDesonerado() ? "S" : "";
+            dados[i][8] = String.format("%.02f", aliquota.getPorcentagemDesonerado());
             
             i++;
         }            
