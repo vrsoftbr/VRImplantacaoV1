@@ -83,12 +83,17 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
 
             @Override
             public String getSistema() {
-                return dao.getSistema();
+                String lojaMesmoId = "";
+                if (!"".equals(txtLojaCliente.getText().trim()) && !txtLojaCliente.getText().isEmpty()) {
+                    lojaMesmoId = " - " + txtLojaCliente.getText();
+                }
+                return dao.getSistema() + lojaMesmoId;
             }
 
             @Override
             public String getLoja() {                
                 vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                dao.setLojaOrigem(vLojaCliente);
                 return vLojaCliente;
             }
 

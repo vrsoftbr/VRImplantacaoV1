@@ -100,6 +100,8 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="vrframework.bean.comboBox.VRComboBox" name="vRComboBox1">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="title" type="java.lang.String" value="Sistema WEB - Cronos 20"/>
@@ -268,8 +270,19 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkFornEndereco" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFornNumero" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFornBairro" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFornMunicipio" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFornEstado" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="462" max="32767" attributes="0"/>
+                          <EmptySpace pref="268" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -279,8 +292,16 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFornEndereco" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornNumero" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornBairro" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornMunicipio" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornEstado" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="246" max="32767" attributes="0"/>
+                          <EmptySpace pref="223" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -307,6 +328,31 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkProdutoFornecedorActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornEndereco">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Endere&#xe7;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornNumero">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornBairro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bairro"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornMunicipio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Munic&#xed;pio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornEstado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Estado"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -340,13 +386,20 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkCliPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkCliPermiteCheque" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkCliValorLimite" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace pref="459" max="32767" attributes="0"/>
+                              <EmptySpace pref="255" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -356,8 +409,14 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkCliPermiteRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkCliPermiteCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkCliValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="218" max="32767" attributes="0"/>
+                              <EmptySpace pref="195" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -377,6 +436,21 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRotativo">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliPermiteRotativo">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Permite Cr&#xe9;dito Rotativo"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliPermiteCheque">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Permite Cheque"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliValorLimite">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Valor Limite"/>
                       </Properties>
                     </Component>
                   </SubComponents>

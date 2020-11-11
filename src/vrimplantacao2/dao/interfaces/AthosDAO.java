@@ -562,6 +562,11 @@ public class AthosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setBloqueado(rst.getBoolean("bloqueaprazo"));
                     imp.setEmail(rst.getString("emailcliente"));
                     imp.setTelefone(rst.getString("telefoneempresa"));
+                    
+                    if (imp.getValorLimite() > 0) {
+                        imp.setPermiteCreditoRotativo(true);
+                        imp.setPermiteCheque(true);
+                    }
 
                     if ((rst.getString("estadocivil") != null)
                             && (!rst.getString("estadocivil").trim().isEmpty())) {
