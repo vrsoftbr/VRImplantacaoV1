@@ -131,21 +131,7 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	distinct\n" +
-                    "	p.cod_marca merc1,\n" +
-                    "	m.descricao descmerc1,\n" +
-                    "	p.cod_grupo merc2,\n" +
-                    "	g.descricao descmerc2,\n" +
-                    "	p.cod_subgrupo merc3,\n" +
-                    "	s.descricao descmerc3\n" +
-                    "from \n" +
-                    "	produto p\n" +
-                    "join marca m on p.cod_marca = m.cod_marca\n" +
-                    "join grupo g on p.cod_grupo = g.cod_grupo\n" +
-                    "join subgrupo s on p.cod_subgrupo = s.cod_subgrupo\n" +
-                    "order by \n" +
-                    "	2, 4, 6")) {
+                    "")) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
@@ -244,24 +230,31 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setEstoqueMaximo(rs.getDouble("estq_maximo"));
                     //imp.setEstoqueMinimo(rs.getDouble("estq_minimo"));
                     //imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setSituacaoCadastro("S".equals(rs.getString("ativo").trim()) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    String situacao = rs.getString("excluido");
+                    
+                    if(situacao != null && !"".equals(situacao.trim())) {
+                        imp.setSituacaoCadastro("N".equals(rs.getString("excluido").trim()) ? 
+                                SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    }
+                    
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
-                    //imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("pisdebito"));
                     
                     imp.setIcmsCstConsumidor(rs.getInt("cstdebito"));
                     imp.setIcmsAliqConsumidor(rs.getDouble("icmsdebito"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("reducaodebito"));
+                    imp.setIcmsReducaoConsumidor(rs.getDouble("reducaodebito"));
                     
-                    /*imp.setIcmsDebitoId(rs.getString("aliquota").trim());
-                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
-                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());*/
+                    imp.setIcmsCstSaida(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqSaida(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoSaida(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstEntrada(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqEntrada(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoConsumidor());
+                    imp.setBeneficio(rs.getString("beneficio"));
                     
                     result.add(imp);
                 }
@@ -302,7 +295,7 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.fide_desde,\n" +
                     "    p.limi_credito,\n" +
                     "    p.limi_cheque,\n" +
-                    "    p.id_situacao,\n" +
+                    "    p.id_situacao situacao,\n" +
                     "    p.data_cadastro,\n" +
                     "    p.email,\n" +
                     "    p.esta_civil,\n" +
@@ -320,24 +313,24 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
-                    imp.setAtivo("A".equals(rs.getString("situacao")));
-                    imp.setDatacadastro(rs.getDate("cadastro"));
+                    imp.setAtivo(rs.getInt("situacao") == 1);
+                    imp.setDatacadastro(rs.getDate("data_cadastro"));
                     imp.setRazao(Utils.acertarTexto(rs.getString("nome")));
                     imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
-                    imp.setCnpj_cpf(rs.getString("cpf_cnpj"));
-                    imp.setIe_rg(rs.getString("rg_insc"));
+                    imp.setCnpj_cpf(rs.getString("cnpj_cpf"));
+                    imp.setIe_rg(rs.getString("ie_rg"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setCep(rs.getString("cep"));
                     imp.setComplemento(rs.getString("complemento"));
-                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setEndereco(rs.getString("logradouro"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setMunicipio(rs.getString("cidade"));
-                    imp.setIbge_municipio(rs.getInt("cidadeibge"));
-                    imp.setUf(rs.getString("uf"));
+                    imp.setUf(rs.getString("estado"));
                     imp.setTel_principal(rs.getString("fone"));
-                    imp.setObservacao(rs.getString("obs"));
+                    imp.setObservacao(rs.getString("observacao"));
                     
-                    String celular = rs.getString("celular"), contato = rs.getString("contato");
+                    String celular = rs.getString("celular"), contato = rs.getString("contato"),
+                            email = rs.getString("email");
                     
                     if(celular != null && !"".equals(celular)) {
                         imp.addContato("1", "CELULAR", null, celular, TipoContato.COMERCIAL, null);
@@ -345,6 +338,10 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     if(contato != null && !"".equals(contato)) {
                         imp.addContato("2", contato, null, null, TipoContato.COMERCIAL, null);
+                    }
+                    
+                    if(email != null && !"".equals(email)) {
+                        imp.addContato("3", "EMAIL", null, null, TipoContato.COMERCIAL, email);
                     }
                     
                     result.add(imp);
@@ -439,22 +436,25 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
                     
                     imp.setId(rs.getString("id"));
-                    imp.setAtivo("A".equals(rs.getString("situacao")));
-                    imp.setDataCadastro(rs.getDate("cadastro"));
-                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setAtivo(rs.getInt("id_situacao") == 1);
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setValorLimite(rs.getDouble("limi_credito"));
                     imp.setRazao(Utils.acertarTexto(rs.getString("nome")));
                     imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
-                    imp.setCnpj(rs.getString("cpf_cnpj"));
-                    imp.setInscricaoestadual(rs.getString("rg_insc"));
+                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setInscricaoestadual(rs.getString("ie_rg"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setCep(rs.getString("cep"));
                     imp.setComplemento(rs.getString("complemento"));
-                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setEndereco(rs.getString("logradouro"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
                     imp.setTelefone(rs.getString("fone"));
-                    imp.setObservacao(rs.getString("obs"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setObservacao(rs.getString("observacao"));
                     imp.setCelular(rs.getString("celular"));
+                    imp.setDataNascimento(rs.getDate("data_nascimento"));
                     
                     result.add(imp);
                 }
@@ -470,20 +470,23 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "	cr.cod_contas_receber id,\n" +
-                    "	cr.cod_cliente idcliente,\n" +
-                    "	cr.dt_emissao emissao,\n" +
-                    "	cr.dt_vencimento vencimento,\n" +
-                    "	cr.parcela,\n" +
-                    "	cr.valor,\n" +
-                    "	cr.vl_pago,\n" +
-                    "	cr.documento,\n" +
-                    "	cr.obs\n" +
+                    "    t.id_titulo id,\n" +
+                    "    t.id_parceiro idcliente,\n" +
+                    "    t.emissao,\n" +
+                    "    t.vencimento,\n" +
+                    "    t.valor,\n" +
+                    "    t.observacao,\n" +
+                    "    t.multa,\n" +
+                    "    t.juros,\n" +
+                    "    t.documento,\n" +
+                    "    t.dcto_numero,\n" +
+                    "    t.parcelas,\n" +
+                    "    t.filial\n" +
                     "from\n" +
-                    "	contas_receber cr\n" +
-                    "where \n" +
-                    "	cr.cod_empresa = " + getLojaOrigem() + " and\n" +
-                    "	cr.dt_pagamento is null")) {
+                    "    ttitulos t\n" +
+                    "where\n" +
+                    "    t.situacao = 1 and \n" +
+                    "    t.tipo = 'R'")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
@@ -492,53 +495,13 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     
-                    String parc = rs.getString("parcela");
-                    String parcelas[] = parc.split("/");
+                    String parc = rs.getString("parcelas");
+                    String parcelas[] = parc.split("-");
                     
                     imp.setParcela(Integer.valueOf(parcelas[0]));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("obs"));
-                    imp.setNumeroCupom(rs.getString("documento"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	cp.cod_contas_pagar id,\n" +
-                    "	cp.documento,\n" +
-                    "	cp.cod_fornecedor idfornecedor,\n" +
-                    "	cp.dt_emissao emissao,\n" +
-                    "	cp.dt_vencimento vencimento,\n" +
-                    "	cp.valor,\n" +
-                    "	cp.parcela\n" +
-                    "from \n" +
-                    "	contas_pagar cp \n" +
-                    "where \n" +
-                    "	cp.cod_empresa = " + getLojaOrigem() + " and \n" +
-                    "	cp.dt_pagamento is null")) {
-                while(rs.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-                    
-                    imp.setId(rs.getString("id"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
-                    
-                    String parcela = rs.getString("parcela");
-                    String pr[] = parcela.split("/");
-                    
-                    parc.setNumeroParcela(Integer.valueOf(pr[0]));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setNumeroCupom(rs.getString("dcto_numero"));
                     
                     result.add(imp);
                 }

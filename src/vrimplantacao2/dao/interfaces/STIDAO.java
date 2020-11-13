@@ -22,6 +22,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -519,32 +520,52 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "  cp.codigo,\n" +
-                    "  cc.parcela,\n" +
-                    "  cp.documento,\n" +
-                    "  cp.codfor idfornecedor,\n" +
-                    "  cp.dataemissao,\n" +
-                    "  cc.vencimento,\n" +
-                    "  cp.historico,\n" +
-                    "  cc.valor,\n" +
-                    "  cc.juros,\n" +
-                    "  cc.multa\n" +
+                    "  cp.codigo id,\n" +
+                    "  cp.parcela,\n" +
+                    "  cp.competencia data,\n" +
+                    "  cp.vencimento,\n" +
+                    "  cp.valor,\n" +
+                    "  coalesce(cp.codcompra, cc.documento) doc,\n" +
+                    "  coalesce(c.codfor, cc.codfor) idfornecedor,\n" +
+                    "  cc.historico,\n" +
+                    "  cp.pago,\n" +
+                    "  'compras'\n" +
                     "from\n" +
-                    "  cond_pagto_pagar cc\n" +
-                    "join contas_pagar cp on cc.codcontaspagar = cp.codigo\n" +
+                    "  cond_pagto_pagar cp\n" +
+                    "left join compras c on cp.codcompra = c.codigo\n" +
+                    "left join contas_pagar cc on cp.codcontaspagar = cc.codigo\n" +
                     "where\n" +
-                    "  cp.codemp = " + getLojaOrigem() + " and\n" +
-                    "  cc.datapagto is null\n" +
+                    "  pago = false\n" +
+                    "union\n" +
+                    "select\n" +
+                    "  cp.codigo id,\n" +
+                    "  parcela,\n" +
+                    "  dataemissao data,\n" +
+                    "  cc.vencimento,\n" +
+                    "  cc.valor,\n" +
+                    "  cp.documento doc,\n" +
+                    "  codfor idfornecedor,\n" +
+                    "  cp.historico,\n" +
+                    "  cc.pago,\n" +
+                    "  'conta pagar'\n" +
+                    "from\n" +
+                    "  contas_pagar cp\n" +
+                    "left join cond_pagto_pagar cc on cp.codigo = cc.codcontaspagar\n" +
+                    "where\n" +
+                    "  pago = false\n" +
                     "order by\n" +
-                    "  cc.vencimento")) {
+                    "  id")) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     
-                    imp.setId(rs.getString("codigo"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroDocumento(rs.getString("doc"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setDataEmissao(rs.getDate("dataemissao"));
-                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    imp.setDataEmissao(rs.getDate("data"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    
+                    parc.setNumeroParcela(Utils.stringToInt(rs.getString("parcela"), 1));
+                    parc.setObservacao(rs.getString("historico"));
                     
                     result.add(imp);
                 }
