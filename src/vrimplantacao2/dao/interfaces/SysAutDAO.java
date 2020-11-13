@@ -15,10 +15,12 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -520,6 +522,36 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    a.cod_produto_pai as idproduto_pai,\n"
+                    + "    p1.descricao as desc_produtopai,\n"
+                    + "    a.cod_produto_filho as idproduto_filho,\n"
+                    + "    p2.descricao as desc_produto_filho,\n"
+                    + "    a.qtde_indice\n"
+                    + "from estoque_indices a\n"
+                    + "join estoque p1 on p1.codigo = a.cod_produto_pai\n"
+                    + "join estoque p2 on p2.codigo = a.cod_produto_filho\n"
+                    + "order by 1, 3"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    imp.setId(rst.getString("idproduto_pai"));
+                    imp.setQtdEmbalagem(1);
+                    imp.setProdutoAssociadoId(rst.getString("idproduto_filho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtde_indice"));
                     result.add(imp);
                 }
             }
