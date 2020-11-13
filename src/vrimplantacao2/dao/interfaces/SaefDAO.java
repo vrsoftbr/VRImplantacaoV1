@@ -455,7 +455,7 @@ public class SaefDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("cdpessoa") + "-" + rst.getString("ecf");
+                        String id = rst.getString("numerocupom") + "-" + rst.getString("idclientepreferencial") + "-" + rst.getString("data");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -497,10 +497,9 @@ public class SaefDAO extends InterfaceDAO {
             this.sql
                     = "SELECT\n"
                     + "	v.dslancamento numerocupom,\n"
-                    + "	v.cdpessoa,\n"
                     + " v.dsstatus,\n"
                     + "	cdTipo ecf,\n"
-                    + "	dtemissao as data,\n"
+                    + "	dtdatahora as data,\n"
                     + "	SUBSTRING(CAST (dtDataHora as char), 13, 5) AS horainicio,\n"
                     + "	SUBSTRING(CAST (dtDataHora AS char), 13, 5) AS horatermino,\n"
                     + "	coalesce(v.cdpessoa, '') idclientepreferencial,\n"
@@ -526,9 +525,9 @@ public class SaefDAO extends InterfaceDAO {
                     + "LEFT JOIN Endereco e ON e.cdPessoa = p.cdpessoa\n"
                     + "WHERE\n"
                     + "	dsmodelo = '65'\n"
-                    + " and (dtemissao between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23))\n"
+                    + " and (dtdatahora between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23))\n"
                     + "ORDER BY\n"
-                    + "	dtemissao";
+                    + "	dtdatahora";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -566,11 +565,11 @@ public class SaefDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("numerocupom") + "-" + rst.getString("cdpessoa") + "-" + rst.getString("ecf");
-                        //String idVendaItem = rst.getString("dtdatahora") + "-" + rst.getString("numerocupom") + "-" + rst.getString("nritem") + "-" + rst.getString("cdpessoa");
-                        
-                        next.setVenda(idVenda);
-                        next.setId(rst.getString("nritem") + "-" + rst.getString("ecf") + "-" + rst.getString("numerocupom") + "-" + rst.getString("data"));
+                        String id = rst.getString("numerocupom") + "-" + rst.getString("idclientepreferencial") + "-" + rst.getString("data");
+                        //String idItem = rst.getString("nritem") +"-"+ rst.getString("numerocupom") +"-"+ rst.getString("idclientepreferencial") +"-"+rst.getString("produto") +"-"+rst.getString("quantidade");
+
+                        next.setVenda(id);
+                        next.setId(rst.getString("id_vendaitem"));
                         next.setProduto(rst.getString("produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
@@ -590,18 +589,20 @@ public class SaefDAO extends InterfaceDAO {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
+                    + " CAST (CAST (vi.cdProduto as varchar) +'-'+ CAST (vi.dslancamento as varchar) +'-'+ CAST (vi.cdPessoa as varchar) +'-'+ CAST (vi.dsstatus as varchar) +'-'+ CAST (vi.cdIteLcto as varchar) as varchar) id_vendaitem,\n"
                     + "	vi.cdIteLcto nritem,\n"
                     + "	v.dslancamento numerocupom,\n"
-                    + "	v.cdpessoa,\n"
+                    + "	v.cdpessoa idclientepreferencial,\n"
                     + "	v.dsstatus,\n"
                     + "	cdTipo ecf,\n"
-                    + "	dtemissao data,\n"
-                    + "	dtdatahora,\n"
+                    + "	dtemissao emissao,\n"
+                    + "	dtdatahora data,\n"
                     + "	vi.cdProduto produto,\n"
                     + "	p.nmproduto descricao,\n"
                     + "	p.dsunidade unidade,\n"
                     + "	nrqtd quantidade,\n"
-                    + " vlunitario valor,"
+                    + " vlunitario valor,\n"
+                    + " nrqtd quantidade,\n"
                     + "	nrqtd * vlunitario_bruto total,\n"
                     + "	nrvalordesconto desconto,\n"
                     + "	p.cdfabricante codigobarras,\n"
@@ -612,9 +613,9 @@ public class SaefDAO extends InterfaceDAO {
                     + "left join Lancto v on v.dslancamento = vi.dslancamento\n"
                     + "where\n"
                     + " v.dsModelo = '65'\n"
-                    + "    and (v.dtemissao between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23))\n"
+                    + "    and (v.dtdatahora between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23))\n"
                     + "order by\n"
-                    + "	nrnumeroitem, vi.dslancamento";
+                    + "	vi.dslancamento, nrnumeroitem";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
