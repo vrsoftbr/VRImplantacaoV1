@@ -2,6 +2,7 @@ package vrimplantacao2.vo.cadastro;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -271,7 +272,7 @@ public class ProdutoComplementoVO {
     }
 
     public void setPrateleira(String prateleira) {
-        this.prateleira = prateleira;
+        this.prateleira = Utils.acertarTexto(prateleira, 3);
     }
 
     public String getSetor() {

@@ -607,8 +607,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                SimpleDateFormat timestamp = new SimpleDateFormat("hh:mm:ss");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -621,17 +621,14 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("emissao"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
-                        String horaInicio = timestampDate.format(rst.getDate("data_hora"));
+                        
+                        /*String horaInicio = timestampDate.format(rst.getDate("data_hora"));
                         String horaTermino = timestampDate.format(rst.getDate("data_hora"));
                         next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setHoraTermino(timestamp.parse(horaTermino));*/
+                        
                         next.setSubTotalImpressora(rst.getDouble("valortotal"));
                         next.setCpf(rst.getString("cnpj_cpf"));
-                        //next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        //next.setNumeroSerie(rst.getString("numeroserie"));
-                        //next.setModeloImpressora(rst.getString("modelo"));
                         next.setNomeCliente(rst.getString("nome"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
@@ -644,8 +641,9 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEnderecoCliente(endereco);
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                System.out.println(next.getId() + " - " + next.getData());
                 throw new RuntimeException(ex);
             }
         }
@@ -661,6 +659,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  v.desconto,\n" +
                         "  v.status,\n" +
                         "  v.numcaixa ecf,\n" +
+                        "  v.cancelada,\n" +
                         "  c.nome,\n" +
                         "  c.cnpj_cpf,\n" +
                         "  c.logradouro endereco,\n" +
@@ -725,11 +724,9 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setUnidadeMedida(rst.getString("unidade"));
 
                         String trib = rst.getString("icms");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("icms");
+                        if (trib != null && !"".equals(trib.trim())) {
+                            obterAliquota(next, trib);
                         }
-
-                        obterAliquota(next, trib);
                     }
                 }
             } catch (Exception ex) {
@@ -745,16 +742,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
          * @throws SQLException
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
-             07	- ALIQUOTA 07%
-             11	- ALIQUOTA 11%
-             12	- ALIQUOTA 12%
-             18	- ALIQUOTA 18%
-             25	- ALIQUOTA 25%
-             ST - SUBSTITUIDO
-             II	- ISENTO
-             
-             */
+            
             int cst;
             double aliq;
             switch (icms) {
@@ -815,9 +803,10 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  i.cancelado\n" +
                         "from\n" +
                         "  itens_vendas i join produtos p on i.codprod = p.codpro\n" +
+                        "  join vendas v on i.codvenda = v.codigo\n" +
                         "  left join aliquotas_ecf al on i.codigoaliquotaecf = al.codigo\n" +
                         "where\n" +
-                        "  dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and codempresa = " + idLojaCliente;
+                        "  v.dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and codempresa = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

@@ -293,8 +293,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setEstoqueMinimo(linha.getDouble("estoqueminimo"));
                 produto.setEstoque(linha.getDouble("estoque"));
                 produto.setCustoComImposto(linha.getDouble("custocomimposto"));
+                produto.setCustoAnteriorComImposto(linha.getDouble("custocomimpostoanterior"));
                 produto.setCustoSemImposto(linha.getDouble("custosemimposto"));
+                produto.setCustoAnteriorSemImposto(linha.getDouble("custosemimpostoanterior"));
+                produto.setCustoSemImposto(linha.getDouble("customedio"));
                 produto.setPrecovenda(linha.getDouble("precovenda"));
+                produto.setVendaPdv(linha.getBoolean("vendapdv"));
+                produto.setEmiteEtiqueta(linha.getBoolean("emiteetiqueta"));
                 switch (Utils.acertarTexto(linha.getString("ativo"))) {
                     case "N":
                         produto.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
@@ -546,6 +551,17 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                             contato.setTipoContato(TipoContato.getByDescricao(linha.getString(prefixo + "tipo")));
                         }
 
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                i = 1;
+                while (true) {
+                    String prefixo = "prazo" + i;
+                    if (linha.existsColumn(prefixo)) {
+                        forn.addPagamento(String.valueOf(i), Utils.stringToInt(linha.getString(prefixo)));
                         i++;
                     } else {
                         break;
@@ -873,7 +889,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     linha.getString("descricao"),
                     linha.getInt("cst"),
                     linha.getDouble("aliquota"),
-                    linha.getDouble("reduzido")
+                    linha.getDouble("reduzido"),
+                    linha.getDouble("fcp"),
+                    linha.getBoolean("desonerado"),
+                    linha.getDouble("percentualdesonerado")
             ));
         }
 
