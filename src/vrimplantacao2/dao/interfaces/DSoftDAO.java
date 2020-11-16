@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -50,6 +51,26 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         );
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    codigo,\n"
+                    + "    nome,\n"
+                    + "    cgc as cnpj\n"
+                    + "from empresa\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(
+                            rst.getString("codigo"), rst.getString("CNPJFIL") + " - " + rst.getString("NOMFIL")));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -72,7 +93,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getInt("cst"),
                             rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
-                    )
+                        )
                     );
                 }
             }
@@ -98,7 +119,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getInt("cst"),
                             rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
-                    )
+                        )
                     );
                 }
             }
@@ -124,7 +145,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getInt("cst_entrada"),
                             rst.getDouble("aliquota_entrada"),
                             rst.getDouble("reducao_entrada")
-                    )
+                        )
                     );
                 }
             }
