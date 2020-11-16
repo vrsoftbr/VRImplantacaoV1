@@ -1,4 +1,4 @@
-package vrimplantacao2.dao.interfaces;
+package vrimplantacao2.dao.interfaces.linear;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -26,6 +28,8 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -33,6 +37,17 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private Date vendaDataIni;
+    private Date vendaDataFim;
+
+    public void setVendaDataIni(Date vendaDataIni) {
+        this.vendaDataIni = vendaDataIni;
+    }
+
+    public void setVendaDataFim(Date vendaDataFim) {
+        this.vendaDataFim = vendaDataFim;
+    }    
+    
     @Override
     public String getSistema() {
         return "Linear";
@@ -756,4 +771,15 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new LinearVendaIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new LinearVendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+    }    
+    
 }
