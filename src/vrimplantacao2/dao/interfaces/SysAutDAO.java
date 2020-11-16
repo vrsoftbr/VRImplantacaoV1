@@ -17,8 +17,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
-import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -182,7 +180,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.codigo as id,\n"
                     + "	ean.dsBarras as ean,\n"
                     + "	p.referencia,\n"
-                    + "	p.Balanca as balanca,\n"
+                    + "	case p.Balanca when 'S' then 1 else 0 end balanca,\n"
                     + "	p.descricao as descricaocompleta,\n"
                     + "	p.descricao2 as descricaoreduzida,\n"
                     + "	p.unidade as tipoembalagem,\n"
@@ -221,7 +219,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.seteBalanca("S".equals(rst.getString("balanca")));
+                    imp.seteBalanca(rst.getInt("balanca") == 1);
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -251,6 +249,45 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("idIcms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("idIcms"));
                     imp.setIcmsConsumidorId(rst.getString("idIcms"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p.codigo,\n"
+                    + "	p.barras as ean,\n"
+                    + "	p.unidade as tipoembalagem,\n"
+                    + "	p.nuQtdeEmbalagem as qtdembalagem\n"
+                    + "from Produtos p\n"
+                    + "where p.barras is not null\n"
+                    + "and p.barras != ''\n"
+                    + "union all\n"
+                    + "select \n"
+                    + "	p.codigo,\n"
+                    + "	p.barras2 as ean,\n"
+                    + "	p.unidade as tipoembalagem,\n"
+                    + "	p.nuQtdeEmbalagem as qtdembalagem\n"
+                    + "from Produtos p\n"
+                    + "where p.barras2 is not null\n"
+                    + "and p.barras2 != ''"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     result.add(imp);
                 }
             }
@@ -314,7 +351,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rst.getString("cep"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setAtivo(rst.getBoolean("situacaodastro"));
-                    imp.setTipoFornecedor(rst.getInt("produtorrural") == 1 ? TipoFornecedor.PRODUTORRURAL : TipoFornecedor.DISTRIBUIDOR);
+                    //imp.setTipoFornecedor(rst.getInt("produtorrural") == 1 ? TipoFornecedor.PRODUTORRURAL : TipoFornecedor.DISTRIBUIDOR);
                     imp.setTel_principal(rst.getString("tefefone"));
                     imp.setObservacao(rst.getString("observacao"));
 
@@ -353,8 +390,8 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "	pf.codpro as idproduto, \n"
-                    + "	pf.codfor as idfornecedor\n"
-                    + "	--p.referencia\n"
+                    + "	pf.codfor as idfornecedor,\n"
+                    + "	p.referencia\n"
                     + "from Itenscompra pf\n"
                     + "join Produtos p on p.codigo = pf.codpro \n"
                     + "join Fornecedor f on f.codigo = pf.codfor\n"
@@ -366,6 +403,7 @@ public class SysAutDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setCodigoExterno(rst.getString("referencia"));
                     result.add(imp);
                 }
             }

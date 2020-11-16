@@ -616,7 +616,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "	v.cod_empresa = " + idLojaCliente + " and\n" +
                     "	v.dt_emissao between '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "' and\n" +
-                    "   v.sn_sat_enviado = 'S'";
+                    "   v.sn_sat_enviado = 'N'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

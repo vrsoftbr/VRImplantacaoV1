@@ -280,9 +280,11 @@
                                   <Component id="chkFornMunicipio" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFornEstado" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFornCep" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="268" max="32767" attributes="0"/>
+                          <EmptySpace pref="223" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -298,6 +300,7 @@
                               <Component id="chkFornBairro" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFornMunicipio" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFornEstado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornCep" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
@@ -352,6 +355,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornEstado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Estado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornCep">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cep"/>
                   </Properties>
                 </Component>
               </SubComponents>

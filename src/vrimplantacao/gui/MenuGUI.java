@@ -264,6 +264,8 @@ import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
+import vrimplantacao2.gui.interfaces.SysAutGUI;
+import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -675,6 +677,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAtmaFirebird = new javax.swing.JMenuItem();
         mnuSolido = new javax.swing.JMenuItem();
         mnuMaster = new javax.swing.JMenuItem();
+        mnuGDI = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -831,6 +834,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuEasySac = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
+        chkSysAut = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -1706,6 +1710,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuMaster);
+
+        mnuGDI.setText("GDI");
+        mnuGDI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGDIActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuGDI);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -2908,6 +2920,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu1.add(mnuSTSistemas_v2);
+
+        chkSysAut.setText("SysAut");
+        chkSysAut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSysAutActionPerformed(evt);
+            }
+        });
+        jMenu1.add(chkSysAut);
 
         mnuDatabase.add(jMenu1);
 
@@ -4900,8 +4920,18 @@ public final class MenuGUI extends VRMdiFrame {
         CervantesGUI.exibir(this);
     }//GEN-LAST:event_mnuCervantesActionPerformed
 
+    private void chkSysAutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSysAutActionPerformed
+        // TODO add your handling code here:
+        SysAutGUI.exibir(this);
+    }//GEN-LAST:event_chkSysAutActionPerformed
+
+    private void mnuGDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGDIActionPerformed
+        GDIGUI.exibir(this);
+    }//GEN-LAST:event_mnuGDIActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkSysAut;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
@@ -5065,6 +5095,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG10;
     private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuG4;
+    private javax.swing.JMenuItem mnuGDI;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuGeneric;
