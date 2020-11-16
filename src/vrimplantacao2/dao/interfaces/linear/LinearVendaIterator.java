@@ -23,20 +23,19 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
         );
         if (dataInicial == null) throw new NullPointerException("Informe a data inicial");
         if (dataTermino == null) throw new NullPointerException("Informe a data final");
-        
-        //log001venda0820
-        
-        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(Utils.stringToInt(idLoja)), dataInicial, dataTermino, new SimpleDateFormat("MMyy"))) {
+        //log001venda0820        
+        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(Utils.stringToInt(idLoja), dataInicial), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
             this.addStatement(statement);
         }
         
     }
     
-    private String getNomeTabela(int idLoja) {
-        return String.format("log%03dvenda{DATA_INICIO}", idLoja);
+    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MMyy");
+    private String getNomeTabela(int idLoja, Date dataInicial) {        
+        return String.format("log%03dvenda%s", idLoja, TABLE_NAME_DATE.format(dataInicial));
     }
     
-    private String getFullSQL(int idLoja) {
+    private String getFullSQL(int idLoja, Date dataInicial) {
         return
             "select\n" +
             "	v.cupom,\n" +
@@ -57,7 +56,7 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
             "	min(cx.serie) serie,\n" +
             "	min(nf.chv_cfe) chave\n" +
             "from\n" +
-            "	" + getNomeTabela(idLoja) + " v\n" +
+            "	" + getNomeTabela(idLoja, dataInicial) + " v\n" +
             "	left join (\n" +
             "		select\n" +
             "			distinct\n" +
@@ -69,7 +68,7 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
             "			cf.filial = " + idLoja + "\n" +
             "	) cx on\n" +
             "		v.caixa = cx.caixa\n" +
-            "	left join " + getNomeTabela(idLoja) + "nf nf on\n" +
+            "	left join " + getNomeTabela(idLoja, dataInicial) + "nf nf on\n" +
             "		v.cupom = nf.cupom and \n" +
             "		v.caixa = nf.caixa and\n" +
             "		v.`data` = nf.`data` and\n" +
@@ -82,13 +81,34 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
             "	v.data";
     }
     
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static String formatID(int cupom, int caixa, Date data) {
+        return String.format("%d-%d-%s", cupom, caixa, DATE_FORMAT.format(data));
+    }
+    
     private static class LinearNextBuilder implements NextBuilder<VendaIMP> {
 
         @Override
-        public VendaIMP makeNext(ResultSet rst) throws Exception {
+        public VendaIMP makeNext(ResultSet rs) throws Exception {
             VendaIMP v = new VendaIMP();
             
-            
+            v.setId(formatID(
+                    rs.getInt("cupom"),
+                    rs.getInt("caixa"),
+                    rs.getDate("data")
+            ));
+            v.setNumeroCupom(rs.getInt("cupom"));
+            v.setEcf(rs.getInt("caixa"));
+            v.setData(rs.getDate("data"));
+            v.setIdClientePreferencial(rs.getString("id_clientepreferencial"));
+            v.setHoraInicio(rs.getDate("horainicio"));
+            v.setHoraTermino(rs.getDate("horatermino"));
+            v.setCancelado(rs.getBoolean("cancelado"));
+            v.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
+            v.setValorDesconto(rs.getDouble("valorDesconto"));
+            v.setValorAcrescimo(rs.getDouble("valorAcrescimo"));
+            v.setNumeroSerie(rs.getString("serie"));
+            v.setChaveCfe(rs.getString("chave"));          
             
             return v;
         }
@@ -96,7 +116,6 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
     }
 
     private static class LinearStatementBuilder implements StatementBuilder {
-
         @Override
         public Statement makeStatement() throws Exception {
             return ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);

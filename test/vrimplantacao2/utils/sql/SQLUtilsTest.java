@@ -91,4 +91,19 @@ public class SQLUtilsTest {
         System.out.println("OK");
     }
     
+    @Test
+    public void testQuebrarSqlEmMesesStringTest2() throws Exception {
+        System.out.print("SQLUtilsTest.testQuebrarSqlEmMesesStringTest2()...");
+        
+        String sql = "log001venda{DATA_INICIO}";
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        
+        List<String> stms = SQLUtils.quebrarSqlEmMeses(sql, format.parse("2020-08-01"), format.parse("2020-08-31"), new SimpleDateFormat("MMyy"));
+        
+        assertEquals(1, stms.size());
+        assertEquals("log001venda0820", stms.get(0));
+        
+        System.out.println("OK");
+    }
+    
 }
