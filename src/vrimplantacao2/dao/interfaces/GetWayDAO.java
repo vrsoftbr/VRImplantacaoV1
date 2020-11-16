@@ -496,7 +496,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodigoAnp(rst.getString("codigoanp") != null ? rst.getString("codigoanp").trim()
                             : "");
 
-                    imp.setPrateleira(String.valueOf(Utils.stringToInt(rst.getString("corredor"))));
+                    imp.setPrateleira(rst.getString("corredor"));
 
                     vResult.add(imp);
                 }
