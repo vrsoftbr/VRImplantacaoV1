@@ -2,9 +2,12 @@ package vrimplantacao2.dao.interfaces.linear;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.importacao.VendaIMP;
 
 /**
@@ -13,59 +16,86 @@ import vrimplantacao2.vo.importacao.VendaIMP;
  */
 public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
 
-    public LinearVendaIterator(String idLojas, Date dataInicial, Date dataTermino) {        
+    public LinearVendaIterator(String idLoja, Date dataInicial, Date dataTermino) {        
         super(
                 new LinearNextBuilder(),
                 new LinearStatementBuilder()
         );
         if (dataInicial == null) throw new NullPointerException("Informe a data inicial");
         if (dataTermino == null) throw new NullPointerException("Informe a data final");
+        
+        //log001venda0820
+        
+        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(Utils.stringToInt(idLoja)), dataInicial, dataTermino, new SimpleDateFormat("MMyy"))) {
+            this.addStatement(statement);
+        }
+        
     }
     
-    private String getFullSQL(String idLojaCliente) throws Exception {
-
+    private String getNomeTabela(int idLoja) {
+        return String.format("log%03dvenda{DATA_INICIO}", idLoja);
+    }
+    
+    private String getFullSQL(int idLoja) {
         return
             "select\n" +
-            "	v.id_cupom id,\n" +
-            "	v.numero_cupom,\n" +
+            "	v.cupom,\n" +
             "	v.caixa,\n" +
-            "	v.`data`,\n" +
-            "	min(v.hora) horainicio,\n" +
-            "	max(v.hora) horafim,\n" +
-            "	min(case when v.cupom_cancelado = 'S' then 1 else 0 end) cancelado,\n" +
-            "	sum(v.valor_total) subtotalimpressora,\n" +
-            "	sum(v.valor_acrescimo_cupom) valoracrescimo,\n" +
-            "	sum(v.valor_desconto_cupom) valordesconto,\n" +
-            "	v.serie_aparelho numeroserie,\n" +
-            "	v.tipo_fiscal modeloimpressora\n" +
+            "	v.data,\n" +
+            "	max(codcli) id_clientepreferencial,\n" +
+            "	min(hora) horainicio,\n" +
+            "	max(hora) horatermino,\n" +
+            "	min(\n" +
+            "		case\n" +
+            "			when reproccanc is null then 0\n" +
+            "			else 1\n" +
+            "		end\n" +
+            "	) cancelado,\n" +
+            "	sum(coalesce(total,0)) subtotalimpressora,\n" +
+            "	sum(coalesce(desconto,0)) valorDesconto,\n" +
+            "	sum(coalesce(acrescimo,0)) valorAcrescimo,\n" +
+            "	min(cx.serie) serie,\n" +
+            "	min(nf.chv_cfe) chave\n" +
             "from\n" +
-            "	view_vendas_pdv_antiga v\n" +
+            "	" + getNomeTabela(idLoja) + " v\n" +
+            "	left join (\n" +
+            "		select\n" +
+            "			distinct\n" +
+            "			caixa,\n" +
+            "			serie\n" +
+            "		from\n" +
+            "			cadecf_faixa cf\n" +
+            "		where\n" +
+            "			cf.filial = " + idLoja + "\n" +
+            "	) cx on\n" +
+            "		v.caixa = cx.caixa\n" +
+            "	left join " + getNomeTabela(idLoja) + "nf nf on\n" +
+            "		v.cupom = nf.cupom and \n" +
+            "		v.caixa = nf.caixa and\n" +
+            "		v.`data` = nf.`data` and\n" +
+            "		cast(cx.serie as SIGNED) = cast(nf.serie as SIGNED)\n" +
             "where\n" +
-            "	v.`data` >= '{DATA_INICIO}' and\n" +
-            "	v.`data` <= '{DATA_TERMINO}' and\n" +
-            "	v.loja = " + idLojaCliente + "\n" +
+            "	v.data between '{DATA_INICIO}' and '{DATA_TERMINO}'\n" +
             "group by\n" +
-            "	v.id_cupom,\n" +
-            "	v.numero_cupom,\n" +
+            "	v.cupom,\n" +
             "	v.caixa,\n" +
-            "	v.`data`,\n" +
-            "	v.serie_aparelho,\n" +
-            "	v.tipo_fiscal";
+            "	v.data";
     }
     
     private static class LinearNextBuilder implements NextBuilder<VendaIMP> {
 
         @Override
         public VendaIMP makeNext(ResultSet rst) throws Exception {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            VendaIMP v = new VendaIMP();
+            
+            
+            
+            return v;
         }
         
     }
 
     private static class LinearStatementBuilder implements StatementBuilder {
-
-        public LinearStatementBuilder() {
-        }
 
         @Override
         public Statement makeStatement() throws Exception {
