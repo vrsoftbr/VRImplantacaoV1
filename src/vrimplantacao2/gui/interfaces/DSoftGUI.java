@@ -134,6 +134,20 @@ public class DSoftGUI extends VRInternalFrame {
         cmbLojaOrigem.setSelectedIndex(index);
     }
     
+    public static void exibir(VRMdiFrame i_mdiFrame) {
+        try {
+            i_mdiFrame.setWaitCursor();
+            if (instance == null || instance.isClosed()) {
+                instance = new DSoftGUI(i_mdiFrame);
+            }
+            instance.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Erro ao abrir");
+        } finally {
+            i_mdiFrame.setDefaultCursor();
+        }
+    }
+    
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
