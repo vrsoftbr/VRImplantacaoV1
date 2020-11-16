@@ -8,15 +8,21 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -126,6 +132,56 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.MANTER_DESCRICAO_PRODUTO,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                    OpcaoProduto.QTD_EMBALAGEM_EAN,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.EXCECAO,
+                    OpcaoProduto.TIPO_PRODUTO,
+                    OpcaoProduto.ATACADO
+                }
+        ));
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -380,7 +436,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("ie").trim().isEmpty())) {
                         imp.setIe_rg(rst.getString("ie"));
                     } else {
-                        imp.setIe_rg(rst.getString("ie"));
+                        imp.setIe_rg(rst.getString("rg"));
                     }
 
                     imp.setEndereco(rst.getString("endereco"));
@@ -469,7 +525,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.nome as razao,\n"
                     + "    c.cpf,\n"
                     + "    c.rg,\n"
-                    + "    c.cgc,\n"
+                    + "    c.cgc as cnpj,\n"
                     + "    c.ie as inscricaoestadual,\n"
                     + "    c.endereco,\n"
                     + "    c.num_endereco,\n"
@@ -522,11 +578,85 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by 1"
             )) {
                 while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString(imp.getFantasia()));
 
+                    if ((rst.getString("cnpj") != null)
+                            && (!rst.getString("cnpj").trim().isEmpty())) {
+                        imp.setCnpj(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj(rst.getString("cpf"));
+                    }
+
+                    if ((rst.getString("inscricaoestadual") != null)
+                            && (!rst.getString("inscricaoestadual").trim().isEmpty())) {
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    } else {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    }
+
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo(rst.getInt("situacaocadastro") == 1);
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("num_endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setCobrancaEndereco(rst.getString("endereco_cobranca"));
+                    imp.setCobrancaComplemento(rst.getString("complemento_cobranca"));
+                    imp.setCobrancaBairro(rst.getString("bairro_cobranca"));
+                    imp.setCobrancaMunicipio(rst.getString("cidade_cobranca"));
+                    imp.setCobrancaUf(rst.getString("uf_cobranca"));
+                    imp.setCobrancaCep(rst.getString("cep_cobranca"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+
+                    if (imp.getValorLimite() > 0) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                    } else {
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
+                    }
+
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaEndereco(rst.getString("enderecotrabalho"));
+                    imp.setEmpresaTelefone(rst.getString("telefoneempresa"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setNomeConjuge(rst.getString("conjugue"));
+                    imp.setCpfConjuge(rst.getString("conjugue_cpf"));
+
+                    if ((rst.getString("estadocivil") != null)
+                            && (!rst.getString("estadocivil").trim().isEmpty())) {
+                        if ("CASADO".equals(rst.getString("estadocivil"))
+                                || "CASADO(A)".equals(rst.getString("estadocivil"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                        } else if ("DIVORCIADO".equals(rst.getString("estadocivil"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                        } else if ("SOLTEIRO".equals(rst.getString("estadocivil"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                        } else {
+                            imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                        }
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                    }
+
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -584,10 +714,31 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "and pg.codfornecedor is not null"
             )) {
                 while (rst.next()) {
-
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataemissao"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("datavencimento"), rst.getDouble("valor"));
+                    
+                    String numParcela = rst.getString("parcela");
+                    
+                    if ((numParcela != null)
+                            && (!numParcela.trim().isEmpty())) {
+                        parc.setNumeroParcela(Utils.stringToInt(numParcela.substring(numParcela.indexOf("/"))));
+                    } else {
+                        parc.setNumeroParcela(1);
+                    }
+                    
+                    parc.setObservacao(numParcela);
+                    
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
