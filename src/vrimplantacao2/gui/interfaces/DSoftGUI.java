@@ -203,7 +203,7 @@ public class DSoftGUI extends VRInternalFrame {
                     }
 
                     ProgressBar.dispose();
-                    Util.exibirMensagem("Importação Interagem 2 realizada com sucesso!", getTitle());
+                    Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());

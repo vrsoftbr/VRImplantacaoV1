@@ -18,8 +18,11 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -28,6 +31,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -64,7 +68,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(
-                            rst.getString("codigo"), rst.getString("CNPJFIL") + " - " + rst.getString("NOMFIL")));
+                            rst.getString("codigo"), rst.getString("nome") + " - " + rst.getString("cnpj")));
                 }
             }
         }
@@ -116,7 +120,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(new MapaTributoIMP(
                             id,
                             id,
-                            rst.getInt("cst"),
+                            Utils.stringToInt(rst.getString("cst")),
                             rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
                         )
@@ -142,7 +146,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(new MapaTributoIMP(
                             id,
                             id,
-                            rst.getInt("cst_entrada"),
+                            Utils.stringToInt(rst.getString("cst_entrada")),
                             rst.getDouble("aliquota_entrada"),
                             rst.getDouble("reducao_entrada")
                         )
@@ -159,7 +163,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                    OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
@@ -271,7 +275,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    e.cod_cest as cest,\n"
                     + "    e.cst,\n"
                     + "    e.icm,\n"
-                    + "    e.perc_reducao_icms,\n"
+                    + "    e.perc_reducao_icms as reducao,\n"
                     + "    e.cst_entrada,\n"
                     + "    e.icms_entrada,\n"
                     + "    e.red_bc_entrada as reducao_entrada,\n"
@@ -296,7 +300,12 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
-                    imp.setValidade(rst.getInt("validade"));
+                    
+                    if ((rst.getString("validade") != null)
+                            && (!rst.getString("validade").trim().isEmpty())) {
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+                                        
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -401,6 +410,124 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    distinct\n"
+                    + "    e.cod_ncm as ncm,\n"
+                    + "    e.cst as cst_debito,\n"
+                    + "    coalesce(e.icm, 0) as aliquota_debito,\n"
+                    + "    coalesce(e.perc_reducao_icms, 0) as reducao_debito,\n"
+                    + "    e.cst_entrada as cst_credito,\n"
+                    + "    coalesce(e.icms_entrada, 0) as aliquota_credito,\n"
+                    + "    coalesce(e.red_bc_entrada, 0) as reducao_credito,\n"
+                    + "    e.PERC_MVA_COMPRA as mva\n"
+                    + "from estoque e\n"
+                    + "where coalesce(e.PERC_MVA_COMPRA, 0) > 0\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setId(rst.getString("ncm")
+                            + rst.getString("cst_debito")
+                            + rst.getString("aliquota_debito")
+                            + rst.getString("reducao_debito")
+                            + rst.getString("cst_credito")
+                            + rst.getString("aliquota_credito")
+                            + rst.getString("reducao_credito")
+                            + rst.getString("mva")
+                    );
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setIva(rst.getDouble("mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setUf(Parametros.get().getUfPadraoV2().getSigla());
+
+                    int cstSaida = rst.getInt("cst_debito");
+                    double aliquotaSaida = rst.getDouble("aliquota_debito");
+                    double reduzidoSaida = rst.getDouble("reducao_debito");
+                    int cstEntrada = rst.getInt("cst_credito");
+                    double aliquotaEntrada = rst.getDouble("aliquota_credito");
+                    double reduzidoEntrada = rst.getDouble("reducao_credito");
+
+                    if (aliquotaSaida > 0 && reduzidoSaida == 0) {
+                        cstSaida = 0;
+                    }
+                    if (aliquotaEntrada > 0 && reduzidoEntrada == 0) {
+                        cstEntrada = 0;
+                    }
+
+                    if (aliquotaSaida > 0 && reduzidoSaida > 0) {
+                        cstSaida = 20;
+                    }
+                    if (aliquotaEntrada > 0 && reduzidoEntrada > 0) {
+                        cstEntrada = 20;
+                    }
+
+                    imp.setAliquotaDebito(cstSaida, aliquotaSaida, reduzidoSaida);
+                    imp.setAliquotaDebitoForaEstado(cstSaida, aliquotaSaida, reduzidoSaida);
+                    imp.setAliquotaCredito(cstEntrada, aliquotaEntrada, reduzidoEntrada);
+                    imp.setAliquotaCreditoForaEstado(cstEntrada, aliquotaEntrada, reduzidoEntrada);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.EXCECAO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "    e.codigo as id,\n"
+                        + "    e.cod_ncm as ncm,\n"
+                        + "    e.cst as cst_debito,\n"
+                        + "    coalesce(e.icm, 0) as aliquota_debito,\n"
+                        + "    coalesce(e.perc_reducao_icms, 0) as reducao_debito,\n"
+                        + "    e.cst_entrada as cst_credito,\n"
+                        + "    coalesce(e.icms_entrada, 0) as aliquota_credito,\n"
+                        + "    coalesce(e.red_bc_entrada, 0) as reducao_credito,\n"
+                        + "    e.PERC_MVA_COMPRA as mva\n"
+                        + "from estoque e\n"
+                        + "where coalesce(e.PERC_MVA_COMPRA, 0) > 0\n"
+                        + "order by 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        
+                        String id_pautafiscal = rst.getString("ncm")
+                                + rst.getString("cst_debito")
+                                + rst.getString("aliquota_debito")
+                                + rst.getString("reducao_debito")
+                                + rst.getString("cst_credito")
+                                + rst.getString("aliquota_credito")
+                                + rst.getString("reducao_credito")
+                                + rst.getString("mva");
+
+                        imp.setPautaFiscalId(id_pautafiscal);
+
+                        result.add(imp);                        
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
+    }
+
+    
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -416,7 +543,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.rg, \n"
                     + "    f.contato,\n"
                     + "    f.endereco,\n"
-                    + "    f.num_endereco,\n"
+                    + "    f.num_endereco as numero,\n"
                     + "    f.bairro,\n"
                     + "    f.cidade as municipio,\n"
                     + "    f.uf,\n"
@@ -602,7 +729,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
-                    imp.setFantasia(rst.getString(imp.getFantasia()));
+                    imp.setFantasia(imp.getRazao());
 
                     if ((rst.getString("cnpj") != null)
                             && (!rst.getString("cnpj").trim().isEmpty())) {
@@ -636,7 +763,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setFax(rst.getString("fax"));
                     imp.setEmail(rst.getString("email"));
-                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setValorLimite(rst.getDouble("valorlimite") > 100000000 ? 0 : rst.getDouble("valorlimite"));
 
                     if (imp.getValorLimite() > 0) {
                         imp.setPermiteCheque(true);
@@ -690,13 +817,13 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.codigo as id,\n"
                     + "    r.codcliente as idcliente,\n"
                     + "    r.documento,\n"
-                    + "    r.numparcela,\n"
+                    + "    r.numparcela as parcela,\n"
                     + "    r.dataemissao,\n"
                     + "    r.datavencimento,\n"
                     + "    r.historico,\n"
                     + "    r.valorrecebido\n"
                     + "from receber r\n"
-                    + "where r.codigo not in (select cod_receber from recebido)\n"
+                    + "where r.valorrecebido is null\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
