@@ -285,7 +285,7 @@ public class NotaSaidaNfceDAO {
                 Element vDescUn = (Element) prod.getElementsByTagName("vDesc").item(0);
                 Element cEAN = (Element) prod.getElementsByTagName("cEAN").item(0);
                 Element uCom = (Element) prod.getElementsByTagName("uCom").item(0);
-                String unidadeMedida = uCom.getTextContent().substring(0, 2);
+                String unidadeMedida = Utils.acertarTexto(uCom.getTextContent(), 2);
 
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
