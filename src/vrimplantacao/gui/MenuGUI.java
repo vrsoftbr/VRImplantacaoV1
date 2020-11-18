@@ -263,6 +263,7 @@ import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
+import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
@@ -678,6 +679,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSolido = new javax.swing.JMenuItem();
         mnuMaster = new javax.swing.JMenuItem();
         mnuGDI = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        mnuDSoft = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1720,6 +1723,18 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFirebird2.add(mnuGDI);
 
         mnuDatabase.add(mnuFirebird2);
+
+        jMenu2.setText("Firebird / Interbase 3");
+
+        mnuDSoft.setText("DSoft");
+        mnuDSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDSoftActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuDSoft);
+
+        mnuDatabase.add(jMenu2);
 
         mnuDB2.setText("IBM DB2");
 
@@ -4929,6 +4944,11 @@ public final class MenuGUI extends VRMdiFrame {
         GDIGUI.exibir(this);
     }//GEN-LAST:event_mnuGDIActionPerformed
 
+    private void mnuDSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDSoftActionPerformed
+        // TODO add your handling code here:
+        DSoftGUI.exibir(this);
+    }//GEN-LAST:event_mnuDSoftActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -4939,6 +4959,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu jMenu13;
     private javax.swing.JMenu jMenu14;
     private javax.swing.JMenu jMenu15;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu6;
@@ -5066,6 +5087,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuDB2;
     private javax.swing.JMenuItem mnuDJSystem;
     private javax.swing.JMenuItem mnuDLink;
+    private javax.swing.JMenuItem mnuDSoft;
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
     private javax.swing.JMenuItem mnuDelRegistro;
