@@ -38,6 +38,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
+        tabProdutos.carregarParametros(params, SISTEMA);
         txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
         txtSCO.setArquivo(params.getWithNull("C:\\SHI\\DADOS\\SCO.FDB", SISTEMA, "SCO"));
         txtCLI.setArquivo(params.getWithNull("C:\\SHI\\DADOS\\CLI.FDB", SISTEMA, "CLI"));
@@ -52,6 +53,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
+        tabProdutos.gravarParametros(params, SISTEMA);
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtSCO.getArquivo(), SISTEMA, "SCO");
         params.put(txtCLI.getArquivo(), SISTEMA, "CLI");
@@ -382,6 +384,7 @@ public class ShiGUI_v2 extends VRInternalFrame {
                         }
                     }
 
+                    gravarParametros();
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
