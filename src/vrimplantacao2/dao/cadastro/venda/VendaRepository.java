@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,8 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStack;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStackProvider;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
@@ -605,17 +608,10 @@ public class VendaRepository {
         item.setValorDesconto(imp.getValorDesconto());
         item.setValorAcrescimo(imp.getValorAcrescimo());
         
-        Icms aliquota = provider.getAliquota(imp.getIcmsCst(), imp.getIcmsAliq(), imp.getIcmsReduzido());
+        Icms aliquota = provider.getAliquota(imp.getIcmsAliquotaId());
+        if (aliquota == null) aliquota = provider.getAliquota(imp.getIcmsCst(), imp.getIcmsAliq(), imp.getIcmsReduzido());
         if (aliquota != null) {
-            
-            //if ((aliquota.getId() == 28) || (aliquota.getId() == 34)) {
-            //    item.setId_aliquota(7); // SUBSTITUIDO
-            //} else if ((aliquota.getId() == 33) || (aliquota.getId() == 45)) {
-            //    item.setId_aliquota(6); // ISENTO
-            //} else { //ISSO FOI FEITO POR MERCADINHO PIRATINGA, POR EXISTEM 3 CADASTROS DE SUBS E ISENTO
             item.setId_aliquota(aliquota.getId());
-            //}
-            
         } else {
             LOG.warning(String.format(
                     "Aliquota CST: %03d Aliq: %.2f Red: %.2f não "
@@ -625,10 +621,6 @@ public class VendaRepository {
                     imp.getIcmsReduzido()
             ));
             item.setId_aliquota(provider.getIsento().getId());
-        }
-        
-        if(item.getId_aliquota() != 0 && imp.getIdAliquota() != 0) {
-            item.setId_aliquota(imp.getIdAliquota());
         }
         
         item.setCancelado(imp.isCancelado() || cupomCancelado);

@@ -1,5 +1,6 @@
 package vrimplantacao2.utils.sql;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import org.junit.Test;
@@ -104,6 +105,32 @@ public class SQLUtilsTest {
         assertEquals("log001venda0820", stms.get(0));
         
         System.out.println("OK");
+    }
+    
+    @Test
+    public void testIntervalosMensais() throws Exception {
+        System.out.print("SQLUtilsTest.testIntervalosMensais()...");
+        
+        List<SQLUtils.Intervalo> intervalos = SQLUtils.intervalosMensais(
+                FORMAT.parse("2019-11-24"),
+                FORMAT.parse("2020-04-14")
+        );
+        
+        assertEquals(6, intervalos.size());
+        testIntervalor(intervalos.get(0), "2019-11-24", "2019-11-30");
+        testIntervalor(intervalos.get(1), "2019-12-01", "2019-12-31");
+        testIntervalor(intervalos.get(2), "2020-01-01", "2020-01-31");
+        testIntervalor(intervalos.get(3), "2020-02-01", "2020-02-29");
+        testIntervalor(intervalos.get(4), "2020-03-01", "2020-03-31");
+        testIntervalor(intervalos.get(5), "2020-04-01", "2020-04-14");
+        
+        System.out.println("OK");
+    }
+    
+    private SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public void testIntervalor(SQLUtils.Intervalo intervalo, String dataInicial, String dataFinal) throws ParseException {
+        assertEquals(FORMAT.format(intervalo.dataInicial), dataInicial);
+        assertEquals(FORMAT.format(intervalo.dataFinal),dataFinal);
     }
     
 }
