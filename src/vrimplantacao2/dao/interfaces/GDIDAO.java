@@ -93,12 +93,7 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	cod_aliquota id,\n" +
-                    "	percentual,\n" +
-                    "	descricao\n" +
-                    "from \n" +
-                    "	aliquota")) {
+                    "")) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("percentual").trim(), rs.getString("descricao")));
                 }
