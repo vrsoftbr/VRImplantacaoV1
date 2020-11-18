@@ -995,7 +995,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    v.tipo_lancamento,\n"
                     + "    v.tipo_ecf,\n"
                     + "    v.nfce_chave\n"
-                    + "from venda v"
+                    + "from venda v\n"
                     + "where v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -1042,6 +1042,8 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "-"
                                 + rst.getString("item")
                                 + "-"
+                                + rst.getString("codvenda")
+                                + "-"
                                 + rst.getString("datavenda");
 
                         String idVenda = rst.getString("idvenda");
@@ -1052,7 +1054,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("qtde"));
                         next.setTotalBruto(rst.getDouble("totaliten"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
+                        //next.setValorDesconto(rst.getDouble("desconto"));
                         //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getInt("cancelado") == 1);
                         //next.setCodigoBarras(rst.getString("codigobarras"));
@@ -1162,7 +1164,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    i.aliq_pis,\n"
                     + "    i.aliq_cofins,\n"
                     + "    i.tipo_lancamento\n"
-                    + "from itemvenda i"
+                    + "from itemvenda i\n"
                     + "where i.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
