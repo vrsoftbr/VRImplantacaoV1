@@ -23,9 +23,9 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
         );
         if (dataInicial == null) throw new NullPointerException("Informe a data inicial");
         if (dataTermino == null) throw new NullPointerException("Informe a data final");
-        //log001venda0820        
-        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(Utils.stringToInt(idLoja), dataInicial), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
-            this.addStatement(statement);
+        //log001venda0820
+        for (SQLUtils.Intervalo intervalo: SQLUtils.intervalosMensais(dataInicial, dataTermino)) {
+            this.addStatement(getFullSQL(Utils.stringToInt(idLoja), intervalo));
         }
         
     }
@@ -35,50 +35,89 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
         return String.format("log%03dvenda%s", idLoja, TABLE_NAME_DATE.format(dataInicial));
     }
     
-    private String getFullSQL(int idLoja, Date dataInicial) {
-        return
-            "select\n" +
-            "	v.cupom,\n" +
-            "	v.caixa,\n" +
-            "	v.data,\n" +
-            "	max(codcli) id_clientepreferencial,\n" +
-            "	min(hora) horainicio,\n" +
-            "	max(hora) horatermino,\n" +
-            "	min(\n" +
-            "		case\n" +
-            "			when reproccanc is null then 0\n" +
-            "			else 1\n" +
-            "		end\n" +
-            "	) cancelado,\n" +
-            "	sum(coalesce(total,0)) subtotalimpressora,\n" +
-            "	sum(coalesce(desconto,0)) valorDesconto,\n" +
-            "	sum(coalesce(acrescimo,0)) valorAcrescimo,\n" +
-            "	min(cx.serie) serie,\n" +
-            "	min(nf.chv_cfe) chave\n" +
-            "from\n" +
-            "	" + getNomeTabela(idLoja, dataInicial) + " v\n" +
-            "	left join (\n" +
-            "		select\n" +
-            "			distinct\n" +
-            "			caixa,\n" +
-            "			serie\n" +
-            "		from\n" +
-            "			cadecf_faixa cf\n" +
-            "		where\n" +
-            "			cf.filial = " + idLoja + "\n" +
-            "	) cx on\n" +
-            "		v.caixa = cx.caixa\n" +
-            "	left join " + getNomeTabela(idLoja, dataInicial) + "nf nf on\n" +
-            "		v.cupom = nf.cupom and \n" +
-            "		v.caixa = nf.caixa and\n" +
-            "		v.`data` = nf.`data` and\n" +
-            "		cast(cx.serie as SIGNED) = cast(nf.serie as SIGNED)\n" +
-            "where\n" +
-            "	v.data between '{DATA_INICIO}' and '{DATA_TERMINO}'\n" +
-            "group by\n" +
-            "	v.cupom,\n" +
-            "	v.caixa,\n" +
-            "	v.data";
+    private String getFullSQL(int idLoja, SQLUtils.Intervalo intervalo) {
+        boolean nfExiste = false;
+        try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select * from information_schema.TABLES t where TABLE_NAME = '" + getNomeTabela(idLoja, intervalo.dataInicial) + "nf'"
+            )) {
+                nfExiste = rs.next();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        if (nfExiste) {
+            return
+                "select\n" +
+                "	v.cupom,\n" +
+                "	v.caixa,\n" +
+                "	v.data,\n" +
+                "	max(codcli) id_clientepreferencial,\n" +
+                "	min(hora) horainicio,\n" +
+                "	max(hora) horatermino,\n" +
+                "	min(\n" +
+                "		case\n" +
+                "			when v.datahoracancelamentoitem is null then 0\n" +
+                "			else 1\n" +
+                "		end\n" +
+                "	) cancelado,\n" +
+                "	sum(coalesce(total,0)) subtotalimpressora,\n" +
+                "	sum(coalesce(desconto,0)) valorDesconto,\n" +
+                "	sum(coalesce(acrescimo,0)) valorAcrescimo,\n" +
+                "	min(cx.serie) serie,\n" +
+                "	min(nf.chv_cfe) chave\n" +
+                "from\n" +
+                "	" + getNomeTabela(idLoja, intervalo.dataInicial) + " v\n" +
+                "	left join (\n" +
+                "		select\n" +
+                "			distinct\n" +
+                "			caixa,\n" +
+                "			serie\n" +
+                "		from\n" +
+                "			cadecf_faixa cf\n" +
+                "		where\n" +
+                "			cf.filial = " + idLoja + "\n" +
+                "	) cx on\n" +
+                "		v.caixa = cx.caixa\n" +
+                "	left join " + getNomeTabela(idLoja, intervalo.dataInicial) + "nf nf on\n" +
+                "		v.cupom = nf.cupom and \n" +
+                "		v.caixa = nf.caixa and\n" +
+                "		v.`data` = nf.`data` and\n" +
+                "		cast(cx.serie as SIGNED) = cast(nf.serie as SIGNED)\n" +
+                "where\n" +
+                "	v.data between '" + format.format(intervalo.dataInicial) + "' and '" + format.format(intervalo.dataFinal) + "'\n" +
+                "group by\n" +
+                "	v.cupom,\n" +
+                "	v.caixa,\n" +
+                "	v.data";
+        } else {
+            return
+                "select\n" +
+                "	v.cupom,\n" +
+                "	v.caixa,\n" +
+                "	v.data,\n" +
+                "	max(codcli) id_clientepreferencial,\n" +
+                "	min(hora) horainicio,\n" +
+                "	max(hora) horatermino,\n" +
+                "	min(\n" +
+                "		case\n" +
+                "			when v.datahoracancelamentoitem is null then 0\n" +
+                "			else 1\n" +
+                "		end\n" +
+                "	) cancelado,\n" +
+                "	sum(coalesce(total,0)) subtotalimpressora,\n" +
+                "	sum(coalesce(desconto,0)) valorDesconto,\n" +
+                "	sum(coalesce(acrescimo,0)) valorAcrescimo\n" +
+                "from\n" +
+                "	" + getNomeTabela(idLoja, intervalo.dataInicial) + " v\n" +
+                "where\n" +
+                "	v.data between '" + format.format(intervalo.dataInicial) + "' and '" + format.format(intervalo.dataFinal) + "'\n" +
+                "group by\n" +
+                "	v.cupom,\n" +
+                "	v.caixa,\n" +
+                "	v.data";
+        }
     }
     
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

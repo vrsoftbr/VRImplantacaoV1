@@ -36,6 +36,7 @@ import vrimplantacao.vo.vrimplantacao.ProdutoComplementoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -54,6 +55,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -139,6 +141,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PRODUTOS_BALANCA,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.DATA_CADASTRO,
                     OpcaoProduto.TIPO_EMBALAGEM_EAN,
                     OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
@@ -168,7 +171,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
                     OpcaoProduto.EXCECAO,
-                    OpcaoProduto.DESCONTINUADO
+                    OpcaoProduto.DESCONTINUADO,
+                    OpcaoProduto.ASSOCIADO
                 }
         ));
     }
@@ -207,6 +211,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     if (cods.length == 1) {
                         MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+
                         imp.setId(cods[0]);
                         imp.setDescricao(rst.getString("descri"));
                         mercs.put(imp, imp.getId());
@@ -215,8 +220,12 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         mercs.put(mercs.get(cods[0])
                                 .addFilho(cods[1], rst.getString("descri")), cods[0], cods[1]);
                     } else if (cods.length == 3) {
-                        mercs.put(mercs.get(cods[0], cods[1])
+                        if(mercs.get(cods[0], cods[1]) == null) {
+                            continue;
+                        } else {
+                            mercs.put(mercs.get(cods[0], cods[1])
                                 .addFilho(cods[2], rst.getString("descri")), cods[0], cods[1], cods[2]);
+                        }
                     } else if (cods.length == 4) {
                         mercs.put(mercs.get(cods[0], cods[1], cods[2])
                                 .addFilho(cods[3], rst.getString("descri")), cods[0], cods[1], cods[2], cods[3]);
@@ -565,12 +574,12 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select "
+                        /*"select "
                         + "codigo, "
                         + "codassoc, "
                         + "qtdassoc "
-                        + "from produtos "
-                /*"select\n"
+                        + "from produtos "*/
+                        "select\n"
                         + "    e.codpro,\n"
                         + "    e.saldoatu,\n"
                         + "    e.saldoant,\n"
@@ -586,15 +595,19 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "         group by\n"
                         + "             codpro, filial) a using (codpro, filial, data)\n"
                         + "where\n"
-                        + "    e.filial = " + getLojaOrigem()*/
+                        + "    e.filial = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
+                        
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("codigo"));
+                        imp.setImportId(rst.getString("codpro"));
+                        imp.setEstoque(rst.getDouble("saldoatu"));
+                        
+                        result.add(imp);
 
-                        try (ResultSet rst2 = stm.executeQuery(
+                        /*try (ResultSet rst2 = stm.executeQuery(
                                 "SELECT first 1 saldoatu\n"
                                 + "  FROM ESTOQUE\n"
                                 + " WHERE CODPRO in (" + rst.getString("codassoc") + ")\n"
@@ -606,7 +619,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                 imp.setEstoque(rst2.getDouble("saldoatu") / rst.getDouble("qtdassoc"));
                                 result.add(imp);
                             }
-                        }
+                        }*/
                     }
                 }
             }
@@ -920,7 +933,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "     f.cepxxx cep, \n"
                         + "     f.dtcada datacadastro, \n"
                         + "     f.observ observacao, \n"
-                        + "     f.entreg prazoEntrega, \n"
+                        + "     f.entreg prazoEntrega,\n"
                         + "     case f.simples when 'S' then 1 else 0 end simples,\n"
                         + "     f.endcob as enderecocobranca,\n"
                         + "     f.baicob as bairrocobranca,\n"
@@ -1642,6 +1655,42 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
     }
+    
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = sco.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n" +
+                    "	pf.codigo idpai,\n" +
+                    "	pf.codassoc idfilho,\n" +
+                    "	pp.EMBALA qtdembpai,\n" +
+                    "	pf.qtdassoc qtdembfilho,\n" +
+                    "	pp.descri descpai,\n" +
+                    "	pf.descri descfilho,\n" +
+                    "	pf.CUSASSOC,\n" +
+                    "	pf.PREASSOC\n" +
+                    "FROM \n" +
+                    "	produtos pp \n" +
+                    "INNER JOIN produtos pf ON pp.codigo = pf.codassoc\n" +
+                    "WHERE \n" +
+                    "	pf.codigo != pf.CODASSOC"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    
+                    imp.setId(rst.getString("idpai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembpai"));
+                    imp.setProdutoAssociadoId(rst.getString("idfilho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtdembfilho"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
@@ -1711,7 +1760,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
                     + "    and p.datapago is null\n"
                     + "     and p.saldev > 0\n"
-                    + "     and p.autorizado = 'S' \n"
+                    + "     and p.autorizado = 'N' \n"
                     + "order by\n"
                     + "    p.sequen"
             )) {

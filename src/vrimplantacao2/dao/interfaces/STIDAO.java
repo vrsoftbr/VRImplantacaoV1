@@ -519,53 +519,55 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "  cp.codigo id,\n" +
-                    "  cp.parcela,\n" +
-                    "  cp.competencia data,\n" +
-                    "  cp.vencimento,\n" +
-                    "  cp.valor,\n" +
-                    "  coalesce(cp.codcompra, cc.documento) doc,\n" +
-                    "  coalesce(c.codfor, cc.codfor) idfornecedor,\n" +
-                    "  cc.historico,\n" +
-                    "  cp.pago,\n" +
-                    "  'compras'\n" +
-                    "from\n" +
-                    "  cond_pagto_pagar cp\n" +
-                    "left join compras c on cp.codcompra = c.codigo\n" +
-                    "left join contas_pagar cc on cp.codcontaspagar = cc.codigo\n" +
-                    "where\n" +
-                    "  pago = false\n" +
-                    "union\n" +
-                    "select\n" +
-                    "  cp.codigo id,\n" +
-                    "  parcela,\n" +
-                    "  dataemissao data,\n" +
-                    "  cc.vencimento,\n" +
-                    "  cc.valor,\n" +
-                    "  cp.documento doc,\n" +
-                    "  codfor idfornecedor,\n" +
-                    "  cp.historico,\n" +
-                    "  cc.pago,\n" +
-                    "  'conta pagar'\n" +
-                    "from\n" +
-                    "  contas_pagar cp\n" +
-                    "left join cond_pagto_pagar cc on cp.codigo = cc.codcontaspagar\n" +
-                    "where\n" +
-                    "  pago = false\n" +
-                    "order by\n" +
-                    "  id")) {
+                    "select distinct `cond_pagto_pagar`.`codigo` AS `codigo`,\n" +
+                    "         ifnull(`compras`.`numDocto`,`contas_pagar`.`documento`) AS `numdocto`,\n" +
+                    "         `contas_pagar`.`codigo` AS `codcontpagar`,\n" +
+                    "         `contas_pagar`.`historico` AS `historico`,\n" +
+                    "         `cond_pagto_pagar`.`codContasPagar` AS `codcontaspagar`,\n" +
+                    "         `cond_pagto_pagar`.`codCompra` AS `codcompra`,\n" +
+                    "         `cond_pagto_pagar`.`parcela` AS `parcela`,\n" +
+                    "         `cond_pagto_pagar`.`vencimento` AS `vencimento`,\n" +
+                    "         `cond_pagto_pagar`.`valor` AS `valor`,\n" +
+                    "         `cond_pagto_pagar`.`codFormaPagto` AS `codformapagto`,\n" +
+                    "         `cond_pagto_pagar`.`dataPagto` AS `datapagto`,\n" +
+                    "         `cond_pagto_pagar`.`juros` AS `juros`,\n" +
+                    "         `cond_pagto_pagar`.`multa` AS `multa`,\n" +
+                    "         `cond_pagto_pagar`.`pago` AS `pago`,\n" +
+                    "         `cond_pagto_pagar`.`valorPagto` AS `valorpagto`,\n" +
+                    "         `cond_pagto_pagar`.`desconto` AS `desconto`,\n" +
+                    "         ifnull(`contas_pagar`.`codEmp`,`compras`.`codEmp`) AS `codemp`,\n" +
+                    "         `formapagto`.`descricao` AS `descformapagto`,\n" +
+                    "         ifnull(`fornecedores`.`razao`,`fornecedores_1`.`razao`) AS `forrazao`,\n" +
+                    "         ifnull(`fornecedores`.`codigo`,`fornecedores_1`.`codigo`) AS `forcod`,\n" +
+                    "         ifnull(`compras`.`dataEmissao`,`contas_pagar`.`dataEmissao`) AS `data`,\n" +
+                    "         (to_days(`cond_pagto_pagar`.`vencimento`) - to_days(`cond_pagto_pagar`.`dataPagto`)) AS `atraso`,\n" +
+                    "         `plano_contas`.`codigo` AS `codplanoconta`,\n" +
+                    "         `plano_contas`.`descricao` AS `descricao`,\n" +
+                    "         `cond_pagto_pagar`.`habilitado` AS `habilitado`\n" +
+                    "from     (((((`cond_pagto_pagar`\n" +
+                    "left join (`compras`\n" +
+                    "left join `fornecedores` on((`compras`.`codFor` = `fornecedores`.`codigo`))) on((`cond_pagto_pagar`.`codCompra` = `compras`.`codigo`)))\n" +
+                    "left join `contas_pagar` on((`cond_pagto_pagar`.`codContasPagar` = `contas_pagar`.`codigo`)))\n" +
+                    "join     `plano_contas`  on(((`cond_pagto_pagar`.`codConta` = `plano_contas`.`codigo`)\n" +
+                    "         and (`plano_contas`.`gerarFinanceiro` is true))))\n" +
+                    "left join `fornecedores` `fornecedores_1` on((`contas_pagar`.`codFor` = `fornecedores_1`.`codigo`)))\n" +
+                    "left join `formapagto`                    on((`formapagto`.`codigo` = `cond_pagto_pagar`.`codFormaPagto`)))\n" +
+                    "where    ((`cond_pagto_pagar`.`provisao` is false)\n" +
+                    "         and (`cond_pagto_pagar`.`pago` is false)\n" +
+                    "         and ((`compras`.`liberado` is true)\n" +
+                    "         or (`contas_pagar`.`codigo` > 0)))\n" +
+                    "         and ifnull(`contas_pagar`.`codEmp`,`compras`.`codEmp`) = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     
-                    imp.setId(rs.getString("id"));
-                    imp.setNumeroDocumento(rs.getString("doc"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setId(rs.getString("codigo"));
+                    imp.setNumeroDocumento(rs.getString("numdocto"));
+                    imp.setIdFornecedor(rs.getString("forcod"));
                     imp.setDataEmissao(rs.getDate("data"));
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
                     
                     parc.setNumeroParcela(Utils.stringToInt(rs.getString("parcela"), 1));
-                    parc.setObservacao(rs.getString("historico"));
+                    parc.setObservacao(rs.getString("historico") == null ? "" : rs.getString("historico"));
                     
                     result.add(imp);
                 }
@@ -673,7 +675,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  vendas v left join clientes c on v.codcli = c.codigo_cliente\n" +
                         "where\n" +
                         "  v.codemp = " + idLojaCliente + " and\n" +
-                        "  v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
+                        "  v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and troca = false";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
