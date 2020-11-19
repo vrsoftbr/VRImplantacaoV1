@@ -480,6 +480,11 @@ public class VendaRepository {
                     provider.notificar();
 
                 }
+                
+                if (!haDivergencia) {
+                    provider.gerarConsistencia();
+                }
+                
                 //</editor-fold>
                 provider.commit();
             } catch (Exception e) {
