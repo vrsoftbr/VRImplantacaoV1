@@ -340,7 +340,11 @@ public class ProdutoComplementoDAO {
                 }
             }
             if (opt.contains(OpcaoProduto.TROCA)) {
-                sql.put("troca", complemento.getTroca());
+                if (opt.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {
+                    sql.putSql("troca", String.format(Locale.US, "troca + (%.2f)", complemento.getTroca()));
+                } else {
+                    sql.put("troca", complemento.getTroca());
+                }                
             }
             if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
                 sql.put("estoqueminimo", complemento.getEstoqueMinimo());

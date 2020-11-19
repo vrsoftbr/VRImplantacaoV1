@@ -30,11 +30,18 @@ public class VendaImpDao {
 
     /**
      * Retorna uma listagem com todas as {@link VendaIMP} do banco de dados implantação.
+     * @param limit
+     * @param offSet
      * @return Lista com as vendas encontradas.
      * @throws java.sql.SQLException Caso ocorra um erro.
      */
-    public Iterator<VendaIMP> getVendas() throws SQLException {
-        QueryBuilder<VendaIMP, String> query = dao.queryBuilder().orderBy("id", true);
+    public Iterator<VendaIMP> getVendas(long limit, long offSet) throws SQLException {
+        QueryBuilder<VendaIMP, String> query = dao.queryBuilder()
+                .limit(limit)
+                .offset(offSet)
+                .orderBy("data", true)
+                .orderBy("ecf", true)
+                .orderBy("numerocupom", true);
         return query.iterator();
     }
     

@@ -179,8 +179,8 @@ public class VendaRepositoryProvider {
         return clienteEventualDAO.getClientesPorCnpj();
     }
 
-    public Iterator<VendaIMP> getVendaIMP() throws Exception {
-        return vendaImpDao.getVendas();
+    public Iterator<VendaIMP> getVendaIMP(long limit, long offSet) throws Exception {
+        return vendaImpDao.getVendas(limit, offSet);
     }
 
     public List<VendaItemIMP> getVendaItemIMP(String vendaId) throws Exception {

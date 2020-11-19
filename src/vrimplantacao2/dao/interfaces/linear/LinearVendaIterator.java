@@ -58,7 +58,7 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
                 "	max(hora) horatermino,\n" +
                 "	min(\n" +
                 "		case\n" +
-                "			when v.datahoracancelamentoitem is null then 0\n" +
+                "			when v.datahoracancelamentoitem is null and v.reproccanc = 0 then 0\n" +
                 "			else 1\n" +
                 "		end\n" +
                 "	) cancelado,\n" +
@@ -102,13 +102,15 @@ public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
                 "	max(hora) horatermino,\n" +
                 "	min(\n" +
                 "		case\n" +
-                "			when v.datahoracancelamentoitem is null then 0\n" +
+                "			when v.datahoracancelamentoitem is null and v.reproccanc = 0 then 0\n" +
                 "			else 1\n" +
                 "		end\n" +
                 "	) cancelado,\n" +
-                "	sum(coalesce(total,0)) subtotalimpressora,\n" +
+                "	sum(coalesce(v.total,0)) subtotalimpressora,\n" +
                 "	sum(coalesce(desconto,0)) valorDesconto,\n" +
-                "	sum(coalesce(acrescimo,0)) valorAcrescimo\n" +
+                "	sum(coalesce(acrescimo,0)) valorAcrescimo,\n" +
+                "	caixa serie,\n" +
+                "	null chave\n" +
                 "from\n" +
                 "	" + getNomeTabela(idLoja, intervalo.dataInicial) + " v\n" +
                 "where\n" +
