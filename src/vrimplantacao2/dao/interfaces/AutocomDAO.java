@@ -183,8 +183,7 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    p.numero as id,\n"
-                    + "    p.codigo,\n"
-                    + "    p.ean,\n"
+                    + "    p.codigo as ean,\n"
                     + "    case p.balanca when 'S' then 1 else 0 end balanca,\n"
                     + "    p.diasval as validade,\n"
                     + "    p.descricao as descricaocompleta,\n"
@@ -268,7 +267,36 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                            + " p.numero as id, \n"
+                            + " p.ean as ean, \n"
+                            + " p.unidade as tipoembalagem, \n"
+                            + " p.embalagem as qtdembalagem \n"
+                            + "from produto p \n"
+                            + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -293,7 +321,7 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.contato,\n"
                     + "    f.telvend,\n"
                     + "    f.email,\n"
-                    + "    case when f.status 'ATIVO' then 1 else 0 end situacaocadastro,\n"
+                    + "    case f.status when 'ATIVO' then 1 else 0 end situacaocadastro,\n"
                     + "    f.observacao\n"
                     + "from forneced f\n"
                     + "order by 1"

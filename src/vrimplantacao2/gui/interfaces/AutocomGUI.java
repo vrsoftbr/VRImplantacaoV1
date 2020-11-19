@@ -11,7 +11,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.interfaces.DSoftDAO;
+import vrimplantacao2.dao.interfaces.AutocomDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -27,7 +27,7 @@ public class AutocomGUI extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
-    private DSoftDAO dao = new DSoftDAO();
+    private AutocomDAO dao = new AutocomDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
