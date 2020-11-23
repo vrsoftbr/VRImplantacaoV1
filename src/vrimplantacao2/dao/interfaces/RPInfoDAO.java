@@ -591,22 +591,22 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			prod_codbarras ean,\n" +
                     "			prod_funcao unidade,\n" +
                     "			1 qtdembalagem,\n" +
-                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]',''),'')::bigint longean\n" +
+                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint longean\n" +
                     "		from\n" +
                     "			produtos\n" +
                     "		where			\n" +
-                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]',''),'')::bigint > 0\n" +
+                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint > 0\n" +
                     "		union\n" +
                     "		select\n" +
                     "			prod_codigo id,\n" +
                     "			prod_codcaixa ean,\n" +
                     "			prod_emb unidade,\n" +
                     "			prod_qemb qtdembalagem,\n" +
-                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]',''),'')::bigint longean\n" +
+                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint longean\n" +
                     "		from\n" +
                     "			produtos\n" +
                     "		where			\n" +
-                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]',''),'')::bigint > 0\n" +
+                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint > 0\n" +
                     "	) ean on ean.id = p.prod_codigo\n" +
                     "	left join piscofins_s on\n" +
                     "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
@@ -1020,7 +1020,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.forn_datacad datacadastro,\n"
                     + "	f.forn_obspedidos,\n"
                     + "	f.forn_obstrocas,\n"
-                    + "	f.forn_caractrib tipofornecedor,\n"
+                    + "	coalesce(f.forn_caractrib,'') tipofornecedor,\n"
                     + "	fc.rfor_pzentrega prazo_entrega,\n"
                     + "	fc.rfor_pzrecebimento prazo_recebimento,\n"
                     + "	fp.fpgt_prazos forma_pagamento\n"
