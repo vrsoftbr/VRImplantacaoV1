@@ -583,7 +583,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("documento")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf") == null ? "7" : rst.getString("ecf")));
                         next.setData(rst.getDate("emissao"));
                         
                         String horaInicio = rst.getString("hora");
@@ -602,21 +602,39 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.stm = ConexaoFirebird.getConexao().createStatement();
-            this.sql = "select \n" +
-                    "	v.cod_venda id,\n" +
-                    "	v.documento,\n" +
-                    "	v.dt_emissao emissao,\n" +
-                    "	v.cod_cliente idcliente,\n" +
-                    "	v.vl_produto valor,\n" +
-                    "	v.vl_total total,\n" +
-                    "	v.dh_inclusao hora,\n" +
-                    "	v.cod_sat ecf\n" +
+            this.sql = 
+                    "select \n" +
+                    "    v.cod_venda id,\n" +
+                    "    v.documento,\n" +
+                    "    v.dt_emissao emissao,\n" +
+                    "    v.cod_cliente idcliente,\n" +
+                    "    v.vl_total total,\n" +
+                    "    v.dh_inclusao hora,\n" +
+                    "    coalesce(v.cod_sat, 1) ecf,\n" +
+                    "    v.sn_sat_enviado,\n" +
+                    "    v.tipo_documento\n" +
                     "from\n" +
-                    "	venda v\n" +
+                    "    venda v\n" +
+                    "inner join\n" +
+                    "    (select\n" +
+                    "        max(cod_venda) id,\n" +
+                    "        coalesce(cod_sat, 1) ecf,\n" +
+                    "        documento,\n" +
+                    "        dt_emissao,\n" +
+                    "        cod_empresa\n" +
+                    "    from\n" +
+                    "        venda\n" +
+                    "     group by\n" +
+                    "        coalesce(cod_sat, 1),\n" +
+                    "        documento,\n" +
+                    "        dt_emissao,\n" +
+                    "        cod_empresa) b on v.cod_venda = b.id and\n" +
+                    "            coalesce(v.cod_sat, 1) = b.ecf and\n" +
+                    "            v.dt_emissao = b.dt_emissao and\n" +
+                    "            v.cod_empresa = b.cod_empresa\n" +
                     "where\n" +
-                    "	v.cod_empresa = " + idLojaCliente + " and\n" +
-                    "	v.dt_emissao between '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "' and\n" +
-                    "   v.sn_sat_enviado = 'N'";
+                    "    v.cod_empresa = " + idLojaCliente + " and\n" +
+                    "    v.dt_emissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -744,7 +762,7 @@ public class MasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     "inner join venda v on vp.cod_venda = v.cod_venda\n" +
                     "inner join produto p on vp.cod_produto = p.cod_produto\n" +
                     "where" +
-                    "	v.dt_emissao between '" + MasterDAO.VendaIterator.FORMAT.format(dataInicio) + "' and '" + MasterDAO.VendaIterator.FORMAT.format(dataTermino) + "' AND \n" +
+                    "	v.dt_emissao between '" + MasterDAO.VendaIterator.FORMAT.format(dataInicio) + "' and '" + MasterDAO.VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
                     "	v.cod_empresa = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
