@@ -58,6 +58,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean soAtivos = false;
     private Date dtOfertas;
     private boolean ignorarEnviaBalanca = false;
+    private boolean usarOfertasDoEncarte = false;
     private Set<String> finalizadorasRotativo;
     private Set<String> finalizadorasCheque;
     
@@ -246,6 +247,10 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setIgnorarEnviaBalanca(boolean ignorarEnviaBalanca) {
         this.ignorarEnviaBalanca = ignorarEnviaBalanca;
+    }
+
+    public void setUsarOfertasDoEncarte(boolean usarOfertasDoEncarte) {
+        this.usarOfertasDoEncarte = usarOfertasDoEncarte;
     }
 
     private static class Ean {
@@ -1182,18 +1187,36 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            String dataOferta = new SimpleDateFormat("yyyy-MM-dd").format(dtOfertas);
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "    oft.procod id_produto,\n"
-                    + "    oft.pprdatini datainicial,\n"
-                    + "    oft.pprdatfim datafinal,\n"
-                    + "    oft.pprprcprog precooferta\n"
-                    + "from\n"
-                    + "    preco_programado oft\n"
-                    + "where\n"
-                    + "    oft.pprdatfim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dtOfertas) + "'\n"
-                    + "order by\n"
-                    + "    id_produto"
+                    (
+                            usarOfertasDoEncarte ?
+                            "select\n"
+                            + "     cast(ep.PROCOD as integer) id_produto,\n"
+                            + "     cast('" + dataOferta + "' as date) as datainicial,\n"
+                            + "     cast(e.ENCDATFIM as date) datafinal,\n"
+                            + "     ep.ENCPROPRCOFE precooferta\n"
+                            + "from \n"
+                            + "     ENCARTE_PRODUTO ep\n"
+                            + "     join ENCARTE e on\n"
+                            + "		ep.ENCCOD = e.ENCCOD\n"
+                            + "where\n"
+                            + "     e.ENCDATFIM >= '" + dataOferta + "'\n"
+                            + "order by\n"
+                            + "     id_produto" :
+                                    
+                            "select distinct\n"
+                            + "    oft.procod id_produto,\n"
+                            + "    oft.pprdatini datainicial,\n"
+                            + "    oft.pprdatfim datafinal,\n"
+                            + "    oft.pprprcprog precooferta\n"
+                            + "from\n"
+                            + "    preco_programado oft\n"
+                            + "where\n"
+                            + "    oft.pprdatfim >= '" + dataOferta + "'\n"
+                            + "order by\n"
+                            + "    id_produto"
+                    )
             )) {
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
