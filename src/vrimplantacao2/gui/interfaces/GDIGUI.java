@@ -19,7 +19,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.GDIDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -37,7 +36,6 @@ public class GDIGUI extends VRInternalFrame {
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private int vTipoVenda = -1;
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -49,7 +47,6 @@ public class GDIGUI extends VRInternalFrame {
         txtSenhaFirebird.setText(params.getWithNull("", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
-        vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
     }
 
     private void gravarParametros() throws Exception {
