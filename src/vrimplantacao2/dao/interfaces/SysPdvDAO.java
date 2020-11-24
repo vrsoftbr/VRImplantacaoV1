@@ -1192,7 +1192,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     (
                             usarOfertasDoEncarte ?
                             "select\n"
-                            + "     cast(ep.PROCOD as integer) id_produto,\n"
+                            + "     ep.PROCOD id_produto,\n"
                             + "     cast('" + dataOferta + "' as date) as datainicial,\n"
                             + "     cast(e.ENCDATFIM as date) datafinal,\n"
                             + "     ep.ENCPROPRCOFE precooferta\n"
