@@ -274,6 +274,42 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  p.codpro id,\n" +
+                    "  p.descricao,\n" +
+                    "  e.codigobarras ean,\n" +
+                    "  e.codigobarrasfornecedor,\n" +
+                    "  p.unidade,\n" +
+                    "  p.qtdporcaixa qtdembalagem\n" +
+                    "from\n" +
+                    "  produtos p\n" +
+                    "left join produtos_empresas pe on p.codpro = pe.codprod\n" +
+                    "left join estoque e on p.codpro = e.codprod and\n" +
+                    "  e.codemp = pe.codemp\n" +
+                    "where\n" +
+                    "  pe.codemp = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setEan(rs.getString("codigobarrasfornecedor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         

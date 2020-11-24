@@ -262,6 +262,7 @@ import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterDataWShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
+import vrimplantacao2.gui.interfaces.AutocomGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
@@ -681,6 +682,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuGDI = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         mnuDSoft = new javax.swing.JMenuItem();
+        mnuAutocom = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1733,6 +1735,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu2.add(mnuDSoft);
+
+        mnuAutocom.setText("Autocom");
+        mnuAutocom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutocomActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuAutocom);
 
         mnuDatabase.add(jMenu2);
 
@@ -4949,6 +4959,11 @@ public final class MenuGUI extends VRMdiFrame {
         DSoftGUI.exibir(this);
     }//GEN-LAST:event_mnuDSoftActionPerformed
 
+    private void mnuAutocomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutocomActionPerformed
+        // TODO add your handling code here:
+        AutocomGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutocomActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5061,6 +5076,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAutoADM;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
+    private javax.swing.JMenuItem mnuAutocom;
     private javax.swing.JMenuItem mnuAutomaq;
     private javax.swing.JMenu mnuAvancadas;
     private javax.swing.JMenuItem mnuAvance;
