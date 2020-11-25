@@ -15,6 +15,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -98,7 +99,7 @@ public class PlenoKWDAO extends InterfaceDAO {
                 }
         ));
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -114,13 +115,12 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "	p.mcd01_flgbalanca as balanca,\n"
                     + "	p.mcd01_validade as validade,\n"
                     + "	p.mcd01_descricao as descricaocompleta,\n"
-                    + "	p.mcd01_descricao_curta as descricaoreduzida,	\n"
+                    + "	p.mcd01_descricao_curta as descricaoreduzida,\n"
                     + "	p.mcd01_flgativa as situacaocadastro,\n"
                     + "	p.mcd01_flgsazonal as sazonal,\n"
                     + "	pl.mcd03_flgativa_compra as descontinuado,\n"
                     + "	pl.mcd03_flgativa_venda as vendapdv,\n"
                     + "	p.mcd01_data_inclusao as datacadastro,\n"
-                    + "	p.mcd01_flgativa as situacaocadastro,\n"
                     + "	p.mcd01_dthr_ultima_alteracao as dataalteracao,\n"
                     + "	pl.mcd03_qtdestoque_maximo as estoquemaximo,\n"
                     + "	est.est06_qtd as estoque,\n"
@@ -171,11 +171,41 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "order by 1"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("mcd01_codint"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.seteBalanca(rst.getInt("balanca") == 1);
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setDescontinuado(rst.getInt("descontinuado") == 1);
+                    imp.setVendaPdv(rst.getInt("vendapdv") == 1);
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setTroca(rst.getDouble("estoquetroca"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setBeneficio(rst.getString("codigobeneficio"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -198,11 +228,18 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "order by 1"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("mcd01_codint"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -264,11 +301,82 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "order by 1"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
 
+                    if ((rst.getString("pessoafisica") != null)
+                            && (!rst.getString("pessoafisica").trim().isEmpty())) {
+                        imp.setRazao(rst.getString("nomepessoa"));
+                        imp.setFantasia(imp.getRazao());
+                        imp.setCnpj_cpf(rst.getString("cpf"));
+                    } else {
+                        imp.setRazao(rst.getString("razao"));
+                        imp.setFantasia(rst.getString("fantasia"));
+                        imp.setCnpj_cpf(rst.getString("cnpj"));
+                    }
+
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo(rst.getInt("situacaocadastro") == 1);
+                    imp.setPrazoEntrega(rst.getInt("com01_prazo_entrega_pedido"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setValor_minimo_pedido(rst.getDouble("pedidominimo"));
+
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addTelefone("FAX", rst.getString("fax"));
+                    }
+
+                    if ((rst.getString("com01_fone_comercial") != null)
+                            && (!rst.getString("com01_fone_comercial").trim().isEmpty())) {
+                        imp.addTelefone("FONE COMERCIAL", rst.getString("com01_fone_comercial"));
+                    }
+
+                    if ((rst.getString("com01_fone_financeiro") != null)
+                            && (!rst.getString("com01_fone_financeiro").trim().isEmpty())) {
+                        imp.addTelefone("FONE FINANCEIRO", rst.getString("com01_fone_financeiro"));
+                    }
+
+                    if ((rst.getString("com01_fone_vendedor") != null)
+                            && (!rst.getString("com01_fone_vendedor").trim().isEmpty())) {
+                        imp.addTelefone("FONE VENDEDOR", rst.getString("com01_fone_vendedor"));
+                    }
+
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.NFE);
+                    }
+
+                    if ((rst.getString("com01_email_financeiro") != null)
+                            && (!rst.getString("com01_email_financeiro").trim().isEmpty())) {
+                        imp.addEmail("EMAIL FINANCEIRO", rst.getString("com01_email_financeiro").toLowerCase(), TipoContato.FINANCEIRO);
+                    }
+
+                    if ((rst.getString("com01_email_comercial") != null)
+                            && (!rst.getString("com01_email_comercial").trim().isEmpty())) {
+                        imp.addEmail("EMAIL COMERCIAL", rst.getString("com01_email_comercial").toLowerCase(), TipoContato.COMERCIAL);
+                    }
+
+                    if ((rst.getString("com01_email_vendedor") != null)
+                            && (!rst.getString("com01_email_vendedor").trim().isEmpty())) {
+                        imp.addEmail("EMAIL VENDEDOR", rst.getString("com01_email_vendedor").toLowerCase(), TipoContato.COMERCIAL);
+                    }
+
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -287,10 +395,18 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "order by 2, 1"
             )) {
                 while (rst.next()) {
-
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    imp.setFatorEmbalagem(rst.getDouble("fatorconversao"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }

@@ -13,6 +13,7 @@ public class ProdutoFornecedorIMP {
     private String idFornecedor;
     private String idProduto;
     private String codigoExterno;
+    private double fatorEmbalagem = 1;
     private Date dataAlteracao = new Date();
     private double qtdEmbalagem = 1;
     private double pesoEmbalagem = 0;
@@ -115,6 +116,20 @@ public class ProdutoFornecedorIMP {
 
     public void setIdDivisaoFornecedor(String idDivisaoFornecedor) {
         this.idDivisaoFornecedor = idDivisaoFornecedor;
+    }
+
+    /**
+     * @return the fatorEmbalagem
+     */
+    public double getFatorEmbalagem() {
+        return fatorEmbalagem;
+    }
+
+    /**
+     * @param fatorEmbalagem the fatorEmbalagem to set
+     */
+    public void setFatorEmbalagem(double fatorEmbalagem) {
+        this.fatorEmbalagem = fatorEmbalagem;
     }
     
 }

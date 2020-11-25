@@ -307,12 +307,13 @@ public class ProdutoFornecedorDAO {
                             }
                             produtoFornecedor.setCodigoExterno(imp.getCodigoExterno());
                             produtoFornecedor.setPesoEmbalagem(imp.getPesoEmbalagem());
+                            produtoFornecedor.setFatorEmbalagem(imp.getFatorEmbalagem());
                             codigoExterno = produtoFornecedor.getCodigoExterno();
                             //</editor-fold>
 
                             //<editor-fold defaultstate="collapsed" desc="Gravando o ProdutoFornecedorVO">
                             
-                            if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {
+                            /*if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {
                                 SQLBuilder sql = new SQLBuilder();
                                 sql.setTableName("produtofornecedorprelancamento");
                                 sql.put("id_produto", produtoFornecedor.getProduto().getId());
@@ -331,6 +332,7 @@ public class ProdutoFornecedorDAO {
                                 sql.put("custoinicial", produtoFornecedor.getCustoTabela());
                                 sql.put("tipodesconto", 0);
                                 sql.put("id_divisaofornecedor", produtoFornecedor.getIdDivisaoFornecedor());
+                                sql.put("fatorembalagem", produtoFornecedor.getFatorEmbalagem());
                                 sql.getReturning().add("id");
                                 
                                 try (Statement stm = Conexao.createStatement()) {
@@ -342,7 +344,7 @@ public class ProdutoFornecedorDAO {
                                         }
                                     }
                                 }                                
-                            } else {
+                            } else {*/
                                 SQLBuilder sql = new SQLBuilder();
                                 sql.setTableName("produtofornecedor");
                                 sql.put("id_produto", produtoFornecedor.getProduto().getId());
@@ -366,6 +368,7 @@ public class ProdutoFornecedorDAO {
                                 sql.putNull("csosn");
                                 sql.put("fatorembalagem", 1);
                                 sql.put("id_divisaofornecedor", produtoFornecedor.getIdDivisaoFornecedor());
+                                sql.put("fatorembalagem", produtoFornecedor.getFatorEmbalagem());
                                 sql.getReturning().add("id");
 
                                 try (Statement stm = Conexao.createStatement()) {
@@ -377,7 +380,7 @@ public class ProdutoFornecedorDAO {
                                         }
                                     }
                                 }
-                            }
+                            //}
                             //</editor-fold>
 
                             //<editor-fold defaultstate="collapsed" desc="Inclui na listagem produtoFornecedorExistentes">
