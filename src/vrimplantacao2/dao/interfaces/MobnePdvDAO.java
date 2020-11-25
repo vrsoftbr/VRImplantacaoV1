@@ -55,7 +55,8 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select distinct\n" +
                     "	trib.situacaotributacao cst,\n" +
                     "	trib.percaliquota aliquota,\n" +
-                    "	trib.situacaosimples cst_simples\n" +
+                    "	trib.situacaosimples cst_simples,\n" +
+                    "   trib.percoutro reducao\n" +        
                     "from\n" +
                     "	tb_produto p\n" +
                     "	join tb_divisao dv on\n" +
@@ -80,13 +81,15 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                                 getCodigoTributacao(
                                         rs.getString("cst"),
                                         rs.getDouble("aliquota"),
-                                        rs.getString("cst_simples")                                        
+                                        rs.getString("cst_simples"),
+                                        rs.getDouble("reducao")
                                 ),
                                 String.format(
-                                        "CST: %s - ALIQ: %.2f - CSOSN: %s",
+                                        "CST: %s - ALIQ: %.2f - CSOSN: %s - RED: %.2f",
                                         rs.getString("cst"),
                                         rs.getDouble("aliquota"),
-                                        rs.getString("cst_simples") 
+                                        rs.getString("cst_simples"),
+                                        rs.getDouble("reducao")
                                 )
                             )
                     );
@@ -215,12 +218,13 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
         return new ArrayList<>(result.values());
     }
 
-    private String getCodigoTributacao(String cst, double aliq, String csosn) {
+    private String getCodigoTributacao(String cst, double aliq, String csosn, double reducao) {
         return String.format(
-                "%s-%.2f-%s",
+                "%s-%.2f-%s-%.2f",
                 cst,
                 aliq,
-                csosn
+                csosn,
+                reducao
         );
     }
 
@@ -304,7 +308,8 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	coalesce(trib.situacaopis, pf.situacaopis) piscofins_debito,\n" +
                     "	trib.situacaotributacao cst,\n" +
                     "	trib.percaliquota aliquota,\n" +
-                    "	trib.situacaosimples cst_simples\n" +
+                    "	trib.situacaosimples cst_simples,\n" +
+                    "   trib.percoutro reducao\n" +        
                     "from\n" +
                     "	tb_produto p\n" +
                     "	join tb_divisao dv on\n" +
@@ -382,7 +387,8 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     String trib = getCodigoTributacao(
                              rs.getString("cst"),
                              rs.getDouble("aliquota"),
-                             rs.getString("cst_simples")                                        
+                             rs.getString("cst_simples"),
+                             rs.getDouble("reducao")
                      );
                     imp.setIcmsDebitoId(trib);
                     imp.setIcmsDebitoForaEstadoId(trib);
@@ -407,6 +413,7 @@ public class MobnePdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.EAN_EM_BRANCO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
