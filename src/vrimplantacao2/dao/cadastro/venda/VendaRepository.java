@@ -83,6 +83,7 @@ public class VendaRepository {
             LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));   
 
             provider.notificar("Vendas...Carregando listas auxiliares");
+            LOG.info("Carregando listas auxiliares"); 
 
             cliPreferencialAnterior = provider.getClientesPreferenciaisAnteriores();
             cliPreferencialCnpj = provider.getClientesPorCnpj();
@@ -91,7 +92,8 @@ public class VendaRepository {
             produtosNaoExistentes = new HashSet<>();
 
             System.gc();
-
+            
+            LOG.info("Listas auxiliares carregadas...");
             provider.notificar("Vendas...Convertendo as vendas", (int) provider.getVendaImpSize());
 
             produtoPadrao = Parametros.get().getItemVendaPadrao();
@@ -103,7 +105,7 @@ public class VendaRepository {
             providerProduto = new ProdutoRepositoryProvider();
             produtoAnteriorDAO = new ProdutoAnteriorDAO();
 
-            divergentes = new ArrayList<>();            
+            divergentes = new ArrayList<>();
 
             if (opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR)) {
                 provider.vincularMapaDivergenciaComAnteriores();
@@ -115,8 +117,12 @@ public class VendaRepository {
             LOG.log(Level.SEVERE, e.getMessage(), e);
             throw e;            
         }
+        long recordsCount = provider.getVendaImpSize();
         
-        int steps = (int) MathUtils.trunc(provider.getVendaImpSize() / LIMIT_OFFSET, 0);
+        int steps = (int) MathUtils.trunc(recordsCount / LIMIT_OFFSET, 0);
+        if (steps == 0 && recordsCount > 0)
+            steps = 1;
+        LOG.info("Iniciando as vendas: steps " + steps + " recordsCount " + recordsCount); 
         for (int offSet = 0; offSet < steps; offSet++) { 
             provider.begin();
             try {
