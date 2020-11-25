@@ -5,7 +5,6 @@
  */
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -407,7 +406,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join estoque p1 on p1.codigo = a.cod_produto_pai\n"
                     + "join estoque p2 on p2.codigo = a.cod_produto_filho\n"
                     + "order by 1, 3"
-                    + /* TESTAR AMBOS SQL PARA MIGRAÇÃO DO ASSOCIADO */ "select\n"
+                    /*+  TESTAR AMBOS SQL PARA MIGRAÇÃO DO ASSOCIADO  "select\n"
                     + "    ren.cod_prod_mestre,\n"
                     + "    p1.descricao as idproduto_pai,\n"
                     + "    ren.cod_prod_filho,\n"
@@ -417,7 +416,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from estoque_rentabilidade ren\n"
                     + "join estoque p1 on p1.codigo = ren.cod_prod_mestre\n"
                     + "join estoque p2 on p2.codigo = ren.cod_prod_filho\n"
-                    + "order by 1, 3"
+                    + "order by 1, 3"*/
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();

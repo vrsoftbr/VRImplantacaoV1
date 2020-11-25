@@ -711,7 +711,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  vendas v left join clientes c on v.codcli = c.codigo_cliente\n" +
                         "where\n" +
                         "  v.codemp = " + idLojaCliente + " and\n" +
-                        "  v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and troca = false";
+                        "  v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino);
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

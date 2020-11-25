@@ -268,6 +268,7 @@ import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -721,6 +722,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMobnePdv = new javax.swing.JMenuItem();
         mnuLinear = new javax.swing.JMenuItem();
         mnuSTI = new javax.swing.JMenuItem();
+        mnuPlenoKW = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -2031,6 +2033,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuSTI);
+
+        mnuPlenoKW.setText("Pleno KW");
+        mnuPlenoKW.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlenoKWActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuPlenoKW);
 
         mnuDatabase.add(jMenu10);
 
@@ -4964,6 +4974,11 @@ public final class MenuGUI extends VRMdiFrame {
         AutocomGUI.exibir(this);
     }//GEN-LAST:event_mnuAutocomActionPerformed
 
+    private void mnuPlenoKWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlenoKWActionPerformed
+        // TODO add your handling code here:
+        PlenoKWGUI.exibir(this);
+    }//GEN-LAST:event_mnuPlenoKWActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5191,6 +5206,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
+    private javax.swing.JMenuItem mnuPlenoKW;
     private javax.swing.JMenuItem mnuProton;
     private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;

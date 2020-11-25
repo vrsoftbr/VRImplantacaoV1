@@ -254,10 +254,23 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstSaida(imp.getIcmsCstConsumidor());
                     imp.setIcmsAliqSaida(imp.getIcmsAliqConsumidor());
                     imp.setIcmsReducaoSaida(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoConsumidor());
 
                     imp.setIcmsCstEntrada(imp.getIcmsCstConsumidor());
                     imp.setIcmsAliqEntrada(imp.getIcmsAliqConsumidor());
                     imp.setIcmsReducaoEntrada(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoConsumidor());
+                    
                     imp.setBeneficio(rs.getString("beneficio"));
 
                     result.add(imp);
