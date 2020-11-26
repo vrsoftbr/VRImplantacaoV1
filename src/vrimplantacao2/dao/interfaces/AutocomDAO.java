@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -72,7 +73,7 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
                     + "    p.cst as cst,\n"
-                    + "    coalesce(p.icms, 0) as aliquota,\n"
+                    + "    coalesce(p.aliqinterna, 0) as aliquota,\n"
                     + "    coalesce(p.redbcicms, 0) as reducao\n"
                     + "from produto p"
             )) {
@@ -87,6 +88,30 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
                             id,
                             id,
                             rst.getInt("cst"),
+                            rst.getDouble("aliquota"),
+                            rst.getDouble("reducao")
+                    ));
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "    coalesce(p.cstent, '000') as cstentrada,\n"
+                    + "    coalesce(p.aliqinterna, 0) as aliquota,\n"
+                    + "    coalesce(p.redbcicms, 0) as reducao\n"
+                    + "from produto p"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            rst.getString("cstentrada"),
+                            rst.getDouble("aliquota"),
+                            rst.getDouble("reducao")
+                    );
+
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            rst.getInt("cstentrada"),
                             rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
                     ));
@@ -210,8 +235,9 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.cstcofinsc,\n"
                     + "    p.codnat as naturezareceita,\n"
                     + "    p.tributado as sittrib,\n"
-                    + "    p.cst as cst,\n"
-                    + "    coalesce(p.icms, 0) as aliquota,\n"
+                    + "    coalesce(p.cstent, '000') as cstentrada,\n"                            
+                    + "    coalesce(p.cst, '000') as cst,\n"
+                    + "    coalesce(p.aliqinterna, 0) as aliquota,\n"
                     + "    coalesce(p.redbcicms, 0) as reducao,\n"
                     + "    p.cstent as cst_credito,\n"
                     + "    p.fcp\n"
@@ -252,14 +278,15 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getString("cstcofinsc"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
 
-                    String icmsId = getAliquotaKey(rst.getString("cst"), rst.getDouble("aliquota"), rst.getDouble("reducao"));
+                    String icmsDebitoId = getAliquotaKey(rst.getString("cst"), rst.getDouble("aliquota"), rst.getDouble("reducao"));
+                    String icmsCreditoId = getAliquotaKey(rst.getString("cstentrada"), rst.getDouble("aliquota"), rst.getDouble("reducao"));
 
-                    imp.setIcmsDebitoId(icmsId);
-                    imp.setIcmsDebitoForaEstadoId(icmsId);
-                    imp.setIcmsDebitoForaEstadoNfId(icmsId);
-                    imp.setIcmsCreditoId(icmsId);
-                    imp.setIcmsCreditoForaEstadoId(icmsId);
-                    imp.setIcmsConsumidorId(icmsId);
+                    imp.setIcmsDebitoId(icmsDebitoId);
+                    imp.setIcmsDebitoForaEstadoId(icmsDebitoId);
+                    imp.setIcmsDebitoForaEstadoNfId(icmsDebitoId);
+                    imp.setIcmsCreditoId(icmsCreditoId);
+                    imp.setIcmsCreditoForaEstadoId(icmsCreditoId);
+                    imp.setIcmsConsumidorId(icmsDebitoId);
 
                     result.add(imp);
                 }
@@ -445,7 +472,7 @@ public class AutocomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cpf"));
-                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setInscricaoestadual(Utils.acertarTexto(rst.getString("inscricaoestadual")));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));

@@ -11,12 +11,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -24,11 +30,21 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Lucas
  */
-public class PlenoKWDAO extends InterfaceDAO {
+public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
         return "PlenoKW";
+    }
+
+    private String getAliquotaKey(String cst, double aliq, double red, double fcp) throws Exception {
+        return String.format(
+                "%s-%.2f-%.2f-%.2f",
+                cst,
+                aliq,
+                red,
+                fcp
+        );
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -52,6 +68,44 @@ public class PlenoKWDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "	cst_icms,\n"
+                    + "	aliq_icms,\n"
+                    + "	red_icms,\n"
+                    + "	fcp\n"
+                    + "from implantacao.tributacao_produtos_plenokw\n"
+                    + "order by 1, 2, 3"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            rst.getString("cst_icms"),
+                            rst.getDouble("aliq_icms"),
+                            rst.getDouble("red_icms"),
+                            rst.getDouble("fcp")
+                    );
+
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            rst.getInt("cst_icms"),
+                            rst.getDouble("aliq_icms"),
+                            rst.getDouble("red_icms"),
+                            rst.getDouble("fcp"),
+                            false,
+                            0
+                    ));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
@@ -64,6 +118,7 @@ public class PlenoKWDAO extends InterfaceDAO {
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.MANTER_DESCRICAO_PRODUTO,
                     OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.PRODUTOS_BALANCA,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
                     OpcaoProduto.DATA_CADASTRO,
@@ -95,11 +150,179 @@ public class PlenoKWDAO extends InterfaceDAO {
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.EXCECAO,
                     OpcaoProduto.TIPO_PRODUTO,
-                    OpcaoProduto.ATACADO
+                    OpcaoProduto.ATACADO,
+                    OpcaoProduto.CODIGO_BENEFICIO,
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
 
+    @Override
+    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p.mcd01_id,\n"
+                    + "	p.mcd01_codint,\n"
+                    + "	ean.mcd02_codigo as codigobarras,\n"
+                    + "	ean.mcd02_multiplicador as qtdembalagem,\n"
+                    + "	un.adm01_unidade as tipoembalagem,\n"
+                    + "	p.mcd01_flgbalanca as balanca,\n"
+                    + "	p.mcd01_validade as validade,\n"
+                    + "	p.mcd01_descricao as descricaocompleta,\n"
+                    + "	p.mcd01_descricao_curta as descricaoreduzida,	\n"
+                    + "	p.mcd01_flgativa as situacaocadastro,\n"
+                    + "	p.mcd01_flgsazonal as sazonal,\n"
+                    + "	pl.mcd03_flgativa_compra as descontinuado,\n"
+                    + "	pl.mcd03_flgativa_venda as vendapdv,\n"
+                    + "	p.mcd01_data_inclusao as datacadastro,\n"
+                    + "	p.mcd01_flgativa as situacaocadastro,\n"
+                    + "	p.mcd01_dthr_ultima_alteracao as dataalteracao,\n"
+                    + "	pl.mcd03_qtdestoque_maximo as estoquemaximo,\n"
+                    + "	est.est06_qtd as estoque,\n"
+                    + "	est.est06_qtdtroca as estoquetroca,\n"
+                    + "	p.mcd01_perc_margem_ideal as margem,\n"
+                    + "	pl.mcd03_preco_venda as precovenda,\n"
+                    + "	est.est06_vlrunit_ultnf as custo,\n"
+                    + "	p.fis11_ncm_id as ncm_id,\n"
+                    + "	ncm.fis11_codigo as ncm,\n"
+                    + "	cest.fis15_codigo as cest,\n"
+                    + "	cstpiss.fis08_codigo as piscofins_saida,\n"
+                    + "	cstpise.fis08_codigo as piscofins_entrada,\n"
+                    + "	pis.fis20_codigo_natureza_receita as naturezareceita,\n"
+                    + "	pl.mcd03_perc_aliquota_efetiva_fcx,\n"
+                    + "	pl.mcd03_perc_aliquota_normal_st,\n"
+                    + "	pl.mcd03_perc_aliquota_original,\n"
+                    + "	pl.mcd03_aliq_fcp as fcp,\n"
+                    + "	pl.mcd03_cbenef as codigobeneficio,\n"
+                    + "	cst.fis10_codigo as csticms,\n"
+                    + "	coalesce(fa.fse02_perc_aliquota, 0) as perc_aliquota,\n"
+                    + "	coalesce(frb.fse03_perc_aliquota_aplicavel, 0) as perc_aliquota_aplicavel,\n"
+                    + "	coalesce(frb.fse03_perc_aliquota_efetiva, 0) as perc_aliquota_efetiva,\n"
+                    + "	coalesce(frb.fse03_perc_reducao, 0) as perc_reducao,\n"
+                    + "	coalesce(iva.fse11_mva_interna, 0) as mva_interna,\n"
+                    + "	coalesce(iva.fse11_mva_interestadual, 0) as mva_interestadual,\n"
+                    + "	coalesce(iva.fse11_mva_importados, 0) as mva_importados\n"
+                    + "from mcd01_mercadoria p\n"
+                    + "left join adm01_unidade_mercadoria un\n"
+                    + "	on un.adm01_id = p.adm01_unidade_mercadoria_id \n"
+                    + "left join mcd02_codigo_mercadoria ean\n"
+                    + "	on ean.mcd01_mercadoria_id = p.mcd01_id\n"
+                    + "left join fis11_ncm ncm\n"
+                    + "	on ncm.fis11_id = p.fis11_ncm_id\n"
+                    + "left join fis15_cest cest\n"
+                    + "	on cest.fis15_id = p.fis15_cest_id \n"
+                    + "left join mcd03_mercadoria_filial pl\n"
+                    + "	on pl.mcd01_mercadoria_id = p.mcd01_id \n"
+                    + "	and pl.cfg06_filial_id = " + getLojaOrigem() + "\n"
+                    + "left join est06_estoque_atual est\n"
+                    + "	on est.mcd03_mercadoria_filial_id = pl.mcd03_id\n"
+                    + "	and est.dom18_finalidadenf_id = 1\n"
+                    + "left join fis20_regras_pis_cofins pis\n"
+                    + "	on pis.fis11_ncm_id = ncm.fis11_id\n"
+                    + "	and fis20_id = p.fis20_regras_pis_cofins_id \n"
+                    + "left join fis08_cstpiscofins cstpise\n"
+                    + "	on cstpise.fis08_codigo = pis.fis08_cstpiscofins_entrada_id \n"
+                    + "	and cstpise.fis08_flgentrada = 1\n"
+                    + "left join fis08_cstpiscofins cstpiss\n"
+                    + "	on cstpiss.fis08_codigo = pis.fis08_cstpiscofins_saida_id \n"
+                    + "	and cstpiss.fis08_flgentrada = 0\n"
+                    + "left join fis10_csticms cst\n"
+                    + "	on cst.fis10_id = pl.fis10_csticms_id_fcx\n"
+                    + "left join fse11_valorbcst_ncm iva\n"
+                    + "	on iva.fis11_ncm_id = ncm.fis11_id \n"
+                    + "left join fse06_aliquota_ncm aliq\n"
+                    + "	on aliq.fis11_ncm_id = ncm.fis11_id\n"
+                    + "left join fse02_aliquota fa \n"
+                    + "	on fa.fse02_id = aliq.fse02_aliquota_id\n"
+                    + "left join fse09_reducaobc_ncm frn \n"
+                    + "	on frn.fis11_ncm_id = ncm.fis11_id \n"
+                    + "left join fse03_reducao_bc frb \n"
+                    + "	on frb.fse03_id = frn.fse03_reducao_bc_id\n"
+                    + "where p.mcd01_flgbalanca = 1\n"
+                    + "and ean.mcd02_codigo is not null \n"
+                    + "and ean.mcd02_codigo != '' \n"
+                    //+ "and p.mcd01_descricao like '%MORCELA OURO%' \n"        
+                    + "order by 1"
+            )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("mcd01_codint"));
+                    
+                    String ean = rst.getString("codigobarras");
+                    
+                    //imp.setEan(rst.getString("codigobarras"));
+                    
+                    if ((ean != null)
+                            && (!ean.trim().isEmpty())) {
+
+                        if (ean.startsWith("20") && ean.trim().length() == 13) {
+                            
+                            long codigoProduto;
+                            String codigobalanca = ean.substring(0, 5);
+                            codigoProduto = Long.parseLong(codigobalanca.substring(2, 5));
+                            
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            
+                            if (produtoBalanca != null) {
+                                imp.setEan(String.valueOf(codigoProduto));
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                            } else {
+                                imp.setEan(ean);
+                                imp.setValidade(rst.getInt("validade"));
+                                imp.seteBalanca(false);
+                            }                            
+                        } else {
+                           imp.setEan(ean);
+                           imp.seteBalanca(false);
+                           imp.setValidade(rst.getInt("validade"));
+                        }
+                    } else {
+                        imp.seteBalanca(false);
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setDescontinuado(rst.getInt("descontinuado") == 1);
+                    imp.setVendaPdv(rst.getInt("vendapdv") == 1);
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setTroca(rst.getDouble("estoquetroca"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setBeneficio(rst.getString("codigobeneficio"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -115,12 +338,13 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "	p.mcd01_flgbalanca as balanca,\n"
                     + "	p.mcd01_validade as validade,\n"
                     + "	p.mcd01_descricao as descricaocompleta,\n"
-                    + "	p.mcd01_descricao_curta as descricaoreduzida,\n"
+                    + "	p.mcd01_descricao_curta as descricaoreduzida,	\n"
                     + "	p.mcd01_flgativa as situacaocadastro,\n"
                     + "	p.mcd01_flgsazonal as sazonal,\n"
                     + "	pl.mcd03_flgativa_compra as descontinuado,\n"
                     + "	pl.mcd03_flgativa_venda as vendapdv,\n"
                     + "	p.mcd01_data_inclusao as datacadastro,\n"
+                    + "	p.mcd01_flgativa as situacaocadastro,\n"
                     + "	p.mcd01_dthr_ultima_alteracao as dataalteracao,\n"
                     + "	pl.mcd03_qtdestoque_maximo as estoquemaximo,\n"
                     + "	est.est06_qtd as estoque,\n"
@@ -134,13 +358,19 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "	cstpiss.fis08_codigo as piscofins_saida,\n"
                     + "	cstpise.fis08_codigo as piscofins_entrada,\n"
                     + "	pis.fis20_codigo_natureza_receita as naturezareceita,\n"
-                    + "	cst.fis10_codigo as csticms,\n"
                     + "	pl.mcd03_perc_aliquota_efetiva_fcx,\n"
                     + "	pl.mcd03_perc_aliquota_normal_st,\n"
                     + "	pl.mcd03_perc_aliquota_original,\n"
                     + "	pl.mcd03_aliq_fcp as fcp,\n"
                     + "	pl.mcd03_cbenef as codigobeneficio,\n"
-                    + "	iva.fse10_mva_interna as mva\n"
+                    + "	cst.fis10_codigo as csticms,\n"
+                    + "	coalesce(fa.fse02_perc_aliquota, 0) as perc_aliquota,\n"
+                    + "	coalesce(frb.fse03_perc_aliquota_aplicavel, 0) as perc_aliquota_aplicavel,\n"
+                    + "	coalesce(frb.fse03_perc_aliquota_efetiva, 0) as perc_aliquota_efetiva,\n"
+                    + "	coalesce(frb.fse03_perc_reducao, 0) as perc_reducao,\n"
+                    + "	coalesce(iva.fse11_mva_interna, 0) as mva_interna,\n"
+                    + "	coalesce(iva.fse11_mva_interestadual, 0) as mva_interestadual,\n"
+                    + "	coalesce(iva.fse11_mva_importados, 0) as mva_importados\n"
                     + "from mcd01_mercadoria p\n"
                     + "left join adm01_unidade_mercadoria un\n"
                     + "	on un.adm01_id = p.adm01_unidade_mercadoria_id \n"
@@ -155,6 +385,7 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "	and pl.cfg06_filial_id = " + getLojaOrigem() + "\n"
                     + "left join est06_estoque_atual est\n"
                     + "	on est.mcd03_mercadoria_filial_id = pl.mcd03_id\n"
+                    + "	and est.dom18_finalidadenf_id = 1\n"
                     + "left join fis20_regras_pis_cofins pis\n"
                     + "	on pis.fis11_ncm_id = ncm.fis11_id\n"
                     + "	and fis20_id = p.fis20_regras_pis_cofins_id \n"
@@ -166,12 +397,22 @@ public class PlenoKWDAO extends InterfaceDAO {
                     + "	and cstpiss.fis08_flgentrada = 0\n"
                     + "left join fis10_csticms cst\n"
                     + "	on cst.fis10_id = pl.fis10_csticms_id_fcx\n"
-                    + "left join fse10_valorbcst_mercadoria iva\n"
-                    + "	on iva.mcd01_mercadoria_id = p.mcd01_id \n"
+                    + "left join fse11_valorbcst_ncm iva\n"
+                    + "	on iva.fis11_ncm_id = ncm.fis11_id \n"
+                    + "left join fse06_aliquota_ncm aliq\n"
+                    + "	on aliq.fis11_ncm_id = ncm.fis11_id\n"
+                    + "left join fse02_aliquota fa \n"
+                    + "	on fa.fse02_id = aliq.fse02_aliquota_id\n"
+                    + "left join fse09_reducaobc_ncm frn \n"
+                    + "	on frn.fis11_ncm_id = ncm.fis11_id \n"
+                    + "left join fse03_reducao_bc frb \n"
+                    + "	on frb.fse03_id = frn.fse03_reducao_bc_id\n"
+                    //+ "where p.mcd01_descricao like '%NABO KG%'\n"        
                     + "order by 1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("mcd01_codint"));
@@ -206,6 +447,51 @@ public class PlenoKWDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ICMS) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "	codigointerno,\n"
+                        + "	cst_icms,\n"
+                        + "	aliq_icms,\n"
+                        + "	red_icms,\n"
+                        + "	fcp\n"
+                        + "from implantacao.tributacao_produtos_plenokw\n"
+                        + "order by 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigointerno"));
+
+                        String idIcms = getAliquotaKey(
+                                rst.getString("cst_icms"),
+                                rst.getDouble("aliq_icms"),
+                                rst.getDouble("red_icms"),
+                                rst.getDouble("fcp")
+                        );
+
+                        imp.setIcmsDebitoId(idIcms);
+                        imp.setIcmsDebitoForaEstadoId(idIcms);
+                        imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                        imp.setIcmsCreditoId(idIcms);
+                        imp.setIcmsCreditoForaEstadoId(idIcms);
+                        imp.setIcmsConsumidorId(idIcms);
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
     }
 
     @Override

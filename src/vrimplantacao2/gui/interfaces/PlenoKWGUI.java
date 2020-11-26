@@ -76,7 +76,7 @@ public class PlenoKWGUI extends VRInternalFrame implements ConexaoEvent {
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.tabParametros.add(pnlOutros);
         
-        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -99,7 +99,7 @@ public class PlenoKWGUI extends VRInternalFrame implements ConexaoEvent {
                 return mdiFrame;
             }
             
-        });*/
+        });
 
         conexaoMySQL.host = "localhost";
         conexaoMySQL.database = "sglinx";
