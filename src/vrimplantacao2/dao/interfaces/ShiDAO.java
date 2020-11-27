@@ -442,6 +442,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pv.preco,\n"
                     + "    case p.inativ when 'S' then 0 else 1 end ativo,\n"
                     + "    ncm.clafis ncm,\n"
+                    + "    pis.id idpisdebito,\n"
+                    + "    pis.descri descpisdebito,\n"
                     + "    p.cest,\n"
                     + "    p.cstpis,\n"
                     + "    p.cstcofins,\n"
@@ -459,6 +461,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join precovenda pv on pv.codpro = p.codigo and pv.filial = f.codigo\n"
                     + "    left join clafis ncm on ncm.id = p.idclafis\n"
                     + "    left join icmsprod icm on icm.codpro = p.codigo and icm.estado = f.estado\n"
+                    + "    left join tabpiscofins pis on p.idpiscofins = pis.id\n"        
                     + "order by\n"
                     + "    1"
             )) {
@@ -511,8 +514,42 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("ativo")));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("cstpis")));
+                    
+                    /*int cstpis = rst.getInt("idpisdebito");
+                    switch(cstpis) {
+                        case 1:
+                            imp.setPiscofinsCstDebito(4);
+                            break;
+                        case 2:
+                            imp.setPiscofinsCstDebito(5);
+                            break;
+                        case 3:
+                            imp.setPiscofinsCstDebito(6);
+                            break; 
+                        case 4:
+                            imp.setPiscofinsCstDebito(7);
+                            break; 
+                        case 5:
+                            imp.setPiscofinsCstDebito(1);
+                            break; 
+                        case 6:
+                            imp.setPiscofinsCstDebito(4);
+                            break;     
+                        case 7:
+                            imp.setPiscofinsCstDebito(8);
+                            break; 
+                        case 8:
+                            imp.setPiscofinsCstDebito(9);
+                            break; 
+                        case 9:
+                            imp.setPiscofinsCstDebito(99);
+                            break; 
+                    }*/
+                    
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("cstpiscr")));
+                    
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("natrec")));
 
                     imp.setIcmsDebitoId(rst.getString("icms"));
