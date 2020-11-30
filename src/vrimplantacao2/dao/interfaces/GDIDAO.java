@@ -193,7 +193,8 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    tprodutos p\n"
                     + "left join tprecos pp on p.id_produto = pp.id_produto\n"
-                    + "left join tbarras ean on p.id_produto = ean.id_produto")) {
+                    + "left join tbarras ean on p.id_produto = ean.id_produto\n"
+                    + "where p.excluido = 'N'")) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
