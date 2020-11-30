@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
-import com.hxtt.f.e;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.CestDAO;
@@ -299,6 +297,14 @@ public class ProdutoRepositoryProvider {
         
         public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
             produtoComplementoDAO.salvarLogCusto(vo);
+        }
+
+        public void criarEstoqueTrocaAnteriorTemporario() throws Exception {
+            produtoComplementoDAO.criarEstoqueTrocaAnteriorTemporario(lojaVR);
+        }
+
+        public void gerarLogDeTroca() throws Exception {
+            produtoComplementoDAO.gerarLogDeTrocaViaTMP_TROCA(getLojaVR());
         }
     }
     
