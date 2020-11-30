@@ -581,7 +581,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
                         + "    pc.codpro,\n"
-                        + "    pc.custo\n"
+                        + "    pc.custo custosemimposto,\n"
+                        + "    CAST(COALESCE((CUSTO + SUBTRI + FRETE + DESPES + IPI), 0) AS FLOAT) custocomimposto\n"        
                         + "from\n"
                         + "    precocusto pc\n"
                         + "    join(select\n"
@@ -600,8 +601,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rst.getString("codpro"));
-                        imp.setCustoComImposto(rst.getDouble("custo"));
-                        imp.setCustoSemImposto(rst.getDouble("custo"));
+                        imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                        imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                         result.add(imp);
                     }
                 }
@@ -711,7 +712,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and ri.filial = " + getLojaOrigem()*/
                         "select\n"
                         + "    pc.codpro,\n"
-                        + "    pc.custo as custocomimposto\n"
+                        + "    CAST(COALESCE((CUSTO + SUBTRI + FRETE + DESPES + IPI), 0) AS FLOAT) custocomimposto\n"
                         + "from\n"
                         + "    precocusto pc\n"
                         + "    join(select\n"
