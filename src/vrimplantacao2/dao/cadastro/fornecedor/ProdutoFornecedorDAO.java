@@ -307,6 +307,7 @@ public class ProdutoFornecedorDAO {
                             }
                             produtoFornecedor.setCodigoExterno(imp.getCodigoExterno());
                             produtoFornecedor.setPesoEmbalagem(imp.getPesoEmbalagem());
+                            produtoFornecedor.setFatorEmbalagem(imp.getFatorEmbalagem());
                             codigoExterno = produtoFornecedor.getCodigoExterno();
                             //</editor-fold>
 
@@ -332,7 +333,7 @@ public class ProdutoFornecedorDAO {
                             sql.put("pesoembalagem", produtoFornecedor.getPesoEmbalagem());
                             sql.put("id_tipopiscofins", 0);
                             sql.putNull("csosn");
-                            sql.put("fatorembalagem", 1);
+                            sql.put("fatorembalagem", produtoFornecedor.getFatorEmbalagem());
                             sql.put("id_divisaofornecedor", produtoFornecedor.getIdDivisaoFornecedor());
                             sql.getReturning().add("id");
 

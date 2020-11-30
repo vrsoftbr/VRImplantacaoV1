@@ -20,9 +20,12 @@ import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -284,9 +287,16 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
                                 imp.seteBalanca(false);
                             }                            
                         } else {
-                           imp.setEan(ean);
-                           imp.seteBalanca(false);
-                           imp.setValidade(rst.getInt("validade"));
+                            
+                            if (ean.trim().length() <= 6) {
+                                imp.setManterEAN(true);
+                            } else {
+                                imp.setManterEAN(false);
+                            }
+                            
+                            imp.setEan(ean);
+                            imp.seteBalanca(false);
+                            imp.setValidade(rst.getInt("validade"));
                         }
                     } else {
                         imp.seteBalanca(false);
@@ -412,11 +422,20 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("mcd01_codint"));
                     imp.setEan(rst.getString("codigobarras"));
+                    
+                    if ((imp.getEan() != null)
+                            && (!imp.getEan().trim().isEmpty())) {
+                        if (imp.getEan().trim().length() <= 6) {
+                            imp.setManterEAN(true);
+                        } else{
+                            imp.setManterEAN(false);
+                        }
+                    }
+                                        
                     imp.seteBalanca(rst.getInt("balanca") == 1);
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -457,7 +476,7 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "	codigointerno,\n"
+                        + "	codigo,\n"
                         + "	cst_icms,\n"
                         + "	aliq_icms,\n"
                         + "	red_icms,\n"
@@ -469,7 +488,7 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("codigointerno"));
+                        imp.setImportId(rst.getString("codigo"));
 
                         String idIcms = getAliquotaKey(
                                 rst.getString("cst_icms"),
@@ -485,6 +504,41 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIcmsCreditoForaEstadoId(idIcms);
                         imp.setIcmsConsumidorId(idIcms);
 
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        
+        if (opt == OpcaoProduto.EXCECAO) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	codigo,\n"
+                        + "	ncm,\n"
+                        + "	cst_icms,\n"
+                        + "	aliq_icms,\n"
+                        + "	red_icms,\n"
+                        + "	fcp,\n"
+                        + "	mva_interna\n"
+                        + "from implantacao.tributacao_produtos_plenokw	\n"
+                        + "where mva_interna::numeric > 0\n"
+                        + "and fcp::numeric = 0\n"
+                        + "order by 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo"));
+                        
+                        String idPauta = rst.getString("ncm") + "-"
+                            + rst.getString("cst_icms") + "-"
+                            + rst.getString("aliq_icms") + "-"
+                            + rst.getString("red_icms");
+                        
+                        imp.setPautaFiscalId(idPauta);
                         result.add(imp);
                     }
                 }
@@ -521,6 +575,47 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("codigobarras"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        String id = "";
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                        "select distinct \n"
+                        + "	ncm,\n"
+                        + "	cst_icms,\n"
+                        + "	aliq_icms,\n"
+                        + "	red_icms,\n"
+                        + "	mva_interna\n"
+                        + "from implantacao.tributacao_produtos_plenokw	\n"
+                        + "where mva_interna::numeric > 0\n"
+                        + "and fcp::numeric = 0 "        
+                        + "order by 1"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    id = rst.getString("ncm") + "-"
+                            + rst.getString("cst_icms") + "-"
+                            + rst.getString("aliq_icms") + "-"
+                            + rst.getString("red_icms");
+                    imp.setId(id);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setIva(rst.getDouble("mva_interna"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                    
+                    imp.setAliquotaDebito(rst.getDouble("red_icms") == 0 ? 0 : 20, rst.getDouble("aliq_icms"), rst.getDouble("red_icms"));
+                    imp.setAliquotaDebitoForaEstado(rst.getDouble("red_icms") == 0 ? 0 : 20, rst.getDouble("aliq_icms"), rst.getDouble("red_icms"));
+                    imp.setAliquotaCredito(rst.getDouble("red_icms") == 0 ? 0 : 20, rst.getDouble("aliq_icms"), rst.getDouble("red_icms"));
+                    imp.setAliquotaCreditoForaEstado(rst.getDouble("red_icms") == 0 ? 0 : 20, rst.getDouble("aliq_icms"), rst.getDouble("red_icms"));
+                    
                     result.add(imp);
                 }
             }
@@ -672,12 +767,14 @@ public class PlenoKWDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	mcd01_mercadoria_id as idproduto,\n"
+                    + "	mm.mcd01_codint as idproduto,\n"
                     + "	com01_fornecedor_id as idfornecedor,\n"
                     + "	com02_codmerc_fornecedor as codigoexterno,\n"
                     + "	com02_nrounid_embalagem as qtdembalagem,\n"
                     + "	com02_fator_conversao as fatorconversao\n"
-                    + "from com02_mercadoria_fornecedor cmf \n"
+                    + "from com02_mercadoria_fornecedor cmf\n"
+                    + "join mcd01_mercadoria mm\n"
+                    + "	on mm.mcd01_id = mcd01_mercadoria_id \n"
                     + "order by 2, 1"
             )) {
                 while (rst.next()) {
