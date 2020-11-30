@@ -303,6 +303,9 @@ public class ProdutoRepository {
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().criarEstoqueAnteriorTemporario();
                 }
+                if (optSimples.contains(OpcaoProduto.TROCA)) {
+                    provider.complemento().criarEstoqueTrocaAnteriorTemporario();
+                }
 
                 for (KeyList<String> keys : organizados.keySet()) {
                     String[] chave;
@@ -444,6 +447,9 @@ public class ProdutoRepository {
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().gerarLogDeImportacaoDeEstoque();
+                }
+                if (optSimples.contains(OpcaoProduto.TROCA)) {
+                    provider.complemento().gerarLogDeTroca();
                 }
 
                 provider.commit();
