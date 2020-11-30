@@ -656,7 +656,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagemCotacao(rst.getInt("embalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompletacomplemento"));
                     imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
