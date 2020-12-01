@@ -24,6 +24,7 @@ import vrimplantacao2.utils.arquivo.Arquivo;
 import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -92,6 +93,34 @@ public class SicDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoParadox.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	controle,\n"
+                    + "	setor\n"
+                    + "FROM tabest8"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("controle"));
+                    imp.setMerc1Descricao(rst.getString("setor"));
+                    imp.setMerc2ID("1");
+                    imp.setMerc2Descricao(imp.getMerc1Descricao());
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(imp.getMerc3Descricao());
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -115,7 +144,8 @@ public class SicDAO extends InterfaceDAO {
                     + "	p.inativo,\n"
                     + "	p.pesobruto,\n"
                     + "	p.pesoliq,\n"
-                    + "	p.datainc\n"
+                    + "	p.datainc,\n"
+                    + " p.lksetor\n"
                     + "FROM tabest1 p"
             )) {
                 while (rst.next()) {
@@ -131,6 +161,9 @@ public class SicDAO extends InterfaceDAO {
                     //imp.setDataCadastro(rst.getDate("datainc"));
                     //imp.setPesoBruto(Utils.truncar2(rst.getDouble("pesobruto"), 2));
                     //imp.setPesoLiquido(Utils.truncar2(rst.getDouble("pesoliq"), 2));
+                    imp.setCodMercadologico1(rst.getString("lksetor"));
+                    imp.setCodMercadologico2("1");
+                    imp.setCodMercadologico3("1");
                     imp.setMargem(Utils.truncar2(rst.getDouble("lucro"), 2));
                     imp.setCustoComImposto(Utils.truncar2(rst.getDouble("precocusto"), 2));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
@@ -139,7 +172,7 @@ public class SicDAO extends InterfaceDAO {
                     imp.setEstoqueMinimo(Utils.truncar2(rst.getDouble("estminimo"), 2));
                     imp.setNcm(rst.getString("codipi"));
                     imp.setCest(rst.getString("cest"));
-                    
+
                     imp.setIcmsCstSaida(rst.getInt("cst"));
                     imp.setIcmsAliqSaida(rst.getDouble("icms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("basecalculo"));
@@ -192,7 +225,7 @@ public class SicDAO extends InterfaceDAO {
                     result.add(imp);
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
                     + "	p.controle,\n"
@@ -208,11 +241,11 @@ public class SicDAO extends InterfaceDAO {
                     imp.setEan(rst.getString("ceantrib"));
                     result.add(imp);
                 }
-            }            
+            }
         }
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -270,7 +303,7 @@ public class SicDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     public List<ProdutoIMP> getProdutos_() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
