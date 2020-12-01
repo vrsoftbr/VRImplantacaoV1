@@ -21,14 +21,14 @@ public class ConexaoParadox {
     public static void abrirConexao(String i_database) throws Exception {
         if (!usarOdbc) {    
             //Class.forName("com.hxtt.sql.paradox.ParadoxDriver");
-            Class.forName("com.hxtt.sql.paradox.ParadoxDriver");
+            Class.forName("com.googlecode.paradox.Driver");
         } else {            
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
         }
         
         try {
             if (!usarOdbc) {
-                con = DriverManager.getConnection("jdbc:Paradox:/" + i_database, "", "");
+                con = DriverManager.getConnection("jdbc:paradox:" + i_database, "", "");
             } else {
                 con = DriverManager.getConnection("jdbc:odbc:" + i_database, "", "");
             }

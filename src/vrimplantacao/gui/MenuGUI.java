@@ -269,6 +269,7 @@ import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
+import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -752,6 +753,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuBrainSoft = new javax.swing.JMenuItem();
         mnuFarm2000 = new javax.swing.JMenuItem();
         mnuForti = new javax.swing.JMenuItem();
+        mnuSic = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -2262,6 +2264,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu13.add(mnuForti);
+
+        mnuSic.setText("Sic");
+        mnuSic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSicActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuSic);
 
         mnuDatabase.add(jMenu13);
 
@@ -4979,6 +4989,11 @@ public final class MenuGUI extends VRMdiFrame {
         PlenoKWGUI.exibir(this);
     }//GEN-LAST:event_mnuPlenoKWActionPerformed
 
+    private void mnuSicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSicActionPerformed
+        // TODO add your handling code here:
+        SicGUI.exibir(this);
+    }//GEN-LAST:event_mnuSicActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5233,6 +5248,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuScripts;
     private javax.swing.JMenuItem mnuSiaCriareByFile;
     private javax.swing.JMenuItem mnuSiaCriareDbf;
+    private javax.swing.JMenuItem mnuSic;
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
     private javax.swing.JMenuItem mnuSigma;
