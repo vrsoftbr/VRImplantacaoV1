@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vrimplantacao2.dao.interfaces;
+package vrimplantacao2.dao.interfaces.planilhas;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,6 +15,7 @@ import java.util.Map;
 import org.openide.util.Exceptions;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.arquivo.Arquivo;
 import vrimplantacao2.utils.arquivo.ArquivoFactory;
@@ -32,6 +33,8 @@ public class SicDAO extends InterfaceDAO {
     private String sistema = "Sic";
     private Map<String, String> opcoes = new LinkedHashMap<>();
     private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
+    private String planilhaProdutos;
+    private String planilhaFornecedores;
 
     @Override
     public String getSistema() {
@@ -41,7 +44,7 @@ public class SicDAO extends InterfaceDAO {
     public Map<String, String> getOpcoes() {
         return opcoes;
     }
-
+    
     private Date getData(String format) {
         if (format != null && !"".equals(format.trim())) {
             try {
@@ -53,11 +56,39 @@ public class SicDAO extends InterfaceDAO {
         return null;
     }
 
+    /**
+     * @return the planilhaProdutos
+     */
+    public String getPlanilhaProdutos() {
+        return planilhaProdutos;
+    }
+
+    /**
+     * @param planilhaProdutos the planilhaProdutos to set
+     */
+    public void setPlanilhaProdutos(String planilhaProdutos) {
+        this.planilhaProdutos = planilhaProdutos;
+    }
+
+    /**
+     * @return the planilhaFornecedores
+     */
+    public String getPlanilhaFornecedores() {
+        return planilhaFornecedores;
+    }
+
+    /**
+     * @param planilhaFornecedores the planilhaFornecedores to set
+     */
+    public void setPlanilhaFornecedores(String planilhaFornecedores) {
+        this.planilhaFornecedores = planilhaFornecedores;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        Arquivo produtos = ArquivoFactory.getArquivo(this.planilhaProdutos, getOpcoes());
         ProgressBar.setStatus("Carregando produtos...");
 
         for (LinhaArquivo rst : produtos) {
@@ -119,7 +150,7 @@ public class SicDAO extends InterfaceDAO {
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        Arquivo produtos = ArquivoFactory.getArquivo(this.planilhaFornecedores, getOpcoes());
         ProgressBar.setStatus("Carregando produtos...");
 
         for (LinhaArquivo rst : produtos) {
