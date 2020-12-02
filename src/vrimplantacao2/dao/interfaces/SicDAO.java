@@ -10,21 +10,19 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import org.openide.util.Exceptions;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoParadox;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.utils.arquivo.Arquivo;
-import vrimplantacao2.utils.arquivo.ArquivoFactory;
-import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -33,24 +31,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SicDAO extends InterfaceDAO {
 
-    private String arquivo;
     private String sistema = "Sic";
-    private Map<String, String> opcoes = new LinkedHashMap<>();
     private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
-    private String planilhaProdutos;
-    private String planilhaFornecedores;
 
     @Override
     public String getSistema() {
         return sistema;
-    }
-
-    public Map<String, String> getOpcoes() {
-        return opcoes;
-    }
-
-    public void setArquivo(String arquivo) {
-        this.arquivo = arquivo;
     }
 
     private Date getData(String format) {
@@ -64,34 +50,49 @@ public class SicDAO extends InterfaceDAO {
         return null;
     }
 
-    /**
-     * @return the planilhaProdutos
-     */
-    public String getPlanilhaProdutos() {
-        return planilhaProdutos;
-    }
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.MANTER_DESCRICAO_PRODUTO,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                    OpcaoProduto.QTD_EMBALAGEM_EAN,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.CUSTO_COM_IMPOSTO,
+                    OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.MARGEM,
 
-    /**
-     * @param planilhaProdutos the planilhaProdutos to set
-     */
-    public void setPlanilhaProdutos(String planilhaProdutos) {
-        this.planilhaProdutos = planilhaProdutos;
+                }
+        ));
     }
-
-    /**
-     * @return the planilhaFornecedores
-     */
-    public String getPlanilhaFornecedores() {
-        return planilhaFornecedores;
-    }
-
-    /**
-     * @param planilhaFornecedores the planilhaFornecedores to set
-     */
-    public void setPlanilhaFornecedores(String planilhaFornecedores) {
-        this.planilhaFornecedores = planilhaFornecedores;
-    }
-
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -158,7 +159,7 @@ public class SicDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    //imp.setDataCadastro(rst.getDate("datainc"));
+                    imp.setDataCadastro(getData(rst.getString("datainc")));
                     //imp.setPesoBruto(Utils.truncar2(rst.getDouble("pesobruto"), 2));
                     //imp.setPesoLiquido(Utils.truncar2(rst.getDouble("pesoliq"), 2));
                     imp.setCodMercadologico1(rst.getString("lksetor"));
@@ -304,6 +305,32 @@ public class SicDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoParadox.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	controle,\n"
+                    + "	lkfornec\n"
+                    + "FROM tabest1\n"
+                    + "WHERE lkfornec <> ''"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("controle"));
+                    imp.setIdFornecedor(rst.getString("lkfornec"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    /*
     public List<ProdutoIMP> getProdutos_() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -429,4 +456,5 @@ public class SicDAO extends InterfaceDAO {
         }
         return result;
     }
+    */
 }
