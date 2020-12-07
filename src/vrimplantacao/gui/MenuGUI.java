@@ -268,6 +268,7 @@ import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -685,6 +686,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu2 = new javax.swing.JMenu();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuAutocom = new javax.swing.JMenuItem();
+        mnuMercaLite = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1747,6 +1749,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu2.add(mnuAutocom);
+
+        mnuMercaLite.setText("MercaLite");
+        mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMercaLiteActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuMercaLite);
 
         mnuDatabase.add(jMenu2);
 
@@ -4994,6 +5004,11 @@ public final class MenuGUI extends VRMdiFrame {
         SicGUI.exibir(this);
     }//GEN-LAST:event_mnuSicActionPerformed
 
+    private void mnuMercaLiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMercaLiteActionPerformed
+        // TODO add your handling code here:
+        MercaLiteGUI.exibir(this);
+    }//GEN-LAST:event_mnuMercaLiteActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5205,6 +5220,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
+    private javax.swing.JMenuItem mnuMercaLite;
     private javax.swing.JMenuItem mnuMobnePdv;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
