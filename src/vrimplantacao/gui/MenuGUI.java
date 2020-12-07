@@ -269,6 +269,7 @@ import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
+import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -750,6 +751,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuContaPagar1 = new javax.swing.JMenuItem();
         mnuVarejoFacil = new javax.swing.JMenuItem();
         mnuGeneric = new javax.swing.JMenuItem();
+        mnuMerceariaSene = new javax.swing.JMenuItem();
         jMenu13 = new javax.swing.JMenu();
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
@@ -2238,6 +2240,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu3.add(mnuGeneric);
+
+        mnuMerceariaSene.setText("Mercearia Sene (cliente)");
+        mnuMerceariaSene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMerceariaSeneActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuMerceariaSene);
 
         mnuDatabase.add(jMenu3);
 
@@ -5009,6 +5019,11 @@ public final class MenuGUI extends VRMdiFrame {
         MercaLiteGUI.exibir(this);
     }//GEN-LAST:event_mnuMercaLiteActionPerformed
 
+    private void mnuMerceariaSeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMerceariaSeneActionPerformed
+        // TODO add your handling code here:
+        MerceariaSeneGUI.exibir(this);
+    }//GEN-LAST:event_mnuMerceariaSeneActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5221,6 +5236,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenuItem mnuMercaLite;
+    private javax.swing.JMenuItem mnuMerceariaSene;
     private javax.swing.JMenuItem mnuMobnePdv;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;

@@ -54,7 +54,7 @@ public class MerceariaSeneDAO extends InterfaceDAO implements MapaTributoProvide
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "distinct icms_entrada "
-                    + "from implantacao.produtoplanilha"
+                    + "from implantacao.produtoplanilha_sene"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -93,7 +93,6 @@ public class MerceariaSeneDAO extends InterfaceDAO implements MapaTributoProvide
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.MANTER_DESCRICAO_PRODUTO,
                     OpcaoProduto.PRODUTOS,
-                    OpcaoProduto.PRODUTOS_BALANCA,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
                     OpcaoProduto.DATA_CADASTRO,
@@ -158,7 +157,7 @@ public class MerceariaSeneDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setDataCadastro(rst.getDate("saneamento"));
+                    //imp.setDataCadastro(rst.getDate("saneamento"));
                     imp.setNcm(Utils.formataNumero(rst.getString("ncm")));
                     imp.setCest(Utils.formataNumero(rst.getString("cest")));
                     imp.setPiscofinsCstDebito(Utils.formataNumero(rst.getString("piscofins_saida")));
