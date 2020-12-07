@@ -134,6 +134,9 @@ public class SicGUI extends VRInternalFrame {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
+                        if (chkProdutoFornecedor.isSelected()) {
+                            importador.importarProdutoFornecedor();
+                        }
                     }
                     
                     gravarParametros();
