@@ -50,7 +50,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(ShiDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(DSoftDAO.class.getName());
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
