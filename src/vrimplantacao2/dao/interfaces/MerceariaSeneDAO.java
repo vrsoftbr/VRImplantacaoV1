@@ -264,16 +264,16 @@ public class MerceariaSeneDAO extends InterfaceDAO implements MapaTributoProvide
                     } else if ("F 25% CST 10".equals(rst.getString("icms_entrada"))) {
                         imp.setAliquotaCredito(0, 25, 0);
                         imp.setAliquotaCreditoForaEstado(0, 25, 0);
-                    } else if ("F 25% CST 70".equals(rst.getString("icms_credito"))) {
+                    } else if ("F 25% CST 70".equals(rst.getString("icms_entrada"))) {
                         imp.setAliquotaCredito(0, 25, 0);
                         imp.setAliquotaCreditoForaEstado(0, 25, 0);
-                    } else if ("F 32% CST 10".equals(rst.getString("icms_credito"))) {
+                    } else if ("F 32% CST 10".equals(rst.getString("icms_entrada"))) {
                         imp.setAliquotaCredito(0, 32, 0);
                         imp.setAliquotaCreditoForaEstado(0, 32, 0);
                     } else if ("I 0% CST 40".equals(rst.getString("icms_entrada"))) {
                         imp.setAliquotaCredito(40, 0, 0);
                         imp.setAliquotaCreditoForaEstado(40, 0, 0);
-                    } else if ("N 0% CST 41".equals(rst.getString("icms_entrdada"))) {
+                    } else if ("N 0% CST 41".equals(rst.getString("icms_entrada"))) {
                         imp.setAliquotaCredito(41, 0, 0);
                         imp.setAliquotaCreditoForaEstado(41, 0, 0);
                     } else if ("R 18% 61,11".equals(rst.getString("icms_entrada"))) {
