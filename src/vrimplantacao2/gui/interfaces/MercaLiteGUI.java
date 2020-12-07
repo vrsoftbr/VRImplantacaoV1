@@ -20,18 +20,18 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WeberDAO;
+import vrimplantacao2.dao.interfaces.MercaLiteDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class WeberGUI extends VRInternalFrame {
+public class MercaLiteGUI extends VRInternalFrame {
 
-    private static final String NOME_SISTEMA = "Weber";
+    private static final String NOME_SISTEMA = "MercaLite";
     private static final String SERVIDOR_SQL = "Firebird";
-    private static WeberGUI instance;
+    private static MercaLiteGUI instance;
 
-    private final WeberDAO dao = new WeberDAO();
+    private final MercaLiteDAO dao = new MercaLiteDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
 
     private String vLojaCliente = "-1";
@@ -72,7 +72,7 @@ public class WeberGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private WeberGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private MercaLiteGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "UTF-8";
@@ -155,7 +155,7 @@ public class WeberGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : dao.getLojaCliente()) {
+        for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -238,11 +238,11 @@ public class WeberGUI extends VRInternalFrame {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        if(chkPdvVendas.isSelected()) {
+                        /*if(chkPdvVendas.isSelected()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
+                        }*/
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -275,7 +275,7 @@ public class WeberGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new WeberGUI(i_mdiFrame);
+                instance = new MercaLiteGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
