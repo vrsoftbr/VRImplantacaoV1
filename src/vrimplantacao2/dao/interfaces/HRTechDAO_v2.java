@@ -61,7 +61,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(HRTechDAO_v2.class.getName());
     
     private String complemento;
     private String codigoConvenio = "000001";

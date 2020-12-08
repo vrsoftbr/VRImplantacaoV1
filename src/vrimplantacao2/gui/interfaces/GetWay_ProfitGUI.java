@@ -25,21 +25,21 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-import vrimplantacao2.dao.interfaces.GetWayDAO;
+import vrimplantacao2.dao.interfaces.GetWay_ProfitDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 
-public class GetWayGUI extends VRInternalFrame {
+public class GetWay_ProfitGUI extends VRInternalFrame {
 
     private static final String SISTEMA = "GetWay";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static GetWayGUI instance;
+    private static GetWay_ProfitGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private GetWayDAO getWayDAO = new GetWayDAO();
+    private GetWay_ProfitDAO getWayDAO = new GetWay_ProfitDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
 
     private void carregarTipoDocumento() throws Exception {
@@ -107,7 +107,7 @@ public class GetWayGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private GetWayGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private GetWay_ProfitGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "WIN1252";        
@@ -214,7 +214,7 @@ public class GetWayGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new GetWayGUI(i_mdiFrame);
+                instance = new GetWay_ProfitGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);

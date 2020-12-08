@@ -146,7 +146,7 @@ import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GenericGUI;
 import vrimplantacao2.gui.interfaces.GestorPdvGUI;
-import vrimplantacao2.gui.interfaces.GetWayGUI;
+import vrimplantacao2.gui.interfaces.GetWay_ProfitGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI_v2;
@@ -236,7 +236,7 @@ import vrimplantacao2.gui.interfaces.SophyxVendaGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
-import vrimplantacao2.gui.interfaces.SuperServerGUI;
+import vrimplantacao2.gui.interfaces.SuperControle_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.SyncTecGUI;
 import vrimplantacao2.gui.interfaces.SysERPGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
@@ -288,7 +288,7 @@ public final class MenuGUI extends VRMdiFrame {
     public CgaGUI formImportarCga = null;
     public MilenioGUI formImportarMilenio = null;
     public JMasterGUI formImportarJMaster = null;    
-    public GetWayGUI formImportarGetWay = null;
+    public GetWay_ProfitGUI formImportarGetWay = null;
     public IdealGUI formImportarIdeal = null;
     public ImportacaoLogVendaGUI formImportacaoLogVendaGUI = null;
     public RMSGUI formImportarRM = null;
@@ -311,7 +311,7 @@ public final class MenuGUI extends VRMdiFrame {
     public DirectorGUI formImportarDirector = null;
     public VRSoftwarePDVGUI formImportarVRSoftwarePDV = null;
     public EccusInformaticaGUI formImportarEccusInformatica = null;
-    public SuperServerGUI formImportarSuperServer = null;
+    public SuperControle_SuperServerGUI formImportarSuperServer = null;
     public ControlWareGUI formImportarControlWare = null;
     public DestroGUI formImportarDestroGUI = null;
     public SysMouraGUI formImportarSysMoura = null;
@@ -3361,7 +3361,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSHIActionPerformed
 
     private void jMenuItemGetWayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGetWayActionPerformed
-        GetWayGUI.exibir(this);
+        GetWay_ProfitGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGetWayActionPerformed
 
     private void jMenuItemSysPDVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVActionPerformed
@@ -3691,7 +3691,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItemSuperServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSuperServerActionPerformed
         
-        SuperServerGUI.exibir(this);
+        SuperControle_SuperServerGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSuperServerActionPerformed
 
     private void jMenuItemCISSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCISSActionPerformed

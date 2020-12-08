@@ -38,7 +38,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(STIDAO.class.getName());
     
     @Override
     public String getSistema() {
