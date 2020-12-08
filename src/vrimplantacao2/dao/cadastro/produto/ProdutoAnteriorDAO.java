@@ -698,6 +698,7 @@ public class ProdutoAnteriorDAO {
                         anterior.getImportId());
             } catch (Exception e) {
                 sql.setFormatarSQL(true);
+                System.out.println(sql.getInsert());
                 Util.exibirMensagem(sql.getInsert(), "");
                 throw e;
             }

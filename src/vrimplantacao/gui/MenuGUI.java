@@ -268,7 +268,10 @@ import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.MercaLiteGUI;
+import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
+import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -684,6 +687,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu2 = new javax.swing.JMenu();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuAutocom = new javax.swing.JMenuItem();
+        mnuMercaLite = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -747,11 +751,13 @@ public final class MenuGUI extends VRMdiFrame {
         mnuContaPagar1 = new javax.swing.JMenuItem();
         mnuVarejoFacil = new javax.swing.JMenuItem();
         mnuGeneric = new javax.swing.JMenuItem();
+        mnuMerceariaSene = new javax.swing.JMenuItem();
         jMenu13 = new javax.swing.JMenu();
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
         mnuFarm2000 = new javax.swing.JMenuItem();
         mnuForti = new javax.swing.JMenuItem();
+        mnuSic = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -1746,6 +1752,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu2.add(mnuAutocom);
 
+        mnuMercaLite.setText("MercaLite");
+        mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMercaLiteActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuMercaLite);
+
         mnuDatabase.add(jMenu2);
 
         mnuDB2.setText("IBM DB2");
@@ -2227,6 +2241,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu3.add(mnuGeneric);
 
+        mnuMerceariaSene.setText("Mercearia Sene (cliente)");
+        mnuMerceariaSene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMerceariaSeneActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuMerceariaSene);
+
         mnuDatabase.add(jMenu3);
 
         jMenu13.setText("Paradox");
@@ -2262,6 +2284,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu13.add(mnuForti);
+
+        mnuSic.setText("Sic");
+        mnuSic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSicActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuSic);
 
         mnuDatabase.add(jMenu13);
 
@@ -4979,6 +5009,21 @@ public final class MenuGUI extends VRMdiFrame {
         PlenoKWGUI.exibir(this);
     }//GEN-LAST:event_mnuPlenoKWActionPerformed
 
+    private void mnuSicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSicActionPerformed
+        // TODO add your handling code here:
+        SicGUI.exibir(this);
+    }//GEN-LAST:event_mnuSicActionPerformed
+
+    private void mnuMercaLiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMercaLiteActionPerformed
+        // TODO add your handling code here:
+        MercaLiteGUI.exibir(this);
+    }//GEN-LAST:event_mnuMercaLiteActionPerformed
+
+    private void mnuMerceariaSeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMerceariaSeneActionPerformed
+        // TODO add your handling code here:
+        MerceariaSeneGUI.exibir(this);
+    }//GEN-LAST:event_mnuMerceariaSeneActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5190,6 +5235,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
+    private javax.swing.JMenuItem mnuMercaLite;
+    private javax.swing.JMenuItem mnuMerceariaSene;
     private javax.swing.JMenuItem mnuMobnePdv;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
@@ -5233,6 +5280,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuScripts;
     private javax.swing.JMenuItem mnuSiaCriareByFile;
     private javax.swing.JMenuItem mnuSiaCriareDbf;
+    private javax.swing.JMenuItem mnuSic;
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
     private javax.swing.JMenuItem mnuSigma;
