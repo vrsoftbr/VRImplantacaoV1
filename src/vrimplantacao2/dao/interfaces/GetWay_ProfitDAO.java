@@ -68,9 +68,9 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author lucasrafael
  */
-public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
+public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(GetWay_ProfitDAO.class.getName());
 
     public int v_tipoDocumento;
     public int v_tipoDocumentoCheque;

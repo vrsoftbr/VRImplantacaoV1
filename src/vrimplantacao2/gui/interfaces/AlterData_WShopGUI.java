@@ -10,18 +10,17 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.AlterDataWShopDAO;
+import vrimplantacao2.dao.interfaces.AlterData_WShopDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
 
-public class AlterDataWShopGUI extends VRInternalFrame {    
+public class AlterData_WShopGUI extends VRInternalFrame {    
     
     private static final String SISTEMA = "WSoft";
-    private static AlterDataWShopGUI instance;
+    private static AlterData_WShopGUI instance;
     
-    private final AlterDataWShopDAO dao = new AlterDataWShopDAO();
+    private final AlterData_WShopDAO dao = new AlterData_WShopDAO();
     private final ConexaoPostgres connSQL = new ConexaoPostgres();
     
     private int vLojaVR = -1;
@@ -49,7 +48,7 @@ public class AlterDataWShopGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private AlterDataWShopGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private AlterData_WShopGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -185,7 +184,7 @@ public class AlterDataWShopGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new AlterDataWShopGUI(i_mdiFrame);
+                instance = new AlterData_WShopGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);

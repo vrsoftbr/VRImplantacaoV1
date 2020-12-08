@@ -37,7 +37,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class HRTechDAO extends InterfaceDAO {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(HRTechDAO.class.getName());
 
     @Override
     public String getSistema() {

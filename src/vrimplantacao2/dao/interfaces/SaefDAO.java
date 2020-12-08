@@ -36,7 +36,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class SaefDAO extends InterfaceDAO {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(SaefDAO.class.getName());
 
     public String v_lojaMesmoId;
     private Object SaefDAO;
