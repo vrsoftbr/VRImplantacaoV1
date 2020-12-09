@@ -46,7 +46,7 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             "	v.quant qtd,\n" +
             "	v.total,\n" +
             "	case\n" +
-            "		when v.datahoracancelamentoitem is null then 0\n" +
+            "		when v.tipo = 1 then 0\n" +
             "		else 1\n" +
             "	end cancelado,\n" +
             "	v.desconto valorDesconto,\n" +
@@ -62,7 +62,7 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             "		p.es1_cod = pc.ES1_COD\n" +
             "where\n" +
             "	v.data between '" + format.format(intervalo.dataInicial) + "' and '" + format.format(intervalo.dataFinal) + "'\n" +
-            "	and	pc.es1_empresa = " + idLoja + "\n" +
+            "	and pc.es1_empresa = " + idLoja + "\n" +
             "order by\n" +
             "	v.cupom,\n" +
             "	v.caixa,\n" +
