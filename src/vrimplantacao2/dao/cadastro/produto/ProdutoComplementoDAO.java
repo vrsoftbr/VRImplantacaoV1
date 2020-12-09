@@ -731,4 +731,67 @@ public class ProdutoComplementoDAO {
                     + " and id_loja = " + vo.getIdLoja());
         }
     }
+
+    public void criarEstoqueTrocaAnteriorTemporario(int lojaVR) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "create temp table tmp_troca \n"
+                    + "on commit drop \n"
+                    + "as \n"
+                    + "select \n"
+                    + "	id, \n"
+                    + "	id_produto, \n"
+                    + "	troca \n"
+                    + "from\n"
+                    + "	produtocomplemento\n"
+                    + "where\n"
+                    + "	id_loja = " + lojaVR + "\n"
+                    + "order by\n"
+                    + "	id"
+            );
+        }
+    }
+
+    public void gerarLogDeTrocaViaTMP_TROCA(int lojaVR) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "insert into logtroca (\n" +
+                    "	id_loja,\n" +
+                    "	id_produto,\n" +
+                    "	quantidade,\n" +
+                    "	datahora,\n" +
+                    "	id_usuario,\n" +
+                    "	estoqueanterior,\n" +
+                    "	estoqueatual,\n" +
+                    "	id_tipoentradasaida,\n" +
+                    "	datamovimento,\n" +
+                    "	id_motivotroca,\n" +
+                    "	observacaotroca\n" +
+                    ")\n" +
+                    "select\n" +
+                    "	pc.id_loja,\n" +
+                    "	pc.id_produto,\n" +
+                    "	(pc.troca - coalesce(l.troca, pc.troca)) * (case when coalesce(l.troca,pc.troca) > pc.troca then -1 else 1 end) quantidade,\n" +
+                    "	current_timestamp datahora, \n" +
+                    "	0 id_usuario, \n" +
+                    "	coalesce(l.troca, pc.troca) estoqueanterior,\n" +
+                    "	pc.troca estoqueatual, \n" +
+                    "	case \n" +
+                    "	when coalesce(l.troca, pc.troca) < pc.troca then 0 \n" +
+                    "	when coalesce(l.troca, pc.troca) = pc.troca then 2\n" +
+                    "	else 1 end id_tipoentradasaida, \n" +
+                    "	current_timestamp datamovimento, \n" +
+                    "	(select id from tipomotivotroca t where descricao like '%IMPORTA%' and id_situacaocadastro = 1 limit 1) id_tipotroca,\n" +
+                    "	'IMPORTACAO (VRIMPLANTACAO)' observacaotroca\n" +
+                    "from\n" +
+                    "	produtocomplemento pc\n" +
+                    "	left join tmp_troca l on\n" +
+                    "		pc.id_produto = l.id_produto\n" +
+                    "where\n" +
+                    "	pc.id_loja = " + lojaVR + "\n" +
+                    "order by\n" +
+                    "	id_produto;"
+            );
+        }
+    }
 }

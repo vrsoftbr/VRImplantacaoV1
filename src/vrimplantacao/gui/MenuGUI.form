@@ -740,6 +740,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutocomActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuMercaLite">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="MercaLite"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMercaLiteActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuDB2">
@@ -1040,6 +1048,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSTIActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuPlenoKW">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Pleno KW"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPlenoKWActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu7">
@@ -1231,6 +1247,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuGenericActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuMerceariaSene">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Mercearia Sene (cliente)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMerceariaSeneActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu13">
@@ -1268,6 +1292,14 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuFortiActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSic">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sic"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSicActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

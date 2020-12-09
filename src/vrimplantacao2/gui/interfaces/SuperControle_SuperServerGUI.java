@@ -20,19 +20,19 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.SuperServerDAO;
+import vrimplantacao2.dao.interfaces.SuperControle_SuperServerDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class SuperServerGUI extends VRInternalFrame {
+public class SuperControle_SuperServerGUI extends VRInternalFrame {
     
     private static final String SISTEMA = "SuperServer";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static SuperServerGUI instance;    
+    private static SuperControle_SuperServerGUI instance;    
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private SuperServerDAO dao = new SuperServerDAO();
+    private SuperControle_SuperServerDAO dao = new SuperControle_SuperServerDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
 
     private void carregarParametros() throws Exception {
@@ -66,7 +66,7 @@ public class SuperServerGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private SuperServerGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private SuperControle_SuperServerGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -164,7 +164,7 @@ public class SuperServerGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new SuperServerGUI(i_mdiFrame);
+                instance = new SuperControle_SuperServerGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);

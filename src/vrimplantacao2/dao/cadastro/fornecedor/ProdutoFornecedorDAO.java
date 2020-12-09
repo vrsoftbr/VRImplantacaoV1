@@ -215,10 +215,10 @@ public class ProdutoFornecedorDAO {
         
             for (ProdutoFornecedorIMP imp: produtos) {
                 //Impede a importação de códigos externos em branco.
-                //if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {                    
-                //    ProgressBar.next();
-                //    continue;
-                //}
+                if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {                    
+                    ProgressBar.next();
+                    continue;
+                }
                 FornecedorVO fornecedor = null;
                 if (fornAntDAO.getAnteriores().containsKey(
                     imp.getImportSistema(),
@@ -307,74 +307,42 @@ public class ProdutoFornecedorDAO {
                             }
                             produtoFornecedor.setCodigoExterno(imp.getCodigoExterno());
                             produtoFornecedor.setPesoEmbalagem(imp.getPesoEmbalagem());
+                            produtoFornecedor.setFatorEmbalagem(imp.getFatorEmbalagem());
                             codigoExterno = produtoFornecedor.getCodigoExterno();
                             //</editor-fold>
 
                             //<editor-fold defaultstate="collapsed" desc="Gravando o ProdutoFornecedorVO">
-                            
-                            if (imp.getCodigoExterno() == null || imp.getCodigoExterno().trim().equals("")) {
-                                SQLBuilder sql = new SQLBuilder();
-                                sql.setTableName("produtofornecedorprelancamento");
-                                sql.put("id_produto", produtoFornecedor.getProduto().getId());
-                                sql.put("id_fornecedor", produtoFornecedor.getFornecedor().getId());
-                                sql.put("id_estado", produtoFornecedor.getEstado().getId());
-                                sql.put("custotabela", produtoFornecedor.getCustoTabela());
-                                sql.put("qtdembalagem", produtoFornecedor.getQtdEmbalagem());
-                                sql.put("dataalteracao", produtoFornecedor.getDataAlteracao());
-                                sql.put("desconto", 0);
-                                sql.put("tipoipi", 0);
-                                sql.put("ipi", 0);
-                                sql.put("tipobonificacao", 0);
-                                sql.put("bonificacao", 0);
-                                sql.put("tipoverba", 0);
-                                sql.put("verba", 0);
-                                sql.put("custoinicial", produtoFornecedor.getCustoTabela());
-                                sql.put("tipodesconto", 0);
-                                sql.put("id_divisaofornecedor", produtoFornecedor.getIdDivisaoFornecedor());
-                                sql.getReturning().add("id");
-                                
-                                try (Statement stm = Conexao.createStatement()) {
-                                    try (ResultSet rst = stm.executeQuery(
-                                            sql.getInsert()
-                                    )) {
-                                        while (rst.next()) {
-                                            produtoFornecedor.setId(rst.getInt("id"));
-                                        }
-                                    }
-                                }                                
-                            } else {
-                                SQLBuilder sql = new SQLBuilder();
-                                sql.setTableName("produtofornecedor");
-                                sql.put("id_produto", produtoFornecedor.getProduto().getId());
-                                sql.put("id_fornecedor", produtoFornecedor.getFornecedor().getId());
-                                sql.put("id_estado", produtoFornecedor.getEstado().getId());
-                                sql.put("custotabela", produtoFornecedor.getCustoTabela());
-                                sql.put("codigoexterno", produtoFornecedor.getCodigoExterno());
-                                sql.put("qtdembalagem", produtoFornecedor.getQtdEmbalagem());
-                                sql.put("dataalteracao", produtoFornecedor.getDataAlteracao());
-                                sql.put("desconto", 0);
-                                sql.put("tipoipi", 0);
-                                sql.put("ipi", 0);
-                                sql.put("tipobonificacao", 0);
-                                sql.put("bonificacao", 0);
-                                sql.put("tipoverba", 0);
-                                sql.put("verba", 0);
-                                sql.put("custoinicial", produtoFornecedor.getCustoTabela());
-                                sql.put("tipodesconto", 0);
-                                sql.put("pesoembalagem", produtoFornecedor.getPesoEmbalagem());
-                                sql.put("id_tipopiscofins", 0);
-                                sql.putNull("csosn");
-                                sql.put("fatorembalagem", 1);
-                                sql.put("id_divisaofornecedor", produtoFornecedor.getIdDivisaoFornecedor());
-                                sql.getReturning().add("id");
+                            SQLBuilder sql = new SQLBuilder();
+                            sql.setTableName("produtofornecedor");
+                            sql.put("id_produto", produtoFornecedor.getProduto().getId());
+                            sql.put("id_fornecedor", produtoFornecedor.getFornecedor().getId());
+                            sql.put("id_estado", produtoFornecedor.getEstado().getId());
+                            sql.put("custotabela", produtoFornecedor.getCustoTabela());
+                            sql.put("codigoexterno", produtoFornecedor.getCodigoExterno());
+                            sql.put("qtdembalagem", produtoFornecedor.getQtdEmbalagem());
+                            sql.put("dataalteracao", produtoFornecedor.getDataAlteracao());
+                            sql.put("desconto", 0);
+                            sql.put("tipoipi", 0);
+                            sql.put("ipi", 0);
+                            sql.put("tipobonificacao", 0);
+                            sql.put("bonificacao", 0);
+                            sql.put("tipoverba", 0);
+                            sql.put("verba", 0);
+                            sql.put("custoinicial", produtoFornecedor.getCustoTabela());
+                            sql.put("tipodesconto", 0);
+                            sql.put("pesoembalagem", produtoFornecedor.getPesoEmbalagem());
+                            sql.put("id_tipopiscofins", 0);
+                            sql.putNull("csosn");
+                            sql.put("fatorembalagem", produtoFornecedor.getFatorEmbalagem());
+                            sql.put("id_divisaofornecedor", produtoFornecedor.getIdDivisaoFornecedor());
+                            sql.getReturning().add("id");
 
-                                try (Statement stm = Conexao.createStatement()) {
-                                    try (ResultSet rst = stm.executeQuery(
-                                            sql.getInsert()
-                                    )) {
-                                        while (rst.next()) {
-                                            produtoFornecedor.setId(rst.getInt("id"));
-                                        }
+                            try (Statement stm = Conexao.createStatement()) {
+                                try (ResultSet rst = stm.executeQuery(
+                                        sql.getInsert()
+                                )) {
+                                    while (rst.next()) {
+                                        produtoFornecedor.setId(rst.getInt("id"));
                                     }
                                 }
                             }
@@ -447,10 +415,7 @@ public class ProdutoFornecedorDAO {
                             }  
                         }
                     }
-                } else {
-                    System.out.println("Fornecedor: " + imp.getIdFornecedor() + " and Produto: " + imp.getIdProduto() + " não localizado.");
                 }
-                
                 ProgressBar.next();                
             }
             Conexao.commit();

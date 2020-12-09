@@ -680,6 +680,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setSalario(linha.getDouble("salario"));
                 imp.setValorLimite(linha.getDouble("valorLimite"));
                 imp.setNomeConjuge(linha.getString("nomeConjuge"));
+                imp.setDataNascimentoConjuge(linha.getData("dataNascimentoConjuge"));
                 imp.setNomePai(linha.getString("nomePai"));
                 imp.setNomeMae(linha.getString("nomeMae"));
                 imp.setObservacao(linha.getString("observacao"));
@@ -687,9 +688,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDiaVencimento(linha.getInt("diaVencimento"));
                 imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
                 imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
+                imp.setSenha(linha.getInt("senha"));
                 imp.setTelefone(linha.getString("telefone"));
                 imp.setCelular(linha.getString("celular"));
                 imp.setEmail(linha.getString("email"));
+                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
                 //EVENTUAL
                 imp.setFax(linha.getString("fax"));
                 imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));

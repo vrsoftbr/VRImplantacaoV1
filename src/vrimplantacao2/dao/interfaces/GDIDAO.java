@@ -1,19 +1,13 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
@@ -25,16 +19,12 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -193,7 +183,8 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    tprodutos p\n"
                     + "left join tprecos pp on p.id_produto = pp.id_produto\n"
-                    + "left join tbarras ean on p.id_produto = ean.id_produto")) {
+                    + "left join tbarras ean on p.id_produto = ean.id_produto\n"
+                    + "where p.excluido = 'N'")) {
                 Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -254,10 +245,23 @@ public class GDIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstSaida(imp.getIcmsCstConsumidor());
                     imp.setIcmsAliqSaida(imp.getIcmsAliqConsumidor());
                     imp.setIcmsReducaoSaida(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoConsumidor());
 
                     imp.setIcmsCstEntrada(imp.getIcmsCstConsumidor());
                     imp.setIcmsAliqEntrada(imp.getIcmsAliqConsumidor());
                     imp.setIcmsReducaoEntrada(imp.getIcmsReducaoConsumidor());
+                    
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstConsumidor());
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqConsumidor());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoConsumidor());
+                    
                     imp.setBeneficio(rs.getString("beneficio"));
 
                     result.add(imp);

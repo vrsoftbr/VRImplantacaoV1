@@ -177,10 +177,6 @@ public class AutocomGUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
-                        if (chkRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
-                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -230,7 +226,6 @@ public class AutocomGUI extends VRInternalFrame {
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel11 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
@@ -342,14 +337,6 @@ public class AutocomGUI extends VRInternalFrame {
             }
         });
 
-        chkRotativo.setText("Crédito Rotativo");
-        chkRotativo.setEnabled(true);
-        chkRotativo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkRotativoActionPerformed(evt);
-            }
-        });
-
         chkClienteEventual.setText("Cliente Eventual");
         chkClienteEventual.setEnabled(true);
         chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
@@ -365,20 +352,15 @@ public class AutocomGUI extends VRInternalFrame {
             .addGroup(vRPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel11Layout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(377, Short.MAX_VALUE))
+                .addContainerGap(482, Short.MAX_VALUE))
         );
         vRPanel11Layout.setVerticalGroup(
             vRPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel11Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(201, Short.MAX_VALUE))
@@ -500,10 +482,6 @@ public class AutocomGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkClientePreferencialActionPerformed
 
-    private void chkRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRotativoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkRotativoActionPerformed
-
     private void chkFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
@@ -522,7 +500,6 @@ public class AutocomGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;

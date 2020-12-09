@@ -31,9 +31,9 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class AlterDataWShopDAO extends InterfaceDAO {
+public class AlterData_WShopDAO extends InterfaceDAO {
 
-    private static final Logger LOG = Logger.getLogger(AlterDataWShopDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(AlterData_WShopDAO.class.getName());
 
     @Override
     public String getSistema() {
