@@ -46,7 +46,7 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             "	v.quant qtd,\n" +
             "	v.total total,\n" +
             "	case\n" +
-            "		when v.datahoracancelamentoitem is null and v.reproccanc = 0 then 0\n" +
+            "		when v.tipo = 1 then 0\n" +
             "		else 1\n" +
             "	end cancelado,\n" +
             "	v.desconto valorDesconto,\n" +
