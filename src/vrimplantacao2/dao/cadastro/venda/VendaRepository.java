@@ -534,6 +534,13 @@ public class VendaRepository {
 
                 provider.begin();
                 try {
+                    //TODO: Remover essa repetição de código.
+                    provider.gerarRegistrosGenericos();
+
+                    provider.gerarECFs();
+
+                    provider.gerarConsistencia();
+                    
                     for (VendaItemIMP impItem : divergentes) {
                         provider.gravarMapa(
                                 impItem.getProduto(),
