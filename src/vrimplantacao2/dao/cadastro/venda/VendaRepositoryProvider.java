@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.venda;
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -231,8 +232,8 @@ public class VendaRepositoryProvider {
         return icm;
     }
 
-    List<VendaItemIMP> getProdutosVendidos() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<VendaItemIMP> getProdutosVendidos() throws SQLException {
+        return vendaItemImpDao.getProdutosVendidos();
     }
     
 

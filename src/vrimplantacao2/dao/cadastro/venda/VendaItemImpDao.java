@@ -73,6 +73,12 @@ public class VendaItemImpDao {
             throw ex;
         }
     }
+
+    public List<VendaItemIMP> getProdutosVendidos() throws SQLException {
+        QueryBuilder<VendaItemIMP, String> query = dao.queryBuilder()
+                .groupBy("produto");
+        return query.query();
+    }
     
     /**
      * Transação para gravar uma listagem de {@link VendaItemIMP}.
