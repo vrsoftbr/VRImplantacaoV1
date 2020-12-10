@@ -27,9 +27,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
     @Override
     public String getSistema() {
-        return "SuperServer";
+        return "SuperServer" + ("".equals(complemento) ? "" : " - " + complemento);
     }
 
     @Override
