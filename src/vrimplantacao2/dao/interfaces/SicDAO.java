@@ -113,7 +113,7 @@ public class SicDAO extends InterfaceDAO {
                     imp.setMerc2ID("1");
                     imp.setMerc2Descricao(imp.getMerc1Descricao());
                     imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc3Descricao());
+                    imp.setMerc3Descricao(imp.getMerc1Descricao());
                     result.add(imp);
                 }
             }
