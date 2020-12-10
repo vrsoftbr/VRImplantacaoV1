@@ -33,6 +33,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexao.carregarParametros();
+        pnlProdutos.carregarParametros(params, SISTEMA);
         txtComplemento.setText(params.get(SISTEMA, "COMPLEMENTO"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -41,6 +42,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexao.atualizarParametros();
+        pnlProdutos.gravarParametros(params, SISTEMA);
         params.put(txtComplemento.getText(), SISTEMA, "COMPLEMENTO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -60,6 +62,8 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         initComponents();
         
         this.title = "Importação " + SISTEMA;
+        
+        conexao.setSistema(SISTEMA);
         
         conexao.host = "localhost";
         conexao.database = "sc2010";
@@ -255,13 +259,13 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        pnlFornecedor = new vrframework.bean.panel.VRPanel();
+        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         pnlClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        pnlFornecedor = new vrframework.bean.panel.VRPanel();
-        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -337,6 +341,47 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Produtos", pnlProdutos);
 
+        pnlFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        chkFornecedor.setText("Fornecedor");
+        chkFornecedor.setEnabled(true);
+        chkFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFornecedorActionPerformed(evt);
+            }
+        });
+
+        chkProdutoFornecedor.setText("Produto Fornecedor");
+        chkProdutoFornecedor.setEnabled(true);
+        chkProdutoFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkProdutoFornecedorActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlFornecedorLayout = new javax.swing.GroupLayout(pnlFornecedor);
+        pnlFornecedor.setLayout(pnlFornecedorLayout);
+        pnlFornecedorLayout.setHorizontalGroup(
+            pnlFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(383, Short.MAX_VALUE))
+        );
+        pnlFornecedorLayout.setVerticalGroup(
+            pnlFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(199, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Fornecedores", pnlFornecedor);
+
         pnlClientes.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         chkClientePreferencial.setText("Cliente Preferencial");
@@ -390,47 +435,6 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         );
 
         vRTabbedPane2.addTab("Clientes", pnlClientes);
-
-        pnlFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
-        chkFornecedor.setText("Fornecedor");
-        chkFornecedor.setEnabled(true);
-        chkFornecedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFornecedorActionPerformed(evt);
-            }
-        });
-
-        chkProdutoFornecedor.setText("Produto Fornecedor");
-        chkProdutoFornecedor.setEnabled(true);
-        chkProdutoFornecedor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkProdutoFornecedorActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnlFornecedorLayout = new javax.swing.GroupLayout(pnlFornecedor);
-        pnlFornecedor.setLayout(pnlFornecedorLayout);
-        pnlFornecedorLayout.setHorizontalGroup(
-            pnlFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlFornecedorLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(383, Short.MAX_VALUE))
-        );
-        pnlFornecedorLayout.setVerticalGroup(
-            pnlFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlFornecedorLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(199, Short.MAX_VALUE))
-        );
-
-        vRTabbedPane2.addTab("Fornecedores", pnlFornecedor);
 
         tabs.addTab("Importação", vRTabbedPane2);
 
