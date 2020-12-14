@@ -1,14 +1,22 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -27,9 +35,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
     @Override
     public String getSistema() {
-        return "SuperServer";
+        return "SuperServer" + ("".equals(complemento) ? "" : " - " + complemento);
     }
 
     @Override
@@ -93,6 +107,49 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_CONSUMIDOR
+        ));
     }
 
     @Override
@@ -177,36 +234,30 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     + "		e.fkCliente = @fkCliente\n"
                     + "	left join CadProduto.AliquotaICMS icms on \n"
                     + "		icms.id = p.aliqICMS and\n"
-                    + "		icms.fkCliente = @fkCliente"
+                    + "		icms.fkCliente = @fkCliente\n"
+                    + "order by p.balanca desc, ean.ean"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-
-                    String plu = String.valueOf(Utils.stringToLong(rst.getString("ean")));
                     
-                    if (rst.getInt("balanca") == 1) {
-                        if (plu.startsWith("2") && plu.endsWith("0") && plu.length() == 7) {
-                            imp.seteBalanca(true);
-
-                            imp.setEan(plu.substring(1, 6));
-
-                            if (rst.getInt("e_unitario_pesavel") == 1) {
-                                imp.setTipoEmbalagem("UN");
-                            } else {
-                                imp.setTipoEmbalagem("KG");
-                            }
-                        } else {
-                            imp.seteBalanca(false);
-                        }
-                    }
+                    String ean = tratandoPLU(rst.getBoolean("balanca"), rst.getString("ean"));
+                    int plu = Utils.stringToInt(ean, -2);
                     
-                    if(plu != null && !"".equals(plu) && plu.length() < 7 && !imp.isBalanca()) {
-                        imp.setManterEAN(true);
+                    ProdutoBalancaVO bal = balanca.get(plu);
+                    if (bal != null && rst.getBoolean("balanca")) {
+                        imp.setEan(ean);
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        imp.setEan(ean);
+                        imp.seteBalanca(rst.getBoolean("balanca"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(rst.getInt("validade"));
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -246,6 +297,22 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         }
 
         return result;
+    }
+
+    private String tratandoPLU(boolean isBalanca, String ean) throws SQLException {
+        //Tratando em de balança
+        if (isBalanca) {
+            //ean = 0000000200020
+            String eanBal = Utils.stringLong(ean); //200020
+            if (eanBal.startsWith("2") && eanBal.endsWith("0")) {
+                int plu = Utils.stringToInt(
+                        eanBal.substring(1, eanBal.length() - 1),//0002
+                        -2
+                ); //ean = 2
+                ean = String.valueOf(plu);
+            }
+        }
+        return ean;
     }
 
     @Override

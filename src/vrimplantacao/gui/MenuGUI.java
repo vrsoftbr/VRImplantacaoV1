@@ -2602,7 +2602,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(jMenuItemEcosInformatica);
 
-        jMenuItemSuperServer.setText("SuperServer");
+        jMenuItemSuperServer.setText("Super Controler - SuperServer");
         jMenuItemSuperServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemSuperServerActionPerformed(evt);
