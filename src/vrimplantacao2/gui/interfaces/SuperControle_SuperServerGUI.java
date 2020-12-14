@@ -94,7 +94,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
             @Override
             public String getLoja() {
                 updateDaoSistemaLoja();
-                return vLojaCliente;
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -171,18 +171,16 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
-            String idLojaCliente;
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
                     
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id; 
                     
                     Importador importador = new Importador(dao);
-                    importador.setLojaOrigem(idLojaCliente);
+                    updateDaoSistemaLoja();
                     importador.setLojaVR(idLojaVR);                    
 
                     if (tabs.getSelectedIndex() == 0) {                        
