@@ -18,7 +18,6 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.MercaLiteDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -83,7 +82,7 @@ public class MercaLiteGUI extends VRInternalFrame {
         carregarParametros();
 
         tabProdutos.setOpcoesDisponiveis(dao);
-        
+
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
@@ -106,9 +105,9 @@ public class MercaLiteGUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-            
+
         });
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -179,7 +178,7 @@ public class MercaLiteGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     dao.setEncoding(txtEncoding.getText());
-                    
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
@@ -194,15 +193,15 @@ public class MercaLiteGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        if(chkContaPagar.isSelected()) {
+                        if (chkContaPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        } 
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
-                                    OpcaoCliente.DADOS, 
-                                    OpcaoCliente.CONTATOS, 
-                                    OpcaoCliente.VALOR_LIMITE, 
+                                    OpcaoCliente.DADOS,
+                                    OpcaoCliente.CONTATOS,
+                                    OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO,
                                     OpcaoCliente.EMAIL,
                                     OpcaoCliente.BAIRRO);
@@ -218,20 +217,20 @@ public class MercaLiteGUI extends VRInternalFrame {
                             if (chkCVencimento.isSelected()) {
                                 opcoes.add(OpcaoCliente.VENCIMENTO_ROTATIVO);
                             }
-                            
+
                             if (chkRazao.isSelected()) {
                                 opcoes.add(OpcaoCliente.RAZAO);
                             }
-                            
+
                             if (chkEnderecoCompleto.isSelected()) {
                                 opcoes.add(OpcaoCliente.ENDERECO_COMPLETO);
                             }
-                            
+
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
-                            }                            
+                            }
                         }
-                        
+
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
@@ -239,10 +238,10 @@ public class MercaLiteGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         /*if(chkPdvVendas.isSelected()) {
-                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }*/
+                         dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                         dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                         importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                         }*/
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
