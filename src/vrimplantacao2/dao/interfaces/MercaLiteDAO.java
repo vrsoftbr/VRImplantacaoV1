@@ -22,12 +22,11 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
- * @author Importacao
+ * @author Alan
  */
 public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -178,7 +177,7 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rs.getString("importid"));
                     imp.setEan(imp.getImportId());
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
@@ -190,34 +189,34 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(imp.getCustoSemImposto());
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setEstoque(rs.getDouble("estoque"));
-                    
+
                     imp.setCodMercadologico1(rs.getString("m1"));
                     imp.setCodMercadologico2(rs.getString("m2"));
                     imp.setCodMercadologico3(rs.getString("m3"));
-                    
+
                     //imp.seteBalanca("S".equals(rs.getString("balanca")));
                     
                     imp.setIcmsAliqSaida(rs.getDouble("icms_aliq"));
                     imp.setIcmsCstSaida(rs.getInt("icms_cst"));
                     imp.setIcmsReducaoSaida(0);
-                    
+
                     imp.setIcmsAliqConsumidor(rs.getDouble("icms_aliq"));
                     imp.setIcmsCstConsumidor(rs.getInt("icms_cst"));
                     imp.setIcmsReducaoConsumidor(0);
-                    
-                    /*String icmsDeb = rs.getString("tabicm");
-                    imp.setIcmsDebitoId(icmsDeb);
-                    imp.setIcmsDebitoForaEstadoId(icmsDeb);
-                    imp.setIcmsDebitoForaEstadoNfId(icmsDeb);
-                    imp.setIcmsConsumidorId(icmsDeb);
 
-                    String icmsCre = getAliquotaCreditoKey(
-                            rs.getString("icms_cst_credito"),
-                            rs.getDouble("icms_credito"),
-                            rs.getDouble("icms_reducao_credito")
-                    );
-                    imp.setIcmsCreditoId(icmsCre);
-                    imp.setIcmsCreditoForaEstadoId(icmsCre);*/
+                    /*String icmsDeb = rs.getString("tabicm");
+                     imp.setIcmsDebitoId(icmsDeb);
+                     imp.setIcmsDebitoForaEstadoId(icmsDeb);
+                     imp.setIcmsDebitoForaEstadoNfId(icmsDeb);
+                     imp.setIcmsConsumidorId(icmsDeb);
+
+                     String icmsCre = getAliquotaCreditoKey(
+                     rs.getString("icms_cst_credito"),
+                     rs.getDouble("icms_credito"),
+                     rs.getDouble("icms_reducao_credito")
+                     );
+                     imp.setIcmsCreditoId(icmsCre);
+                     imp.setIcmsCreditoForaEstadoId(icmsCre);*/
 
                     result.add(imp);
                 }
@@ -240,20 +239,17 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	id_produto idProduto,\n"
-                    + "	pre_promocao_datai dataInicio,\n"
-                    + "	pre_promocao_dataf dataFim,\n"
-                    + "	pre_promocao_preco precooferta,\n"
-                    + "	preco_venda precoNormal\n"
-                    + "from est_produtos\n"
-                    + "where\n"
-                    + "	pre_promocao_datai is not null\n"
-                    + "	and pre_promocao_dataf is not null\n"
-                    + "	and pre_promocao_datai <> '1899-12-30'\n"
-                    + "	and pre_promocao_dataf >= current_date"
+                    "SELECT\n"
+                    + "	 codprod idproduto,\n"
+                    + "	 per1 datainicio,\n"
+                    + "	 per2 datafim,\n"
+                    + "	 pr_unit preconormal,\n"
+                    + "	 pr_per precooferta\n"
+                    + "FROM \n"
+                    + "	 ATAKREJO \n"
+                    + "WHERE\n"
+                    + "	 pr_per > 0 AND pr_unit > 0 "
             )) {
-
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
                     imp.setIdProduto(rs.getString("idproduto"));
@@ -261,9 +257,8 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataFim(rs.getDate("datafim"));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
-
+                    
                     result.add(imp);
-
                 }
             }
         }
@@ -428,58 +423,6 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setValorLimite(rs.getDouble("valorlimite"));
                     imp.setTelefone(rs.getString("telefone"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    /*"select\n"
-                     + "    c.id_cliente as idFornecedor,\n"
-                     + "    cf.cod_prod as idProduto,\n"
-                     + "    fator as qtdEmbalagem,\n"
-                     + "    cf.id_cod codigoexterno\n"
-                     + "from\n"
-                     + "    codigo_fornec cf\n"
-                     + "        left join clie_dados c\n"
-                     + "            on cf.id_cnpj = replace(replace(replace(c.cnpj_cpf,'.',''), '/', ''), '-', '')\n"
-                     + "where\n"
-                     + "    cf.cod_prod is not null\n"
-                     + "order by\n"
-                     + "    idFornecedor"*/
-                    "select\n"
-                    + "c.id_cliente as idFornecedor,\n"
-                    + "cf.cod_prod as idProduto,\n"
-                    + "fator as qtdEmbalagem,\n"
-                    + "cf.id_cod codigoexterno\n"
-                    + "from\n"
-                    + "codigo_fornec cf\n"
-                    + "left join clie_dados c\n"
-                    + "on cf.id_cnpj = replace(replace(replace(c.cnpj_cpf,'.',''), '/', ''), '-', '')\n"
-                    + "where cf.cod_prod is not null\n"
-                    + "union all\n"
-                    + "select\n"
-                    + "cod_fornecedor as idFornecedor,\n"
-                    + "id_produto as idProduto,\n"
-                    + "qtd_emb as qtdEmbalagem,\n"
-                    + "'' as codigoexterno\n"
-                    + "from est_produtos"
-            )) {
-                while (rs.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setIdFornecedor(rs.getString("idFornecedor"));
-                    imp.setIdProduto(rs.getString("idProduto"));
-                    imp.setQtdEmbalagem(rs.getDouble("qtdEmbalagem"));
-                    imp.setCodigoExterno(rs.getString("codigoexterno"));
 
                     result.add(imp);
                 }
