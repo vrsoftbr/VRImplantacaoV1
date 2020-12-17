@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -40,7 +41,7 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
-    
+
     @Override
     public String getSistema() {
         return "SuperServer" + ("".equals(complemento) ? "" : " - " + complemento);
@@ -238,6 +239,10 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     + "order by p.balanca desc, ean.ean"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                
+                System.out.println(getSistema());
+                System.out.println(getLojaOrigem());
+                
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
@@ -246,7 +251,7 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     
                     String ean = tratandoPLU(rst.getBoolean("balanca"), rst.getString("ean"));
                     int plu = Utils.stringToInt(ean, -2);
-                    
+
                     ProdutoBalancaVO bal = balanca.get(plu);
                     if (bal != null && rst.getBoolean("balanca")) {
                         imp.setEan(ean);
@@ -289,8 +294,19 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("piscofins_cst_debito")));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofins_cst_credito")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofins_natureza_receita")));
-                    imp.setIcmsDebitoId(rst.getString("aliqICMS"));
-                    imp.setIcmsCreditoId(rst.getString("aliqICMS"));
+                    
+                    String idIcms = getAliquotaKey(
+                            rst.getString("icms_cst"),
+                            rst.getDouble("icms_aliq"),
+                            rst.getDouble("icms_reducao")
+                    );
+                    
+                    imp.setIcmsDebitoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                    imp.setIcmsCreditoId(idIcms);
+                    imp.setIcmsCreditoForaEstadoId(idIcms);
+                    imp.setIcmsConsumidorId(idIcms);
                     result.add(imp);
                 }
             }
@@ -364,7 +380,8 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                         imp.setCnpj_cpf(rst.getString("cnpj"));
                         imp.setIe_rg(rst.getString("inscricaoEstadual"));
                         imp.setInsc_municipal(rst.getString("inscricaoMunicipal"));
-                        imp.setAtivo(rst.getInt("bloqueado") == 0);
+                        imp.setBloqueado(rst.getInt("bloqueado") != 0);
+                        imp.setAtivo(rst.getInt("ativo") == 1);
 
                         imp.setEndereco(rst.getString("logradouro"));
                         imp.setNumero(rst.getString("numero"));
@@ -648,8 +665,8 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         return result;
     }
 
-    @Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
+    //@Override
+    public List<MapaTributoIMP> _getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -670,6 +687,56 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         }
     }
 
+    private String getAliquotaKey(String cst, double aliq, double red) throws Exception {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	distinct	\n"
+                    + "	p.aliqICMS,\n"
+                    + "	icm.descricaoAliquota,\n"
+                    + "	p.tribICMS as cst_icms,\n"
+                    + "	icm.taxa as aliq_icms,\n"
+                    + "	icm.reducaoBaseCalculo as red_icms\n"
+                    + "from CadProduto.Produto p\n"
+                    + "left join CadProduto.AliquotaICMS icm\n"
+                    + "	on icm.id = p.aliqICMS\n"
+                    + "where p.tribICMS is not null\n"
+                    + "and p.tribICMS != ''\n"
+                    + "and icm.fkCliente = 1\n"
+                    + "order by p.tribICMS, icm.taxa"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            rst.getString("cst_icms"),
+                            rst.getDouble("aliq_icms"),
+                            rst.getDouble("red_icms")
+                    );
+                    result.add(
+                            new MapaTributoIMP(
+                                    id,
+                                    rst.getString("descricaoAliquota"),
+                                    rst.getInt("cst_icms"),
+                                    rst.getDouble("aliq_icms"),
+                                    rst.getDouble("red_icms")
+                            )
+                    );
+                }
+            }
+            return result;
+        }
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -689,5 +756,5 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
             }
         }
         return result;
-    }
+    }    
 }

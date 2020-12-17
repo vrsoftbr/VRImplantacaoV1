@@ -1057,6 +1057,8 @@
                                           <Component id="chkIcmsDebitoForaEstado" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkIcmsDebitoForaEstadoNF" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkIcmsCreditoForaEstado" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
@@ -1095,6 +1097,7 @@
                               <Component id="chkIcmsCreditoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsConsumidor" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCodigoBeneficio" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsDebitoForaEstadoNF" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
@@ -1163,6 +1166,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCodigoBeneficio">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="C&#xf3;digo de Benef&#xed;cio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsDebitoForaEstadoNF">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito Fora Estado NF"/>
                   </Properties>
                 </Component>
               </SubComponents>

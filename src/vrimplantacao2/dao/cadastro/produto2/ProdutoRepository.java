@@ -409,6 +409,7 @@ public class ProdutoRepository {
 
                         if (aliquotas.containsKey(prod.getId(), aliquota.getEstado().getId())) {
                             provider.aliquota().atualizar(aliquota, optSimples);
+                            provider.anterior().atualizarIcms(anterior);
                         } else {
                             provider.aliquota().salvar(aliquota);
                             aliquotas.put(null, prod.getId(), aliquota.getEstado().getId());
@@ -1387,6 +1388,10 @@ public class ProdutoRepository {
         destino.setIcmsAliqSaidaForaEstadoNf(imp.getIcmsAliqSaidaForaEstadoNF());
         destino.setIcmsReducaoSaidaForaEstadoNf(imp.getIcmsReducaoSaidaForaEstadoNF());
 
+        destino.setIcmsCstConsumidor(imp.getIcmsCstConsumidor());
+        destino.setIcmsAliqConsumidor(imp.getIcmsAliqConsumidor());
+        destino.setIcmsReducaoConsumidor(imp.getIcmsReducaoConsumidor());
+        
         destino.setIcmsCstEntrada(imp.getIcmsCstEntrada());
         destino.setIcmsAliqEntrada(imp.getIcmsAliqEntrada());
         destino.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());

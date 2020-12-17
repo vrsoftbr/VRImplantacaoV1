@@ -259,6 +259,11 @@ public class ProdutoRepositoryProvider {
             dao.alterar(anterior);
         }
         
+        public void atualizarIcms(ProdutoAnteriorVO anterior) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            dao.atualizarIcmsAnterior(anterior);            
+        }
         public boolean cadastrado(String id) throws Exception {
             dao.setImportSistema(getSistema());
             dao.setImportLoja(getLoja());

@@ -722,6 +722,60 @@ public class ProdutoAnteriorDAO {
             }
         }
     }
+
+    public void atualizarIcmsAnterior(ProdutoAnteriorVO anterior) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("implantacao");
+            sql.setTableName("codant_produto");
+
+            sql.put("icmscst", anterior.getIcmsCst());
+            sql.put("icmsaliq", anterior.getIcmsAliq());
+            sql.put("icmsreducao", anterior.getIcmsReducao());
+            
+            sql.put("icmscstsaida", anterior.getIcmsCstSaida());
+            sql.put("icmsaliqsaida", anterior.getIcmsAliqSaida());
+            sql.put("icmsreducaosaida", anterior.getIcmsReducaoSaida());
+            
+            sql.put("icmscstsaidaforaestado", anterior.getIcmsCstSaidaForaEstado());
+            sql.put("icmsaliqsaidaforaestado", anterior.getIcmsAliqSaidaForaEstado());
+            sql.put("icmsreducaosaidaforaestado", anterior.getIcmsReducaoSaidaForaEstado());
+            
+            sql.put("icmscstsaidaforaestadonf", anterior.getIcmsCstSaidaForaEstadoNf());
+            sql.put("icmsaliqsaidaforaestadonf", anterior.getIcmsAliqSaidaForaEstadoNf());
+            sql.put("icmsreducaosaidaforaestadonf", anterior.getIcmsReducaoSaidaForaEstadoNf());
+            
+            sql.put("icmscstentrada", anterior.getIcmsCstEntrada());
+            sql.put("icmsaliqentrada", anterior.getIcmsAliqEntrada());
+            sql.put("icmsreducaoentrada", anterior.getIcmsReducaoEntrada());
+            
+            sql.put("icmscstentradaforaestado", anterior.getIcmsCstEntradaForaEstado());
+            sql.put("icmsaliqentradaforaestado", anterior.getIcmsAliqEntradaForaEstado());
+            sql.put("icmsreducaoentradaforaestado", anterior.getIcmsReducaoEntradaForaEstado());
+            
+            sql.put("icmscstconsumidor", anterior.getIcmsCstConsumidor());
+            sql.put("icmsaliqconsumidor", anterior.getIcmsAliqConsumidor());
+            sql.put("icmsreducaoconsumidor", anterior.getIcmsReducaoConsumidor());
+            
+            sql.put("icmsdebitoid", anterior.getIcmsDebitoId());
+            sql.put("icmsdebitoforaestadoid", anterior.getIcmsDebitoForaEstadoId());
+            sql.put("icmsdebitoforaestadonfid", anterior.getIcmsDebitoForaEstadoIdNf());
+            
+            sql.put("icmscreditoid", anterior.getIcmsCreditoId());
+            sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
+            
+            sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
+            
+            sql.setWhere(
+                    "impsistema = '" + anterior.getImportSistema() + "'"
+                    + " and imploja = '" + anterior.getImportLoja() + "'"
+                    + " and impid = '" + anterior.getImportId() + "'");
+            
+            if (!sql.isEmpty()) {
+                stm.execute(sql.getUpdate());
+            }
+        }
+    }
     
     public Map<String, ProdutoAnteriorVO> getCodigoAnterior(String sistema, String loja) throws Exception {
         Map<String, ProdutoAnteriorVO> result = new LinkedHashMap<>();

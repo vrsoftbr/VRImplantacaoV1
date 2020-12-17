@@ -1577,7 +1577,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -1716,7 +1716,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
