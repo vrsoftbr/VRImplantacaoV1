@@ -3,18 +3,22 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -173,12 +177,13 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM CADPROD p\n"
                     + "ORDER BY descr"
             )) {
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    imp.setImportId(rs.getString("importid"));
+                    imp.setImportId(rs.getString("importid").trim());
                     imp.setEan(imp.getImportId());
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
@@ -193,6 +198,12 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("m1"));
                     imp.setCodMercadologico2(rs.getString("m2"));
                     imp.setCodMercadologico3(rs.getString("m3"));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+                        if (bal != null) {
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                        }
 
                     //imp.seteBalanca("S".equals(rs.getString("balanca")));
                     
@@ -239,22 +250,25 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	 codprod idproduto,\n"
-                    + "	 per1 datainicio,\n"
-                    + "	 per2 datafim,\n"
-                    + "	 pr_unit preconormal,\n"
-                    + "	 pr_per precooferta\n"
-                    + "FROM \n"
-                    + "	 ATAKREJO \n"
-                    + "WHERE\n"
-                    + "	 pr_per > 0 AND pr_unit > 0 "
-            )) {
+                    "SELECT\n" +
+                    "	codprod idproduto,\n" +
+                    "	per1 datainicio,\n" +
+                    "	per2 datafim,\n" +
+                    "	pr_unit preconormal,\n" +
+                    "	pr_per precooferta\n" +
+                    "FROM\n" +
+                    "	ATAKREJO\n" +
+                    "WHERE \n" +
+                    "	pr_per > 0\n" +
+                    "	AND pr_unit > 0\n" +
+                    "	AND CAST(CASE WHEN per2 = '  .  .       :  ' THEN CURRENT_date \n" +
+                    "       WHEN per2 = '' THEN current_date ELSE per2 end AS timestamp) >= current_date")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
+                    
                     imp.setIdProduto(rs.getString("idproduto"));
-                    imp.setDataInicio(rs.getDate("datainicio"));
-                    imp.setDataFim(rs.getDate("datafim"));
+                    imp.setDataInicio(Utils.convertStringToDate("dd.MM.yyyy HH:mm", rs.getString("datainicio")));
+                    imp.setDataFim(Utils.convertStringToDate("dd.MM.yyyy HH:mm", rs.getString("datafim")));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
                     
