@@ -11,13 +11,15 @@ import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
  * @author lucasrafael
  */
-public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO {
+public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
 
@@ -33,6 +35,7 @@ public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MAPA_TRIBUTACAO,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.PIS_COFINS,
@@ -45,6 +48,85 @@ public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO {
                 OpcaoProduto.ICMS_SAIDA_NF,
                 OpcaoProduto.ICMS_CONSUMIDOR
         ));
+    }
+
+    private String getAliquotaKeyDebito(String cst, double aliq, double red) throws Exception {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+
+    private String getAliquotaKeyCredito(String cst, double aliq, double red) throws Exception {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + "tributacao as descricao, \n"
+                    + "	cst::int as cst_icms,\n"
+                    + "	icmssaida aliq_icms,\n"
+                    + "	reducaosaida red_icms \n"
+                    + "from implantacao.produtoscorrecaofiscal\n"
+                    + "order by cst::int"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKeyDebito(
+                            rst.getString("cst_icms"),
+                            Double.parseDouble(rst.getString("aliq_icms").replace(",", ".")),
+                            Double.parseDouble(rst.getString("red_icms").replace(",", "."))
+                    );
+                    result.add(
+                            new MapaTributoIMP(
+                                    id,
+                                    rst.getString("descricao"),
+                                    rst.getInt("cst_icms"),
+                                    Double.parseDouble(rst.getString("aliq_icms").replace(",", ".")),
+                                    Double.parseDouble(rst.getString("red_icms").replace(",", "."))
+                            )
+                    );
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + "tributacao as descricao, \n"
+                    + "	cst::int as cst_icms,\n"
+                    + "	icmsentrada aliq_icms,\n"
+                    + "	reducaoentrada red_icms\n"
+                    + "from implantacao.produtoscorrecaofiscal\n"
+                    + "order by cst::int"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKeyCredito(
+                            rst.getString("cst_icms"),
+                            Double.parseDouble(rst.getString("aliq_icms").replace(",", ".")),
+                            Double.parseDouble(rst.getString("red_icms").replace(",", "."))
+                    );
+                    result.add(
+                            new MapaTributoIMP(
+                                    id,
+                                    rst.getString("descricao"),
+                                    rst.getInt("cst_icms"),
+                                    Double.parseDouble(rst.getString("aliq_icms").replace(",", ".")),
+                                    Double.parseDouble(rst.getString("red_icms").replace(",", "."))
+                            )
+                    );
+                }
+            }
+        }
+        return result;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -66,16 +148,14 @@ public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO {
             }
         }
         return result;
-    }    
-    
+    }
+
     /* O TRECHO ABAIXO FOI DESENVOLVIDO PARA FAZER O ACERTO FISCAL DOS PRODUTOS, FOI FORNECIDO UMA PLANILHA POR PARTE DO CLIENTE 
         ESSA PLANILHA SALVEI NO BANCO DE DADOS 
     
     ASS.: LUCAS SANTOS
     
-    */
-    
-    
+     */
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -169,106 +249,17 @@ public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO {
                 return result;
             }
         }
-        
+
         if (opt == OpcaoProduto.ICMS) {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
                         + "barras, "
-                        + "cst, \n"
-                        + "icmsentrada, \n"
-                        + "reducaoentrada, \n"
-                        + "icmssaida, \n"
-                        + "reducaosaida \n"        
-                        + "from implantacao.produtoscorrecaofiscal "
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("barras"));
-
-                        /* icms débito */
-                        if ((rst.getInt("cst") == 20) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) == 0)) {
-                            imp.setIcmsCstSaida(0);
-                        } else if ((rst.getInt("cst") == 0) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) > 0)) {
-                            imp.setIcmsCstSaida(20);
-                        } else {
-                            imp.setIcmsCstSaida(rst.getInt("cst"));
-                        }
-                        imp.setIcmsAliqSaida(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaida(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));
-
-                        /* icms débito fora estado */
-                        if ((rst.getInt("cst") == 20) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) == 0)) {
-                            imp.setIcmsCstSaidaForaEstado(0);
-                        } else if ((rst.getInt("cst") == 0) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) > 0)) {
-                            imp.setIcmsCstSaidaForaEstado(20);
-                        } else {
-                            imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
-                        }
-                        imp.setIcmsAliqSaidaForaEstado(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaidaForaEstado(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));
-
-                        /* icms débito fora estado nf */
-                        if ((rst.getInt("cst") == 20) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) == 0)) {
-                            imp.setIcmsCstSaidaForaEstadoNF(0);
-                        } else if ((rst.getInt("cst") == 0) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) > 0)) {
-                            imp.setIcmsCstSaidaForaEstadoNF(20);
-                        } else {
-                            imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst"));
-                        }
-                        imp.setIcmsAliqSaidaForaEstadoNF(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaidaForaEstadoNF(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));
-
-                        /* icms crédito */
-                        if ((rst.getInt("cst") == 20) && (Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")) == 0)) {
-                            imp.setIcmsCstEntrada(0);
-                        } else if ((rst.getInt("cst") == 0) && (Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")) > 0)) {
-                            imp.setIcmsCstEntrada(20);
-                        } else {
-                            imp.setIcmsCstEntrada(rst.getInt("cst"));
-                        }
-                        imp.setIcmsAliqEntrada(Double.parseDouble(rst.getString("icmsentrada").replace(",", ".")));
-                        imp.setIcmsReducaoEntrada(Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")));
-                        
-                        /* icms crédito fora estado */
-                        if ((rst.getInt("cst") == 20) && (Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")) == 0)) {
-                            imp.setIcmsCstEntradaForaEstado(0);
-                        } else if ((rst.getInt("cst") == 0) && (Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")) > 0)) {
-                            imp.setIcmsCstEntradaForaEstado(20);
-                        } else {
-                            imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
-                        }
-                        imp.setIcmsAliqEntradaForaEstado(Double.parseDouble(rst.getString("icmsentrada").replace(",", ".")));
-                        imp.setIcmsReducaoEntradaForaEstado(Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")));                        
-                        
-                        /* icms consumidor */
-                        if ((rst.getInt("cst") == 20) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) == 0)) {
-                            imp.setIcmsCstConsumidor(0);
-                        } else if ((rst.getInt("cst") == 0) && (Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")) > 0)) {
-                            imp.setIcmsCstConsumidor(20);
-                        } else {
-                            imp.setIcmsCstConsumidor(rst.getInt("cst"));
-                        }
-                        imp.setIcmsAliqConsumidor(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoConsumidor(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));
-                        
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
-        
-        if (opt == OpcaoProduto.ICMS_SAIDA) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "barras, "
-                        + "cst, \n"
-                        + "icmssaida, \n"
-                        + "reducaosaida\n"
+                        + "cst::int as icms_cst, \n"
+                        + "icmssaida as icms_saida, \n"
+                        + "reducaosaida as reducao_saida, \n"
+                        + "icmsentrada as icms_entrada, \n"
+                        + "reducaoentrada as reducao_entrada \n"
                         + "from implantacao.produtoscorrecaofiscal "
                 )) {
                     while (rst.next()) {
@@ -277,169 +268,34 @@ public class CorrecaoImpostosSuperControle_SuperServerDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("barras"));
                         
-                        imp.setIcmsCstSaida(rst.getInt("cst"));
-                        imp.setIcmsAliqSaida(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaida(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));
-                        
-                        imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
-                        imp.setIcmsAliqSaidaForaEstado(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaidaForaEstado(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));                        
-                        
-                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst"));
-                        imp.setIcmsAliqSaidaForaEstadoNF(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaidaForaEstadoNF(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));                        
-                        
-                        imp.setIcmsCstConsumidor(rst.getInt("cst"));
-                        imp.setIcmsAliqConsumidor(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoConsumidor(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));                        
-                        
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
+                        String idIcmsDebito = getAliquotaKeyDebito(
+                                rst.getString("icms_cst"),
+                                Double.parseDouble(rst.getString("icms_saida").replace(",", ".")) ,
+                                Double.parseDouble(rst.getString("reducao_saida").replace(",", ".")) 
+                        );
 
-        if (opt == OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "barras, "
-                        + "cst, \n"
-                        + "icmssaida, \n"
-                        + "reducaosaida\n"
-                        + "from implantacao.produtoscorrecaofiscal "
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("barras"));
+                        String idIcmsCredito = getAliquotaKeyCredito(
+                                rst.getString("icms_cst"),
+                                Double.parseDouble(rst.getString("icms_entrada").replace(",", ".")) ,
+                                Double.parseDouble(rst.getString("reducao_entrada").replace(",", ".")) 
+                        );
                         
-                        imp.setIcmsCstSaidaForaEstado(rst.getInt("cst"));
-                        imp.setIcmsAliqSaidaForaEstado(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaidaForaEstado(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));                        
+                        imp.setIcmsDebitoId(idIcmsDebito);
+                        imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
+                        imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
                         
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
+                        imp.setIcmsCreditoId(idIcmsCredito);
+                        imp.setIcmsCreditoForaEstadoId(idIcmsCredito);
+                        
+                        imp.setIcmsConsumidorId(idIcmsDebito);
 
-        if (opt == OpcaoProduto.ICMS_SAIDA_NF) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "barras, "
-                        + "cst, \n"
-                        + "icmssaida, \n"
-                        + "reducaosaida\n"
-                        + "from implantacao.produtoscorrecaofiscal "
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("barras"));
-                        
-                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst"));
-                        imp.setIcmsAliqSaidaForaEstadoNF(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoSaidaForaEstadoNF(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));                        
-                        
                         result.add(imp);
                     }
                 }
                 return result;
             }
         }
-
-        if (opt == OpcaoProduto.ICMS_CONSUMIDOR) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "barras, "
-                        + "cst, \n"
-                        + "icmssaida, \n"
-                        + "reducaosaida\n"
-                        + "from implantacao.produtoscorrecaofiscal "
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("barras"));
-                        
-                        imp.setIcmsCstConsumidor(rst.getInt("cst"));
-                        imp.setIcmsAliqConsumidor(Double.parseDouble(rst.getString("icmssaida").replace(",", ".")));
-                        imp.setIcmsReducaoConsumidor(Double.parseDouble(rst.getString("reducaosaida").replace(",", ".")));                        
-                        
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
-
-        if (opt == OpcaoProduto.ICMS_ENTRADA) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "barras, "
-                        + "cst, \n"
-                        + "icmsentrada, \n"
-                        + "reducaoentrada\n"
-                        + "from implantacao.produtoscorrecaofiscal "
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("barras"));
-                        
-                        imp.setIcmsCstEntrada(rst.getInt("cst"));
-                        imp.setIcmsAliqEntrada(Double.parseDouble(rst.getString("icmsentrada").replace(",", ".")));
-                        imp.setIcmsReducaoEntrada(Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")));
-                        
-                        imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
-                        imp.setIcmsAliqEntradaForaEstado(Double.parseDouble(rst.getString("icmsentrada").replace(",", ".")));
-                        imp.setIcmsReducaoEntradaForaEstado(Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")));                        
-                        
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
-
-        if (opt == OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "barras, "
-                        + "cst, \n"
-                        + "icmsentrada, \n"
-                        + "reducaoentrada\n"
-                        + "from implantacao.produtoscorrecaofiscal "
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("barras"));
-                        
-                        imp.setIcmsCstEntradaForaEstado(rst.getInt("cst"));
-                        imp.setIcmsAliqEntradaForaEstado(Double.parseDouble(rst.getString("icmsentrada").replace(",", ".")));
-                        imp.setIcmsReducaoEntradaForaEstado(Double.parseDouble(rst.getString("reducaoentrada").replace(",", ".")));                        
-                        
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
-        
         return null;
     }
-    
+
 }
