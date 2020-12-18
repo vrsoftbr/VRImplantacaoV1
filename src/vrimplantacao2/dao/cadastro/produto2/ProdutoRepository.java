@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -274,13 +275,16 @@ public class ProdutoRepository {
         //</editor-fold>
 
         if (!optSimples.isEmpty()) {
-
+            
             provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
             MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            String primeiraLojaMigrada = getPrimeiraLojaMigrada();
+            
             produtos.clear();
             System.gc();
 
@@ -291,6 +295,11 @@ public class ProdutoRepository {
 
                 LOG.info("Produtos a serem atualizados: " + organizados.size());
 
+                
+                /* Identificar qual foi a primeira loja que migrou */
+                
+                isDataAlteracaoCodAntProduto();
+                
                 StringBuilder strOpt = new StringBuilder();
                 for (Iterator<OpcaoProduto> iterator = optSimples.iterator(); iterator.hasNext();) {
                     OpcaoProduto next = iterator.next();
@@ -364,6 +373,7 @@ public class ProdutoRepository {
                         ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
 
                         anterior = converterImpEmAnterior(imp);
+                        anterior.setDataHoraAlteracao(dataHoraImportacao);
                         anterior.setCodigoAtual(prod);
 
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
@@ -408,8 +418,22 @@ public class ProdutoRepository {
                         provider.automacao().atualizar(automacao, optSimples);
 
                         if (aliquotas.containsKey(prod.getId(), aliquota.getEstado().getId())) {
-                            provider.aliquota().atualizar(aliquota, optSimples);
-                            provider.anterior().atualizarIcms(anterior);
+                            
+                            if (optSimples.contains(OpcaoProduto.ICMS_LOJA)) {
+                                
+                                String loja_sistema = imp.getImportSistema()+' '+imp.getImportLoja();
+                                boolean isPrimeiraLojaMigrada = false;
+                                if (loja_sistema.equals(primeiraLojaMigrada)) {
+                                    isPrimeiraLojaMigrada = true;
+                                }
+                                                                
+                                provider.aliquota().atualizarIcmsLoja(aliquota, optSimples, anterior, isPrimeiraLojaMigrada);
+                                provider.anterior().atualizarIcmsLoja(anterior, isPrimeiraLojaMigrada);
+                                
+                            } else {                            
+                                provider.aliquota().atualizar(aliquota, optSimples);
+                                provider.anterior().atualizarIcms(anterior);
+                            }
                         } else {
                             provider.aliquota().salvar(aliquota);
                             aliquotas.put(null, prod.getId(), aliquota.getEstado().getId());
@@ -1677,5 +1701,44 @@ public class ProdutoRepository {
         //</editor-fold>
 
         return to;
+    }
+    
+    public String getPrimeiraLojaMigrada() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct (impsistema||' '||imploja) sistema_loja \n"
+                            + "from implantacao.codant_produto \n"
+                            + "where dataimportacao in (select min(dataimportacao)"
+                            + "                         from implantacao.codant_produto)"
+            )) {
+                if (rst.next())  {
+                    return rst.getString("sistema_loja");
+                } else {
+                    return "";
+                }
+            }
+        }
+    }
+    
+    public void isDataAlteracaoCodAntProduto() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	*\n"
+                    + "from \n"
+                    + "	information_schema.columns c\n"
+                    + "where\n"
+                    + "	table_schema like 'implantacao'\n"
+                    + "	and table_name like '%codant_produto%'\n"
+                    + "	and column_name like '%dataalteracao%'\n"
+                    + "order by\n"
+                    + "	1,2,3,4"
+            )) {
+                if (!rst.next()) {                    
+                    String sql = "alter table implantacao.codant_produto add column dataalteracao timestamp";
+                    stm.execute(sql);                    
+                }
+            }
+        }
     }
 }

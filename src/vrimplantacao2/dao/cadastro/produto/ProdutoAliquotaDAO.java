@@ -11,6 +11,7 @@ import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 
 public class ProdutoAliquotaDAO {
 
@@ -273,6 +274,67 @@ public class ProdutoAliquotaDAO {
         }
     }
 
+    public void atualizarIcmsLoja(ProdutoAliquotaVO vo, Set<OpcaoProduto> opt, ProdutoAnteriorVO anterior, boolean primeiraLojaMigrada) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtoaliquota");
+
+            sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
+            sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+
+            if (vo.getAliquotaDebitoForaEstado().getId() == 0) {
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebito().getId());
+            } else {
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+            }
+
+            if (vo.getAliquotaCreditoForaEstado().getId() == 0) {
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+            } else {
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+            }
+
+            if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebito().getId());
+            } else {
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+            }
+
+            if (vo.getAliquotaConsumidor().getId() == 0) {
+                sql.put("id_aliquotaconsumidor", vo.getAliquotaDebito().getId());
+            } else {
+                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+            }
+
+            if (!Versao.menorQue(3, 18, 3)) {
+                sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+            }
+            
+            if (primeiraLojaMigrada) {
+                if (!sql.isEmpty()) {
+                    sql.setWhere(
+                            "id_produto = " + vo.getProduto().getId() + " and "
+                            + "id_estado = " + vo.getEstado().getId());
+
+                    stm.execute(sql.getUpdate());
+                }
+            } else {
+                if (!sql.isEmpty()) {
+                    sql.setWhere(
+                            "id_produto = " + vo.getProduto().getId() + " and "
+                            + "id_estado = " + vo.getEstado().getId() + " and "
+                            + "id_produto in (select codigoatual from implantacao.codant_produto "
+                            + "where impsistema = '" + anterior.getImportSistema() + "' and "
+                            + "imploja = '" + anterior.getImportLoja() + "' "
+                            + "and codigoatual = " + vo.getProduto().getId() + " and "
+                            + "obsimportacao like '%PRODUTO NOVO%')");
+
+                    stm.execute(sql.getUpdate());
+                }
+            }
+        }
+    }
+    
     public void atualizarBeneficio(ProdutoAliquotaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();

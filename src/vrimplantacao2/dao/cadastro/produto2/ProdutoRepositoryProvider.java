@@ -264,6 +264,12 @@ public class ProdutoRepositoryProvider {
             dao.setImportLoja(getLoja());
             dao.atualizarIcmsAnterior(anterior);            
         }
+        public void atualizarIcmsLoja(ProdutoAnteriorVO anterior, boolean primeiraLojaMigrada) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            dao.atualizarIcmsAnteriorLoja(anterior, primeiraLojaMigrada);
+        }
+        
         public boolean cadastrado(String id) throws Exception {
             dao.setImportSistema(getSistema());
             dao.setImportLoja(getLoja());
@@ -327,6 +333,10 @@ public class ProdutoRepositoryProvider {
 
         public void atualizar(ProdutoAliquotaVO aliquota, Set<OpcaoProduto> opt) throws Exception {
             dao.atualizar(aliquota, opt);
+        }
+
+        public void atualizarIcmsLoja(ProdutoAliquotaVO aliquota, Set<OpcaoProduto> opt, ProdutoAnteriorVO anterior, boolean primeiraLojaMigrada) throws Exception {
+            dao.atualizarIcmsLoja(aliquota, opt, anterior, primeiraLojaMigrada);
         }
         
         public void atualizaBeneficio(ProdutoAliquotaVO aliquota) throws Exception {

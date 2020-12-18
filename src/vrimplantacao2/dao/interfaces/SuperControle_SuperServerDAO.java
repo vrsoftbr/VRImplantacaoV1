@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -149,7 +148,8 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 OpcaoProduto.ICMS_SAIDA,
                 OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                 OpcaoProduto.ICMS_SAIDA_NF,
-                OpcaoProduto.ICMS_CONSUMIDOR
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_LOJA
         ));
     }
 

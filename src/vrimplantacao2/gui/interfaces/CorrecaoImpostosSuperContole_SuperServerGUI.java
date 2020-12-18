@@ -99,7 +99,6 @@ public class CorrecaoImpostosSuperContole_SuperServerGUI extends VRInternalFrame
             }
         });
         
-        carregarLojaVR();
         centralizarForm();
         this.setMaximum(false);
     }
