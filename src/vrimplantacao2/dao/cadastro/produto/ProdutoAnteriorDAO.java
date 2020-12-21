@@ -823,9 +823,7 @@ public class ProdutoAnteriorDAO {
             
             sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
             
-            if (primeiraLojaMigrada) {
-                sql.put("dataalteracao", anterior.getDataHoraAlteracao());
-            }
+            sql.put("dataalteracao", anterior.getDataHoraAlteracao());
             
             sql.setWhere(
                     "impsistema = '" + anterior.getImportSistema() + "'"
