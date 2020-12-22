@@ -242,6 +242,10 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
+                    } else if (tabs.getSelectedIndex() == 3) {
+                        if (chkGerarCodigoBarras.isSelected()) {
+                            dao.importarDigitoVerificador();
+                        }
                     }
                                        
                     ProgressBar.dispose();
@@ -292,6 +296,8 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkGerarCodigoBarras = new vrframework.bean.checkBox.VRCheckBox();
 
         vRTextArea1.setColumns(20);
         vRTextArea1.setRows(5);
@@ -517,6 +523,27 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         tabs.addTab("Unificação", vRPanel2);
         tabs.addTab("Balança", pnlBalanca);
 
+        chkGerarCodigoBarras.setText("Gerar Código de Barras");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkGerarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(388, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkGerarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(246, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Especiais", vRPanel1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -608,6 +635,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornFantasia;
     private vrframework.bean.checkBox.VRCheckBox chkFornSituacaoCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkGerarCodigoBarras;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
@@ -628,6 +656,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox1;
     private vrframework.bean.label.VRLabel vRLabel21;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
