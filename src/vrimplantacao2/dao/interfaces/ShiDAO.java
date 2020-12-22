@@ -2212,7 +2212,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "m.serie as numeroserie,\n"
                     + "cb.cupom as numerocupom,\n"
                     + "cb.chave as ChaveCfe,\n"
-                    + "c.codcli as vc_clientepreferencial,\n"
+                    + "--c.codcli as vc_clientepreferencial,\n"
                     + "cb.valor as subtotalimpressora,\n"
                     + "0 as desconto,\n"
                     + "0 as acrescimo,\n"
