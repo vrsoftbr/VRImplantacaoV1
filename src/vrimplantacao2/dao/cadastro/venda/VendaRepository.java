@@ -490,10 +490,8 @@ public class VendaRepository {
                 produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
             }
             if ( produto == null ) {
-
+                haDivergencia = true;                
                 if (!forcarCadastroProdutoNaoExistente) {
-
-                    haDivergencia = true;
                     final String msg = String.format(
                             "Produto não encontrado - código:%s ean:%s descricao:%s",
                             impItem.getProduto(),
@@ -506,7 +504,6 @@ public class VendaRepository {
 
                 } else {
                     //<editor-fold defaultstate="collapsed" desc="Inclusão de Produto">
-                    haDivergencia = true;
                     LOG.warning(
                             String.format(
                                     "Produto não encontrado - código:%s ean:%s descricao:%s",
