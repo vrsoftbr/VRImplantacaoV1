@@ -1622,7 +1622,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemSuperServer">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="SuperServer"/>
+                            <Property name="text" type="java.lang.String" value="Super Controler - SuperServer"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemSuperServerActionPerformed"/>
@@ -2287,6 +2287,14 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuDelRegistroActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Corre&#xe7;&#xe3;o Impostos SuperControle - SuperServer"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem6ActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>

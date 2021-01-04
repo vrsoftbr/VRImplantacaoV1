@@ -264,6 +264,7 @@ import vrimplantacao2.gui.interfaces.AlterData_WShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.AutocomGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
+import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
@@ -351,6 +352,7 @@ public final class MenuGUI extends VRMdiFrame {
     public JacsysGUI formImportarJacsys = null;
     public SifatGUI formImportarSifat = null;
     public GerarCodigoBarrasAtacadoGUI formImportarGerarCodigoBarrasAtacado = null;
+    public CorrecaoImpostosSuperContole_SuperServerGUI formCorrecaoImpostosSuperControle_SuperServer = null;
     public NotaSaidaNfceImportacaoArquivoGUI formNotaSaidaNfceImportacaoArquivoGUI = null;
     public AlterarProdutoPdvVendaItemGUI formAlterarProdutoPdvVendaItem = null;    
     public ArquivoPadraoGUI formArquivoPadrao = null;
@@ -882,6 +884,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
         mnuDelRegistro = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -2602,7 +2605,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(jMenuItemEcosInformatica);
 
-        jMenuItemSuperServer.setText("SuperServer");
+        jMenuItemSuperServer.setText("Super Controler - SuperServer");
         jMenuItemSuperServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemSuperServerActionPerformed(evt);
@@ -3238,6 +3241,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuAvancadas.add(mnuDelRegistro);
+
+        jMenuItem6.setText("Correção Impostos SuperControle - SuperServer");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(jMenuItem6);
 
         mnuFerramentas.add(mnuAvancadas);
 
@@ -5024,6 +5035,22 @@ public final class MenuGUI extends VRMdiFrame {
         MerceariaSeneGUI.exibir(this);
     }//GEN-LAST:event_mnuMerceariaSeneActionPerformed
 
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            if (formCorrecaoImpostosSuperControle_SuperServer == null || formCorrecaoImpostosSuperControle_SuperServer.isClosed()) {
+                formCorrecaoImpostosSuperControle_SuperServer = new CorrecaoImpostosSuperContole_SuperServerGUI(this);
+            }
+            formCorrecaoImpostosSuperControle_SuperServer.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        } finally {
+            this.setDefaultCursor();
+        }
+        
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5057,6 +5084,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem32;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JMenuItem jMenuItemActive;

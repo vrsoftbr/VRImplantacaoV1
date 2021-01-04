@@ -1,14 +1,25 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -27,9 +38,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+
     @Override
     public String getSistema() {
-        return "SuperServer";
+        return "SuperServer" + ("".equals(complemento) ? "" : " - " + complemento);
     }
 
     @Override
@@ -93,6 +110,50 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_LOJA
+        ));
     }
 
     @Override
@@ -177,36 +238,34 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     + "		e.fkCliente = @fkCliente\n"
                     + "	left join CadProduto.AliquotaICMS icms on \n"
                     + "		icms.id = p.aliqICMS and\n"
-                    + "		icms.fkCliente = @fkCliente"
+                    + "		icms.fkCliente = @fkCliente\n"
+                    + "order by p.balanca desc, ean.ean"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                
+                System.out.println(getSistema());
+                System.out.println(getLojaOrigem());
+                
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-
-                    String plu = String.valueOf(Utils.stringToLong(rst.getString("ean")));
                     
-                    if (rst.getInt("balanca") == 1) {
-                        if (plu.startsWith("2") && plu.endsWith("0") && plu.length() == 7) {
-                            imp.seteBalanca(true);
+                    String ean = tratandoPLU(rst.getBoolean("balanca"), rst.getString("ean"));
+                    int plu = Utils.stringToInt(ean, -2);
 
-                            imp.setEan(plu.substring(1, 6));
-
-                            if (rst.getInt("e_unitario_pesavel") == 1) {
-                                imp.setTipoEmbalagem("UN");
-                            } else {
-                                imp.setTipoEmbalagem("KG");
-                            }
-                        } else {
-                            imp.seteBalanca(false);
-                        }
-                    }
-                    
-                    if(plu != null && !"".equals(plu) && plu.length() < 7 && !imp.isBalanca()) {
-                        imp.setManterEAN(true);
+                    ProdutoBalancaVO bal = balanca.get(plu);
+                    if (bal != null && rst.getBoolean("balanca")) {
+                        imp.setEan(ean);
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        imp.setEan(ean);
+                        imp.seteBalanca(rst.getBoolean("balanca"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(rst.getInt("validade"));
                     }
 
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
@@ -238,14 +297,41 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("piscofins_cst_debito")));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofins_cst_credito")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofins_natureza_receita")));
-                    imp.setIcmsDebitoId(rst.getString("aliqICMS"));
-                    imp.setIcmsCreditoId(rst.getString("aliqICMS"));
+                    
+                    String idIcms = getAliquotaKey(
+                            rst.getString("icms_cst"),
+                            rst.getDouble("icms_aliq"),
+                            rst.getDouble("icms_reducao")
+                    );
+                    
+                    imp.setIcmsDebitoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                    imp.setIcmsCreditoId(idIcms);
+                    imp.setIcmsCreditoForaEstadoId(idIcms);
+                    imp.setIcmsConsumidorId(idIcms);
                     result.add(imp);
                 }
             }
         }
 
         return result;
+    }
+
+    private String tratandoPLU(boolean isBalanca, String ean) throws SQLException {
+        //Tratando em de balança
+        if (isBalanca) {
+            //ean = 0000000200020
+            String eanBal = Utils.stringLong(ean); //200020
+            if (eanBal.startsWith("2") && eanBal.endsWith("0")) {
+                int plu = Utils.stringToInt(
+                        eanBal.substring(1, eanBal.length() - 1),//0002
+                        -2
+                ); //ean = 2
+                ean = String.valueOf(plu);
+            }
+        }
+        return ean;
     }
 
     @Override
@@ -297,7 +383,8 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                         imp.setCnpj_cpf(rst.getString("cnpj"));
                         imp.setIe_rg(rst.getString("inscricaoEstadual"));
                         imp.setInsc_municipal(rst.getString("inscricaoMunicipal"));
-                        imp.setAtivo(rst.getInt("bloqueado") == 0);
+                        imp.setBloqueado(rst.getInt("bloqueado") != 0);
+                        imp.setAtivo(rst.getInt("ativo") == 1);
 
                         imp.setEndereco(rst.getString("logradouro"));
                         imp.setNumero(rst.getString("numero"));
@@ -581,8 +668,8 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         return result;
     }
 
-    @Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
+    //@Override
+    public List<MapaTributoIMP> _getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -603,6 +690,56 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         }
     }
 
+    private String getAliquotaKey(String cst, double aliq, double red) throws Exception {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	distinct	\n"
+                    + "	p.aliqICMS,\n"
+                    + "	icm.descricaoAliquota,\n"
+                    + "	p.tribICMS as cst_icms,\n"
+                    + "	icm.taxa as aliq_icms,\n"
+                    + "	icm.reducaoBaseCalculo as red_icms\n"
+                    + "from CadProduto.Produto p\n"
+                    + "left join CadProduto.AliquotaICMS icm\n"
+                    + "	on icm.id = p.aliqICMS\n"
+                    + "where p.tribICMS is not null\n"
+                    + "and p.tribICMS != ''\n"
+                    + "and icm.fkCliente = 1\n"
+                    + "order by p.tribICMS, icm.taxa"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            rst.getString("cst_icms"),
+                            rst.getDouble("aliq_icms"),
+                            rst.getDouble("red_icms")
+                    );
+                    result.add(
+                            new MapaTributoIMP(
+                                    id,
+                                    rst.getString("descricaoAliquota"),
+                                    rst.getInt("cst_icms"),
+                                    rst.getDouble("aliq_icms"),
+                                    rst.getDouble("red_icms")
+                            )
+                    );
+                }
+            }
+            return result;
+        }
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -623,4 +760,123 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         }
         return result;
     }
+    
+    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+        boolean isGerarDigito = true;
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, \n"
+                    + "id_tipoembalagem, \n"
+                    + "pesavel \n"
+                    + "from produto \n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
+                    vo.setIdproduto(rst.getInt("id"));
+                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
+                    
+                    isGerarDigito = !(rst.getInt("id_tipoembalagem") == 4 || rst.getBoolean("pesavel") == true);
+                    
+                    vo.setCodigoBarras(gerarEan13(rst.getLong("id"), isGerarDigito));
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
+    
+    public void importarDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+        ProgressBar.setStatus("Carregar Produtos...");
+        try {
+            result = getDigitoVerificador();
+            
+            if (!result.isEmpty()) {
+                gravarCodigoBarrasDigitoVerificador(result);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
+        
+        Conexao.begin();
+        Statement stm = null;
+        ResultSet rst = null;
+        
+        stm = Conexao.createStatement();
+        
+        String sql = "";
+        ProgressBar.setStatus("Gravando Código de Barras...");
+        ProgressBar.setMaximum(vo.size());
+        
+        try {
+            
+            for (ProdutoAutomacaoVO i_vo : vo) {
+                
+                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
+                rst = stm.executeQuery(sql);
+
+                if (!rst.next()) {
+                    sql = "insert into produtoautomacao ("
+                            + "id_produto, "
+                            + "codigobarras, "
+                            + "id_tipoembalagem, "
+                            + "qtdembalagem, "
+                            + "pesobruto,"
+                            + "dun14) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ", "
+                            + i_vo.getIdTipoEmbalagem() + ", 1, 0, false);";
+                    stm.execute(sql);
+                }
+                ProgressBar.next();
+            }
+            
+            stm.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+    
+    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
+        String codigo = String.format("%012d", i_codigo);
+
+        int somaPar = 0;
+        int somaImpar = 0;
+
+        for (int i = 0; i < 12; i += 2) {
+            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
+            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
+        }
+
+        int soma = somaImpar + (3 * somaPar);
+        int digito = 0;
+        boolean verifica = false;
+        int calculo = 0;
+
+        do {
+            calculo = soma % 10;
+
+            if (calculo != 0) {
+                digito += 1;
+                soma += 1;
+            }
+        } while (calculo != 0);
+
+        if (i_digito) {
+            return Long.parseLong(codigo + digito);
+        } else {
+            return Long.parseLong(codigo);
+        }
+    }        
+    
 }

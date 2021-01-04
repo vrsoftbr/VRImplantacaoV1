@@ -1043,11 +1043,18 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkIcmsDebitoForaEstadoNF" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="chkPisCofins" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="chkNatReceita" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkIcmsLoja" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkICMS" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkIcmsDebito" min="-2" max="-2" attributes="0"/>
@@ -1056,7 +1063,7 @@
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkIcmsDebitoForaEstado" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Group type="102" alignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
                                           <Component id="chkIcmsCreditoForaEstado" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkIcmsConsumidor" min="-2" max="-2" attributes="0"/>
@@ -1070,7 +1077,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="134" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1087,6 +1094,7 @@
                               <Component id="chkIcmsDebito" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsCredito" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsDebitoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -1095,6 +1103,7 @@
                               <Component id="chkIcmsCreditoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIcmsConsumidor" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCodigoBeneficio" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsDebitoForaEstadoNF" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
@@ -1163,6 +1172,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCodigoBeneficio">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="C&#xf3;digo de Benef&#xed;cio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsDebitoForaEstadoNF">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito Fora Estado NF"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsLoja">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Loja"/>
                   </Properties>
                 </Component>
               </SubComponents>

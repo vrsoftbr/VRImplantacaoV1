@@ -543,8 +543,13 @@
                           <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkOfertas" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="315" max="32767" attributes="0"/>
+                      <EmptySpace pref="584" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -557,7 +562,12 @@
                       <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="219" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="166" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -576,6 +586,13 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliPreferencial">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Unificar Cliente Preferencial (Somente CPF/CNPJ v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDataFimOferta">
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOfertas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Ofertas a partir:"/>
               </Properties>
             </Component>
           </SubComponents>
