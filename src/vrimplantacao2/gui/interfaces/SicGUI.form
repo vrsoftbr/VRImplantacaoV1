@@ -34,7 +34,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="vRPanel6" alignment="1" pref="602" max="32767" attributes="0"/>
+          <Component id="vRPanel6" alignment="1" pref="611" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -161,7 +161,7 @@
                               <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="442" max="32767" attributes="0"/>
+                          <EmptySpace pref="433" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -211,7 +211,7 @@
                           <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="320" max="32767" attributes="0"/>
+                      <EmptySpace pref="289" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -332,10 +332,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="vRLabel26" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtDatabase" min="-2" pref="495" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="vRTextField1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDatabase" pref="506" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -364,7 +364,7 @@
                     <Property name="text" type="java.lang.String" value="vRTextField1"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDatabase">
+                <Component class="javax.swing.JTextField" name="txtDatabase">
                 </Component>
               </SubComponents>
             </Container>
