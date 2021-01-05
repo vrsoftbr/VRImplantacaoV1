@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;

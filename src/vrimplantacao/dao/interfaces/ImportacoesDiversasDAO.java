@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import jxl.Cell;
 import jxl.Sheet;
@@ -17,8 +18,6 @@ import vrimplantacao.vo.vrimplantacao.NcmVO;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
-import org.sonar.runner.commonsio.FilenameUtils;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.CestDAO;
@@ -135,9 +134,21 @@ public class ImportacoesDiversasDAO {
         
         return result;
     }
+    
+    /**
+     * Retorna a extensão do {@link File} informado.
+     * @param file Arquivo para localizar a extensão.
+     * @return Extensão em String.
+     */
+    private String getFileExtension(String file) {
+        String fileName = new File(file).getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+            return fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+        return "";
+    }
 
     public void importarCEST(String arquivo) throws IOException, Exception {
-        String extFile = FilenameUtils.getExtension(arquivo);
+        String extFile = getFileExtension(arquivo);
         if ("xls".equals(extFile)) {
             List<CestVO> cestMapeadosXls = parseXls(arquivo);
             ProgressBar.setStatus("Carregando dados...Cest arquivo Xls...");
