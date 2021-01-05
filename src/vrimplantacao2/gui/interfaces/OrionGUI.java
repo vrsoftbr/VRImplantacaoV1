@@ -32,14 +32,14 @@ public class OrionGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtDatabase.setText(params.get(SISTEMA, "DATABASE"));
+        txtDatabase.setArquivo(params.get(SISTEMA, "DATABASE"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
     
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
+        params.put(txtDatabase.getArquivo(), SISTEMA, "DATABASE");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -70,8 +70,8 @@ public class OrionGUI extends VRInternalFrame {
     }
 
     public void validarDadosAcesso() throws Exception {
-        ConexaoDBF.usarOdbc = true;
-        ConexaoDBF.abrirConexao(txtDatabase.getText());
+        ConexaoDBF.usarOdbc = false;
+        ConexaoDBF.abrirConexao(txtDatabase.getArquivo());
         gravarParametros();
         carregarLojaCliente();
         carregarLojaVR();
@@ -132,7 +132,7 @@ public class OrionGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    orionDAO.i_arquivo = txtDatabase.getText();
+                    orionDAO.i_arquivo = txtDatabase.getArquivo();
                     
                     Importador importador = new Importador(orionDAO);
                     importador.setLojaOrigem(idLojaCliente);
@@ -252,10 +252,10 @@ public class OrionGUI extends VRInternalFrame {
         jPanel4 = new javax.swing.JPanel();
         vRLabel25 = new vrframework.bean.label.VRLabel();
         vRTextField1 = new vrframework.bean.textField.VRTextField();
-        txtDatabase = new vrframework.bean.textField.VRTextField();
         jLabel2 = new javax.swing.JLabel();
         btnConectar = new javax.swing.JToggleButton();
         cmbLojaOrigem = new javax.swing.JComboBox();
+        txtDatabase = new vrframework.bean.fileChooser.VRFileChooser();
 
         vRTextArea1.setColumns(20);
         vRTextArea1.setRows(5);
@@ -528,6 +528,8 @@ public class OrionGUI extends VRInternalFrame {
             }
         });
 
+        txtDatabase.setFileSelectionMode("Directories");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -535,29 +537,29 @@ public class OrionGUI extends VRInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                        .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConectar))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnConectar))
+                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -692,7 +694,7 @@ public class OrionGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabsImportacao;
     private vrframework.bean.textField.VRTextField txtDataInicioVendas;
     private vrframework.bean.textField.VRTextField txtDataTerminoVendas;
-    private vrframework.bean.textField.VRTextField txtDatabase;
+    private vrframework.bean.fileChooser.VRFileChooser txtDatabase;
     private vrframework.bean.button.VRButton vRButton1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel25;

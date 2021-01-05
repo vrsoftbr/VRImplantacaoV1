@@ -20,6 +20,7 @@ import vrframework.classe.Conexao;
 import vrframework.classe.OperacaoCanceladaException;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.dao.fiscal.EscritaDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
@@ -347,7 +348,7 @@ public class CleanDataBase extends VRInternalFrame {
 
         public CleanDataBaseTableModel() throws Exception {
             this.lojas = new ArrayList<>();
-            for (Estabelecimento e: new VRToVRDAO().getLojas()) {
+            for (Estabelecimento e: new LojaDAO().getLojasVR()) {
                 this.lojas.add(new CleanDataBaseTableModelRecord(
                         false,
                         Integer.parseInt(e.cnpj),

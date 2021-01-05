@@ -656,8 +656,11 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
-                      <Component id="chkEANAtacado" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="343" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkSomenteAtivo" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkEANAtacado" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="355" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -666,7 +669,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkEANAtacado" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="261" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkSomenteAtivo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="237" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -675,6 +680,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEANAtacado">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Importar EAN Atacado"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSomenteAtivo">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Somente Produto Ativo"/>
               </Properties>
             </Component>
           </SubComponents>

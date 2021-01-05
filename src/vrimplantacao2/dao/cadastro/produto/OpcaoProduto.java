@@ -429,6 +429,7 @@ public enum OpcaoProduto {
             return "Importar - Copiar ICMS débito no crédito";
         }        
     }, 
+    SOMENTE_ATIVO,
     /***
      * Força a atualização de custo mesmo que o usuário já os tenha alterado.
      */

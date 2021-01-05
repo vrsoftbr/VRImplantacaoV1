@@ -2,6 +2,7 @@ package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -16,8 +17,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.LinearDAO;
+import vrimplantacao2.dao.interfaces.linear.LinearDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -39,6 +41,8 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
         chkSomenteEansUnitarios.setSelected(params.getBool(SISTEMA, "SOMENTE_PRODUTOS_UNITARIOS"));
+        edtDtVendaIni.setDate(params.getDate(SISTEMA, "VENDAS_INI"));
+        edtDtVendaFim.setDate(params.getDate(SISTEMA, "VENDAS_FIM"));
         conexaoMySQL.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -48,6 +52,8 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
         params.put(chkSomenteEansUnitarios.isSelected(), SISTEMA, "SOMENTE_PRODUTOS_UNITARIOS");
+        params.put(edtDtVendaIni.getDate(), SISTEMA, "VENDAS_INI");
+        params.put(edtDtVendaFim.getDate(), SISTEMA, "VENDAS_FIM");
         conexaoMySQL.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -198,6 +204,12 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
+                        
+                        if (chkPdvVendas.isSelected()) {
+                            dao.setVendaDataIni(edtDtVendaIni.getDate());
+                            dao.setVendaDataFim(edtDtVendaFim.getDate());
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                        }
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -272,6 +284,12 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new javax.swing.JCheckBox();
+        tabVendas = new vrframework.bean.panel.VRPanel();
+        pnlVendas = new vrframework.bean.panel.VRPanel();
+        pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
+        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -374,6 +392,83 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
+
+        pnlVendas.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
+
+        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaIniActionPerformed(evt);
+            }
+        });
+
+        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaFimActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlPdvVendaDatasLayout = new javax.swing.GroupLayout(pnlPdvVendaDatas);
+        pnlPdvVendaDatas.setLayout(pnlPdvVendaDatasLayout);
+        pnlPdvVendaDatasLayout.setHorizontalGroup(
+            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPdvVendaDatasLayout.createSequentialGroup()
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 123, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 123, Short.MAX_VALUE))
+        );
+        pnlPdvVendaDatasLayout.setVerticalGroup(
+            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        chkPdvVendas.setEnabled(true);
+        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPdvVendasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlVendasLayout = new javax.swing.GroupLayout(pnlVendas);
+        pnlVendas.setLayout(pnlVendasLayout);
+        pnlVendasLayout.setHorizontalGroup(
+            pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(153, Short.MAX_VALUE))
+        );
+        pnlVendasLayout.setVerticalGroup(
+            pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
+        tabVendas.setLayout(tabVendasLayout);
+        tabVendasLayout.setHorizontalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlVendas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabVendasLayout.setVerticalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(119, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Vendas", tabVendas);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -532,12 +627,29 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
 
+    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
+        if (edtDtVendaIni.getDate() == null) {
+            edtDtVendaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaIniActionPerformed
+
+    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
+        if (edtDtVendaFim.getDate() == null) {
+            edtDtVendaFim.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaFimActionPerformed
+
+    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkPdvVendasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkSomenteEansUnitarios;
@@ -549,11 +661,15 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
+    private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
+    private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.panel.VRPanel pnlOutros;
+    private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
+    private vrframework.bean.panel.VRPanel pnlVendas;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;
     private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
@@ -561,6 +677,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
+    private vrframework.bean.panel.VRPanel tabVendas;
     private javax.swing.JTabbedPane tabs;
     private org.jdesktop.swingx.JXDatePicker txtDataFimOferta;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;

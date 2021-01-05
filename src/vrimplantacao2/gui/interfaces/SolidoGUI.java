@@ -245,7 +245,16 @@ public class SolidoGUI extends VRInternalFrame {
                             }
                             if (chkCliIERG.isSelected()) {
                                 opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
-                            }                            
+                            }   
+                            if (chkCliRazao.isSelected()) {
+                                opcoes.add(OpcaoCliente.RAZAO);
+                            }
+                            if (chkCliBairro.isSelected()) {
+                                opcoes.add(OpcaoCliente.BAIRRO);
+                            }
+                            if (chkCliContato.isSelected()) {
+                                opcoes.add(OpcaoCliente.CONTATOS);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                             }                            
@@ -328,6 +337,9 @@ public class SolidoGUI extends VRInternalFrame {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkCliIERG = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliRazao = new javax.swing.JCheckBox();
+        chkCliBairro = new javax.swing.JCheckBox();
+        chkCliContato = new javax.swing.JCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabCheque = new vrframework.bean.panel.VRPanel();
@@ -480,6 +492,12 @@ public class SolidoGUI extends VRInternalFrame {
 
         chkCliIERG.setText("IE/RG");
 
+        chkCliRazao.setText("Razão");
+
+        chkCliBairro.setText("Bairro");
+
+        chkCliContato.setText("Contato");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -490,17 +508,28 @@ public class SolidoGUI extends VRInternalFrame {
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(404, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCliContato)
+                    .addComponent(chkCliBairro)
+                    .addComponent(chkCliRazao))
+                .addContainerGap(321, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliRazao))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliBairro))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliContato))
                 .addContainerGap(129, Short.MAX_VALUE))
         );
 
@@ -897,7 +926,10 @@ public class SolidoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
+    private javax.swing.JCheckBox chkCliBairro;
+    private javax.swing.JCheckBox chkCliContato;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
+    private javax.swing.JCheckBox chkCliRazao;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkContFornecedor;
     private javax.swing.JCheckBox chkContaPagar;

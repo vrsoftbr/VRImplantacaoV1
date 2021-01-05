@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,12 +14,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
@@ -52,9 +56,9 @@ public class ProdutoRepository {
     private boolean copiarIcmsDebitoParaCredito = false;
     private boolean manterDescricao = false;
     public boolean importarSomenteLoja = false;
-    
+
     private Map<String, Entry<String, Integer>> divisoes;
-    
+
     public ProdutoRepository(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
         this.divisoes = provider.getDivisoesAnteriores();
@@ -79,9 +83,9 @@ public class ProdutoRepository {
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
-        
+
         LOG.finest("Abrindo a transação");
-        provider.begin();        
+        provider.begin();
         try {
             /**
              * Organizando a listagem de dados antes de efetuar a gravação.
@@ -92,19 +96,19 @@ public class ProdutoRepository {
             System.gc();
 
             ProdutoIDStack idStack = provider.getIDStack();
-            
+
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
                 this.naoTransformarEANemUN = true;
             }
-            
+
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
-            
+
             setNotify("Gravando os produtos...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
                 StringBuilder rep = new StringBuilder();
                 try {
                     ProdutoIMP imp = organizados.get(keys);
-                    
+
                     rep
                             .append("00|")
                             .append(imp.getImportId()).append("|")
@@ -120,7 +124,7 @@ public class ProdutoRepository {
                     boolean eBalanca;
                     TipoEmbalagem unidade;
                     boolean manterEAN;
-                    
+
                     {
                         SetUpVariaveisTO to = setUpVariaveis(imp);
                         ean = to.ean;
@@ -129,12 +133,12 @@ public class ProdutoRepository {
                         unidade = to.unidade;
                     }
                     //</editor-fold>
-                    
+
                     ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
-                    
+
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
-                        
+
                         if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_PDV_VR)) {
                             try {
                                 id = Integer.parseInt(strID);
@@ -159,7 +163,7 @@ public class ProdutoRepository {
                                 notificar();
                                 continue;
                             }
-                        } else {                                                    
+                        } else {
                             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
                                 try {
                                     int idValido = Integer.parseInt(strID);
@@ -172,23 +176,23 @@ public class ProdutoRepository {
                                 }
                             } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
                                 strID = String.valueOf(ean);
-                            } else if (imp.isManterEAN() && ean >= 1 && ean <= 999999) {
+                            } else if ((importarMenoresQue7Digitos || imp.isManterEAN()) && ean >= 1 && ean <= 999999) {
                                 strID = String.valueOf(ean);
                             }
-                            
+
                             id = idStack.obterID(strID, eBalanca);
                         }
-                        
+
                         ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
 
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
                         anterior.setDataHora(dataHoraImportacao);
                         anterior.setObsImportacao("PRODUTO NOVO - INSERIDO PELO METODO salvar DA CLASSE " + ProdutoRepository.class.getName().toString());
-                        
+
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
-                        
+
                         ProdutoComplementoVO complemento = converterComplemento(imp);
                         complemento.setProduto(prod);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
@@ -196,8 +200,11 @@ public class ProdutoRepository {
                         provider.salvar(prod);
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
-                        provider.aliquota().salvar(aliquota); 
+                        provider.aliquota().salvar(aliquota);
                         
+                        if(aliquota.getBeneficio() != 0) {
+                            provider.aliquota().salvarAliquotaBeneficio(aliquota);
+                        }
                     } else if (anterior.getCodigoAtual() != null) {
                         id = anterior.getCodigoAtual().getId();
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
@@ -244,13 +251,13 @@ public class ProdutoRepository {
             throw e;
         }
     }
-    
+
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
         Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
-                
+
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
         Set<OpcaoProduto> optComLista = new LinkedHashSet<>();
@@ -268,23 +275,31 @@ public class ProdutoRepository {
         //</editor-fold>
 
         if (!optSimples.isEmpty()) {
-
+            
             provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
             MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            String primeiraLojaMigrada = getPrimeiraLojaMigrada();
+            
             produtos.clear();
             System.gc();
 
             try {
                 provider.begin();
-                
+
                 LOG.info("importarSomenteLoja: " + importarSomenteLoja);
-                
+
                 LOG.info("Produtos a serem atualizados: " + organizados.size());
 
+                
+                /* Identificar qual foi a primeira loja que migrou */
+                
+                isDataAlteracaoCodAntProduto();
+                
                 StringBuilder strOpt = new StringBuilder();
                 for (Iterator<OpcaoProduto> iterator = optSimples.iterator(); iterator.hasNext();) {
                     OpcaoProduto next = iterator.next();
@@ -296,6 +311,9 @@ public class ProdutoRepository {
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().criarEstoqueAnteriorTemporario();
+                }
+                if (optSimples.contains(OpcaoProduto.TROCA)) {
+                    provider.complemento().criarEstoqueTrocaAnteriorTemporario();
                 }
 
                 for (KeyList<String> keys : organizados.keySet()) {
@@ -324,17 +342,17 @@ public class ProdutoRepository {
                     ProdutoIMP imp = organizados.get(chave);
 
                     ProdutoAnteriorVO anterior = null;
-                    
+
                     if (!importarSomenteLoja) {
                         anterior = provider.anterior().get(chaveProd);
                     } else {
                         anterior = provider.anterior().getLojaImp(chaveProd);
                     }
-                    
+
                     LOG.finer("Chave Prod: " + Arrays.deepToString(chaveProd));
 
                     if (anterior != null && anterior.getCodigoAtual() != null) {
-                        
+
                         LOG.finer("Anterior encontrado: " + anterior.getImportId() + " - " + anterior.getDescricao());
 
                         //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
@@ -355,11 +373,12 @@ public class ProdutoRepository {
                         ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
 
                         anterior = converterImpEmAnterior(imp);
+                        anterior.setDataHoraAlteracao(dataHoraImportacao);
                         anterior.setCodigoAtual(prod);
 
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
-                        
+
                         ProdutoComplementoVO complemento = converterComplemento(imp);
                         complemento.setProduto(prod);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
@@ -370,12 +389,12 @@ public class ProdutoRepository {
                         ProdutoAutomacaoLojaVO precoAtacadoLoja = converterProdutoAutomacaoLoja(imp);
                         ProdutoAutomacaoDescontoVO precoAtacadoDesconto = converterProdutoAutomacaoDesconto(imp);
                         AtacadoProdutoComplementoVO atacadoProdutoComplemento = converterAtacadoProdutoComplemtnto(imp, id);
-                        
-                        precoAtacadoDesconto.setProduto(prod);   
-                        
+
+                        precoAtacadoDesconto.setProduto(prod);
+
                         provider.atualizar(prod, optSimples);
                         provider.complemento().atualizar(complemento, optSimples);
-                        
+
                         if (optSimples.contains(OpcaoProduto.ATACADO)) {
                             if (id > 0 && ean > 0) { //ID e EAN válidos
                                 if (!provider.automacao().cadastrado(ean)) {
@@ -389,34 +408,47 @@ public class ProdutoRepository {
                                 provider.eanAnterior().salvar(eanAnterior);
                             }
                         }
-                        
+
                         if (optSimples.contains(OpcaoProduto.VR_ATACADO)) {
                             if (id > 0) {
                                 provider.vrAtacado().salvar(atacadoProdutoComplemento, optSimples);
                             }
                         }
-                        
+
                         provider.automacao().atualizar(automacao, optSimples);
 
                         if (aliquotas.containsKey(prod.getId(), aliquota.getEstado().getId())) {
-                            provider.aliquota().atualizar(aliquota, optSimples);
+                            
+                            if (optSimples.contains(OpcaoProduto.ICMS_LOJA)) {
+                                
+                                String loja_sistema = imp.getImportSistema()+' '+imp.getImportLoja();
+                                boolean isPrimeiraLojaMigrada = false;
+                                if (loja_sistema.equals(primeiraLojaMigrada)) {
+                                    isPrimeiraLojaMigrada = true;
+                                }
+                                                                
+                                provider.aliquota().atualizarIcmsLoja(aliquota, optSimples, anterior, isPrimeiraLojaMigrada);
+                                provider.anterior().atualizarIcmsLoja(anterior, isPrimeiraLojaMigrada);
+                                
+                            } else {                            
+                                provider.aliquota().atualizar(aliquota, optSimples);
+                                provider.anterior().atualizarIcms(anterior);
+                            }
                         } else {
                             provider.aliquota().salvar(aliquota);
                             aliquotas.put(null, prod.getId(), aliquota.getEstado().getId());
                         }
-                        
+
                         if (optSimples.contains(OpcaoProduto.CODIGO_BENEFICIO)) {
                             int produtoAliquotaBeneficio = provider.aliquota().getProdutoAliquotaBeneficio(aliquota.getId()),
                                     beneficio = provider.aliquota().getBeneficio(imp.getBeneficio()),
                                     idProdutoAliquota = provider.aliquota().getProdutoAliquotaByProduto(prod.getId());
-                            
+
                             if (produtoAliquotaBeneficio != 0 && beneficio != 0 && idProdutoAliquota != 0) {
-                                System.out.println("BENEFICIO: " + beneficio + " E PRODUTO: " + prod.getId() + " NÃO ENCONTRADO!");
                                 aliquota.setBeneficio(beneficio);
                                 aliquota.setId(idProdutoAliquota);
                                 provider.aliquota().atualizaBeneficio(aliquota);
-                            } else if(produtoAliquotaBeneficio == 0 && beneficio != 0 && idProdutoAliquota != 0) {
-                                System.out.println("BENEFICIO: " + beneficio + " E PRODUTO: " + prod.getId() + " NÃO ENCONTRADO!");
+                            } else if (produtoAliquotaBeneficio == 0 && beneficio != 0 && idProdutoAliquota != 0) {
                                 aliquota.setBeneficio(beneficio);
                                 aliquota.setId(idProdutoAliquota);
                                 provider.aliquota().salvarAliquotaBeneficio(aliquota);
@@ -424,13 +456,13 @@ public class ProdutoRepository {
                                 System.out.println("BENEFICIO: " + beneficio + " E PRODUTO: " + prod.getId() + " NÃO ENCONTRADO!");
                             }
                         }
-                        
+
                         if (Versao.menorQue(3, 18, 1)) {
                             if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
                                 provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
                             }
                         }
-                        
+
                         if (precoAtacadoDesconto.getDesconto() > 0) {
                             provider.atacado().atualizarDesconto(precoAtacadoDesconto, optSimples);
                         }
@@ -440,6 +472,9 @@ public class ProdutoRepository {
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().gerarLogDeImportacaoDeEstoque();
+                }
+                if (optSimples.contains(OpcaoProduto.TROCA)) {
+                    provider.complemento().gerarLogDeTroca();
                 }
 
                 provider.commit();
@@ -466,7 +501,7 @@ public class ProdutoRepository {
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
-        
+
         provider.begin();
         try {
             System.gc();
@@ -487,6 +522,8 @@ public class ProdutoRepository {
             for (KeyList<String> keys : organizados.keySet()) {
                 ProdutoIMP imp = organizados.get(keys);
 
+                imp.setManterEAN(false);
+                
                 //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
                 int id;
                 long ean;
@@ -509,7 +546,7 @@ public class ProdutoRepository {
                 int idProdutoExistente = provider.automacao().getIdProdutoPorEAN(ean);
                 boolean eanExistente = idProdutoExistente > 0;
                 ProdutoVO codigoAtual = null;
-
+                
                 if (eanValido) {
                     if (!eanExistente) {
                         /**
@@ -532,7 +569,7 @@ public class ProdutoRepository {
 
                             ProdutoAliquotaVO aliquota = converterAliquota(imp);
                             aliquota.setProduto(codigoAtual);
-                            
+
                             ProdutoComplementoVO complemento = converterComplemento(imp);
                             complemento.setProduto(codigoAtual);
                             complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
@@ -553,11 +590,48 @@ public class ProdutoRepository {
                             }
                             provider.aliquota().salvar(aliquota);
                         } else {
+                            
                             codigoAtual = provider.anterior().get(
                                     provider.getSistema(),
                                     provider.getLoja(),
                                     keys.get(2)
                             ).getCodigoAtual();
+
+                            if (codigoAtual == null) {
+
+                                if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
+                                    strID = String.valueOf(ean);
+                                }
+
+                                id = idStack.obterID(strID, eBalanca);
+
+                                codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
+
+                                ProdutoAliquotaVO aliquota = converterAliquota(imp);
+                                aliquota.setProduto(codigoAtual);
+
+                                ProdutoComplementoVO complemento = converterComplemento(imp);
+                                complemento.setProduto(codigoAtual);
+                                complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
+
+                                provider.salvar(codigoAtual);
+                                obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                                //provider.anterior().salvar(anterior);
+                                double estoque = complemento.getEstoque();
+                                for (LojaVO loja : provider.getLojas()) {
+                                    complemento.setIdLoja(loja.getId());
+                                    if (loja.getId() == getLojaVR()) {
+                                        complemento.setEstoque(estoque);
+                                    } else {
+                                        complemento.setEstoque(0);
+                                    }
+                                    provider.complemento().salvar(complemento, false);
+
+                                }
+                                provider.aliquota().salvar(aliquota);
+                            } else {
+                                obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                            }
                         }
                         /**
                          * Cadastra o EAN no sistema.
@@ -566,13 +640,17 @@ public class ProdutoRepository {
                             ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
+
+                            gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
                         }
                     } else {
-                            id = idProdutoExistente;
-                            codigoAtual = new ProdutoVO();
-                            codigoAtual.setId(id);
-                            obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
-                            
+                        id = idProdutoExistente;
+                        codigoAtual = new ProdutoVO();
+                        codigoAtual.setId(id);
+                        obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+
+                        // gravar codigo atual se for null
+                        gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), id, obsImportacao);
                     }
                 }
 
@@ -584,11 +662,11 @@ public class ProdutoRepository {
                     ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
                     anterior.setDataHora(dataHoraImportacao);
-                    
-                    if(anterior.getCodigoAtual() == null) {
+
+                    if (anterior.getCodigoAtual() == null) {
                         obsImportacao = "PRODUTO NAO LOCALIZADO NA UNIFICACAO";
                     }
-                    
+
                     anterior.setObsImportacao(obsImportacao);
                     provider.anterior().salvar(anterior);
                 }
@@ -606,6 +684,33 @@ public class ProdutoRepository {
         }
     }
 
+    public void gravarCodigoAtual(String impsistema, String imploja, String impid, int codigoatual, String obsimportacao) throws Exception {
+        try {
+            Conexao.begin();
+
+            try (Statement stm = Conexao.createStatement()) {
+                SQLBuilder sql = new SQLBuilder();
+
+                sql.setSchema("implantacao");
+                sql.setTableName("codant_produto");
+                sql.setWhere("impid = " + Utils.quoteSQL(impid)
+                        + " and imploja = '" + imploja + "'"
+                        + " and impsistema = '" + impsistema + "'"
+                        + " and codigoatual is null"
+                );
+                sql.put("codigoatual", codigoatual);
+                sql.put("obsimportacao", obsimportacao);
+
+                stm.execute(sql.getUpdate());
+                
+            }
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
     /**
      * Unifica uma listagem de produtos no sistema.
      *
@@ -614,7 +719,7 @@ public class ProdutoRepository {
      */
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
-        
+
         provider.begin();
         try {
             System.gc();
@@ -692,7 +797,7 @@ public class ProdutoRepository {
 
                             ProdutoAliquotaVO aliquota = converterAliquota(imp);
                             aliquota.setProduto(codigoAtual);
-                            
+
                             ProdutoComplementoVO complemento = converterComplemento(imp);
                             complemento.setProduto(codigoAtual);
                             complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
@@ -717,7 +822,7 @@ public class ProdutoRepository {
                                     provider.getLoja(),
                                     keys.get(2)
                             ).getCodigoAtual();
-                            
+
                             if ((!eBalanca) && (codigoAtual == null)) {
                                 strID = String.valueOf(ean);
                                 id = idStack.obterID(strID, eBalanca);
@@ -726,10 +831,10 @@ public class ProdutoRepository {
 
                                 ProdutoAliquotaVO aliquota = converterAliquota(imp);
                                 aliquota.setProduto(codigoAtual);
-                                
+
                                 ProdutoComplementoVO complemento = converterComplemento(imp);
                                 complemento.setProduto(codigoAtual);
-                                complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());                                
+                                complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                                 provider.salvar(codigoAtual);
                                 //provider.anterior().salvar(anterior);
@@ -769,7 +874,7 @@ public class ProdutoRepository {
                 } else {
                     ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
-                    
+
                     if (!eBalanca) {
                         provider.anterior().alterar(anterior);
                     }
@@ -787,7 +892,7 @@ public class ProdutoRepository {
             throw e;
         }
     }
-    
+
     /**
      * Converte um {@link ProdutoIMP} em {@link ProdutoAliquotaVO}.
      *
@@ -820,7 +925,7 @@ public class ProdutoRepository {
             debitoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsDebitoForaEstado);
             debitoForaEstadoNfe = provider.tributo().getAliquotaByMapaId(idIcmsDebitoForaEstadoNf);
             consumidor = provider.tributo().getAliquotaByMapaId(idIcmsConsumidor);
-            
+
             if (debitoForaEstado == null) {
                 debitoForaEstado = aliqDebito;
             }
@@ -835,8 +940,8 @@ public class ProdutoRepository {
             if (consumidor == null) {
                 if (icmsCstSaida == 20) {
                     /*
-                    Comentado o calculo da alíquota consumidor por questão de impressora NFC-e
-                    */
+                     Comentado o calculo da alíquota consumidor por questão de impressora NFC-e
+                     */
                     //double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);
                     consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
                 } else {
@@ -844,22 +949,22 @@ public class ProdutoRepository {
                 }
             }
         } else {
-            int icmsCstSaida = imp.getIcmsCstSaida();            
+            int icmsCstSaida = imp.getIcmsCstSaida();
             double icmsAliqSaida = 0;
             double icmsReducaoSaida = 0;
 
-            int icmsCstSaidaForaEstado = imp.getIcmsCstSaidaForaEstado();            
+            int icmsCstSaidaForaEstado = imp.getIcmsCstSaidaForaEstado();
             double icmsAliqSaidaForaEstado = 0;
             double icmsReducaoSaidaForaEstado = 0;
 
-            int icmsCstSaidaForaEstadoNF = imp.getIcmsCstSaidaForaEstadoNF();            
+            int icmsCstSaidaForaEstadoNF = imp.getIcmsCstSaidaForaEstadoNF();
             double icmsAliqSaidaForaEstadoNF = 0;
             double icmsReducaoSaidaForaEstadoNF = 0;
 
-            int icmsCstConsumidor = imp.getIcmsCstConsumidor();            
+            int icmsCstConsumidor = imp.getIcmsCstConsumidor();
             double icmsAliqConsumidor = 0;
             double icmsReducaoConsumidor = 0;
-            
+
             if (icmsCstSaida == 20 || icmsCstSaida == 0) {
                 icmsAliqSaida = imp.getIcmsAliqSaida();
                 icmsReducaoSaida = imp.getIcmsReducaoSaida();
@@ -876,12 +981,12 @@ public class ProdutoRepository {
                 icmsAliqConsumidor = imp.getIcmsAliqConsumidor();
                 icmsReducaoConsumidor = imp.getIcmsReducaoConsumidor();
             }
-            
+
             aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaidaForaEstado, icmsAliqSaidaForaEstado, icmsReducaoSaidaForaEstado);
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaidaForaEstadoNF, icmsAliqSaidaForaEstadoNF, icmsReducaoSaidaForaEstadoNF);
             consumidor = provider.tributo().getIcms(icmsCstConsumidor, icmsAliqConsumidor, icmsReducaoConsumidor);
-            
+
             if (debitoForaEstado == null) {
                 debitoForaEstado = aliqDebito;
             }
@@ -892,9 +997,9 @@ public class ProdutoRepository {
             if (consumidor == null) {
                 if (icmsCstSaida == 20) {
                     /*
-                        Comentado o calculo da alíquota consumidor 
-                        por questão de impressora NFC-e
-                    */
+                     Comentado o calculo da alíquota consumidor 
+                     por questão de impressora NFC-e
+                     */
                     //double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
                     consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
                 } else {
@@ -902,7 +1007,7 @@ public class ProdutoRepository {
                 }
             }
         }
-        
+
         if (copiarIcmsDebitoParaCredito) {
             aliqCredito = aliqDebito;
             creditoForaEstado = debitoForaEstado;
@@ -947,22 +1052,24 @@ public class ProdutoRepository {
         aliquota.setAliquotaCreditoForaEstado(creditoForaEstado);
         aliquota.setAliquotaDebitoForaEstadoNf(debitoForaEstadoNfe);
         aliquota.setAliquotaConsumidor(consumidor);
-        
-        if(idIcmsCreditoFornecedor != null) {
+
+        if (idIcmsCreditoFornecedor != null) {
             aliquota.setAliquotaCreditoFornecedor(idIcmsCreditoFornecedor);
         }
-        
+
         aliquota.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
-        
+
         int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
-        aliquota.setBeneficio(idBeneficio);                        
-        if(idBeneficio != 0) {
-            provider.aliquota().salvarAliquotaBeneficio(aliquota);
-        }
+        aliquota.setBeneficio(idBeneficio);
         
+        /*
+        if (idBeneficio != 0) {
+            provider.aliquota().salvarAliquotaBeneficio(aliquota);
+        }*/
+
         return aliquota;
     }
-    
+
     /**
      * Converte um {@link ProdutoIMP} em um {@link ProdutoComplementoVO} e o
      * incluí no {@link ProdutoVO} informado.
@@ -1045,7 +1152,7 @@ public class ProdutoRepository {
             TipoEmbalagem unidade, boolean eBalanca) throws Exception {
 
         manterDescricao = provider.getOpcoes().contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO);
-        
+
         if (fabricantes == null) {
             fabricantes = provider.getFornecedoresImportados();
         }
@@ -1069,12 +1176,12 @@ public class ProdutoRepository {
         }
         vo.setDescricaoReduzida(imp.getDescricaoReduzida());
         vo.setDescricaoGondola(imp.getDescricaoGondola());
-        
+
         if (vo.getId() == 1) {
             System.out.println("imp " + imp.getDescricaoReduzida());
             System.out.println("vo " + vo.getDescricaoReduzida());
         }
-        
+
         vo.setQtdEmbalagem(imp.getQtdEmbalagemCotacao() == 0 ? 1 : imp.getQtdEmbalagemCotacao());
         vo.setSugestaoCotacao(imp.isSugestaoCotacao());
         vo.setSugestaoPedido(imp.isSugestaoPedido());
@@ -1088,7 +1195,7 @@ public class ProdutoRepository {
             vo.setDatacadastro(new Date());
         }
         vo.setDataAlteracao(imp.getDataAlteracao());
-        if(vo.getDataAlteracao() == null) {
+        if (vo.getDataAlteracao() == null) {
             vo.setDataAlteracao(new Date());
         }
         Integer fornecedorFabricante = fabricantes.get(imp.getFornecedorFabricante());
@@ -1158,7 +1265,6 @@ public class ProdutoRepository {
         }
         //<editor-fold defaultstate="collapsed" desc="Tratamento dos produtos de Kilo e Unitário Pesável">
 
-        
         if (eBalanca) {
             if (TipoEmbalagem.UN.equals(unidade)) {
                 vo.setPesavel(true);
@@ -1185,7 +1291,7 @@ public class ProdutoRepository {
         vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
         vo.setVendaPdv(imp.isVendaPdv());
         vo.setAceitaMultiplicacaoPDV(imp.isAceitaMultiplicacaoPDV());
-        
+
         //Importação da divisão de fornecedores
         Entry<String, Integer> divisaoFornecedor = this.divisoes.get(imp.getDivisao());
         if (divisaoFornecedor != null && divisaoFornecedor.getValue() != null) {
@@ -1199,7 +1305,7 @@ public class ProdutoRepository {
         if (comprador != null) {
             vo.setIdComprador(comprador);
         }
-        
+
         if (imp.getTipoEmbalagemVolume() == null || imp.getTipoEmbalagemVolume().trim().equals("")) {
             vo.setTipoEmbalagemVolume(vo.getTipoEmbalagem());
         } else {
@@ -1209,12 +1315,12 @@ public class ProdutoRepository {
         vo.setVendaControlada(imp.isVendaControlada());
         vo.setProdutoecommerce(imp.isProdutoECommerce());
         Integer codigoANP = codigosAnp.get(imp.getCodigoAnp());
-        if(codigoANP != null) {
+        if (codigoANP != null) {
             vo.setCodigoAnp(codigoANP);
         }
-        
+
         vo.setNumeroparcela(imp.getNumeroparcela());
-        
+
         return vo;
     }
 
@@ -1289,40 +1395,44 @@ public class ProdutoRepository {
         destino.setPisCofinsCredito(imp.getPiscofinsCstCredito());
         destino.setPisCofinsDebito(imp.getPiscofinsCstDebito());
         destino.setPisCofinsNaturezaReceita(imp.getPiscofinsNaturezaReceita());
-        
+
         destino.setIcmsCst(imp.getIcmsCst());
         destino.setIcmsAliq(imp.getIcmsAliq());
         destino.setIcmsReducao(imp.getIcmsReducao());
-        
+
         destino.setIcmsCstSaida(imp.getIcmsCstSaida());
         destino.setIcmsAliqSaida(imp.getIcmsAliqSaida());
         destino.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
-        
+
         destino.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaidaForaEstado());
         destino.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaidaForaEstado());
         destino.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaidaForaEstado());
-        
+
         destino.setIcmsCstSaidaForaEstadoNf(imp.getIcmsCstSaidaForaEstadoNF());
         destino.setIcmsAliqSaidaForaEstadoNf(imp.getIcmsAliqSaidaForaEstadoNF());
         destino.setIcmsReducaoSaidaForaEstadoNf(imp.getIcmsReducaoSaidaForaEstadoNF());
+
+        destino.setIcmsCstConsumidor(imp.getIcmsCstConsumidor());
+        destino.setIcmsAliqConsumidor(imp.getIcmsAliqConsumidor());
+        destino.setIcmsReducaoConsumidor(imp.getIcmsReducaoConsumidor());
         
         destino.setIcmsCstEntrada(imp.getIcmsCstEntrada());
         destino.setIcmsAliqEntrada(imp.getIcmsAliqEntrada());
         destino.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
-        
+
         destino.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntradaForaEstado());
         destino.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntradaForaEstado());
         destino.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
-        
+
         destino.setIcmsDebitoId(imp.getIcmsDebitoId());
         destino.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoForaEstadoId());
         destino.setIcmsDebitoForaEstadoIdNf(imp.getIcmsDebitoForaEstadoId());
-        
+
         destino.setIcmsCreditoId(imp.getIcmsCreditoId());
         destino.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoForaEstadoId());
-        
+
         destino.setIcmsConsumidorId(imp.getIcmsConsumidorId());
-        
+
         destino.setEstoque(imp.getEstoque());
         destino.seteBalanca(imp.isBalanca());
         destino.setCustosemimposto(imp.getCustoSemImposto());
@@ -1439,7 +1549,7 @@ public class ProdutoRepository {
         vo.setDesconto(desconto);
         return vo;
     }
-    
+
     private AtacadoProdutoComplementoVO converterAtacadoProdutoComplemtnto(ProdutoIMP imp, int id) {
         AtacadoProdutoComplementoVO vo = new AtacadoProdutoComplementoVO();
         vo.setIdLoja(provider.getLojaVR());
@@ -1457,11 +1567,11 @@ public class ProdutoRepository {
 
         try {
             provider.begin();
-            
+
             setNotify("Ofertas...Carregando anteriores do produto", 0);
-            
+
             Map<String, Integer> anteriores = provider.anterior().getAnteriores();
-            
+
             setNotify("Ofertas...Gravando...", filtrados.size());
 
             for (OfertaIMP imp : filtrados.values()) {
@@ -1591,5 +1701,44 @@ public class ProdutoRepository {
         //</editor-fold>
 
         return to;
+    }
+    
+    public String getPrimeiraLojaMigrada() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct (impsistema||' '||imploja) sistema_loja \n"
+                            + "from implantacao.codant_produto \n"
+                            + "where dataimportacao in (select min(dataimportacao)"
+                            + "                         from implantacao.codant_produto)"
+            )) {
+                if (rst.next())  {
+                    return rst.getString("sistema_loja");
+                } else {
+                    return "";
+                }
+            }
+        }
+    }
+    
+    public void isDataAlteracaoCodAntProduto() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	*\n"
+                    + "from \n"
+                    + "	information_schema.columns c\n"
+                    + "where\n"
+                    + "	table_schema like 'implantacao'\n"
+                    + "	and table_name like '%codant_produto%'\n"
+                    + "	and column_name like '%dataalteracao%'\n"
+                    + "order by\n"
+                    + "	1,2,3,4"
+            )) {
+                if (!rst.next()) {                    
+                    String sql = "alter table implantacao.codant_produto add column dataalteracao timestamp";
+                    stm.execute(sql);                    
+                }
+            }
+        }
     }
 }

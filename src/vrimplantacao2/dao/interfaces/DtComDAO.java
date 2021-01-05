@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -64,15 +63,29 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	tribu,\n"
-                    + "	desctribu\n"
-                  + "from\n"
-                    + "	aliquo\n"
-                  + "order by\n"
-                    + "	desctribu")) {
+                    "select\n" +
+                    "	tribu,\n" +
+                    "	desctribu,\n" +
+                    "	cst,\n" +
+                    "	\"PERCENT\",\n" +
+                    "	REDBC,\n" +
+                    "	FECP\n" +
+                    "from\n" +
+                    "	aliquo\n" +
+                    "order by\n" +
+                    "	desctribu"
+            )) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("tribu"), rs.getString("desctribu")));
+                    result.add(new MapaTributoIMP(
+                            rs.getString("tribu"),
+                            rs.getString("desctribu"),
+                            rs.getInt("cst"),
+                            rs.getDouble("PERCENT"),
+                            rs.getDouble("REDBC"),
+                            rs.getDouble("FECP"),
+                            false,
+                            0
+                    ));
                 }
             }
         }

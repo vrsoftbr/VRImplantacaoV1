@@ -91,7 +91,17 @@ public class MapaVendaDAO {
 
                     stm.execute(sql.getInsert());
                     
-                    sql = new SQLBuilder();
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select impid from implantacao.codant_produto where\n"
+                            + "impsistema = " + SQLUtils.stringSQL(sistema) + "\n"
+                            + "and imploja = " + SQLUtils.stringSQL(loja) + "\n"
+                            + "and impid = " + SQLUtils.stringSQL(produto)
+            )) {
+                if (!rst.next()) {
+                    
+                    SQLBuilder sql = new SQLBuilder();
 
                     sql.setSchema("implantacao");
                     sql.setTableName("codant_produto");

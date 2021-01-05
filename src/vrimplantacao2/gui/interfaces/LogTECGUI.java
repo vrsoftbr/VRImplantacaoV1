@@ -45,6 +45,8 @@ public class LogTECGUI extends VRInternalFrame {
         txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
         txtSenhaPostgres.setText(params.getWithNull("36217900", NOME_SISTEMA, "SENHA"));
+        chkManterBalanca.setSelected(params.getBool(NOME_SISTEMA, "MANTER_BALANCA"));
+        chkManterEansMenores.setSelected(params.getBool(NOME_SISTEMA, "MANTER_MENORES"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
@@ -58,6 +60,8 @@ public class LogTECGUI extends VRInternalFrame {
         params.put(txtPortaPostgres.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioPostgres.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaPostgres.getText(), NOME_SISTEMA, "SENHA");
+        params.put(chkManterBalanca.isSelected(), NOME_SISTEMA, "MANTER_BALANCA");
+        params.put(chkManterEansMenores.isSelected(), NOME_SISTEMA, "MANTER_MENORES");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
@@ -188,7 +192,14 @@ public class LogTECGUI extends VRInternalFrame {
                         }
 
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            List<OpcaoProduto> opcoes = new ArrayList<>();
+                            if (chkManterBalanca.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                            }
+                            if (chkManterEansMenores.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                            }
+                            importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
                         }
 
                         {
@@ -377,6 +388,7 @@ public class LogTECGUI extends VRInternalFrame {
         pnlImpProd = new javax.swing.JPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkManterEansMenores = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
@@ -426,6 +438,8 @@ public class LogTECGUI extends VRInternalFrame {
         cbxUnifProdutoForn = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliEventual = new vrframework.bean.checkBox.VRCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioPostgres = new vrframework.bean.textField.VRTextField();
@@ -444,20 +458,20 @@ public class LogTECGUI extends VRInternalFrame {
 
         setTitle("Lyncis");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -506,6 +520,10 @@ public class LogTECGUI extends VRInternalFrame {
         chkManterBalanca.setText("Manter Balança");
         chkManterBalanca.setEnabled(true);
         pnlImpProd.add(chkManterBalanca);
+
+        chkManterEansMenores.setText("Manter EANs menores");
+        chkManterEansMenores.setEnabled(true);
+        pnlImpProd.add(chkManterEansMenores);
 
         vRPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -596,8 +614,7 @@ public class LogTECGUI extends VRInternalFrame {
                     .addGroup(tabDadosLayout.createSequentialGroup()
                         .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pnlImpProd, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 78, Short.MAX_VALUE)))
+                        .addComponent(pnlImpProd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabDadosLayout.setVerticalGroup(
@@ -653,7 +670,7 @@ public class LogTECGUI extends VRInternalFrame {
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(260, Short.MAX_VALUE))
+                .addContainerGap(330, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -713,7 +730,7 @@ public class LogTECGUI extends VRInternalFrame {
                         .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(241, Short.MAX_VALUE))
+                .addContainerGap(311, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -750,7 +767,7 @@ public class LogTECGUI extends VRInternalFrame {
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(271, Short.MAX_VALUE))
+                .addContainerGap(341, Short.MAX_VALUE))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -811,6 +828,25 @@ public class LogTECGUI extends VRInternalFrame {
         );
 
         tab.addTab("Unificação", tabUnificacao);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(147, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(108, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Balança", jPanel1);
 
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Postgres"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
@@ -1053,6 +1089,7 @@ public class LogTECGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkLimite;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkManterEansMenores;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
@@ -1079,6 +1116,7 @@ public class LogTECGUI extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.comboBox.VRComboBox cmbPlanoContas;
+    private javax.swing.JPanel jPanel1;
     private vrframework.bean.label.VRLabel lblPlanoContas;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private javax.swing.JPanel pnlImpProd;
@@ -1095,6 +1133,7 @@ public class LogTECGUI extends VRInternalFrame {
     private vrframework.bean.passwordField.VRPasswordField txtSenhaPostgres;
     private vrframework.bean.textField.VRTextField txtUsuarioPostgres;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;

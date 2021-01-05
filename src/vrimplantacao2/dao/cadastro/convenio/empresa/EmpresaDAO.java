@@ -2,8 +2,8 @@ package vrimplantacao2.dao.cadastro.convenio.empresa;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.convenio.empresa.ConvenioEmpresaVO;
@@ -14,14 +14,14 @@ import vrimplantacao2.vo.cadastro.convenio.empresa.ConvenioEmpresaVO;
  */
 public class EmpresaDAO {
 
-    public Set<Long> getCnpjExistentes() throws Exception {
-        Set<Long> result = new LinkedHashSet<>();
+    public Map<Long, Integer> getCnpjExistentes() throws Exception {
+        Map<Long, Integer> result = new LinkedHashMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select cnpj from empresa order by cnpj"
+                    "select cnpj, id from empresa order by cnpj"
             )) {
                 while (rst.next()) {
-                    result.add(rst.getLong("cnpj"));
+                    result.put(rst.getLong("cnpj"), rst.getInt("id"));
                 }
             }
         }

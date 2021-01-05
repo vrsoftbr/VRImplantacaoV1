@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
-import com.hxtt.f.e;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.CestDAO;
@@ -261,6 +259,17 @@ public class ProdutoRepositoryProvider {
             dao.alterar(anterior);
         }
         
+        public void atualizarIcms(ProdutoAnteriorVO anterior) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            dao.atualizarIcmsAnterior(anterior);            
+        }
+        public void atualizarIcmsLoja(ProdutoAnteriorVO anterior, boolean primeiraLojaMigrada) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            dao.atualizarIcmsAnteriorLoja(anterior, primeiraLojaMigrada);
+        }
+        
         public boolean cadastrado(String id) throws Exception {
             dao.setImportSistema(getSistema());
             dao.setImportLoja(getLoja());
@@ -300,6 +309,14 @@ public class ProdutoRepositoryProvider {
         public void gerarLogCusto(LogProdutoComplementoVO vo) throws Exception {
             produtoComplementoDAO.salvarLogCusto(vo);
         }
+
+        public void criarEstoqueTrocaAnteriorTemporario() throws Exception {
+            produtoComplementoDAO.criarEstoqueTrocaAnteriorTemporario(lojaVR);
+        }
+
+        public void gerarLogDeTroca() throws Exception {
+            produtoComplementoDAO.gerarLogDeTrocaViaTMP_TROCA(getLojaVR());
+        }
     }
     
     public class Aliquota {
@@ -316,6 +333,10 @@ public class ProdutoRepositoryProvider {
 
         public void atualizar(ProdutoAliquotaVO aliquota, Set<OpcaoProduto> opt) throws Exception {
             dao.atualizar(aliquota, opt);
+        }
+
+        public void atualizarIcmsLoja(ProdutoAliquotaVO aliquota, Set<OpcaoProduto> opt, ProdutoAnteriorVO anterior, boolean primeiraLojaMigrada) throws Exception {
+            dao.atualizarIcmsLoja(aliquota, opt, anterior, primeiraLojaMigrada);
         }
         
         public void atualizaBeneficio(ProdutoAliquotaVO aliquota) throws Exception {

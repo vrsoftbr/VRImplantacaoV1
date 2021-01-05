@@ -11,6 +11,7 @@ import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 
 public class ProdutoAliquotaDAO {
 
@@ -33,8 +34,8 @@ public class ProdutoAliquotaDAO {
             if (!Versao.menorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
             }
-            if (Versao.maiorQue(3, 19,1, 64)) {
-                    sql.put("excecao", vo.getExcecao());
+            if (Versao.maiorQue(3, 19, 1, 64)) {
+                sql.put("excecao", vo.getExcecao());
             }
 
             sql.getReturning().add("id");
@@ -48,22 +49,28 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
-    
+
     public void salvarAliquotaBeneficio(ProdutoAliquotaVO vo) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            SQLBuilder sql = new SQLBuilder();
-            sql.setTableName("produtoaliquotabeneficio");
-            sql.put("id_produtoaliquota", vo.getId());
-            sql.put("id_aliquota", vo.getAliquotaDebito().getId());
-            sql.put("id_beneficio", vo.getBeneficio());
 
-            sql.getReturning().add("id");
+        if (vo.getId() == 0) {
+            System.out.println("Produto Alíquota não localizada!" + " Beneficio ID: " + vo.getBeneficio()
+            + " Aliquota ID: " +  vo.getAliquotaDebito().getId());
+        } else {
+            try (Statement stm = Conexao.createStatement()) {
+                SQLBuilder sql = new SQLBuilder();
+                sql.setTableName("produtoaliquotabeneficio");
+                sql.put("id_produtoaliquota", vo.getId());
+                sql.put("id_aliquota", vo.getAliquotaDebito().getId());
+                sql.put("id_beneficio", vo.getBeneficio());
 
-            try (ResultSet rst = stm.executeQuery(
-                    sql.getInsert()
-            )) {
-                if (rst.next()) {
-                    vo.setId(rst.getInt("id"));
+                sql.getReturning().add("id");
+
+                try (ResultSet rst = stm.executeQuery(
+                        sql.getInsert()
+                )) {
+                    if (rst.next()) {
+                        vo.setId(rst.getInt("id"));
+                    }
                 }
             }
         }
@@ -102,12 +109,18 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 } else if (opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO)) {
                     sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
-                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                    
+                    if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                        sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstado().getId());
+                    } else {
+                        sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                    }
+                    
                 } else if (opt.contains(OpcaoProduto.ICMS_CONSUMIDOR)) {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 }
                 if (opt.contains(OpcaoProduto.EXCECAO)) {
-                    if (Versao.maiorQue(3, 19,1, 64)) {
+                    if (Versao.maiorQue(3, 19, 1, 64)) {
                         sql.put("excecao", vo.getExcecao());
                     }
                 }
@@ -130,26 +143,82 @@ public class ProdutoAliquotaDAO {
             if (opt.contains(OpcaoProduto.ICMS)) {
                 sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
-                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
-                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
-                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
-                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                
+                if (vo.getAliquotaDebitoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                }
+                
+                if (vo.getAliquotaCreditoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+                } else {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                }
+                
+                if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                }
+                
+                if (vo.getAliquotaConsumidor().getId() == 0) {
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                }                
+                
                 if (!Versao.menorQue(3, 18, 3)) {
                     sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                 }
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
-                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaDebitoForaEstado().getId());               
+                
+                if (vo.getAliquotaDebitoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+                } else {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                }
+                
             } else if (opt.contains(OpcaoProduto.ICMS_LOJA)) {
+                
                 sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
-                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
-                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
-                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
-                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                
+                
+                if (vo.getAliquotaDebitoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                }
+                
+                if (vo.getAliquotaCreditoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+                } else {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                }
+                
+                if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                }
+                
+                if (vo.getAliquotaConsumidor().getId() == 0) {
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                }
+                
             } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
-                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                
+                if (vo.getAliquotaCreditoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+                } else {
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                }                
+                
                 if (!Versao.menorQue(3, 18, 3)) {
                     sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                 }
@@ -157,21 +226,41 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
             } else if (opt.contains(OpcaoProduto.ICMS_SAIDA)) {
                 sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
-                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
-                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
-                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                
+                if (vo.getAliquotaDebitoForaEstado().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                }
+                
+                if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                }
+                
+                if (vo.getAliquotaConsumidor().getId() == 0) {
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaDebito().getId());
+                } else {
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                }                
+                
             } else if (opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO)) {
                 sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
-                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                
+                if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstado().getId());
+                } else {
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                }
+                
             } else if (opt.contains(OpcaoProduto.ICMS_CONSUMIDOR)) {
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             } else if (opt.contains(OpcaoProduto.ICMS_SAIDA_NF)) {
-                sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
-                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
             }
             if (opt.contains(OpcaoProduto.EXCECAO)) {
-                if (Versao.maiorQue(3, 19,1, 64)) {
+                if (Versao.maiorQue(3, 19, 1, 64)) {
                     sql.put("excecao", vo.getExcecao());
                 }
             }
@@ -184,16 +273,77 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
+
+    public void atualizarIcmsLoja(ProdutoAliquotaVO vo, Set<OpcaoProduto> opt, ProdutoAnteriorVO anterior, boolean primeiraLojaMigrada) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("produtoaliquota");
+
+            sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
+            sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+
+            if (vo.getAliquotaDebitoForaEstado().getId() == 0) {
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebito().getId());
+            } else {
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+            }
+
+            if (vo.getAliquotaCreditoForaEstado().getId() == 0) {
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+            } else {
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+            }
+
+            if (vo.getAliquotaDebitoForaEstadoNf().getId() == 0) {
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebito().getId());
+            } else {
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+            }
+
+            if (vo.getAliquotaConsumidor().getId() == 0) {
+                sql.put("id_aliquotaconsumidor", vo.getAliquotaDebito().getId());
+            } else {
+                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+            }
+
+            if (!Versao.menorQue(3, 18, 3)) {
+                sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+            }
+            
+            if (primeiraLojaMigrada) {
+                if (!sql.isEmpty()) {
+                    sql.setWhere(
+                            "id_produto = " + vo.getProduto().getId() + " and "
+                            + "id_estado = " + vo.getEstado().getId());
+
+                    stm.execute(sql.getUpdate());
+                }
+            } else {
+                if (!sql.isEmpty()) {
+                    sql.setWhere(
+                            "id_produto = " + vo.getProduto().getId() + " and "
+                            + "id_estado = " + vo.getEstado().getId() + " and "
+                            + "id_produto in (select codigoatual from implantacao.codant_produto "
+                            + "where impsistema = '" + anterior.getImportSistema() + "' and "
+                            + "imploja = '" + anterior.getImportLoja() + "' "
+                            + "and codigoatual = " + vo.getProduto().getId() + " and "
+                            + "obsimportacao like '%PRODUTO NOVO%')");
+
+                    stm.execute(sql.getUpdate());
+                }
+            }
+        }
+    }
     
     public void atualizarBeneficio(ProdutoAliquotaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             sql.setTableName("produtoaliquotabeneficio");
-            
+
             sql.put("id_aliquota", vo.getAliquotaDebito().getId());
             sql.put("id_beneficio", vo.getBeneficio());
-            
+
             if (!sql.isEmpty()) {
                 sql.setWhere(
                         "id_produtoaliquota = " + vo.getId());
@@ -218,7 +368,7 @@ public class ProdutoAliquotaDAO {
 
         return result;
     }
-    
+
     public int getProdutoAliquotaByProduto(int idProduto) throws Exception {
         int result = 0;
 
@@ -234,34 +384,36 @@ public class ProdutoAliquotaDAO {
 
         return result;
     }
-    
+
     public int getBeneficio(String beneficio) throws Exception {
         int idBeneficio = 0;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select id from codigobeneficiocst where codigo = '" + beneficio + "'"
             )) {
-                if(rst.next()) 
+                if (rst.next()) {
                     idBeneficio = rst.getInt("id");
-                
+                }
+
             }
         }
         return idBeneficio;
     }
-    
+
     public int getProdutoAliquotaBeneficio(int idProdutoAliquota) throws Exception {
         int id = 0;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"+
-                    "   id\n"+        
-                    "from\n"+
-                        "produtoaliquotabeneficio\n"+
-                    "where\n"+
-                         "id_produtoaliquota = " + idProdutoAliquota
+                    "select\n"
+                    + "   id\n"
+                    + "from\n"
+                    + "produtoaliquotabeneficio\n"
+                    + "where\n"
+                    + "id_produtoaliquota = " + idProdutoAliquota
             )) {
-                if(rst.next()) 
-                    id = rst.getInt("id");                
+                if (rst.next()) {
+                    id = rst.getInt("id");
+                }
             }
         }
         return id;

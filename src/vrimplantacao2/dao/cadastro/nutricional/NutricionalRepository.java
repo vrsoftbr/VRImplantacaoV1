@@ -28,6 +28,9 @@ public class NutricionalRepository {
     }
 
     public void importar(List<NutricionalIMP> nutricionais, Set<OpcaoNutricional> opt) throws Exception {
+        
+        boolean resetarIds = opt.contains(OpcaoNutricional.RESETAR_IDS);
+        
         provider.setStatus("Nutricionais...Carregando dados");
         LOG.fine("Carregando os preliminares necessários");
         Map<String, NutricionalAnteriorVO> anteriores = provider.getAnteriores();
@@ -63,7 +66,11 @@ public class NutricionalRepository {
                     if (opt.contains(OpcaoNutricional.FILIZOLA)) {
                         NutricionalFilizolaVO vo = converterNutricionalFilizola(imp);
                         
-                        vo.setId((int) idsFilizola.pop(imp.getId()));
+                        if (resetarIds) {
+                            vo.setId((int) idsFilizola.pop());
+                        } else {
+                            vo.setId((int) idsFilizola.pop(imp.getId()));
+                        }
                         
                         provider.gravar(vo);
                         
@@ -74,7 +81,11 @@ public class NutricionalRepository {
                     if (opt.contains(OpcaoNutricional.TOLEDO)) {
                         NutricionalToledoVO vo = converterNutricionalToledo(imp);
                         
-                        vo.setId((int) idsToledo.pop(imp.getId()));
+                        if (resetarIds) {
+                            vo.setId((int) idsToledo.pop());
+                        } else {
+                            vo.setId((int) idsToledo.pop(imp.getId()));
+                        }
                         
                         provider.gravar(vo);
                         
@@ -204,6 +215,10 @@ public class NutricionalRepository {
         nut.setPercentualferro(imp.getPercentualFerro());
         nut.setPercentualsodio(imp.getPercentualSodio());
         nut.setQuantidade(Utils.stringToInt(imp.getPorcao()));
+        if (imp.getIdTipoMedida() > 0) {
+            nut.setId_tipomedida(imp.getIdTipoMedida());
+        }
+        nut.setMedidainteira(imp.getMedidaInteira());
         
         for (String linha: imp.getMensagemAlergico()) {
             nut.addMensagemAlergico(linha);

@@ -180,7 +180,15 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
-                    imp.setId(rst.getString("merc").substring(0, 2));
+                    
+                    if ((rst.getString("merc") != null)
+                            && (!rst.getString("merc").trim().isEmpty())
+                            && (rst.getString("merc").trim().length() > 2)) {
+                        imp.setId(rst.getString("merc").substring(0, 2));
+                    } else {
+                        imp.setId(rst.getString("merc"));
+                    }
+                    
                     imp.setDescricao(rst.getString("descricao"));
                     merc.put(imp.getId(), imp);
 
@@ -199,7 +207,14 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by id_grupos"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP merc2 = merc.get(rst.getString("merc").substring(0, 2));
+                    MercadologicoNivelIMP merc2 = null;
+                    if ((rst.getString("merc") != null)
+                            && (!rst.getString("merc").trim().isEmpty())
+                            && (rst.getString("merc").trim().length() > 2)) {
+                         merc2 = merc.get(rst.getString("merc").substring(0, 2));
+                    } else {
+                         merc2 = merc.get(rst.getString("merc"));
+                    }
                     if (merc2 != null) {
                         merc2.addFilho(
                                 rst.getString("merc").substring(3, rst.getString("merc").length()),
@@ -221,7 +236,14 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by id_grupos"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc").substring(0, 2));
+                    MercadologicoNivelIMP merc1 = null;
+                    if ((rst.getString("merc") != null)
+                            && (!rst.getString("merc").trim().isEmpty())
+                            && (rst.getString("merc").trim().length() > 2)) {
+                         merc1 = merc.get(rst.getString("merc").substring(0, 2));
+                    } else {
+                        merc1 = merc.get(rst.getString("merc"));
+                    }
                     if (merc1 != null) {
                         MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc").substring(3, rst.getString("merc").length()));
                         if (merc2 != null) {
@@ -320,6 +342,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico1(rs.getString("merc").substring(0, 2));
                         imp.setCodMercadologico2(rs.getString("merc").substring(3, rs.getString("merc").length()));
                         imp.setCodMercadologico3("1");
+                    } else {
+                        imp.setCodMercadologico1(rs.getString("merc"));
                     }
 
                     imp.setEstoque(rs.getDouble("estoque"));

@@ -1090,7 +1090,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
 
@@ -1133,7 +1133,7 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
@@ -2166,13 +2166,14 @@ public class VisualMixDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and id_loja = " + idLoja + ";";
                         /*+ "\n\n"*/
                         "update escrita set "
+                        + "numeronota = " + i_vo.getNumeronota() + ", "
                         + "cpfadquirente = " + i_vo.getCpf() + " "
                         + "where data = '" + i_vo.getData() + "' "
-                        + "and ecf = " + i_vo.getEcf() + " "
+                        //+ "and ecf = " + i_vo.getEcf() + " "
                         + "and chavecfe != '' "
                         + "and chavecfe = '"+i_vo.getChaveCfe()+"' "
-                        + "and especie = 'CFE' "
-                        + "and modelo = '59' "
+                        //+ "and especie = 'CFE' "
+                        //+ "and modelo = '59' "
                         + "and id_loja = " + idLoja + ";";
                         
                 /*sql = "update escrita set "

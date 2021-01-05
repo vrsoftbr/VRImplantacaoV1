@@ -28,7 +28,7 @@ public class ConvenioEmpresaRepository {
             this.provider.setStatus("Gravando empresas (Convênio)...");
             this.provider.begin();
         
-            Set<Long> cnpjExistentes = this.provider.getCnpjExistentes();
+            Map<Long, Integer> cnpjExistentes = this.provider.getCnpjExistentes();
             ConvenioEmpresaIDStack ids = this.provider.getIds();
             Map<String, ConvenioEmpresaAnteriorVO> anteriores = this.provider.getAnteriores();
             
@@ -40,28 +40,23 @@ public class ConvenioEmpresaRepository {
             for (ConvenioEmpresaIMP imp: filtrados.values()) {
                 ConvenioEmpresaAnteriorVO anterior = anteriores.get(imp.getId());
                 
-                if (anterior == null) {
-                
+                if (anterior == null) {                    
                     long cnpj = Utils.stringToLong(imp.getCnpj());
-                    if (cnpjExistentes.contains(cnpj)) {
-                        cnpj = -2;
-                    }
-
-                    int id = ids.obterID(imp.getId());
-                    if (cnpj < 0) {
-                        cnpj = id;
-                    }
+                    Integer id = cnpjExistentes.get(cnpj);
                     
-                    ConvenioEmpresaVO vo = converterEmpresa(imp);                                        
-                    vo.setId(id);
-                    vo.setCnpj(cnpj);                    
-                    gravarEmpresa(vo);
+                    if (id == null) {
+                        id = ids.obterID(imp.getId());
+                        ConvenioEmpresaVO vo = converterEmpresa(imp);                                        
+                        vo.setId(id);
+                        vo.setCnpj(cnpj);                    
+                        gravarEmpresa(vo);
+                        cnpjExistentes.put(cnpj, id);
+                    }
                     
                     anterior = converterEmpresaAnterior(imp);
-                    anterior.setCodigoAtual(vo.getId());
+                    anterior.setCodigoAtual(id);
                     gravarEmpresaAnterior(anterior);
                     
-                    cnpjExistentes.add(cnpj);
                     anteriores.put( imp.getId(), anterior );
                 }
                                 

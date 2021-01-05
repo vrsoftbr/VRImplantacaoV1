@@ -44,7 +44,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
     private Connection mvcupom;
     private Connection bcodados;
     
-    private static final Logger LOG = Logger.getLogger(IntelliCashDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(SolidoDAO.class.getName());
 
     public Connection getMvcupom() {
         return mvcupom;
@@ -211,8 +211,8 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pl.produto_liberado,\n" +
                     "	p.produto_ativo_compra,\n" +
                     "	p.produto_balanca,\n" +
-                    "	p.ncm,\n" +
-                    "	p.cest,\n" +
+                    "	pct.ncm,\n" +
+                    "	pct.cest,\n" +
                     "	pe.codigo piscredito,\n" +
                     "	ps.codigo pisdebito,\n" +
                     "	pl.id_empresa_tributacao idaliquota,\n" +
@@ -220,10 +220,11 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.peso_liquido \n" +
                     "from \n" +
                     "	produto p\n" +
-                    "inner join produto_codigo_pdv ean on p.id_produto = ean.id_produto\n" +
+                    "left join produto_codigo_pdv ean on p.id_produto = ean.id_produto\n" +
                     "inner join produto_loja pl on p.id_produto = pl.id_produto\n" +
                     "left join pis_entrada pe on p.id_pis_entrada = pe.id_pis_entrada\n" +
                     "left join pis_saida ps on p.id_pis_saida = ps.id_pis_saida \n" +
+                    "left join produto_carga_tributaria pct on p.id_produto = pct.id_produto\n" +        
                     "where \n" +
                     "	pl.id_empresa = " + getLojaOrigem())) {
                 while(rs.next()) {
@@ -325,17 +326,34 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     try(ResultSet rs1 = stm.executeQuery(
                             "select\n" +
                             "	ft.id_fornecedor idfornecedor,\n" +
-                            "	ft.ddd,\n" +
-                            "	ft.telefone,\n" +
+                            "	ft.ddd || '' || ft.telefone telefone,\n" +
                             "	ft.contato,\n" +
                             "	ft.e_mail \n" +
                             "from\n" +
                             "	fornecedor_telefone ft where ft.id_fornecedor = " + imp.getImportId())) {
                         while(rs1.next()) {
                             String contato = rs1.getString("contato"),
-                                    telefone = rs1.getString("ddd") + rs1.getString("telefone");
+                                    telefone = rs1.getString("telefone");
                             
                             imp.addContato(String.valueOf(i), contato == null ? "SEM CONTATO" : contato, telefone, null, TipoContato.NFE, rs1.getString("e_mail"));
+                            i++;
+                        }
+                    }
+                    
+                    try(ResultSet rs2 = stm.executeQuery(
+                            "select \n" +
+                            "	fv.id_fornecedor,\n" +
+                            "	v.telefone1,\n" +
+                            "	v.nome contato,\n" +
+                            "	v.e_mail \n" +
+                            "from \n" +
+                            "	fornecedor_vendedores fv\n" +
+                            "inner join vendedores v on fv.id_vendedor = v.id_vendedor WHERE fv.id_fornecedor =" + imp.getImportId())) {
+                        while(rs2.next()) {
+                            String contato = rs2.getString("contato"),
+                                    telefone = rs2.getString("telefone1");
+                            
+                            imp.addContato(String.valueOf(i), contato == null ? "SEM CONTATO" : contato, telefone, null, TipoContato.NFE, rs2.getString("e_mail"));
                             i++;
                         }
                     }
@@ -435,7 +453,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     
                     imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
+                    imp.setBairro(Utils.acertarTexto(rs.getString("bairro")));
                     imp.setMunicipio(Utils.acertarTexto(rs.getString("cidade")));
                     imp.setUf(rs.getString("estado"));
                     imp.setNumero(rs.getString("numero"));
@@ -448,6 +466,7 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSalario(rs.getDouble("salario"));
                     imp.setValorLimite(rs.getDouble("limite_compra"));
                     imp.setAtivo("S".equals(rs.getString("cliente_ativo")));
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
                     imp.setDiaVencimento(rs.getInt("dia_vencimento"));
                     
                     String estCivil = rs.getString("estado_civil");
@@ -478,10 +497,15 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                             "	CLIENTE_TELEFONE where id_cliente = " + imp.getId())) {
                         while(rs2.next()) {
                             
+                            String nomeCont = rs2.getString("contato");
+                            
+                            if(nomeCont == null || "".equals(nomeCont)) {
+                                nomeCont = "SEM CONTATO";
+                            }
+                            
                             imp.addContato(String.valueOf(i), 
-                                    rs2.getString("contato") == null ? "SEM CONTATO" : rs2.getString("contato"),
-                                    rs2.getString("ddd") + 
-                                    rs2.getString("telefone"), 
+                                    nomeCont,
+                                    rs2.getString("ddd") + rs2.getString("telefone"), 
                                     null, null);
                             i++;
                         }
@@ -501,19 +525,25 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = bcodados.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	rv.id_receber_vale id,\n" +
-                    "	rv.id_cliente idcliente,\n" +
-                    "	rv.data_compra emissao,\n" +
-                    "	rv.numero_caixa ecf,\n" +
-                    "	rv.numero_cupom coo,\n" +
-                    "	rv.valor,\n" +
-                    "	rv.vencimento,\n" +
-                    "	rv.observacao \n" +
+                    "select  \n" +
+                    "	rv.id_receber_vale id, \n" +
+                    "	rv.id_cliente idcliente, \n" +
+                    "	rv.data_compra emissao, \n" +
+                    "	rv.numero_caixa ecf, \n" +
+                    "	rv.numero_cupom coo, \n" +
+                    "	rv.valor - coalesce(rv.valor_pago, 0) valor,\n" +
+                    "	rv.vencimento, \n" +
+                    "	rv.observacao,\n" +
+                    "	rv.codigo_operador,\n" +
+                    "	o2.nome operador,\n" +
+                    "	rv.id_usuario,\n" +
+                    "	u2.nome usuario\n" +
                     "from \n" +
-                    "	receber_vale rv\n" +
-                    "where \n" +
-                    "	rv.id_empresa = " + getLojaOrigem() + " and \n" +
+                    "	receber_vale rv \n" +
+                    "left join operador o2 on rv.codigo_operador = o2.codigo_operador\n" +
+                    "left join usuario u2 on rv.id_usuario = u2.id_usuario\n" +
+                    "where\n" +
+                    "	rv.id_empresa = " + getLojaOrigem() + " and\n" +
                     "	rv.historico = 'I'")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -525,7 +555,12 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEcf(rs.getString("ecf"));
                     imp.setNumeroCupom(rs.getString("coo"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    String dados = String.format("Operador: %s, Usuario: %s", 
+                            rs.getString("operador") == null ? "" : rs.getString("operador"),
+                            rs.getString("usuario") == null ? "" : rs.getString("usuario"));
+                    
+                    imp.setObservacao(rs.getString("observacao") + " " + dados);
                     
                     result.add(imp);
                 }
@@ -717,14 +752,17 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "INNER JOIN\n" +
                     "	(SELECT \n" +
                     "		max(id_mvcupom) id,\n" +
-                    "		NUMERO_CUPOM\n" +
+                    "		NUMERO_CUPOM,\n" +
+                    "           data,\n" +
+                    "           maquina\n" +
                     "	FROM \n" +
                     "		mvcupom\n" +
                     "	GROUP BY\n" +
-                    "		NUMERO_CUPOM) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
-                    "		c.NUMERO_CUPOM = maxid.numero_cupom\n" +
+                    "		NUMERO_CUPOM, data, maquina) maxid ON c.ID_MVCUPOM = maxid.id AND\n" +
+                    "		c.NUMERO_CUPOM = maxid.numero_cupom and c.data = maxid.data and\n" +
+                    "           c.maquina = maxid.maquina\n" +
                     "WHERE\n" +
-                    "	c.ID_EMPRESA = " + idLojaCliente + " AND \n" +
+                    "	c.ID_EMPRESA = " + idLojaCliente + " AND\n" +
                     "	c.DATA BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -779,7 +817,38 @@ public class SolidoDAO extends InterfaceDAO implements MapaTributoProvider {
                         
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("embalagem"));
-                        next.setIdAliquota(rst.getInt("idaliquota"));
+                        
+                        String icms = rst.getString("ALIQUOTA");
+                        
+                        if(icms != null && !"".equals(icms)) {
+                            switch(icms.trim()) {
+                                case "0450": next.setIcmsAliq(4.50);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "0700": next.setIcmsAliq(7);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "1200": next.setIcmsAliq(12);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "1800": next.setIcmsAliq(18);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                case "F": next.setIcmsAliq(0);
+                                    next.setIcmsCst(60);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                default: next.setIcmsAliq(0);
+                                    next.setIcmsCst(40);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                            }
+                        }
                         
                     }
                 }

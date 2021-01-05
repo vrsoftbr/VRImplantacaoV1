@@ -335,32 +335,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-
-        if (!gerarCodigoAtacado) {
-            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select\n"
-                        + "	cbal_prod_codigo id,\n"
-                        + "	cbal_prod_codbarras ean,\n"
-                        + "	null unidade,\n"
-                        + "	coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem\n"
-                        + "from\n"
-                        + "	cbalt")) {
-                    while (rs.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rs.getString("id"));
-                        imp.setEan(rs.getString("ean"));
-                        imp.setTipoEmbalagem("UN");
-                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-
-                        result.add(imp);
-                    }
-                }
-            }
-        } else {
+        if (gerarCodigoAtacado) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
@@ -391,8 +368,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
+            
+            return result;
         }
-        return result;
+        return super.getEANs();
     }
 
     @Override
@@ -591,22 +570,36 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			prod_codbarras ean,\n" +
                     "			prod_funcao unidade,\n" +
                     "			1 qtdembalagem,\n" +
-                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]',''),'')::bigint longean\n" +
+                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint longean,\n" +
+                    "			'prod_codbarras' tipo\n" +
                     "		from\n" +
                     "			produtos\n" +
                     "		where			\n" +
-                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]',''),'')::bigint > 0\n" +
+                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint > 0\n" +
                     "		union\n" +
                     "		select\n" +
                     "			prod_codigo id,\n" +
                     "			prod_codcaixa ean,\n" +
                     "			prod_emb unidade,\n" +
                     "			prod_qemb qtdembalagem,\n" +
-                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]',''),'')::bigint longean\n" +
+                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint longean,\n" +
+                    "			'prod_codcaixa' tipo\n" +
                     "		from\n" +
                     "			produtos\n" +
                     "		where			\n" +
-                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]',''),'')::bigint > 0\n" +
+                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint > 0\n" +
+                    "		union\n" +
+                    "		select\n" +
+                    "			cbal_prod_codigo id,\n" +
+                    "			cbal_prod_codbarras ean,\n" +
+                    "			'UN' unidade,\n" +
+                    "			coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem,\n" +
+                    "			nullif(regexp_replace(cbal_prod_codbarras, '[^0-9]*',''),'')::bigint longean,\n" +
+                    "			'cbal_prod_codbarras' tipo\n" +
+                    "		from\n" +
+                    "			cbalt\n" +
+                    "		where\n" +
+                    "			nullif(regexp_replace(cbal_prod_codbarras, '[^0-9]*',''),'')::bigint > 999999\n" +
                     "	) ean on ean.id = p.prod_codigo\n" +
                     "	left join piscofins_s on\n" +
                     "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
@@ -663,7 +656,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagemCotacao(rst.getInt("embalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompletacomplemento"));
                     imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
@@ -1020,7 +1013,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.forn_datacad datacadastro,\n"
                     + "	f.forn_obspedidos,\n"
                     + "	f.forn_obstrocas,\n"
-                    + "	f.forn_caractrib tipofornecedor,\n"
+                    + "	coalesce(f.forn_caractrib,'') tipofornecedor,\n"
                     + "	fc.rfor_pzentrega prazo_entrega,\n"
                     + "	fc.rfor_pzrecebimento prazo_recebimento,\n"
                     + "	fp.fpgt_prazos forma_pagamento\n"

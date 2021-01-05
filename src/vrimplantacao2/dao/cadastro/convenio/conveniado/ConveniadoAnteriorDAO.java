@@ -79,7 +79,7 @@ public class ConveniadoAnteriorDAO {
             sql.put("sistema", anterior.getSistema());
             sql.put("loja", anterior.getLoja());
             sql.put("id", anterior.getId());
-            sql.put("codigoatual", anterior.getCodigoAtual());
+            sql.put("codigoatual", anterior.getCodigoAtual() == -1 ? null : anterior.getCodigoAtual());
             sql.put("cnpj", anterior.getCnpj());
             sql.put("razao", anterior.getRazao());
             sql.put("lojacadastro", anterior.getLojaCadastro());

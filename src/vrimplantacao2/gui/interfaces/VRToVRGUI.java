@@ -196,6 +196,7 @@ public class VRToVRGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     
                     dao.eanAtacado = chkEANAtacado.isSelected();
+                    dao.apenasAtivo = chkSomenteAtivo.isSelected();
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -272,7 +273,7 @@ public class VRToVRGUI extends VRInternalFrame {
                             importador.importarConvenioEmpresa();
                         }
                         if (chkCvConveniado.isSelected()) {
-                            importador.importarConvenioConveniado(OpcaoConvenio.IMPORTACAO_NAO_FILTRAR_CPF);
+                            importador.importarConvenioConveniado();
                         }
                         if (chkCvTransacao.isSelected()) {
                             importador.importarConvenioTransacao();
@@ -379,6 +380,7 @@ public class VRToVRGUI extends VRInternalFrame {
         txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
         jPanel1 = new javax.swing.JPanel();
         chkEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkSomenteAtivo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel2 = new javax.swing.JLabel();
@@ -754,21 +756,27 @@ public class VRToVRGUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkEANAtacado, "Importar EAN Atacado");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkSomenteAtivo, "Somente Produto Ativo");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(343, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(355, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkSomenteAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(237, Short.MAX_VALUE))
         );
 
         tabs.addTab("Especifico", jPanel1);
@@ -956,6 +964,7 @@ public class VRToVRGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
+    private vrframework.bean.checkBox.VRCheckBox chkSomenteAtivo;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;

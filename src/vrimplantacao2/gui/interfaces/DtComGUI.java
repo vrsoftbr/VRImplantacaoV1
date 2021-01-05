@@ -91,6 +91,8 @@ public class DtComGUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
+                dtcomDAO.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                vLojaCliente = dtcomDAO.getLojaOrigem();
                 return vLojaCliente;
             }
 
@@ -105,7 +107,7 @@ public class DtComGUI extends VRInternalFrame {
     }
 
     public void validarDadosAcessoDBF() throws Exception {
-                
+        ConexaoDBF.usarOdbc = true;    
         ConexaoDBF.abrirConexao(txtDatabase.getArquivo());
         
         gravarParametros();
@@ -506,11 +508,6 @@ public class DtComGUI extends VRInternalFrame {
         vRPanel7.add(chkQtdEmbalagemEAN);
 
         btnMapaTrib.setEnabled(false);
-        btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapaTribActionPerformed(evt);
-            }
-        });
         vRPanel7.add(btnMapaTrib);
 
         chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
@@ -841,10 +838,6 @@ public class DtComGUI extends VRInternalFrame {
     private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
         dtcomDAO.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
     }//GEN-LAST:event_cmbLojaOrigemActionPerformed
-
-    private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
-
-    }//GEN-LAST:event_btnMapaTribActionPerformed
 
     private void btnExcluirCreditoRotativoChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirCreditoRotativoChequeActionPerformed
         try {

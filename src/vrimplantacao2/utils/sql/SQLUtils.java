@@ -113,5 +113,41 @@ public final class SQLUtils {
         
         return result;
     }
+    
+    public static class Intervalo {
         
+        public final Date dataInicial;
+        public final Date dataFinal;
+
+        public Intervalo(Date dataInicial, Date dataFinal) {
+            this.dataInicial = dataInicial;
+            this.dataFinal = dataFinal;
+        }
+        
+    }
+    
+    public static List<Intervalo> intervalosMensais(Date dataInicio, Date dataTermino) {
+        DateTime inicio = new DateTime(dataInicio.getTime());
+        DateTime termino = new DateTime(dataTermino.getTime());
+        
+        if (termino.isBefore(inicio)) throw new RuntimeException("Data final menor que a data inicial");
+        
+        List<Intervalo> result = new ArrayList<>();
+        
+        if (inicio.equals(termino) || inicio.getMonthOfYear() == termino.getMonthOfYear()) {
+            result.add(new Intervalo(new Date(inicio.getMillis()), new Date(termino.getMillis())));
+        } else {
+            while (inicio.isBefore(termino)) {                
+                DateTime prox = inicio.plusMonths(1).minusDays(inicio.getDayOfMonth());
+                if (prox.isAfter(termino)) {
+                    prox = termino;
+                }
+                result.add(new Intervalo(new Date(inicio.getMillis()), new Date(prox.getMillis())));
+                inicio = prox.plusDays(1);
+            }
+        }
+        
+        return result;
+    }
+    
 }

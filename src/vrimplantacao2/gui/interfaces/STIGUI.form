@@ -180,6 +180,14 @@
                         <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
                       </Properties>
                     </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkContaPagar">
+                      <Properties>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Dialog" size="12" style="0"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="Conta Pagar"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
               </SubComponents>
@@ -199,12 +207,20 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="vRPanel1" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="vRPanel1" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -223,7 +239,9 @@
                               </Group>
                               <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="118" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkClienteEventual" min="-2" pref="33" max="-2" attributes="0"/>
+                          <EmptySpace pref="77" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -325,6 +343,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>

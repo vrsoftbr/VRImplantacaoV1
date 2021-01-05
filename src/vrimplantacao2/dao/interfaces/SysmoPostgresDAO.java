@@ -3,12 +3,16 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -35,22 +39,60 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
         }
         return "Sysmo" + lojaMesmoID;
     }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[] {
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.MARGEM
+                }
+        ));
+    }
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "      emp.cod::integer as id,\n"
-                    + "      emp.ccg::bigint as cnpj,\n"
+                    + "      emp.cod as id,\n"
+                    + "      emp.ccg as cnpj,\n"
                     + "      emp.cnm as nome\n"
                     + "from\n"
                     + "    spsemp00 emp\n"
                     + "order by\n"
-                    + "      emp.cod::integer"
+                    + "      emp.cod"
             )) {
                 while (rs.next()) {
-                    lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
+                    lojas.add(new Estabelecimento(
+                            rs.getString("id"), 
+                            rs.getString("cnpj") + " " + rs.getString("nome")));
                 }
             }
         }
@@ -61,25 +103,30 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+            String sql = "select\n"
                     + "      distinct\n"
-                    + "      fiscal.cod::integer,\n"
+                    + "      fiscal.cod,\n"
                     + "      fiscal.dsc,\n"
-                    + "      fiscal.ctr,\n"
-                    + "      fiscal.ica,\n"
-                    + "      fiscal.icr,\n"
+                    + "      fiscal.ctr cst,\n"
+                    + "      fiscal.ica icms,\n"
+                    + "      fiscal.icr reducao,\n"
                     + "      fiscal.icf\n"
                     + "from\n"
                     + "    gceffs01 fiscal\n"
                     + "where\n"
-                    + "     fiscal.ufo = 'RJ' and\n"
-                    + "     fiscal.ufd = 'RJ' and\n"
+                    + "     fiscal.ufo = (select tx_crcuf from spsemp00 where cod = " + getLojaOrigem() + ") and\n"
+                    + "     fiscal.ufd = (select tx_crcuf from spsemp00 where cod = " + getLojaOrigem() + ") and\n"
                     + "     fiscal.rgf = 0\n"
                     + "order by\n"
-                    + "     fiscal.cod::integer")) {
+                    + "     fiscal.cod";
+            System.out.println(sql);
+            try (ResultSet rs = stm.executeQuery(sql)) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("cod"), rs.getString("dsc")));
+                    result.add(new MapaTributoIMP(rs.getString("cod"), 
+                                rs.getString("dsc"),
+                                rs.getInt("cst"),
+                                rs.getDouble("icms"),
+                                rs.getDouble("reducao")));
                 }
             }
         }
@@ -217,11 +264,9 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "      proest.emn as estoquemin,\n"
                     + "      proest.emx as estoquemax,\n"
                     + "      prod.cd_especificadorst as cest,\n"
-                    + "      custo.icm as icmscredito,\n"
-                    + "      fis.ctr as cstdebito,\n"
-                    + "      fis.icf as icmsdebito,\n"
-                    + "      fis.icr as icmsreducao,\n"
-                    + "      prod.fpc::integer as piscofins\n"
+                    + "      pis.ctp as piscofins,\n"
+                    + "      pis.nrp as naturezareceita,\n"        
+                    + "      prod.ffs idaliquota\n"        
                     + "from\n"
                     + "      gcepro02 as prod\n"
                     + "left join gcebar01 as ean on ean.pro = prod.cod\n"
@@ -231,28 +276,18 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     + "left join gcepro06 val on emp.cod = val.emp and\n"
                     + "     val.cod = prod.cod\n"
                     + "join tb_produtoestoque est on prod.cod = est.cd_produto\n"
-                    + "left join (select\n"
-                    + "            fiscal.cod,\n"
-                    + "            fiscal.ctr,\n"
-                    + "            fiscal.ica,\n"
-                    + "            fiscal.icr,\n"
-                    + "            fiscal.icf\n"
-                    + "      from\n"
-                    + "          gceffs01 fiscal\n"
-                    + "      where\n"
-                    + "           fiscal.ufo = 'RJ' and\n"
-                    + "           fiscal.ufd = 'RJ' and\n"
-                    + "           fiscal.rgf = 0) as fis on prod.ffs = fis.cod\n"
+                    + "left join gceffs02 pis on prod.fpc = pis.cod\n"        
                     + "join gcepro03 as proest on prod.cod = proest.cod and\n"
                     + "     proest.emp = emp.cod and\n"
                     + "     est.cd_empresa = emp.cod and\n"
-                    + "     emp.cod = preco.emp and\n"
-                    + "     emp.cod = " + getLojaOrigem() + "\n"
+                    + "     emp.cod = preco.emp\n"
+                    + "where pis.nop = 5102.00 and emp.cod = " + getLojaOrigem() + "\n"        
                     + "order by\n"
                     + "      prod.cod::integer")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
@@ -263,7 +298,7 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
                     imp.setCodMercadologico4(rs.getString("mercadologico4"));
-                    imp.setCodMercadologico5(rs.getString("mercadologico5"));
+                    imp.setCodMercadologico5("0".equals(rs.getString("mercadologico5")) ? "1" : rs.getString("mercadologico5"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     imp.setEan(rs.getString("ean"));
@@ -288,7 +323,7 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                             }
                         }
                     } else {
-                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG") ? true : false);
+                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG"));
                         imp.setValidade(rs.getInt("validade"));
                     }
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
@@ -304,18 +339,18 @@ public class SysmoPostgresDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmscredito"));
-                    imp.setIcmsCstSaida(rs.getInt("cstdebito"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
-                    imp.setIcmsReducao(rs.getDouble("icmsreducao"));
+                    
+                    imp.setIcmsDebitoId(rs.getString("idaliquota"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
 
-                    if (rs.getInt("piscofins") == 1) {
-                        imp.setPiscofinsCstCredito(50);
-                        imp.setPiscofinsCstDebito(1);
-                    } else {
-                        imp.setPiscofinsCstCredito(71);
-                        imp.setPiscofinsCstDebito(7);
-                    }
+                    imp.setPiscofinsCstDebito(rs.getString("piscofins"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    
                     result.add(imp);
                 }
             }

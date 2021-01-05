@@ -1,7 +1,9 @@
 package vrimplantacao2.dao.cadastro.venda;
 
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,8 @@ import vrimplantacao2.dao.cadastro.cliente.ClienteEventualDAO;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialDAO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
@@ -176,8 +180,8 @@ public class VendaRepositoryProvider {
         return clienteEventualDAO.getClientesPorCnpj();
     }
 
-    public Iterator<VendaIMP> getVendaIMP() throws Exception {
-        return vendaImpDao.getVendas();
+    public Iterator<VendaIMP> getVendaIMP(long limit, long offSet) throws Exception {
+        return vendaImpDao.getVendas(limit, offSet);
     }
 
     public List<VendaItemIMP> getVendaItemIMP(String vendaId) throws Exception {
@@ -207,5 +211,30 @@ public class VendaRepositoryProvider {
     public void gerarConsistencia() throws Exception {
         vendaDAO.gerarConsistencia(getLojaVR());
     }
+
+    private Map<String, Icms> icms;
+    private MapaTributacaoDAO mapaDao = new MapaTributacaoDAO();
+    public Icms getAliquota(String icmsAliquotaId) throws Exception {
+        if (icms == null) {
+            icms = new HashMap<>();
+            for (MapaTributoVO vo: mapaDao.getMapa(getSistema(), getLoja())) {
+                if (vo.getAliquota() != null) {
+                    icms.put(vo.getOrigId(), vo.getAliquota());
+                }
+            }
+        }
+        
+        Icms icm = icms.get(icmsAliquotaId);
+        if (icm == null) {
+            icm = Icms.getIsento();
+        }
+
+        return icm;
+    }
+
+    public List<VendaItemIMP> getProdutosVendidos() throws SQLException {
+        return vendaItemImpDao.getProdutosVendidos();
+    }
     
+
 }

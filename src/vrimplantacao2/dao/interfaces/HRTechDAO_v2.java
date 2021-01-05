@@ -27,10 +27,13 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
@@ -46,6 +49,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -57,7 +61,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(HRTechDAO_v2.class.getName());
     
     private String complemento;
     private String codigoConvenio = "000001";
@@ -279,6 +283,62 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         result.add(imp);
                     }
                 }
+            }
+            return result;
+        }
+        if (opt == OpcaoProduto.DESCONTINUADO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n" +
+                        "	CODIGOPLU,\n" +
+                        "	MIXPRODUTO\n" +
+                        "from\n" +
+                        "	FL302MIX"
+                )) {
+                    while (rs.next()) {
+                        int index = Utils.stringToInt(getLojaOrigem(), -2);
+                        String a = rs.getString("MIXPRODUTO");
+                        boolean descontinuado = a.charAt(index - 1) == '0';
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("CODIGOPLU"));
+                        imp.setDescontinuado(descontinuado);
+                        
+                        if ("052061".equals(rs.getString("CODIGOPLU"))) 
+                            System.out.println("OK");
+                        
+                        result.add(imp);
+                    }
+                }                
+            }
+            return result;
+        }
+        if (opt == OpcaoProduto.TROCA) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n" +
+                        "		codigoplu,\n" +
+                        "		sum(QTDEPENDEN) troca\n" +
+                        "	from\n" +
+                        "		FL345TRO\n" +
+                        "	where\n" +
+                        "		ltrim(rtrim(CODIGOPLU)) != ''\n" +
+                        "		and CODIGOLOJA = " + getLojaOrigem() + "\n" +
+                        "	group by\n" +
+                        "		codigoplu"
+                )) {
+                    while (rs.next()) {                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("CODIGOPLU"));
+                        imp.setTroca(rs.getDouble("troca"));
+                        
+                        result.add(imp);
+                    }
+                }                
             }
             return result;
         }
@@ -630,6 +690,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdComprador(rs.getString("comprador"));
                     imp.setFornecedorFabricante(rs.getString("fabricante"));
                     imp.setDivisao(rs.getString("id_divisao"));
+                    
+                    imp.setPautaFiscalId(rs.getString("id"));
 
                     result.add(imp);
                 }
@@ -639,31 +701,125 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoSqlServer.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "declare @loja integer = " + getLojaOrigem() + ";\n" +
+                        "with trib as (\n" +
+                        "	select distinct\n" +
+                        "		ts.CODIGOTRIB id,\n" +
+                        "		ts.DESCRICAO,\n" +
+                        "		ts.situatribu icms_cst,\n" +
+                        "		ts.VALORICM icms_aliq,\n" +
+                        "		ts.mrger icms_red\n" +
+                        "	from\n" +
+                        "		fl301est est\n" +
+                        "		join fltribut ts on \n" +
+                        "			est.codtribsai = ts.codigotrib and\n" +
+                        "			ts.codigoloja = @loja\n" +
+                        "	where\n" +
+                        "		ts.situatribu = '60'\n" +
+                        "	union\n" +
+                        "	select distinct\n" +
+                        "		te.CODIGOTRIB id,\n" +
+                        "		te.descricao,\n" +
+                        "		te.situatribu icms_cst,\n" +
+                        "		te.VALORICM icms_aliq,\n" +
+                        "		te.mrger icms_red\n" +
+                        "	from\n" +
+                        "		fl301est est\n" +
+                        "		join fltribut te on \n" +
+                        "			est.codtribent = te.codigotrib and\n" +
+                        "			te.codigoloja = @loja\n" +
+                        "	where\n" +
+                        "		te.situatribu = '60'\n" +
+                        ")\n" +
+                        "SELECT \n" +
+                        "	prod.Codigoplu id,\n" +
+                        "	ncm.COD_NCM ncm,\n" +
+                        "	ESTA.origem uf,\n" +
+                        "	ESTA.iva,\n" +
+                        "	esta.pauta,\n" +
+                        "	est.codtribent,\n" +
+                        "	case trib.icms_red \n" +
+                        "		when 0 then 0 \n" +
+                        "		else 20 \n" +
+                        "	end as icms_cst,\n" +
+                        "	trib.icms_aliq,\n" +
+                        "	trib.icms_red\n" +
+                        "FROM\n" +
+                        "	FLGRUSUB_ESTA ESTA\n" +
+                        "	INNER JOIN FLTRIBUT TRIB1 ON\n" +
+                        "		ESTA.CODTRIBENT=TRIB1.CODIGOTRIB AND\n" +
+                        "		TRIB1.CODIGOLOJA=@loja\n" +
+                        "	INNER JOIN FLTRIBUT TRIB2 ON\n" +
+                        "		ESTA.CODTRIBSAI=TRIB2.CODIGOTRIB AND\n" +
+                        "		TRIB2.CODIGOLOJA=@loja\n" +
+                        "	join flgrusub_prod prod on\n" +
+                        "		esta.id_Grupo = prod.Id_Grupo and\n" +
+                        "		prod.Id_Estado = 0\n" +
+                        "	join fl301est est on\n" +
+                        "		est.CODIGOLOJA = @loja and\n" +
+                        "		est.CODIGOPLU = prod.Codigoplu\n" +
+                        "	join fltabncm_pro ncm on\n" +
+                        "		est.codigoplu = ncm.codigoplu\n" +
+                        "	join trib on\n" +
+                        "		trib.id = est.codtribent\n" +
+                        "where\n" +
+                        "	ESTA.origem = 'PB' and\n" +
+                        "	ESTA.destino = 'PB' and\n" +
+                        "	(esta.iva != 0 or esta.pauta != 0)\n" +
+                        "ORDER BY\n" +
+                        "	ESTA.ORIGEM,ESTA.DESTINO"
+                )
+                ) {
+            while (rs.next()) {
+                PautaFiscalIMP imp = new PautaFiscalIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setNcm(rs.getString("ncm"));
+                imp.setUf(rs.getString("uf"));
+                if (rs.getDouble("iva") > 0) {
+                    imp.setIva(rs.getDouble("iva"));
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                } else {
+                    imp.setIva(rs.getDouble("pauta"));
+                    imp.setTipoIva(TipoIva.VALOR);
+                }
+                
+                AliquotaVO a = new AliquotaVO(rs.getInt("icms_cst"), rs.getDouble("icms_aliq"), rs.getDouble("icms_red"));
+                imp.setAliquotaCredito(a);
+                imp.setAliquotaCreditoForaEstado(a);
+                imp.setAliquotaDebito(a);
+                imp.setAliquotaDebitoForaEstado(a);
+                
+                result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+    
+    @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
         
         try (
                 Statement st = ConexaoSqlServer.getConexao().createStatement();
                 ResultSet rs = st.executeQuery(
-                        "declare @dat date = cast(CURRENT_TIMESTAMP as date);\n" +
-                        "declare @id_loja integer = " + getLojaOrigem() + ";\n" +
                         "select\n" +
                         "	o.CODIGOPLU id_produto,\n" +
                         "	o.DATINICOFE datainicio,\n" +
                         "	o.DATFINAOFE datatermino,\n" +
                         "	o.VENDAOFERT precooferta,\n" +
-                        "	o.VENDAATUA preconormal,\n" +
-                        "	o.*\n" +
+                        "	o.VENDAATUA preconormal\n" +
                         "from\n" +
-                        "	fl311ofe o\n" +
-                        "	join FLOFEBLO b on\n" +
-                        "		o.BLOCO = b.BLOCO \n" +
+                        "	HRTECH.dbo.fl304ven o\n" +
                         "where\n" +
-                        "	b.DATFINAOFE >= @dat\n" +
-                        "	and b.GRUPOLOJAS like '%,' + cast(@id_loja as varchar(8)) + ',%'\n" +
-                        "	and o.CODIGOLOJA = @id_loja\n" +
-                        "order by\n" +
-                        "	cast(o.CODIGOPLU as integer)"
+                        "	codigoloja=" + getLojaOrigem() + " and DATFINAOFE >= cast(current_timestamp as date)"
                 )
                 ) {
             while (rs.next()) {
@@ -719,6 +875,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO,
                 OpcaoProduto.FAMILIA,
+                OpcaoProduto.TROCA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.DIVISAO,
                 OpcaoProduto.DIVISAO_PRODUTO,
@@ -732,6 +889,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESC_GONDOLA,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.ATIVO,
+                OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.PESAVEL,
                 OpcaoProduto.VALIDADE,
                 OpcaoProduto.MARGEM,
@@ -760,7 +918,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.FABRICANTE,
-                OpcaoProduto.NUTRICIONAL
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO
         ));
     }
 
@@ -1527,40 +1687,72 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select\n"
-                    + "	c.codi_relacio id,\n"
-                    + "	coalesce(cl.codigoenti, '') idcliente,\n"
-                    + " case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n"
-                    + "	c.numerocaix ecf,\n"
-                    + "	c.numerocupo coo,\n"
-                    + "	c.datamovime data,\n"
-                    + "	c.vdg_dia subtotalimpressora,\n"
-                    + "	c.numcgc_cpf cnpj,\n"
-                    + "	c.hora_ini horainicio,\n"
-                    + "	c.hora_fin horafim,\n"
-                    + "	c.chave_nfe chavenfe,\n"
-                    + "	coalesce(cpf.nomeentida, '') razao,\n"
-                    + "	coalesce(cep.logradouro, '') endereco,\n"
-                    + "	coalesce(cpf.complocent, '') complemento,\n"
-                    + "	coalesce(cpf.compreside, '') numero,\n"
-                    + "	coalesce(cep.bairro, '') bairro,\n"
-                    + "	coalesce(cep.cidade, '') cidade,\n"
-                    + "	coalesce(cep.estado, '') estado,\n"
-                    + "	coalesce(cpf.codcepresi, '') cep\n"
-                    + "from\n"
-                    + "	FL305CUP c\n"
-                    + "left join flcgccpf cpf on \n"
-                    + "	(case when (cast(c.numcgc_cpf as bigint)) = 0 then 1 \n"
-                    + "		else (cast(c.numcgc_cpf as bigint)) end = cast(cpf.numcgc_cpf as bigint))\n"
-                    + "left join FL400CLI cl on (cl.id_entidade = cpf.id_entidade)\n"
-                    + "left join fl423cep cep on (cl.id_cliente = cep.id_cliente) and\n"
-                    + "	cep.codigocep = cpf.codcepcobr and\n"
-                    + "	cep.tipocadast = 'CLI'\n"
-                    + "where\n"
-                    + "	c.codigoloja = " + idLojaCliente + " and\n"
-                    + "	cast(c.datamovime as date) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                    + "order by\n"
-                    + "	c.datamovime, c.numerocupo";
+                    = 
+                    "declare @loja integer = " + idLojaCliente + ";\n" +
+                    "declare @dataini date = '" + FORMAT.format(dataInicio) + "';\n" +
+                    "declare @datafim date = '" + FORMAT.format(dataTermino) + "';\n" +
+                    "with vend as (\n" +
+                    "select\n" +
+                    "	c.codi_relacio  id,\n" +
+                    "	coalesce(cl.codigoenti, '') idcliente,\n" +
+                    "	case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n" +
+                    "	c.numerocaix ecf,\n" +
+                    "	c.numerocupo coo,\n" +
+                    "	c.datamovime data,\n" +
+                    "	c.vdg_dia subtotalimpressora,\n" +
+                    "	c.numcgc_cpf cnpj,\n" +
+                    "	c.hora_ini horainicio,\n" +
+                    "	c.hora_fin horafim,\n" +
+                    "	c.chave_nfe chavenfe,\n" +
+                    "	coalesce(cpf.nomeentida, '') razao,\n" +
+                    "	coalesce(cep.logradouro, '') endereco,\n" +
+                    "	coalesce(cpf.complocent, '') complemento,\n" +
+                    "	coalesce(cpf.compreside, '') numero,\n" +
+                    "	coalesce(cep.bairro, '') bairro,\n" +
+                    "	coalesce(cep.cidade, '') cidade,\n" +
+                    "	coalesce(cep.estado, '') estado,\n" +
+                    "	coalesce(cpf.codcepresi, '') cep\n" +
+                    "from\n" +
+                    "	FL305CUP c\n" +
+                    "left join flcgccpf cpf on \n" +
+                    "	(case when (cast(c.numcgc_cpf as bigint)) = 0 then 1 \n" +
+                    "		else (cast(c.numcgc_cpf as bigint)) end = cast(cpf.numcgc_cpf as bigint))\n" +
+                    "left join FL400CLI cl on (cl.id_entidade = cpf.id_entidade)\n" +
+                    "left join fl423cep cep on (cl.id_cliente = cep.id_cliente) and\n" +
+                    "	cep.codigocep = cpf.codcepcobr and\n" +
+                    "	cep.tipocadast = 'CLI'\n" +
+                    "where\n" +
+                    "	c.codigoloja = @loja and\n" +
+                    "	cast(c.datamovime as date) between @dataini and @datafim\n" +
+                    "),\n" +
+                    "dupl_id as (\n" +
+                    "	select id, count(*) cont from vend group by id having count(*) > 1\n" +
+                    "),\n" +
+                    "dupl_cupom as (\n" +
+                    "	select coo, ecf, data, count(*) cont from vend group by coo, ecf, data having count(*) > 1\n" +
+                    "),\n" +
+                    "dupl as (\n" +
+                    "	select\n" +
+                    "		id\n" +
+                    "	from\n" +
+                    "		dupl_id\n" +
+                    "	union\n" +
+                    "	select\n" +
+                    "		v.id\n" +
+                    "	from\n" +
+                    "		vend v\n" +
+                    "		join dupl_cupom c on\n" +
+                    "			v.coo = c.coo and\n" +
+                    "			v.ecf = c.ecf and\n" +
+                    "			v.data = c.data\n" +
+                    ")\n" +
+                    "select distinct\n" +
+                    "	v.*\n" +
+                    "from\n" +
+                    "	vend v\n" +
+                    "where\n" +
+                    "	not v.id in (select id from dupl)\n" +
+                    "order by v.data, v.ecf, v.coo";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }
@@ -1624,36 +1816,45 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select\n"
-                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) + '-' + cast(it.codigoplu as varchar) id,\n"
-                    + "	it.codi_relacio id_venda,\n"
-                    + "	it.codigoplu id_produto,\n"
-                    + "	pr.estc35desc descricao,\n"
-                    + " case upper(it.origem) when 'C' then 1 else 0 end cancelado,\n"
-                    + "   case\n"
-                    + "		pr.estc13codi when '' then pr.codigoplu else\n"
-                    + "		pr.estc13codi end as codigobarras,\n"
-                    + "	pr.tip_emb_vd unidade,\n"
-                    + "	it.datamovime data,\n"
-                    + "	it.id_item sequencia,\n"
-                    + "	it.vdg_dia total,\n"
-                    + "	it.qtd_dia quantidade,\n"
-                    + "	tr.valoricm icms,\n"
-                    + "	tr.situatribu cst,\n"
-                    + "	tr.mrger icmsreducao\n"
-                    + "from\n"
-                    + "	FL305DIA it\n"
-                    + "join FLTRIBUT tr on (it.codigoloja = tr.codigoloja) and\n"
-                    + "	it.codtribsai = tr.codigotrib\n"
-                    + "join HRPDV_PREPARA_PRO pr on (it.codigoplu = pr.codigoplu) and\n"
-                    + "	it.codigoloja = pr.codigoloja\n"
-                    + "where \n"
-                    + "	it.codigoloja = " + idLojaCliente + " and\n"
-                    + "	(it.datamovime between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23))\n"
-                    + "order by\n"
-                    + "	it.codi_relacio, it.id_item";
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {                    
+            this.sql = 
+                    "declare @loja integer = " + idLojaCliente + ";\n" +
+                    "declare @dataini date = '" + VendaIterator.FORMAT.format(dataInicio) + "';\n" +
+                    "declare @datafim date = '" + VendaIterator.FORMAT.format(dataTermino) + "';\n" +
+                    "with vend as (\n" +
+                    "	select\n" +
+                    "	 	it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) + '-' + cast(it.codigoplu as varchar) id,\n" +
+                    "		it.codi_relacio id_venda,\n" +
+                    "		it.codigoplu id_produto,\n" +
+                    "		pr.estc35desc descricao,\n" +
+                    "	 case upper(it.origem) when 'C' then 1 else 0 end cancelado,\n" +
+                    "	   case\n" +
+                    "			pr.estc13codi when '' then pr.codigoplu else\n" +
+                    "			pr.estc13codi end as codigobarras,\n" +
+                    "		pr.tip_emb_vd unidade,\n" +
+                    "		it.datamovime data,\n" +
+                    "		it.id_item sequencia,\n" +
+                    "		it.vdg_dia total,\n" +
+                    "		it.qtd_dia quantidade,\n" +
+                    "		tr.valoricm icms,\n" +
+                    "		tr.situatribu cst,\n" +
+                    "		tr.mrger icmsreducao\n" +
+                    "	from\n" +
+                    "		FL305DIA it\n" +
+                    "	join FLTRIBUT tr on (it.codigoloja = tr.codigoloja) and\n" +
+                    "		it.codtribsai = tr.codigotrib\n" +
+                    "	join HRPDV_PREPARA_PRO pr on (it.codigoplu = pr.codigoplu) and\n" +
+                    "		it.codigoloja = pr.codigoloja\n" +
+                    "	where \n" +
+                    "		it.codigoloja = @loja and\n" +
+                    "		(cast(it.datamovime as date) between @dataini and @datafim)\n" +
+                    "),\n" +
+                    "dupl as (\n" +
+                    "	select id from vend group by id having count(*) > 1\n" +
+                    ")\n" +
+                    "select v.* from vend v left join dupl d on v.id = d.id where d.id is null\n" +
+                    "order by\n" +
+                    "	id, sequencia";
             LOG.log(Level.FINE, "SQL da venda: {0}", sql);
             rst = stm.executeQuery(sql);
         }

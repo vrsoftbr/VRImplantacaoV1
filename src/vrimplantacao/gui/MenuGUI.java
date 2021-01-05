@@ -140,13 +140,13 @@ import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.G10GUI;
-import vrimplantacao2.gui.interfaces.G3GUI;
+import vrimplantacao2.gui.interfaces.G3_v2GUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
 import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GenericGUI;
 import vrimplantacao2.gui.interfaces.GestorPdvGUI;
-import vrimplantacao2.gui.interfaces.GetWayGUI;
+import vrimplantacao2.gui.interfaces.GetWay_ProfitGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI_v2;
@@ -178,6 +178,7 @@ import vrimplantacao2.gui.interfaces.LogusRetailGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
+import vrimplantacao2.gui.interfaces.MasterGUI;
 import vrimplantacao2.gui.interfaces.MilenioGUI;
 import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao2.gui.interfaces.MobnePdvGUI;
@@ -205,7 +206,9 @@ import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
 import vrimplantacao2.gui.interfaces.STIGUI;
+import vrimplantacao2.gui.interfaces.STSistemasGUI;
 import vrimplantacao2.gui.interfaces.SabTechGUI;
+import vrimplantacao2.gui.interfaces.SaefGUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SambaNetV2GUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
@@ -233,7 +236,7 @@ import vrimplantacao2.gui.interfaces.SophyxVendaGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
-import vrimplantacao2.gui.interfaces.SuperServerGUI;
+import vrimplantacao2.gui.interfaces.SuperControle_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.SyncTecGUI;
 import vrimplantacao2.gui.interfaces.SysERPGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
@@ -257,7 +260,19 @@ import vrimplantacao2.gui.interfaces.ViggoGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
-import vrimplantacao2.gui.interfaces.WShopGUI;
+import vrimplantacao2.gui.interfaces.AlterData_WShopGUI;
+import vrimplantacao2.gui.interfaces.AthosGUI;
+import vrimplantacao2.gui.interfaces.AutocomGUI;
+import vrimplantacao2.gui.interfaces.CervantesGUI;
+import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI;
+import vrimplantacao2.gui.interfaces.DSoftGUI;
+import vrimplantacao2.gui.interfaces.EasySacGUI;
+import vrimplantacao2.gui.interfaces.SysAutGUI;
+import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.MercaLiteGUI;
+import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
+import vrimplantacao2.gui.interfaces.PlenoKWGUI;
+import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -277,7 +292,7 @@ public final class MenuGUI extends VRMdiFrame {
     public CgaGUI formImportarCga = null;
     public MilenioGUI formImportarMilenio = null;
     public JMasterGUI formImportarJMaster = null;    
-    public GetWayGUI formImportarGetWay = null;
+    public GetWay_ProfitGUI formImportarGetWay = null;
     public IdealGUI formImportarIdeal = null;
     public ImportacaoLogVendaGUI formImportacaoLogVendaGUI = null;
     public RMSGUI formImportarRM = null;
@@ -300,7 +315,7 @@ public final class MenuGUI extends VRMdiFrame {
     public DirectorGUI formImportarDirector = null;
     public VRSoftwarePDVGUI formImportarVRSoftwarePDV = null;
     public EccusInformaticaGUI formImportarEccusInformatica = null;
-    public SuperServerGUI formImportarSuperServer = null;
+    public SuperControle_SuperServerGUI formImportarSuperServer = null;
     public ControlWareGUI formImportarControlWare = null;
     public DestroGUI formImportarDestroGUI = null;
     public SysMouraGUI formImportarSysMoura = null;
@@ -337,6 +352,7 @@ public final class MenuGUI extends VRMdiFrame {
     public JacsysGUI formImportarJacsys = null;
     public SifatGUI formImportarSifat = null;
     public GerarCodigoBarrasAtacadoGUI formImportarGerarCodigoBarrasAtacado = null;
+    public CorrecaoImpostosSuperContole_SuperServerGUI formCorrecaoImpostosSuperControle_SuperServer = null;
     public NotaSaidaNfceImportacaoArquivoGUI formNotaSaidaNfceImportacaoArquivoGUI = null;
     public AlterarProdutoPdvVendaItemGUI formAlterarProdutoPdvVendaItem = null;    
     public ArquivoPadraoGUI formArquivoPadrao = null;
@@ -584,6 +600,30 @@ public final class MenuGUI extends VRMdiFrame {
         mnuInterface = new javax.swing.JMenu();
         mnuImpSistema = new javax.swing.JMenu();
         mnuDatabase = new javax.swing.JMenu();
+        mnuADT = new javax.swing.JMenu();
+        mnuInfoMacStore = new javax.swing.JMenuItem();
+        jMenu12 = new javax.swing.JMenu();
+        jMenuItem25 = new javax.swing.JMenuItem();
+        mnuBase = new javax.swing.JMenuItem();
+        mnuOryon = new javax.swing.JMenuItem();
+        mnuW2A = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        mnuCache = new javax.swing.JMenu();
+        jMenuItemSIMS = new javax.swing.JMenuItem();
+        mnuOrion = new javax.swing.JMenu();
+        jMenuItemOrion = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItemSics = new javax.swing.JMenuItem();
+        jMenuItem23 = new javax.swing.JMenuItem();
+        mnuFG = new javax.swing.JMenuItem();
+        mnuJacsys = new javax.swing.JMenuItem();
+        mnuEsSystem = new javax.swing.JMenuItem();
+        mnuMSIInfor = new javax.swing.JMenuItem();
+        mnuDtCom = new javax.swing.JMenuItem();
+        mnuSiaCriareDbf = new javax.swing.JMenuItem();
+        mnuVCash = new javax.swing.JMenuItem();
+        mnuAdmRioPreto = new javax.swing.JMenuItem();
+        mnuDJSystem = new javax.swing.JMenuItem();
         mnuFirebird = new javax.swing.JMenu();
         jMenuItemCGA = new javax.swing.JMenuItem();
         jMenuItemSHI = new javax.swing.JMenuItem();
@@ -644,6 +684,110 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutoADM = new javax.swing.JMenuItem();
         mnuAtmaFirebird = new javax.swing.JMenuItem();
         mnuSolido = new javax.swing.JMenuItem();
+        mnuMaster = new javax.swing.JMenuItem();
+        mnuGDI = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        mnuDSoft = new javax.swing.JMenuItem();
+        mnuAutocom = new javax.swing.JMenuItem();
+        mnuMercaLite = new javax.swing.JMenuItem();
+        mnuDB2 = new javax.swing.JMenu();
+        jMenuItemCISS = new javax.swing.JMenuItem();
+        mnuInformix = new javax.swing.JMenu();
+        mnuiLogus = new javax.swing.JMenuItem();
+        jMenu9 = new javax.swing.JMenu();
+        jMenuItemFMSistemas = new javax.swing.JMenuItem();
+        jMenuItemEverast = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItemTopSystem = new javax.swing.JMenuItem();
+        jMenuItemSci = new javax.swing.JMenuItem();
+        jMenuItem11 = new javax.swing.JMenuItem();
+        jMenuItemGR7 = new javax.swing.JMenuItem();
+        jMenuItemSacLumi = new javax.swing.JMenuItem();
+        jMenuItemTiTecnologia = new javax.swing.JMenuItem();
+        mnuSifat = new javax.swing.JMenuItem();
+        mnuRCNet = new javax.swing.JMenuItem();
+        mnuEmporio = new javax.swing.JMenuItem();
+        mnuSatecfe = new javax.swing.JMenuItem();
+        mnuTsti = new javax.swing.JMenuItem();
+        mnuAvance = new javax.swing.JMenuItem();
+        mnuHipcom = new javax.swing.JMenuItem();
+        mnuUmPontoDois = new javax.swing.JMenuItem();
+        mnuOpen = new javax.swing.JMenuItem();
+        mnuSuperLoja10 = new javax.swing.JMenuItem();
+        mnuGTech = new javax.swing.JMenuItem();
+        mnuClick = new javax.swing.JMenuItem();
+        mnuIQSistemas = new javax.swing.JMenuItem();
+        jMenu10 = new javax.swing.JMenu();
+        mnuDLink = new javax.swing.JMenuItem();
+        mnuSTI3 = new javax.swing.JMenuItem();
+        mnuG3 = new javax.swing.JMenuItem();
+        mnuG4 = new javax.swing.JMenuItem();
+        mnuGestorPDV = new javax.swing.JMenuItem();
+        mnuExodus = new javax.swing.JMenuItem();
+        mnuSiit = new javax.swing.JMenuItem();
+        mnuMobnePdv = new javax.swing.JMenuItem();
+        mnuLinear = new javax.swing.JMenuItem();
+        mnuSTI = new javax.swing.JMenuItem();
+        mnuPlenoKW = new javax.swing.JMenuItem();
+        jMenu7 = new javax.swing.JMenu();
+        jMenuItemRMS = new javax.swing.JMenuItem();
+        jMenuItemGCF = new javax.swing.JMenuItem();
+        jMenuItemPCSistemas = new javax.swing.JMenuItem();
+        jMenuItemConcretize = new javax.swing.JMenuItem();
+        jMenuItemSuperus = new javax.swing.JMenuItem();
+        jMenuItemArius = new javax.swing.JMenuItem();
+        mnuSicom = new javax.swing.JMenuItem();
+        mnuRMS_2 = new javax.swing.JMenuItem();
+        mnuRMS_3 = new javax.swing.JMenuItem();
+        mnuApollo = new javax.swing.JMenuItem();
+        mnuLinner = new javax.swing.JMenuItem();
+        mnuCPGestor = new javax.swing.JMenuItem();
+        mnuWmsi = new javax.swing.JMenuItem();
+        mnuWmsi1 = new javax.swing.JMenuItem();
+        mnuCefas = new javax.swing.JMenuItem();
+        mnuViaSoft = new javax.swing.JMenuItem();
+        mnuProton = new javax.swing.JMenuItem();
+        jMenuItemCupermax = new javax.swing.JMenuItem();
+        mnuSTSistemas = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        mnuContaPagar1 = new javax.swing.JMenuItem();
+        mnuVarejoFacil = new javax.swing.JMenuItem();
+        mnuGeneric = new javax.swing.JMenuItem();
+        mnuMerceariaSene = new javax.swing.JMenuItem();
+        jMenu13 = new javax.swing.JMenu();
+        mnuLogus = new javax.swing.JMenuItem();
+        mnuBrainSoft = new javax.swing.JMenuItem();
+        mnuFarm2000 = new javax.swing.JMenuItem();
+        mnuForti = new javax.swing.JMenuItem();
+        mnuSic = new javax.swing.JMenuItem();
+        jMenu8 = new javax.swing.JMenu();
+        jMenuItemControlWare = new javax.swing.JMenuItem();
+        mnuFlatan = new javax.swing.JMenuItem();
+        mnuJrf = new javax.swing.JMenuItem();
+        mnuAutoSystem = new javax.swing.JMenuItem();
+        mnuAutoSystem1 = new javax.swing.JMenuItem();
+        mnuWebsaq = new javax.swing.JMenuItem();
+        mnuSysmoPostgres = new javax.swing.JMenuItem();
+        mnuAlterDataWShop = new javax.swing.JMenuItem();
+        mnuMarket = new javax.swing.JMenuItem();
+        mnuUniplus = new javax.swing.JMenuItem();
+        mnuSofttech = new javax.swing.JMenuItem();
+        mnuLyncis = new javax.swing.JMenuItem();
+        mnuRPInfo = new javax.swing.JMenuItem();
+        mnuMrs = new javax.swing.JMenuItem();
+        mnuMrs1 = new javax.swing.JMenuItem();
+        mnuMrs2 = new javax.swing.JMenuItem();
+        mnuG10 = new javax.swing.JMenuItem();
+        mnuDevMaster = new javax.swing.JMenuItem();
+        mnuVRToVR = new javax.swing.JMenuItem();
+        mnuBrajanGestores = new javax.swing.JMenuItem();
+        mnuLogTec = new javax.swing.JMenuItem();
+        mnuNCA = new javax.swing.JMenuItem();
+        mnuCronos20 = new javax.swing.JMenuItem();
+        jMenu15 = new javax.swing.JMenu();
+        mnuViggo = new javax.swing.JMenuItem();
+        mnuAthos = new javax.swing.JMenuItem();
+        mnuCervantes = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -701,124 +845,13 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPhixa = new javax.swing.JMenuItem();
         mnuTpaRootac = new javax.swing.JMenuItem();
         mnuAvistate = new javax.swing.JMenuItem();
-        jMenu7 = new javax.swing.JMenu();
-        jMenuItemRMS = new javax.swing.JMenuItem();
-        jMenuItemGCF = new javax.swing.JMenuItem();
-        jMenuItemPCSistemas = new javax.swing.JMenuItem();
-        jMenuItemConcretize = new javax.swing.JMenuItem();
-        jMenuItemSuperus = new javax.swing.JMenuItem();
-        jMenuItemArius = new javax.swing.JMenuItem();
-        mnuSicom = new javax.swing.JMenuItem();
-        mnuRMS_2 = new javax.swing.JMenuItem();
-        mnuRMS_3 = new javax.swing.JMenuItem();
-        mnuApollo = new javax.swing.JMenuItem();
-        mnuLinner = new javax.swing.JMenuItem();
-        mnuCPGestor = new javax.swing.JMenuItem();
-        mnuWmsi = new javax.swing.JMenuItem();
-        mnuWmsi1 = new javax.swing.JMenuItem();
-        mnuCefas = new javax.swing.JMenuItem();
-        mnuViaSoft = new javax.swing.JMenuItem();
-        mnuProton = new javax.swing.JMenuItem();
-        jMenuItemCupermax = new javax.swing.JMenuItem();
-        jMenu8 = new javax.swing.JMenu();
-        jMenuItemControlWare = new javax.swing.JMenuItem();
-        mnuFlatan = new javax.swing.JMenuItem();
-        mnuJrf = new javax.swing.JMenuItem();
-        mnuAutoSystem = new javax.swing.JMenuItem();
-        mnuAutoSystem1 = new javax.swing.JMenuItem();
-        mnuWebsaq = new javax.swing.JMenuItem();
-        mnuSysmoPostgres = new javax.swing.JMenuItem();
-        mnuAlterDataWShop = new javax.swing.JMenuItem();
-        mnuMarket = new javax.swing.JMenuItem();
-        mnuUniplus = new javax.swing.JMenuItem();
-        mnuSofttech = new javax.swing.JMenuItem();
-        mnuLyncis = new javax.swing.JMenuItem();
-        mnuRPInfo = new javax.swing.JMenuItem();
-        mnuMrs = new javax.swing.JMenuItem();
-        mnuMrs1 = new javax.swing.JMenuItem();
-        mnuMrs2 = new javax.swing.JMenuItem();
-        mnuG10 = new javax.swing.JMenuItem();
-        mnuDevMaster = new javax.swing.JMenuItem();
-        mnuVRToVR = new javax.swing.JMenuItem();
-        mnuBrajanGestores = new javax.swing.JMenuItem();
-        mnuLogTec = new javax.swing.JMenuItem();
-        mnuNCA = new javax.swing.JMenuItem();
-        mnuCronos20 = new javax.swing.JMenuItem();
-        jMenu15 = new javax.swing.JMenu();
-        mnuViggo = new javax.swing.JMenuItem();
-        jMenu9 = new javax.swing.JMenu();
-        jMenuItemFMSistemas = new javax.swing.JMenuItem();
-        jMenuItemEverast = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItemTopSystem = new javax.swing.JMenuItem();
-        jMenuItemSci = new javax.swing.JMenuItem();
-        jMenuItem11 = new javax.swing.JMenuItem();
-        jMenuItemGR7 = new javax.swing.JMenuItem();
-        jMenuItemSacLumi = new javax.swing.JMenuItem();
-        jMenuItemTiTecnologia = new javax.swing.JMenuItem();
-        mnuSifat = new javax.swing.JMenuItem();
-        mnuRCNet = new javax.swing.JMenuItem();
-        mnuEmporio = new javax.swing.JMenuItem();
-        mnuSatecfe = new javax.swing.JMenuItem();
-        mnuTsti = new javax.swing.JMenuItem();
-        mnuAvance = new javax.swing.JMenuItem();
-        mnuHipcom = new javax.swing.JMenuItem();
-        mnuUmPontoDois = new javax.swing.JMenuItem();
-        mnuOpen = new javax.swing.JMenuItem();
-        mnuSuperLoja10 = new javax.swing.JMenuItem();
-        mnuGTech = new javax.swing.JMenuItem();
-        mnuClick = new javax.swing.JMenuItem();
-        mnuIQSistemas = new javax.swing.JMenuItem();
-        jMenu10 = new javax.swing.JMenu();
-        mnuDLink = new javax.swing.JMenuItem();
-        mnuSTI3 = new javax.swing.JMenuItem();
-        mnuG3 = new javax.swing.JMenuItem();
-        mnuG4 = new javax.swing.JMenuItem();
-        mnuGestorPDV = new javax.swing.JMenuItem();
-        mnuExodus = new javax.swing.JMenuItem();
-        mnuSiit = new javax.swing.JMenuItem();
-        mnuMobnePdv = new javax.swing.JMenuItem();
-        mnuLinear = new javax.swing.JMenuItem();
-        mnuSTI = new javax.swing.JMenuItem();
-        mnuOrion = new javax.swing.JMenu();
-        jMenuItemOrion = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItemSics = new javax.swing.JMenuItem();
-        jMenuItem23 = new javax.swing.JMenuItem();
-        mnuFG = new javax.swing.JMenuItem();
-        mnuJacsys = new javax.swing.JMenuItem();
-        mnuEsSystem = new javax.swing.JMenuItem();
-        mnuMSIInfor = new javax.swing.JMenuItem();
-        mnuDtCom = new javax.swing.JMenuItem();
-        mnuSiaCriareDbf = new javax.swing.JMenuItem();
-        mnuVCash = new javax.swing.JMenuItem();
-        mnuAdmRioPreto = new javax.swing.JMenuItem();
-        mnuDJSystem = new javax.swing.JMenuItem();
-        mnuDB2 = new javax.swing.JMenu();
-        jMenuItemCISS = new javax.swing.JMenuItem();
-        mnuCache = new javax.swing.JMenu();
-        jMenuItemSIMS = new javax.swing.JMenuItem();
-        jMenu12 = new javax.swing.JMenu();
-        jMenuItem25 = new javax.swing.JMenuItem();
-        mnuBase = new javax.swing.JMenuItem();
-        mnuOryon = new javax.swing.JMenuItem();
-        mnuW2A = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenu13 = new javax.swing.JMenu();
-        mnuLogus = new javax.swing.JMenuItem();
-        mnuBrainSoft = new javax.swing.JMenuItem();
-        mnuFarm2000 = new javax.swing.JMenuItem();
-        mnuForti = new javax.swing.JMenuItem();
-        mnuADT = new javax.swing.JMenu();
-        mnuInfoMacStore = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        mnuContaPagar1 = new javax.swing.JMenuItem();
-        mnuVarejoFacil = new javax.swing.JMenuItem();
-        mnuGeneric = new javax.swing.JMenuItem();
+        mnuSaef = new javax.swing.JMenuItem();
+        mnuEasySac = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        mnuSTSistemas_v2 = new javax.swing.JMenuItem();
+        chkSysAut = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
-        mnuInformix = new javax.swing.JMenu();
-        mnuiLogus = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem24 = new javax.swing.JMenuItem();
@@ -851,6 +884,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
         mnuDelRegistro = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -1038,6 +1072,182 @@ public final class MenuGUI extends VRMdiFrame {
         mnuImpSistema.setText("Importação");
 
         mnuDatabase.setText("Sistemas");
+
+        mnuADT.setText("ADS");
+
+        mnuInfoMacStore.setText("InfoMac - Store");
+        mnuInfoMacStore.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuInfoMacStoreActionPerformed(evt);
+            }
+        });
+        mnuADT.add(mnuInfoMacStore);
+
+        mnuDatabase.add(mnuADT);
+
+        jMenu12.setText("Access");
+
+        jMenuItem25.setText("Alfa Software");
+        jMenuItem25.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem25ActionPerformed(evt);
+            }
+        });
+        jMenu12.add(jMenuItem25);
+
+        mnuBase.setText("Base");
+        mnuBase.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuBaseActionPerformed(evt);
+            }
+        });
+        jMenu12.add(mnuBase);
+
+        mnuOryon.setText("Oryon");
+        mnuOryon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuOryonActionPerformed(evt);
+            }
+        });
+        jMenu12.add(mnuOryon);
+
+        mnuW2A.setText("W2A Brasil");
+        mnuW2A.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuW2AActionPerformed(evt);
+            }
+        });
+        jMenu12.add(mnuW2A);
+
+        jMenuItem5.setText("LB Software");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu12.add(jMenuItem5);
+
+        mnuDatabase.add(jMenu12);
+
+        mnuCache.setText("Caché");
+
+        jMenuItemSIMS.setText("SIMS");
+        jMenuItemSIMS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSIMSActionPerformed(evt);
+            }
+        });
+        mnuCache.add(jMenuItemSIMS);
+
+        mnuDatabase.add(mnuCache);
+
+        mnuOrion.setText("DBF");
+
+        jMenuItemOrion.setText("Orion");
+        jMenuItemOrion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemOrionActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(jMenuItemOrion);
+
+        jMenuItem3.setText("Rootac");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(jMenuItem3);
+
+        jMenuItemSics.setText("SICS");
+        jMenuItemSics.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSicsActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(jMenuItemSics);
+
+        jMenuItem23.setText("SoftClass/AutoCom");
+        jMenuItem23.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem23ActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(jMenuItem23);
+
+        mnuFG.setText("FG");
+        mnuFG.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFGActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuFG);
+
+        mnuJacsys.setText("Jacsys");
+        mnuJacsys.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuJacsysActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuJacsys);
+
+        mnuEsSystem.setText("ES System");
+        mnuEsSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEsSystemActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuEsSystem);
+
+        mnuMSIInfor.setText("MSI Infor");
+        mnuMSIInfor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMSIInforActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuMSIInfor);
+
+        mnuDtCom.setText("DtCom");
+        mnuDtCom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDtComActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuDtCom);
+
+        mnuSiaCriareDbf.setText("SiaCriare (versão Dbf)");
+        mnuSiaCriareDbf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSiaCriareDbfActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuSiaCriareDbf);
+
+        mnuVCash.setText("VCash");
+        mnuVCash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVCashActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuVCash);
+
+        mnuAdmRioPreto.setText("ADM (Rio Preto)");
+        mnuAdmRioPreto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAdmRioPretoActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuAdmRioPreto);
+
+        mnuDJSystem.setText("DJ System");
+        mnuDJSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDJSystemActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuDJSystem);
+
+        mnuDatabase.add(mnuOrion);
 
         mnuFirebird.setText("Firebird / Interbase");
 
@@ -1509,7 +1719,800 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird2.add(mnuSolido);
 
+        mnuMaster.setText("Master");
+        mnuMaster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMasterActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuMaster);
+
+        mnuGDI.setText("GDI");
+        mnuGDI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGDIActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuGDI);
+
         mnuDatabase.add(mnuFirebird2);
+
+        jMenu2.setText("Firebird / Interbase 3");
+
+        mnuDSoft.setText("DSoft");
+        mnuDSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDSoftActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuDSoft);
+
+        mnuAutocom.setText("Autocom");
+        mnuAutocom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutocomActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuAutocom);
+
+        mnuMercaLite.setText("MercaLite");
+        mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMercaLiteActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuMercaLite);
+
+        mnuDatabase.add(jMenu2);
+
+        mnuDB2.setText("IBM DB2");
+
+        jMenuItemCISS.setText("CISS");
+        jMenuItemCISS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemCISSActionPerformed(evt);
+            }
+        });
+        mnuDB2.add(jMenuItemCISS);
+
+        mnuDatabase.add(mnuDB2);
+
+        mnuInformix.setText("Informix");
+
+        mnuiLogus.setText("Logus Retail");
+        mnuiLogus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiLogusActionPerformed(evt);
+            }
+        });
+        mnuInformix.add(mnuiLogus);
+
+        mnuDatabase.add(mnuInformix);
+
+        jMenu9.setText("MySQL");
+
+        jMenuItemFMSistemas.setText("FM Sistemas");
+        jMenuItemFMSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemFMSistemasActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemFMSistemas);
+
+        jMenuItemEverast.setText("Everest");
+        jMenuItemEverast.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemEverastActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemEverast);
+
+        jMenuItem4.setText("MRS");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItem4);
+
+        jMenuItemTopSystem.setText("TopSystem");
+        jMenuItemTopSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemTopSystemActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemTopSystem);
+
+        jMenuItemSci.setText("Sci");
+        jMenuItemSci.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSciActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemSci);
+
+        jMenuItem11.setText("GZ Sistemas");
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItem11);
+
+        jMenuItemGR7.setText("GR7");
+        jMenuItemGR7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGR7ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemGR7);
+
+        jMenuItemSacLumi.setText("SAC Lumi");
+        jMenuItemSacLumi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSacLumiActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemSacLumi);
+
+        jMenuItemTiTecnologia.setText("Ti Tecnologia");
+        jMenuItemTiTecnologia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemTiTecnologiaActionPerformed(evt);
+            }
+        });
+        jMenu9.add(jMenuItemTiTecnologia);
+
+        mnuSifat.setText("Sifat");
+        mnuSifat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSifatActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuSifat);
+
+        mnuRCNet.setText("RCNet");
+        mnuRCNet.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRCNetActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuRCNet);
+
+        mnuEmporio.setText("Emporio");
+        mnuEmporio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEmporioActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuEmporio);
+
+        mnuSatecfe.setText("Satecfe");
+        mnuSatecfe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSatecfeActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuSatecfe);
+
+        mnuTsti.setText("TSTI");
+        mnuTsti.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuTstiActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuTsti);
+
+        mnuAvance.setText("Avance");
+        mnuAvance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAvanceActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuAvance);
+
+        mnuHipcom.setText("Hipcom");
+        mnuHipcom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHipcomActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuHipcom);
+
+        mnuUmPontoDois.setText("1.2 Informatica");
+        mnuUmPontoDois.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuUmPontoDoisActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuUmPontoDois);
+
+        mnuOpen.setText("Open");
+        mnuOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuOpenActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuOpen);
+
+        mnuSuperLoja10.setText("Super Loja 10");
+        mnuSuperLoja10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSuperLoja10ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuSuperLoja10);
+
+        mnuGTech.setText("GTech");
+        mnuGTech.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGTechActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuGTech);
+
+        mnuClick.setText("Click");
+        mnuClick.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuClickActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuClick);
+
+        mnuIQSistemas.setText("IQSistemas");
+        mnuIQSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuIQSistemasActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuIQSistemas);
+
+        mnuDatabase.add(jMenu9);
+
+        jMenu10.setText("MySQL 2");
+
+        mnuDLink.setText("DLink");
+        mnuDLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDLinkActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuDLink);
+
+        mnuSTI3.setText("STI3");
+        mnuSTI3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTI3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuSTI3);
+
+        mnuG3.setText("G3");
+        mnuG3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuG3);
+
+        mnuG4.setText("Sia Criare (MySQL)");
+        mnuG4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG4ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuG4);
+
+        mnuGestorPDV.setText("Gestor PDV");
+        mnuGestorPDV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGestorPDVActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuGestorPDV);
+
+        mnuExodus.setText("Exodus");
+        mnuExodus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuExodusActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuExodus);
+
+        mnuSiit.setText("Siit");
+        mnuSiit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSiitActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuSiit);
+
+        mnuMobnePdv.setText("Mobne (PDV)");
+        mnuMobnePdv.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMobnePdvActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuMobnePdv);
+
+        mnuLinear.setText("Linear");
+        mnuLinear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLinearActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuLinear);
+
+        mnuSTI.setText("STI");
+        mnuSTI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTIActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuSTI);
+
+        mnuPlenoKW.setText("Pleno KW");
+        mnuPlenoKW.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlenoKWActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuPlenoKW);
+
+        mnuDatabase.add(jMenu10);
+
+        jMenu7.setText("Oracle");
+
+        jMenuItemRMS.setText("RMS");
+        jMenuItemRMS.setEnabled(false);
+        jMenuItemRMS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemRMSActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemRMS);
+
+        jMenuItemGCF.setText("GCF");
+        jMenuItemGCF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGCFActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemGCF);
+
+        jMenuItemPCSistemas.setText("PCSistemas");
+        jMenuItemPCSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemPCSistemasActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemPCSistemas);
+
+        jMenuItemConcretize.setText("Concretize");
+        jMenuItemConcretize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemConcretizeActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemConcretize);
+
+        jMenuItemSuperus.setText("Superus");
+        jMenuItemSuperus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemSuperusActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemSuperus);
+
+        jMenuItemArius.setText("Arius");
+        jMenuItemArius.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemAriusActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemArius);
+
+        mnuSicom.setText("Sicom");
+        mnuSicom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSicomActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuSicom);
+
+        mnuRMS_2.setText("RMS v2");
+        mnuRMS_2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRMS_2ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuRMS_2);
+
+        mnuRMS_3.setText("Winthor");
+        mnuRMS_3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRMS_3ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuRMS_3);
+
+        mnuApollo.setText("Apollo");
+        mnuApollo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuApolloActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuApollo);
+
+        mnuLinner.setText("Linner");
+        mnuLinner.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLinnerActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuLinner);
+
+        mnuCPGestor.setText("CPGestor");
+        mnuCPGestor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCPGestorActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuCPGestor);
+
+        mnuWmsi.setText("Wmsi");
+        mnuWmsi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWmsiActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuWmsi);
+
+        mnuWmsi1.setText("Siac");
+        mnuWmsi1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWmsi1ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuWmsi1);
+
+        mnuCefas.setText("Cefas / Concretize V2");
+        mnuCefas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCefasActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuCefas);
+
+        mnuViaSoft.setText("Via Soft");
+        mnuViaSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuViaSoftActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuViaSoft);
+
+        mnuProton.setText("Proton");
+        mnuProton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuProtonActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuProton);
+
+        jMenuItemCupermax.setText("Cupermax");
+        jMenuItemCupermax.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemCupermaxActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItemCupermax);
+
+        mnuSTSistemas.setText("ST Sistemas");
+        mnuSTSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTSistemasActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuSTSistemas);
+
+        mnuDatabase.add(jMenu7);
+
+        jMenu3.setText("Planilhas Específicas");
+
+        mnuContaPagar1.setText("SambaNet");
+        mnuContaPagar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuContaPagar1ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuContaPagar1);
+
+        mnuVarejoFacil.setText("Varejo Fácil");
+        mnuVarejoFacil.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVarejoFacilActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuVarejoFacil);
+
+        mnuGeneric.setText("Generic");
+        mnuGeneric.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGenericActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuGeneric);
+
+        mnuMerceariaSene.setText("Mercearia Sene (cliente)");
+        mnuMerceariaSene.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMerceariaSeneActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuMerceariaSene);
+
+        mnuDatabase.add(jMenu3);
+
+        jMenu13.setText("Paradox");
+
+        mnuLogus.setText("Logus");
+        mnuLogus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLogusActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuLogus);
+
+        mnuBrainSoft.setText("BrainSoft");
+        mnuBrainSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuBrainSoftActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuBrainSoft);
+
+        mnuFarm2000.setText("Farm 2000");
+        mnuFarm2000.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFarm2000ActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuFarm2000);
+
+        mnuForti.setText("Forti");
+        mnuForti.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFortiActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuForti);
+
+        mnuSic.setText("Sic");
+        mnuSic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSicActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuSic);
+
+        mnuDatabase.add(jMenu13);
+
+        jMenu8.setText("PostgreSQL");
+
+        jMenuItemControlWare.setText("ControlWare");
+        jMenuItemControlWare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemControlWareActionPerformed(evt);
+            }
+        });
+        jMenu8.add(jMenuItemControlWare);
+
+        mnuFlatan.setText("Flatan");
+        mnuFlatan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFlatanActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuFlatan);
+
+        mnuJrf.setText("Jrf");
+        mnuJrf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuJrfActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuJrf);
+
+        mnuAutoSystem.setText("AutoSystem");
+        mnuAutoSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoSystemActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuAutoSystem);
+
+        mnuAutoSystem1.setText("RMS Compras");
+        mnuAutoSystem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoSystem1ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuAutoSystem1);
+
+        mnuWebsaq.setText("WebSaq");
+        mnuWebsaq.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWebsaqActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuWebsaq);
+
+        mnuSysmoPostgres.setText("Sysmo");
+        mnuSysmoPostgres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSysmoPostgresActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuSysmoPostgres);
+
+        mnuAlterDataWShop.setText("AlterData (WShop)");
+        mnuAlterDataWShop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAlterDataWShopActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuAlterDataWShop);
+
+        mnuMarket.setText("Market");
+        mnuMarket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMarketActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMarket);
+
+        mnuUniplus.setText("Uniplus");
+        mnuUniplus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuUniplusActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuUniplus);
+
+        mnuSofttech.setText("Softtech");
+        mnuSofttech.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSofttechActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuSofttech);
+
+        mnuLyncis.setText("Lyncis");
+        mnuLyncis.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLyncisActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuLyncis);
+
+        mnuRPInfo.setText("RPInfo");
+        mnuRPInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRPInfoActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuRPInfo);
+
+        mnuMrs.setText("Mrs");
+        mnuMrs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMrsActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMrs);
+
+        mnuMrs1.setText("Zoombox");
+        mnuMrs1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMrs1ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMrs1);
+
+        mnuMrs2.setText("Inove");
+        mnuMrs2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMrs2ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMrs2);
+
+        mnuG10.setText("G10");
+        mnuG10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG10ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuG10);
+
+        mnuDevMaster.setText("DevMaster");
+        mnuDevMaster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDevMasterActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuDevMaster);
+
+        mnuVRToVR.setText("VR para VR");
+        mnuVRToVR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVRToVRActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuVRToVR);
+
+        mnuBrajanGestores.setText("Brajan/Gestores");
+        mnuBrajanGestores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuBrajanGestoresActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuBrajanGestores);
+
+        mnuLogTec.setText("LogTEC");
+        mnuLogTec.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLogTecActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuLogTec);
+
+        mnuNCA.setLabel("NCA");
+        mnuNCA.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuNCAActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuNCA);
+
+        mnuCronos20.setText("Cronos 20");
+        mnuCronos20.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCronos20ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuCronos20);
+
+        mnuDatabase.add(jMenu8);
+
+        jMenu15.setText("PostgreSQL 2");
+
+        mnuViggo.setText("Viggo");
+        mnuViggo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuViggoActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuViggo);
+
+        mnuAthos.setText("Athos");
+        mnuAthos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAthosActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuAthos);
+
+        mnuCervantes.setText("Cervantes");
+        mnuCervantes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCervantesActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuCervantes);
+
+        mnuDatabase.add(jMenu15);
 
         jMenu6.setText("SQL Server");
 
@@ -1602,7 +2605,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(jMenuItemEcosInformatica);
 
-        jMenuItemSuperServer.setText("SuperServer");
+        jMenuItemSuperServer.setText("Super Controler - SuperServer");
         jMenuItemSuperServer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemSuperServerActionPerformed(evt);
@@ -1958,872 +2961,43 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuAvistate);
 
+        mnuSaef.setText("Saef Sistemas");
+        mnuSaef.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSaefActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuSaef);
+
+        mnuEasySac.setText("EasySac");
+        mnuEasySac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEasySacActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuEasySac);
+
         mnuDatabase.add(mnuSqlServer2);
 
-        jMenu7.setText("Oracle");
+        jMenu1.setText("SQL Server 3");
 
-        jMenuItemRMS.setText("RMS");
-        jMenuItemRMS.setEnabled(false);
-        jMenuItemRMS.addActionListener(new java.awt.event.ActionListener() {
+        mnuSTSistemas_v2.setText("ST Sistemas");
+        mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemRMSActionPerformed(evt);
+                mnuSTSistemas_v2ActionPerformed(evt);
             }
         });
-        jMenu7.add(jMenuItemRMS);
+        jMenu1.add(mnuSTSistemas_v2);
 
-        jMenuItemGCF.setText("GCF");
-        jMenuItemGCF.addActionListener(new java.awt.event.ActionListener() {
+        chkSysAut.setText("SysAut");
+        chkSysAut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemGCFActionPerformed(evt);
+                chkSysAutActionPerformed(evt);
             }
         });
-        jMenu7.add(jMenuItemGCF);
+        jMenu1.add(chkSysAut);
 
-        jMenuItemPCSistemas.setText("PCSistemas");
-        jMenuItemPCSistemas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemPCSistemasActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jMenuItemPCSistemas);
-
-        jMenuItemConcretize.setText("Concretize");
-        jMenuItemConcretize.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemConcretizeActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jMenuItemConcretize);
-
-        jMenuItemSuperus.setText("Superus");
-        jMenuItemSuperus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemSuperusActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jMenuItemSuperus);
-
-        jMenuItemArius.setText("Arius");
-        jMenuItemArius.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemAriusActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jMenuItemArius);
-
-        mnuSicom.setText("Sicom");
-        mnuSicom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSicomActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuSicom);
-
-        mnuRMS_2.setText("RMS v2");
-        mnuRMS_2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRMS_2ActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuRMS_2);
-
-        mnuRMS_3.setText("Winthor");
-        mnuRMS_3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRMS_3ActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuRMS_3);
-
-        mnuApollo.setText("Apollo");
-        mnuApollo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuApolloActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuApollo);
-
-        mnuLinner.setText("Linner");
-        mnuLinner.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuLinnerActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuLinner);
-
-        mnuCPGestor.setText("CPGestor");
-        mnuCPGestor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuCPGestorActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuCPGestor);
-
-        mnuWmsi.setText("Wmsi");
-        mnuWmsi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuWmsiActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuWmsi);
-
-        mnuWmsi1.setText("Siac");
-        mnuWmsi1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuWmsi1ActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuWmsi1);
-
-        mnuCefas.setText("Cefas / Concretize V2");
-        mnuCefas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuCefasActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuCefas);
-
-        mnuViaSoft.setText("Via Soft");
-        mnuViaSoft.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuViaSoftActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuViaSoft);
-
-        mnuProton.setText("Proton");
-        mnuProton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuProtonActionPerformed(evt);
-            }
-        });
-        jMenu7.add(mnuProton);
-
-        jMenuItemCupermax.setText("Cupermax");
-        jMenuItemCupermax.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemCupermaxActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jMenuItemCupermax);
-
-        mnuDatabase.add(jMenu7);
-
-        jMenu8.setText("PostgreSQL");
-
-        jMenuItemControlWare.setText("ControlWare");
-        jMenuItemControlWare.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemControlWareActionPerformed(evt);
-            }
-        });
-        jMenu8.add(jMenuItemControlWare);
-
-        mnuFlatan.setText("Flatan");
-        mnuFlatan.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuFlatanActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuFlatan);
-
-        mnuJrf.setText("Jrf");
-        mnuJrf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuJrfActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuJrf);
-
-        mnuAutoSystem.setText("AutoSystem");
-        mnuAutoSystem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAutoSystemActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuAutoSystem);
-
-        mnuAutoSystem1.setText("RMS Compras");
-        mnuAutoSystem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAutoSystem1ActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuAutoSystem1);
-
-        mnuWebsaq.setText("WebSaq");
-        mnuWebsaq.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuWebsaqActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuWebsaq);
-
-        mnuSysmoPostgres.setText("Sysmo");
-        mnuSysmoPostgres.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSysmoPostgresActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuSysmoPostgres);
-
-        mnuAlterDataWShop.setText("AlterData (WShop)");
-        mnuAlterDataWShop.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAlterDataWShopActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuAlterDataWShop);
-
-        mnuMarket.setText("Market");
-        mnuMarket.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMarketActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuMarket);
-
-        mnuUniplus.setText("Uniplus");
-        mnuUniplus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuUniplusActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuUniplus);
-
-        mnuSofttech.setText("Softtech");
-        mnuSofttech.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSofttechActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuSofttech);
-
-        mnuLyncis.setText("Lyncis");
-        mnuLyncis.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuLyncisActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuLyncis);
-
-        mnuRPInfo.setText("RPInfo");
-        mnuRPInfo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRPInfoActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuRPInfo);
-
-        mnuMrs.setText("Mrs");
-        mnuMrs.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMrsActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuMrs);
-
-        mnuMrs1.setText("Zoombox");
-        mnuMrs1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMrs1ActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuMrs1);
-
-        mnuMrs2.setText("Inove");
-        mnuMrs2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMrs2ActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuMrs2);
-
-        mnuG10.setText("G10");
-        mnuG10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuG10ActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuG10);
-
-        mnuDevMaster.setText("DevMaster");
-        mnuDevMaster.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuDevMasterActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuDevMaster);
-
-        mnuVRToVR.setText("VR para VR");
-        mnuVRToVR.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuVRToVRActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuVRToVR);
-
-        mnuBrajanGestores.setText("Brajan/Gestores");
-        mnuBrajanGestores.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuBrajanGestoresActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuBrajanGestores);
-
-        mnuLogTec.setText("LogTEC");
-        mnuLogTec.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuLogTecActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuLogTec);
-
-        mnuNCA.setLabel("NCA");
-        mnuNCA.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuNCAActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuNCA);
-
-        mnuCronos20.setText("Cronos 20");
-        mnuCronos20.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuCronos20ActionPerformed(evt);
-            }
-        });
-        jMenu8.add(mnuCronos20);
-
-        mnuDatabase.add(jMenu8);
-
-        jMenu15.setText("PostgreSQL 2");
-
-        mnuViggo.setText("Viggo");
-        mnuViggo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuViggoActionPerformed(evt);
-            }
-        });
-        jMenu15.add(mnuViggo);
-
-        mnuDatabase.add(jMenu15);
-
-        jMenu9.setText("MySQL");
-
-        jMenuItemFMSistemas.setText("FM Sistemas");
-        jMenuItemFMSistemas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemFMSistemasActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemFMSistemas);
-
-        jMenuItemEverast.setText("Everest");
-        jMenuItemEverast.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemEverastActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemEverast);
-
-        jMenuItem4.setText("MRS");
-        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem4ActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItem4);
-
-        jMenuItemTopSystem.setText("TopSystem");
-        jMenuItemTopSystem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemTopSystemActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemTopSystem);
-
-        jMenuItemSci.setText("Sci");
-        jMenuItemSci.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemSciActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemSci);
-
-        jMenuItem11.setText("GZ Sistemas");
-        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem11ActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItem11);
-
-        jMenuItemGR7.setText("GR7");
-        jMenuItemGR7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemGR7ActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemGR7);
-
-        jMenuItemSacLumi.setText("SAC Lumi");
-        jMenuItemSacLumi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemSacLumiActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemSacLumi);
-
-        jMenuItemTiTecnologia.setText("Ti Tecnologia");
-        jMenuItemTiTecnologia.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemTiTecnologiaActionPerformed(evt);
-            }
-        });
-        jMenu9.add(jMenuItemTiTecnologia);
-
-        mnuSifat.setText("Sifat");
-        mnuSifat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSifatActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuSifat);
-
-        mnuRCNet.setText("RCNet");
-        mnuRCNet.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRCNetActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuRCNet);
-
-        mnuEmporio.setText("Emporio");
-        mnuEmporio.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuEmporioActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuEmporio);
-
-        mnuSatecfe.setText("Satecfe");
-        mnuSatecfe.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSatecfeActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuSatecfe);
-
-        mnuTsti.setText("TSTI");
-        mnuTsti.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuTstiActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuTsti);
-
-        mnuAvance.setText("Avance");
-        mnuAvance.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAvanceActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuAvance);
-
-        mnuHipcom.setText("Hipcom");
-        mnuHipcom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuHipcomActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuHipcom);
-
-        mnuUmPontoDois.setText("1.2 Informatica");
-        mnuUmPontoDois.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuUmPontoDoisActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuUmPontoDois);
-
-        mnuOpen.setText("Open");
-        mnuOpen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuOpenActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuOpen);
-
-        mnuSuperLoja10.setText("Super Loja 10");
-        mnuSuperLoja10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSuperLoja10ActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuSuperLoja10);
-
-        mnuGTech.setText("GTech");
-        mnuGTech.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuGTechActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuGTech);
-
-        mnuClick.setText("Click");
-        mnuClick.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuClickActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuClick);
-
-        mnuIQSistemas.setText("IQSistemas");
-        mnuIQSistemas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuIQSistemasActionPerformed(evt);
-            }
-        });
-        jMenu9.add(mnuIQSistemas);
-
-        mnuDatabase.add(jMenu9);
-
-        jMenu10.setText("MySQL 2");
-
-        mnuDLink.setText("DLink");
-        mnuDLink.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuDLinkActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuDLink);
-
-        mnuSTI3.setText("STI3");
-        mnuSTI3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSTI3ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuSTI3);
-
-        mnuG3.setText("G3");
-        mnuG3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuG3ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuG3);
-
-        mnuG4.setText("Sia Criare (MySQL)");
-        mnuG4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuG4ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuG4);
-
-        mnuGestorPDV.setText("Gestor PDV");
-        mnuGestorPDV.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuGestorPDVActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuGestorPDV);
-
-        mnuExodus.setText("Exodus");
-        mnuExodus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuExodusActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuExodus);
-
-        mnuSiit.setText("Siit");
-        mnuSiit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSiitActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuSiit);
-
-        mnuMobnePdv.setText("Mobne (PDV)");
-        mnuMobnePdv.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMobnePdvActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuMobnePdv);
-
-        mnuLinear.setText("Linear");
-        mnuLinear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuLinearActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuLinear);
-
-        mnuSTI.setText("STI");
-        mnuSTI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSTIActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuSTI);
-
-        mnuDatabase.add(jMenu10);
-
-        mnuOrion.setText("DBF");
-
-        jMenuItemOrion.setText("Orion");
-        jMenuItemOrion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemOrionActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(jMenuItemOrion);
-
-        jMenuItem3.setText("Rootac");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(jMenuItem3);
-
-        jMenuItemSics.setText("SICS");
-        jMenuItemSics.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemSicsActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(jMenuItemSics);
-
-        jMenuItem23.setText("SoftClass/AutoCom");
-        jMenuItem23.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem23ActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(jMenuItem23);
-
-        mnuFG.setText("FG");
-        mnuFG.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuFGActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuFG);
-
-        mnuJacsys.setText("Jacsys");
-        mnuJacsys.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuJacsysActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuJacsys);
-
-        mnuEsSystem.setText("ES System");
-        mnuEsSystem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuEsSystemActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuEsSystem);
-
-        mnuMSIInfor.setText("MSI Infor");
-        mnuMSIInfor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMSIInforActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuMSIInfor);
-
-        mnuDtCom.setText("DtCom");
-        mnuDtCom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuDtComActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuDtCom);
-
-        mnuSiaCriareDbf.setText("SiaCriare (versão Dbf)");
-        mnuSiaCriareDbf.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSiaCriareDbfActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuSiaCriareDbf);
-
-        mnuVCash.setText("VCash");
-        mnuVCash.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuVCashActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuVCash);
-
-        mnuAdmRioPreto.setText("ADM (Rio Preto)");
-        mnuAdmRioPreto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAdmRioPretoActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuAdmRioPreto);
-
-        mnuDJSystem.setText("DJ System");
-        mnuDJSystem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuDJSystemActionPerformed(evt);
-            }
-        });
-        mnuOrion.add(mnuDJSystem);
-
-        mnuDatabase.add(mnuOrion);
-
-        mnuDB2.setText("IBM DB2");
-
-        jMenuItemCISS.setText("CISS");
-        jMenuItemCISS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemCISSActionPerformed(evt);
-            }
-        });
-        mnuDB2.add(jMenuItemCISS);
-
-        mnuDatabase.add(mnuDB2);
-
-        mnuCache.setText("Caché");
-
-        jMenuItemSIMS.setText("SIMS");
-        jMenuItemSIMS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemSIMSActionPerformed(evt);
-            }
-        });
-        mnuCache.add(jMenuItemSIMS);
-
-        mnuDatabase.add(mnuCache);
-
-        jMenu12.setText("Access");
-
-        jMenuItem25.setText("Alfa Software");
-        jMenuItem25.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem25ActionPerformed(evt);
-            }
-        });
-        jMenu12.add(jMenuItem25);
-
-        mnuBase.setText("Base");
-        mnuBase.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuBaseActionPerformed(evt);
-            }
-        });
-        jMenu12.add(mnuBase);
-
-        mnuOryon.setText("Oryon");
-        mnuOryon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuOryonActionPerformed(evt);
-            }
-        });
-        jMenu12.add(mnuOryon);
-
-        mnuW2A.setText("W2A Brasil");
-        mnuW2A.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuW2AActionPerformed(evt);
-            }
-        });
-        jMenu12.add(mnuW2A);
-
-        jMenuItem5.setText("LB Software");
-        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem5ActionPerformed(evt);
-            }
-        });
-        jMenu12.add(jMenuItem5);
-
-        mnuDatabase.add(jMenu12);
-
-        jMenu13.setText("Paradox");
-
-        mnuLogus.setText("Logus");
-        mnuLogus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuLogusActionPerformed(evt);
-            }
-        });
-        jMenu13.add(mnuLogus);
-
-        mnuBrainSoft.setText("BrainSoft");
-        mnuBrainSoft.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuBrainSoftActionPerformed(evt);
-            }
-        });
-        jMenu13.add(mnuBrainSoft);
-
-        mnuFarm2000.setText("Farm 2000");
-        mnuFarm2000.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuFarm2000ActionPerformed(evt);
-            }
-        });
-        jMenu13.add(mnuFarm2000);
-
-        mnuForti.setText("Forti");
-        mnuForti.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuFortiActionPerformed(evt);
-            }
-        });
-        jMenu13.add(mnuForti);
-
-        mnuDatabase.add(jMenu13);
-
-        mnuADT.setText("ADS");
-
-        mnuInfoMacStore.setText("InfoMac - Store");
-        mnuInfoMacStore.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuInfoMacStoreActionPerformed(evt);
-            }
-        });
-        mnuADT.add(mnuInfoMacStore);
-
-        mnuDatabase.add(mnuADT);
-
-        jMenu3.setText("Planilhas Específicas");
-
-        mnuContaPagar1.setText("SambaNet");
-        mnuContaPagar1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuContaPagar1ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(mnuContaPagar1);
-
-        mnuVarejoFacil.setText("Varejo Fácil");
-        mnuVarejoFacil.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuVarejoFacilActionPerformed(evt);
-            }
-        });
-        jMenu3.add(mnuVarejoFacil);
-
-        mnuGeneric.setText("Generic");
-        mnuGeneric.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuGenericActionPerformed(evt);
-            }
-        });
-        jMenu3.add(mnuGeneric);
-
-        mnuDatabase.add(jMenu3);
+        mnuDatabase.add(jMenu1);
 
         mnuSQLite.setText("SQLite");
 
@@ -2836,18 +3010,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSQLite.add(mnuSQLiteSophyx);
 
         mnuDatabase.add(mnuSQLite);
-
-        mnuInformix.setText("Informix");
-
-        mnuiLogus.setText("Logus Retail");
-        mnuiLogus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuiLogusActionPerformed(evt);
-            }
-        });
-        mnuInformix.add(mnuiLogus);
-
-        mnuDatabase.add(mnuInformix);
 
         mnuImpSistema.add(mnuDatabase);
 
@@ -3080,6 +3242,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuAvancadas.add(mnuDelRegistro);
 
+        jMenuItem6.setText("Correção Impostos SuperControle - SuperServer");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(jMenuItem6);
+
         mnuFerramentas.add(mnuAvancadas);
 
         mnuMenu.add(mnuFerramentas);
@@ -3232,7 +3402,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSHIActionPerformed
 
     private void jMenuItemGetWayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGetWayActionPerformed
-        GetWayGUI.exibir(this);
+        GetWay_ProfitGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGetWayActionPerformed
 
     private void jMenuItemSysPDVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVActionPerformed
@@ -3562,7 +3732,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItemSuperServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSuperServerActionPerformed
         
-        SuperServerGUI.exibir(this);
+        SuperControle_SuperServerGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSuperServerActionPerformed
 
     private void jMenuItemCISSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCISSActionPerformed
@@ -4321,7 +4491,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSriActionPerformed
 
     private void mnuAlterDataWShopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAlterDataWShopActionPerformed
-        WShopGUI.exibir(this);
+        AlterData_WShopGUI.exibir(this);
     }//GEN-LAST:event_mnuAlterDataWShopActionPerformed
 
     private void mnuCadastraFacilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastraFacilActionPerformed
@@ -4583,7 +4753,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuG3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuG3ActionPerformed
         // TODO add your handling code here:
-        G3GUI.exibir(this);
+        G3_v2GUI.exibir(this);
     }//GEN-LAST:event_mnuG3ActionPerformed
 
     private void mnuAdmRioPretoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAdmRioPretoActionPerformed
@@ -4795,14 +4965,103 @@ public final class MenuGUI extends VRMdiFrame {
         SolidoGUI.exibir(this);
     }//GEN-LAST:event_mnuSolidoActionPerformed
 
+    private void mnuSaefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSaefActionPerformed
+        SaefGUI.exibir(this);
+    }//GEN-LAST:event_mnuSaefActionPerformed
+	
+    private void mnuMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMasterActionPerformed
+       MasterGUI.exibir(this);
+    }//GEN-LAST:event_mnuMasterActionPerformed
+
+    private void mnuSTSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTSistemasActionPerformed
+        // TODO add your handling code here:
+        STSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuSTSistemasActionPerformed
+
+    private void mnuSTSistemas_v2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTSistemas_v2ActionPerformed
+        // TODO add your handling code here:
+        STSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuSTSistemas_v2ActionPerformed
+
+    private void mnuEasySacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEasySacActionPerformed
+        EasySacGUI.exibir(this);
+    }//GEN-LAST:event_mnuEasySacActionPerformed
+
+    private void mnuAthosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAthosActionPerformed
+        // TODO add your handling code here:
+        AthosGUI.exibir(this);
+    }//GEN-LAST:event_mnuAthosActionPerformed
+
+    private void mnuCervantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCervantesActionPerformed
+        CervantesGUI.exibir(this);
+    }//GEN-LAST:event_mnuCervantesActionPerformed
+
+    private void chkSysAutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSysAutActionPerformed
+        // TODO add your handling code here:
+        SysAutGUI.exibir(this);
+    }//GEN-LAST:event_chkSysAutActionPerformed
+
+    private void mnuGDIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGDIActionPerformed
+        GDIGUI.exibir(this);
+    }//GEN-LAST:event_mnuGDIActionPerformed
+
+    private void mnuDSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDSoftActionPerformed
+        // TODO add your handling code here:
+        DSoftGUI.exibir(this);
+    }//GEN-LAST:event_mnuDSoftActionPerformed
+
+    private void mnuAutocomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutocomActionPerformed
+        // TODO add your handling code here:
+        AutocomGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutocomActionPerformed
+
+    private void mnuPlenoKWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlenoKWActionPerformed
+        // TODO add your handling code here:
+        PlenoKWGUI.exibir(this);
+    }//GEN-LAST:event_mnuPlenoKWActionPerformed
+
+    private void mnuSicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSicActionPerformed
+        // TODO add your handling code here:
+        SicGUI.exibir(this);
+    }//GEN-LAST:event_mnuSicActionPerformed
+
+    private void mnuMercaLiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMercaLiteActionPerformed
+        // TODO add your handling code here:
+        MercaLiteGUI.exibir(this);
+    }//GEN-LAST:event_mnuMercaLiteActionPerformed
+
+    private void mnuMerceariaSeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMerceariaSeneActionPerformed
+        // TODO add your handling code here:
+        MerceariaSeneGUI.exibir(this);
+    }//GEN-LAST:event_mnuMerceariaSeneActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            if (formCorrecaoImpostosSuperControle_SuperServer == null || formCorrecaoImpostosSuperControle_SuperServer.isClosed()) {
+                formCorrecaoImpostosSuperControle_SuperServer = new CorrecaoImpostosSuperContole_SuperServerGUI(this);
+            }
+            formCorrecaoImpostosSuperControle_SuperServer.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        } finally {
+            this.setDefaultCursor();
+        }
+        
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkSysAut;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
     private javax.swing.JMenu jMenu12;
     private javax.swing.JMenu jMenu13;
     private javax.swing.JMenu jMenu14;
     private javax.swing.JMenu jMenu15;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu6;
@@ -4825,6 +5084,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem32;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JMenuItem jMenuItemActive;
@@ -4898,11 +5158,13 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
     private javax.swing.JMenuItem mnuAtenasSQLServer;
+    private javax.swing.JMenuItem mnuAthos;
     private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAtmaFirebird;
     private javax.swing.JMenuItem mnuAutoADM;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
+    private javax.swing.JMenuItem mnuAutocom;
     private javax.swing.JMenuItem mnuAutomaq;
     private javax.swing.JMenu mnuAvancadas;
     private javax.swing.JMenuItem mnuAvance;
@@ -4917,6 +5179,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuCaixa;
     private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCerebro;
+    private javax.swing.JMenuItem mnuCervantes;
     private javax.swing.JMenuItem mnuClick;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
@@ -4928,6 +5191,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuDB2;
     private javax.swing.JMenuItem mnuDJSystem;
     private javax.swing.JMenuItem mnuDLink;
+    private javax.swing.JMenuItem mnuDSoft;
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
     private javax.swing.JMenuItem mnuDelRegistro;
@@ -4935,6 +5199,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDevMaster;
     private javax.swing.JMenuItem mnuDirector;
     private javax.swing.JMenuItem mnuDtCom;
+    private javax.swing.JMenuItem mnuEasySac;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuEtica;
@@ -4956,6 +5221,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG10;
     private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuG4;
+    private javax.swing.JMenuItem mnuGDI;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuGeneric;
@@ -4995,7 +5261,10 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
     private javax.swing.JMenuItem mnuMarket;
+    private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
+    private javax.swing.JMenuItem mnuMercaLite;
+    private javax.swing.JMenuItem mnuMerceariaSene;
     private javax.swing.JMenuItem mnuMobnePdv;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
@@ -5012,6 +5281,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
+    private javax.swing.JMenuItem mnuPlenoKW;
     private javax.swing.JMenuItem mnuProton;
     private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;
@@ -5027,7 +5297,10 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSQLiteSophyx;
     private javax.swing.JMenuItem mnuSTI;
     private javax.swing.JMenuItem mnuSTI3;
+    private javax.swing.JMenuItem mnuSTSistemas;
+    private javax.swing.JMenuItem mnuSTSistemas_v2;
     private javax.swing.JMenuItem mnuSaac;
+    private javax.swing.JMenuItem mnuSaef;
     private javax.swing.JMenuItem mnuSambaNet;
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuSav;
@@ -5035,6 +5308,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuScripts;
     private javax.swing.JMenuItem mnuSiaCriareByFile;
     private javax.swing.JMenuItem mnuSiaCriareDbf;
+    private javax.swing.JMenuItem mnuSic;
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
     private javax.swing.JMenuItem mnuSigma;
@@ -5109,9 +5383,9 @@ public final class MenuGUI extends VRMdiFrame {
             if ("lince".equals(param)) {
                 LinceGUI.exibir(this, true);
             }
-            if ("g3".equals(param)) {
-                G3GUI.exibir(this, true);
-            }
+            /*if ("g3".equals(param)) {
+                G3_v2GUI.exibir(this, true);
+            }*/
             if("winthor".equals(param)) {
                 WinthorGUI.exibir(this, true);
             }

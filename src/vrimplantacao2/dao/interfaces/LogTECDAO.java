@@ -58,7 +58,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stmt.executeQuery(
                     "select distinct\n" +
                     "	'SAIDA' tipo,\n" +
-                    "	cod_taxa id,\n" +
+                    "	cod_taxa || '' || cod_sit_tributaria id,\n" +
                     "	cod_taxa descricao,\n" +
                     "	cod_sit_tributaria cst,\n" +
                     "	aliq_ecf aliquota,\n" +
@@ -202,7 +202,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	pis.cod_st_saida piscofinsCstDebito,\n" +
                 "	pis.cod_st_entrada piscofinsCstCredito,\n" +
                 "	pis.nat_receita	natrec,\n" +
-                "	cp.cod_taxa id_icms_s,\n" +
+                "	cp.cod_taxa || '' || cp.cod_sit_tributaria id_icms_s,\n" +
                 "	cp.cod_sit_tributaria icms_cst_s,\n" +
                 "	cp.aliq_ecf icms_aliq_s,\n" +
                 "	0 icms_red_s,\n" +
@@ -216,7 +216,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	join produto p\n" +
                 "		on p.cod_produto = cp.cod_produto\n" +
                 "		and p.cod_empresa = cp.cod_empresa\n" +
-                "	join pis_cofins pis\n" +
+                "	left join pis_cofins pis\n" +
                 "		on pis.codigo = p.cod_pis_cofins\n" +
                 "	join produto_estoque e\n" +
                 "		on e.cod_produto = p.cod_produto\n" +
@@ -235,21 +235,21 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rs.getString("ean"));
                     imp.setImportId(rs.getString("importId"));
 
-                        ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(imp.getEan(), -2));
-                if (bal != null) {
-                    imp.setQtdEmbalagem(1);
-                    imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
-                    imp.seteBalanca(true);
-                    imp.setValidade(bal.getValidade());
-                } else {
-                    if (this.importarSomenteBalanca) {
-                        continue;
+                    ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(imp.getEan(), -2));
+                    if (bal != null) {
+                        imp.setQtdEmbalagem(1);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.seteBalanca(true);
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        if (this.importarSomenteBalanca) {
+                            continue;
+                        }
+                        //imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.seteBalanca(rs.getBoolean("pesavel"));
+                        imp.setValidade(rs.getInt("validade"));
                     }
-                    //imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.seteBalanca(rs.getBoolean("pesavel"));
-                    imp.setValidade(rs.getInt("validade"));
-                }
 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
@@ -312,17 +312,21 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    " select\n"
-                    + "     pf.cod_fornece fornecedor,\n"
-                    + "     p.cod_produto produto,\n"
-                    + "     pf.cod_barras codexterno\n"
-                    + " from\n"
-                    + "     produto_fornecedor pf\n"
-                    + "     left join produto p\n"
-                    + "     on p.cod_produto = pf.cod_produto\n"
-                    + "     and p.cod_empresa = pf.cod_empresa\n"
-                    + " where pf.cod_empresa = " + getLojaOrigem() + "\n"
-                    + " order by 1,2")) {
+                    "select\n" +
+                    "	pf.cod_fornece fornecedor,\n" +
+                    "	p.cod_produto produto,\n" +
+                    "	pf.cod_barras codexterno,\n" +
+                    "	um.des_unidade unidade,\n" +
+                    "	um.qtd\n" +
+                    "from\n" +
+                    "	produto_fornecedor pf\n" +
+                    "left join produto p on p.cod_produto = pf.cod_produto and \n" +
+                    "	p.cod_empresa = pf.cod_empresa\n" +
+                    "left join unidade_medida um on pf.cod_unidade = um.cod_unidade\n" +
+                    "where \n" +
+                    "	pf.cod_empresa = " + getLojaOrigem() + "\n" +
+                    "order by \n" +
+                    "1,2")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -330,6 +334,7 @@ public class LogTECDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("fornecedor"));
                     imp.setIdProduto(rs.getString("produto"));
                     imp.setCodigoExterno(rs.getString("codexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtd"));
 
                     result.add(imp);
                 }

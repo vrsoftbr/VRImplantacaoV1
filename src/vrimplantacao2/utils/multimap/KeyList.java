@@ -1,6 +1,6 @@
 package vrimplantacao2.utils.multimap;
 
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 
 /**
  * Lista que armazena as chaves de cada registro.

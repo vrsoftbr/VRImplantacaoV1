@@ -11,7 +11,7 @@ import vrimplantacao2.vo.cadastro.local.EstadoVO;
  * @author Leandro
  */
 public class ProdutoFornecedorVO {
-    
+   
     private int id = -1;
     private FornecedorVO fornecedor;    
     private ProdutoVO produto;
@@ -24,6 +24,7 @@ public class ProdutoFornecedorVO {
     private double ipi = 0;
     private int tipoIpi = 0;
     private int idDivisaoFornecedor = 0;
+    private double fatorEmbalagem = 1;
 
     public int getId() {
         return id;
@@ -119,6 +120,20 @@ public class ProdutoFornecedorVO {
 
     public void setIdDivisaoFornecedor(int idDivisaoFornecedor) {
         this.idDivisaoFornecedor = idDivisaoFornecedor;
+    }
+
+    /**
+     * @return the fatorConversao
+     */
+    public double getFatorEmbalagem() {
+        return fatorEmbalagem;
+    }
+
+    /**
+     * @param fatorEmbalagem the fatorEmbalagem to set
+     */
+    public void setFatorEmbalagem(double fatorEmbalagem) {
+        this.fatorEmbalagem = fatorEmbalagem;
     }
     
 }

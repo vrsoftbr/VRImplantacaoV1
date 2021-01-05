@@ -69,7 +69,7 @@ public class ConvenioEmpresaRepositoryProvider {
         ProgressBar.next();
     }
 
-    public Set<Long> getCnpjExistentes() throws Exception {
+    public Map<Long, Integer> getCnpjExistentes() throws Exception {
         return empresaDAO.getCnpjExistentes();
     }
 

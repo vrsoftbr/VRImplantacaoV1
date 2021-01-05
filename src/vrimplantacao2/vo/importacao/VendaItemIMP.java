@@ -44,7 +44,7 @@ public class VendaItemIMP {
     @DatabaseField() private double icmsAliq = 0;
     @DatabaseField() private double icmsReduzido = 0;
     @DatabaseField() private int contadorDoc;
-    @DatabaseField() private int idAliquota;
+    @DatabaseField() private String icmsAliquotaId;
     @DatabaseField() private boolean oferta = false;
 
     public String getId() {
@@ -206,12 +206,12 @@ public class VendaItemIMP {
         this.icmsReduzido = icmsReduzido;
     }
 
-    public int getIdAliquota() {
-        return idAliquota;
+    public String getIcmsAliquotaId() {
+        return icmsAliquotaId;
     }
 
-    public void setIdAliquota(int idAliquota) {
-        this.idAliquota = idAliquota;
+    public void setIcmsAliquotaId(String icmsAliquotaId) {
+        this.icmsAliquotaId = icmsAliquotaId;
     }
 
     public boolean isOferta() {

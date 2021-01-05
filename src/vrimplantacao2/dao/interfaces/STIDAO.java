@@ -22,6 +22,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -37,7 +38,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(STIDAO.class.getName());
     
     @Override
     public String getSistema() {
@@ -141,11 +142,14 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  g.codigo merc1,\n" +
                     "  g.descricao descmerc1,\n" +
                     "  g2.codigo merc2,\n" +
-                    "  g2.descricao descmerc2\n" +
+                    "  g2.descricao descmerc2,\n" +
+                    "  m.codigo merc3,\n" +
+                    "  m.descricao descmerc3\n" +
                     "FROM\n" +
                     "  produtos p\n" +
                     "join grupos g on p.codgrupo = g.codigo\n" +
-                    "join grupos2 g2 on p.codgrupo2 = g2.codigo")) {
+                    "join grupos2 g2 on p.codgrupo2 = g2.codigo\n" +
+                    "join marcas m on p.codmarca = m.codigo")) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
@@ -155,8 +159,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
                     imp.setMerc2Descricao(rs.getString("descmerc2"));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+                    imp.setMerc3ID(rs.getString("merc3"));
+                    imp.setMerc3Descricao(rs.getString("descmerc3"));
                     
                     result.add(imp);
                 }
@@ -175,6 +179,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  p.codpro id,\n" +
                     "  p.descricao,\n" +
                     "  e.codigobarras ean,\n" +
+                    "  e.codigobarrasfornecedor,\n" +
                     "  p.unidade,\n" +
                     "  p.qtdporcaixa qtdembalagem,\n" +
                     "  e.precoavista precovenda,\n" +
@@ -194,14 +199,18 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  p.inativo,\n" +
                     "  p.codgrupo merc1,\n" +
                     "  p.codgrupo2 merc2,\n" +
+                    "  p.codmarca merc3,\n" +
                     "  p.aliqecf idaliquotaecf,\n" +
                     "  pe.aliqdentroestado idaliquotadebito,\n" +
-                    "  p.natreceita\n" +
+                    "  p.natreceita,\n" +
+                    "  p.aliquotapis,\n" +
+                    "  op.descricao operacaopis\n" +
                     "from\n" +
                     "  produtos p\n" +
                     "left join produtos_empresas pe on p.codpro = pe.codprod\n" +
                     "left join estoque e on p.codpro = e.codprod and\n" +
                     "  e.codemp = pe.codemp\n" +
+                    "left join grupos_operacoes op on pe.codgrupooperacao = op.codigo\n" +
                     "where\n" +
                     "  pe.codemp = " + getLojaOrigem())) {
                 while(rs.next()) {
@@ -215,9 +224,16 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3("1");
-                    //imp.setEan(rs.getString("ean"));
-                    imp.setEan(imp.getImportId());
+                    imp.setCodMercadologico3(rs.getString("merc3"));
+                    
+                    long ean = Utils.stringToLong(rs.getString("ean"));
+                    
+                    if(ean != 0 && ean > 999999) {
+                        imp.setEan(rs.getString("ean"));
+                    } else {
+                        imp.setEan(imp.getImportId());
+                    }
+                    
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
@@ -233,13 +249,58 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setValidade(rs.getInt("diasvalidade"));
                     imp.setSituacaoCadastro(rs.getBoolean("inativo") == true ? 0 : 1);
+                    
                     imp.setIcmsDebitoId(rs.getString("idaliquotadebito"));
-                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
                     imp.setPiscofinsNaturezaReceita(rs.getString("natreceita"));
+                    double porcentagemPis = rs.getDouble("aliquotapis");
+                    
+                    imp.setPiscofinsCstDebito(6);
+                    if(porcentagemPis > 0) {
+                        imp.setPiscofinsCstDebito(1);
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  p.codpro id,\n" +
+                    "  p.descricao,\n" +
+                    "  e.codigobarras ean,\n" +
+                    "  e.codigobarrasfornecedor,\n" +
+                    "  p.unidade,\n" +
+                    "  p.qtdporcaixa qtdembalagem\n" +
+                    "from\n" +
+                    "  produtos p\n" +
+                    "left join produtos_empresas pe on p.codpro = pe.codprod\n" +
+                    "left join estoque e on p.codpro = e.codprod and\n" +
+                    "  e.codemp = pe.codemp\n" +
+                    "where\n" +
+                    "  pe.codemp = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setEan(rs.getString("codigobarrasfornecedor"));
                     
                     result.add(imp);
                 }
@@ -466,7 +527,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  cond_pagto c\n" +
                     "where\n" +
                     "  datapagto is null and\n" +
-                    "  empresas_idempresas = " + getLojaOrigem() + "\n" +
+                    "  empresas_idempresas = " + getLojaOrigem() + " and\n" +
+                    "  statusvalidotrigger = true\n" +        
                     "order by\n" +
                     "  vencimento")) {
                 while(rs.next()) {
@@ -493,33 +555,55 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "  cp.codigo,\n" +
-                    "  cc.parcela,\n" +
-                    "  cp.documento,\n" +
-                    "  cp.codfor idfornecedor,\n" +
-                    "  cp.dataemissao,\n" +
-                    "  cc.vencimento,\n" +
-                    "  cp.historico,\n" +
-                    "  cc.valor,\n" +
-                    "  cc.juros,\n" +
-                    "  cc.multa\n" +
-                    "from\n" +
-                    "  cond_pagto_pagar cc\n" +
-                    "join contas_pagar cp on cc.codcontaspagar = cp.codigo\n" +
-                    "where\n" +
-                    "  cp.codemp = " + getLojaOrigem() + " and\n" +
-                    "  cc.datapagto is null\n" +
-                    "order by\n" +
-                    "  cc.vencimento")) {
+                    "select distinct `cond_pagto_pagar`.`codigo` AS `codigo`,\n" +
+                    "         ifnull(`compras`.`numDocto`,`contas_pagar`.`documento`) AS `numdocto`,\n" +
+                    "         `contas_pagar`.`codigo` AS `codcontpagar`,\n" +
+                    "         `contas_pagar`.`historico` AS `historico`,\n" +
+                    "         `cond_pagto_pagar`.`codContasPagar` AS `codcontaspagar`,\n" +
+                    "         `cond_pagto_pagar`.`codCompra` AS `codcompra`,\n" +
+                    "         `cond_pagto_pagar`.`parcela` AS `parcela`,\n" +
+                    "         `cond_pagto_pagar`.`vencimento` AS `vencimento`,\n" +
+                    "         `cond_pagto_pagar`.`valor` AS `valor`,\n" +
+                    "         `cond_pagto_pagar`.`codFormaPagto` AS `codformapagto`,\n" +
+                    "         `cond_pagto_pagar`.`dataPagto` AS `datapagto`,\n" +
+                    "         `cond_pagto_pagar`.`juros` AS `juros`,\n" +
+                    "         `cond_pagto_pagar`.`multa` AS `multa`,\n" +
+                    "         `cond_pagto_pagar`.`pago` AS `pago`,\n" +
+                    "         `cond_pagto_pagar`.`valorPagto` AS `valorpagto`,\n" +
+                    "         `cond_pagto_pagar`.`desconto` AS `desconto`,\n" +
+                    "         ifnull(`contas_pagar`.`codEmp`,`compras`.`codEmp`) AS `codemp`,\n" +
+                    "         `formapagto`.`descricao` AS `descformapagto`,\n" +
+                    "         ifnull(`fornecedores`.`razao`,`fornecedores_1`.`razao`) AS `forrazao`,\n" +
+                    "         ifnull(`fornecedores`.`codigo`,`fornecedores_1`.`codigo`) AS `forcod`,\n" +
+                    "         ifnull(`compras`.`dataEmissao`,`contas_pagar`.`dataEmissao`) AS `data`,\n" +
+                    "         (to_days(`cond_pagto_pagar`.`vencimento`) - to_days(`cond_pagto_pagar`.`dataPagto`)) AS `atraso`,\n" +
+                    "         `plano_contas`.`codigo` AS `codplanoconta`,\n" +
+                    "         `plano_contas`.`descricao` AS `descricao`,\n" +
+                    "         `cond_pagto_pagar`.`habilitado` AS `habilitado`\n" +
+                    "from     (((((`cond_pagto_pagar`\n" +
+                    "left join (`compras`\n" +
+                    "left join `fornecedores` on((`compras`.`codFor` = `fornecedores`.`codigo`))) on((`cond_pagto_pagar`.`codCompra` = `compras`.`codigo`)))\n" +
+                    "left join `contas_pagar` on((`cond_pagto_pagar`.`codContasPagar` = `contas_pagar`.`codigo`)))\n" +
+                    "join     `plano_contas`  on(((`cond_pagto_pagar`.`codConta` = `plano_contas`.`codigo`)\n" +
+                    "         and (`plano_contas`.`gerarFinanceiro` is true))))\n" +
+                    "left join `fornecedores` `fornecedores_1` on((`contas_pagar`.`codFor` = `fornecedores_1`.`codigo`)))\n" +
+                    "left join `formapagto`                    on((`formapagto`.`codigo` = `cond_pagto_pagar`.`codFormaPagto`)))\n" +
+                    "where    ((`cond_pagto_pagar`.`provisao` is false)\n" +
+                    "         and (`cond_pagto_pagar`.`pago` is false)\n" +
+                    "         and ((`compras`.`liberado` is true)\n" +
+                    "         or (`contas_pagar`.`codigo` > 0)))\n" +
+                    "         and ifnull(`contas_pagar`.`codEmp`,`compras`.`codEmp`) = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     
                     imp.setId(rs.getString("codigo"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setDataEmissao(rs.getDate("dataemissao"));
-                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    imp.setNumeroDocumento(rs.getString("numdocto"));
+                    imp.setIdFornecedor(rs.getString("forcod"));
+                    imp.setDataEmissao(rs.getDate("data"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    
+                    parc.setNumeroParcela(Utils.stringToInt(rs.getString("parcela"), 1));
+                    parc.setObservacao(rs.getString("historico") == null ? "" : rs.getString("historico"));
                     
                     result.add(imp);
                 }
@@ -561,8 +645,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                SimpleDateFormat timestamp = new SimpleDateFormat("hh:mm:ss");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -575,17 +659,14 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("emissao"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
-                        String horaInicio = timestampDate.format(rst.getDate("data_hora"));
+                        
+                        /*String horaInicio = timestampDate.format(rst.getDate("data_hora"));
                         String horaTermino = timestampDate.format(rst.getDate("data_hora"));
                         next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setHoraTermino(timestamp.parse(horaTermino));*/
+                        
                         next.setSubTotalImpressora(rst.getDouble("valortotal"));
                         next.setCpf(rst.getString("cnpj_cpf"));
-                        //next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        //next.setNumeroSerie(rst.getString("numeroserie"));
-                        //next.setModeloImpressora(rst.getString("modelo"));
                         next.setNomeCliente(rst.getString("nome"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
@@ -598,8 +679,9 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEnderecoCliente(endereco);
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                System.out.println(next.getId() + " - " + next.getData());
                 throw new RuntimeException(ex);
             }
         }
@@ -615,6 +697,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  v.desconto,\n" +
                         "  v.status,\n" +
                         "  v.numcaixa ecf,\n" +
+                        "  v.cancelada,\n" +
                         "  c.nome,\n" +
                         "  c.cnpj_cpf,\n" +
                         "  c.logradouro endereco,\n" +
@@ -628,7 +711,8 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  vendas v left join clientes c on v.codcli = c.codigo_cliente\n" +
                         "where\n" +
                         "  v.codemp = " + idLojaCliente + " and\n" +
-                        "  v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
+                        "  v.dataemissao between '" + 
+                    FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -679,11 +763,9 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setUnidadeMedida(rst.getString("unidade"));
 
                         String trib = rst.getString("icms");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("icms");
+                        if (trib != null && !"".equals(trib.trim())) {
+                            obterAliquota(next, trib);
                         }
-
-                        obterAliquota(next, trib);
                     }
                 }
             } catch (Exception ex) {
@@ -699,16 +781,7 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
          * @throws SQLException
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
-             07	- ALIQUOTA 07%
-             11	- ALIQUOTA 11%
-             12	- ALIQUOTA 12%
-             18	- ALIQUOTA 18%
-             25	- ALIQUOTA 25%
-             ST - SUBSTITUIDO
-             II	- ISENTO
-             
-             */
+            
             int cst;
             double aliq;
             switch (icms) {
@@ -769,9 +842,10 @@ public class STIDAO extends InterfaceDAO implements MapaTributoProvider {
                         "  i.cancelado\n" +
                         "from\n" +
                         "  itens_vendas i join produtos p on i.codprod = p.codpro\n" +
+                        "  join vendas v on i.codvenda = v.codigo\n" +
                         "  left join aliquotas_ecf al on i.codigoaliquotaecf = al.codigo\n" +
                         "where\n" +
-                        "  dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and codempresa = " + idLojaCliente;
+                        "  v.dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and codempresa = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

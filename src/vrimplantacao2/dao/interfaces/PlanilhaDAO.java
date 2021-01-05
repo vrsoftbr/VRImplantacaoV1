@@ -293,8 +293,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setEstoqueMinimo(linha.getDouble("estoqueminimo"));
                 produto.setEstoque(linha.getDouble("estoque"));
                 produto.setCustoComImposto(linha.getDouble("custocomimposto"));
+                produto.setCustoAnteriorComImposto(linha.getDouble("custocomimpostoanterior"));
                 produto.setCustoSemImposto(linha.getDouble("custosemimposto"));
+                produto.setCustoAnteriorSemImposto(linha.getDouble("custosemimpostoanterior"));
+                produto.setCustoSemImposto(linha.getDouble("customedio"));
                 produto.setPrecovenda(linha.getDouble("precovenda"));
+                produto.setVendaPdv(linha.getBoolean("vendapdv"));
+                produto.setEmiteEtiqueta(linha.getBoolean("emiteetiqueta"));
                 switch (Utils.acertarTexto(linha.getString("ativo"))) {
                     case "N":
                         produto.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
@@ -551,6 +556,17 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         break;
                     }
                 }
+                
+                i = 1;
+                while (true) {
+                    String prefixo = "prazo" + i;
+                    if (linha.existsColumn(prefixo)) {
+                        forn.addPagamento(String.valueOf(i), Utils.stringToInt(linha.getString(prefixo)));
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
 
                 result.add(forn);
             }
@@ -664,6 +680,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setSalario(linha.getDouble("salario"));
                 imp.setValorLimite(linha.getDouble("valorLimite"));
                 imp.setNomeConjuge(linha.getString("nomeConjuge"));
+                imp.setDataNascimentoConjuge(linha.getData("dataNascimentoConjuge"));
                 imp.setNomePai(linha.getString("nomePai"));
                 imp.setNomeMae(linha.getString("nomeMae"));
                 imp.setObservacao(linha.getString("observacao"));
@@ -671,9 +688,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDiaVencimento(linha.getInt("diaVencimento"));
                 imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
                 imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
+                imp.setSenha(linha.getInt("senha"));
                 imp.setTelefone(linha.getString("telefone"));
                 imp.setCelular(linha.getString("celular"));
                 imp.setEmail(linha.getString("email"));
+                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
                 //EVENTUAL
                 imp.setFax(linha.getString("fax"));
                 imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));
@@ -873,7 +892,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     linha.getString("descricao"),
                     linha.getInt("cst"),
                     linha.getDouble("aliquota"),
-                    linha.getDouble("reduzido")
+                    linha.getDouble("reduzido"),
+                    linha.getDouble("fcp"),
+                    linha.getBoolean("desonerado"),
+                    linha.getDouble("percentualdesonerado")
             ));
         }
 
@@ -1052,7 +1074,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             if (!"".equals(ln.getString("tipodesconto"))) {
                 imp.setTipoDesconto(TipoDesconto.getById(ln.getInt("tipodesconto")));
             }
-            imp.setIdAliquota(ln.getInt("id_aliquota"));
+            imp.setIcmsAliquotaId(ln.getString("id_aliquota"));
             imp.setIcmsCst(ln.getInt("icms_cst"));
             imp.setIcmsAliq(ln.getDouble("icms_aliq"));
             imp.setIcmsReduzido(ln.getDouble("icms_red"));
