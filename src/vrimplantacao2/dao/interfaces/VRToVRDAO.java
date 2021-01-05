@@ -67,10 +67,19 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(VRToVRDAO.class.getName());
     public boolean eanAtacado = false;
     public boolean apenasAtivo = false;
+    
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
 
     @Override
     public String getSistema() {
-        return "VR MASTER";
+        if ("".equals(complemento)) {
+            return "VR MASTER";
+        }
+        return "VR MASTER - " + complemento;
     }
 
     @Override
@@ -481,6 +490,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.descricaocompleta,\n" +
                     "	p.descricaoreduzida,\n" +
                     "	p.descricaogondola,\n" +
+                    "	p.mercadologico1,\n" +
+                    "	p.mercadologico2,\n" +
+                    "	p.mercadologico3,\n" +
+                    "	p.mercadologico4,\n" +
+                    "	p.mercadologico5,\n" +
                     "	p.id_familiaproduto,\n" +
                     "	p.pesobruto,\n" +
                     "	p.pesoliquido,\n" +
@@ -554,11 +568,11 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                    imp.setCodMercadologico1(rs.getString("cod_mercadologico1"));
-                    imp.setCodMercadologico2(rs.getString("cod_mercadologico2"));
-                    imp.setCodMercadologico3(rs.getString("cod_mercadologico3"));
-                    imp.setCodMercadologico4(rs.getString("cod_mercadologico4"));
-                    imp.setCodMercadologico5(rs.getString("cod_mercadologico5"));
+                    imp.setCodMercadologico1(rs.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rs.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rs.getString("mercadologico3"));
+                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
+                    imp.setCodMercadologico5(rs.getString("mercadologico5"));
                     imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));

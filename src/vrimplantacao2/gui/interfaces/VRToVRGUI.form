@@ -26,18 +26,22 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="conexao" max="32767" attributes="0"/>
+                  <Component id="conexao" pref="493" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
+                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="txtCompl" min="-2" pref="102" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="tabs" alignment="0" pref="511" max="32767" attributes="0"/>
+                  <Component id="tabs" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,6 +54,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtCompl" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tabs" pref="317" max="32767" attributes="0"/>
@@ -62,6 +68,8 @@
   </Layout>
   <SubComponents>
     <Component class="vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel" name="conexao">
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtCompl">
     </Component>
     <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
       <Properties>
@@ -136,7 +144,7 @@
                               <Component id="chkFPrazo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFContasAPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="265" max="32767" attributes="0"/>
+                          <EmptySpace pref="247" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -300,7 +308,7 @@
                                           <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkCvTransacao" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace pref="30" max="32767" attributes="0"/>
+                                      <EmptySpace pref="12" max="32767" attributes="0"/>
                                       <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
@@ -571,7 +579,7 @@
                               <Component id="txtReiniciarIDClienteUnif" min="-2" pref="47" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="213" max="32767" attributes="0"/>
+                      <EmptySpace pref="195" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -660,7 +668,7 @@
                           <Component id="chkSomenteAtivo" min="-2" max="-2" attributes="0"/>
                           <Component id="chkEANAtacado" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="355" max="32767" attributes="0"/>
+                      <EmptySpace pref="319" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -671,7 +679,7 @@
                       <Component id="chkEANAtacado" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkSomenteAtivo" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="237" max="32767" attributes="0"/>
+                      <EmptySpace pref="235" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -747,5 +755,10 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="jLabel3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Compl:"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
