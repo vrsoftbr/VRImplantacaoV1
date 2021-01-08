@@ -60,6 +60,7 @@ import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -96,7 +97,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setNotasDataTermino(Date notasDataTermino) {
         this.notasDataTermino = notasDataTermino;
     }
-    
+
     public List<PlanoConta> getPlanosSelecionados() {
         return planosSelecionados;
     }
@@ -303,8 +304,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        String sql = 
-                "SELECT\n"
+        String sql
+                = "SELECT\n"
                 + "    a.id,\n"
                 + "    a.nutricional,\n"
                 + "    coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n"
@@ -401,8 +402,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    if("S".equals(rst.getString("balanca").trim())){
-                        if(rst.getString("codigobarras").length() > 6 && rst.getString("codigobarras").length() < 9) {
+                    if ("S".equals(rst.getString("balanca").trim())) {
+                        if (rst.getString("codigobarras").length() > 6 && rst.getString("codigobarras").length() < 9) {
                             imp.setEan(rst.getString("codigobarras").substring(1, rst.getString("codigobarras").length()));
                         } else {
                             imp.setEan(rst.getString("codigobarras"));
@@ -413,8 +414,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
 
-                    String tipoembalagem =  rst.getString("UNIDADE_VENDA");                    
-                    
+                    String tipoembalagem = rst.getString("UNIDADE_VENDA");
+
                     if (tipoembalagem.contains("KG")) {
 
                         if (rst.getInt("ipv") == 1) {
@@ -422,7 +423,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setTipoEmbalagem("UN");
                             imp.setTipoEmbalagemCotacao("UN");
                         } else {
-                            
+
                             imp.setTipoEmbalagem("KG");
                             imp.setTipoEmbalagemCotacao("KG");
                         }
@@ -472,13 +473,12 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    
+
                     /*if ("N".equals(rst.getString("ativo"))) {
-                        imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
-                    } else {
-                        imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
-                    }*/
-                    
+                     imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                     } else {
+                     imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                     }*/
                     imp.setDescontinuado((rst.getInt("status") == 1));
                     imp.setSituacaoCadastro(rst.getInt("status") == 3 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setVendaPdv((rst.getInt("status") != 2));
@@ -618,7 +618,6 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
                     //imp.setIdDivisao(rst.getString("iddivisao") + "-" + rst.getString("id"));
 
-                    
                     if ("T".equals(rst.getString("produtor"))) {
                         if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
                             imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
@@ -698,7 +697,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                             }
                         }
                     }
-                    
+
                     try (Statement stm3 = ConexaoOracle.getConexao().createStatement()) {
                         try (ResultSet rst3 = stm3.executeQuery(
                                 "select "
@@ -721,11 +720,11 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                                         rst3.getInt("prazovisita"),
                                         rst3.getInt("prazoentrega"),
                                         0
-                                );                                
+                                );
                             }
                         }
                     }
-                    
+
                     result.add(imp);
                 }
             }
@@ -964,20 +963,20 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	tf.fornecedor,\n" +
-                    "	tf.produto,\n" +
-                    "	pf.referencia,\n" +
-                    "	tf.datahora_alteracao,\n" +
-                    "	tf.qtde_embalageme qtdembalagem\n" +
-                    "from\n" +
-                    "	tabela_fornecedor tf \n" +
-                    "	join produtos_fornecedor pf on tf.produto = pf.produto and tf.fornecedor = pf.fornecedor\n" +
-                    "where\n" +
-                    "    not pf.referencia is null\n" +
-                    "order by\n" +
-                    "	tf.fornecedor,\n" +
-                    "	tf.produto"
+                    "select\n"
+                    + "	tf.fornecedor,\n"
+                    + "	tf.produto,\n"
+                    + "	pf.referencia,\n"
+                    + "	tf.datahora_alteracao,\n"
+                    + "	tf.qtde_embalageme qtdembalagem\n"
+                    + "from\n"
+                    + "	tabela_fornecedor tf \n"
+                    + "	join produtos_fornecedor pf on tf.produto = pf.produto and tf.fornecedor = pf.fornecedor\n"
+                    + "where\n"
+                    + "    not pf.referencia is null\n"
+                    + "order by\n"
+                    + "	tf.fornecedor,\n"
+                    + "	tf.produto"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -1483,48 +1482,48 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
         List<NotaFiscalIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    nfe.id_c100 id,\n" +
-                    "    nfe.ind_oper notaoperacao,\n" +
-                    "    nfe.nf_complementar_a e_complementar, --tiponota\n" +
-                    "    coalesce(nfe.cod_part,'') participante,\n" +
-                    "    nfe.cod_mod modelo,\n" +
-                    "    nfe.ser serie,\n" +
-                    "    nfe.num_doc numeronota,\n" +
-                    "    nfe.dt_doc dataemissao,\n" +
-                    "    nfe.dt_e_s dataentrasasaida,\n" +
-                    "    nfe.vl_ipi,\n" +
-                    "    nfe.vl_frt vl_frete,\n" +
-                    "    nfe.vl_out_da vl_outrasdespesas,\n" +
-                    "    nfe.vl_merc vl_produto,\n" +
-                    "    nfe.vl_doc vl_total,\n" +
-                    "    nfe.vl_bc_icms,\n" +
-                    "    nfe.vl_icms,\n" +
-                    "    nfe.vl_bc_icms_st,\n" +
-                    "    nfe.vl_icms_st,\n" +
-                    "    nfe.vl_ipi,\n" +
-                    "    nfe.vl_seg vl_seguro,\n" +
-                    "    nfe.vl_desc vl_desconto,\n" +
-                    "    nfe.ind_frt ind_tipofrete,\n" +
-                    "    nfe.observacao_a info_complementar,\n" +
-                    "    nfe.nota_impressa_a impressa,\n" +
-                    "    nfe.cod_sit situacaonfe,\n" +
-                    "    nfe.chv_nfe\n" +
-                    "from\n" +
-                    "    arius.fis_t_c100 nfe\n" +
-                    "where\n" +
-                    "    nfe.id_empresa_a = " + getLojaOrigem() + " and\n" +
-                    "    nfe.cod_part like 'F%' and\n" +
-                    "    not nfe.cod_part is null and\n" +
-                    "    nfe.dt_doc between '" 
-                            + DATE_FORMAT.format(notasDataInicio)
-                            + "' and '" 
-                            + DATE_FORMAT.format(notasDataTermino) + "'\n" +
-                    "order by\n" +
-                    "    nfe.id_c100"
+                    "select\n"
+                    + "    nfe.id_c100 id,\n"
+                    + "    nfe.ind_oper notaoperacao,\n"
+                    + "    nfe.nf_complementar_a e_complementar, --tiponota\n"
+                    + "    coalesce(nfe.cod_part,'') participante,\n"
+                    + "    nfe.cod_mod modelo,\n"
+                    + "    nfe.ser serie,\n"
+                    + "    nfe.num_doc numeronota,\n"
+                    + "    nfe.dt_doc dataemissao,\n"
+                    + "    nfe.dt_e_s dataentrasasaida,\n"
+                    + "    nfe.vl_ipi,\n"
+                    + "    nfe.vl_frt vl_frete,\n"
+                    + "    nfe.vl_out_da vl_outrasdespesas,\n"
+                    + "    nfe.vl_merc vl_produto,\n"
+                    + "    nfe.vl_doc vl_total,\n"
+                    + "    nfe.vl_bc_icms,\n"
+                    + "    nfe.vl_icms,\n"
+                    + "    nfe.vl_bc_icms_st,\n"
+                    + "    nfe.vl_icms_st,\n"
+                    + "    nfe.vl_ipi,\n"
+                    + "    nfe.vl_seg vl_seguro,\n"
+                    + "    nfe.vl_desc vl_desconto,\n"
+                    + "    nfe.ind_frt ind_tipofrete,\n"
+                    + "    nfe.observacao_a info_complementar,\n"
+                    + "    nfe.nota_impressa_a impressa,\n"
+                    + "    nfe.cod_sit situacaonfe,\n"
+                    + "    nfe.chv_nfe\n"
+                    + "from\n"
+                    + "    arius.fis_t_c100 nfe\n"
+                    + "where\n"
+                    + "    nfe.id_empresa_a = " + getLojaOrigem() + " and\n"
+                    + "    nfe.cod_part like 'F%' and\n"
+                    + "    not nfe.cod_part is null and\n"
+                    + "    nfe.dt_doc between '"
+                    + DATE_FORMAT.format(notasDataInicio)
+                    + "' and '"
+                    + DATE_FORMAT.format(notasDataTermino) + "'\n"
+                    + "order by\n"
+                    + "    nfe.id_c100"
             )) {
                 while (rs.next()) {
 
@@ -1540,19 +1539,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         String str = rs.getString("participante");
                         char tipoParticipante = str.charAt(0);
                         String idParticipante = str.substring(1, str.length());
-                        
+
                         if (tipoParticipante == 'F') {
                             imp.setTipoDestinatario(TipoDestinatario.FORNECEDOR);
                         } else {
                             imp.setTipoDestinatario(TipoDestinatario.CLIENTE_EVENTUAL);
                         }
-                        if (
-                                idParticipante.equals("34695") ||
-                                idParticipante.equals("34695")
-                        ) {
+                        if (idParticipante.equals("34695")
+                                || idParticipante.equals("34695")) {
                             System.out.println(tipoParticipante + " - " + idParticipante);
                         }
-                        imp.setIdDestinatario(idParticipante);                        
+                        imp.setIdDestinatario(idParticipante);
                     }
                     imp.setModelo(rs.getString("modelo"));
                     imp.setSerie(rs.getString("serie"));
@@ -1580,58 +1577,58 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(imp);
                 }
             }
-        }            
-        
+        }
+
         return result;
     }
 
     private void getNotasItem(NotaFiscalIMP imp) throws Exception {
-        
+
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    i.id_c170 id,\n" +
-                    "    i.id_c100 id_notafiscal,\n" +
-                    "    i.num_item numeroitem,\n" +
-                    "    i.cod_item id_produto,\n" +
-                    "    p.classificacao_fiscal ncm,\n" +
-                    "    i.cest_a cest,\n" +
-                    "    i.cfop,\n" +
-                    "    i.descr_compl descricao,\n" +
-                    "    i.unid unidade,\n" +
-                    "    1 as qtd_embalagem,\n" +
-                    "    i.qtd quantidade,\n" +
-                    "    i.vl_item,\n" +
-                    "    i.vl_desc,\n" +
-                    "    i.vl_isentas_a vl_isento,\n" +
-                    "    i.vl_outras_a vl_outras,\n" +
-                    "    \n" +
-                    "    i.cst_icms,\n" +
-                    "    i.aliq_icms,\n" +
-                    "    i.vl_red_bc_a,\n" +
-                    "    i.vl_bc_icms,\n" +
-                    "    i.vl_icms,\n" +
-                    "    i.vl_bc_icms_st,\n" +
-                    "    i.vl_icms_st,\n" +
-                    "    \n" +
-                    "    i.vl_bc_ipi,\n" +
-                    "    i.vl_ipi_a,\n" +
-                    "    \n" +
-                    "    i.cst_pis,\n" +
-                    "    i.vl_pis,\n" +
-                    "    i.nat_rec,\n" +
-                    "    \n" +
-                    "    i.iva_valor_a,\n" +
-                    "    i.cst_icms_a,\n" +
-                    "    i.aliq_icms_a\n" +
-                    "from\n" +
-                    "    arius.fis_t_c170 i\n" +
-                    "    join produtos p on\n" +
-                    "        i.cod_item = p.id\n" +
-                    "where\n" +
-                    "    i.id_c100 = " + imp.getId() + "\n" +
-                    "order by\n" +
-                    "    i.id_c170"
+                    "select\n"
+                    + "    i.id_c170 id,\n"
+                    + "    i.id_c100 id_notafiscal,\n"
+                    + "    i.num_item numeroitem,\n"
+                    + "    i.cod_item id_produto,\n"
+                    + "    p.classificacao_fiscal ncm,\n"
+                    + "    i.cest_a cest,\n"
+                    + "    i.cfop,\n"
+                    + "    i.descr_compl descricao,\n"
+                    + "    i.unid unidade,\n"
+                    + "    1 as qtd_embalagem,\n"
+                    + "    i.qtd quantidade,\n"
+                    + "    i.vl_item,\n"
+                    + "    i.vl_desc,\n"
+                    + "    i.vl_isentas_a vl_isento,\n"
+                    + "    i.vl_outras_a vl_outras,\n"
+                    + "    \n"
+                    + "    i.cst_icms,\n"
+                    + "    i.aliq_icms,\n"
+                    + "    i.vl_red_bc_a,\n"
+                    + "    i.vl_bc_icms,\n"
+                    + "    i.vl_icms,\n"
+                    + "    i.vl_bc_icms_st,\n"
+                    + "    i.vl_icms_st,\n"
+                    + "    \n"
+                    + "    i.vl_bc_ipi,\n"
+                    + "    i.vl_ipi_a,\n"
+                    + "    \n"
+                    + "    i.cst_pis,\n"
+                    + "    i.vl_pis,\n"
+                    + "    i.nat_rec,\n"
+                    + "    \n"
+                    + "    i.iva_valor_a,\n"
+                    + "    i.cst_icms_a,\n"
+                    + "    i.aliq_icms_a\n"
+                    + "from\n"
+                    + "    arius.fis_t_c170 i\n"
+                    + "    join produtos p on\n"
+                    + "        i.cod_item = p.id\n"
+                    + "where\n"
+                    + "    i.id_c100 = " + imp.getId() + "\n"
+                    + "order by\n"
+                    + "    i.id_c170"
             )) {
                 while (rs.next()) {
                     NotaFiscalItemIMP item = imp.addItem();
@@ -1667,7 +1664,6 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
-    
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
@@ -1903,7 +1899,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and pagamento is null\n"
                     + "	and not tipo_cadastro is null\n"
                     + " and cl.id is not null\n"
-                    + (naoUtilizaPlanoConta == true ? "\n" : " and plano_conta in (" + getPlanosContaStr() + ")\n") 
+                    + (naoUtilizaPlanoConta == true ? "\n" : " and plano_conta in (" + getPlanosContaStr() + ")\n")
                     + "order by id";
             LOG.fine("SQL a ser executado:\n" + sql);
             try (ResultSet rst = stm.executeQuery(sql)) {
@@ -2743,7 +2739,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ReceitaIMP> getReceitas() throws Exception {
         List<ReceitaIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -2762,11 +2758,11 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
-                    
+
                     double qtdEmbUtilizado = 0;
                     qtdEmbUtilizado = rst.getDouble("qtde");
-                    
-                    imp.setImportsistema(getSistema());                    
+
+                    imp.setImportsistema(getSistema());
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportid(rst.getString("id"));
                     imp.setIdproduto(rst.getString("id"));
@@ -2776,15 +2772,15 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdembalagemproduto(rst.getInt("qtdeemb"));
                     imp.setFator(1);
                     imp.getProdutos().add(rst.getString("produto"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<DivisaoIMP> getDivisoes() throws Exception {
         List<DivisaoIMP> result = new ArrayList<>();
@@ -2805,7 +2801,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     public void importarReceberDevolucao(int idLojaVR) throws Exception {
         List<ReceberDevolucaoVO> vResult;
         try {
@@ -2861,12 +2857,12 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                             } else {
                                 imp.setNumeroNota(0);
                             }
-                            
-                            if ((rst.getString("NF") != null) &&
-                                    (!rst.getString("NF").trim().isEmpty())) {                                
+
+                            if ((rst.getString("NF") != null)
+                                    && (!rst.getString("NF").trim().isEmpty())) {
                                 obs = obs + " NF " + rst.getString("NF");
                             }
-                            
+
                             imp.setDataemissao(rst.getDate("EMISSAO"));
                             imp.setDatavencimento(rst.getDate("VENCIMENTO"));
                             imp.setValor(rst.getDouble("VALOR"));
@@ -2880,5 +2876,39 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return vResult;
     }
-    
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                        "SELECT\n"
+                        + "	DATA_INICIAL dataInicio,\n"
+                        + "	DATA_FINAL dataFim,\n"
+                        + "	item.PRODUTO idProduto,\n"
+                        + "	PRECO.VENDA precoNormal,\n"
+                        + "	ITEM.PRECO precoOferta\n"
+                        + "FROM\n"
+                        + "	PROG_MIDIA ofer\n"
+                        + "JOIN PROG_MIDIA_EMPRESAS emp ON emp.PROG_MIDIA = ofer.ID\n"
+                        + "JOIN PROG_MIDIA_ITENS item ON ofer.ID = item.PROG_MIDIA\n"
+                        + "JOIN PRODUTOS_PRECOS preco ON item.PRODUTO = preco.PRODUTO\n"
+                        + "WHERE\n"
+                        + "	emp.CONCLUIDO = 'F'\n"
+                        + "     AND emp.EMPRESA = " + getLojaOrigem() + "\n"
+                        + "	ORDER BY 1,2"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("idProduto"));
+                    imp.setDataInicio(rst.getDate("dataInicio"));
+                    imp.setDataFim(rst.getDate("dataFim"));
+                    imp.setPrecoNormal(rst.getDouble("precoNormal"));
+                    imp.setPrecoOferta(rst.getDouble("precoOferta"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
