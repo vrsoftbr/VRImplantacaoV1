@@ -68,6 +68,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean eanAtacado = false;
     public boolean apenasAtivo = false;
     
+    public boolean importarRotativoBaixados = false;
+    public boolean importarConveniosBaixados = false;
+    
     private String complemento = "";
 
     public void setComplemento(String complemento) {
@@ -1052,7 +1055,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	recebercreditorotativoitem ci\n"
                     + "	join recebercreditorotativo c on\n"
                     + "     ci.id_recebercreditorotativo = c.id and\n"
-                    + "     c.id_situacaorecebercreditorotativo = 0 and\n"
+                    + (!importarRotativoBaixados ? "     c.id_situacaorecebercreditorotativo = 0 and\n" : "")
                     + "     c.id_loja = " + getLojaOrigem() + "\n"
                     + "order by\n"
                     + "	ci.id"
@@ -1100,8 +1103,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join clientepreferencial c on\n"
                     + "     r.id_clientepreferencial = c.id\n"
                     + "where\n"
-                    + "	id_loja = " + getLojaOrigem() + " and\n"
-                    + "	id_situacaorecebercreditorotativo = 0\n"
+                    + "	id_loja = " + getLojaOrigem() + "\n"
+                    + (!importarRotativoBaixados ? "	and id_situacaorecebercreditorotativo = 0\n" : "")
                     + "order by\n"
                     + "	r.id")) {
                 while (rs.next()) {
@@ -1350,8 +1353,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         "from\n" +
                             "	conveniadotransacao t\n" +
                         "where\n" +
-                        "	t.id_loja = " + getLojaOrigem() + "and\n" +
-                        "	t.id_situacaotransacaoconveniado = 1\n" +
+                        "	t.id_loja = " + getLojaOrigem() + "\n" +
+                        (!importarConveniosBaixados ? "	and t.id_situacaotransacaoconveniado = 1\n" : "") +
                         "order by\n" +
                         "	t.id"
                 )
