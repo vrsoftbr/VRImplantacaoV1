@@ -252,7 +252,7 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     
-                    String ean = tratandoPLU(rst.getBoolean("balanca"), rst.getString("ean"));
+                    String ean = tratandoPLU(rst.getString("ean"));
                     int plu = Utils.stringToInt(ean, -2);
 
                     ProdutoBalancaVO bal = balanca.get(plu);
@@ -318,18 +318,15 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         return result;
     }
 
-    private String tratandoPLU(boolean isBalanca, String ean) throws SQLException {
-        //Tratando em de balança
-        if (isBalanca) {
-            //ean = 0000000200020
-            String eanBal = Utils.stringLong(ean); //200020
-            if (eanBal.startsWith("2") && eanBal.endsWith("0")) {
-                int plu = Utils.stringToInt(
-                        eanBal.substring(1, eanBal.length() - 1),//0002
-                        -2
-                ); //ean = 2
-                ean = String.valueOf(plu);
-            }
+    private String tratandoPLU(String ean) throws SQLException {
+        //ean = 0000000200020
+        String eanBal = Utils.stringLong(ean); //200020
+        if (eanBal.startsWith("2") && eanBal.endsWith("0")) {
+            int plu = Utils.stringToInt(
+                    eanBal.substring(1, eanBal.length() - 1),//0002
+                    -2
+            ); //ean = 2
+            ean = String.valueOf(plu);
         }
         return ean;
     }
