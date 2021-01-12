@@ -74,8 +74,6 @@ public class AlterData_WShopDAO extends InterfaceDAO {
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
-                    OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA
                 }
