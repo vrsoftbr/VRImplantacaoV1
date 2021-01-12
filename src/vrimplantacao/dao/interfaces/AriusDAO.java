@@ -2896,6 +2896,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "WHERE\n"
                         + "	emp.CONCLUIDO = 'F'\n"
                         + "     AND emp.EMPRESA = " + getLojaOrigem() + "\n"
+                        + "     AND DATA_FINAL >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "' "
                         + "	ORDER BY 1,2"
             )) {
                 while (rst.next()) {
