@@ -71,7 +71,7 @@ public class Organizador {
      * @return
      * @throws Exception 
      */
-    public MultiMap<String, ProdutoIMP> organizarListagem(List<ProdutoIMP> produtos) throws Exception {
+    public List<ProdutoIMP> organizarListagem(List<ProdutoIMP> produtos) throws Exception {
         LOG.info("Organizando a listagem de produtos. Total: " + produtos.size());
         repository.setNotify("Produtos - Organizando produtos", produtos.size());
         MultiMap<String, ProdutoIMP> result = new MultiMap<>();
@@ -211,7 +211,7 @@ public class Organizador {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             result.put(produto, chave);
         }
-        return result;
+        return new ArrayList<>(result.values());
     }
 
     /**

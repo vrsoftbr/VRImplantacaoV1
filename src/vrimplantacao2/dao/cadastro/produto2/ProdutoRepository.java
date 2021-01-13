@@ -91,7 +91,7 @@ public class ProdutoRepository {
              * Organizando a listagem de dados antes de efetuar a gravação.
              */
             System.gc();
-            MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -104,10 +104,9 @@ public class ProdutoRepository {
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
 
             setNotify("Gravando os produtos...", organizados.size());
-            for (KeyList<String> keys : organizados.keySet()) {
+            for (ProdutoIMP imp: organizados) {
                 StringBuilder rep = new StringBuilder();
                 try {
-                    ProdutoIMP imp = organizados.get(keys);
 
                     rep
                             .append("00|")
@@ -134,7 +133,11 @@ public class ProdutoRepository {
                     }
                     //</editor-fold>
 
-                    ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
+                    ProdutoAnteriorVO anterior = provider.anterior().get(
+                            provider.getSistema(),
+                            provider.getLoja(),
+                            imp.getImportId()
+                    );
 
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
@@ -279,7 +282,7 @@ public class ProdutoRepository {
             provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
-            MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
@@ -316,40 +319,25 @@ public class ProdutoRepository {
                     provider.complemento().criarEstoqueTrocaAnteriorTemporario();
                 }
 
-                for (KeyList<String> keys : organizados.keySet()) {
-                    String[] chave;
-                    String[] chaveProd;
-                    if (keys.size() == 3) {
-                        chave = new String[]{
-                            keys.get(0),
-                            keys.get(1),
-                            keys.get(2)
-                        };
-                        chaveProd = chave;
-                    } else {
-                        chave = new String[]{
-                            keys.get(0),
-                            keys.get(1),
-                            keys.get(2),
-                            keys.get(3)
-                        };
-                        chaveProd = new String[]{
-                            keys.get(0),
-                            keys.get(1),
-                            keys.get(2)
-                        };
-                    }
-                    ProdutoIMP imp = organizados.get(chave);
+                for (ProdutoIMP imp :organizados) {
 
                     ProdutoAnteriorVO anterior = null;
 
                     if (!importarSomenteLoja) {
-                        anterior = provider.anterior().get(chaveProd);
+                        anterior = provider.anterior().get(
+                                provider.getSistema(),
+                                provider.getLoja(),
+                                imp.getImportId()
+                        );
                     } else {
-                        anterior = provider.anterior().getLojaImp(chaveProd);
+                        anterior = provider.anterior().getLojaImp(                                
+                                provider.getSistema(),
+                                provider.getLoja(),
+                                imp.getImportId()
+                        );
                     }
 
-                    LOG.finer("Chave Prod: " + Arrays.deepToString(chaveProd));
+                    LOG.finer("Chave Prod: " + Arrays.deepToString(imp.getChave()));
 
                     if (anterior != null && anterior.getCodigoAtual() != null) {
 
@@ -505,7 +493,7 @@ public class ProdutoRepository {
         provider.begin();
         try {
             System.gc();
-            MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -519,8 +507,7 @@ public class ProdutoRepository {
             }
 
             setNotify("Gravando os produtos...", organizados.size());
-            for (KeyList<String> keys : organizados.keySet()) {
-                ProdutoIMP imp = organizados.get(keys);
+            for (ProdutoIMP imp : organizados) {                
 
                 imp.setManterEAN(false);
                 
@@ -558,7 +545,7 @@ public class ProdutoRepository {
                          * evitar duplicação.
                          */
                         //Se o produto não foi importado, um novo produto é criado.
-                        if (!provider.anterior().cadastrado(keys.get(2))) {
+                        if (!provider.anterior().cadastrado(imp.getImportId())) {
                             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
                                 strID = String.valueOf(ean);
                             }
@@ -594,7 +581,7 @@ public class ProdutoRepository {
                             codigoAtual = provider.anterior().get(
                                     provider.getSistema(),
                                     provider.getLoja(),
-                                    keys.get(2)
+                                    imp.getImportId()
                             ).getCodigoAtual();
 
                             if (codigoAtual == null) {
@@ -658,7 +645,7 @@ public class ProdutoRepository {
                  * Independentemente se o produto foi gravado ou não, o código
                  * anterior deve ser registrado.
                  */
-                if (!provider.anterior().cadastrado(keys.get(2))) {
+                if (!provider.anterior().cadastrado(imp.getImportId())) {
                     ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
                     anterior.setDataHora(dataHoraImportacao);
