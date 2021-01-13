@@ -18,20 +18,20 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
 
     public GestoraVendaItemIterator(String idLoja, Date dataInicial, Date dataTermino) {
         super(
-                new LinearVendaItemNextBuild(),
-                new LinearVendaItemStatementBuilder()
+                new GestoraVendaItemNextBuild(),
+                new GestoraVendaItemStatementBuilder()
         );
         if (dataInicial == null) throw new NullPointerException("Informe a data inicial");
         if (dataTermino == null) throw new NullPointerException("Informe a data final");
-        //log001venda0820        
+        //cp_12_2020
         for (SQLUtils.Intervalo intervalo: SQLUtils.intervalosMensais(dataInicial, dataTermino)) {
             this.addStatement(getFullSQL(Utils.stringToInt(idLoja), intervalo));
         }
     }
     
-    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MMyy");
+    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MM_yyyy");
     private String getNomeTabela(int idLoja, Date dataInicial) {        
-        return String.format("log%03dvenda%s", idLoja, TABLE_NAME_DATE.format(dataInicial));
+        return String.format("sp_%s", idLoja, TABLE_NAME_DATE.format(dataInicial));
     }
     private String getFullSQL(int idLoja, SQLUtils.Intervalo intervalo) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -74,7 +74,7 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
         return String.format("%s-%d", GestoraVendaIterator.formatID(cupom, caixa, data), numeroProduto);
     }
     
-    private static class LinearVendaItemNextBuild implements MultiStatementIterator.NextBuilder<VendaItemIMP> {
+    private static class GestoraVendaItemNextBuild implements MultiStatementIterator.NextBuilder<VendaItemIMP> {
         
         @Override
         public VendaItemIMP makeNext(ResultSet rs) throws Exception {
@@ -98,7 +98,7 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
         }        
     }
     
-    private static class LinearVendaItemStatementBuilder implements MultiStatementIterator.StatementBuilder {
+    private static class GestoraVendaItemStatementBuilder implements MultiStatementIterator.StatementBuilder {
         @Override
         public Statement makeStatement() throws Exception {
             return ConexaoSqlServer.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);

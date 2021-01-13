@@ -1,4 +1,4 @@
-package vrimplantacao.dao.interfaces;
+package vrimplantacao2.dao.interfaces.gestora;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
