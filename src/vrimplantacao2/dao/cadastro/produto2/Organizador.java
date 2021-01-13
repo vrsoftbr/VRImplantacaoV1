@@ -1,7 +1,9 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -39,6 +41,9 @@ public class Organizador {
         
         {
             List<ProdutoIMP> filtrados = eliminarDuplicados(produtos);
+            
+            List<ProdutoIMP> bal = separarProdutosBalanca(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
+            
             separarBalancaNormaisManterEAN(
                     filtrados,
                     balanca,
@@ -48,7 +53,14 @@ public class Organizador {
             filtrados.clear();
             produtos.clear();
             System.gc();
-        }
+        }/*
+        
+        List<ProdutoIMP> resultado = new ArrayList<>();
+        resultado.addAll(tratarProdutosBalanca(balanca));
+        resultado.addAll(tratarManterEAN(manterEAN));
+        resultado.addAll(tratarNormais(normais));
+        
+        return resultado;*/
         
         if (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
             //Listagem para os produtos de balança com PLUs válidos.
@@ -176,6 +188,110 @@ public class Organizador {
         return new ArrayList<>(result.values());
     }
 
+    public List<ProdutoIMP> separarProdutosBalanca(List<ProdutoIMP> filtrados, boolean manterBalanca) {
+        List<ProdutoIMP> 
+                balanca = new ArrayList<>(),
+                outros = new ArrayList<>();
+        MultiMap<String, ProdutoIMP>
+                validos = new MultiMap<>(),
+                invalidos = new MultiMap<>();
+        Set<Long> existentes = new HashSet<>();
+        
+        for (ProdutoIMP imp: filtrados) {
+            
+            String unidade = Utils.acertarTexto(imp.getTipoEmbalagem(), 2, "UN");
+            boolean isKilo = "KG".equals(unidade);
+            boolean isPesavel = imp.isBalanca();
+            boolean vaiParaBalanca = isKilo || isPesavel;            
+            String codigo = manterBalanca ? imp.getEan() : imp.getImportId();
+            codigo = codigo == null ? "" : codigo.trim();            
+            long plu;
+            
+            //<editor-fold defaultstate="collapsed" desc="Verifica se é possível converter o código em número">
+            
+            //-456 = OK
+            //0001 = OK
+            // 25 = OK
+            //7891000100103 = OK
+            //A2 = NOT OK
+            //2 5 = NOT OK
+            
+            try {
+                plu = Long.parseLong(codigo);
+            } catch (NumberFormatException ex) {
+                if (manterBalanca && vaiParaBalanca) {
+                    invalidos.put(imp, codigo);
+                } else {
+                    outros.add(imp);
+                }
+                continue;
+            }
+            //</editor-fold>
+            
+            //<editor-fold defaultstate="collapsed" desc="Elimina códigos EANs">
+            // Se for EAN, automaticamente é eliminado da lista de balança,
+            // Produtos com EANs válidos são unitários.
+            
+            //-456 = OK
+            //0001 = OK
+            // 25 = OK
+            //7891000100103 = NOT OK
+            
+            long ean = Utils.stringToLong(imp.getEan(), -2);
+            if (plu > 999999 || ean > 999999) {
+                outros.add(imp);
+                continue;
+            }
+            //</editor-fold>
+            
+            //<editor-fold defaultstate="collapsed" desc="Elimina códigos menores que 1">
+            
+            //-456 = NOT OK
+            //0001 = OK
+            // 25 = OK
+            
+            if (plu < 1) {
+                if (vaiParaBalanca && manterBalanca) {
+                    invalidos.put(imp, codigo);
+                } else {
+                    outros.add(imp);
+                }
+                continue;
+            }
+            //</editor-fold>
+            
+            //<editor-fold defaultstate="collapsed" desc="Se for para balança entra nos válidos, senão é descartado">
+            
+            //0001 = OK
+            // 25 = OK
+            if (vaiParaBalanca) {
+                if (!existentes.contains(plu)) {
+                    validos.put(imp, codigo);
+                    existentes.add(plu);
+                } else {
+                    if (manterBalanca) {
+                        invalidos.put(imp, codigo);
+                    } else {
+                        outros.add(imp);
+                    }
+                }
+            } else {
+                outros.add(imp);
+            }
+            //</editor-fold>
+            
+        }
+        
+        balanca.addAll(validos.getSortedMap().values());
+        balanca.addAll(invalidos.getSortedMap().values());
+        
+        //Remove os produtos de balança da listagem inicial
+        filtrados.clear();
+        filtrados.addAll(outros);
+        
+        return balanca;
+    }
+
     /**
      * Elimina produtos duplicados.
      * @param produtos Listagem de produtos.
@@ -200,10 +316,22 @@ public class Organizador {
      * @throws java.lang.Exception
      */
     public void separarBalancaNormaisManterEAN(List<ProdutoIMP> filtrados, MultiMap<String, ProdutoIMP> balanca, MultiMap<String, ProdutoIMP> normais, MultiMap<String, ProdutoIMP> manterEAN) throws Exception {
-        repository.setNotify("Produtos - Separando balan\u00e7a e normais...", 0);
+        repository.setNotify("Produtos - Separando balança, eansMenores e normais...", 0);
         boolean isManterEAN = repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
                 
         for (ProdutoIMP produto : filtrados) {
+            long ean = Utils.stringToLong(produto.getEan(), -2);
+            String unidade = Utils.acertarTexto(produto.getTipoEmbalagem(), 2, "UN");
+            boolean isPLU = ean >= 1 && ean <= 999999;
+            //Verificar se é produto de balança
+            
+            //Verificar se é produto bazar hortfrut (EAN <= 999999)
+            //Verificar se é produto normal
+           
+            
+            
+            /*
+            
             String[] chave = null;
             if (produto.isBalanca() && (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA))) {
                 chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getDescricaoCompleta(), produto.getImportId(), produto.getEan()};
@@ -219,20 +347,8 @@ public class Organizador {
                 manterEAN.put(produto, chave);
             } else {
                 normais.put(produto, chave);
-            }
+            }*/
         }
-    }
-
-    private List<ProdutoIMP> tratarProdutosBalanca(List<ProdutoIMP> balanca) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private List<ProdutoIMP> tratarManterEAN(List<ProdutoIMP> manterEAN) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private List<ProdutoIMP> tratarNormais(List<ProdutoIMP> normais) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
