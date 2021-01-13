@@ -52,8 +52,7 @@ public class OrganizadorTest {
         imports.add(imp2);
         imports.add(imp3);
         
-        MultiMap<String, ProdutoIMP> results;
-        
+        List<ProdutoIMP> results;        
         results = new Organizador(repository).eliminarDuplicados(imports);        
         assertEquals(2, results.size());
         
