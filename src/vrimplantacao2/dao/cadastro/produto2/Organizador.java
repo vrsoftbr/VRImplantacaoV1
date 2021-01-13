@@ -225,36 +225,7 @@ public class Organizador {
         repository.setNotify("Produtos - Eliminando duplicados...", 0);
         MultiMap<String, ProdutoIMP> result = new MultiMap<>();
         for (ProdutoIMP produto : produtos) {
-            if (
-                    !repository.getSistema().equals(produto.getImportSistema()) ||
-                    !repository.getLoja().equals(produto.getImportLoja())
-            ) {
-                continue;
-            }
-            String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
-                             
-            if (Level.FINER.equals(
-                    (LOG.getLevel() == null ? LOG.getParent().getLevel() : LOG.getLevel())
-            )) {
-                ProdutoIMP atual = result.get(chave);  
-                if (atual != null) {
-                    String msg = "Chave '" + Arrays.toString(chave) + "' já existe e será substituida\n";
-                    msg += String.format(
-                            "{atual:{id:%s,ean:%s,descricaocompleta:%s},",
-                            atual.getImportId(),
-                            atual.getEan(),
-                            atual.getDescricaoCompleta()
-                    );
-                    msg += String.format(
-                            "novo:{id:%s,ean:%s,descricaocompleta:%s}}",
-                            produto.getImportId(),
-                            produto.getEan(),
-                            produto.getDescricaoCompleta()                        
-                    );
-                    LOG.finer(msg);
-                }
-            }
-            result.put(produto, chave);
+            result.put(produto, produto.getImportId(), produto.getEan());
         }
         return result;
     }
