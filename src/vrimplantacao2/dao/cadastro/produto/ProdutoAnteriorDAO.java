@@ -397,8 +397,8 @@ public class ProdutoAnteriorDAO {
                         produto = new ProdutoVO();
                         produto.setId(rst.getInt("codigoatual"));
                         produto.setDescricaoCompleta("descricaocompleta");
-                        produto.setDescricaoCompleta("descricaogondola");
-                        produto.setDescricaoCompleta("descricaoreduzida");
+                        produto.setDescricaoGondola("descricaogondola");
+                        produto.setDescricaoReduzida("descricaoreduzida");
                     }
                     vo.setCodigoAtual(produto);
                     vo.setPisCofinsCredito(rst.getInt("piscofinscredito"));

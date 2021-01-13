@@ -567,23 +567,6 @@ public class Importador {
         provider.setOpcoes(opcoes);
         new ProdutoRepository(provider).unificar(produtos);
     }
-
-    /**
-     * Unifica o cadastro de produtos. Todos os produtos com EAN válido serão
-     * importados e aqueles que não possuirem EAN maior que 999999 são gravados
-     * apenas na tabela implantacao.codant_produto.
-     *
-     * @throws Exception
-     */
-    public void unificarProdutos2() throws Exception {
-        ProgressBar.setStatus("Carregando produtos (Unificação 2)...");
-        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutosUnificacao();
-        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLoja(getInterfaceDAO().getLojaOrigem());
-        provider.setLojaVR(getLojaVR());
-        new ProdutoRepository(provider).unificar2(produtos);
-    }
     
     /**
      * Unifica o cadastro dos fornecedores, apenas aqueles com CPF/CNPJ válidos,
