@@ -72,14 +72,14 @@ public class OrganizadorTest {
 
         List<ProdutoIMP> imports = new ArrayList<>();
 
-        imports.add(newProduto("1", "000156", "KG", true));
-        imports.add(newProduto("A222", "3", "UN", true));
-        imports.add(newProduto("222", "AA443", "KG", true));
-        imports.add(newProduto("156", "0004", "UN", true));
-        imports.add(newProduto("356", "00004", "KG", true));
-        imports.add(newProduto("157", "2", "KG", false));
-        imports.add(newProduto("1345", "7891000100103", "KG", false));
-        imports.add(newProduto("1346", "1346", "UN", false));
+        imports.add(newProduto("1", "000156", "KG", true, false));
+        imports.add(newProduto("A222", "3", "UN", true, false));
+        imports.add(newProduto("222", "AA443", "KG", true, false));
+        imports.add(newProduto("156", "0004", "UN", true, false));
+        imports.add(newProduto("356", "00004", "KG", true, false));
+        imports.add(newProduto("157", "2", "KG", false, false));
+        imports.add(newProduto("1345", "7891000100103", "KG", false, false));
+        imports.add(newProduto("1346", "1346", "UN", false, false));
 
         List<ProdutoIMP> balanca = new Organizador(repository).separarProdutosBalanca(imports, true);
 
@@ -101,14 +101,14 @@ public class OrganizadorTest {
 
         List<ProdutoIMP> imports = new ArrayList<>();
 
-        imports.add(newProduto("1", "000156", "KG", true));
-        imports.add(newProduto("A222", "3", "UN", true));
-        imports.add(newProduto("222", "AA443", "KG", true));
-        imports.add(newProduto("156", "0004", "UN", true));
-        imports.add(newProduto("356", "00004", "KG", true));
-        imports.add(newProduto("157", "2", "KG", false));
-        imports.add(newProduto("1345", "7891000100103", "KG", false));
-        imports.add(newProduto("1346", "1346", "UN", false));
+        imports.add(newProduto("1", "000156", "KG", true, false));
+        imports.add(newProduto("A222", "3", "UN", true, false));
+        imports.add(newProduto("222", "AA443", "KG", true, false));
+        imports.add(newProduto("156", "0004", "UN", true, false));
+        imports.add(newProduto("356", "00004", "KG", true, false));
+        imports.add(newProduto("157", "2", "KG", false, false));
+        imports.add(newProduto("1345", "7891000100103", "KG", false, false));
+        imports.add(newProduto("1346", "1346", "UN", false, false));
 
         List<ProdutoIMP> balanca = new Organizador(repository).separarProdutosBalanca(imports, false);
 
@@ -122,8 +122,72 @@ public class OrganizadorTest {
 
         System.out.println("OK");
     }
+    
+    @Test
+    public void testSepararProdutosManterEan_MANTER_EAN_INDIVIDUAL() throws Exception {
+        System.out.print("OrganizadorTest.testSepararProdutosManterEan_MANTER_EAN_INDIVIDUAL...");
 
-    private ProdutoIMP newProduto(String id, String ean, String unidade, boolean pesavel) {
+        List<ProdutoIMP> imports = new ArrayList<>();
+
+        imports.add(newProduto("1", "000156", "KG", false, true));
+        imports.add(newProduto("A222", "0000003", "UN", false, true));
+        imports.add(newProduto("222", "AA443", "KG", false, true));
+        imports.add(newProduto("157", "2", "KG", false, false));
+        imports.add(newProduto("156", "0004", "UN", false, true));
+        imports.add(newProduto("356", "00004", "KG", false, true));
+        imports.add(newProduto("1345", "7891000100103", "KG", false, true));
+        imports.add(newProduto("1346", "1346", "UN", false, false));
+
+        List<ProdutoIMP> manterEan = new Organizador(repository).separarManterEAN(imports, false);
+        
+        /*
+        valids 000156,3,0004 -> 3,0004,00156
+        outros AA443,2,00004,7891000100103,1346
+        */
+
+        assertEquals(3, manterEan.size());
+        assertEquals(5, imports.size());//Produtos não retornados, são mantidos na lista original.
+        assertEquals("A222", manterEan.get(0).getImportId());//2
+        assertEquals("156", manterEan.get(1).getImportId());//3
+        assertEquals("1", manterEan.get(2).getImportId());//0004
+
+        System.out.println("OK");
+    }
+    
+    @Test
+    public void testSepararProdutosManterEan_MANTER_EAN_OPCAO() throws Exception {
+        System.out.print("OrganizadorTest.testSepararProdutosManterEan_MANTER_EAN_OPCAO...");
+
+        List<ProdutoIMP> imports = new ArrayList<>();
+
+        imports.add(newProduto("1", "000156", "KG", false, false));
+        imports.add(newProduto("A222", "0000003", "UN", false, false));
+        imports.add(newProduto("222", "AA443", "KG", false, false));
+        imports.add(newProduto("157", "2", "KG", false, false));
+        imports.add(newProduto("156", "0004", "UN", false, false));
+        imports.add(newProduto("356", "00004", "KG", false, false));
+        imports.add(newProduto("1345", "7891000100103", "KG", false, false));
+        imports.add(newProduto("1346", "1346", "UN", false, false));
+
+        List<ProdutoIMP> manterEan = new Organizador(repository).separarManterEAN(imports, true);
+        
+        /*
+        valids 000156,0000003,2,0004,1346 -> 2,0000003,0004,000156,1346
+        outros AA443,00004,7891000100103
+        */
+
+        assertEquals(5, manterEan.size());
+        assertEquals(3, imports.size());//Produtos não retornados, são mantidos na lista original.
+        assertEquals("157", manterEan.get(0).getImportId());
+        assertEquals("A222", manterEan.get(1).getImportId());
+        assertEquals("156", manterEan.get(2).getImportId());
+        assertEquals("1", manterEan.get(3).getImportId());
+        assertEquals("1346", manterEan.get(4).getImportId());
+
+        System.out.println("OK");
+    }
+
+    private ProdutoIMP newProduto(String id, String ean, String unidade, boolean pesavel, boolean manterEan) {
         ProdutoIMP imp = new ProdutoIMP();
         imp.setImportSistema(repository.getSistema());
         imp.setImportLoja(repository.getLoja());
@@ -131,6 +195,7 @@ public class OrganizadorTest {
         imp.setEan(ean);
         imp.setTipoEmbalagem(unidade);
         imp.seteBalanca(pesavel);
+        imp.setManterEAN(manterEan);
         return imp;
     }
 

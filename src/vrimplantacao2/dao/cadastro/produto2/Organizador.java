@@ -20,6 +20,7 @@ public class Organizador {
     private static final Logger LOG = Logger.getLogger(Organizador.class.getName());
     
     private final ProdutoRepository repository;
+    private final Set<Long> existentes = new HashSet<>();
     
     public Organizador(ProdutoRepository repository) {
         this.repository = repository;
@@ -32,6 +33,7 @@ public class Organizador {
      * @throws Exception 
      */
     public List<ProdutoIMP> organizarListagem(List<ProdutoIMP> produtos) throws Exception {
+        existentes.clear();
         LOG.info("Organizando a listagem de produtos. Total: " + produtos.size());
         repository.setNotify("Produtos - Organizando produtos", produtos.size());
         MultiMap<String, ProdutoIMP> result = new MultiMap<>();
@@ -43,6 +45,7 @@ public class Organizador {
             List<ProdutoIMP> filtrados = eliminarDuplicados(produtos);
             
             List<ProdutoIMP> bal = separarProdutosBalanca(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
+            List<ProdutoIMP> manEan = separarManterEAN(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
             
             separarBalancaNormaisManterEAN(
                     filtrados,
@@ -188,6 +191,61 @@ public class Organizador {
         return new ArrayList<>(result.values());
     }
 
+    /**
+     *Serão mantidos:<br>
+     * * ManterEAN true no item ou no parâmetro<br>
+     * * PLU convertido em número<br>
+     * * PLU >= 1 <= 999999<br>
+     * * PLU Não existente
+     * @param filtrados
+     * @param manterEan
+     * @return 
+     */
+    public List<ProdutoIMP> separarManterEAN(List<ProdutoIMP> filtrados, boolean manterEan) {
+        List<ProdutoIMP> outros = new ArrayList<>();
+        MultiMap<String, ProdutoIMP> manter = new MultiMap<>();
+        
+        for (ProdutoIMP imp: filtrados) {
+            boolean manterEanProduto = imp.isManterEAN() || manterEan;
+            long plu;
+            String strEan = imp.getEan() == null ? "" : imp.getEan().trim();
+            
+            //<editor-fold defaultstate="collapsed" desc="Manter o EAN">
+            if (!manterEanProduto) {
+                outros.add(imp);
+                continue;
+            }
+            //</editor-fold>
+            //<editor-fold defaultstate="collapsed" desc="Não pode converter EAN em número">
+            try {
+                plu = Long.parseLong(strEan);
+            } catch (NumberFormatException ex) {
+                outros.add(imp);
+                continue;
+            }
+            //</editor-fold>
+            //<editor-fold defaultstate="collapsed" desc="PLU inválido">
+            if (!(plu >= 1 && plu <= 999999)) {
+                outros.add(imp);
+                continue;
+            }
+            //</editor-fold>
+            //<editor-fold defaultstate="collapsed" desc="PLU já foi usado">
+            if (existentes.contains(plu)) {
+                outros.add(imp);
+                continue;
+            }
+            //</editor-fold>
+            manter.put(imp, imp.getEan());
+            existentes.add(plu);
+        }
+        
+        filtrados.clear();
+        filtrados.addAll(outros);
+        
+        return new ArrayList<>(manter.getSortedMap().values());
+    }
+    
     public List<ProdutoIMP> separarProdutosBalanca(List<ProdutoIMP> filtrados, boolean manterBalanca) {
         List<ProdutoIMP> 
                 balanca = new ArrayList<>(),
@@ -195,7 +253,6 @@ public class Organizador {
         MultiMap<String, ProdutoIMP>
                 validos = new MultiMap<>(),
                 invalidos = new MultiMap<>();
-        Set<Long> existentes = new HashSet<>();
         
         for (ProdutoIMP imp: filtrados) {
             
