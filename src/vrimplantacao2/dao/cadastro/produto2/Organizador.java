@@ -21,6 +21,7 @@ public class Organizador {
     
     private final ProdutoRepository repository;
     private final Set<Long> existentes = new HashSet<>();
+    private final Set<Long> idsValidos = new HashSet<>();
     
     public Organizador(ProdutoRepository repository) {
         this.repository = repository;
@@ -45,7 +46,9 @@ public class Organizador {
             List<ProdutoIMP> filtrados = eliminarDuplicados(produtos);
             
             List<ProdutoIMP> bal = separarProdutosBalanca(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
-            List<ProdutoIMP> manEan = separarManterEAN(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
+            List<ProdutoIMP> manEAN = separarManterEAN(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
+            List<ProdutoIMP> normaisComEAN = separarIdsValidos(filtrados);
+            List<ProdutoIMP> invalidos = filtrados;
             
             separarBalancaNormaisManterEAN(
                     filtrados,
@@ -190,6 +193,40 @@ public class Organizador {
         }
         return new ArrayList<>(result.values());
     }
+    
+    public List<ProdutoIMP> separarIdsValidos(List<ProdutoIMP> filtrados) {
+        MultiMap<String, ProdutoIMP> ids = new MultiMap<>();
+        List<ProdutoIMP> outros = new ArrayList<>();
+        
+        for (ProdutoIMP imp : filtrados) {
+            long id;
+            try {
+                id = Integer.parseInt(imp.getImportId().trim());
+            } catch (NumberFormatException ex) {
+                outros.add(imp);
+                continue;
+            }
+            
+            if (!(id >= 1 && id <= 999999)) {
+                outros.add(imp);
+                continue;
+            }
+            
+            if (idsValidos.contains(id)) {
+                outros.add(imp);
+                continue;                
+            }
+            
+            ids.put(imp, imp.getImportId());
+            idsValidos.add(id);
+        }
+        
+        filtrados.clear();
+        filtrados.addAll(outros);
+        System.gc();
+        
+        return new ArrayList<>(ids.getSortedMap().values());
+    }
 
     /**
      *Serão mantidos:<br>
@@ -242,6 +279,7 @@ public class Organizador {
         
         filtrados.clear();
         filtrados.addAll(outros);
+        System.gc();
         
         return new ArrayList<>(manter.getSortedMap().values());
     }
@@ -325,6 +363,7 @@ public class Organizador {
                 if (!existentes.contains(plu)) {
                     validos.put(imp, codigo);
                     existentes.add(plu);
+                    idsValidos.add(plu);
                 } else {
                     if (manterBalanca) {
                         invalidos.put(imp, codigo);
@@ -345,6 +384,7 @@ public class Organizador {
         //Remove os produtos de balança da listagem inicial
         filtrados.clear();
         filtrados.addAll(outros);
+        System.gc();
         
         return balanca;
     }
