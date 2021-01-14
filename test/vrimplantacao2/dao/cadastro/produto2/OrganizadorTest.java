@@ -1,6 +1,8 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -10,6 +12,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -33,7 +36,48 @@ public class OrganizadorTest {
 
     @Test
     public void testOrganizarListagem() throws Exception {
-        fail("Não implementado");
+        System.out.print("OrganizadorTest.testOrganizarListagem()...");
+        List<ProdutoIMP> imports = new ArrayList<>();
+
+        imports.add(newProduto("156", "178", "UN", true, false));
+        imports.add(newProduto("1", "000156", "KG", true, false));
+        imports.add(newProduto("A222", "3", "UN", true, false));
+        imports.add(newProduto("222", "AA443", "KG", true, false));
+        imports.add(newProduto("156", "0004", "UN", true, false));
+        imports.add(newProduto("356", "00004", "KG", true, false));
+        imports.add(newProduto("157", "2", "KG", false, false));
+        imports.add(newProduto("1345", "7891000100103", "KG", false, false));
+        imports.add(newProduto("1346", "1346", "UN", false, false));
+        imports.add(newProduto("156", "005", "UN", true, false));
+        imports.add(newProduto("1", "000156", "KG", false, false));
+        imports.add(newProduto("A222", "0000003", "UN", false, false));
+        imports.add(newProduto("222", "17891000100103", "KG", false, false));
+        imports.add(newProduto("157", "2", "KG", false, false));//
+        imports.add(newProduto("0000156", "0004", "UN", false, false));
+        imports.add(newProduto("356", "00004567892", "KG", false, false));
+        imports.add(newProduto("1345", "7891000100103", "KG", false, false));//
+        imports.add(newProduto("1346", "AAA1346", "UN", false, false));
+                
+        
+        
+        when(repository.getOpcoes()).thenReturn(new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA
+        )));
+        
+        List<ProdutoIMP> result = new Organizador(repository).organizarListagem(imports);
+        
+        assertTrue(imports.isEmpty());
+        assertEquals(15, result.size());
+        
+        for (ProdutoIMP imp: result) {
+            System.out.println(String.format("ID: %s EAN: %s Bal:%s ManEAN: %s", 
+                    imp.getImportId(), imp.getEan(),
+                    (imp.isBalanca() || imp.getTipoEmbalagem().equals("KG")),
+                    imp.isManterEAN()));
+        }
+        
+        System.out.println("OK");
     }
 
     @Test

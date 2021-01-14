@@ -37,161 +37,29 @@ public class Organizador {
         existentes.clear();
         LOG.info("Organizando a listagem de produtos. Total: " + produtos.size());
         repository.setNotify("Produtos - Organizando produtos", produtos.size());
-        MultiMap<String, ProdutoIMP> result = new MultiMap<>();
-        MultiMap<String, ProdutoIMP> balanca = new MultiMap<>();
-        MultiMap<String, ProdutoIMP> normais = new MultiMap<>();
-        MultiMap<String, ProdutoIMP> manterEAN = new MultiMap<>();
-        
-        {
-            List<ProdutoIMP> filtrados = eliminarDuplicados(produtos);
-            
-            List<ProdutoIMP> bal = separarProdutosBalanca(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
-            List<ProdutoIMP> manEAN = separarManterEAN(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
-            List<ProdutoIMP> normaisComEAN = separarIdsValidos(filtrados);
-            List<ProdutoIMP> invalidos = filtrados;
-            
-            separarBalancaNormaisManterEAN(
-                    filtrados,
-                    balanca,
-                    normais,
-                    manterEAN
-            );            
-            filtrados.clear();
-            produtos.clear();
-            System.gc();
-        }/*
-        
-        List<ProdutoIMP> resultado = new ArrayList<>();
-        resultado.addAll(tratarProdutosBalanca(balanca));
-        resultado.addAll(tratarManterEAN(manterEAN));
-        resultado.addAll(tratarNormais(normais));
-        
-        return resultado;*/
-        
-        if (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
-            //Listagem para os produtos de balança com PLUs válidos.
-            MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
-            //Listagem para os produtos de balança com PLUs inválidos
-            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>();
-            //Separando os produtos e análisando o PLU.
-            for (KeyList<String> keys : normais.keySet()) {
-                ProdutoIMP imp = normais.get(keys);
-                try {
-                    int id = Integer.parseInt(imp.getImportId());
-                    if (id >= 10000 && id <= 999999) {
-                        validos.put(imp, keys);
-                    } else {
-                        invalidos.put(imp, keys);
-                    }
-                } catch (NumberFormatException e) {
-                    invalidos.put(imp, keys);
-                } 
-            }
-            //Ordenando as listagtem.
-            balanca = balanca.getSortedMap();
-            validos = validos.getSortedMap();
-            invalidos = invalidos.getSortedMap();
-            //Reorganizando os produtos e ordenando a listagem           
-            normais.clear();
-            for (ProdutoIMP prod : validos.values()) {
-                normais.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId(), prod.getEan());
-            }
-            for (ProdutoIMP prod : invalidos.values()) {
-                normais.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId());
-            }
-            
-            validos.clear();
-            invalidos.clear();
-        } else if (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA)) {
-            
-            /**
-            * Se optar por manter os códigos dos produtos de balança entra neste if.
-            */
-            
-            //Listagem para os produtos de balança com PLUs válidos.
-            MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
-            //Listagem para os produtos de balança com PLUs inválidos
-            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>();
-            //Separando os produtos e análisando o PLU.
-            for (KeyList<String> keys : balanca.keySet()) {
-                ProdutoIMP imp = balanca.get(keys);
-                long ean = Utils.stringToLong(imp.getEan());
-                String[] chave = new String[]{imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), imp.getEan()};//String.valueOf(ean)};
-                if (ean >= 0 && ean <= 999999) {
-                    validos.put(imp, chave);
-                } else {
-                    invalidos.put(imp, chave);
-                }
-            }
-            //Ordenando as listagtem.
-            validos = validos.getSortedMap();
-            invalidos = invalidos.getSortedMap();
-            //Reorganizando os produtos e ordenando a listagem           
-            balanca.clear();
-            for (ProdutoIMP prod : validos.values()) {
-                balanca.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId(), prod.getEan());
-            }
-            for (ProdutoIMP prod : invalidos.values()) {
-                balanca.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId());
-            }
-            
-            validos.clear();
-            invalidos.clear();
-        }
-        
-        
-        if (!manterEAN.isEmpty()) {
-            /**
-            * Tratamento dos produtos que forçam o manter o EAN.
-            */
 
-            //Listagem para os produtos de balança com PLUs válidos.
-            MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
-            //Listagem para os produtos de balança com PLUs inválidos
-            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>();
-            //Separando os produtos e análisando o PLU.
-            for (KeyList<String> keys : manterEAN.keySet()) {
-                ProdutoIMP imp = manterEAN.get(keys);
-                long ean = Utils.stringToLong(imp.getEan());
-                String[] chave = new String[]{imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), imp.getEan()};//String.valueOf(ean)};
-                if (ean >= 0 && ean <= 999999) {
-                    validos.put(imp, chave);
-                } else {
-                    invalidos.put(imp, chave);
-                }
-            }
-            //Ordenando as listagtem.
-            validos = validos.getSortedMap();
-            invalidos = invalidos.getSortedMap();
-            //Reorganizando os produtos e ordenando a listagem           
-            manterEAN.clear();
-            for (ProdutoIMP prod : validos.values()) {
-                manterEAN.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId(), prod.getEan());
-            }
-            //Aqueles com código EAN inválido é colocado com os normais para receber uma nova numeração e o manter
-            //Código é desmarcado
-            for (ProdutoIMP prod : invalidos.values()) {
-                normais.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId());
-            }
+        List<ProdutoIMP> filtrados = eliminarDuplicados(produtos);
+        produtos.clear();
+        System.gc();
 
-            validos.clear();
-            invalidos.clear();
-        }
-            
-        LOG.fine("QTDs Balanca: " + balanca.size() + "|Normais: " + normais.size());
-        for (ProdutoIMP produto : balanca.values()) {
-            String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
-            result.put(produto, chave);
-        }
-        for (ProdutoIMP produto : manterEAN.values()) {
-            String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
-            result.put(produto, chave);
-        }
-        for (ProdutoIMP produto : normais.values()) {
-            String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
-            result.put(produto, chave);
-        }
-        return new ArrayList<>(result.values());
+        List<ProdutoIMP> balanca = separarProdutosBalanca(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
+        List<ProdutoIMP> manterEAN = separarManterEAN(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
+        List<ProdutoIMP> validos = separarIdsValidos(filtrados);
+        
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        result.addAll(balanca);
+        result.addAll(manterEAN);
+        result.addAll(validos);
+        result.addAll(filtrados);
+        
+        filtrados.clear();
+        balanca.clear();
+        manterEAN.clear();
+        validos.clear();
+        System.gc();
+        
+        return result;
     }
     
     public List<ProdutoIMP> separarIdsValidos(List<ProdutoIMP> filtrados) {
