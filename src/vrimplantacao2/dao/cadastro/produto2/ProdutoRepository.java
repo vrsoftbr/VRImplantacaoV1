@@ -186,7 +186,7 @@ public class ProdutoRepository {
                             id = idStack.obterID(strID, eBalanca);
                         }
 
-                        ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+                        ProdutoVO prod = converterIMP(imp, id, unidade, eBalanca);
 
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
@@ -358,7 +358,7 @@ public class ProdutoRepository {
                         }
                         //</editor-fold>
 
-                        ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+                        ProdutoVO prod = converterIMP(imp, id, unidade, eBalanca);
 
                         anterior = converterImpEmAnterior(imp);
                         anterior.setDataHoraAlteracao(dataHoraImportacao);
@@ -552,7 +552,7 @@ public class ProdutoRepository {
 
                             id = idStack.obterID(strID, eBalanca);
 
-                            codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
+                            codigoAtual = converterIMP(imp, id, unidade, eBalanca);
 
                             ProdutoAliquotaVO aliquota = converterAliquota(imp);
                             aliquota.setProduto(codigoAtual);
@@ -592,7 +592,7 @@ public class ProdutoRepository {
 
                                 id = idStack.obterID(strID, eBalanca);
 
-                                codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
+                                codigoAtual = converterIMP(imp, id, unidade, eBalanca);
 
                                 ProdutoAliquotaVO aliquota = converterAliquota(imp);
                                 aliquota.setProduto(codigoAtual);
@@ -953,7 +953,7 @@ public class ProdutoRepository {
      * @return {@link ProdutoAnteriorEanVO} convertido.
      * @exception Exception
      */
-    public ProdutoVO converterIMP(ProdutoIMP imp, int id, long ean,
+    public ProdutoVO converterIMP(ProdutoIMP imp, int id,
             TipoEmbalagem unidade, boolean eBalanca) throws Exception {
 
         manterDescricao = provider.getOpcoes().contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO);
