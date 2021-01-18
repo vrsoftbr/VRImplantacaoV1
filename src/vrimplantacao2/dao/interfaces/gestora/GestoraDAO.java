@@ -1,4 +1,4 @@
-package vrimplantacao.dao.interfaces;
+package vrimplantacao2.dao.interfaces.gestora;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,14 +10,9 @@ import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.PagarOutrasDespesasDAO;
-import vrimplantacao.dao.cadastro.ReceberChequeDAO;
-import vrimplantacao.dao.cadastro.ReceberCreditoRotativoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVO;
 import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVencimentoVO;
-import vrimplantacao.vo.vrimplantacao.ReceberChequeItemVO;
-import vrimplantacao.vo.vrimplantacao.ReceberChequeVO;
-import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -26,7 +21,6 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
