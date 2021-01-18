@@ -353,7 +353,7 @@ public class SyncTecDAO extends InterfaceDAO {
                     }
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaocadastro")));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));

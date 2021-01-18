@@ -12,10 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import vr.core.utils.StringUtils;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -23,6 +27,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -31,13 +36,26 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class AlterData_WShopDAO extends InterfaceDAO {
+public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(AlterData_WShopDAO.class.getName());
+    
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        if (complemento == null) {
+            complemento = "";
+        }
+        this.complemento = complemento.trim();
+    }
 
     @Override
     public String getSistema() {
-        return "WShop";
+        if ("".equals(complemento)) {
+            return "WShop";
+        } else {
+            return "WShop - " + complemento;
+        }
     }
 
     @Override
@@ -74,8 +92,6 @@ public class AlterData_WShopDAO extends InterfaceDAO {
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
-                    OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA
                 }
@@ -204,6 +220,49 @@ public class AlterData_WShopDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	icms.idcalculoicms id,\n" +
+                    "	icms.cdsituacaotributaria cst,\n" +
+                    "	icms.alicms aliq,\n" +
+                    "	icms.alreducaobaseicms reducao\n" +
+                    "from\n" +
+                    "	wshop.icms_uf icms\n" +
+                    "	join wshop.empshop emp on \n" +
+                    "		emp.cdempresa = '001' and\n" +
+                    "		iduf = emp.cduf and\n" +
+                    "		idufdestino = emp.cduf and\n" +
+                    "		stvendaconsumidorfinal\n" +
+                    "order by\n" +
+                    "	cst,\n" +
+                    "	aliq,\n" +
+                    "	reducao"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                        rs.getString("id"),
+                        String.format(
+                                "Cst: %s - Aliq: %.2f - Red: %.2f",
+                                rs.getString("cst"),
+                                rs.getDouble("aliq"),
+                                rs.getDouble("reducao")
+                        ),
+                        rs.getInt("cst"),
+                        rs.getDouble("aliq"),
+                        rs.getDouble("reducao")
+                    ));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -235,9 +294,7 @@ public class AlterData_WShopDAO extends InterfaceDAO {
                     + "	dt.cdsittribpisentrada piscofins_entrada,\n"
                     + "	dt.cdsittribpis piscofins_saida,\n"
                     + "	dt.cdnaturezareceita piscofins_naturezareceita,	\n"
-                    + "	icms.cdsituacaotributaria icms_cst,\n"
-                    + "	icms.alicms icms_aliquota,\n"
-                    + "	0 as icms_reduzido\n"
+                    + "	p.idcalculoicms\n"
                     + "from\n"
                     + "	wshop.produto p\n"
                     + "	join wshop.empshop emp on emp.cdempresa = '" + getLojaOrigem() + "'\n"
@@ -273,11 +330,11 @@ public class AlterData_WShopDAO extends InterfaceDAO {
                     + "					iddetalhe, cdempresa\n"
                     + "			) a on est.iddetalhe = a.iddetalhe and est.dtreferencia = a.dtreferencia\n"
                     + "	) est on est.iddetalhe = dt.iddetalhe and est.cdempresa = emp.cdempresa\n"
-                    + "	left join wshop.icms_uf icms on p.idcalculoicms = icms.idcalculoicms and iduf = emp.cduf and idufdestino = emp.cduf and stvendaconsumidorfinal\n"
                     + "order by\n"
                     + "	id"
             )) {
                 mapearFamilia();
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -286,11 +343,24 @@ public class AlterData_WShopDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(rst.getString("ean"));
+                    
+                    int ean = StringUtils.toInt(rst.getString("ean"), -2);
+                    ProdutoBalancaVO bal = balanca.get(ean);
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.seteBalanca(rst.getBoolean("ebalanca"));
+                        imp.setEan(rst.getString("ean"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(rst.getInt("validade"));
+                        imp.setQtdEmbalagem(1);
+                    }
+                    
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.seteBalanca(rst.getBoolean("ebalanca"));
-                    imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
@@ -314,29 +384,12 @@ public class AlterData_WShopDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_naturezareceita"));
 
-                    imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("icms_reduzido"));
-
-                    imp.setIcmsCstSaidaForaEstado(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_reduzido"));
-
-                    imp.setIcmsCstSaidaForaEstadoNF(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_reduzido"));
-
-                    imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("icms_reduzido"));
-
-                    imp.setIcmsCstEntradaForaEstado(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_reduzido"));
-
-                    imp.setIcmsCstConsumidor(Utils.stringToInt(rst.getString("icms_cst")));
-                    imp.setIcmsAliqConsumidor(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducaoConsumidor(rst.getDouble("icms_reduzido"));
+                    imp.setIcmsDebitoId(rst.getString("idcalculoicms"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("idcalculoicms"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("idcalculoicms"));
+                    imp.setIcmsConsumidorId(rst.getString("idcalculoicms"));
+                    imp.setIcmsCreditoId(rst.getString("idcalculoicms"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("idcalculoicms"));
 
                     result.add(imp);
                 }
@@ -345,42 +398,7 @@ public class AlterData_WShopDAO extends InterfaceDAO {
 
         return result;
     }
-
-    /*@Override
-    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        if (opt == OpcaoProduto.PRECO) {
-            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "with precovenda_alt as (\n"
-                        + "  select d.cdprincipal, max(e.dtreferencia) as precovenda_alt \n"
-                        + "    from wshop.detalhe d\n"
-                        + "   inner join wshop.estoque e on e.iddetalhe = d.iddetalhe\n"
-                        + "   where e.cdempresa in ('" + getLojaOrigem() + "')\n"
-                        + "     and e.qtvenda = 1\n"
-                        + "   group by d.cdprincipal\n"
-                        + ") \n"
-                        + "select d.cdprincipal, e.vlvenda, e.dtreferencia\n"
-                        + "  from wshop.detalhe d\n"
-                        + " inner join wshop.estoque e on e.iddetalhe = d.iddetalhe\n"
-                        + " inner join precovenda_alt alt on alt.cdprincipal = d.cdprincipal and alt.precovenda_alt = e.dtreferencia\n"
-                        + " where e.cdempresa in ('" + getLojaOrigem() + "')\n"
-                        + "   and e.qtvenda = 1"
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportSistema(getSistema());
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("cdprincipal"));
-                        imp.setPrecovenda(rst.getDouble("vlvenda"));
-                        result.add(imp);
-                    }
-                }
-                return result;
-            }
-        }
-        return null;
-    }*/
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();

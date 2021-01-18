@@ -39,9 +39,9 @@ public class HiperGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHostSQLServer.setText(params.getWithNull("192.168.1.100", NOME_SISTEMA, "HOST"));
-        txtBancoDadosSQLServer.setText(params.getWithNull("iCommerce", NOME_SISTEMA, "DATABASE"));
-        txtPortaSQLServer.setText(params.getWithNull("50009", NOME_SISTEMA, "PORTA"));
+        txtHostSQLServer.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
+        txtBancoDadosSQLServer.setText(params.getWithNull("HIPER", NOME_SISTEMA, "DATABASE"));
+        txtPortaSQLServer.setText(params.getWithNull("1343", NOME_SISTEMA, "PORTA"));
         txtUsuarioSQLServer.setText(params.getWithNull("sa", NOME_SISTEMA, "USUARIO"));
         txtSenhaSQLServer.setText(params.getWithNull("id-0601", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
@@ -200,7 +200,12 @@ public class HiperGUI extends VRInternalFrame {
                         }
 
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            List<OpcaoProduto> opcoes = new ArrayList<>();
+                            if (chkManterBalanca.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                                opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                            }
+                            importador.importarProduto(opcoes.toArray(new OpcaoProduto[0]));
                         }
 
                         {
