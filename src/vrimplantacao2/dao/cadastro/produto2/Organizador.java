@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -156,9 +155,7 @@ public class Organizador {
         List<ProdutoIMP> 
                 balanca = new ArrayList<>(),
                 outros = new ArrayList<>();
-        MultiMap<String, ProdutoIMP>
-                validos = new MultiMap<>(),
-                invalidos = new MultiMap<>();
+        MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
         
         for (ProdutoIMP imp: filtrados) {
             
@@ -182,11 +179,7 @@ public class Organizador {
             try {
                 plu = Long.parseLong(codigo);
             } catch (NumberFormatException ex) {
-                if (manterBalanca && vaiParaBalanca) {
-                    invalidos.put(imp, codigo);
-                } else {
-                    outros.add(imp);
-                }
+                outros.add(imp);
                 continue;
             }
             //</editor-fold>
@@ -214,11 +207,7 @@ public class Organizador {
             // 25 = OK
             
             if (plu < 1) {
-                if (vaiParaBalanca && manterBalanca) {
-                    invalidos.put(imp, codigo);
-                } else {
-                    outros.add(imp);
-                }
+                outros.add(imp);
                 continue;
             }
             //</editor-fold>
@@ -233,11 +222,7 @@ public class Organizador {
                     existentes.add(plu);
                     idsValidos.add(plu);
                 } else {
-                    if (manterBalanca) {
-                        invalidos.put(imp, codigo);
-                    } else {
-                        outros.add(imp);
-                    }
+                    outros.add(imp);
                 }
             } else {
                 outros.add(imp);
@@ -247,7 +232,6 @@ public class Organizador {
         }
         
         balanca.addAll(validos.getSortedMap().values());
-        balanca.addAll(invalidos.getSortedMap().values());
         
         //Remove os produtos de balança da listagem inicial
         filtrados.clear();
@@ -271,49 +255,6 @@ public class Organizador {
             result.put(produto, produto.getImportId(), produto.getEan());
         }
         return new ArrayList<>(result.values());
-    }
-
-    /**
-     * Pega o map de produtos e separa entre balança e normais.
-     * @param filtrados
-     * @param balanca
-     * @param normais
-     * @throws java.lang.Exception
-     */
-    public void separarBalancaNormaisManterEAN(List<ProdutoIMP> filtrados, MultiMap<String, ProdutoIMP> balanca, MultiMap<String, ProdutoIMP> normais, MultiMap<String, ProdutoIMP> manterEAN) throws Exception {
-        repository.setNotify("Produtos - Separando balança, eansMenores e normais...", 0);
-        boolean isManterEAN = repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
-                
-        for (ProdutoIMP produto : filtrados) {
-            long ean = Utils.stringToLong(produto.getEan(), -2);
-            String unidade = Utils.acertarTexto(produto.getTipoEmbalagem(), 2, "UN");
-            boolean isPLU = ean >= 1 && ean <= 999999;
-            //Verificar se é produto de balança
-            
-            //Verificar se é produto bazar hortfrut (EAN <= 999999)
-            //Verificar se é produto normal
-           
-            
-            
-            /*
-            
-            String[] chave = null;
-            if (produto.isBalanca() && (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA))) {
-                chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getDescricaoCompleta(), produto.getImportId(), produto.getEan()};
-            } else {
-                chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};                                
-            }
-            
-            long ean = Utils.stringToLong(produto.getEan());
-            String un = Utils.acertarTexto(produto.getTipoEmbalagem(), 2);
-            if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
-                balanca.put(produto, chave);
-            } else if (ean >= 1 && ean <= 999999 && (produto.isManterEAN() || isManterEAN)) {
-                manterEAN.put(produto, chave);
-            } else {
-                normais.put(produto, chave);
-            }*/
-        }
     }
     
 }

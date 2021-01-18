@@ -582,7 +582,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterIMP_MOCA() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA();
-        ProdutoVO actual = new ProdutoRepository(provider).converterIMP(imp, 12345, 7891000100103L, TipoEmbalagem.UN, false);
+        ProdutoVO actual = new ProdutoRepository(provider).converterIMP(imp, 12345, TipoEmbalagem.UN, false);
         
         assertEquals(17, actual.getCest().getCest1());
         assertEquals(20, actual.getCest().getCest2());
@@ -736,7 +736,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterIMP_ACEM() throws Exception {
         ProdutoIMP imp = getProdutoIMP_ACEM();
-        ProdutoVO actual = new ProdutoRepository(provider).converterIMP(imp, 18, 18, TipoEmbalagem.KG, true);
+        ProdutoVO actual = new ProdutoRepository(provider).converterIMP(imp, 18, TipoEmbalagem.KG, true);
         
         assertEquals(17, actual.getCest().getCest1());
         assertEquals(83, actual.getCest().getCest2());

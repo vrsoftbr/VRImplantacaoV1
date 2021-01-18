@@ -38,37 +38,19 @@ public class OrganizadorTest {
     public void testOrganizarListagem() throws Exception {
         System.out.print("OrganizadorTest.testOrganizarListagem()...");
         List<ProdutoIMP> imports = new ArrayList<>();
-
-        imports.add(newProduto("156", "178", "UN", true, false));
-        imports.add(newProduto("1", "000156", "KG", true, false));
-        imports.add(newProduto("A222", "3", "UN", true, false));
-        imports.add(newProduto("222", "AA443", "KG", true, false));
-        imports.add(newProduto("156", "0004", "UN", true, false));
-        imports.add(newProduto("356", "00004", "KG", true, false));
-        imports.add(newProduto("157", "2", "KG", false, false));
-        imports.add(newProduto("1345", "7891000100103", "KG", false, false));
-        imports.add(newProduto("1346", "1346", "UN", false, false));
-        imports.add(newProduto("156", "005", "UN", true, false));
-        imports.add(newProduto("1", "000156", "KG", false, false));
-        imports.add(newProduto("A222", "0000003", "UN", false, false));
-        imports.add(newProduto("222", "17891000100103", "KG", false, false));
-        imports.add(newProduto("157", "2", "KG", false, false));//
-        imports.add(newProduto("0000156", "0004", "UN", false, false));
-        imports.add(newProduto("356", "00004567892", "KG", false, false));
-        imports.add(newProduto("1345", "7891000100103", "KG", false, false));//
-        imports.add(newProduto("1346", "AAA1346", "UN", false, false));
-                
-        
         
         when(repository.getOpcoes()).thenReturn(new HashSet<>(Arrays.asList(
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA
         )));
         
+        imports.add(newProduto("1", "123", "UN", true, false));
+        
         List<ProdutoIMP> result = new Organizador(repository).organizarListagem(imports);
         
         assertTrue(imports.isEmpty());
-        assertEquals(15, result.size());
+        assertEquals(1, result.size());
+        assertEquals("123", result.get(0).getEan());
         
         for (ProdutoIMP imp: result) {
             System.out.println(String.format("ID: %s EAN: %s Bal:%s ManEAN: %s", 
@@ -126,8 +108,8 @@ public class OrganizadorTest {
 
         List<ProdutoIMP> balanca = new Organizador(repository).separarProdutosBalanca(imports, true);
 
-        assertEquals(8, balanca.size());
-        assertEquals(2, imports.size());//Produtos não retornados, são mantidos na lista original.
+        assertEquals(6, balanca.size());
+        assertEquals(4, imports.size());//Produtos não retornados, são mantidos na lista original.
         assertEquals("157", balanca.get(0).getImportId());//2
         assertEquals("A222", balanca.get(1).getImportId());//3
         assertEquals("156", balanca.get(2).getImportId());//0004
@@ -137,8 +119,6 @@ public class OrganizadorTest {
         assertEquals("1", balanca.get(4).getImportId());//000156
         assertEquals("156", balanca.get(5).getImportId());//000156
         assertEquals("178", balanca.get(5).getEan());//000156
-        assertEquals("356", balanca.get(6).getImportId());//00004
-        assertEquals("222", balanca.get(7).getImportId());//AA443
 
         System.out.println("OK");
     }
