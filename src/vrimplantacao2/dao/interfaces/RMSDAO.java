@@ -598,7 +598,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       p.git_cod_for = f.TIP_CODIGO\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
-                    (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "where p.GIT_DAT_SAI_LIN = 1\n") +
+                    (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : " ") +
+                    //(somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "where p.GIT_DAT_SAI_LIN = 1\n") +                            
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {
