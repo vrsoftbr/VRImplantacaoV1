@@ -152,47 +152,57 @@ public class HiperDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "p.id_produto, \n"
-                    + "e.codigo_barras,\n"
-                    + "e.sigla_unidade_logistica,\n"
-                    + "'1' as qtdembalagem,\n"
-                    + "p.nome as descricao, \n"
-                    + "p.situacao,\n"
-                    + "u.sigla as tipoembalagem,\n"
-                    + "p.id_hierarquia_produto as mercadologico,\n"
-                    + "cast(p.data_hora_cadastro as date) as datacadastro,\n"
-                    + "p.preco_custo,\n"
-                    + "p.preco_aquisicao,\n"
-                    + "p.preco_venda,\n"
-                    + "pis.codigo_situacao_tributaria_pis as cst_pis,\n"
-                    + "pis.nome as desc_pis,\n"
-                    + "cofins.codigo_situacao_tributaria_cofins as cst_cofins,\n"
-                    + "cofins.nome as desc_cofins,\n"
-                    + "nat.codigo_natureza_receita as naturezareceita,\n"
-                    + "nat2.codigo_natureza_receita as naturezareceita2,\n"
-                    + "p.id_ncm as ncm,\n"
-                    + "p.codigo_cest as cest,\n"
-                    + "p.dias_validade,\n"
-                    + "p.markup_varejo,\n"
-                    + "p.produto_integrado_balanca as balanca,\n"
-                    + "est.quantidade as estoque,\n"
-                    + "cst_icms.codigo_situacao_tributaria as cst_icms,\n"
-                    + "icm.aliquota_icms as aliq_icms,\n"
-                    + "icm.reducao_base_calculo as red_icms\n"
-                    + "from produto p\n"
-                    + "inner join unidade_medida u on u.id_unidade_medida = p.id_unidade_medida\n"
-                    + "left join produto_sinonimo e on e.id_produto = p.id_produto\n"
-                    + "left join hierarquia_produto m on m.id_hierarquia_produto = p.id_hierarquia_produto\n"
-                    + "left join situacao_tributaria_pis pis on pis.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis\n"
-                    + "left join situacao_tributaria_cofins cofins on cofins.id_situacao_tributaria_cofins = p.id_situacao_tributaria_cofins\n"
-                    + "left join saldo_estoque est on est.id_produto = p.id_produto\n"
-                    + "left join natureza_receita_pis_cofins nat on nat.id_natureza_receita_pis_cofins = p.id_natureza_receita_pis\n"
-                    + "left join natureza_receita_pis_cofins nat2 on nat2.id_natureza_receita_pis_cofins = p.id_natureza_receita_cofins\n"
-                    + "left join view_hiperpdv_produto_tributacao_icms icm on icm.id_produto = p.id_produto\n"
-                    + "left join situacao_tributaria_icms cst_icms on cst_icms.id_situacao_tributaria_icms = icm.id_situacao_tributaria_icms\n"
-                    + "	and icm.uf_de = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ") and icm.uf_para = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ")\n"
-                    + "order by id_produto"
+                    "select \n" +
+                    "    p.id_produto, \n" +
+                    "    e.codigo_barras,\n" +
+                    "    e.sigla_unidade_logistica,\n" +
+                    "    '1' as qtdembalagem,\n" +
+                    "    p.nome as descricao, \n" +
+                    "    p.situacao,\n" +
+                    "    u.sigla as tipoembalagem,\n" +
+                    "    p.id_hierarquia_produto as mercadologico,\n" +
+                    "    cast(p.data_hora_cadastro as date) as datacadastro,\n" +
+                    "    p.preco_custo,\n" +
+                    "    p.preco_aquisicao,\n" +
+                    "    p.preco_venda,\n" +
+                    "    pis.codigo_situacao_tributaria_pis as cst_pis,\n" +
+                    "    pis.nome as desc_pis,\n" +
+                    "	 pis_e.codigo_situacao_tributaria_pis cst_pis_e,\n" +
+                    "	 pis_e.nome as desc_pis_e,\n" +
+                    "    cofins.codigo_situacao_tributaria_cofins as cst_cofins,\n" +
+                    "    cofins.nome as desc_cofins,\n" +
+                    "	 cofins_e.codigo_situacao_tributaria_cofins cst_cofins_e,\n" +
+                    "	 cofins_e.nome as desc_cofins_e,\n" +
+                    "    nat.codigo_natureza_receita as naturezareceita,\n" +
+                    "    nat2.codigo_natureza_receita as naturezareceita2,\n" +
+                    "    p.id_ncm as ncm,\n" +
+                    "    p.codigo_cest as cest,\n" +
+                    "    p.dias_validade,\n" +
+                    "    p.markup_varejo,\n" +
+                    "    p.produto_integrado_balanca as balanca,\n" +
+                    "    est.quantidade as estoque,\n" +
+                    "    cst_icms.codigo_situacao_tributaria as cst_icms,\n" +
+                    "    coalesce(icm.aliquota_icms, 0) as aliq_icms,\n" +
+                    "    coalesce(icm.reducao_base_calculo, 0) as red_icms,\n" +
+                    "    substring(rt.nome, 0, 3) cst_regra\n" +        
+                    "from produto p\n" +
+                    "    inner join unidade_medida u on u.id_unidade_medida = p.id_unidade_medida\n" +
+                    "    left join produto_sinonimo e on e.id_produto = p.id_produto\n" +
+                    "    left join hierarquia_produto m on m.id_hierarquia_produto = p.id_hierarquia_produto\n" +
+                    "    left join situacao_tributaria_pis pis on pis.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis\n" +
+                    "    left join situacao_tributaria_cofins cofins on cofins.id_situacao_tributaria_cofins = p.id_situacao_tributaria_cofins\n" +
+                    "	left join situacao_tributaria_pis pis_e on pis_e.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis_entrada\n" +
+                    "    left join situacao_tributaria_cofins cofins_e on cofins_e.id_situacao_tributaria_cofins = p.id_situacao_tributaria_cofins_entrada\n" +
+                    "    left join saldo_estoque est on est.id_produto = p.id_produto\n" +
+                    "    left join natureza_receita_pis_cofins nat on nat.id_natureza_receita_pis_cofins = p.id_natureza_receita_pis\n" +
+                    "    left join natureza_receita_pis_cofins nat2 on nat2.id_natureza_receita_pis_cofins = p.id_natureza_receita_cofins\n" +
+                    "    left join view_hiperpdv_produto_tributacao_icms icm on icm.id_produto = p.id_produto\n" +
+                    "    left join situacao_tributaria_icms cst_icms on cst_icms.id_situacao_tributaria_icms = icm.id_situacao_tributaria_icms\n" +
+                    "    	and icm.uf_de = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ") and \n" +
+                    "		icm.uf_para = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ")\n" +
+                    "left join regra_tributacao_produto rp on p.id_produto = rp.id_produto\n" +
+                    "left join regra_tributacao rt on rp.id_regra_tributacao = rt.id_regra_tributacao\n" +       
+                    "order by id_produto"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -241,14 +251,46 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
-                    imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                    imp.setPiscofinsCstCredito(rst.getString("cst_cofins_e"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    
+                    //Debito
                     imp.setIcmsCstSaida(rst.getInt("cst_icms"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliq_icms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("red_icms"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_icms"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("aliq_icms"));
+                    
+                    String cst = rst.getString("cst_icms");
+                    
+                    if(cst == null || cst.isEmpty()) {
+                        imp.setIcmsCstSaida(rst.getInt("cst_regra"));
+                    }
+                    
+                    if(imp.getIcmsAliqSaida() == 0 && imp.getIcmsReducaoSaida() == 0 && imp.getIcmsCstSaida() == 0) {
+                        imp.setIcmsAliqSaida(17);
+                    }
+                    
+                    //Credito
+                    imp.setIcmsCstEntrada(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqEntrada(imp.getIcmsAliqSaida());
                     imp.setIcmsReducaoEntrada(rst.getDouble("red_icms"));
+                    
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("red_icms"));
+                    
+                    //Consumidor
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstEntrada());
+                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("red_icms"));
+                    
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("red_icms"));
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("red_icms"));
+                    
                     result.add(imp);
                 }
             }
