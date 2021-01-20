@@ -883,8 +883,8 @@ public class ParametroGUI extends VRInternalFrame {
                 txtNomeDriverODBC.setEnabled(false);
         }
         txtNomeDriverODBC.setText(parametros.getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC"));
-        chkNfeSaidaProcessarFinalizacoes.setSelected(parametros.getBool(true, "IMPORT_NFE", "PROCESSAR_FINALIZACOES"));
-        chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(true, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
+        chkNfeSaidaProcessarFinalizacoes.setSelected(parametros.getBool(false, "IMPORT_NFE", "PROCESSAR_FINALIZACOES"));
+        chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(false, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
         
         LOG.fine("Parametros carregados na tela");
     }
