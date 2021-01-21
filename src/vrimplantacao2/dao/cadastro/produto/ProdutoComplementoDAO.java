@@ -52,82 +52,6 @@ public class ProdutoComplementoDAO {
         }
     }
 
-    public void salvar(Collection<ProdutoComplementoVO> values, boolean unificacao) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoComplementoVO vo : values) {
-                if (!getComplementos().containsKey(vo.getIdLoja(), vo.getProduto().getId())) {
-                    SQLBuilder sql = new SQLBuilder();
-                    sql.setTableName("produtocomplemento");
-                    sql.put("id_produto", vo.getProduto().getId());
-                    sql.put("prateleira", "");
-                    sql.put("secao", "");
-                    sql.put("estoqueminimo", vo.getEstoqueMinimo());
-                    sql.put("estoquemaximo", vo.getEstoqueMaximo());
-                    sql.put("valoripi", 0);
-                    sql.putNull("dataultimopreco");
-                    sql.putNull("dataultimaentrada");
-                    sql.put("dataprimeiraalteracao", vo.getDataPrimeiraAlteracao());
-                    sql.put("custosemimposto", vo.getCustoSemImposto());
-                    sql.put("custocomimposto", vo.getCustoComImposto());
-                    sql.put("custosemimpostoanterior", 0);
-                    sql.put("custocomimpostoanterior", 0);
-                    sql.put("precovenda", vo.getPrecoVenda());
-                    sql.put("precovendaanterior", 0);
-                    sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
-                    
-                    if (Versao.maiorQue(3, 21)) {
-                        sql.put("margemminima", vo.getMargemMinima());
-                        sql.put("margemmaxima", vo.getMargemMaxima());
-                        sql.put("margem", vo.getMargem());
-                    }
-                    
-                    if (unificacao) {
-                        sql.put("estoque", 0);
-                    } else {
-                        sql.put("estoque", vo.getEstoque());
-                    }
-                    sql.put("troca", vo.getTroca());
-                    sql.put("emiteetiqueta", vo.isEmiteEtiqueta());
-                    sql.put("custosemperdasemimposto", 0);
-                    sql.put("custosemperdasemimpostoanterior", 0);
-                    sql.put("customediocomimposto", 0);
-                    sql.put("customediosemimposto", 0);
-                    sql.put("id_aliquotacredito", vo.getIdAliquotaCredito());
-                    sql.putNull("dataultimavenda");
-                    sql.put("teclaassociada", 0);
-                    sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
-                    sql.put("id_loja", vo.getIdLoja());
-                    sql.put("descontinuado", false);
-                    sql.put("quantidadeultimaentrada", 0);
-                    sql.put("centralizado", false);
-                    sql.put("operacional", 0);
-                    sql.put("valoricmssubstituicao", 0);
-                    sql.putNull("dataultimaentradaanterior");
-                    sql.put("cestabasica", 0);
-                    sql.put("customediocomimpostoanterior", 0);
-                    sql.put("customediosemimpostoanterior", 0);
-                    sql.put("id_tipopiscofinscredito", vo.getProduto().getPisCofinsCredito().getId());
-                    sql.put("valoroutrassubstituicao", 0);
-                    if (Versao.maiorQue(3, 17, 9)) {
-                        sql.put("id_tipoproduto", vo.getTipoProduto().getId());
-                        sql.put("fabricacaopropria", vo.isFabricacaoPropria());
-                    }
-                    sql.put("id_normareposicao", vo.getNormaReposicao().getId());
-                    sql.getReturning().add("id");
-
-                    try (ResultSet rst = stm.executeQuery(
-                            sql.getInsert()
-                    )) {
-                        if (rst.next()) {
-                            vo.setId(rst.getInt("id"));
-                        }
-                    }
-                    getComplementos().put(vo.getId(), vo.getIdLoja(), vo.getProduto().getId());
-                }
-            }
-        }
-    }
-
     public void salvar(ProdutoComplementoVO vo, boolean unificacao) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             if (!getComplementos().containsKey(vo.getIdLoja(), vo.getProduto().getId())) {
@@ -165,8 +89,8 @@ public class ProdutoComplementoDAO {
                 sql.put("emiteetiqueta", vo.isEmiteEtiqueta());
                 sql.put("custosemperdasemimposto", 0);
                 sql.put("custosemperdasemimpostoanterior", 0);
-                sql.put("customediocomimposto", 0);
-                sql.put("customediosemimposto", 0);
+                sql.put("customediocomimposto", vo.getCustoMedioComImposto());
+                sql.put("customediosemimposto", vo.getCustoMedioSemImposto());
                 sql.put("id_aliquotacredito", vo.getIdAliquotaCredito());
                 sql.putNull("dataultimavenda");
                 sql.put("teclaassociada", vo.getTeclaassociada());
@@ -306,20 +230,24 @@ public class ProdutoComplementoDAO {
             if (opt.contains(OpcaoProduto.CUSTO) && atualizarCusto) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
-                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
-                sql.put("customediocomimposto", complemento.getCustoMedio());
-                sql.put("customediosemimposto", complemento.getCustoMedio());
+                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
+                sql.put("customediocomimposto", complemento.getCustoMedioComImposto());
+                sql.put("customediosemimposto", complemento.getCustoMedioSemImposto());
                 
                 gerarLogCusto(complemento);
             }
             if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO) && atualizarCusto) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
+                sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
+                sql.put("customediocomimposto", complemento.getCustoMedioComImposto());
                 
                 gerarLogCusto(complemento);
             }
             if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO) && atualizarCusto) {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
+                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
+                sql.put("customediosemimposto", complemento.getCustoMedioSemImposto());
                 
                 gerarLogCusto(complemento);
             }

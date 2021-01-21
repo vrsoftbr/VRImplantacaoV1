@@ -78,7 +78,8 @@ public class ProdutoComplementoVO {
     private double custoComImposto = 0;
     private double custoAnteriorSemImposto = 0;
     private double custoAnteriorComImposto = 0;
-    private double custoMedio = 0;
+    private double custoMedioComImposto = 0;
+    private double custoMedioSemImposto = 0;
     private double precoVenda = 0;
     private double precoDiaSeguinte = 0;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
@@ -307,12 +308,20 @@ public class ProdutoComplementoVO {
         this.tipoAtacado = tipoAtacado;
     }
 
-    public double getCustoMedio() {
-        return custoMedio;
+    public double getCustoMedioComImposto() {
+        return custoMedioComImposto;
     }
 
-    public void setCustoMedio(double custoMedio) {
-        this.custoMedio = custoMedio;
+    public void setCustoMedioComImposto(double custoMedioComImposto) {
+        this.custoMedioComImposto = custoMedioComImposto;
+    }
+    
+    public double getCustoMedioSemImposto() {
+        return custoMedioSemImposto;
+    }
+
+    public void setCustoMedioSemImposto(double custoMedioSemImposto) {
+        this.custoMedioSemImposto = custoMedioSemImposto;
     }
     
 }

@@ -375,7 +375,8 @@ public class JMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setCustoMedio(rs.getDouble("customedio"));
+                    imp.setCustoMedioComImposto(rs.getDouble("customedio"));
+                    imp.setCustoMedioSemImposto(rs.getDouble("customedio"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setTeclaAssociada(rs.getInt("teclassociada"));
                     try {

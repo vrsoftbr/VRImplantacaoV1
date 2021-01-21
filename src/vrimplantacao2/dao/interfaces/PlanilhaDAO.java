@@ -296,7 +296,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setCustoAnteriorComImposto(linha.getDouble("custocomimpostoanterior"));
                 produto.setCustoSemImposto(linha.getDouble("custosemimposto"));
                 produto.setCustoAnteriorSemImposto(linha.getDouble("custosemimpostoanterior"));
-                produto.setCustoSemImposto(linha.getDouble("customedio"));
+                produto.setCustoMedioComImposto(linha.getDouble("customediocomimposto"));
+                produto.setCustoMedioSemImposto(linha.getDouble("customediosemimposto"));
                 produto.setPrecovenda(linha.getDouble("precovenda"));
                 produto.setVendaPdv(linha.getBoolean("vendapdv"));
                 produto.setEmiteEtiqueta(linha.getBoolean("emiteetiqueta"));

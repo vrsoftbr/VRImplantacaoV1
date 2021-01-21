@@ -609,7 +609,8 @@ public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoMedio(rst.getDouble("customedio"));
+                    imp.setCustoMedioComImposto(rst.getDouble("customedio"));
+                    imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
                     imp.setNcm(rst.getString("ncm"));

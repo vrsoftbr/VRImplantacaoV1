@@ -440,7 +440,8 @@ public class TpaRootacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setCustoMedio(rs.getDouble("customedio"));
+                    imp.setCustoMedioComImposto(rs.getDouble("customedio"));
+                    imp.setCustoMedioSemImposto(rs.getDouble("customedio"));
                     imp.setSituacaoCadastro("S".equals(rs.getString("ativo")) ? 1 : 0);
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));

@@ -213,7 +213,8 @@ public class AtmaFirebirdDAO extends InterfaceDAO implements MapaTributoProvider
                 imp.setMargem(rs.getDouble("margem"));
                 imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                 imp.setCustoSemImposto(rs.getDouble("custocomimposto"));
-                imp.setCustoMedio(rs.getDouble("CUSTOMEDIO"));
+                imp.setCustoMedioComImposto(rs.getDouble("CUSTOMEDIO"));
+                imp.setCustoMedioSemImposto(rs.getDouble("CUSTOMEDIO"));
                 imp.setCustoAnteriorComImposto(rs.getDouble("CUSTOCOMIMPOSTOanterior"));
                 imp.setCustoAnteriorSemImposto(rs.getDouble("CUSTOCOMIMPOSTOanterior"));
                 imp.setPrecovenda(rs.getDouble("precovenda"));

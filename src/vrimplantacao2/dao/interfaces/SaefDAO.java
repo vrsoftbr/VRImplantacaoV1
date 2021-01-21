@@ -254,7 +254,8 @@ public class SaefDAO extends InterfaceDAO {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                    imp.setCustoMedio(rs.getDouble("custoMedio"));
+                    imp.setCustoMedioComImposto(rs.getDouble("custoMedio"));
+                    imp.setCustoMedioSemImposto(rs.getDouble("custoMedio"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
 
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
