@@ -931,6 +931,7 @@
                               </Group>
                               <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNUtilizaPlanoConta" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkAtualizaLimite" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="272" max="32767" attributes="0"/>
                       </Group>
@@ -950,9 +951,11 @@
                                   <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkNUtilizaPlanoConta" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkAtualizaLimite" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="vRPanel1" pref="307" max="32767" attributes="0"/>
+                              <Component id="vRPanel1" pref="311" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -1035,6 +1038,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNUtilizaPlanoConta">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="N&#xe3;o Utiliza Plano de Conta Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtualizaLimite">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atualiza Limite Cliente"/>
                   </Properties>
                 </Component>
               </SubComponents>
