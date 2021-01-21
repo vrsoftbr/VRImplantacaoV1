@@ -301,13 +301,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setPrecovenda(linha.getDouble("precovenda"));
                 produto.setVendaPdv(linha.getBoolean("vendapdv"));
                 produto.setEmiteEtiqueta(linha.getBoolean("emiteetiqueta"));
-                switch (Utils.acertarTexto(linha.getString("ativo"))) {
-                    case "N":
-                        produto.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
-                        break;
-                    default:
-                        produto.setSituacaoCadastro(SituacaoCadastro.ATIVO);
-                }
+                produto.setSituacaoCadastro(!linha.getBoolean("ativo") ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                produto.setDescontinuado(linha.getBoolean("descontinuado"));
                 produto.setNcm(linha.getString("ncm"));
                 produto.setCest(linha.getString("cest"));
                 produto.setPiscofinsCstCredito(linha.getString("piscofins_cst_credito"));
@@ -390,7 +385,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
                 produto.setBeneficio("cbeneficio");
                 produto.setCodigoGIA("cbeneficio");
-                
+                produto.setSugestaoCotacao(linha.getBoolean("sugestaocotacao"));
+                produto.setSugestaoPedido(linha.getBoolean("sugestaopedido"));
 
                 //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
