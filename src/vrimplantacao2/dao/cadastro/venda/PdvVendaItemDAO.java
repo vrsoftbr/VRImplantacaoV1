@@ -72,6 +72,13 @@ public class PdvVendaItemDAO {
             sql.put("aplicaDescontoPromocao", item.isAplicaDescontoPromocao());
             sql.put("id_tipoOferta", item.getId_tipoOferta(), -1);
             sql.put("atacado", item.isAtacado());
+            
+            if (Versao.maiorQue(3, 21, 10)) {
+                if (item.getData() != null) {
+                    sql.put("data", item.getData());
+                }
+            }
+            
             sql.getReturning().add("id");
             
             String strSQL = sql.getInsert();
