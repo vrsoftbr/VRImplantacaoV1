@@ -6,12 +6,12 @@ import java.util.Map;
 import javax.swing.UIManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vr.core.collection.Properties;
 import vrframework.classe.Conexao;
-import vrframework.classe.Properties;
 import vrframework.classe.SplashScreen;
 import vrframework.classe.Util;
 import vrimplantacao.classe.Global;
-import vrimplantacao.dao.PropertiesDAO;
+import vrimplantacao.gui.ConfiguracaoGUI;
 import vrimplantacao.gui.LoginGUI;
 import vrimplantacao2.parametro.Parametros;
 
@@ -63,14 +63,23 @@ public class App {
     
     private static void inicializarSistema() {
         try {
-            new PropertiesDAO().verficarConfiguracao();
 
             SplashScreen.show();
             SplashScreen.setSobre("VR Implantação", Global.VERSAO, Global.DATA);
             SplashScreen.setStatus("Inicializando sistema...");
 
-
-            Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
+            Properties oProperties = Properties.getVrImplantacaoProperties();
+            if (oProperties == null) {
+                ConfiguracaoGUI gui = new ConfiguracaoGUI();
+                gui.setModal(true);
+                gui.setVisible(true);
+                oProperties = Properties.getVrImplantacaoProperties();
+                if (oProperties == null) {
+                    System.exit(0);
+                }
+            }
+            oProperties.carregar();
+            
             Global.idLoja = oProperties.getInt("system.numeroloja");
             
             SplashScreen.setStatus("Abrindo conexão...");
@@ -88,12 +97,12 @@ public class App {
     }
 
     private static void abrirConexao(Properties oProperties) throws Exception {
-        String ipBanco = oProperties.getString("database.ip");
-        String ipSecBanco = oProperties.getString("database.ipsec");
+        String ipBanco = oProperties.get("database.ip");
+        String ipSecBanco = oProperties.get("database.ipsec");
         int portaBanco = oProperties.getInt("database.porta");
-        String nomeBanco = oProperties.getString("database.nome");
-        String usuarioBanco = oProperties.getString("database.usuario").isEmpty() ? "postgres" : oProperties.getString("database.usuario");
-        String senhaBanco = oProperties.getString("database.senha").isEmpty() ? "postgres" : oProperties.getString("database.senha");
+        String nomeBanco = oProperties.get("database.nome");
+        String usuarioBanco = oProperties.get("database.usuario") == null ? "postgres" : oProperties.get("database.usuario");
+        String senhaBanco = oProperties.get("database.senha") == null ? "postgres" : oProperties.get("database.senha");
         
         Conexao.abrirConexao(ipBanco, ipSecBanco, portaBanco, nomeBanco, usuarioBanco, senhaBanco);
     }
@@ -101,14 +110,13 @@ public class App {
     private static void callLogin(Properties oProperties) throws Exception {
         LoginGUI form = new LoginGUI();
         
-        if (!oProperties.getString("system.usuario").isEmpty()) {
-            form.setUsuario(oProperties.getString("system.usuario").toUpperCase());
+        if (!oProperties.get("system.usuario","").isEmpty()) {
+            form.setUsuario(oProperties.get("system.usuario").toUpperCase());
         }
         
-        if (!oProperties.getString("system.senha").isEmpty()) {
-            form.setSenha(oProperties.getString("system.senha").toUpperCase());
-        }
-        
+        if (!oProperties.get("system.senha","").isEmpty()) {
+            form.setSenha(oProperties.get("system.senha").toUpperCase());
+        }        
         
         form.setVisible(true);
     }
