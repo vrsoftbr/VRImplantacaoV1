@@ -33,6 +33,7 @@ public class AlterData_WShopGUI extends VRInternalFrame {
         conexao.carregarParametros();
         Parametros params = Parametros.get();
         txtComplemento.setText(params.get(SISTEMA, "COMPL"));
+        chkSomenteBalanca.setSelected(params.getBool(SISTEMA, "SOMENTE_BALANCA"));
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
     }
@@ -40,6 +41,7 @@ public class AlterData_WShopGUI extends VRInternalFrame {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtComplemento.getText(), SISTEMA, "COMPL");
+        params.put(chkSomenteBalanca.isSelected(), SISTEMA, "SOMENTE_BALANCA");
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
@@ -99,6 +101,7 @@ public class AlterData_WShopGUI extends VRInternalFrame {
             }
         });
         tabProduto.setOpcoesDisponiveis(dao);
+        tabProduto.tabParametros.add(pnlCustom);
 
         carregarParametros();
         
@@ -152,7 +155,7 @@ public class AlterData_WShopGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     
                     if (tab.getSelectedIndex() == 0) {
-                        
+                        dao.somenteBalanca = chkSomenteBalanca.isSelected();
                         tabProduto.setImportador(importador);
                         tabProduto.executarImportacao();
                         
@@ -229,6 +232,8 @@ public class AlterData_WShopGUI extends VRInternalFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
+        pnlCustom = new javax.swing.JPanel();
+        chkSomenteBalanca = new vrframework.bean.checkBox.VRCheckBox();
         vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -258,6 +263,31 @@ public class AlterData_WShopGUI extends VRInternalFrame {
         cmbLojaOrigem = new javax.swing.JComboBox();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         vRLabel2 = new vrframework.bean.label.VRLabel();
+
+        chkSomenteBalanca.setText("Somente produtos de balança");
+        chkSomenteBalanca.setEnabled(true);
+        chkSomenteBalanca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSomenteBalancaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlCustomLayout = new javax.swing.GroupLayout(pnlCustom);
+        pnlCustom.setLayout(pnlCustomLayout);
+        pnlCustomLayout.setHorizontalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkSomenteBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlCustomLayout.setVerticalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkSomenteBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         setTitle("Sysmo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
@@ -554,6 +584,10 @@ public class AlterData_WShopGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
+    private void chkSomenteBalancaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSomenteBalancaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkSomenteBalancaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
@@ -568,9 +602,11 @@ public class AlterData_WShopGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkSomenteBalanca;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
+    private javax.swing.JPanel pnlCustom;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
