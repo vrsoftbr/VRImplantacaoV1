@@ -44,8 +44,7 @@ public class OrganizadorTest {
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA
         )));
         
-        imports.add(newProduto("1", "123", "UN", true, false));
-        
+        imports.add(newProduto("1", "123", "UN", true, false));        
         List<ProdutoIMP> result = new Organizador(repository).organizarListagem(imports);
         
         assertTrue(imports.isEmpty());
