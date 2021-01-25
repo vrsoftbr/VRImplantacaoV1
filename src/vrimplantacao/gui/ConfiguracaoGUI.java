@@ -1,8 +1,8 @@
 package vrimplantacao.gui;
 
+import vr.core.collection.Properties;
 import vrframework.bean.dialog.VRDialog;
 import vrframework.classe.Conexao;
-import vrframework.classe.Properties;
 import vrframework.classe.Util;
 import vrframework.remote.Arquivo;
 
@@ -15,9 +15,9 @@ public class ConfiguracaoGUI extends VRDialog {
 
         centralizarForm();
 
-        txtPortaBanco.setInt(5432);
+        txtPortaBanco.setInt(8745);
         txtUsuarioBanco.setText("postgres");
-        txtSenhaBanco.setText("postgres");
+        txtSenhaBanco.setText("VrPost@Server");
 
         setIconImage(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/icone/master.png")).getImage());
     }
@@ -31,24 +31,25 @@ public class ConfiguracaoGUI extends VRDialog {
         //cria arquivo properties
         Arquivo.mkdir(Util.getRoot() + "vr/");
 
-        Arquivo file = new Arquivo(Util.getRoot() + "vr/vr.properties", "w");
+        Arquivo file = new Arquivo(Util.getRoot() + "vr/implantacao/vrimplantacao.properties", "w");
         file.close();
 
         //configura arquivo
-        Properties oProperties = new Properties(Util.getRoot() + "vr/vr.properties");
-        oProperties.setPropertie("database.ip", txtIpBanco.getText());
-        oProperties.setPropertie("database.porta", txtPortaBanco.getInt());
-        oProperties.setPropertie("database.nome", txtNomeBanco.getText().toLowerCase());
+        Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
+        oProperties.set("database.ip", txtIpBanco.getText());
+        oProperties.set("database.porta", txtPortaBanco.getInt());
+        oProperties.set("database.nome", txtNomeBanco.getText());
 
         if (!txtUsuarioBanco.getText().isEmpty()) {
-            oProperties.setPropertie("database.usuario", txtUsuarioBanco.getText().toLowerCase());
+            oProperties.set("database.usuario", txtUsuarioBanco.getText().toLowerCase());
         }
 
-        if (!txtSenhaBanco.getText().isEmpty()) {
-            oProperties.setPropertie("database.senha", txtSenhaBanco.getText().toLowerCase());
+        if (!new String(txtSenhaBanco.getPassword()).isEmpty()) {
+            oProperties.set("database.senha", new String(txtSenhaBanco.getPassword()));
         }
 
-        oProperties.setPropertie("system.numeroloja", txtNumeroLoja.getInt());
+        oProperties.set("system.numeroloja", txtNumeroLoja.getInt());
+        oProperties.salvar();
 
         this.setCancel(false);
 
@@ -87,9 +88,9 @@ public class ConfiguracaoGUI extends VRDialog {
         vRLabel6 = new vrframework.bean.label.VRLabel();
         txtPortaBanco = new vrframework.bean.textField.VRTextField();
         vRLabel7 = new vrframework.bean.label.VRLabel();
-        txtSenhaBanco = new vrframework.bean.passwordField.VRPasswordField();
-        txtNumeroLoja = new vrframework.bean.textField.VRTextField();
+        txtSenhaBanco = new javax.swing.JPasswordField();
         vRLabel8 = new vrframework.bean.label.VRLabel();
+        txtNumeroLoja = new vrframework.bean.textField.VRTextField();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnSalvar = new vrframework.bean.button.VRButton();
         btnSair = new vrframework.bean.button.VRButton();
@@ -105,7 +106,6 @@ public class ConfiguracaoGUI extends VRDialog {
         txtIpBanco.setCaixaAlta(false);
         txtIpBanco.setObrigatorio(true);
 
-        txtNomeBanco.setColumns(10);
         txtNomeBanco.setCaixaAlta(false);
         txtNomeBanco.setObrigatorio(true);
 
@@ -125,14 +125,11 @@ public class ConfiguracaoGUI extends VRDialog {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Senha");
 
-        txtSenhaBanco.setColumns(10);
-        txtSenhaBanco.setCaixaAlta(false);
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel8, "Loja");
 
         txtNumeroLoja.setColumns(2);
         txtNumeroLoja.setCaixaAlta(false);
         txtNumeroLoja.setMascara("Numero");
-
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel8, "Loja");
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
@@ -149,8 +146,8 @@ public class ConfiguracaoGUI extends VRDialog {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtSenhaBanco, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
-                    .addComponent(txtNomeBanco, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtNomeBanco, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                    .addComponent(txtSenhaBanco))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -187,11 +184,12 @@ public class ConfiguracaoGUI extends VRDialog {
                             .addGroup(vRPanel1Layout.createSequentialGroup()
                                 .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtUsuarioBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtUsuarioBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtSenhaBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(vRPanel1Layout.createSequentialGroup()
                                 .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSenhaBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGap(24, 24, 24)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -283,7 +281,7 @@ public class ConfiguracaoGUI extends VRDialog {
     private vrframework.bean.textField.VRTextField txtNomeBanco;
     private vrframework.bean.textField.VRTextField txtNumeroLoja;
     private vrframework.bean.textField.VRTextField txtPortaBanco;
-    private vrframework.bean.passwordField.VRPasswordField txtSenhaBanco;
+    private javax.swing.JPasswordField txtSenhaBanco;
     private vrframework.bean.textField.VRTextField txtUsuarioBanco;
     private vrframework.bean.label.VRLabel vRLabel3;
     private vrframework.bean.label.VRLabel vRLabel4;

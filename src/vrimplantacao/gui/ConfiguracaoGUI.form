@@ -68,8 +68,8 @@
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="vRLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtSenhaBanco" alignment="0" pref="113" max="32767" attributes="0"/>
-                      <Component id="txtNomeBanco" alignment="0" max="32767" attributes="0"/>
+                      <Component id="txtNomeBanco" alignment="0" pref="113" max="32767" attributes="0"/>
+                      <Component id="txtSenhaBanco" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -114,12 +114,14 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtUsuarioBanco" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="txtUsuarioBanco" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtSenhaBanco" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Group type="102" alignment="1" attributes="0">
                                   <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtSenhaBanco" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -144,7 +146,6 @@
         </Component>
         <Component class="vrframework.bean.textField.VRTextField" name="txtNomeBanco">
           <Properties>
-            <Property name="columns" type="int" value="10"/>
             <Property name="caixaAlta" type="boolean" value="false"/>
             <Property name="obrigatorio" type="boolean" value="true"/>
           </Properties>
@@ -183,10 +184,11 @@
             <Property name="text" type="java.lang.String" value="Senha"/>
           </Properties>
         </Component>
-        <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenhaBanco">
+        <Component class="javax.swing.JPasswordField" name="txtSenhaBanco">
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
           <Properties>
-            <Property name="columns" type="int" value="10"/>
-            <Property name="caixaAlta" type="boolean" value="false"/>
+            <Property name="text" type="java.lang.String" value="Loja"/>
           </Properties>
         </Component>
         <Component class="vrframework.bean.textField.VRTextField" name="txtNumeroLoja">
@@ -194,11 +196,6 @@
             <Property name="columns" type="int" value="2"/>
             <Property name="caixaAlta" type="boolean" value="false"/>
             <Property name="mascara" type="java.lang.String" value="Numero"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Loja"/>
           </Properties>
         </Component>
       </SubComponents>

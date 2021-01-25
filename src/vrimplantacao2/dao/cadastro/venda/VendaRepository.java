@@ -197,6 +197,7 @@ public class VendaRepository {
 
                             item.setVenda(venda);
                             item.setSequencia(cont);
+                            item.setData(impVenda.getData());
                             cont++;
                             venda.getItens().add(item);
 

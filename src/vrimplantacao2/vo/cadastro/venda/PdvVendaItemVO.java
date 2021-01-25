@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.cadastro.venda;
 
+import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.TipoCancelamento;
@@ -43,6 +44,7 @@ public class PdvVendaItemVO {
     private boolean aplicaDescontoPromocao = false;// boolean,
     private int id_tipoOferta = -1;// integer,
     private boolean atacado = false;// boolean,
+    private Date data;
 
     public void setId(long id) {
         this.id = id;
@@ -296,4 +298,13 @@ public class PdvVendaItemVO {
     public boolean isAtacado() {
         return atacado;
     }
+
+    public Date getData() {
+        return data;
+    }
+
+    public void setData(Date data) {
+        this.data = data;
+    }
+    
 }

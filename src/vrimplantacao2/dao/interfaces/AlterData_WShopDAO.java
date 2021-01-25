@@ -41,6 +41,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
     private static final Logger LOG = Logger.getLogger(AlterData_WShopDAO.class.getName());
     
     private String complemento = "";
+    public boolean somenteBalanca = false;
 
     public void setComplemento(String complemento) {
         if (complemento == null) {
@@ -92,6 +93,12 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA
                 }
@@ -225,18 +232,34 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
         
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	icms.idcalculoicms id,\n" +
+                    "with icms_usados as (\n" +
+                    "	select distinct p.idcalculoicms from wshop.produto p where not nullif(trim(idcalculoicms), '') is null\n" +
+                    ")\n" +
+                    "select distinct\n" +
+                    "	icms.idcalculoicms||'-'||icms.stexp id,\n" +
+                    "	i.dscalculoicms,\n" +
+                    "	icms.idcfop,\n" +
                     "	icms.cdsituacaotributaria cst,\n" +
                     "	icms.alicms aliq,\n" +
                     "	icms.alreducaobaseicms reducao\n" +
                     "from\n" +
                     "	wshop.icms_uf icms\n" +
                     "	join wshop.empshop emp on \n" +
-                    "		emp.cdempresa = '001' and\n" +
+                    "		emp.cdempresa = '" + getLojaOrigem() + "' and\n" +
                     "		iduf = emp.cduf and\n" +
-                    "		idufdestino = emp.cduf and\n" +
-                    "		stvendaconsumidorfinal\n" +
+                    "		idufdestino = emp.cduf\n" +
+                    "	join wshop.icms i on\n" +
+                    "		icms.idcalculoicms = i.idcalculoicms\n" +
+                    "where\n" +
+                    "	icms.idcalculoicms in (select idcalculoicms from icms_usados) and\n" +
+                    "	icms.idcfop in (\n" +
+                    "		'5101',\n" +
+                    "		'5102',\n" +
+                    "		'5401',\n" +
+                    "		'5403',\n" +
+                    "		'5405',\n" +
+                    "		'1253'\n" +
+                    "	)\n" +
                     "order by\n" +
                     "	cst,\n" +
                     "	aliq,\n" +
@@ -246,7 +269,8 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     result.add(new MapaTributoIMP(
                         rs.getString("id"),
                         String.format(
-                                "Cst: %s - Aliq: %.2f - Red: %.2f",
+                                "%s - cst: %s - al: %.2f - rd: %.2f",
+                                rs.getString("dscalculoicms"),
                                 rs.getString("cst"),
                                 rs.getDouble("aliq"),
                                 rs.getDouble("reducao")
@@ -284,7 +308,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	dt.iddetalhe,\n"
                     + "	dt.pesoliquido,\n"
                     + "	dt.pesobruto,\n"
-                    + "	est.qtestoque estoque,\n"
+                    //+ "	est.qtestoque estoque,\n"
                     + "	dt.allucro margem,\n"
                     + "	dt.vlprecocusto custocomimposto,\n"
                     + "	dt.vlprecovenda precovenda,\n"
@@ -294,13 +318,15 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "	dt.cdsittribpisentrada piscofins_entrada,\n"
                     + "	dt.cdsittribpis piscofins_saida,\n"
                     + "	dt.cdnaturezareceita piscofins_naturezareceita,	\n"
-                    + "	p.idcalculoicms\n"
+                    + "	p.idcalculoicms||'-'||p.stexp idcalculoicms\n"
                     + "from\n"
                     + "	wshop.produto p\n"
                     + "	join wshop.empshop emp on emp.cdempresa = '" + getLojaOrigem() + "'\n"
                     + "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n"
                     + "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
-                    + "	left join (\n"
+                    + "	left join wshop.codigos ean on dt.idproduto = ean.idproduto"
+                    + (somenteBalanca ? " and ean.tpcodigo = 'Personalizado' and length(coalesce(ean.dscodigo, ids.dscodigo)) = 6\n" : "\n")
+                    /*+ "	left join (\n"
                     + "		select \n"
                     + "			ean.*\n"
                     + "		from\n"
@@ -309,9 +335,10 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "		where\n"
                     + "			(dt.stbalanca and ean.tpcodigo = 'Chamada') or\n"
                     + "			(not dt.stbalanca and ean.tpcodigo != 'Chamada')\n"
-                    + "	) ean on dt.iddetalhe = ean.iddetalhe and dt.idproduto = ean.idproduto	\n"
+                    + "	) ean on dt.iddetalhe = ean.iddetalhe and dt.idproduto = ean.idproduto	\n"*/
                     + "	left join wshop.unidade un on un.idunidade = p.idunidade\n"
                     + "	left join wshop.produto_balanca bal on bal.iddetalhe = dt.iddetalhe\n"
+                    /*
                     + "	left join (\n"
                     + "		select\n"
                     + "			est.iddetalhe,\n"
@@ -330,11 +357,14 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     + "					iddetalhe, cdempresa\n"
                     + "			) a on est.iddetalhe = a.iddetalhe and est.dtreferencia = a.dtreferencia\n"
                     + "	) est on est.iddetalhe = dt.iddetalhe and est.cdempresa = emp.cdempresa\n"
+                    */      
                     + "order by\n"
-                    + "	id"
+                    + "	coalesce(ean.dscodigo, ids.dscodigo)"
             )) {
-                mapearFamilia();
+                //mapearFamilia();
+                System.out.println("Mapeamento concluído");
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                int count = 0, count2 = 0;
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -353,6 +383,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setValidade(bal.getValidade());
                         imp.setQtdEmbalagem(1);
                     } else {
+                        if (somenteBalanca) continue;
                         imp.seteBalanca(rst.getBoolean("ebalanca"));
                         imp.setEan(rst.getString("ean"));
                         imp.setTipoEmbalagem(rst.getString("unidade"));
@@ -365,14 +396,14 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
-                    String familia = mapaFamilia.get(rst.getString("iddetalhe"));
+                    /*String familia = mapaFamilia.get(rst.getString("iddetalhe"));
                     if (familia != null) {
                         LOG.finer("Familia " + familia + " encontrada para " + imp.getImportId() + " - " + imp.getDescricaoCompleta());
                     }
-                    imp.setIdFamiliaProduto(familia);
+                    imp.setIdFamiliaProduto(familia);*/
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    //imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custocomimposto"));
@@ -383,7 +414,7 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_naturezareceita"));
-
+                    
                     imp.setIcmsDebitoId(rst.getString("idcalculoicms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("idcalculoicms"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("idcalculoicms"));
@@ -392,7 +423,16 @@ public class AlterData_WShopDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setIcmsCreditoForaEstadoId(rst.getString("idcalculoicms"));
 
                     result.add(imp);
+                    
+                    count++;
+                    count2++;
+                    
+                    if (count == 500) {
+                        count = 0;
+                        System.out.println(count2 + " produtos prontos para importação!");
+                    }
                 }
+                System.out.println(count2 + " produtos prontos para importação - Fim!");
             }
         }
 
