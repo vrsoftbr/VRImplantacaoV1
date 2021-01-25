@@ -4,16 +4,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import vr.core.collection.Properties;
+import vr.implantacao.App;
 import vrframework.bean.dialog.VRDialog;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Conexao;
-import vrframework.classe.Properties;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.classe.Global;
-import vrimplantacao.dao.PropertiesDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.dao.cadastro.UsuarioDAO;
@@ -63,8 +63,6 @@ public class LoginGUI extends VRDialog {
             oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboLoja.getId());
         }
 
-        new PropertiesDAO().carregarConfiguracao(new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties"));
-
         LojaVO oLoja = new LojaDAO().carregar(cboLoja.getId());
 
         FornecedorVO oFornecedor = new FornecedorDAO().carregar(oLoja.idFornecedor);
@@ -90,13 +88,11 @@ public class LoginGUI extends VRDialog {
 
         mdiFrame = form;
 
-        Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
+        Properties oProperties = App.properties();
 
-        if (chkLembrar.isSelected() && !oProperties.getString("system.usuario").equals(txtUsuario.getText())) {
-            oProperties.setPropertie("system.usuario", txtUsuario.getText());
+        if (chkLembrar.isSelected()) {
+            oProperties.set("system.usuario", txtUsuario.getText());
 
-        } else if (!chkLembrar.isSelected() && !oProperties.getString("system.usuario").equals("")) {
-            oProperties.setPropertie("system.usuario", "");
         }
 
         this.dispose();
@@ -116,6 +112,7 @@ public class LoginGUI extends VRDialog {
 
     private void carregarEmpresa() throws Exception {
         Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
+        oProperties.carregar();
 
         vEmpresa = new ArrayList();
         cboEmpresa.removeAllItems();
@@ -125,17 +122,17 @@ public class LoginGUI extends VRDialog {
         while (true) {
             String empresa = i == 1 ? "" : String.valueOf(i);
 
-            if (oProperties.getString("database" + empresa + ".ip").isEmpty()) {
+            if (oProperties.get("database" + empresa + ".ip") == null) {
                 break;
             }
             DadosConexaoPostgreSQL oEmpresa = new DadosConexaoPostgreSQL();
-            oEmpresa.ipBanco = oProperties.getString("database" + empresa + ".ip");
-            oEmpresa.ipSecBanco = oProperties.getString("database" + empresa + ".ipsec");
+            oEmpresa.ipBanco = oProperties.get("database" + empresa + ".ip");
+            oEmpresa.ipSecBanco = oProperties.get("database" + empresa + ".ipsec");
             oEmpresa.portaBanco = oProperties.getInt("database" + empresa + ".porta");
-            oEmpresa.nomeBanco = oProperties.getString("database" + empresa + ".nome");
-            oEmpresa.usuarioBanco = oProperties.getString("database" + empresa + ".usuario").isEmpty() ? "postgres" : oProperties.getString("database" + empresa + ".usuario");
-            oEmpresa.senhaBanco = oProperties.getString("database" + empresa + ".senha").isEmpty() ? "postgres" : oProperties.getString("database" + empresa + ".senha");
-            oEmpresa.alias = oProperties.getString("database" + empresa + ".alias").isEmpty() ? ("EMPRESA " + String.valueOf(i)) : oProperties.getString("database" + empresa + ".alias");
+            oEmpresa.nomeBanco = oProperties.get("database" + empresa + ".nome");
+            oEmpresa.usuarioBanco = oProperties.get("database" + empresa + ".usuario") == null  ? "postgres" : oProperties.get("database" + empresa + ".usuario");
+            oEmpresa.senhaBanco = oProperties.get("database" + empresa + ".senha") == null ? "postgres" : oProperties.get("database" + empresa + ".senha");
+            oEmpresa.alias = oProperties.get("database" + empresa + ".alias") == null? ("EMPRESA " + String.valueOf(i)) : oProperties.get("database" + empresa + ".alias");
 
             vEmpresa.add(oEmpresa);
             cboEmpresa.addItem(new ItemComboVO(i, oEmpresa.alias));

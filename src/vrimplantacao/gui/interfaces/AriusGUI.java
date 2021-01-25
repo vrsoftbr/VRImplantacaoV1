@@ -496,6 +496,9 @@ public class AriusGUI extends VRInternalFrame {
                         if (chkEstadoCivil.isSelected()) {
                             opcoes.add(OpcaoCliente.ESTADO_CIVIL);
                         }
+                        if (chkAtualizaLimite.isSelected()) {
+                            opcoes.add(OpcaoCliente.VALOR_LIMITE);
+                        }
                         if (!opcoes.isEmpty()) {
                             importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                         }
@@ -658,6 +661,7 @@ public class AriusGUI extends VRInternalFrame {
         chkClAdminCard = new javax.swing.JCheckBox();
         chkEstadoCivil = new vrframework.bean.checkBox.VRCheckBox();
         chkNUtilizaPlanoConta = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtualizaLimite = new vrframework.bean.checkBox.VRCheckBox();
         tabRotativo = new vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasRotativoGUI();
         tabCheque = new vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasChequeGUI();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
@@ -1273,6 +1277,8 @@ public class AriusGUI extends VRInternalFrame {
 
         chkNUtilizaPlanoConta.setText("Não Utiliza Plano de Conta Rotativo");
 
+        chkAtualizaLimite.setText("Atualiza Limite Cliente");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -1287,7 +1293,8 @@ public class AriusGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkNUtilizaPlanoConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkNUtilizaPlanoConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkAtualizaLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(272, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
@@ -1303,8 +1310,10 @@ public class AriusGUI extends VRInternalFrame {
                         .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkNUtilizaPlanoConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkAtualizaLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE))
+                    .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1953,6 +1962,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkAssociado;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
+    private vrframework.bean.checkBox.VRCheckBox chkAtualizaLimite;
     private javax.swing.JCheckBox chkClAdminCard;
     private javax.swing.JCheckBox chkClClientes;
     private javax.swing.JCheckBox chkClEmpresas;
