@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import vr.core.collection.Properties;
+import vr.implantacao.App;
 import vrframework.bean.dialog.VRDialog;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Conexao;
@@ -87,7 +88,7 @@ public class LoginGUI extends VRDialog {
 
         mdiFrame = form;
 
-        Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
+        Properties oProperties = App.properties();
 
         if (chkLembrar.isSelected()) {
             oProperties.set("system.usuario", txtUsuario.getText());

@@ -9,6 +9,8 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import vr.implantacao.App;
+import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import vrframework.bean.busca.VRBusca;
 import vrframework.bean.busca.VREventoBusca;
 import vrframework.bean.busca.VREventoBuscaListener;
@@ -282,7 +284,6 @@ import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.ZoomboxGUI;
 import vrimplantacao2.gui.interfaces.ZpfGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
-import vrimplantacao2.gui.tools.scripts.ScriptsGUI;
 import vrimplantacao2.parametro.Parametros;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -877,7 +878,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSistema = new javax.swing.JMenu();
         mnuSistemaLogin = new javax.swing.JMenuItem();
         mnuFerramentas = new javax.swing.JMenu();
-        mnuScripts = new javax.swing.JMenuItem();
+        mnuEditarConexoes = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mnuAvancadas = new javax.swing.JMenu();
         mnuImportarNCM = new javax.swing.JMenuItem();
@@ -3197,15 +3198,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuFerramentas.setText("Ferramentas");
 
-        mnuScripts.setText("Scripts");
-        mnuScripts.setToolTipText("");
-        mnuScripts.setEnabled(false);
-        mnuScripts.addActionListener(new java.awt.event.ActionListener() {
+        mnuEditarConexoes.setText("Editar conexões");
+        mnuEditarConexoes.setToolTipText("");
+        mnuEditarConexoes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuScriptsActionPerformed(evt);
+                mnuEditarConexoesActionPerformed(evt);
             }
         });
-        mnuFerramentas.add(mnuScripts);
+        mnuFerramentas.add(mnuEditarConexoes);
         mnuFerramentas.add(jSeparator1);
 
         mnuAvancadas.setText("Avançadas");
@@ -3992,9 +3992,9 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem27ActionPerformed
 
-    private void mnuScriptsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuScriptsActionPerformed
-        ScriptsGUI.Exibir(this);
-    }//GEN-LAST:event_mnuScriptsActionPerformed
+    private void mnuEditarConexoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEditarConexoesActionPerformed
+        ConexaoPropertiesEditorGUI.editar(App.properties());
+    }//GEN-LAST:event_mnuEditarConexoesActionPerformed
 
     private void jMenuItemAriusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAriusActionPerformed
         AriusGUI.exibir(this);
@@ -5200,6 +5200,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDirector;
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEasySac;
+    private javax.swing.JMenuItem mnuEditarConexoes;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuEtica;
@@ -5305,7 +5306,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuSav;
     private javax.swing.JMenuItem mnuScef;
-    private javax.swing.JMenuItem mnuScripts;
     private javax.swing.JMenuItem mnuSiaCriareByFile;
     private javax.swing.JMenuItem mnuSiaCriareDbf;
     private javax.swing.JMenuItem mnuSic;
