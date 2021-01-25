@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -31,6 +32,8 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -42,6 +45,17 @@ public class GestoraDAO extends InterfaceDAO {
     public String getSistema() {
         return "Gestora";
     }
+    
+    private Date vendaDataIni;
+    private Date vendaDataFim;
+
+    public void setVendaDataIni(Date vendaDataIni) {
+        this.vendaDataIni = vendaDataIni;
+    }
+
+    public void setVendaDataFim(Date vendaDataFim) {
+        this.vendaDataFim = vendaDataFim;
+    }    
 
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
@@ -862,5 +876,15 @@ public class GestoraDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new GestoraVendaIterator(this.vendaDataIni, this.vendaDataFim);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new GestoraVendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
     }
 }

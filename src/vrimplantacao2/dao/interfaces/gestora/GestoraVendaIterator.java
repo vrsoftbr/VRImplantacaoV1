@@ -1,11 +1,10 @@
-package vrimplantacao2.dao.interfaces.linear;
+package vrimplantacao2.dao.interfaces.gestora;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -14,153 +13,111 @@ import vrimplantacao2.vo.importacao.VendaIMP;
  *
  * @author leandro
  */
-public class LinearVendaIterator extends MultiStatementIterator<VendaIMP> {
+public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
 
-    public LinearVendaIterator(String idLoja, Date dataInicial, Date dataTermino) {        
+    public GestoraVendaIterator(Date dataInicial, Date dataTermino) {
         super(
-                new LinearNextBuilder(),
-                new LinearStatementBuilder()
+                new GestoraNextBuilder(),
+                new GestoraStatementBuilder()
         );
-        if (dataInicial == null) throw new NullPointerException("Informe a data inicial");
-        if (dataTermino == null) throw new NullPointerException("Informe a data final");
-        //log001venda0820
-        for (SQLUtils.Intervalo intervalo: SQLUtils.intervalosMensais(dataInicial, dataTermino)) {
-            this.addStatement(getFullSQL(Utils.stringToInt(idLoja), intervalo));
+        if (dataInicial == null) {
+            throw new NullPointerException("Informe a data inicial");
         }
-        
+        if (dataTermino == null) {
+            throw new NullPointerException("Informe a data final");
+        }
+        //CP_12_2020
+        for (SQLUtils.Intervalo intervalo : SQLUtils.intervalosMensais(dataInicial, dataTermino)) {
+            this.addStatement(getFullSQL(intervalo));
+        }
+
     }
-    
-    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MMyy");
-    private String getNomeTabela(int idLoja, Date dataInicial) {        
-        return String.format("log%03dvenda%s", idLoja, TABLE_NAME_DATE.format(dataInicial));
+
+    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MM-yyyy");
+
+    private String getNomeTabela(Date dataInicial) {
+        return String.format("CP_%s", TABLE_NAME_DATE.format(dataInicial));
     }
-    
-    private String getFullSQL(int idLoja, SQLUtils.Intervalo intervalo) {
-        boolean nfExiste = false;
+
+    private String getFullSQL(SQLUtils.Intervalo intervalo) {
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "select * from information_schema.TABLES t where TABLE_NAME = '" + getNomeTabela(idLoja, intervalo.dataInicial) + "nf'"
+                    "SELECT\n"
+                    + "	COM_REGISTRO ID,\n"
+                    + "	COM_NCUPOM NUMEROCUPOM,\n"
+                    + " CASE maq_nome\n"
+                    + "	  WHEN 'CAIXA-01' THEN 1\n"
+                    + "	  WHEN 'CAIXA-02' THEN 2\n"
+                    + "	  WHEN 'CAIXA-03' THEN 3\n"
+                    + "	  WHEN 'ADM'      THEN 4\n"
+                    + "	  ELSE 5\n"
+                    + "END ECF,\n"
+                    + "	COM_DATA DATA,\n"
+                    + "	COM_HORA HORAINICIO,\n"
+                    + "	COM_HORA HORATERMINO,\n"
+                    + "	CLI_CODIGO IDCLIENTEPREFERENCIAL,\n"
+                    + "	CLI_CPFCGC CPF,\n"
+                    + "	CLI_NOME NOMECLIENTE,\n"
+                    + "	CLI_ENDERECO+' '+CLI_ENDNRO+' '+CLI_BAIRRO+' '+CLI_CIDADE+' '+CLI_ESTADO as ENDERECO,\n"
+                    + "	COM_TOTAL SUBTOTALIMPRESSORA,\n"
+                    + "	COM_DESCONTO DESCONTO,\n"
+                    + "	COM_NSERIE NUMEROSERIE,\n"
+                    + "	COM_CHAVE CHAVE,\n"
+                    + "	ECF_FAB MODELO,\n"
+                    + "	CASE WHEN DATA_PROCESSO_CANCEL IS NULL THEN 0 ELSE 1 END CANCELADO\n"
+                    + "FROM\n"
+                    + "	" + getNomeTabela(intervalo.dataInicial) + " AS CP"
             )) {
-                nfExiste = rs.next();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        if (nfExiste) {
-            return
-                "select\n" +
-                "	v.cupom,\n" +
-                "	v.caixa,\n" +
-                "	v.data,\n" +
-                "	max(codcli) id_clientepreferencial,\n" +
-                "	min(hora) horainicio,\n" +
-                "	max(hora) horatermino,\n" +
-                "	min(\n" +
-                "		case\n" +
-                "			when v.tipo = 1 then 0\n" +
-                "			else 1\n" +
-                "		end\n" +
-                "	) cancelado,\n" +
-                "	sum(coalesce(total,0)) subtotalimpressora,\n" +
-                "	sum(coalesce(desconto,0)) valorDesconto,\n" +
-                "	sum(coalesce(acrescimo,0)) valorAcrescimo,\n" +
-                "	min(cx.serie) serie,\n" +
-                "	min(nf.chv_cfe) chave\n" +
-                "from\n" +
-                "	" + getNomeTabela(idLoja, intervalo.dataInicial) + " v\n" +
-                "	left join (\n" +
-                "		select\n" +
-                "			distinct\n" +
-                "			caixa,\n" +
-                "			serie\n" +
-                "		from\n" +
-                "			cadecf_faixa cf\n" +
-                "		where\n" +
-                "			cf.filial = " + idLoja + "\n" +
-                "	) cx on\n" +
-                "		v.caixa = cx.caixa\n" +
-                "	left join " + getNomeTabela(idLoja, intervalo.dataInicial) + "nf nf on\n" +
-                "		v.cupom = nf.cupom and \n" +
-                "		v.caixa = nf.caixa and\n" +
-                "		v.`data` = nf.`data` and\n" +
-                "		cast(cx.serie as SIGNED) = cast(nf.serie as SIGNED)\n" +
-                "where\n" +
-                "	v.data between '" + format.format(intervalo.dataInicial) + "' and '" + format.format(intervalo.dataFinal) + "'\n" +
-                "group by\n" +
-                "	v.cupom,\n" +
-                "	v.caixa,\n" +
-                "	v.data";
-        } else {
-            return
-                "select\n" +
-                "	v.cupom,\n" +
-                "	v.caixa,\n" +
-                "	v.data,\n" +
-                "	max(codcli) id_clientepreferencial,\n" +
-                "	min(hora) horainicio,\n" +
-                "	max(hora) horatermino,\n" +
-                "	min(\n" +
-                "		case\n" +
-                "			when v.tipo = 1 then 0\n" +
-                "			else 1\n" +
-                "		end\n" +
-                "	) cancelado,\n" +
-                "	sum(coalesce(v.total,0)) subtotalimpressora,\n" +
-                "	sum(coalesce(desconto,0)) valorDesconto,\n" +
-                "	sum(coalesce(acrescimo,0)) valorAcrescimo,\n" +
-                "	v.caixa serie,\n" +
-                "	null chave\n" +
-                "from\n" +
-                "	" + getNomeTabela(idLoja, intervalo.dataInicial) + " v\n" +
-                "where\n" +
-                "	v.data between '" + format.format(intervalo.dataInicial) + "' and '" + format.format(intervalo.dataFinal) + "'\n" +
-                "group by\n" +
-                "	v.cupom,\n" +
-                "	v.caixa,\n" +
-                "	v.data";
-        }
+        return null;
     }
-    
+
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    public static String formatID(int cupom, int caixa, Date data) {
-        return String.format("%d-%d-%s", cupom, caixa, DATE_FORMAT.format(data));
+
+    public static String formatID(int numerocupom, int numeroserie, Date data) {
+        return String.format("%d-%d-%s", numerocupom, numeroserie, DATE_FORMAT.format(data));
     }
-    
-    private static class LinearNextBuilder implements NextBuilder<VendaIMP> {
+
+    private static class GestoraNextBuilder implements NextBuilder<VendaIMP> {
 
         @Override
         public VendaIMP makeNext(ResultSet rs) throws Exception {
             VendaIMP v = new VendaIMP();
-            
+
             v.setId(formatID(
-                    rs.getInt("cupom"),
-                    rs.getInt("caixa"),
+                    rs.getInt("id"),
+                    rs.getInt("numeroserie"),
                     rs.getDate("data")
             ));
-            v.setNumeroCupom(rs.getInt("cupom"));
-            v.setEcf(rs.getInt("caixa"));
+            v.setNumeroCupom(rs.getInt("numerocupom"));
+            v.setEcf(rs.getInt("ecf"));
             v.setData(rs.getDate("data"));
-            v.setIdClientePreferencial(rs.getString("id_clientepreferencial"));
             v.setHoraInicio(rs.getDate("horainicio"));
             v.setHoraTermino(rs.getDate("horatermino"));
-            v.setCancelado(rs.getBoolean("cancelado"));
+            v.setIdClientePreferencial(rs.getString("idclientepreferencial"));
+            v.setCpf(rs.getString("cpf"));
+            v.setNomeCliente(rs.getString("nomecliente"));
+            v.setEnderecoCliente(rs.getString("endereco"));
             v.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
-            v.setValorDesconto(rs.getDouble("valorDesconto"));
-            v.setValorAcrescimo(rs.getDouble("valorAcrescimo"));
-            v.setNumeroSerie(rs.getString("serie"));
-            v.setChaveCfe(rs.getString("chave"));          
-            
+            v.setValorDesconto(rs.getDouble("desconto"));
+            v.setNumeroSerie(rs.getString("numeroserie"));
+            v.setChaveCfe(rs.getString("chave"));
+            v.setModeloImpressora(rs.getString("modelo"));
+            v.setCancelado(rs.getBoolean("cancelado"));
+
             return v;
         }
-        
+
     }
 
-    private static class LinearStatementBuilder implements StatementBuilder {
+    private static class GestoraStatementBuilder implements StatementBuilder {
+
         @Override
         public Statement makeStatement() throws Exception {
             return ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         }
     }
-    
 }
