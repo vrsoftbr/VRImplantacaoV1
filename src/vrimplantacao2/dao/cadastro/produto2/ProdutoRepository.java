@@ -19,7 +19,6 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
-import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
@@ -476,7 +475,11 @@ public class ProdutoRepository {
         for (OpcaoProduto opt : optComLista) {
             List<ProdutoIMP> listaEspecial = opt.getListaEspecial();
             opt.setListaEspecial(null);
-            atualizar(listaEspecial, opt);
+            if (op.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {
+                atualizar(listaEspecial, opt, OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE);
+            } else {
+                atualizar(listaEspecial, opt);
+            }
         }
     }
 
