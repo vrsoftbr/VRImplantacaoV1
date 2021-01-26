@@ -885,6 +885,6 @@ public class GestoraDAO extends InterfaceDAO {
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new GestoraVendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
+        return new GestoraVendaItemIterator(this.vendaDataIni, this.vendaDataFim);
     }
 }
