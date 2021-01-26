@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -33,52 +33,45 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
 
     }
 
-    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MM-yyyy");
+    private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MM_yyyy");
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
     private String getNomeTabela(Date dataInicial) {
         return String.format("CP_%s", TABLE_NAME_DATE.format(dataInicial));
     }
 
     private String getFullSQL(SQLUtils.Intervalo intervalo) {
-        try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rs = st.executeQuery(
-                    "SELECT\n"
-                    + "	COM_REGISTRO ID,\n"
-                    + "	COM_NCUPOM NUMEROCUPOM,\n"
-                    + " CASE maq_nome\n"
-                    + "	  WHEN 'CAIXA-01' THEN 1\n"
-                    + "	  WHEN 'CAIXA-02' THEN 2\n"
-                    + "	  WHEN 'CAIXA-03' THEN 3\n"
-                    + "	  WHEN 'ADM'      THEN 4\n"
-                    + "	  ELSE 5\n"
-                    + "END ECF,\n"
-                    + "	COM_DATA DATA,\n"
-                    + "	COM_HORA HORAINICIO,\n"
-                    + "	COM_HORA HORATERMINO,\n"
-                    + "	CLI_CODIGO IDCLIENTEPREFERENCIAL,\n"
-                    + "	CLI_CPFCGC CPF,\n"
-                    + "	CLI_NOME NOMECLIENTE,\n"
-                    + "	CLI_ENDERECO+' '+CLI_ENDNRO+' '+CLI_BAIRRO+' '+CLI_CIDADE+' '+CLI_ESTADO as ENDERECO,\n"
-                    + "	COM_TOTAL SUBTOTALIMPRESSORA,\n"
-                    + "	COM_DESCONTO DESCONTO,\n"
-                    + "	COM_NSERIE NUMEROSERIE,\n"
-                    + "	COM_CHAVE CHAVE,\n"
-                    + "	ECF_FAB MODELO,\n"
-                    + "	CASE WHEN DATA_PROCESSO_CANCEL IS NULL THEN 0 ELSE 1 END CANCELADO\n"
-                    + "FROM\n"
-                    + "	" + getNomeTabela(intervalo.dataInicial) + " AS CP"
-            )) {
-            }
-        } catch (Exception ex) {
-        }
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        return null;
+        return "SELECT\n"
+                + "	COM_REGISTRO ID,\n"
+                + "	COM_NCUPOM NUMEROCUPOM,\n"
+                + " CASE MAQ_NOME\n"
+                + "	  WHEN 'CAIXA-01' THEN 1\n"
+                + "	  WHEN 'CAIXA-02' THEN 2\n"
+                + "	  WHEN 'CAIXA-03' THEN 3\n"
+                + "	  WHEN 'ADM'      THEN 4\n"
+                + "	  ELSE 5\n"
+                + "END ECF,\n"
+                + "	COM_DATA DATA,\n"
+                + "	COM_HORA HORAINICIO,\n"
+                + "	COM_HORA HORATERMINO,\n"
+                + "	CLI_CODIGO IDCLIENTEPREFERENCIAL,\n"
+                + "	CLI_CPFCGC CPF,\n"
+                + "	CLI_NOME NOMECLIENTE,\n"
+                + "	RTRIM(CLI_ENDERECO)+' '+RTRIM(CLI_ENDNRO)+' '+RTRIM(CLI_BAIRRO)+' '+RTRIM(CLI_CIDADE)+' '+RTRIM(CLI_ESTADO) AS ENDERECO,\n"
+                + "	COM_TOTAL SUBTOTALIMPRESSORA,\n"
+                + "	COM_DESCONTO DESCONTO,\n"
+                + "	COM_NSERIE NUMEROSERIE,\n"
+                + "	COM_CHAVE CHAVE,\n"
+                + "	ECF_FAB MODELO,\n"
+                + "	CASE WHEN DATA_PROCESSO_CANCEL IS NULL THEN 0 ELSE 1 END CANCELADO\n"
+                + "FROM\n"
+                + "	" + getNomeTabela(intervalo.dataInicial) + " AS CP";
+
     }
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     public static String formatID(int numerocupom, int numeroserie, Date data) {
-        return String.format("%d-%d-%s", numerocupom, numeroserie, DATE_FORMAT.format(data));
+        return String.format("%d-%d-%s", numerocupom, numeroserie, format.format(data));
     }
 
     private static class GestoraNextBuilder implements NextBuilder<VendaIMP> {
@@ -110,14 +103,13 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
 
             return v;
         }
-
     }
 
     private static class GestoraStatementBuilder implements StatementBuilder {
 
         @Override
         public Statement makeStatement() throws Exception {
-            return ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+            return ConexaoSqlServer.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         }
     }
 }
