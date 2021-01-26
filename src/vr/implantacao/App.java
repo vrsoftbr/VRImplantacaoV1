@@ -1,18 +1,19 @@
 package vr.implantacao;
 
+import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import java.awt.Font;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.UIManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vr.core.collection.Properties;
-import vr.view.LookAndFeel;
+import vr.view.dialogs.Alerts;
 import vrframework.classe.Conexao;
 import vr.view.dialogs.splashsscreen.SplashScreen;
 import vrframework.classe.Util;
 import vrimplantacao.classe.Global;
-import vrimplantacao.gui.ConfiguracaoGUI;
 import vrimplantacao.gui.LoginGUI;
 import vrimplantacao2.parametro.Parametros;
 
@@ -24,8 +25,65 @@ public class App {
     
     private static Logger LOG = LoggerFactory.getLogger(App.class);
     
+    private static App instance;
+    
+    private static void startApp(String... args) {
+        if (instance != null) {
+            instance.encerrar();
+            instance = null;
+        }
+        instance = new App();
+        instance.inicializar();
+    }
+    
+    public static void main(String[] args) {
+        App.startApp(args);
+    }
+    
+    private Properties properties;
+    
+    private App() {}
+    
+    public static Properties properties() {
+        return instance.properties;
+    }
+    
+    /**
+     * Rotina que encerra todas as atividades da aplicação. Seria como o 
+     * desligamento do sistema, porém sem encerrar a aplicação.
+     */
+    private void encerrar() {
+        this.properties = null;
+    }
+    
+    private void inicializar(String... args) {  
+        inicializarProperties();
+        tratarParametros(args);        
+        inicializarView();
+        inicializarSistema();
+    }
+    
+    private void inicializarProperties() {
+        try {
+            //Tenta obter a localização do arquivo properties.
+            properties = Properties.getVrImplantacaoProperties();
+            if (properties == null || !properties.exists()) {                
+                properties = ConexaoPropertiesEditorGUI.create();
+            }
+            if (properties == null || !properties.exists()) {
+                Alerts.aviso("Nenhum arquivo properties foi configurado, encerrando", LOG);
+                System.exit(1);
+            }
+            properties.carregar();
+        } catch (IOException ex) {
+            Alerts.erro("Erro ao carregar o properties", ex);
+            System.exit(1);
+        }
+    }
+    
+    
 
-    private static void tratarParametros(String[] args) {
+    private void tratarParametros(String[] args) {
         Map<String, String> params = new HashMap<>();
         for (String arg: args) {
             String[] st = arg.split("=");
@@ -40,7 +98,7 @@ public class App {
         }
     }
     
-    private static void inicializarView() {
+    private void inicializarView() {
         try {
             String OSName = System.getProperty("os.name");
 
@@ -62,34 +120,22 @@ public class App {
         }
     }
     
-    private static void inicializarSistema() {
+    private void inicializarSistema() {
         try {
 
             SplashScreen.show();
             SplashScreen.setSobre("VR Implantação", Global.VERSAO, Global.DATA);
             SplashScreen.setStatus("Inicializando sistema...");
-
-            Properties oProperties = Properties.getVrImplantacaoProperties();
-            if (oProperties == null) {
-                ConfiguracaoGUI gui = new ConfiguracaoGUI();
-                gui.setModal(true);
-                gui.setVisible(true);
-                oProperties = Properties.getVrImplantacaoProperties();
-                if (oProperties == null) {
-                    System.exit(0);
-                }
-            }
-            oProperties.carregar();
             
-            Global.idLoja = oProperties.getInt("system.numeroloja");
+            Global.idLoja = properties.getInt("system.numeroloja");
             
             SplashScreen.setStatus("Abrindo conexão...");
-            abrirConexao(oProperties);
+            abrirConexao(properties);
 
             SplashScreen.setStatus("Carregando interface...");
             SplashScreen.dispose();            
             
-            callLogin(oProperties);
+            callLogin(properties);
 
         } catch (Exception ex) {
             SplashScreen.dispose();
@@ -120,12 +166,6 @@ public class App {
         }        
         
         form.setVisible(true);
-    }
-    
-    public static void main(String[] args) {        
-        tratarParametros(args);        
-        inicializarView();        
-        inicializarSistema();        
     }
     
 }

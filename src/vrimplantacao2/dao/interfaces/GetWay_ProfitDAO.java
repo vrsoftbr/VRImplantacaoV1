@@ -2311,7 +2311,16 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modelo"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
+                        
+                        if (rst.getString("nomecliente") != null
+                                && !rst.getString("nomecliente").trim().isEmpty()
+                                && rst.getString("nomecliente").trim().length() > 45) {
+
+                            next.setNomeCliente(rst.getString("nomecliente").substring(0, 45));
+                        } else {
+                            next.setNomeCliente(rst.getString("nomecliente"));
+                        }
+                        
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
@@ -2489,6 +2498,50 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                 case "TE":
                     cst = 0;
                     aliq = 11;
+                    break;
+                case "TF":
+                    cst = 0;
+                    aliq = 11;
+                    break;
+                case "TG":
+                    cst = 0;
+                    aliq = 4.5;
+                    break;
+                case "TH":
+                    cst = 0;
+                    aliq = 8;
+                    break;
+                case "TI":
+                    cst = 0;
+                    aliq = 4;
+                    break;
+                case "TJ":
+                    cst = 0;
+                    aliq = 9.14;
+                    break;
+                case "TL":
+                    cst = 0;
+                    aliq = 13.3;
+                    break;
+                case "TM":
+                    cst = 0;
+                    aliq = 4.14;
+                    break;
+                case "TN":
+                    cst = 0;
+                    aliq = 4.7;
+                    break;
+                case "TO":
+                    cst = 0;
+                    aliq = 11.2;
+                    break;
+                case "TP":
+                    cst = 0;
+                    aliq = 8.40;
+                    break;
+                case "TQ":
+                    cst = 0;
+                    aliq = 8.83;
                     break;
                 case "F":
                     cst = 60;
