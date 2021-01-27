@@ -717,6 +717,7 @@ public class ProdutoComplementoDAO {
                     "		pc.id_produto = l.id_produto\n" +
                     "where\n" +
                     "	pc.id_loja = " + lojaVR + "\n" +
+                    "	and coalesce(l.troca, pc.troca) != pc.troca\n" +
                     "order by\n" +
                     "	id_produto;"
             );
