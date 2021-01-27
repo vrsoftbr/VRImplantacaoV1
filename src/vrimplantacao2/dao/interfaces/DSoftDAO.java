@@ -1056,7 +1056,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                         //next.setValorDesconto(rst.getDouble("desconto"));
                         //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getInt("cancelado") == 1);
-                        //next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setSequencia(rst.getInt("item"));
 
                         String trib = Utils.acertarTexto(rst.getString("st"));
@@ -1148,6 +1148,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    i.codvenda as idvenda,\n"
                     + "    i.controle,\n"
                     + "    i.item,\n"
+                    + "    p.codbarra as codigobarras,\n"
                     + "    i.codproduto as idproduto,\n"
                     + "    i.descricao as descricaoproduto,\n"
                     + "    i.dataemissao as datavenda,\n"
@@ -1164,6 +1165,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    i.aliq_cofins,\n"
                     + "    i.tipo_lancamento\n"
                     + "from itemvenda i\n"
+                    + "join estoque p on p.codigo = i.codproduto\n"
                     + "where i.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
