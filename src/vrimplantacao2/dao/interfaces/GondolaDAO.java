@@ -8,7 +8,10 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -177,6 +180,107 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rs.getString("ean"));
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
                     imp.setQtdEmbalagem(rs.getInt("qtd"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "  en_cod idfornecedor,\n" +
+                    "  pr_cod idproduto,\n" +
+                    "  enpr_cod_prduto_entid externo,\n" +
+                    "  um_sig emb,\n" +
+                    "  enpr_fator_conv qtdemb\n" +
+                    "from \n" +
+                    "  gondola.entid_prduto")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCodigoExterno(rs.getString("externo"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdemb"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "  f.en_cod id,\n" +
+                    "  f.en_nom razao,\n" +
+                    "  f.en_nom_fantsa fantasia,\n" +
+                    "  f.en_cpf_cnpj cnpj,\n" +
+                    "  f.en_rg_insest ie,\n" +
+                    "  f.en_dat_cadstr cadastro,\n" +
+                    "  f.en_flg_ativo ativo,\n" +
+                    "  ened_ddd_tel ddd_tel,\n" +
+                    "  ened_ddd_fax ddd_fax,\n" +
+                    "  ened_ddd_cel ddd_cel,\n" +
+                    "  ened_ender_num numero,\n" +
+                    "  ened_ender endereco,\n" +
+                    "  ened_comple_ender complemento,\n" +
+                    "  ened_nom_bairro bairro,\n" +
+                    "  ened_caixa_postal caixa_postal,\n" +
+                    "  ened_nom_cidade cidade,\n" +
+                    "  ened_num_cep cep,\n" +
+                    "  ened_num_tel telefone,\n" +
+                    "  ened_num_fax fax,\n" +
+                    "  e.uf_sig uf,\n" +
+                    "  ened_num_cel celular,\n" +
+                    "  ened_email email,\n" +
+                    "  ened_home_page home_page\n" +
+                    "from \n" +
+                    "  gondola.entid f\n" +
+                    "left join gondola.entid_ender e on f.en_cod = e.en_cod\n" +
+                    "where \n" +
+                    "  f.en_flg_fornec = 'S' and \n" +
+                    "  e.ened_flg_tip = 'E'")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setDatacadastro(rs.getDate("cadastro"));
+                    imp.setAtivo("S".equals(rs.getString("ativo")));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTel_principal(rs.getString("ddd_tel") + rs.getString("telefone"));
+                  
+                    String email = rs.getString("email");
+                    
+                    if(email != null && !"".equals(email)) {
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, email);
+                    }
                     
                     result.add(imp);
                 }
