@@ -30,48 +30,51 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
         for (SQLUtils.Intervalo intervalo : SQLUtils.intervalosMensais(dataInicial, dataTermino)) {
             this.addStatement(getFullSQL(intervalo));
         }
-
     }
 
     private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MM_yyyy");
     private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    //private static final SimpleDateFormat FORMATA_HORA = new SimpleDateFormat("HH:mm:ss");
 
     private String getNomeTabela(Date dataInicial) {
         return String.format("CP_%s", TABLE_NAME_DATE.format(dataInicial));
     }
 
     private String getFullSQL(SQLUtils.Intervalo intervalo) {
-        return "SELECT\n"
-                + "	COM_REGISTRO ID,\n"
-                + "	COM_NCUPOM NUMEROCUPOM,\n"
-                + " CASE MAQ_NOME\n"
-                + "	  WHEN 'CAIXA-01' THEN 1\n"
-                + "	  WHEN 'CAIXA-02' THEN 2\n"
-                + "	  WHEN 'CAIXA-03' THEN 3\n"
-                + "	  WHEN 'ADM'      THEN 4\n"
-                + "	  ELSE 5\n"
-                + "END ECF,\n"
-                + "	COM_DATA DATA,\n"
-                + "	COM_HORA HORAINICIO,\n"
-                + "	COM_HORA HORATERMINO,\n"
-                + "	CLI_CODIGO IDCLIENTEPREFERENCIAL,\n"
-                + "	CLI_CPFCGC CPF,\n"
-                + "	CLI_NOME NOMECLIENTE,\n"
-                + "	RTRIM(CLI_ENDERECO)+' '+RTRIM(CLI_ENDNRO)+' '+RTRIM(CLI_BAIRRO)+' '+RTRIM(CLI_CIDADE)+' '+RTRIM(CLI_ESTADO) AS ENDERECO,\n"
-                + "	COM_TOTAL SUBTOTALIMPRESSORA,\n"
-                + "	COM_DESCONTO DESCONTO,\n"
-                + "	COM_NSERIE NUMEROSERIE,\n"
-                + "	COM_CHAVE CHAVE,\n"
-                + "	ECF_FAB MODELO,\n"
-                + "	CASE WHEN DATA_PROCESSO_CANCEL IS NULL THEN 0 ELSE 1 END CANCELADO\n"
-                + "FROM\n"
-                + "	" + getNomeTabela(intervalo.dataInicial) + " AS CP";
+        return "select\n"
+                + "	com_registro id,\n"
+                + "	com_ncupom numerocupom,\n"
+                + "	case maq_nome\n"
+                + "		when 'caixa-01' then 1\n"
+                + "		when 'caixa-02' then 2\n"
+                + "		when 'caixa-03' then 3\n"
+                + "		when 'adm' then 4\n"
+                + "		else 5\n"
+                + "	end ecf,\n"
+                + "	cast (convert(nvarchar, cp.com_data, 23) as date) as datavenda,\n"
+                + "	cast (com_hora as time) horainicio,\n"
+                + "	cast (com_hora as time) horatermino,\n"
+                + "	cli_codigo idclientepreferencial,\n"
+                + "	cli_cpfcgc cpf,\n"
+                + "	cli_nome nomecliente,\n"
+                + "	rtrim(cli_endereco)+' '+rtrim(cli_endnro)+' '+rtrim(cli_bairro)+' '+rtrim(cli_cidade)+' '+rtrim(cli_estado) as endereco,\n"
+                + "	com_total subtotalimpressora,\n"
+                + "	com_desconto desconto,\n"
+                + "	com_nserie numeroserie,\n"
+                + "	com_chave chave,\n"
+                + "	ecf_fab modelo,\n"
+                + "	case\n"
+                + "		when cast(convert(nvarchar, data_processo_cancel, 23) as date) is null then 0\n"
+                + "		else 1\n"
+                + "	end cancelado\n"
+                + "from\n"
+                + "	" + getNomeTabela(intervalo.dataInicial) + " as cp \n"
+                + "where com_ncupom != 0";
 
     }
 
-
-    public static String formatID(int numerocupom, int numeroserie, Date data) {
-        return String.format("%d-%d-%s", numerocupom, numeroserie, format.format(data));
+    public static String formatID(int numerocupom, int id, int ecf,  Date data) {
+        return String.format("%d-%d-%d-%s", numerocupom, id, ecf, format.format(data));
     }
 
     private static class GestoraNextBuilder implements NextBuilder<VendaIMP> {
@@ -81,15 +84,16 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
             VendaIMP v = new VendaIMP();
 
             v.setId(formatID(
+                    rs.getInt("numerocupom"),
                     rs.getInt("id"),
-                    rs.getInt("numeroserie"),
-                    rs.getDate("data")
+                    rs.getInt("ecf"),
+                    rs.getDate("datavenda")
             ));
             v.setNumeroCupom(rs.getInt("numerocupom"));
             v.setEcf(rs.getInt("ecf"));
-            v.setData(rs.getDate("data"));
-            v.setHoraInicio(rs.getDate("horainicio"));
-            v.setHoraTermino(rs.getDate("horatermino"));
+            v.setData(rs.getDate("datavenda"));
+            v.setHoraInicio(rs.getTime("horainicio"));
+            v.setHoraTermino(rs.getTime("horatermino"));
             v.setIdClientePreferencial(rs.getString("idclientepreferencial"));
             v.setCpf(rs.getString("cpf"));
             v.setNomeCliente(rs.getString("nomecliente"));

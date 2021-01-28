@@ -43,7 +43,7 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
     }
 
     private String getFullSQL(SQLUtils.Intervalo intervalo) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        //SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         return "select\n"
                 + "	cp.com_registro id,\n"
                 + "	sai_registro nritem,\n"
@@ -57,7 +57,8 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
                 + "	when 'adm'      then 4\n"
                 + "	else 5\n"
                 + "end ecf,\n"
-                + "	sp.data_processo data,\n"
+                + "     CAST (CONVERT(NVARCHAR,CP.COM_DATA,23) AS DATE) EMISSAO,\n"
+                + "	CAST (CONVERT(NVARCHAR,SP.DATA_PROCESSO,23) AS DATE) DATA,\n"
                 + "	pro_codigo idproduto,\n"
                 + "	pro_descricao descricao,\n"
                 + "	pro_unidade unidade,\n"
@@ -71,13 +72,13 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
                 + "     " + getNomeTabela(intervalo.dataInicial) + " as SP\n"
                 + "	left join " + getNomeTabelaV(intervalo.dataInicial) + " cp on cp.com_registro = sp.com_registro\n"
                 + "where\n"
-                + "     sp.data_processo between '" + getNomeTabela(intervalo.dataInicial) + "' and '" + getNomeTabela(intervalo.dataFinal) + "'\n";
+                + "     CAST (CONVERT(NVARCHAR,SP.DATA_PROCESSO,23) AS DATE) between '" + getNomeTabela(intervalo.dataInicial) + "' and '" + getNomeTabela(intervalo.dataFinal) + "'\n";
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    public static String formatID(int numerocupom, Date data, int numeroProduto) {
-        return String.format("%d-%s-%d", numerocupom, DATE_FORMAT.format(data), numeroProduto);
+    public static String formatID(int id, int numerocupom, int numeroitem, Date data) {
+        return String.format("%d-%d-%d-%s", id, numerocupom, numeroitem, DATE_FORMAT.format(data));
     }
 
     private static class GestoraVendaItemNextBuild implements NextBuilder<VendaItemIMP> {
@@ -87,14 +88,16 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
             VendaItemIMP v = new VendaItemIMP();
 
             v.setVenda(GestoraVendaIterator.formatID(
-                    rs.getInt("id"), 
-                    rs.getInt("numeroserie"), 
+                    rs.getInt("id"),
+                    rs.getInt("numerocupom"),
+                    rs.getInt("ecf"),
                     rs.getDate("data")
             ));
             v.setId(formatID(
+                    rs.getInt("id"),
                     rs.getInt("numerocupom"),
-                    rs.getDate("data"),
-                    rs.getInt("nritem")
+                    rs.getInt("numeroitem"),
+                    rs.getDate("nritem")
             ));
             v.setSequencia(rs.getInt("nritem"));
             v.setProduto(rs.getString("idproduto"));
