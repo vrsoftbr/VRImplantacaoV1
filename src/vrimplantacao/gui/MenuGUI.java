@@ -271,6 +271,7 @@ import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
@@ -750,6 +751,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuProton = new javax.swing.JMenuItem();
         jMenuItemCupermax = new javax.swing.JMenuItem();
         mnuSTSistemas = new javax.swing.JMenuItem();
+        mnuGondola = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         mnuContaPagar1 = new javax.swing.JMenuItem();
         mnuVarejoFacil = new javax.swing.JMenuItem();
@@ -2216,6 +2218,15 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuSTSistemas);
+
+        mnuGondola.setText("Gondola");
+        mnuGondola.setName("Gondola"); // NOI18N
+        mnuGondola.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGondolaActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuGondola);
 
         mnuDatabase.add(jMenu7);
 
@@ -5051,6 +5062,10 @@ public final class MenuGUI extends VRMdiFrame {
         
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
+    private void mnuGondolaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGondolaActionPerformed
+        GondolaGUI.exibir(this);
+    }//GEN-LAST:event_mnuGondolaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5227,6 +5242,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuGeneric;
     private javax.swing.JMenuItem mnuGestorPDV;
+    private javax.swing.JMenuItem mnuGondola;
     private javax.swing.JMenuItem mnuHRTechV1;
     private javax.swing.JMenuItem mnuHRTechV2;
     private javax.swing.JMenuItem mnuHercules;

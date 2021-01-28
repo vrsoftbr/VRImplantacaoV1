@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -14,9 +15,11 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.interfaces.GondolaDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.ViaSoftDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class GondolaGUI extends VRInternalFrame implements ConexaoEvent {
@@ -54,7 +57,7 @@ public class GondolaGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private ViaSoftDAO dao = new ViaSoftDAO();
+    private GondolaDAO dao = new GondolaDAO();
 
     private GondolaGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -62,15 +65,37 @@ public class GondolaGUI extends VRInternalFrame implements ConexaoEvent {
 
         this.title = "Importação " + SISTEMA;
 
-        conexaoOracle.host = "10.69.0.153";
-        conexaoOracle.database = "PAULISTA3793";
-        conexaoOracle.port = "1522";
-        conexaoOracle.user = "VIASOFTMERC";
-        conexaoOracle.pass = "VIASOFTMERC";
+        conexaoOracle.host = "localhost";
+        conexaoOracle.database = "gondola";
+        conexaoOracle.port = "1521";
+        conexaoOracle.user = "backup";
+        conexaoOracle.pass = "backup";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
         conexaoOracle.setOnConectar(this);
 
         carregarParametros();
@@ -97,7 +122,7 @@ public class GondolaGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : dao.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLoja()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
