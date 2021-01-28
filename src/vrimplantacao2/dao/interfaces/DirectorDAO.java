@@ -329,14 +329,24 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_reducao_debito"));
-
                     imp.setIcmsCstSaidaForaEstado(rs.getInt("icms_debito"));
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaidaForaEstado(rs.getDouble("icms_reducao_debito"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rs.getInt("icms_debito"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("icms_debito"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rs.getDouble("icms_reducao_debito"));                    
 
                     imp.setIcmsCstEntrada(rs.getInt("cst"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_reducao_debito"));
+                    imp.setIcmsCstEntradaForaEstado(rs.getInt("cst"));
+                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_debito"));
+                    imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("icms_reducao_debito"));
+                    
+                    imp.setIcmsCstConsumidor(rs.getInt("cst"));
+                    imp.setIcmsAliqConsumidor(rs.getDouble("icms_debito"));
+                    imp.setIcmsReducaoConsumidor(rs.getDouble("icms_reducao_debito"));
+                    
                     result.add(imp);
                 }
             }
@@ -657,7 +667,7 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	cc.DFcod_cep cep,\n"
                     + "	tl.DFdescricao + ' ' + cl.DFdescricao endereco,\n"
                     + "	cl.DFcomplemento complemento,\n"
-                    + "   bai.DFdescricao bairro,\n"
+                    + " bai.DFdescricao bairro,\n"
                     + "	lo.DFdescricao municipio,\n"
                     + "	lo.DFcod_uf uf,\n"
                     + "	cn.DFe_mail email,\n"
