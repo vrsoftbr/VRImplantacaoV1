@@ -3,6 +3,8 @@ package vrimplantacao2.vo.enums;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
+import vrframework.classe.Util;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 
@@ -84,7 +86,12 @@ public class Icms {
     public static Icms getIcms(int cst, double aliquota, double reduzido) throws Exception {
         Icms result = getIcmsPorValor(cst, aliquota, reduzido);
         if (result == null) {
-            return getIsento();
+            if (Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
+                return getIsento();
+            } else {
+                Util.exibirMensagem("Icms não existe: cst " + cst + " aliquota: " + aliquota + " reducao: " + reduzido + "", "ERRO");
+                return null;
+            }            
         } else {
             return result;
         }
