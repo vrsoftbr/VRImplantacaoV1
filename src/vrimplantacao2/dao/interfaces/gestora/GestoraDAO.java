@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -14,9 +15,11 @@ import vrimplantacao.dao.cadastro.PagarOutrasDespesasDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVO;
 import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVencimentoVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
@@ -28,6 +31,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -39,13 +43,17 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Leandro
  */
-public class GestoraDAO extends InterfaceDAO {
+public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    private static final Logger LOG = Logger.getLogger(GestoraDAO.class.getName());
+
+    public String v_lojaMesmoId;
 
     @Override
     public String getSistema() {
-        return "Gestora";
+        return "Gestora" + v_lojaMesmoId;
     }
-    
+
     private Date vendaDataIni;
     private Date vendaDataFim;
 
@@ -55,7 +63,28 @@ public class GestoraDAO extends InterfaceDAO {
 
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
-    }    
+    }
+
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	EMP_CODIGO id,\n"
+                    + "	EMP_NOME descricao\n"
+                    + "from\n"
+                    + "	EMPRESA e\n"
+                    + "	"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                }
+            }
+        }
+
+        return result;
+    }
 
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
@@ -131,6 +160,41 @@ public class GestoraDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	  tri_codigo as codigo,\n"
+                    + "	  tri_descricao as descricao,\n"
+                    + "	case \n"
+                    + "     when tri_descricao like 'TRIBUT%' then 00\n"
+                    + "     when tri_descricao like 'RED%' then 20\n"
+                    + "     when tri_descricao like 'ISEN%' then 40\n"
+                    + "     when tri_descricao like 'NAO TRIB%' then 41\n"
+                    + "     when tri_descricao like 'SUBSTI%' then 60\n"
+                    + "	end cst,\n"
+                    + "   tri_aliquota as aliquota,\n"
+                    + "   tri_reducao as reducao\n"
+                    + " from\n"
+                    + "	  tributacao\n"
+                    + " order by\n"
+                    + "	  tri_codigo"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("codigo"),
+                            rs.getString("descricao"),
+                            rs.getInt("cst"),
+                            rs.getDouble("aliquota"),
+                            rs.getDouble("reducao")));
+                }
+            }
+        }
         return result;
     }
 
@@ -877,7 +941,7 @@ public class GestoraDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new GestoraVendaIterator(this.vendaDataIni, this.vendaDataFim);
