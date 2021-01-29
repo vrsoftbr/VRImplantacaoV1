@@ -34,7 +34,7 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
 
     private static final SimpleDateFormat TABLE_NAME_DATE = new SimpleDateFormat("MM_yyyy");
     private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    //private static final SimpleDateFormat FORMATA_HORA = new SimpleDateFormat("HH:mm:ss");
+    private static final SimpleDateFormat FORMATA_HORA = new SimpleDateFormat("HH:mm:ss");
 
     private String getNomeTabela(Date dataInicial) {
         return String.format("CP_%s", TABLE_NAME_DATE.format(dataInicial));
@@ -92,8 +92,8 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
             v.setNumeroCupom(rs.getInt("numerocupom"));
             v.setEcf(rs.getInt("ecf"));
             v.setData(rs.getDate("datavenda"));
-            v.setHoraInicio(rs.getTime("horainicio"));
-            v.setHoraTermino(rs.getTime("horatermino"));
+            v.setHoraInicio(FORMATA_HORA.parse(rs.getString("horainicio")));
+            v.setHoraTermino(FORMATA_HORA.parse(rs.getString("horatermino")));
             v.setIdClientePreferencial(rs.getString("idclientepreferencial"));
             v.setCpf(rs.getString("cpf"));
             v.setNomeCliente(rs.getString("nomecliente"));
