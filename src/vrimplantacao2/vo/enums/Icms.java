@@ -89,8 +89,7 @@ public class Icms {
             if (Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
                 return getIsento();
             } else {
-                Util.exibirMensagem("Icms não existe: cst " + cst + " aliquota: " + aliquota + " reducao: " + reduzido + "", "ERRO");
-                return null;
+                throw new Exception("Icms não existe: cst " + cst + " aliquota: " + aliquota + " reducao: " + reduzido);
             }            
         } else {
             return result;

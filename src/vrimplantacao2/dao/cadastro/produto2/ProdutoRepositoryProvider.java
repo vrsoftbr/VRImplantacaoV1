@@ -483,8 +483,7 @@ public class ProdutoRepositoryProvider {
                 if (Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
                     icm = Icms.getIsento();
                 } else {
-                    Util.exibirMensagem("Icms não existe: " + icmsId, "ERROR");
-                    icm = null;
+                    throw new Exception("Icms não existe: " + icmsId);
                 }                
             }
             
