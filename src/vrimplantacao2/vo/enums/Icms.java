@@ -159,6 +159,9 @@ public class Icms {
                     double aliq = rst.getDouble("porcentagem");
                     double red = rst.getDouble("reduzido");
                     int cst = rst.getInt("situacaotributaria");
+                    if (red >= 100) {
+                        red = 0;
+                    }
                     Icms icm = new Icms(
                             rst.getInt("id"), 
                             rst.getString("descricao"), cst, 
