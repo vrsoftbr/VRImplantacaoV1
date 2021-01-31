@@ -189,8 +189,8 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
                     "    est.maximo estoquemaximo,\n" +
                     "    est.qtde estoque,\n" +
                     "    prec.markup margem,\n" +
-                    "    COALESCE(prec.vrcustorep, prec.VRCUSTOCSI, prec.vrcusto) custosemimposto,\n" +
-                    "    COALESCE(prec.VRCUSTOCSI, prec.VRCUSTOREP, prec.vrcusto) custocomimposto,\n" +
+                    "    COALESCE(prec.vrcustorep, prec.VRCUSTOCSI, prec.vrcusto) custocomimposto,\n" +
+                    "    COALESCE(prec.VRCUSTOCSI, prec.VRCUSTOREP, prec.vrcusto) custosemimposto,\n" +
                     "    prec.vrvenda preco,\n" +
                     "    case when p.ativo = 'N' then 0 else 1 end ativo,\n" +
                     "    p.ncmsh ncm,\n" +
