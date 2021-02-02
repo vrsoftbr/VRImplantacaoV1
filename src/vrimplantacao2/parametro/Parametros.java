@@ -48,6 +48,7 @@ public final class Parametros implements Iterable<Parametro>{
     private static final String ITEM_VENDA_PADRAO = "ITEM_VENDA_PADRAO";
     private static final String IGNORAR_CLIENTE_IMP_VENDA = "IGNORAR_CLIENTE_IMP_VENDA";
     private static final String FORCAR_CADASTRO_PRODUTO_NAO_EXISTENTE = "FORCAR CADASTRO DE PRODUTO NAO EXISTENTE";
+    private static final String IMPORTAR_ICMS_ISENTO_MIGRACAO_PRODUTO = "IMPORTAR_ICMS_ISENTO_MIGRACAO_PRODUTO";
     private static final SimpleDateFormat DATA_FORMAT= new SimpleDateFormat("yyyy-MM-dd");
     public static String lite;
     
@@ -469,6 +470,13 @@ public final class Parametros implements Iterable<Parametro>{
     public boolean isForcarCadastroProdutoNaoExistente() {
         return getBool(FORCAR_CADASTRO_PRODUTO_NAO_EXISTENTE);
     }
+    
+    /**
+     * @return the importar icms Isento
+     */
+    public boolean isImportarIcmsIsentoMigracaoProduto() {
+        return getBool(IMPORTAR_ICMS_ISENTO_MIGRACAO_PRODUTO);
+    }
 
     /**
      * @param ignorarClienteImpVenda the verificaClienteImpVenda to set
@@ -493,6 +501,19 @@ public final class Parametros implements Iterable<Parametro>{
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Erro ao gravar", ex);
             throw new RuntimeException(ex);            
+        }
+    }
+    
+    /**
+     * @param importarIcmsIsentoMigracaoProduto 
+     */
+    public void setImportarIcmsIsentoMigracaoProduto(boolean importarIcmsIsentoMigracaoProduto) {
+        try {
+            put(importarIcmsIsentoMigracaoProduto, IMPORTAR_ICMS_ISENTO_MIGRACAO_PRODUTO);
+            LOG.finer("Importar dados do banco implantacao alterado");
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro ao gravar", ex);
+            throw new RuntimeException(ex);
         }
     }
     

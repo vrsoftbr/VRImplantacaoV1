@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.CestDAO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -33,6 +34,7 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoAutomacaoDAO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoComplementoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
@@ -477,8 +479,12 @@ public class ProdutoRepositoryProvider {
             }
             
             Icms icm = icms.get(icmsId);
-            if (icm == null) {
-                icm = Icms.getIsento();
+            if (icm == null) {                
+                if (Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
+                    icm = Icms.getIsento();
+                } else {
+                    throw new Exception("Icms não existe: " + icmsId);
+                }                
             }
             
             return icm;

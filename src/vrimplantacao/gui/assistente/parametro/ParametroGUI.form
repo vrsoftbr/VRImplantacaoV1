@@ -174,6 +174,7 @@
                                       </Group>
                                       <Group type="102" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkIgnorarClienteImpVenda" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
@@ -204,7 +205,9 @@
                                   <Component id="chkIgnorarClienteImpVenda" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="12" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace pref="10" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -240,6 +243,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarCadastroProdutoVenda">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="For&#xe7;ar cadastro de produto que n&#xe3;o existe na importa&#xe7;&#xe3;o de venda"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarIcmsIsentoMigracaoProduto">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Importar Icms ISENTO quando n&#xe3;o encontrar a tributa&#xe7;&#xe3;o de Icms na migra&#xe7;&#xe3;o do produto"/>
                           </Properties>
                         </Component>
                       </SubComponents>
@@ -359,7 +367,7 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" attributes="0">
                                           <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="0" pref="201" max="32767" attributes="0"/>
+                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                       </Group>
                                       <Component id="txtNomeDriverODBC" max="32767" attributes="0"/>
                                   </Group>
@@ -494,7 +502,7 @@
                                   <Component id="chkNfeSaidaVerificarFechamentoPeriodo" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkNfeSaidaProcessarFinalizacoes" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="65" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -543,7 +551,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="63" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="87" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
@@ -630,7 +638,7 @@
                           <Component id="pnlTipoLog" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlNivelLog" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="102" max="32767" attributes="0"/>
+                          <EmptySpace pref="123" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
