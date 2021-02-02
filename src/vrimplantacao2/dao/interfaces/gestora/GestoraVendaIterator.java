@@ -43,7 +43,7 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
     private String getFullSQL(SQLUtils.Intervalo intervalo) {
         return "select\n"
                 + "	com_registro id,\n"
-                + "	com_ncupom numerocupom,\n"
+                + "	lote_codigo numerocupom,\n"
                 + "	case maq_nome\n"
                 + "		when 'caixa-01' then 1\n"
                 + "		when 'caixa-02' then 2\n"
@@ -69,7 +69,7 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
                 + "	end cancelado\n"
                 + "from\n"
                 + "	" + getNomeTabela(intervalo.dataInicial) + " as cp \n"
-                + "where com_ncupom != 0";
+                + "where com_ncupom != 0 and com_tipo_emissao like 'N'";
 
     }
 

@@ -28,6 +28,8 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -751,7 +753,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         return Result;
     }
 
-    public void importarContasAPagar(int idLojaVR) throws Exception {
+    /*public void importarContasAPagar(int idLojaVR) throws Exception {
         ProgressBar.setStatus("Carregando dados para comparação...");
 
         List<PagarOutrasDespesasVO> vPagarOutrasDespesas = carregarContasPagarGetWay(idLojaVR, getLojaOrigem());
@@ -787,7 +789,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	contabil cp\n"
                     + "	join FORNECEDOR f on cp.FOR_CODIGO = f.FOR_CODIGO\n"
                     + "where \n"
-                    + "	cp.CON_STATUS = 'X' and cp.EMP_CODIGO = " + Utils.stringToInt(lojaOrigem)
+                    + "	cp.CON_STATUS = 'X' and cp.EMP_CODIGO = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     PagarOutrasDespesasVO vo = new PagarOutrasDespesasVO();
@@ -835,6 +837,71 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }*/
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> Result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	CP.FOR_CODIGO ID_FORNECEDOR,\n"
+                    + "	RTRIM(F.FOR_CGC) CNPJ,\n"
+                    + "	CP.CON_NLCTO NUMEROCDOCUMENTO,\n"
+                    //+ "	210 ID_TIPOENTRADA,\n"
+                    + "	COALESCE(CP.CON_EMISSAO, CP.CON_DLCTO) DATAEMISSAO,\n"
+                    + "	CP.CON_DLCTO DATAENTRADA,\n"
+                    + "	CP.CON_VALOR VALOR,\n"
+                  //+ " 0 ID_SITUACAOPAGAROUTRASDESPESAS,\n"
+                    + "	COALESCE(CP.CON_HISTORICO1, '') CON_HISTORICO1,\n"
+                    + "	COALESCE(CP.CON_HISTORICO2, '') CON_HISTORICO2,\n"
+                    + "	COALESCE(CP.CON_DEBITO, '') CON_DEBITO,\n"
+                    + "	COALESCE(CP.CON_CREDITO, '') CON_CREDITO,\n"
+                    + "	COALESCE(CP.USU_LOGIN, '') USU_LOGIN,\n"
+                    + "	COALESCE(CP.CON_BARRA, '') CON_BARRA,\n"
+                    + "	CAST(SUBSTRING(CP.CON_NDOC,1,1) AS INTEGER) PARCELA,\n"
+                    + "	CP.CON_VECTO VENCIMENTO\n"
+                    + "FROM\n"
+                    + "	CONTABIL CP\n"
+                    + "JOIN FORNECEDOR F ON CP.FOR_CODIGO = F.FOR_CODIGO\n"
+                    + "WHERE\n"
+                    + "	CP.CON_STATUS = 'X'"
+                            /*+ "/n"
+                    + "	AND CP.EMP_CODIGO = " + getLojaOrigem() + ""*/
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setIdFornecedor(rst.getString("ID_FORNECEDOR"));
+                    imp.setCnpj(rst.getString("CNPJ"));
+                    imp.setId(rst.getString("NUMEROCDOCUMENTO"));
+
+                    String doc = Utils.formataNumero(rst.getString("NUMEROCDOCUMENTO"));
+
+                    imp.setNumeroDocumento(doc);
+
+                    if (doc != null && !"".equals(doc)) {
+                        if (doc.length() > 6) {
+                            imp.setNumeroDocumento(doc.substring(0, 6));
+                        }
+                    }
+
+                  //imp.setIdTipoEntradaVR(rst.getInt("ID_TIPOENTRADA"));
+                    imp.setDataEmissao(rst.getDate("DATAEMISSAO"));
+                    imp.setDataEntrada(rst.getDate("DATAENTRADA"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("DATAENTRADA"));
+                    imp.setValor(rst.getDouble("VALOR"));
+
+                    imp.setObservacao((rst.getString("CON_HISTORICO1") == null ? "" : rst.getString("CON_HISTORICO1")) + " "
+                            + (rst.getString("CON_HISTORICO2") == null ? "" : rst.getString("CON_HISTORICO2")));
+                    imp.setVencimento(rst.getDate("VENCIMENTO"));
+                    //ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("VENCIMENTO"), imp.getValor());
+                    //parc.setNumeroParcela(rst.getInt("PARCELA"));
+
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
     }
 
     public void corrigirObservacoesForn() throws Exception {
