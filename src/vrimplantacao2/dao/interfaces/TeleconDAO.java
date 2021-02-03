@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -289,6 +291,40 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	cd_produto idproduto,\n" +
+                    "	dt_inicial,\n" +
+                    "	dt_final,\n" +
+                    "	valor,\n" +
+                    "	valor_promocao\n" +
+                    "from	\n" +
+                    "	promocao\n" +
+                    "where \n" +
+                    "	dt_final > CURRENT_TIMESTAMP\n" +
+                    "order by\n" +
+                    "	dt_final")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("dt_inicial"));
+                    imp.setDataFim(rs.getDate("dt_final"));
+                    imp.setPrecoNormal(rs.getDouble("valor"));
+                    imp.setPrecoOferta(rs.getDouble("valor_promocao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
