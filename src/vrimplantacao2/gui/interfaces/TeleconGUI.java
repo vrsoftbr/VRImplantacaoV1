@@ -17,7 +17,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.interfaces.EasySacDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.TeleconDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -240,8 +239,6 @@ public class TeleconGUI extends VRInternalFrame implements ConexaoEvent {
                         if(chkCliBloqueado.isSelected()) {
                             opcoes.add(OpcaoCliente.BLOQUEADO);
                         }
-                        
-                        importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                         
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {

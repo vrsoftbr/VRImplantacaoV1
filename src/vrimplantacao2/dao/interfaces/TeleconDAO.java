@@ -75,7 +75,8 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.CODIGO_BENEFICIO
                 }
         ));
     }
@@ -94,8 +95,7 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	Aliquotas")) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codigo"), 
-                            rs.getString("descricao"), 0, 
-                            rs.getDouble("aliquota"), 0));
+                            rs.getString("descricao")));
                 }
             }
         }
@@ -139,6 +139,8 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "join grupos g1 on substring(p.grupo, 0, 3) = substring(g1.codigo, 0, 3)\n" +
                     "join grupos g2 on substring(g2.codigo, 0, 3) = substring(g1.codigo, 0, 3) and\n" +
                     "	 substring(g1.codigo, 4, 6) = substring(g2.codigo, 4, 6)\n" +
+                    "where \n" +
+                    "	 substring(g2.codigo, 4, 6) != ''\n" +
                     "order by 1, 3")) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -272,7 +274,15 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("NaturezaReceita"));
                     imp.setPiscofinsCstDebito(rs.getString("CSTPisSaida"));
+                    
                     imp.setIcmsDebitoId(rs.getString("idicms"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setCodigoGIA(rs.getString("gia"));
                     
                     result.add(imp);
                 }
@@ -406,7 +416,13 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setCep(rs.getString("cep"));
                     imp.setUf(rs.getString("estado"));
-                    imp.setDataNascimento(rs.getDate("datanasc"));
+                    
+                    String dtnasc = rs.getString("datanasc").replace("_", "").replace("-", "");
+                    
+                    if(dtnasc != null && dtnasc.length() == 8) {
+                        imp.setDataNascimento(rs.getDate("datanasc"));
+                    }
+                    
                     imp.setValorLimite(rs.getDouble("saldo"));
                     imp.setTelefone(rs.getString("fone"));
                     imp.setEmail(rs.getString("email"));
