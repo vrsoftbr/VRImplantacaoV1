@@ -548,19 +548,28 @@ public class ProdutoIMP {
     
     public void setIcmsCst(int icmsCst) {
         this.icmsCstEntrada = icmsCst;
+        this.icmsCstEntradaForaEstado = icmsCst;
         this.icmsCstSaida = icmsCst;
+        this.icmsCstSaidaForaEstado = icmsCst;
+        this.icmsCstSaidaForaEstadoNF = icmsCst;
         this.icmsCstConsumidor = icmsCst;
     }
 
     public void setIcmsAliq(double icmsAliq) {
         this.icmsAliqEntrada = icmsAliq;
+        this.icmsAliqEntradaForaEstado = icmsAliq;
         this.icmsAliqSaida = icmsAliq;
+        this.icmsAliqSaidaForaEstado = icmsAliq;
+        this.icmsAliqSaidaForaEstadoNF = icmsAliq;
         this.icmsAliqConsumidor = icmsAliq;
     }
 
     public void setIcmsReducao(double icmsReducao) {
         this.icmsReducaoEntrada = icmsReducao;
+        this.icmsReducaoEntradaForaEstado = icmsReducao;
         this.icmsReducaoSaida = icmsReducao;
+        this.icmsReducaoSaidaForaEstado = icmsReducao;
+        this.icmsReducaoSaidaForaEstadoNF = icmsReducao;
         this.icmsReducaoConsumidor = icmsReducao;
     }
 

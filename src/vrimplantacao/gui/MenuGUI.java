@@ -276,6 +276,7 @@ import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
+import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
@@ -853,6 +854,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu1 = new javax.swing.JMenu();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         chkSysAut = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -3009,6 +3011,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu1.add(chkSysAut);
 
+        jMenuItem7.setText("Telecon");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem7);
+
         mnuDatabase.add(jMenu1);
 
         mnuSQLite.setText("SQLite");
@@ -5066,6 +5076,10 @@ public final class MenuGUI extends VRMdiFrame {
         GondolaGUI.exibir(this);
     }//GEN-LAST:event_mnuGondolaActionPerformed
 
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        TeleconGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5100,6 +5114,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JMenuItem jMenuItemActive;

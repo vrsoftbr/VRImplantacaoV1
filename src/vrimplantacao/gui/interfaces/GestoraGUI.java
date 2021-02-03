@@ -19,6 +19,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao2.dao.interfaces.gestora.GestoraDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
@@ -303,7 +304,7 @@ public class GestoraGUI extends VRInternalFrame {
                         importador.importarNutricionalToledo();
                     }
                     if (chkContasPagar.isSelected()) {
-                        gestoraDAO.importarContasAPagar(idLojaVR);
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                     }
                     if (chkPdvVendas.isSelected()) {
                         gestoraDAO.setVendaDataIni(edtDtVendaIni.getDate());

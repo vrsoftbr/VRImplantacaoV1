@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -218,6 +220,49 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "  p.pv_cod id,\n" +
+                    "  p.pv_nom nome,\n" +
+                    "  p.pv_dat_inic_prom dtinicio,\n" +
+                    "  p.pv_dat_termi_prom dtfim,\n" +
+                    "  pi.pr_cod idproduto,\n" +
+                    "  pi.itpv_val_prvda_prom precopromocao,\n" +
+                    "  pv.pvpr_val_prvda precovenda,\n" +
+                    "  pi.itpv_perc_desc percdesc\n" +
+                    "from \n" +
+                    "  gondola.prom_venda p\n" +
+                    "join gondola.prom_venda_filial pf on p.pv_cod = pf.pv_cod\n" +
+                    "join gondola.item_prom_venda pi on p.pv_cod = pi.pv_cod\n" +
+                    "join gondola.prvda_prduto pv on pi.pr_cod = pv.pr_cod and\n" +
+                    "     pf.fi_cod = pv.fi_cod\n" +
+                    "where \n" +
+                    "     pf.fi_cod = " + getLojaOrigem() + " and \n" +
+                    "     p.pv_dat_termi_prom > sysdate\n" +
+                    "order by \n" +
+                    "     p.pv_dat_termi_prom")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("dtinicio"));
+                    imp.setDataFim(rs.getDate("dtfim"));
+                    imp.setPrecoNormal(rs.getDouble("precovenda"));
+                    imp.setPrecoOferta(rs.getDouble("precopromocao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 
