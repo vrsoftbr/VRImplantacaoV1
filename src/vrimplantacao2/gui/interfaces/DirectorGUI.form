@@ -12,6 +12,11 @@
         <Property name="text" type="java.lang.String" value="vRCheckBox2"/>
       </Properties>
     </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="vRCheckBox3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="vRCheckBox3"/>
+      </Properties>
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Director"/>
@@ -152,6 +157,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCondicaoPagamento">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Condi&#xe7;ao Pagamento"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIndicadorIE">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Indicador IE"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornSituacaoCadastro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">

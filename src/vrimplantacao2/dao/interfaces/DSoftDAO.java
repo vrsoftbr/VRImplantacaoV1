@@ -898,7 +898,12 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     if ((numParcela != null)
                             && (!numParcela.trim().isEmpty())) {
-                        parc.setNumeroParcela(Utils.stringToInt(numParcela.substring(numParcela.indexOf("/"))));
+                        if (numParcela.contains("/")) {
+                            parc.setNumeroParcela(Utils.stringToInt(numParcela.substring(numParcela.indexOf("/"))));
+                        } else {
+                            parc.setNumeroParcela(Utils.stringToInt(numParcela));
+                        }
+                        
                     } else {
                         parc.setNumeroParcela(1);
                     }
@@ -995,7 +1000,8 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    v.tipo_ecf,\n"
                     + "    v.nfce_chave\n"
                     + "from venda v\n"
-                    + "where v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
+                    + "where v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n"
+                    + "AND v.NFCE_STATUS = 'AUTORIZADA'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1022,8 +1028,8 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
 
     }
 
-    private static class VendaItemIterator extends ShiDAO implements Iterator<VendaItemIMP> {
-
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+        
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
         private Statement stm = ConexaoFirebird.getConexao().createStatement();

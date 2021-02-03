@@ -22,6 +22,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -91,6 +92,7 @@ public class DirectorDAO extends InterfaceDAO {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.MAPA_TRIBUTACAO,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST
         ));
@@ -329,16 +331,19 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_reducao_debito"));
-                    imp.setIcmsCstSaidaForaEstado(rs.getInt("icms_debito"));
+                    
+                    imp.setIcmsCstSaidaForaEstado(rs.getInt("cst"));
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaidaForaEstado(rs.getDouble("icms_reducao_debito"));
-                    imp.setIcmsCstSaidaForaEstadoNF(rs.getInt("icms_debito"));
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(rs.getInt("cst"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaidaForaEstadoNF(rs.getDouble("icms_reducao_debito"));                    
 
                     imp.setIcmsCstEntrada(rs.getInt("cst"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_reducao_debito"));
+                    
                     imp.setIcmsCstEntradaForaEstado(rs.getInt("cst"));
                     imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("icms_reducao_debito"));
@@ -422,7 +427,9 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	ct.DFtelefone_celular celular,\n"
                     + "	ct.DFcontato contato,\n"
                     + "	ct.DFcargo_contato cargo_contato,\n"
-                    + "	sc.DFdescricao setor\n"
+                    + "	sc.DFdescricao setor,\n"
+                    + " f.DFindicador_IE as indicadoIE,\n"
+                    + " f.DFdata_inativacao\n"        
                     + "from\n"
                     + "	TBfornecedor f\n"
                     + "left join \n"
@@ -441,9 +448,9 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	TBbairro ba on lo.DFid_bairro = ba.DFid_bairro\n"
                     + "left join\n"
                     + "	TBlocalidade lc on ba.DFcod_localidade = lc.DFcod_localidade\n"
-                    + "inner join\n"
+                    + "left join\n"
                     + "	TBcontato_fornecedor ct on f.DFcod_fornecedor = ct.DFcod_fornecedor\n"
-                    + "       and ct.DFtelefone is not null\n"
+                    //+ "       and ct.DFtelefone is not null\n"
                     + "left join\n"
                     + "	TBsetor_contato sc on ct.DFid_setor_contato = sc.DFid_setor_contato\n"
                     + "order by\n"
@@ -469,7 +476,26 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
-                    imp.setTel_principal(rs.getString("telefone"));
+                    imp.setAtivo((rs.getDate("DFdata_inativacao") == null));
+                    
+                    switch (rs.getInt("indicadoIE")) {
+                        case 1:
+                            imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS);
+                            break;
+                        case 2:
+                            imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ISENTO);
+                            break;
+                        default:
+                            imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+                            break;
+                    }                   
+                    
+                    if (rs.getString("telefone") != null
+                            && !rs.getString("telefone").trim().isEmpty()) {
+                        imp.setTel_principal(rs.getString("telefone"));
+                    } else {
+                        imp.setTel_principal(rs.getString("celular"));
+                    }
 
                     int idTipoEmpresa = rs.getInt("idtipo_empresa");
                     if (idTipoEmpresa == 57) {
@@ -676,7 +702,8 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	sc.DFdescricao setor,\n"
                     + "	cn.DFfax fax,\n"
                     + "	cn.DFtelefone telefone,\n"
-                    + "	cn.DFtelefone_celular celular\n"
+                    + "	cn.DFtelefone_celular celular,\n"
+                    + " c.DFid_tipo_cliente tipocliente\n"        
                     + "from\n"
                     + "	TBcliente c\n"
                     + "left join\n"
@@ -735,8 +762,26 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setFax(rs.getString("fax"));
-                    imp.setPermiteCreditoRotativo(true);
-                    imp.setPermiteCheque(true);
+                    
+                    switch (rs.getInt("tipocliente")) {
+                        case 9: // CHEQUE
+                            imp.setPermiteCreditoRotativo(false);
+                            imp.setPermiteCheque(true);
+                            break;
+                        case 26: // CONVENIO
+                            imp.setPermiteCreditoRotativo(false);
+                            imp.setPermiteCheque(false);
+                            break;
+                        case 31: // FUNCIONARIO
+                            imp.setPermiteCreditoRotativo(true);
+                            imp.setPermiteCheque(false);
+                            break;
+                        default:
+                            imp.setPermiteCreditoRotativo(true);
+                            imp.setPermiteCheque(true);
+                            break;
+                    }
+                    
 
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(

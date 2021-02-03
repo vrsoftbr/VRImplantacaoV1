@@ -201,7 +201,15 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCondicaoPagamento.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO);
                         }
+                        
+                        if (chkIndicadorIE.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.TIPO_INDICADOR_IE);
+                        }
 
+                        if (chkFornSituacaoCadastro.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
+                        }
+                        
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
@@ -299,6 +307,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         vRCheckBox1 = new vrframework.bean.checkBox.VRCheckBox();
         vRCheckBox2 = new vrframework.bean.checkBox.VRCheckBox();
+        vRCheckBox3 = new vrframework.bean.checkBox.VRCheckBox();
         conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
         lblLojaCliente = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
@@ -310,6 +319,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         chkTelefone = new vrframework.bean.checkBox.VRCheckBox();
         chkContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
+        chkIndicadorIE = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornSituacaoCadastro = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -351,6 +362,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         vRCheckBox2.setText("vRCheckBox2");
 
+        vRCheckBox3.setText("vRCheckBox3");
+
         setTitle("Importação Director");
         setToolTipText("");
 
@@ -375,6 +388,12 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCondicaoPagamento.setText("Condiçao Pagamento");
         tabFornecedor.add(chkCondicaoPagamento);
+
+        chkIndicadorIE.setText("Indicador IE");
+        tabFornecedor.add(chkIndicadorIE);
+
+        chkFornSituacaoCadastro.setText("Situação Cadastro");
+        tabFornecedor.add(chkFornSituacaoCadastro);
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
@@ -731,8 +750,10 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkFornSituacaoCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkIcmsForaEstado;
+    private vrframework.bean.checkBox.VRCheckBox chkIndicadorIE;
     private vrframework.bean.checkBox.VRCheckBox chkObservacao2;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPermiteCheque;
@@ -768,6 +789,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTextField txtCompLoja;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox1;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox2;
+    private vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
