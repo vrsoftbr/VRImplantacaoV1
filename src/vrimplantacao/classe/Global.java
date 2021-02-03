@@ -2,8 +2,8 @@ package vrimplantacao.classe;
 
 public class Global {
 
-    public static String VERSAO = "1.1.1-with-v2";
-    public static String DATA = "23/01/2021";
+    public static String VERSAO = "1.1.2";
+    public static String DATA = "04/02/2021";
     public static int idLoja = 0;
     public static String loja = "";
     public static int idEstado = 0;
