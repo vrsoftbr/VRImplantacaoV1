@@ -19,15 +19,16 @@ import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.EasySacDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.TeleconDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
+public class TeleconGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "EasySac";
-    private static EasySacGUI instance;
+    private static final String SISTEMA = "Telecon";
+    private static TeleconGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -59,19 +60,19 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
    
-    private EasySacDAO dao = new EasySacDAO();
+    private TeleconDAO dao = new TeleconDAO();
     
-    private EasySacGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private TeleconGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         this.title = "Importação " + SISTEMA;
 
         conexao.host = "localhost";
-        conexao.database = "EasySAC";
+        conexao.database = "GESTAO";
         conexao.port = "1433";
         conexao.user = "sa";
-        conexao.pass = "*servidor1423";
+        conexao.pass = "a2m8x7h5";
 
         tabProdutos.setOpcoesDisponiveis(dao);
         
@@ -146,7 +147,7 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new EasySacGUI(i_mdiFrame);
+                instance = new TeleconGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -318,7 +319,7 @@ public class EasySacGUI extends VRInternalFrame implements ConexaoEvent {
         txtLojaCliente = new javax.swing.JTextField();
         cmbLojaOrigem = new javax.swing.JComboBox();
 
-        setTitle("Importação EasySac");
+        setTitle("Importação Telecon");
         setToolTipText("");
 
         conexao.setSistema("JM2Online");
