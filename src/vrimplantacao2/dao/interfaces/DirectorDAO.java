@@ -975,6 +975,8 @@ public class DirectorDAO extends InterfaceDAO {
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
+                        
+                        next.setChaveNfCe(rst.getString("chave"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -988,10 +990,10 @@ public class DirectorDAO extends InterfaceDAO {
                     = "select\n"
                     + "	DFnumero as numerocupom,\n"
                     + "	dfserie as ecf,\n"
-                    + "	dfdata_emissao as data,\n"
+                    + "	convert(date, dfdata_emissao, 105) as data,\n"
                     + "	coalesce(dfcod_cliente_destinatario,'') as idclientepreferencial,\n"
-                    + "	min(dfdata_emissao) as horainicio,\n"
-                    + "	max(dfdata_emissao) as horatermino,\n"
+                    + "	min(convert(nvarchar(8), dfdata_emissao, 108)) as horainicio,\n"
+                    + "	max(convert(nvarchar(8), dfdata_emissao, 108)) as horatermino,\n"
                     + "	dfcancelado  as cancelado,\n"
                     + "	cfe.dfvalor_total as subtotalimpressora,\n"
                     + "	dfcnpj_cpf cpf,\n"
@@ -1002,7 +1004,8 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	b.dfdescricao as bairro,\n"
                     + "	c.dfdescricao as cidade,\n"
                     + "	c.dfcod_uf as estado,\n"
-                    + "	dfcod_cep as cep\n"
+                    + "	dfcod_cep as cep,\n"
+                    + " cfe.DFchave_acesso_nfe as chave\n"
                     + "from\n"
                     + "	TBnota_fiscal_saida_nfce cfe\n"
                     + "	left join TBitem_nota_fiscal_saida_nfce icfe on cfe.DFid_nota_fiscal_saida_nfce = icfe.DFid_nota_fiscal_saida_nfce \n"
@@ -1033,7 +1036,7 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	c.dfdescricao,\n"
                     + "	c.dfcod_uf ,\n"
                     + "	dfcod_cep,\n"
-                    + "	dfcod_empresa_emitente\n"
+                    + " cfe.DFchave_acesso_nfe\n"
                     + "order by numerocupom, dfdata_emissao";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1080,19 +1083,21 @@ public class DirectorDAO extends InterfaceDAO {
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        //next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
                         //next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         
 
-                        String trib = rst.getString("codaliq_venda");
+                        String trib = rst.getString("tributacao");
+                        Double aliquota = rst.getDouble("aliquota_icms");
                         /*if (trib == null || "".equals(trib)) {
                             trib = rst.getString("codaliq_produto");
                         }*/
 
-                        obterAliquota(next, trib);
+                        obterAliquota(next, trib, aliquota);
                     }
                 }
             } catch (Exception ex) {
@@ -1107,7 +1112,7 @@ public class DirectorDAO extends InterfaceDAO {
          * @param item
          * @throws SQLException
          */
-        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
+        public void obterAliquota(VendaItemIMP item, String icms, Double aliquota) throws SQLException {
             /*
              TA	7.00	ALIQUOTA 07%
              TB	12.00	ALIQUOTA 12%
@@ -1121,25 +1126,9 @@ public class DirectorDAO extends InterfaceDAO {
             int cst;
             double aliq;
             switch (icms) {
-                case "TA":
+                case "T":
                     cst = 0;
-                    aliq = 7;
-                    break;
-                case "TB":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "TC":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "TD":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "TE":
-                    cst = 0;
-                    aliq = 11;
+                    aliq = aliquota;
                     break;
                 case "F":
                     cst = 60;
@@ -1164,17 +1153,21 @@ public class DirectorDAO extends InterfaceDAO {
                     //+ "icfe.dfid_item_nota_fiscal_saida_nfce as id,\n"
                     + "	dfnumero as numerocupom,\n"
                     + "	dfserie as ecf,\n"
-                    + "	dfdata_emissao as data,\n"
+                    + "	convert(date, dfdata_emissao, 105) as data,\n"
                     + "	ie.DFcod_item_estoque as produto,\n"
                     + "	un.dfdescricao unidade,\n"
                     + "	ie.dfdescricao as descricao,    \n"
-                    + "	isnull(dfqtde, 0) as quantidade,\n"
-                    + "	isnull(icfe.dfvalor_total, 0) as total,\n"
+                    + "	coalesce(dfqtde, 0) as quantidade,\n"
+                    + "	coalesce(icfe.dfvalor_total, 0) as total,\n"
+                    + "	coalesce(icfe.DFpreco_unitario, 0) as precovenda,\n"
+                    + "	coalesce(icfe.DFvalor_desconto, 0) as desconto,"
                     + "	case\n"
                     + "		when LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque)) > 14 \n"
                     + "		then SUBSTRING((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque), 4, LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) ))\n"
                     + "	else (select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) end as codigobarras,\n"
-                    + "	icfe.dfaliquota_icms codaliq_venda\n"
+                    + "	icfe.DFcod_tributacao_st  as cst,\n"
+                    + "	icfe.dfaliquota_icms aliquota_icms,\n"
+                    + "	icfe.DFtipo_tributacao as tributacao\n"
                     + "from\n"
                     + "	TBitem_nota_fiscal_saida_nfce icfe\n"
                     + "	left join TBnota_fiscal_saida_nfce cfe on icfe.DFid_nota_fiscal_saida_nfce = cfe.DFid_nota_fiscal_saida_nfce\n"
@@ -1183,7 +1176,7 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	left join TBunidade un on uie.DFcod_unidade = un.DFcod_unidade\n"
                     + "	left join TBtipo_tributacao tt on icfe.dftipo_tributacao = tt.dftipo_tributacao\n"
                     + "where \n"
-                    + "	cfe.DFdata_emissao convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
+                    + "	cfe.DFdata_emissao between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23) \n"
                     + "	and DFcod_empresa_emitente = " + idLojaCliente + "\n"
                     + "	order by data, numerocupom";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

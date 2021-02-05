@@ -113,7 +113,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA
+                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
                 }
         ));
     }
@@ -259,8 +260,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "					x.cdg_interno = ncm.cdg_interno and \n" +
                     "					x.dat_ini_vigencia <= current year to fraction(3))\n" +
                     "where \n" +
-                    "	est.cdg_filial = " + getLojaOrigem() + "\n" +
-                    "   and p.qtd_por_emb = 1")) {
+                    "	est.cdg_filial = " + getLojaOrigem())) {
+                    //"   and p.qtd_por_emb = 1")) {
                 while(rs.next()) {
                    ProdutoIMP imp = new ProdutoIMP();
                    
@@ -295,9 +296,15 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                    imp.setCodMercadologico3(rs.getString("merc3"));
                    imp.setCodMercadologico4(rs.getString("merc4"));
                    imp.setIcmsDebitoId(rs.getString("idicms"));
+                   imp.setIcmsDebitoForaEstadoId(rs.getString("idicms"));
+                   imp.setIcmsDebitoForaEstadoNfId(rs.getString("idicms"));
                    imp.setIcmsCstEntrada(00);
                    imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
                    imp.setIcmsReducaoEntrada(0.0);
+                   imp.setIcmsCstEntradaForaEstado(00);
+                   imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito"));
+                   imp.setIcmsReducaoEntradaForaEstado(0.0);
+                   imp.setIcmsConsumidorId(rs.getString("idicms"));
                    imp.setPiscofinsCstCredito(rs.getString("pis_credito"));
                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                    

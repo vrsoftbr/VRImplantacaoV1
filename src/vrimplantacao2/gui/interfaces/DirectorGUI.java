@@ -86,6 +86,10 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(vLojaCliente);
+        
+        
         centralizarForm();
         this.setMaximum(false);
     }
@@ -256,7 +260,7 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkPdvVendas.isSelected()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
-                            //importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
