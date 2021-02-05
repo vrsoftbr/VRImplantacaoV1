@@ -12,6 +12,7 @@ public class ReceitaBalancaIMP {
     private String id;
     private String descricao;
     private String receita;
+    private String observacao;
     private Set<String> produtos = new HashSet<>();
 
     public String getId() {
@@ -46,4 +47,11 @@ public class ReceitaBalancaIMP {
         return this.produtos.add(id);
     }
     
+    public String getObservacao() {
+        return this.observacao;
+    }
+    
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
+    }
 }

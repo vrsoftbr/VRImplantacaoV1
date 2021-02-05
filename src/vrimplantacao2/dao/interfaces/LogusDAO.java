@@ -8,9 +8,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoInformix;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -260,27 +263,54 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "					x.cdg_interno = ncm.cdg_interno and \n" +
                     "					x.dat_ini_vigencia <= current year to fraction(3))\n" +
                     "where \n" +
-                    "	est.cdg_filial = " + getLojaOrigem())) {
-                    //"   and p.qtd_por_emb = 1")) {
+                    "	est.cdg_filial = " + getLojaOrigem() + "\n" + 
+                    "   and p.qtd_por_emb = 1")) {
+                
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while(rs.next()) {
                    ProdutoIMP imp = new ProdutoIMP();
+                   ProdutoBalancaVO produtoBalanca;
                    
                    imp.setImportLoja(getLojaOrigem());
                    imp.setImportSistema(getSistema());
                    imp.setImportId(rs.getString("id_interno"));
+                   imp.setEan(rs.getString("ean"));
                    imp.setDescricaoCompleta(rs.getString("descricaogondola") == null ? rs.getString("descricaoreduzida")
                            :rs.getString("descricaogondola"));
                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                   if((rs.getString("pesavel") != null && 
-                           "V".equals(rs.getString("pesavel").trim().toUpperCase())) ||
-                           rs.getInt("unitarioPesavel") == 1) {
-                       imp.seteBalanca(true);
-                   }
-                   if(rs.getString("desativacao") != null) {
-                       imp.setSituacaoCadastro(0);
-                   }
-                   imp.setEan(rs.getString("ean"));
+                   
+                   
+                    if (!produtosBalanca.isEmpty()) {
+
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(imp.getEan());
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
+
+                    } else {
+                        if ((rs.getString("pesavel") != null
+                                && "V".equals(rs.getString("pesavel").trim().toUpperCase()))
+                                || rs.getInt("unitarioPesavel") == 1) {
+                            imp.seteBalanca(true);
+                        }
+                        if (rs.getString("desativacao") != null) {
+                            imp.setSituacaoCadastro(0);
+                        }
+
+                    }
+                                      
                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                    imp.setPrecovenda(rs.getDouble("precovenda"));

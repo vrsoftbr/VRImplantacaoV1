@@ -8,9 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +21,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
@@ -32,6 +35,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -94,7 +98,8 @@ public class DirectorDAO extends InterfaceDAO {
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.NCM,
-                OpcaoProduto.CEST
+                OpcaoProduto.CEST,
+                OpcaoProduto.RECEITA_BALANCA
         ));
     }
 
@@ -908,6 +913,48 @@ public class DirectorDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	rb.DFcod_receita as id,	\n"
+                    + "	rb.DFobservacao_2 as descricao,\n"
+                    + "	rb.DFobservacao_1 as observacao,\n"
+                    + "	CONCAT(\n"
+                    + "		rb.DFcampo_extra_1, ' ', rb.DFcampo_extra_2, ' ', rb.DFcampo_extra_3, ' ',\n"
+                    + "		rb.DFcampo_extra_4, ' ', rb.DFcampo_extra_5, ' ', rb.DFcampo_extra_6, ' ',\n"
+                    + "		rb.DFCampo_extra_7, ' ', rb.DFcampo_extra_8, ' ', rb.DFcampo_extra_9, ' ',\n"
+                    + "		rb.DFcampo_extra_10, ' ', rb.DFcampo_extra_11, ' ', rb.DFcampo_extra_12, ' ',\n"
+                    + "		rb.DFcampo_extra_13, ' ', rb.DFcampo_extra_14, ' ', rb.DFcampo_extra_15) as receita,\n"
+                    + "		rb.DFcod_receita as idproduto\n"
+                    + "from TBreceita rb\n"
+                    + "order by 2"
+            )) {
+                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
+                while (rst.next()) {
+
+                    ReceitaBalancaIMP imp = receitas.get(rst.getString("id"));
+
+                    if (imp == null) {
+                        imp = new ReceitaBalancaIMP();
+                        imp.setId(rst.getString("id"));
+                        imp.setDescricao(rst.getString("descricao"));
+                        imp.setReceita(rst.getString("receita"));
+                        imp.setObservacao(rst.getString("observacao"));
+                        receitas.put(imp.getId(), imp);
+                    }
+
+                    imp.getProdutos().add(rst.getString("idproduto"));
+                }
+
+                return new ArrayList<>(receitas.values());
+            }
+        }
     }
 
     private Date dataInicioVenda;

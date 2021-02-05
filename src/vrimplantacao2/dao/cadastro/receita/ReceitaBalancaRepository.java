@@ -132,6 +132,7 @@ public class ReceitaBalancaRepository {
         ReceitaBalancaToledoVO vo = new ReceitaBalancaToledoVO();
         
         vo.setDescricao(imp.getDescricao());
+        vo.setObservacao(imp.getObservacao());
         
         String receita = imp.getReceita() != null ? imp.getReceita() : "";        
         receita = Utils.acertarTexto(receita.replaceAll("\\r?\\n", " "));
