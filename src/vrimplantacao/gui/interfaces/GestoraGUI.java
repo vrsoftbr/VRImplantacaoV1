@@ -304,7 +304,7 @@ public class GestoraGUI extends VRInternalFrame {
                         importador.importarNutricionalToledo();
                     }
                     if (chkContasPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                     }
                     if (chkPdvVendas.isSelected()) {
                         gestoraDAO.setVendaDataIni(edtDtVendaIni.getDate());
@@ -456,6 +456,7 @@ public class GestoraGUI extends VRInternalFrame {
         vRLabel6.setText("Nome Loja");
 
         txtNomeLoja.setCaixaAlta(false);
+        txtNomeLoja.setEnabled(false);
         txtNomeLoja.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNomeLojaActionPerformed(evt);
@@ -909,7 +910,7 @@ public class GestoraGUI extends VRInternalFrame {
                 .addContainerGap(207, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Outros", jPanel1);
+        vRTabbedPane2.addTab("Contas a Pagar", jPanel1);
 
         pnlVendas.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
 
