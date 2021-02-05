@@ -301,16 +301,19 @@ public class ProdutoAnteriorDAO {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "ant.codigoatual\n"
-                    + "FROM \n"
-                    + "implantacao.codant_produto ant\n"
-                    + "inner join implantacao.codant_ean ean on ean.importid = ant.impid\n"
-                    + "where ant.impsistema = " + SQLUtils.stringSQL(sistema) + "\n"
-                    + "and ean.importsistema = " + SQLUtils.stringSQL(sistema) + "\n"
-                    + "and ant.imploja = " + SQLUtils.stringSQL(loja) + "\n"
-                    + "and ean.importloja = " + SQLUtils.stringSQL(loja) + "\n"
-                    + "and ean.ean = '" + Utils.stringLong(ean) + "'" //SQLUtils.stringSQL(ean)
+                    "select\n" +
+                    "	cp.codigoatual\n" +
+                    "from\n" +
+                    "	implantacao.codant_ean ce\n" +
+                    "	join implantacao.codant_produto cp on\n" +
+                    "		ce.importsistema = cp.impsistema and\n" +
+                    "		ce.importloja = cp.imploja and\n" +
+                    "		ce.importid = cp.impid\n" +
+                    "where\n" +
+                    "	ce.ean = '" + ean + "' and\n" +
+                    "	ce.importsistema = '" + sistema + "' and\n" +
+                    "	ce.importloja = '" + loja + "'\n" +
+                    "limit 1\n"
             )) {
 
                 if (rst.next()) {
