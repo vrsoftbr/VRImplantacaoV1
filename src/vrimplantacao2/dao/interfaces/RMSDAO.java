@@ -470,7 +470,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.git_cod_item id,\n"
                     + "	p.git_cod_item||p.git_digito codigosped,\n"
                     + "	p.GIT_DAT_ENT_LIN datacadastro,\n"
-                    + "	p.GIT_EMB_FOR qtdembalagemcotacao,\n"
+                    + "	p.GIT_EMB_FOR qtdembalagemcotacao,\n"        
                     + "	ean.EAN_COD_EAN ean,\n"
                     + "	ean.EAN_EMB_VENDA qtdEmbalagem,\n"
                     + "	ean.EAN_TPO_EMB_VENDA tipoEmbalagem,\n"
@@ -500,8 +500,10 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when coalesce(preco.preco, 0) != 0 \n"
                     + "	then preco.preco\n"
                     + "	else coalesce(est.get_preco_venda,0) end precovenda,\n"
-                    + "   coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n"
-                    + "	p.git_cus_rep custosemimposto,\n"
+                    //+ " coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n"
+                    //+ " p.git_cus_rep custosemimposto,\n"
+                    + " p.git_cus_ult_ent_bru as CustoUltimaEntradaBruto custocomimposto,\n"
+                    + " p.git_cus_ult_ent as CustoUltimaEntrada custosemimposto,\n"        
                     + "	det.DET_CLASS_FIS ncm,\n"
                     + "	det.DET_NCM_EXCECAO excecao,\n"
                     + "	det.DET_CEST cest,\n"
@@ -656,6 +658,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setVolume(rst.getDouble("qtdembalagemcotacao"));
 
                     imp.setVendaPdv("S".equals(rst.getString("git_envia_pdv")));
 

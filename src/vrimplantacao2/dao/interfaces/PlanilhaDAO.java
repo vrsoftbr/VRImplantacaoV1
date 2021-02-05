@@ -27,6 +27,7 @@ import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.utils.arquivo.csv.ArquivoCSV2;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -48,6 +49,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -805,6 +807,29 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             result.add(imp);
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        
+        Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        
+        for (LinhaArquivo linha : arq) {
+            ContaReceberIMP imp = new ContaReceberIMP();
+
+            imp.setId(linha.getString("id"));
+            imp.setIdClienteEventual(linha.getString("idclienteeventual"));
+            imp.setIdFornecedor(linha.getString("idfornecedor"));
+            imp.setDataEmissao(linha.getData("dataemissao"));
+            imp.setDataVencimento(linha.getData("datavencimento"));
+            imp.setValor(linha.getDouble("valor"));
+            imp.setObservacao(linha.getString("observacao"));
+            
+            result.add(imp);
+        }
+        
         return result;
     }
 
