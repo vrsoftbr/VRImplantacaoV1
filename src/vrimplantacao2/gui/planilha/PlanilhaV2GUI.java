@@ -27,6 +27,7 @@ import vrimplantacao2.dao.interfaces.PlanilhaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.window.WindowUtils;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 
 /**
  *
@@ -143,6 +144,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkCliCheques = new vrframework.bean.checkBox.VRCheckBox();
         chkCNPJCli = new javax.swing.JCheckBox();
         chkLimiteRotativo = new javax.swing.JCheckBox();
+        chkCliContaReceber = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -430,7 +432,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(chkFornSpec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
 
         tabsForn.addTab("Importação", tabFornImportacao);
@@ -457,7 +459,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkFornUnificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFornUnificarProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(172, Short.MAX_VALUE))
+                .addContainerGap(220, Short.MAX_VALUE))
         );
 
         tabsForn.addTab("Unificação", tabFornUnificacao);
@@ -494,7 +496,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(btnFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addContainerGap(210, Short.MAX_VALUE))
         );
 
         tabsForn.addTab("Especial", tabFornEspecial);
@@ -658,6 +660,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkLimiteRotativo, "Limite Rotativo");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCliContaReceber, "Conta Receber Fornecedor");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -680,7 +684,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkCNPJCli)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkLimiteRotativo)))
+                        .addComponent(chkLimiteRotativo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliContaReceber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(139, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -693,10 +699,14 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCliCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCNPJCli)
-                    .addComponent(chkLimiteRotativo)))
+                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkCNPJCli)
+                        .addComponent(chkLimiteRotativo))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel2Layout.createSequentialGroup()
+                        .addComponent(chkCliContaReceber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
 
         vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente Eventual"));
@@ -742,7 +752,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             pnlClienteNormalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlClienteNormalLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(vRPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -984,11 +994,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(txtConvQuote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
                     .addComponent(vRLabel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
@@ -1284,6 +1294,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.JCheckBox chkCNPJCli;
     private vrframework.bean.checkBox.VRCheckBox chkCliCheques;
+    private vrframework.bean.checkBox.VRCheckBox chkCliContaReceber;
     private vrframework.bean.checkBox.VRCheckBox chkCliEspec;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenDados;
@@ -1528,6 +1539,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     }
                                     if(chkCliCheques.isSelected()) {
                                         importador.importarCheque();
+                                    }
+                                    if (chkCliContaReceber.isSelected()) {
+                                        importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
                                     }
                                     
                                     if(chkCNPJCli.isSelected()) {

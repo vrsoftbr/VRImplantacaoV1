@@ -11,10 +11,7 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.PagarOutrasDespesasDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVO;
-import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVencimentoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
@@ -53,7 +50,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Gestora" + v_lojaMesmoId;
+        return "Gestora";
     }
 
     private Date vendaDataIni;
@@ -754,91 +751,90 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     /*public void importarContasAPagar(int idLojaVR) throws Exception {
-        ProgressBar.setStatus("Carregando dados para comparação...");
+     ProgressBar.setStatus("Carregando dados para comparação...");
 
-        List<PagarOutrasDespesasVO> vPagarOutrasDespesas = carregarContasPagarGetWay(idLojaVR, getLojaOrigem());
+     List<PagarOutrasDespesasVO> vPagarOutrasDespesas = carregarContasPagarGetWay(idLojaVR, getLojaOrigem());
 
-        ProgressBar.setMaximum(vPagarOutrasDespesas.size());
+     ProgressBar.setMaximum(vPagarOutrasDespesas.size());
 
-        PagarOutrasDespesasDAO pagarOutrasDespesasDAO = new PagarOutrasDespesasDAO();
-        pagarOutrasDespesasDAO.salvar(vPagarOutrasDespesas);
-    }
+     PagarOutrasDespesasDAO pagarOutrasDespesasDAO = new PagarOutrasDespesasDAO();
+     pagarOutrasDespesasDAO.salvar(vPagarOutrasDespesas);
+     }
 
-    private List<PagarOutrasDespesasVO> carregarContasPagarGetWay(int idLojaVR, String lojaOrigem) throws Exception {
-        List<PagarOutrasDespesasVO> result = new ArrayList<>();
+     private List<PagarOutrasDespesasVO> carregarContasPagarGetWay(int idLojaVR, String lojaOrigem) throws Exception {
+     List<PagarOutrasDespesasVO> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	cp.FOR_CODIGO id_fornecedor,\n"
-                    + "	cp.CON_NLCTO numerocdocumento,\n"
-                    + "	210 id_tipoentrada,\n"
-                    + "	coalesce(cp.CON_EMISSAO, cp.CON_DLCTO) dataemissao,\n"
-                    + "	cp.CON_DLCTO dataentrada,\n"
-                    + "	cp.CON_VALOR valor,\n"
-                    + "	0 id_situacaopagaroutrasdespesas,\n"
-                    + "	coalesce(cp.CON_HISTORICO1,'') CON_HISTORICO1,\n"
-                    + "	coalesce(cp.CON_HISTORICO2,'') CON_HISTORICO2,\n"
-                    + "	coalesce(cp.CON_DEBITO,'') CON_DEBITO, \n"
-                    + "	coalesce(cp.CON_CREDITO,'') CON_CREDITO,\n"
-                    + "	coalesce(cp.usu_login,'') usu_login,\n"
-                    + "	coalesce(cp.CON_BARRA,'') CON_BARRA,\n"
-                    + "	coalesce(cp.CON_NDOC,'') CON_NDOC,\n"
-                    + "	cp.CON_VECTO vencimento\n"
-                    + "from \n"
-                    + "	contabil cp\n"
-                    + "	join FORNECEDOR f on cp.FOR_CODIGO = f.FOR_CODIGO\n"
-                    + "where \n"
-                    + "	cp.CON_STATUS = 'X' and cp.EMP_CODIGO = " + getLojaOrigem() + ""
-            )) {
-                while (rst.next()) {
-                    PagarOutrasDespesasVO vo = new PagarOutrasDespesasVO();
+     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select\n"
+     + "	cp.FOR_CODIGO id_fornecedor,\n"
+     + "	cp.CON_NLCTO numerocdocumento,\n"
+     + "	210 id_tipoentrada,\n"
+     + "	coalesce(cp.CON_EMISSAO, cp.CON_DLCTO) dataemissao,\n"
+     + "	cp.CON_DLCTO dataentrada,\n"
+     + "	cp.CON_VALOR valor,\n"
+     + "	0 id_situacaopagaroutrasdespesas,\n"
+     + "	coalesce(cp.CON_HISTORICO1,'') CON_HISTORICO1,\n"
+     + "	coalesce(cp.CON_HISTORICO2,'') CON_HISTORICO2,\n"
+     + "	coalesce(cp.CON_DEBITO,'') CON_DEBITO, \n"
+     + "	coalesce(cp.CON_CREDITO,'') CON_CREDITO,\n"
+     + "	coalesce(cp.usu_login,'') usu_login,\n"
+     + "	coalesce(cp.CON_BARRA,'') CON_BARRA,\n"
+     + "	coalesce(cp.CON_NDOC,'') CON_NDOC,\n"
+     + "	cp.CON_VECTO vencimento\n"
+     + "from \n"
+     + "	contabil cp\n"
+     + "	join FORNECEDOR f on cp.FOR_CODIGO = f.FOR_CODIGO\n"
+     + "where \n"
+     + "	cp.CON_STATUS = 'X' and cp.EMP_CODIGO = " + getLojaOrigem() + ""
+     )) {
+     while (rst.next()) {
+     PagarOutrasDespesasVO vo = new PagarOutrasDespesasVO();
 
-                    vo.setId_loja(idLojaVR);
-                    vo.setId_fornecedor(rst.getInt("id_fornecedor"));
-                    vo.setNumerodocumento(Utils.stringToInt(rst.getString("numerocdocumento")));
-                    vo.setId_tipoentrada(0);
-                    vo.setDataemissao(rst.getDate("dataemissao"));
-                    vo.setDataentrada(rst.getDate("dataentrada"));
-                    vo.setValor(rst.getDouble("valor"));
-                    vo.setId_situacaopagaroutrasdespesas(0);
-                    String obs = "IMPORTADO VR";
-                    if (!"".equals(rst.getString("CON_DEBITO").trim())) {
-                        obs += "|DEB: " + Utils.acertarTexto(rst.getString("CON_DEBITO"));
-                    }
-                    if (!"".equals(rst.getString("CON_CREDITO").trim())) {
-                        obs += "|CRED: " + Utils.acertarTexto(rst.getString("CON_CREDITO"));
-                    }
-                    if (!"".equals(rst.getString("CON_HISTORICO1").trim())) {
-                        obs += "|OBS1: " + Utils.acertarTexto(rst.getString("CON_HISTORICO1"));
-                    }
-                    if (!"".equals(rst.getString("CON_HISTORICO2").trim())) {
-                        obs += "|nOBS2: " + Utils.acertarTexto(rst.getString("CON_HISTORICO2"));
-                    }
-                    if (!"".equals(rst.getString("usu_login").trim())) {
-                        obs += "|nCriado por: " + Utils.acertarTexto(rst.getString("usu_login"));
-                    }
-                    if (!"".equals(rst.getString("CON_BARRA").trim())) {
-                        obs += "|Barra: " + Utils.acertarTexto(rst.getString("CON_BARRA"));
-                    }
-                    if (!"".equals(rst.getString("CON_NDOC").trim())) {
-                        obs += "|nNum. Doc: " + Utils.acertarTexto(rst.getString("CON_NDOC"));
-                    }
-                    vo.setObservacao(Utils.acertarTexto(obs, 280));
-                    PagarOutrasDespesasVencimentoVO venc = new PagarOutrasDespesasVencimentoVO();
-                    venc.setDatavencimento(rst.getDate("vencimento"));
-                    venc.setValor(vo.getValor());
-                    vo.getvPagarOutrasDespesasVencimento().add(venc);
-                    vo.setId_tipopiscofins(13);
+     vo.setId_loja(idLojaVR);
+     vo.setId_fornecedor(rst.getInt("id_fornecedor"));
+     vo.setNumerodocumento(Utils.stringToInt(rst.getString("numerocdocumento")));
+     vo.setId_tipoentrada(0);
+     vo.setDataemissao(rst.getDate("dataemissao"));
+     vo.setDataentrada(rst.getDate("dataentrada"));
+     vo.setValor(rst.getDouble("valor"));
+     vo.setId_situacaopagaroutrasdespesas(0);
+     String obs = "IMPORTADO VR";
+     if (!"".equals(rst.getString("CON_DEBITO").trim())) {
+     obs += "|DEB: " + Utils.acertarTexto(rst.getString("CON_DEBITO"));
+     }
+     if (!"".equals(rst.getString("CON_CREDITO").trim())) {
+     obs += "|CRED: " + Utils.acertarTexto(rst.getString("CON_CREDITO"));
+     }
+     if (!"".equals(rst.getString("CON_HISTORICO1").trim())) {
+     obs += "|OBS1: " + Utils.acertarTexto(rst.getString("CON_HISTORICO1"));
+     }
+     if (!"".equals(rst.getString("CON_HISTORICO2").trim())) {
+     obs += "|nOBS2: " + Utils.acertarTexto(rst.getString("CON_HISTORICO2"));
+     }
+     if (!"".equals(rst.getString("usu_login").trim())) {
+     obs += "|nCriado por: " + Utils.acertarTexto(rst.getString("usu_login"));
+     }
+     if (!"".equals(rst.getString("CON_BARRA").trim())) {
+     obs += "|Barra: " + Utils.acertarTexto(rst.getString("CON_BARRA"));
+     }
+     if (!"".equals(rst.getString("CON_NDOC").trim())) {
+     obs += "|nNum. Doc: " + Utils.acertarTexto(rst.getString("CON_NDOC"));
+     }
+     vo.setObservacao(Utils.acertarTexto(obs, 280));
+     PagarOutrasDespesasVencimentoVO venc = new PagarOutrasDespesasVencimentoVO();
+     venc.setDatavencimento(rst.getDate("vencimento"));
+     venc.setValor(vo.getValor());
+     vo.getvPagarOutrasDespesasVencimento().add(venc);
+     vo.setId_tipopiscofins(13);
 
-                    result.add(vo);
-                }
-            }
-        }
+     result.add(vo);
+     }
+     }
+     }
 
-        return result;
-    }*/
-
+     return result;
+     }*/
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> Result = new ArrayList<>();
@@ -848,33 +844,32 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	CP.FOR_CODIGO ID_FORNECEDOR,\n"
                     + "	RTRIM(F.FOR_CGC) CNPJ,\n"
                     + "	CP.CON_NLCTO NUMEROCDOCUMENTO,\n"
-                    //+ "	210 ID_TIPOENTRADA,\n"
+                    + "	210 ID_TIPOENTRADA,\n"
+                    + " CASE\n"
+                    + "     WHEN CON_NDOC LIKE '1/%' THEN '1'\n"
+                    + "     WHEN CON_NDOC LIKE '2/%' THEN '2'\n"
+                    + "     WHEN CON_NDOC LIKE '3/%' THEN '3'\n"
+                    + "     WHEN CON_NDOC LIKE '4/%' THEN '4'\n"
+                    + "     WHEN CON_NDOC LIKE '5/%' THEN '5'\n"
+                    + "     WHEN CON_NDOC LIKE '6/%' THEN '6'\n"
+                    + "     ELSE '1'\n"
+                    + "	END PARCELA,"
                     + "	COALESCE(CP.CON_EMISSAO, CP.CON_DLCTO) DATAEMISSAO,\n"
                     + "	CP.CON_DLCTO DATAENTRADA,\n"
-                    + "	CP.CON_VALOR VALOR,\n"
-                  //+ " 0 ID_SITUACAOPAGAROUTRASDESPESAS,\n"
+                    + " ROUND(CAST(CP.CON_VALOR AS REAL),2) AS VALOR,"
                     + "	COALESCE(CP.CON_HISTORICO1, '') CON_HISTORICO1,\n"
                     + "	COALESCE(CP.CON_HISTORICO2, '') CON_HISTORICO2,\n"
-                    + "	COALESCE(CP.CON_DEBITO, '') CON_DEBITO,\n"
-                    + "	COALESCE(CP.CON_CREDITO, '') CON_CREDITO,\n"
-                    + "	COALESCE(CP.USU_LOGIN, '') USU_LOGIN,\n"
-                    + "	COALESCE(CP.CON_BARRA, '') CON_BARRA,\n"
-                    + "	CAST(SUBSTRING(CP.CON_NDOC,1,1) AS INTEGER) PARCELA,\n"
                     + "	CP.CON_VECTO VENCIMENTO\n"
                     + "FROM\n"
                     + "	CONTABIL CP\n"
                     + "JOIN FORNECEDOR F ON CP.FOR_CODIGO = F.FOR_CODIGO\n"
-                    + "WHERE\n"
-                    + "	CP.CON_STATUS = 'X'"
-                            /*+ "/n"
-                    + "	AND CP.EMP_CODIGO = " + getLojaOrigem() + ""*/
+                    + "WHERE CP.CON_STATUS = 'X'\n"
+                    + "	AND CP.EMP_CODIGO = " + getLojaOrigem() + ""
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    imp.setIdFornecedor(rst.getString("ID_FORNECEDOR"));
-                    imp.setCnpj(rst.getString("CNPJ"));
-                    imp.setId(rst.getString("NUMEROCDOCUMENTO"));
 
+                    imp.setId(rst.getString("NUMEROCDOCUMENTO"));
                     String doc = Utils.formataNumero(rst.getString("NUMEROCDOCUMENTO"));
 
                     imp.setNumeroDocumento(doc);
@@ -884,8 +879,9 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setNumeroDocumento(doc.substring(0, 6));
                         }
                     }
-
-                  //imp.setIdTipoEntradaVR(rst.getInt("ID_TIPOENTRADA"));
+                    imp.setIdFornecedor(rst.getString("ID_FORNECEDOR"));
+                    imp.setCnpj(rst.getString("CNPJ"));
+                    imp.setIdTipoEntradaVR(rst.getInt("ID_TIPOENTRADA"));
                     imp.setDataEmissao(rst.getDate("DATAEMISSAO"));
                     imp.setDataEntrada(rst.getDate("DATAENTRADA"));
                     imp.setDataHoraAlteracao(rst.getTimestamp("DATAENTRADA"));
@@ -894,8 +890,8 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao((rst.getString("CON_HISTORICO1") == null ? "" : rst.getString("CON_HISTORICO1")) + " "
                             + (rst.getString("CON_HISTORICO2") == null ? "" : rst.getString("CON_HISTORICO2")));
                     imp.setVencimento(rst.getDate("VENCIMENTO"));
-                    //ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("VENCIMENTO"), imp.getValor());
-                    //parc.setNumeroParcela(rst.getInt("PARCELA"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("VENCIMENTO"), imp.getValor());
+                    parc.setNumeroParcela(rst.getInt("PARCELA"));
 
                     Result.add(imp);
                 }

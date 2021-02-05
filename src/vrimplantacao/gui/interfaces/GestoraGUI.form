@@ -273,6 +273,7 @@
         <Component class="vrframework.bean.textField.VRTextField" name="txtNomeLoja">
           <Properties>
             <Property name="caixaAlta" type="boolean" value="false"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtNomeLojaActionPerformed"/>
@@ -832,8 +833,8 @@
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Outros">
-                    <Property name="tabTitle" type="java.lang.String" value="Outros"/>
+                  <JTabbedPaneConstraints tabName="Contas a Pagar">
+                    <Property name="tabTitle" type="java.lang.String" value="Contas a Pagar"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
