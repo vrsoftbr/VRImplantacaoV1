@@ -31,11 +31,11 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
 
     private String complemento = "";
     public boolean atacadoQtdMinima = false;
-    
+
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
-    }    
-    
+    }
+
     @Override
     public String getSistema() {
         if ("".equals(complemento)) {
@@ -96,96 +96,183 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoProduto.NATUREZA_RECEITA
         ));
     }
-    
+
     /*
-    --Produto - fornecedor sem código externo
-    select * from 
-            dbo.NFITENS nfi
-            join dbo.NFITENS_TRIBUTOS nft on
-                    nfi.NNF = nft.NUMERO_NF and
-                    nfi.CODLOJA = nft.CODLOJA and
-                    nfi.ITEM = nft.ITEM
-            join dbo.NFISCAL nf on
-                    nfi.NNF = nf.NF and
-                    nfi.CODLOJA = nf.CODLOJA
-    where
-            nfi.produto = 967
-            and nf.EMISSAO between '2019-01-01' and '2020-01-08'
-    order by
-            nf.EMISSAO
+     --Produto - fornecedor sem código externo
+     select * from 
+     dbo.NFITENS nfi
+     join dbo.NFITENS_TRIBUTOS nft on
+     nfi.NNF = nft.NUMERO_NF and
+     nfi.CODLOJA = nft.CODLOJA and
+     nfi.ITEM = nft.ITEM
+     join dbo.NFISCAL nf on
+     nfi.NNF = nf.NF and
+     nfi.CODLOJA = nf.CODLOJA
+     where
+     nfi.produto = 967
+     and nf.EMISSAO between '2019-01-01' and '2020-01-08'
+     order by
+     nf.EMISSAO
 
-    --select * from dbo.NFISCAL
+     --select * from dbo.NFISCAL
 
-    --select * from NFITENS_TRIBUTOS where codigo = 1408
-    */
+     --select * from NFITENS_TRIBUTOS where codigo = 1408
+     */
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "select\n" +
-                    "	p.CODIGO id,\n" +
-                    "	coalesce(dt.DATA_INC, p.DATA_ALTERACAO) datacadastro,\n" +
-                    "	coalesce(dt.data_alt, p.DATA_ALTERACAO) dataalteracao,\n" +
-                    "	coalesce(pxc.CODIGOBARRAS, p.cbarra, p.cbarra2, p.cbarra3) ean,\n" +
-                    "	p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0)) qtdembalagem,\n" +
-                    "   p.embalagem,\n" +
-                    "	coalesce(pxc.UNIDADE, p.unidade) unidadevenda,	\n" +
-                    "	p.UNIDADE_COMPRA unidadecotacao,\n" +
-                    "	p.EMBALAGEM qtdembalagemcotacao,\n" +
-                    "	p.QTD_VOLUMES qtdembalagem2,\n" +
-                    "	p.BALANCA balanca,\n" +
-                    "	p.VALIDIAS validade,\n" +
-                    "	p.NOME descricaocompleta,\n" +
-                    "	p.peso pesobruto,\n" +
-                    "	p.PESO_LIQ pesoliquido,\n" +
-                    "	pl.EST_MINIM estoqueminimo,\n" +
-                    "	pl.EST_LOJA estoque,\n" +
-                    "	pl.FORNECEDOR id_fabricante,\n" +
-                    "	pl.PCO_COMPRA,\n" +
-                    "	coalesce(pxl.PRECOSISTEMA, pl.PCO_VENDA) / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem, 0))) preco,\n" +
-                    "	coalesce(p.ATIVO, 'S') ativo,\n" +
-                    "	p.CODIGO_NCM ncm,\n" +
-                    "	p.cod_cest cest,\n" +
-                    "	p.COD_CSTPIS pis_saida,\n" +
-                    "	p.COD_CSTPIS_ENTRADA pis_entrada,\n" +
-                    "	pl.COD_FIG_FISCAL_ent icms_entrada_id,\n" +
-                    "	pl.COD_FIG_FISCAL_sai icms_saida_id,\n" +
-                    "	pl.PER_IVA iva,	\n" +
-                    "	pxl.PRECOVENDA / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0))) precoatacado,\n" +
-                    "   p.TIPOPRODUTO tipo_produto,\n" + 
-                    "   pl.C_AQUIS as custo, \n" + 
-                    "   pl.PCO_REMAR as precovenda \n" + 
-                    "from\n" +
-                    "	produtos p\n" +
-                    "	join EMPRESA e on\n" +
-                    "		e.CODIGO = " + getLojaOrigem() + "\n" +
-                    "	left join PRODEXPL_CADASTRO PXC on\n" +
-                    "		pxc.CODIGOPRODUTO = p.CODIGO\n" +
-                    "	left join PRODEXPL_CADASTROLOJA pxl on\n" +
-                    "		pxl.CODIGOPRODUTO = pxc.CODIGOPRODUTO and\n" +
-                    "		pxl.ITEM = pxc.ITEM and\n" +
-                    "		pxl.CODLOJA = e.codigo		\n" +
-                    "	left join produtos_data dt on\n" +
-                    "		dt.codigo_produto = p.codigo\n" +
-                    "	join PRODLOJAS pl on\n" +
-                    "		p.codigo = pl.CODIGO and\n" +
-                    "		p.CODLOJA = e.CODIGO\n" +
-                    "order by\n" +
-                    "	p.CODIGO"
+                    /*"select\n" +
+                     "	p.CODIGO id,\n" +
+                     "	coalesce(dt.DATA_INC, p.DATA_ALTERACAO) datacadastro,\n" +
+                     "	coalesce(dt.data_alt, p.DATA_ALTERACAO) dataalteracao,\n" +
+                     "	coalesce(pxc.CODIGOBARRAS, p.cbarra, p.cbarra2, p.cbarra3) ean,\n" +
+                     "	p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0)) qtdembalagem,\n" +
+                     "   p.embalagem,\n" +
+                     "	coalesce(pxc.UNIDADE, p.unidade) unidadevenda,	\n" +
+                     "	p.UNIDADE_COMPRA unidadecotacao,\n" +
+                     "	p.EMBALAGEM qtdembalagemcotacao,\n" +
+                     "	p.QTD_VOLUMES qtdembalagem2,\n" +
+                     "	p.BALANCA balanca,\n" +
+                     "	p.VALIDIAS validade,\n" +
+                     "	p.NOME descricaocompleta,\n" +
+                     "	p.peso pesobruto,\n" +
+                     "	p.PESO_LIQ pesoliquido,\n" +
+                     "	pl.EST_MINIM estoqueminimo,\n" +
+                     "	pl.EST_LOJA estoque,\n" +
+                     "	pl.FORNECEDOR id_fabricante,\n" +
+                     "	pl.PCO_COMPRA,\n" +
+                     "	coalesce(pxl.PRECOSISTEMA, pl.PCO_VENDA) / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem, 0))) preco,\n" +
+                     "	coalesce(p.ATIVO, 'S') ativo,\n" +
+                     "	p.CODIGO_NCM ncm,\n" +
+                     "	p.cod_cest cest,\n" +
+                     "	p.COD_CSTPIS pis_saida,\n" +
+                     "	p.COD_CSTPIS_ENTRADA pis_entrada,\n" +
+                     "	pl.COD_FIG_FISCAL_ent icms_entrada_id,\n" +
+                     "	pl.COD_FIG_FISCAL_sai icms_saida_id,\n" +
+                     "	pl.PER_IVA iva,	\n" +
+                     "	pxl.PRECOVENDA / (p.embalagem / coalesce(nullif(pxc.fator,0), nullif(p.embalagem,0))) precoatacado,\n" +
+                     "   p.TIPOPRODUTO tipo_produto,\n" + 
+                     "   pl.C_AQUIS as custo, \n" + 
+                     "   pl.PCO_REMAR as precovenda \n" + 
+                     "from\n" +
+                     "	produtos p\n" +
+                     "	join EMPRESA e on\n" +
+                     "		e.CODIGO = " + getLojaOrigem() + "\n" +
+                     "	left join PRODEXPL_CADASTRO PXC on\n" +
+                     "		pxc.CODIGOPRODUTO = p.CODIGO\n" +
+                     "	left join PRODEXPL_CADASTROLOJA pxl on\n" +
+                     "		pxl.CODIGOPRODUTO = pxc.CODIGOPRODUTO and\n" +
+                     "		pxl.ITEM = pxc.ITEM and\n" +
+                     "		pxl.CODLOJA = e.codigo		\n" +
+                     "	left join produtos_data dt on\n" +
+                     "		dt.codigo_produto = p.codigo\n" +
+                     "	join PRODLOJAS pl on\n" +
+                     "		p.codigo = pl.CODIGO and\n" +
+                     "		p.CODLOJA = e.CODIGO\n" +
+                     "order by\n" +
+                     "	p.CODIGO"*/
+                    "with eans as (\n"
+                    + "	select\n"
+                    + "		pxc.CODIGOPRODUTO,\n"
+                    + "		pxc.CODIGOBARRAS ean,\n"
+                    + "		pxc.fator,\n"
+                    + "		pxc.unidade\n"
+                    + "	from\n"
+                    + "		PRODEXPL_CADASTRO pxc\n"
+                    + "	where\n"
+                    + "		not nullif(ltrim(rtrim(pxc.CODIGOBARRAS)),'') is null\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		p.CODIGO CODIGOPRODUTO,\n"
+                    + "		p.cbarra ean,\n"
+                    + "		p.embalagem fator,\n"
+                    + "		p.unidade\n"
+                    + "	from\n"
+                    + "		produtos p\n"
+                    + "	where\n"
+                    + "		not nullif(ltrim(rtrim(p.cbarra)),'') is null\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		p.CODIGO CODIGOPRODUTO,\n"
+                    + "		p.cbarra2 ean,\n"
+                    + "		p.embalagem fator,\n"
+                    + "		p.unidade\n"
+                    + "	from\n"
+                    + "		produtos p\n"
+                    + "	where\n"
+                    + "		not nullif(ltrim(rtrim(p.cbarra2)),'') is null\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		p.CODIGO CODIGOPRODUTO,\n"
+                    + "		p.cbarra3 ean,\n"
+                    + "		p.embalagem fator,\n"
+                    + "		p.unidade\n"
+                    + "	from\n"
+                    + "		produtos p\n"
+                    + "	where\n"
+                    + "		not nullif(ltrim(rtrim(p.cbarra3)),'') is null\n"
+                    + ")\n"
+                    + "select\n"
+                    + "	p.CODIGO id,\n"
+                    + "	coalesce(dt.DATA_INC, p.DATA_ALTERACAO) datacadastro,\n"
+                    + "	coalesce(dt.data_alt, p.DATA_ALTERACAO) dataalteracao,\n"
+                    + "	eans.ean,\n"
+                    + "	p.embalagem qtdembalagem,\n"
+                    + "	eans.unidade unidadevenda,	\n"
+                    + "	p.UNIDADE_COMPRA unidadecotacao,\n"
+                    + "	p.EMBALAGEM qtdembalagemcotacao,\n"
+                    + "	p.QTD_VOLUMES qtdembalagem2,\n"
+                    + "	p.BALANCA balanca,\n"
+                    + "	p.VALIDIAS validade,\n"
+                    + "	p.NOME descricaocompleta,\n"
+                    + "	p.peso pesobruto,\n"
+                    + "	p.PESO_LIQ pesoliquido,\n"
+                    + "	pl.EST_MINIM estoqueminimo,\n"
+                    + "	pl.EST_LOJA estoque,\n"
+                    + "	pl.FORNECEDOR id_fabricante,\n"
+                    + "	pl.PCO_COMPRA custosemimposto,\n"
+                    + "	pl.C_AQUIS as custocomimposto,\n"
+                    + "	pl.PCO_REMAR preco,\n"
+                    + "	coalesce(p.ATIVO, 'S') ativo,\n"
+                    + "	p.CODIGO_NCM ncm,\n"
+                    + "	p.cod_cest cest,\n"
+                    + "	p.COD_CSTPIS pis_saida,\n"
+                    + "	p.COD_CSTPIS_ENTRADA pis_entrada,\n"
+                    + "	pl.COD_FIG_FISCAL_ent icms_entrada_id,\n"
+                    + "	pl.COD_FIG_FISCAL_sai icms_saida_id,\n"
+                    + "	pl.PER_IVA iva,\n"
+                    + "	coalesce(nullif(pl.PCO_AREMAR,0), pl.PCO_REMAR)  precoatacado,\n"
+                    + "	p.TIPOPRODUTO tipo_produto,\n"
+                    + "	pl.PCO_REMAR as precovenda \n"
+                    + "from\n"
+                    + "	produtos p\n"
+                    + "	join EMPRESA e on\n"
+                    + "		e.CODIGO = " + getLojaOrigem() + "\n"
+                    + "	join PRODLOJAS pl on\n"
+                    + "		p.codigo = pl.CODIGO and\n"
+                    + "		p.CODLOJA = e.CODIGO\n"
+                    + "	left join eans on\n"
+                    + "		eans.CODIGOPRODUTO = p.CODIGO		\n"
+                    + "	left join produtos_data dt on\n"
+                    + "		dt.codigo_produto = p.codigo	\n"
+                    + "order by\n"
+                    + "	p.CODIGO,\n"
+                    + "	eans.ean"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem((rs.getInt("tipo_produto") == 1 ? 1 : rs.getInt("embalagem")));
+                    //imp.setQtdEmbalagem((rs.getInt("tipo_produto") == 1 ? 1 : rs.getInt("embalagem")));
                     imp.setTipoEmbalagem(rs.getString("unidadevenda"));
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setTipoEmbalagemCotacao(rs.getString("qtdembalagem"));
@@ -199,8 +286,8 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setFornecedorFabricante(rs.getString("id_fabricante"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(rs.getDouble("custo"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setSituacaoCadastro("N".equals(rs.getString("ATIVO")) ? 0 : 1);
                     imp.setNcm(String.valueOf(rs.getInt("ncm")));
@@ -210,19 +297,19 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIcmsCreditoId(rs.getString("icms_entrada_id"));
                     imp.setIcmsDebitoId(rs.getString("icms_saida_id"));
                     imp.setAtacadoPreco(rs.getDouble("precoatacado"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -246,7 +333,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 return result;
             }
         }
-        
+
         /* PROVISORIO */
         if (opt == OpcaoProduto.QTD_EMBALAGEM_EAN) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -278,7 +365,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 return result;
             }
         }
-        
+
         if (opt == OpcaoProduto.ATACADO) {
 
             if (!atacadoQtdMinima) {
@@ -353,7 +440,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                             imp.setQtdEmbalagem(rst.getInt("qtde"));
                             imp.setPrecovenda(rst.getDouble("precovenda"));
                             imp.setAtacadoPreco(rst.getDouble("precoatacado"));
-                            result.add(imp);                            
+                            result.add(imp);
                         }
                     }
                     return result;
@@ -362,10 +449,10 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         return null;
     }
-    
+
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
@@ -396,11 +483,11 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                     "select\n" +
@@ -415,24 +502,24 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                 while (rs.next()) {
                     result.add(
                             new MapaTributoIMP(
-                                    rs.getString("codigo"), 
-                                    rs.getString("nome"), 
-                                    rs.getInt("cst"), 
-                                    0, 
+                                    rs.getString("codigo"),
+                                    rs.getString("nome"),
+                                    rs.getInt("cst"),
+                                    0,
                                     0
                             )
                     );
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                     "select\n" +
@@ -463,7 +550,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
@@ -488,12 +575,12 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     switch (rs.getString("TIPO")) {
                         case "D": imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR); break;
                     }
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -524,11 +611,11 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
@@ -572,7 +659,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj_cpf"));
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
@@ -605,12 +692,12 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCelular(rst.getString("CELULAR"));
                     imp.setEmail(rst.getString("EMAIL"));
                     imp.setFax(rst.getString("FAX"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -685,7 +772,7 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
             )) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setCpf(rs.getString("cpf"));
                     imp.setNumeroCheque(rs.getString("numerocheque"));
@@ -698,13 +785,13 @@ public class RensoftwareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setValor(rs.getDouble("VALOR"));
                     imp.setValorJuros(rs.getDouble("juros"));
                     imp.setObservacao(rs.getString("OBSERVACAO"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
 }
