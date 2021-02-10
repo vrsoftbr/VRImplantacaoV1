@@ -77,7 +77,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public boolean v_usar_arquivoBalanca;
     public boolean v_usar_arquivoBalancaUnificacao;
     public boolean usarMargemBruta = false;
-    public String v_lojaMesmoId;
+    
     public boolean usarQtdEmbDoProduto = false;
     public boolean usaMargemLiquidaPraticada = false;
     public boolean usaMargemSobreVenda = false;
@@ -98,9 +98,15 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         this.usarQtdEmbDoProduto = usarQtdEmbDoProduto;
     }
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
     @Override
     public String getSistema() {
-        return "GetWay" + v_lojaMesmoId;
+        return "GetWay" + (!"".equals(complemento) ? " - " + complemento : "");
     }
 
     public List<Estabelecimento> getLojas() throws Exception {

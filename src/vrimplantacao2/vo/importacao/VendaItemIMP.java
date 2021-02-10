@@ -46,6 +46,10 @@ public class VendaItemIMP {
     @DatabaseField() private int contadorDoc;
     @DatabaseField() private String icmsAliquotaId;
     @DatabaseField() private boolean oferta = false;
+    @DatabaseField() private double custoComImposto = 0;
+    @DatabaseField() private double custoSemImposto = 0;
+    @DatabaseField() private double custoMedioComImposto = 0;
+    @DatabaseField() private double custoMedioSemImposto = 0;
 
     public String getId() {
         return id;
@@ -220,5 +224,38 @@ public class VendaItemIMP {
 
     public void setOferta(boolean oferta) {
         this.oferta = oferta;
-    }        
+    }
+
+    public double getCustoComImposto() {
+        return custoComImposto;
+    }
+
+    public void setCustoComImposto(double custoComImposto) {
+        this.custoComImposto = custoComImposto;
+    }
+
+    public double getCustoSemImposto() {
+        return custoSemImposto;
+    }
+
+    public void setCustoSemImposto(double custoSemImposto) {
+        this.custoSemImposto = custoSemImposto;
+    }
+
+    public double getCustoMedioComImposto() {
+        return custoMedioComImposto;
+    }
+
+    public void setCustoMedioComImposto(double custoMedioComImposto) {
+        this.custoMedioComImposto = custoMedioComImposto;
+    }
+
+    public double getCustoMedioSemImposto() {
+        return custoMedioSemImposto;
+    }
+
+    public void setCustoMedioSemImposto(double custoMedioSemImposto) {
+        this.custoMedioSemImposto = custoMedioSemImposto;
+    }
+    
 }

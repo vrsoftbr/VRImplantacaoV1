@@ -53,7 +53,9 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             "	v.acrescimo valorAcrescimo,\n" +
             "	v.codbusca codigobarras,\n" +
             "	pc.Es1_UM unidade,\n" +
-            "	pc.ES1_TRIBUTACAO id_tributo\n" +
+            "	pc.ES1_TRIBUTACAO id_tributo,\n" +
+            "	v.es1_prcusto custosemimposto,\n" +
+            "	v.es1_prcompra custocomimposto\n" +
             "from\n" +
             "	" + getNomeTabela(idLoja, intervalo.dataInicial) + " v\n" +
             "	join es1p p on\n" +
@@ -93,6 +95,8 @@ public class LinearVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             v.setCodigoBarras(rs.getString("codigobarras"));
             v.setUnidadeMedida(rs.getString("unidade"));
             v.setIcmsAliquotaId(rs.getString("id_tributo"));
+            v.setCustoSemImposto(rs.getDouble("custosemimposto"));
+            v.setCustoComImposto(rs.getDouble("custocomimposto"));
             
             return v;
         }        

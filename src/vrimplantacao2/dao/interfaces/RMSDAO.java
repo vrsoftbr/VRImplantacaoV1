@@ -413,6 +413,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
                 OpcaoProduto.CUSTO_COM_IMPOSTO,
                 OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.NCM,
@@ -431,7 +432,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.VOLUME_QTD
         ));
     }
 
@@ -502,8 +504,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	else coalesce(est.get_preco_venda,0) end precovenda,\n"
                     //+ " coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n"
                     //+ " p.git_cus_rep custosemimposto,\n"
-                    + " p.git_cus_ult_ent_bru as CustoUltimaEntradaBruto custocomimposto,\n"
-                    + " p.git_cus_ult_ent as CustoUltimaEntrada custosemimposto,\n"        
+                    //+ " p.git_cus_ult_ent_bru as custocomimposto,\n"
+                    //+ " p.git_cus_ult_ent as custosemimposto,\n"        
                     + "	det.DET_CLASS_FIS ncm,\n"
                     + "	det.DET_NCM_EXCECAO excecao,\n"
                     + "	det.DET_CEST cest,\n"

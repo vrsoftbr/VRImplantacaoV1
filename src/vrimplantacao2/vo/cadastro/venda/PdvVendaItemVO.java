@@ -151,8 +151,8 @@ public class PdvVendaItemVO {
         this.custoSemImposto = MathUtils.round(custoSemImposto, 4);
     }
 
-    public void setCustoMedioComimposto(double custoMedioComimposto) {
-        this.custoMedioComimposto = MathUtils.round(custoMedioComimposto, 4);
+    public void setCustoMedioComImposto(double custoMedioComImposto) {
+        this.custoMedioComimposto = MathUtils.round(custoMedioComImposto, 4);
     }
 
     public void setCustoMedioSemImposto(double custoMedioSemImposto) {
@@ -279,7 +279,7 @@ public class PdvVendaItemVO {
         return custoSemImposto;
     }
 
-    public double getCustoMedioComimposto() {
+    public double getCustoMedioComImposto() {
         return custoMedioComimposto;
     }
 

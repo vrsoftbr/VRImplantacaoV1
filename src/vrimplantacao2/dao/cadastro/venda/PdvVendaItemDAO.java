@@ -67,7 +67,7 @@ public class PdvVendaItemDAO {
             
             sql.put("custoComImposto", item.getCustoComImposto());
             sql.put("custoSemImposto", item.getCustoSemImposto());
-            sql.put("custoMedioComimposto", item.getCustoMedioComimposto(), 0);
+            sql.put("custoMedioComimposto", item.getCustoMedioComImposto(), 0);
             sql.put("custoMedioSemImposto", item.getCustoMedioSemImposto(), 0);
             sql.put("aplicaDescontoPromocao", item.isAplicaDescontoPromocao());
             sql.put("id_tipoOferta", item.getId_tipoOferta(), -1);

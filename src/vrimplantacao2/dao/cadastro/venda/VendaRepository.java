@@ -452,6 +452,10 @@ public class VendaRepository {
         item.setSequencia(imp.getSequencia());
         item.setTipoDesconto(imp.getTipoDesconto());
         item.setOferta(imp.isOferta());
+        item.setCustoComImposto(imp.getCustoComImposto());
+        item.setCustoSemImposto(imp.getCustoSemImposto());
+        item.setCustoMedioComImposto(imp.getCustoMedioComImposto());
+        item.setCustoMedioSemImposto(imp.getCustoMedioSemImposto());
  
         return item;
     

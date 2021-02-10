@@ -39,7 +39,7 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
     private static GetWay_ProfitGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private GetWay_ProfitDAO getWayDAO = new GetWay_ProfitDAO();
+    private GetWay_ProfitDAO dao = new GetWay_ProfitDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
 
     private void carregarTipoDocumento() throws Exception {
@@ -47,7 +47,7 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
         cmbTipoDocRotativo.setModel(new DefaultComboBoxModel());
         cmbTipoDocCheque.removeAllItems();
         cmbTipoDocCheque.setModel(new DefaultComboBoxModel());
-        for (ItemComboVO item : getWayDAO.getTipoDocumento()) {
+        for (ItemComboVO item : dao.getTipoDocumento()) {
             cmbTipoDocRotativo.addItem(item);
             cmbTipoDocCheque.addItem(item);
         }
@@ -119,22 +119,19 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
-                return getWayDAO;
+                return dao;
             }
 
             @Override
             public String getSistema() {
-                if (!txtLojaMesmoID.getText().trim().isEmpty()) {
-                    return SISTEMA + " - " + txtLojaMesmoID.getText();
-                } else {
-                    return SISTEMA;
-                }
+                dao.setComplemento(txtLojaMesmoID.getText());
+                return dao.getSistema();
             }
 
             @Override
             public String getLoja() {
-                vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                return vLojaCliente;
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
             }
 
             @Override
@@ -186,7 +183,7 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : getWayDAO.getLojas()) {
+        for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -244,33 +241,27 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
 
-                    getWayDAO.v_tipoDocumento = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
-                    getWayDAO.v_tipoDocumentoCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
-                    getWayDAO.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
-                    getWayDAO.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
-                    getWayDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
-                    getWayDAO.usaMargemSobreVenda = chkMargemSobreVenda.isSelected();
-                    getWayDAO.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
-                    getWayDAO.usaMargemLiquidaPraticada = chkUsaMargemLiquida.isSelected();
-                    getWayDAO.apenasProdutoAtivo = chkProdutoAtivo.isSelected();
-                    getWayDAO.utilizaMetodoAjustaAliquota = chkMetodoAliquota.isSelected();
-                    getWayDAO.copiarDescricaoCompletaParaGondola = chkCopiaDescComplGondola.isSelected();
-                    getWayDAO.removerCodigoCliente = chkRemoverIDCliente.isSelected();
+                    dao.v_tipoDocumento = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
+                    dao.v_tipoDocumentoCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
+                    dao.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
+                    dao.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
+                    dao.usarMargemBruta = chkUsarMargemBruta.isSelected();
+                    dao.usaMargemSobreVenda = chkMargemSobreVenda.isSelected();
+                    dao.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
+                    dao.usaMargemLiquidaPraticada = chkUsaMargemLiquida.isSelected();
+                    dao.apenasProdutoAtivo = chkProdutoAtivo.isSelected();
+                    dao.utilizaMetodoAjustaAliquota = chkMetodoAliquota.isSelected();
+                    dao.copiarDescricaoCompletaParaGondola = chkCopiaDescComplGondola.isSelected();
+                    dao.removerCodigoCliente = chkRemoverIDCliente.isSelected();
 
-                    if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
-                        lojaMesmoId = " - " + txtLojaMesmoID.getText();
-                    } else {
-                        lojaMesmoId = "";
-                    }
+                    dao.setComplemento(txtLojaMesmoID.getText());
 
-                    getWayDAO.v_lojaMesmoId = lojaMesmoId;
-
-                    Importador importador = new Importador(getWayDAO);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
 
-                    getWayDAO.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
-                    getWayDAO.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
+                    dao.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
+                    dao.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
 
                     if (tabs.getSelectedIndex() == 1) {
                         if (chkFamiliaProduto.isSelected()) {
@@ -294,8 +285,8 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
                             importador.importarPautaFiscal(opcoes.toArray(new OpcaoFiscal[]{}));
                         }
                         if (chkProdutos.isSelected()) {
-                            getWayDAO.setDesconsiderarSetorBalanca(chkDesconsiderarSetorBalanca.isSelected());
-                            getWayDAO.setPesquisarKGnaDescricao(chkPesquisarKG.isSelected());
+                            dao.setDesconsiderarSetorBalanca(chkDesconsiderarSetorBalanca.isSelected());
+                            dao.setPesquisarKGnaDescricao(chkPesquisarKG.isSelected());
                             {
                                 ArrayList<OpcaoProduto> opcoes = new ArrayList<>();
                                 if (chkManterBalanca.isSelected()) {
@@ -531,10 +522,10 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
                             importador.importarCreditoRotativo();
                         }
                         if (chkreceberDevolucao.isSelected()) {
-                            getWayDAO.importarReceberDevolucao(idLojaVR);
+                            dao.importarReceberDevolucao(idLojaVR);
                         }
                         if (chkReceberVerba.isSelected()) {
-                            getWayDAO.importarReceberVerba(idLojaVR);
+                            dao.importarReceberVerba(idLojaVR);
                         }
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
@@ -564,8 +555,8 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
 
                             //getWayDAO.setDataInicioVenda(vendaDataInicio);
                             //getWayDAO.setDataTerminoVenda(vendaDataFim);
-                            getWayDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            getWayDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tabs.getSelectedIndex() == 2) {
