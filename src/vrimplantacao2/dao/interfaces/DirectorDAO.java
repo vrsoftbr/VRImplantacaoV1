@@ -21,6 +21,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -31,6 +32,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -43,7 +45,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Importacao
  */
-public class DirectorDAO extends InterfaceDAO {
+public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(DirectorDAO.class.getName());
 
@@ -94,12 +96,12 @@ public class DirectorDAO extends InterfaceDAO {
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.OFERTA,
-                OpcaoProduto.MAPA_TRIBUTACAO,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
-                OpcaoProduto.RECEITA_BALANCA
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.MAPA_TRIBUTACAO
         ));
     }
 
@@ -117,6 +119,70 @@ public class DirectorDAO extends InterfaceDAO {
         return result;
     }
 
+    private String getAliquotaKey(String cst, double aliq, double red) throws SQLException {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	distinct\n"
+                    + "	 cst.DFcod_tributacao_cst cst,\n"
+                    + "	 ae.DFaliquota_icms icms,\n"
+                    + "	 ae.DFpercentual_reducao icms_reducao\n"
+                    + "from \n"
+                    + "	TBitem_estoque p\n"
+                    + "left join \n"
+                    + "	TBitem_estoque_empresa pe on p.DFcod_item_estoque = pe.DFcod_item_estoque\n"
+                    + "inner join\n"
+                    + "	TBempresa em on pe.DFcod_empresa = em.DFcod_empresa\n"
+                    + "left join\n"
+                    + "	TBitem_cst_aliquota_icms_estado ai on p.DFcod_item_estoque = ai.DFcod_item_estoque\n"
+                    + "left join\n"
+                    + "	TBcst_aliquota_icms_estado ae on ai.DFid_cst_aliquota_icms_estado = ae.DFid_cst_aliquota_icms_estado\n"
+                    + "left join\n"
+                    + "	TBaliquota_icms_estado ac on ae.DFid_aliquota_icms_estado = ac.DFid_aliquota_icms_estado\n"
+                    + "inner join\n"
+                    + "	TBcst cst WITH (NOLOCK) on ae.DFid_cst = cst.DFid_cst \n"
+                    + "inner join\n"
+                    + "	TBtributacao_cst tc WITH (NOLOCK) on tc.DFcod_tributacao_cst = cst.DFcod_tributacao_cst\n"
+                    + "where\n"
+                    + "	em.DFcod_empresa = 1 and\n"
+                    + "	ai.DFpessoa_fisica_juridica = 'F' and\n"
+                    + "	ac.DFcod_uf = em.DFuf_base and\n"
+                    + "	ac.DFcod_uf_destino = em.DFuf_base and\n"
+                    + "	ae.DFcod_grupo_tributacao = em.DFcod_grupo_tributacao\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            rst.getString("cst"),
+                            rst.getDouble("icms"),
+                            rst.getDouble("icms_reducao")
+                    );
+                    
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            Utils.stringToInt(rst.getString("cst")),
+                            rst.getDouble("icms"),
+                            rst.getDouble("icms_reducao")
+                    ));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -225,8 +291,8 @@ public class DirectorDAO extends InterfaceDAO {
                     + "	 pa.dfcod_cest cest,\n"
                     + "	 cst.DFcod_tributacao_cst cst,\n"
                     + "	 tc.DFtipo_tributacao tipocst,\n"
-                    + "	 ae.DFaliquota_icms icms_debito,\n"
-                    + "	 ae.DFpercentual_reducao icms_reducao_debito,\n"
+                    + "	 ae.DFaliquota_icms icms,\n"
+                    + "	 ae.DFpercentual_reducao icms_reducao,\n"
                     + "	 ae.DFaliquota_icms_subst_tributaria icms_sub_tributaria,\n"
                     + "	 ae.DFaliquota_icms_desonerado icms_desonerado,\n"
                     + "	 nr.DFcod_natureza_receita_pis_cofins naturezareceita\n"
@@ -332,8 +398,22 @@ public class DirectorDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rs.getString("cofins_entrada"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setCest(rs.getString("cest"));
+                    
+                    String icms = getAliquotaKey(
+                            rs.getString("cst"),
+                            rs.getDouble("icms"),
+                            rs.getDouble("icms_reducao")
+                    );
+                    
+                    imp.setIcmsDebitoId(icms);
+                    imp.setIcmsDebitoForaEstadoId(icms);
+                    imp.setIcmsDebitoForaEstadoNfId(icms);
+                    imp.setIcmsCreditoId(icms);
+                    imp.setIcmsCreditoForaEstadoId(icms);
+                    imp.setIcmsConsumidorId(icms);
+                    
 
-                    imp.setIcmsCstSaida(rs.getInt("cst"));
+                    /*imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_reducao_debito"));
                     
@@ -355,7 +435,7 @@ public class DirectorDAO extends InterfaceDAO {
                     
                     imp.setIcmsCstConsumidor(rs.getInt("cst"));
                     imp.setIcmsAliqConsumidor(rs.getDouble("icms_debito"));
-                    imp.setIcmsReducaoConsumidor(rs.getDouble("icms_reducao_debito"));
+                    imp.setIcmsReducaoConsumidor(rs.getDouble("icms_reducao_debito"));*/
                     
                     result.add(imp);
                 }
@@ -1197,7 +1277,7 @@ public class DirectorDAO extends InterfaceDAO {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    //+ "icfe.dfid_item_nota_fiscal_saida_nfce as id,\n"
+                    + "icfe.dfid_item_nota_fiscal_saida_nfce as id,\n"
                     + "	dfnumero as numerocupom,\n"
                     + "	dfserie as ecf,\n"
                     + "	convert(date, dfdata_emissao, 105) as data,\n"

@@ -329,7 +329,14 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                                         
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    
+                    if (rst.getString("descricaoreduzida") != null
+                            && !rst.getString("descricaoreduzida").trim().isEmpty()) {
+                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    } else {
+                        imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
+                    }
+                                       
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
@@ -843,7 +850,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.dataemissao,\n"
                     + "    r.datavencimento,\n"
                     + "    r.historico,\n"
-                    + "    r.valorrecebido\n"
+                    + "    r.valor\n"
                     + "from receber r\n"
                     + "where r.valorrecebido is null\n"
                     + "order by 1"
@@ -855,7 +862,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
-                    imp.setValor(rst.getDouble("valorrecebido"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("historico") + " PARCELA - " + rst.getString("parcela"));
                     result.add(imp);
                 }
