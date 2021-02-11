@@ -242,8 +242,9 @@
                               <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSexo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="415" max="32767" attributes="0"/>
+                          <EmptySpace pref="403" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -256,7 +257,9 @@
                           <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="157" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkSexo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="124" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -281,6 +284,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliIERG">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="IE/RG"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSexo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Sexo"/>
                   </Properties>
                 </Component>
               </SubComponents>
