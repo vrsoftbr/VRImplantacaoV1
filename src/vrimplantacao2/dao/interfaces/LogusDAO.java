@@ -21,6 +21,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -83,6 +84,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.PRODUTOS_BALANCA,
                     OpcaoProduto.EAN,
@@ -336,6 +339,29 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+        @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> Result = new ArrayList<>();
+        try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	cdg_eqv_preco idfamilia,\n"
+                    + "	dcr_equivalencia_preco descricao\n"
+                    + "from cadequivalenciasprecos "
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("idfamilia"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    Result.add(imp);
+                }
+            }
+        }
+        return Result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -359,6 +385,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.val_preco precovenda,\n"
                     + "	est.qtd_estoque estoque,\n"
                     + "	p.dat_cadastro cadastro,\n"
+                    + " pa.cdg_eqv_preco idfamilia,\n"
                     + "	p.dat_desativacao desativacao,\n"
                     + "	un.sgl_unidade_medida unidade,\n"
                     + "	p.qtd_por_emb qtdembalagem,\n"
@@ -444,6 +471,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setCodMercadologico4(rs.getString("merc4"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
                     
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
