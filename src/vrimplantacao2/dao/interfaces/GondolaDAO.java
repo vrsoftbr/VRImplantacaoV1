@@ -14,8 +14,10 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -175,8 +177,7 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "left join gondola.estoq_local_armaz est on p.pr_cod = est.pr_cod and \n" +
                     "     prv.fi_cod = est.fi_cod\n" +
                     "where \n" +
-                    "     prv.fi_cod = 1 and \n" +
-                    "     est.la_cod =" + getLojaOrigem())) {
+                    "     est.la_cod = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -215,6 +216,7 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIdFamiliaProduto(rs.getString("grupo"));
                     
                     result.add(imp);
                 }
@@ -328,6 +330,33 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	GRPR_COD id,\n" +
+                    "	grpr_nom descricao\n" +
+                    "FROM \n" +
+                    "	gondola.grupo_prduto")) {
+                while(rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         
@@ -410,6 +439,7 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  f.en_cpf_cnpj cnpj,\n" +
                     "  f.en_rg_insest ie,\n" +
                     "  f.en_dat_cadstr cadastro,\n" +
+                    "  COALESCE(epf.ENPF_FLG_SEXO, 'M') sexo,\n" +
                     "  c.encl_val_limite_cred limite,\n" +
                     "  c.encl_val_limite_cred_cheque limitecheque,\n" +
                     "  f.en_flg_ativo ativo,\n" +
@@ -433,10 +463,11 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  gondola.entid f\n" +
                     "left join gondola.entid_client c on f.en_cod = c.en_cod\n" +
                     "left join gondola.entid_ender e on f.en_cod = e.en_cod\n" +
+                    "LEFT JOIN gondola.ENTID_PESSOA_FISICA epf ON f.EN_COD = epf.EN_COD \n" +
                     "where \n" +
                     "  f.en_flg_client = 'S' and \n" +
                     "  e.ened_flg_tip = 'E' and \n" +
-                    "  c.em_cod = 1")) {
+                    "  c.em_cod = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
@@ -458,6 +489,7 @@ public class GondolaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rs.getString("ddd_tel") + rs.getString("telefone"));
                     imp.setCelular(rs.getString("ddd_cel") + rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
+                    imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     
                     result.add(imp);
                 }
