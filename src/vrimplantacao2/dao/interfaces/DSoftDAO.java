@@ -53,6 +53,12 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(DSoftDAO.class.getName());
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
 
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
@@ -65,7 +71,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
     
     @Override
     public String getSistema() {
-        return "DSoft";
+        return "DSoft" + ("".equals(complemento) ? "" : " - " + complemento);
     }
 
     private String getAliquotaKey(String cst, double aliq, double red) throws Exception {
@@ -853,7 +859,9 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.valor,\n"
                     + "    COALESCE(VALORRECEBIDO, 0) * -1 AS valorrecebido\n"
                     + "from receber r\n"
-                    + "where r.valorrecebido < valor\n"
+                    + "where datapagamento is null\n"        
+                    /*+ "WHERE COALESCE(VALORRECEBIDO, 0) * -1 < VALOR\n"
+                    + "AND COALESCE(VALORRECEBIDO, 0) < 0\n"        */
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -862,10 +870,8 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rst.getString("idcliente"));
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataVencimento(rst.getDate("datavencimento"));
-                    
-
-                    
+                    imp.setDataVencimento(rst.getDate("datavencimento"));                    
+                    //imp.setValor(rst.getDouble("valor") - rst.getDouble("valorrecebido"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("historico") + " PARCELA - " + rst.getString("parcela"));
                     result.add(imp);

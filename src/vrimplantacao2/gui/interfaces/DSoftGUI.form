@@ -32,7 +32,11 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
+                      <Component id="cmbLojaOrigem" min="-2" pref="189" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtComplemento" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -48,9 +52,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="316" max="32767" attributes="0"/>
+              <Component id="tabs" pref="320" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
@@ -475,6 +481,13 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Loja (Cliente):"/>
       </Properties>
+    </Component>
+    <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Complemento Loja:"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.textField.VRTextField" name="txtComplemento">
     </Component>
   </SubComponents>
 </Form>

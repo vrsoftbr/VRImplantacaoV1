@@ -117,7 +117,6 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
                 }
         ));
@@ -356,6 +355,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	est.val_custo custosemimposto,\n"
                     + "	est.val_custo_tot custocomimposto,\n"
                     + "	pa.pct_mg_lucro margem,\n"
+                    + " mar.pct_margem,\n"        
                     + "	est.val_preco precovenda,\n"
                     + "	est.qtd_estoque estoque,\n"
                     + "	p.dat_cadastro cadastro,\n"
@@ -380,6 +380,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pa.cdg_estoque = p.cdg_produto\n"
                     + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
                     + "left join informix.cadgrupo gr on pa.cdg_grupo = gr.cdg_grupo\n"
+                    + "left join informix.cadmargenslucrogrupo mar on mar.cdg_grupo = gr.cdg_grupo\n"        
                     + "left join informix.cadsecao se on gr.cdg_secao = se.cdg_secao\n"
                     + "left join informix.caddepto dp on se.cdg_depto = dp.cdg_depto\n"
                     + "left join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
@@ -433,29 +434,30 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setMargem(rs.getDouble("margem"));
+                    //imp.setMargem(rs.getDouble("margem"));
+                    imp.setMargem(rs.getDouble("pct_margem"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setNcm(rs.getString("ncm"));
-                    imp.setCest(rs.getString("cest"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setCodMercadologico4(rs.getString("merc4"));
+                    
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+
+                    imp.setPiscofinsCstDebito(rs.getString("pis_debito"));
+                    imp.setPiscofinsCstCredito(rs.getString("pis_credito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+
                     imp.setIcmsDebitoId(rs.getString("idicms"));
                     imp.setIcmsDebitoForaEstadoId(rs.getString("idicms"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("idicms"));
-                    imp.setIcmsCstEntrada(00);
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
-                    imp.setIcmsReducaoEntrada(0.0);
-                    imp.setIcmsCstEntradaForaEstado(00);
-                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito"));
-                    imp.setIcmsReducaoEntradaForaEstado(0.0);
-                    imp.setIcmsConsumidorId(rs.getString("idicms"));
-                    imp.setPiscofinsCstCredito(rs.getString("pis_credito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setIcmsCreditoId(rs.getString("idicms"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("idicms"));                    
+                    imp.setIcmsConsumidorId(rs.getString("idicms"));                    
 
                     result.add(imp);
                 }
@@ -465,10 +467,418 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.DESC_COMPLETA) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	pa.dcr_produto nome, \n"
+                        + "	mar.dcr_marca marca,\n"
+                        + "	pa.dcr_variedade variedade\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno \n"
+                        + "join informix.cadmarcasproduto mar on mar.idcadmarcaproduto = pa.idcadmarcaproduto	\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        
+                        imp.setDescricaoCompleta(
+                                (rst.getString("nome") != null ? rst.getString("nome").trim() : "")
+                                + " "
+                                + (rst.getString("variedade") != null ? rst.getString("variedade").trim() : "")
+                        );
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        
+        if (opt == OpcaoProduto.PIS_COFINS) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	ncm.cdg_ncm ncm,\n"
+                        + "	st.cdg_especificador_st cest,\n"
+                        + "	pa.cdg_icms idicms,\n"
+                        + "	est.pct_icms_ent icms_credito,\n"
+                        + "	pis.flg_cst_piscofinse pis_credito,\n"
+                        + "	pis.flg_cst_piscofinss pis_debito,\n"
+                        + "	pis.cdg_natrecpiscof naturezareceita\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
+                        + "	and pis.dat_ini_vigencia = (select\n"
+                        + "                                   max(x.dat_ini_vigencia)\n"
+                        + "                               from\n"
+                        + "                                   cadassocpiscofins x\n"
+                        + "                               where\n"
+                        + "                                   x.cdg_interno = pis.cdg_interno and \n"
+                        + "                                   x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "join cadcodigosespecificstproduto cest on pa.cdg_interno = cest.cdg_interno and \n"
+                        + "	cest.dat_inicio_vigencia = (select \n"
+                        + "					min(x.dat_inicio_vigencia)\n"
+                        + "                               from\n"
+                        + "					cadcodigosespecificstproduto x\n"
+                        + "                               where \n"
+                        + "					x.cdg_interno = cest.cdg_interno)\n"
+                        + "join cadcodigosespecificadoresst st on cest.idcadcodigoespecificadorst = st.idcadcodigoespecificadorst\n"
+                        + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and \n"
+                        + "	ncm.dat_ini_vigencia = (select \n"
+                        + "					max(x.dat_ini_vigencia)\n"
+                        + "				from \n"
+                        + "					cadncmproduto x \n"
+                        + "				where \n"
+                        + "					x.cdg_interno = ncm.cdg_interno and \n"
+                        + "					x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setPiscofinsCstDebito(rst.getString("pis_debito"));
+                        imp.setPiscofinsCstCredito(rst.getString("pis_credito"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        
+        if (opt == OpcaoProduto.NATUREZA_RECEITA) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	ncm.cdg_ncm ncm,\n"
+                        + "	st.cdg_especificador_st cest,\n"
+                        + "	pa.cdg_icms idicms,\n"
+                        + "	est.pct_icms_ent icms_credito,\n"
+                        + "	pis.flg_cst_piscofinse pis_credito,\n"
+                        + "	pis.flg_cst_piscofinss pis_debito,\n"
+                        + "	pis.cdg_natrecpiscof naturezareceita\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
+                        + "	and pis.dat_ini_vigencia = (select\n"
+                        + "                                   max(x.dat_ini_vigencia)\n"
+                        + "                               from\n"
+                        + "                                   cadassocpiscofins x\n"
+                        + "                               where\n"
+                        + "                                   x.cdg_interno = pis.cdg_interno and \n"
+                        + "                                   x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "join cadcodigosespecificstproduto cest on pa.cdg_interno = cest.cdg_interno and \n"
+                        + "	cest.dat_inicio_vigencia = (select \n"
+                        + "					min(x.dat_inicio_vigencia)\n"
+                        + "                               from\n"
+                        + "					cadcodigosespecificstproduto x\n"
+                        + "                               where \n"
+                        + "					x.cdg_interno = cest.cdg_interno)\n"
+                        + "join cadcodigosespecificadoresst st on cest.idcadcodigoespecificadorst = st.idcadcodigoespecificadorst\n"
+                        + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and \n"
+                        + "	ncm.dat_ini_vigencia = (select \n"
+                        + "					max(x.dat_ini_vigencia)\n"
+                        + "				from \n"
+                        + "					cadncmproduto x \n"
+                        + "				where \n"
+                        + "					x.cdg_interno = ncm.cdg_interno and \n"
+                        + "					x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.NCM) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	ncm.cdg_ncm ncm,\n"
+                        + "	st.cdg_especificador_st cest,\n"
+                        + "	pa.cdg_icms idicms,\n"
+                        + "	est.pct_icms_ent icms_credito,\n"
+                        + "	pis.flg_cst_piscofinse pis_credito,\n"
+                        + "	pis.flg_cst_piscofinss pis_debito,\n"
+                        + "	pis.cdg_natrecpiscof naturezareceita\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
+                        + "	and pis.dat_ini_vigencia = (select\n"
+                        + "                                   max(x.dat_ini_vigencia)\n"
+                        + "                               from\n"
+                        + "                                   cadassocpiscofins x\n"
+                        + "                               where\n"
+                        + "                                   x.cdg_interno = pis.cdg_interno and \n"
+                        + "                                   x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "join cadcodigosespecificstproduto cest on pa.cdg_interno = cest.cdg_interno and \n"
+                        + "	cest.dat_inicio_vigencia = (select \n"
+                        + "					min(x.dat_inicio_vigencia)\n"
+                        + "                               from\n"
+                        + "					cadcodigosespecificstproduto x\n"
+                        + "                               where \n"
+                        + "					x.cdg_interno = cest.cdg_interno)\n"
+                        + "join cadcodigosespecificadoresst st on cest.idcadcodigoespecificadorst = st.idcadcodigoespecificadorst\n"
+                        + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and \n"
+                        + "	ncm.dat_ini_vigencia = (select \n"
+                        + "					max(x.dat_ini_vigencia)\n"
+                        + "				from \n"
+                        + "					cadncmproduto x \n"
+                        + "				where \n"
+                        + "					x.cdg_interno = ncm.cdg_interno and \n"
+                        + "					x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setNcm(rst.getString("ncm"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.CEST) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	ncm.cdg_ncm ncm,\n"
+                        + "	st.cdg_especificador_st cest,\n"
+                        + "	pa.cdg_icms idicms,\n"
+                        + "	est.pct_icms_ent icms_credito,\n"
+                        + "	pis.flg_cst_piscofinse pis_credito,\n"
+                        + "	pis.flg_cst_piscofinss pis_debito,\n"
+                        + "	pis.cdg_natrecpiscof naturezareceita\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
+                        + "	and pis.dat_ini_vigencia = (select\n"
+                        + "                                   max(x.dat_ini_vigencia)\n"
+                        + "                               from\n"
+                        + "                                   cadassocpiscofins x\n"
+                        + "                               where\n"
+                        + "                                   x.cdg_interno = pis.cdg_interno and \n"
+                        + "                                   x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "join cadcodigosespecificstproduto cest on pa.cdg_interno = cest.cdg_interno and \n"
+                        + "	cest.dat_inicio_vigencia = (select \n"
+                        + "					min(x.dat_inicio_vigencia)\n"
+                        + "                               from\n"
+                        + "					cadcodigosespecificstproduto x\n"
+                        + "                               where \n"
+                        + "					x.cdg_interno = cest.cdg_interno)\n"
+                        + "join cadcodigosespecificadoresst st on cest.idcadcodigoespecificadorst = st.idcadcodigoespecificadorst\n"
+                        + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and \n"
+                        + "	ncm.dat_ini_vigencia = (select \n"
+                        + "					max(x.dat_ini_vigencia)\n"
+                        + "				from \n"
+                        + "					cadncmproduto x \n"
+                        + "				where \n"
+                        + "					x.cdg_interno = ncm.cdg_interno and \n"
+                        + "					x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setCest(rst.getString("cest"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.ICMS) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	ncm.cdg_ncm ncm,\n"
+                        + "	st.cdg_especificador_st cest,\n"
+                        + "	pa.cdg_icms idicms,\n"
+                        + "	est.pct_icms_ent icms_credito,\n"
+                        + "	pis.flg_cst_piscofinse pis_credito,\n"
+                        + "	pis.flg_cst_piscofinss pis_debito,\n"
+                        + "	pis.cdg_natrecpiscof naturezareceita\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
+                        + "	and pis.dat_ini_vigencia = (select\n"
+                        + "                                   max(x.dat_ini_vigencia)\n"
+                        + "                               from\n"
+                        + "                                   cadassocpiscofins x\n"
+                        + "                               where\n"
+                        + "                                   x.cdg_interno = pis.cdg_interno and \n"
+                        + "                                   x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "join cadcodigosespecificstproduto cest on pa.cdg_interno = cest.cdg_interno and \n"
+                        + "	cest.dat_inicio_vigencia = (select \n"
+                        + "					min(x.dat_inicio_vigencia)\n"
+                        + "                               from\n"
+                        + "					cadcodigosespecificstproduto x\n"
+                        + "                               where \n"
+                        + "					x.cdg_interno = cest.cdg_interno)\n"
+                        + "join cadcodigosespecificadoresst st on cest.idcadcodigoespecificadorst = st.idcadcodigoespecificadorst\n"
+                        + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and \n"
+                        + "	ncm.dat_ini_vigencia = (select \n"
+                        + "					max(x.dat_ini_vigencia)\n"
+                        + "				from \n"
+                        + "					cadncmproduto x \n"
+                        + "				where \n"
+                        + "					x.cdg_interno = ncm.cdg_interno and \n"
+                        + "					x.dat_ini_vigencia <= current year to fraction(3))\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        
+                        imp.setIcmsDebitoId(rst.getString("idicms"));
+                        imp.setIcmsDebitoForaEstadoId(rst.getString("idicms"));
+                        imp.setIcmsDebitoForaEstadoNfId(rst.getString("idicms"));
+                        imp.setIcmsCreditoId(rst.getString("idicms"));
+                        imp.setIcmsCreditoForaEstadoId(rst.getString("idicms"));
+                        imp.setIcmsConsumidorId(rst.getString("idicms"));
+                       
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        
+        if (opt == OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	un.sgl_unidade_medida unidade\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	p.cdg_interno id_interno,\n"
+                        + "	un.sgl_unidade_medida unidade\n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        
+        return null;
+    }
+    
+    @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	p.cdg_interno id_interno,\n"
+                    + "	p.cdg_barra ean,\n"
+                    + "	un.sgl_unidade_medida unidade,\n"
+                    + "	p.qtd_por_emb qtdembalagem\n"
+                    + "from \n"
+                    + "	informix.cadprod p\n"
+                    + "left join informix.cadunidadesmedida un on p.idcadunidademedida = un.idcadunidademedida\n"
+                    + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                    + "where est.cdg_filial = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id_interno"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        
+        /*try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
                     + "	p.cdg_produto id,\n"
@@ -505,7 +915,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(imp);
                 }
             }
-        }
+        }*/
         return result;
     }
 
