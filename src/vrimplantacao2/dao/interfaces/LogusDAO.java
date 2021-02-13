@@ -830,8 +830,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	un.sgl_unidade_medida unidade\n"
                         + "from \n"
                         + "	informix.cadprod p\n"
-                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
-                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno\n"
                         + "join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
                         + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
                         + "where est.cdg_filial = " + getLojaOrigem()
@@ -854,13 +853,13 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
                         + "	p.cdg_interno id_interno,\n"
+                        +"      p.cdg_barra ean\n"        
                         + "	un.sgl_unidade_medida unidade\n"
                         + "from \n"
                         + "	informix.cadprod p\n"
-                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
-                        + "	pa.cdg_estoque = p.cdg_produto\n"
-                        + "join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
-                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno \n"
+                        + "left join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
+                        + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
                         + "where est.cdg_filial = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
@@ -868,6 +867,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_interno"));
+                        imp.setEan(rst.getString("ean"));
                         imp.setTipoEmbalagem(rst.getString("unidade"));
                         result.add(imp);
                     }
