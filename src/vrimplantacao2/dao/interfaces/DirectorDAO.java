@@ -445,6 +445,51 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.QTD_EMBALAGEM_COTACAO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select 	 p.DFcod_item_estoque id,\n"
+                        + "	 max(pu.DFfator_conversao) as qtdembalagem\n"
+                        + "from \n"
+                        + "	TBitem_estoque p\n"
+                        + "left join \n"
+                        + "	TBitem_estoque_empresa pe on p.DFcod_item_estoque = pe.DFcod_item_estoque\n"
+                        + "inner join\n"
+                        + "	TBempresa em on pe.DFcod_empresa = em.DFcod_empresa\n"
+                        + "left join \n"
+                        + "	TBunidade_item_estoque pu on p.DFcod_item_estoque = pu.DFcod_item_estoque\n"
+                        + "left join \n"
+                        + "	TBitem_estoque_atacado_varejo pa on p.DFcod_item_estoque = pa.DFcod_item_estoque_atacado_varejo\n"
+                        + "left join \n"
+                        + "	TBunidade un on pu.DFcod_unidade = un.DFcod_unidade\n"
+                        + "left join \n"
+                        + "	TBtipo_unidade_item_estoque tu WITH (NOLOCK) on tu.DFid_unidade_item_estoque = pu.DFid_unidade_item_estoque and\n"
+                        + "	 tu.DFid_tipo_unidade = (SELECT DFvalor FROM TBopcoes WITH (NOLOCK) WHERE DFcodigo = 420)  \n"
+                        + "where\n"
+                        + "	em.DFcod_empresa = " + getLojaOrigem() + "\n"
+                        + "	and p.DFcod_item_estoque > 0\n"
+                        + "GROUP by\n"
+                        + "	p.DFcod_item_estoque"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+    
+    @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -689,13 +734,23 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
+                    + "	pf.DFcod_fornecedor idfornecedor,\n"
+                    + "	pf.DFcod_item_estoque idproduto,\n"
+                    + "	pf.DFpart_number codigoexterno,\n"
+                    + "	max(pu.DFfator_conversao) as qtdembalagem\n"
+                    + "from\n"
+                    + "	TBfornecedor_item pf\n"
+                    + "join TBitem_estoque p on p.DFcod_item_estoque = pf.DFcod_item_estoque\n"
+                    + "join TBunidade_item_estoque pu on p.DFcod_item_estoque = pu.DFcod_item_estoque\n"
+                    + "group by pf.DFcod_fornecedor, pf.DFcod_item_estoque, pf.DFpart_number "
+            /*"select \n"
                     + "	DFcod_fornecedor idfornecedor,\n"
                     + "	DFcod_item_estoque idproduto,\n"
                     + "	DFpart_number codigoexterno\n"
                     + "from\n"
                     + "	TBfornecedor_item\n"
                     + "order by\n"
-                    + "	1, 2")) {
+                    + "	1, 2"*/)) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
@@ -704,6 +759,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
 
                     result.add(imp);
                 }
