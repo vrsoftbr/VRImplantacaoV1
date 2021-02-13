@@ -848,7 +848,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
 
-        if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
+        /*if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
@@ -874,7 +874,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             return result;
-        }
+        }*/
         
         return null;
     }
@@ -959,11 +959,14 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n"
                     + "	pf.cdg_fornecedor idfornecedor,\n"
                     + "	p.cdg_interno idproduto,\n"
-                    + "	pf.cdg_prod_forn codigoexterno\n"
+                    + "	pf.cdg_prod_forn codigoexterno,\n"
+                    + "	p.qtd_por_emb as qtdembalagem\n"
+                    + "	\n"
                     + "from \n"
                     + "	cadcodfor pf \n"
                     + "inner join cadforn f on pf.cdg_fornecedor = f.cdg_fornecedor \n"
-                    + "inner join cadprod p on pf.cdg_produto = p.cdg_produto")) {
+                    + "inner join cadprod p on pf.cdg_produto = p.cdg_produto"
+            )) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
@@ -972,6 +975,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
 
                     result.add(imp);
                 }
