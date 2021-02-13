@@ -509,9 +509,9 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	pa.dcr_variedade variedade\n"
                         + "from \n"
                         + "	informix.cadprod p\n"
-                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno \n"
-                        + "join informix.cadmarcasproduto mar on mar.idcadmarcaproduto = pa.idcadmarcaproduto	\n"
-                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno \n"
+                        + "left join informix.cadmarcasproduto mar on mar.idcadmarcaproduto = pa.idcadmarcaproduto	\n"
+                        + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
                         + "where est.cdg_filial = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
@@ -637,6 +637,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_interno"));
+                        imp.setPiscofinsCstDebito(rst.getString("pis_debito"));
+                        imp.setPiscofinsCstCredito(rst.getString("pis_credito"));                      
                         imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                         result.add(imp);
                     }
