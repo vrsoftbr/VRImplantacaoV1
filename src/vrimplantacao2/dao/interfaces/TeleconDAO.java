@@ -445,7 +445,7 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
                     
                     imp.setId(rs.getString("codigo"));
-                    imp.setRazao(rs.getString("razaosocial"));
+                    imp.setRazao(rs.getString("nome"));
                     imp.setCnpj(rs.getString("cpf"));
                     imp.setInscricaoestadual(rs.getString("rg"));
                     imp.setEndereco(rs.getString("endereco"));
