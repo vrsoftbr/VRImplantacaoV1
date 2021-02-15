@@ -173,8 +173,9 @@
                                   <Component id="chkCliBloqueado" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="332" max="32767" attributes="0"/>
+                          <EmptySpace pref="338" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -188,7 +189,9 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="176" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="163" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -207,6 +210,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkCliBloqueado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
                 </Component>
               </SubComponents>

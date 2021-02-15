@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -510,6 +511,54 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	cc.codigo id,\n" +
+                    "	codigocliente idcliente,\n" +
+                    "   c.nome,\n" +        
+                    "	c.cpf,\n" +
+                    "	c.rg,\n" +
+                    "	codigobanco banco,\n" +
+                    "	cc.agencia,\n" +
+                    "	cc.conta,\n" +
+                    "	nrocheque cheque,\n" +
+                    "	valor,\n" +
+                    "	bompara vencimento,\n" +
+                    "	dataregistro\n" +
+                    "from\n" +
+                    "	cheques cc\n" +
+                    "join clientes c on cc.CodigoCliente = c.codigo\n" +
+                    "where \n" +
+                    "	CodLancamentoFinanceiro is null and \n" +
+                    "	CodLoja = " + getLojaOrigem())) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setConta(rs.getString("conta"));
+                    imp.setNumeroCheque(rs.getString("cheque"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setDate(rs.getDate("dataregistro"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 }
