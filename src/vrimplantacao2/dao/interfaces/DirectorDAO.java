@@ -1024,7 +1024,22 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select \n"
+                    + "	ch.DFid_movimento_bancario as id,\n"
+                    + "	ch.DFdata_emissao as dataemissao,\n"
+                    + "	ch.DFdata_vencimento as datavencimento,\n"
+                    + "	ch.DFvalor as valor,\n"
+                    + "	tpmb.DFdescricao as descricao_historico,\n"
+                    + "	ch.DFnumero_documento as DFnumero_documento,\n"
+                    + "	ch.DFnominal as nome,\n"
+                    + "	ch.DFobservacao as observacao,\n"
+                    + "	ch.DFid_conta \n"
+                    + "from TBmovimento_bancario ch \n"
+                    + "left join TBhistorico_padrao_movto_bancario tpmb on tpmb.DFcod_historico_movto_bancario = ch.DFcod_historico_movto_bancario\n"
+                    + "where ch.DFcod_tipo_documento in (2)\n"
+                    + "and tpmb.DFnatureza  = 'C'\n"
+                    + "and ch.DFcod_empresa = " + getLojaOrigem()
+            /*"select\n"
                     + "	tr.DFid_titulo_receber id,\n"
                     + "	tr.DFcod_cliente idcliente,\n"
                     + "	tr.DFcod_tipo_documento tipo_doc,\n"
@@ -1041,7 +1056,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tr.DFid_titulo_receber not in (select DFid_titulo_receber from TBtitulo_baixado_receber) and\n"
                     + "   tr.DFcliente_fornecedor_empresa = 'C'\n"
                     + "order by\n"
-                    + "	tr.DFdata_vencimento")) {
+                    + "	tr.DFdata_vencimento"*/)) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
 

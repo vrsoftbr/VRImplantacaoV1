@@ -1018,7 +1018,7 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    v.nfce_chave\n"
                     + "from venda v\n"
                     + "where v.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n"
-                    + "AND v.NFCE_STATUS = 'AUTORIZADA'";
+                    + "AND v.TIPO != 'D'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
