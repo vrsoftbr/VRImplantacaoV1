@@ -121,6 +121,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                     OpcaoProduto.MAPA_TRIBUTACAO,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
                 }
@@ -470,6 +471,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setTipoEmbalagemCotacao(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setVolume(rs.getDouble("volume"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
@@ -826,7 +828,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
 
-        if (opt == OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) {
+        if (opt == OpcaoProduto.VOLUME_TIPO_EMBALAGEM) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
@@ -844,7 +846,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_interno"));
-                        imp.setTipoEmbalagemCotacao(rst.getString("unidade"));
+                        imp.setTipoEmbalagemVolume(rst.getString("unidade"));
                         result.add(imp);
                     }
                 }
