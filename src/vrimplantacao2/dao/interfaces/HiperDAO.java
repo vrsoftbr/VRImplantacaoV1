@@ -517,8 +517,8 @@ public class HiperDAO extends InterfaceDAO {
                     "	documento_receber\n" +
                     "where\n" +
                     "	situacao = 1 and \n" +
-                    "	id_filial_geracao = " + getLojaOrigem() + " and \n" +
-                    "	id_entidade not in (6, 90, 91, 92, 96, 93)")) {
+                    "	id_filial_geracao = " + getLojaOrigem() + ""/*and \n" +
+                    "	id_entidade not in (6, 90, 91, 92, 96, 93)"*/)) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     

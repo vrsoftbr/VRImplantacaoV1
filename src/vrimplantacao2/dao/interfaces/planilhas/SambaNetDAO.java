@@ -731,17 +731,17 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     
                     if (
-                            (val(sh, 6, i) != null) && 
-                            (!val(sh, 6, i).trim().isEmpty()) && 
-                            (!", --/  ".equals(val(sh, 6, i))) && 
-                            (!", --/".equals(val(sh, 6, i)))
+                            (val(sh, 11, i) != null) && 
+                            (!val(sh, 11, i).trim().isEmpty()) && 
+                            (!", --/  ".equals(val(sh, 11, i))) && 
+                            (!", --/".equals(val(sh, 11, i)))
                         ) {
                     
-                        String enderecoCompleto = val(sh, 6, i);
+                        String enderecoCompleto = val(sh, 11, i);
                         String ende[] = enderecoCompleto.split(",");
                         
                         imp.setObservacao2(imp.getObservacao2() + " == " + "ENDERCO " + enderecoCompleto);
-                        
+                                                
                         for (int j = 0; j < ende.length; j++) {
                             
                             switch(j) {
@@ -749,19 +749,35 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                                     imp.setEndereco(ende[j]);
                                     break;
                                 case 1:
-                                    if (ende[j].contains("-")) {
-                                        imp.setNumero(ende[j].substring(0, ende[j].indexOf("-")).trim());
+                                    if (ende[j].contains(",")) {
+                                        imp.setNumero(ende[j].substring(0, ende[j].indexOf(",")).trim());
                                     } else {
                                         imp.setNumero(ende[j].trim());
                                     }
                                     break;
+                                case 2:
+                                    if (ende[j].contains("-")) {
+                                        imp.setMunicipio(ende[j].substring(0, ende[j].indexOf("-")).trim());
+                                    } else {
+                                        imp.setMunicipio(ende[j].trim());
+                                    }
+                                    break;
+                                case 3:
+                                    if (ende[j].contains("/")) {
+                                        imp.setUf(ende[j].substring(0, ende[j].indexOf("/")).trim());
+                                    } else {
+                                        imp.setUf(ende[j].trim());
+                                    }
+                                break;
                             }
+                            
+                        imp.setEndereco(val(sh, 11, i));
                         }
                         
-                        String enderecoCompletoReverse = new StringBuilder(enderecoCompleto).reverse().toString();
-                        String endeReverse[] = enderecoCompletoReverse.split("-");
+                        //String enderecoCompletoReverse = new StringBuilder(enderecoCompleto).reverse().toString();
+                        //String endeReverse[] = enderecoCompletoReverse.split("-");
                         
-                        for (int k = 0; k < endeReverse.length; k++) {
+                        /*for (int k = 0; k < endeReverse.length; k++) {
                             
                             switch(k) {
                                 case 0:
@@ -777,7 +793,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                                     imp.setBairro(bairro);
                                     break;
                             }
-                        }
+                        }*/
                     }
                     
                     /*if (!val(sh, 5, i).equals("")) {
@@ -817,7 +833,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     ) {                        
                         imp.setUf(val(sh, 25, i));
                     }*/
-                }
+                    }
                 if (imp != null) {
                     result.add(imp);
                 }
