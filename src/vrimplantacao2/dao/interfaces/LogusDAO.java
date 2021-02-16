@@ -16,6 +16,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -119,6 +120,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
+                    OpcaoProduto.VOLUME_QTD,
                     OpcaoProduto.MAPA_TRIBUTACAO,
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
                 }
@@ -304,7 +306,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rs.getString("desativacao") != null) {
                         imp.setSituacaoCadastro(0);
                     }
-                    
+
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
@@ -338,8 +340,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
-        @Override
+
+    @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
@@ -361,7 +363,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return Result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -380,8 +382,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pa.flb_habilita_checagem_peso_pdv pesopdv,\n"
                     + "	est.val_custo custosemimposto,\n"
                     + "	est.val_custo_tot custocomimposto,\n"
-                    + "	pa.pct_mg_lucro margem,\n"  
-                    + " mar.pct_margem, \n"        
+                    + "	pa.pct_mg_lucro margem,\n"
+                    + " mar.pct_margem, \n"
                     + "	est.val_preco precovenda,\n"
                     + "	est.qtd_estoque estoque,\n"
                     + "	p.dat_cadastro cadastro,\n"
@@ -389,6 +391,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dat_desativacao desativacao,\n"
                     + "	un.sgl_unidade_medida unidade,\n"
                     + "	p.qtd_por_emb qtdembalagem,\n"
+                    + " p.qtd_da_embalagem as volume,\n"
                     + "	ncm.cdg_ncm ncm,\n"
                     + "	st.cdg_especificador_st cest,\n"
                     + "	se.cdg_depto merc1,\n"
@@ -408,7 +411,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
                     + "left join informix.cadgrupo gr on pa.cdg_grupo = gr.cdg_grupo\n"
                     + "left join informix.cadsubgr sg on pa.cdg_subgrupo = sg.cdg_subgrupo \n"
-                    + "left join informix.cadmargs mar on sg.cdg_subgrupo = mar.cdg_subgrupo \n"        
+                    + "left join informix.cadmargs mar on sg.cdg_subgrupo = mar.cdg_subgrupo \n"
                     + "left join informix.cadsecao se on gr.cdg_secao = se.cdg_secao\n"
                     + "left join informix.caddepto dp on se.cdg_depto = dp.cdg_depto\n"
                     + "left join cadassocpiscofins pis on pa.cdg_interno = pis.cdg_interno\n"
@@ -458,7 +461,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rs.getString("desativacao") != null) {
                         imp.setSituacaoCadastro(0);
                     }
-                    
+
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
@@ -468,12 +471,13 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("cadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    imp.setVolume(rs.getDouble("volume"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setCodMercadologico4(rs.getString("merc4"));
                     imp.setIdFamiliaProduto(rs.getString("idfamilia"));
-                    
+
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
 
@@ -485,8 +489,8 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoId(rs.getString("idicms"));
                     imp.setIcmsDebitoForaEstadoNfId(rs.getString("idicms"));
                     imp.setIcmsCreditoId(rs.getString("idicms"));
-                    imp.setIcmsCreditoForaEstadoId(rs.getString("idicms"));                    
-                    imp.setIcmsConsumidorId(rs.getString("idicms"));                    
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("idicms"));
+                    imp.setIcmsConsumidorId(rs.getString("idicms"));
 
                     result.add(imp);
                 }
@@ -519,7 +523,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_interno"));
-                        
+
                         imp.setDescricaoCompleta(
                                 (rst.getString("nome") != null ? rst.getString("nome").trim() : "")
                                 + " "
@@ -531,7 +535,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
-        
+
         if (opt == OpcaoProduto.PIS_COFINS) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -588,7 +592,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
-        
+
         if (opt == OpcaoProduto.NATUREZA_RECEITA) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -638,7 +642,7 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_interno"));
                         imp.setPiscofinsCstDebito(rst.getString("pis_debito"));
-                        imp.setPiscofinsCstCredito(rst.getString("pis_credito"));                      
+                        imp.setPiscofinsCstCredito(rst.getString("pis_credito"));
                         imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                         result.add(imp);
                     }
@@ -807,21 +811,21 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_interno"));
-                        
+
                         imp.setIcmsDebitoId(rst.getString("idicms"));
                         imp.setIcmsDebitoForaEstadoId(rst.getString("idicms"));
                         imp.setIcmsDebitoForaEstadoNfId(rst.getString("idicms"));
                         imp.setIcmsCreditoId(rst.getString("idicms"));
                         imp.setIcmsCreditoForaEstadoId(rst.getString("idicms"));
                         imp.setIcmsConsumidorId(rst.getString("idicms"));
-                       
+
                         result.add(imp);
                     }
                 }
             }
             return result;
         }
-        
+
         if (opt == OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -848,37 +852,70 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
 
-        /*if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
+        if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
-                        + "	p.cdg_interno id_interno,\n"
-                        +"      p.cdg_barra ean\n"        
-                        + "	un.sgl_unidade_medida unidade\n"
-                        + "from \n"
-                        + "	informix.cadprod p\n"
-                        + "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno \n"
-                        + "left join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
-                        + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
-                        + "where est.cdg_filial = " + getLojaOrigem()
+                        + "	p.cdg_interno id,\n"
+                        + "	val_preco precovenda,\n"
+                        + "	qtd_por_emb,\n"
+                        + "	val_preco/qtd_por_emb precoatacado\n"
+                        + "from estprfil a \n"
+                        + "inner join cadprod p on p.cdg_barra = a.cdg_produto \n"
+                        + "and qtd_por_emb > 1"
                 )) {
                     while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("id_interno"));
-                        imp.setEan(rst.getString("ean"));
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
-                        result.add(imp);
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id"));
+
+                        if (codigoAtual > 0) {
+
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("id"));
+                            //imp.setEan("999999" + String.valueOf(codigoAtual));
+                            imp.setQtdEmbalagem(rst.getInt("qtd_por_emb"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            result.add(imp);
+                        }
                     }
                 }
             }
             return result;
-        }*/
+        }
+
+        /*if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
+         try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+         try (ResultSet rst = stm.executeQuery(
+         "select \n"
+         + "	p.cdg_interno id_interno,\n"
+         +"      p.cdg_barra ean\n"        
+         + "	un.sgl_unidade_medida unidade\n"
+         + "from \n"
+         + "	informix.cadprod p\n"
+         + "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno \n"
+         + "left join informix.cadunidadesmedida un on un.idcadunidademedida = pa.idcadunidademedida\n"
+         + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+         + "where est.cdg_filial = " + getLojaOrigem()
+         )) {
+         while (rst.next()) {
+         ProdutoIMP imp = new ProdutoIMP();
+         imp.setImportLoja(getLojaOrigem());
+         imp.setImportSistema(getSistema());
+         imp.setImportId(rst.getString("id_interno"));
+         imp.setEan(rst.getString("ean"));
+         imp.setTipoEmbalagem(rst.getString("unidade"));
+         result.add(imp);
+         }
+         }
+         }
+         return result;
+         }*/
         
         return null;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -908,45 +945,45 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         /*try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	p.cdg_produto id,\n"
-                    + "	p.cdg_interno id_interno,\n"
-                    + "	p.cdg_barra ean,\n"
-                    + "	un.sgl_unidade_medida unidade,\n"
-                    + "	p.qtd_por_emb qtdembalagem\n"
-                    + "from \n"
-                    + "	informix.cadprod p\n"
-                    + "left join informix.cadunidadesmedida un on p.idcadunidademedida = un.idcadunidademedida\n"
-                    + "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
-                    + "	pa.cdg_estoque = p.cdg_produto\n"
-                    + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
-                    + "where \n"
-                    + "	est.cdg_filial = " + getLojaOrigem() + " and\n"
-                    + "	p.qtd_por_emb > 1\n"
-                    + "order by \n"
-                    + "	p.cdg_produto")) {
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
+         try (ResultSet rs = stm.executeQuery(
+         "select \n"
+         + "	p.cdg_produto id,\n"
+         + "	p.cdg_interno id_interno,\n"
+         + "	p.cdg_barra ean,\n"
+         + "	un.sgl_unidade_medida unidade,\n"
+         + "	p.qtd_por_emb qtdembalagem\n"
+         + "from \n"
+         + "	informix.cadprod p\n"
+         + "left join informix.cadunidadesmedida un on p.idcadunidademedida = un.idcadunidademedida\n"
+         + "left join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+         + "	pa.cdg_estoque = p.cdg_produto\n"
+         + "left join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+         + "where \n"
+         + "	est.cdg_filial = " + getLojaOrigem() + " and\n"
+         + "	p.qtd_por_emb > 1\n"
+         + "order by \n"
+         + "	p.cdg_produto")) {
+         while (rs.next()) {
+         ProdutoIMP imp = new ProdutoIMP();
 
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("id_interno"));
-                    imp.setEan(rs.getString("ean"));
+         imp.setImportSistema(getSistema());
+         imp.setImportLoja(getLojaOrigem());
+         imp.setImportId(rs.getString("id_interno"));
+         imp.setEan(rs.getString("ean"));
 
-                    if (imp.getEan() != null && imp.getEan().length() < 7) {
-                        imp.setEan("999999" + imp.getEan());
-                    }
+         if (imp.getEan() != null && imp.getEan().length() < 7) {
+         imp.setEan("999999" + imp.getEan());
+         }
 
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+         imp.setTipoEmbalagem(rs.getString("unidade"));
+         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
 
-                    result.add(imp);
-                }
-            }
-        }*/
+         result.add(imp);
+         }
+         }
+         }*/
         return result;
     }
 
