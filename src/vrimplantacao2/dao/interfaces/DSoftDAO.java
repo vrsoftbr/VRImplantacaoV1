@@ -1072,9 +1072,10 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setVenda(idVenda);
                         next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("qtde"));
-                        next.setTotalBruto(rst.getDouble("totaliten"));
-                        //next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setPrecoVenda(rst.getDouble("valor_unit_bruto"));
+                        next.setTotalBruto(rst.getDouble("valor_total_bruto"));
+                        next.setValorDesconto(rst.getDouble("valor_desconto"));
+                        next.setValorAcrescimo(rst.getDouble("valor_acrescimo"));
                         next.setCancelado(rst.getInt("cancelado") == 1);
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setSequencia(rst.getInt("item"));
@@ -1175,6 +1176,8 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    i.qtde,\n"
                     + "    i.vendido as precovenda,\n"
                     + "    i.totaliten,\n"
+                    + "    i.valor_total_bruto,\n"
+                    + "    i.valor_unit_bruto, \n"
                     + "    i.custofinal,\n"
                     + "    i.totalcusto,\n"
                     + "    i.st,\n"
@@ -1183,9 +1186,13 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    i.cst_cofins,\n"
                     + "    i.aliq_pis,\n"
                     + "    i.aliq_cofins,\n"
-                    + "    i.tipo_lancamento\n"
+                    + "    i.tipo_lancamento,\n"
+                    + "    i.valor_desconto, \n"
+                    + "    i.valor_acrescimo\n"
                     + "from itemvenda i\n"
                     + "join estoque p on p.codigo = i.codproduto\n"
+                    + "join venda v on v.codvenda = i.codvenda and \n"
+                    + " v.TIPO != 'D' \n"
                     + "where i.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
