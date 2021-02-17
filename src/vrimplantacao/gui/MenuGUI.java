@@ -266,6 +266,7 @@ import vrimplantacao2.gui.interfaces.AlterData_WShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
 import vrimplantacao2.gui.interfaces.AutocomGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
+import vrimplantacao2.gui.interfaces.CorrecaoImpostosDSoftGUI;
 import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
@@ -355,13 +356,14 @@ public final class MenuGUI extends VRMdiFrame {
     public JacsysGUI formImportarJacsys = null;
     public SifatGUI formImportarSifat = null;
     public GerarCodigoBarrasAtacadoGUI formImportarGerarCodigoBarrasAtacado = null;
-    public CorrecaoImpostosSuperContole_SuperServerGUI formCorrecaoImpostosSuperControle_SuperServer = null;
+    public CorrecaoImpostosSuperContole_SuperServerGUI formCorrecaoImpostosSuperControle_SuperServer = null;    
     public NotaSaidaNfceImportacaoArquivoGUI formNotaSaidaNfceImportacaoArquivoGUI = null;
     public AlterarProdutoPdvVendaItemGUI formAlterarProdutoPdvVendaItem = null;    
     public ArquivoPadraoGUI formArquivoPadrao = null;
     public PlanilhaV2GUI formPlanilhaV2 = null;
     public AcertarCodigoInternoGUI formAcertarCodigoInterno = null;
     public AcertarIdsProdutoGUI formAcertarIdsProduto = null;
+    public CorrecaoImpostosDSoftGUI formCorrecaoImpostosDSoft = null;
 
     public VRBusca txtBusca = null;
 
@@ -890,6 +892,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuParametros1 = new javax.swing.JMenuItem();
         mnuDelRegistro = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        mnuCorrecaoImpostosDSoft = new javax.swing.JMenuItem();
         mnuPlanilha = new javax.swing.JMenu();
         mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
@@ -3271,6 +3274,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuAvancadas.add(jMenuItem6);
 
+        mnuCorrecaoImpostosDSoft.setText("Correção Impostos DSfoft");
+        mnuCorrecaoImpostosDSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCorrecaoImpostosDSoftActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(mnuCorrecaoImpostosDSoft);
+
         mnuFerramentas.add(mnuAvancadas);
 
         mnuMenu.add(mnuFerramentas);
@@ -5080,6 +5091,22 @@ public final class MenuGUI extends VRMdiFrame {
         TeleconGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
+    private void mnuCorrecaoImpostosDSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCorrecaoImpostosDSoftActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            if (formCorrecaoImpostosDSoft == null || formCorrecaoImpostosDSoft.isClosed()) {
+                formCorrecaoImpostosDSoft = new CorrecaoImpostosDSoftGUI(this);
+            }
+            formCorrecaoImpostosDSoft.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        } finally {
+            this.setDefaultCursor();
+        }
+        
+    }//GEN-LAST:event_mnuCorrecaoImpostosDSoftActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5216,6 +5243,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuContaPagar1;
     private javax.swing.JMenuItem mnuControlX;
     private javax.swing.JMenuItem mnuControll;
+    private javax.swing.JMenuItem mnuCorrecaoImpostosDSoft;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenuItem mnuCronos20;
     private javax.swing.JMenu mnuDB2;

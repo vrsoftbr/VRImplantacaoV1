@@ -857,11 +857,9 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    r.datavencimento,\n"
                     + "    r.historico,\n"
                     + "    r.valor,\n"
-                    + "    COALESCE(VALORRECEBIDO, 0) * -1 AS valorrecebido\n"
+                    + "    COALESCE(VALORRECEBIDO, 0) AS valorrecebido\n"
                     + "from receber r\n"
-                    + "where datapagamento is null\n"        
-                    /*+ "WHERE COALESCE(VALORRECEBIDO, 0) * -1 < VALOR\n"
-                    + "AND COALESCE(VALORRECEBIDO, 0) < 0\n"        */
+                    + "WHERE COALESCE(VALORRECEBIDO, 0) < VALOR\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
@@ -871,7 +869,6 @@ public class DSoftDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));                    
-                    //imp.setValor(rst.getDouble("valor") - rst.getDouble("valorrecebido"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("historico") + " PARCELA - " + rst.getString("parcela"));
                     result.add(imp);

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrframework.classe.Conexao;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -129,7 +130,7 @@ public class CorrecaoImpostosDSoftDAO extends InterfaceDAO implements MapaTribut
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    codigo,\n"
@@ -213,7 +214,7 @@ public class CorrecaoImpostosDSoftDAO extends InterfaceDAO implements MapaTribut
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo"));
-                        imp.setPiscofinsCstDebito(rst.getInt("cst_pis_d"));
+                        imp.setPiscofinsCstDebito(rst.getString("cst_pis_d"));
                         imp.setPiscofinsCstCredito(rst.getString("cst_pis_c"));                        
                         result.add(imp);
                     }
@@ -237,7 +238,7 @@ public class CorrecaoImpostosDSoftDAO extends InterfaceDAO implements MapaTribut
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo"));
-                        imp.setPiscofinsCstDebito(rst.getInt("cst_pis_d"));
+                        imp.setPiscofinsCstDebito(rst.getString("cst_pis_d"));
                         imp.setPiscofinsCstCredito(rst.getString("cst_pis_c"));                        
                         imp.setPiscofinsNaturezaReceita(rst.getString("natureza_piscofins"));
                         result.add(imp);
