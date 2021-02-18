@@ -208,14 +208,14 @@ public class ContasPagarRepository {
                                 parc.setId_banco(804);
                             }
 
-                            /*pagarFornecedorParcela = provider.getPagarFornecedoresParcela(
+                            pagarFornecedorParcela = provider.getPagarFornecedoresParcela(
                                     anterior.getCodigoAtual(), 
                                     parc.getNumeroparcela()
-                            );*/
-                            //if (pagarFornecedorParcela != null) {
-                            parc.setId_pagarfornecedor(anterior.getCodigoAtual());
-                            provider.gravarVencimento(parc);
-                            //}
+                            );
+                            if (pagarFornecedorParcela.isEmpty()) {
+                                parc.setId_pagarfornecedor(anterior.getCodigoAtual());
+                                provider.gravarVencimento(parc);
+                            }
                         }
 
                         //Inclui na listagem de parcelas (UK)
