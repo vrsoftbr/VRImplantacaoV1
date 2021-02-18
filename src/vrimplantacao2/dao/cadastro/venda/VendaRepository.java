@@ -421,7 +421,8 @@ public class VendaRepository {
         item.setValorDesconto(imp.getValorDesconto());
         item.setValorAcrescimo(imp.getValorAcrescimo());
         
-        Icms aliquota = provider.getAliquota(imp.getIcmsAliquotaId());
+        //Icms aliquota = provider.getAliquota(imp.getIcmsAliquotaId());
+        Icms aliquota = null;
         if (aliquota == null) aliquota = provider.getAliquota(imp.getIcmsCst(), imp.getIcmsAliq(), imp.getIcmsReduzido());
         if (aliquota != null) {
             item.setId_aliquota(aliquota.getId());

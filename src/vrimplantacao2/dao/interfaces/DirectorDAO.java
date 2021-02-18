@@ -486,6 +486,45 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
+        
+        if (opt == OpcaoProduto.TROCA) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select distinct\n"
+                        + "	p.DFcod_item_estoque as idproduto,\n"
+                        + "	est.DFquantidade_Atual as troca \n"
+                        + "from TBitem_estoque p\n"
+                        + "left join \n"
+                        + "	TBitem_estoque_empresa pe on p.DFcod_item_estoque = pe.DFcod_item_estoque\n"
+                        + "inner join\n"
+                        + "	TBempresa em on pe.DFcod_empresa = em.DFcod_empresa\n"
+                        + "left join \n"
+                        + "	TBunidade_item_estoque pu on p.DFcod_item_estoque = pu.DFcod_item_estoque\n"
+                        + "left join \n"
+                        + "	TBitem_estoque_atacado_varejo pa on p.DFcod_item_estoque = pa.DFcod_item_estoque_atacado_varejo\n"
+                        + "left join \n"
+                        + "	TBunidade un on pu.DFcod_unidade = un.DFcod_unidade\n"
+                        + "inner join \n"
+                        + "	TBtipo_unidade_item_estoque tu WITH (NOLOCK) on tu.DFid_unidade_item_estoque = pu.DFid_unidade_item_estoque\n"
+                        + "left join tbresumo_estoque est on tu.DFid_unidade_item_estoque = est.DFid_unidade_item_estoque 	/*and \n"
+                        + "	est.DFcod_empresa = pe.DFcod_empresa and \n"
+                        + "	est.DFid_tipo_estoque = (select DFvalor from TBopcoes WITH (NOLOCK) where DFcodigo = 553)*/\n"
+                        + "where em.DFcod_empresa = " + getLojaOrigem() + "\n"
+                        + "and est.DFid_tipo_estoque = 3\n"
+                        + "and est.DFquantidade_Atual > 0\n"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setTroca(rst.getDouble("troca"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
         return null;
     }
     
