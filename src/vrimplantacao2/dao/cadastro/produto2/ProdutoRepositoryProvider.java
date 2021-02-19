@@ -277,6 +277,12 @@ public class ProdutoRepositoryProvider {
             dao.setImportLoja(getLoja());
             return dao.getCodigoAnterior().containsKey(getSistema(), getLoja(), id);
         }
+        
+        public boolean forcarNovo(String impid) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            return dao.getForcarNovo().containsKey(getSistema(), getLoja(), impid);
+        }
     
     }
     

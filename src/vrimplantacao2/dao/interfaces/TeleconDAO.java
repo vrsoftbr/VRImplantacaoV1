@@ -199,57 +199,77 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "	p.codigo,\n" +
-                    "	p.descricao,\n" +
-                    "	p.DescricaoReduzida,\n" +
-                    "	ean.BARRAS,\n" +
-                    "	p.DT_CADASTRO,\n" +
-                    "	p.CD_SITUACAO_PRODUTO situacao,\n" +
-                    "   pl.ativo,\n" +        
-                    "	p.validade,\n" +
-                    "	p.diasvalidade,\n" +
-                    "	p.grupo,\n" +
-                    "	p.CD_ASSOCIADO familia,\n" +
-                    "	substring(p.grupo, 0, 3) merc1,\n" +
-                    "	substring(p.grupo, 4, 6) merc2,\n" +
-                    "	u.sigla unidade,\n" +
-                    "	p.QT_EMBALAGEM,\n" +
-                    "	p.Qtd_Embalagem_Venda,\n" +
-                    "	p.VALOR_NO_PDV,\n" +
-                    "	p.ValorVenda,\n" +
-                    "	pl.valorProduto,\n" +
-                    "	p.MargemLucro,\n" +
-                    "	p.custo,\n" +
-                    "	p.Qtd estoque,\n" +
-                    "	pe.QtdEstoque,\n" +
-                    "	p.QtdMinima,\n" +
-                    "	aliquota idicms,\n" +
-                    "	p.ICMS_COMPRA,\n" +
-                    "	p.BASE_REDUZIDA_ICMS,\n" +
-                    "	p.st,\n" +
-                    "	pis.CSTPisEntrada,\n" +
-                    "	pis.CSTPisSaida,\n" +
-                    "	p.NaturezaReceita,\n" +
-                    "	p.ncm,\n" +
-                    "	p.codigocest cest,\n" +
-                    "	p.mva,\n" +
-                    "	p.AliquotaICMSST,\n" +
-                    "	p.BaseReduzidaST,\n" +
-                    "	iaa.codgia gia\n" +
+                    "   p.codigo,\n" +
+                    "   p.descricao,\n" +
+                    "   p.DescricaoReduzida,\n" +
+                    "   ean.BARRAS,\n" +
+                    "   p.DT_CADASTRO,\n" +
+                    "   p.CD_SITUACAO_PRODUTO situacao,\n" +
+                    "   pl.ativo,        \n" +
+                    "   p.validade,\n" +
+                    "   p.diasvalidade,\n" +
+                    "   p.grupo,\n" +
+                    "   p.CD_ASSOCIADO familia,\n" +
+                    "   substring(p.grupo, 0, 3) merc1,\n" +
+                    "   substring(p.grupo, 4, 6) merc2,\n" +
+                    "   u.sigla unidade,\n" +
+                    "   p.QT_EMBALAGEM,\n" +
+                    "   p.Qtd_Embalagem_Venda,\n" +
+                    "   p.VALOR_NO_PDV,\n" +
+                    "   p.ValorVenda,\n" +
+                    "   pl.valorProduto,\n" +
+                    "   p.MargemLucro,\n" +
+                    "   p.custo,\n" +
+                    "   custo.CustoGerencial,\n" +
+                    "   p.Qtd estoque,\n" +
+                    "   pe.QtdEstoque,\n" +
+                    "   p.QtdMinima,\n" +
+                    "   aliquota idicms,\n" +
+                    "   p.ICMS_COMPRA,\n" +
+                    "   p.BASE_REDUZIDA_ICMS,\n" +
+                    "   p.st,\n" +
+                    "   pis.CSTPisEntrada,\n" +
+                    "   pis.CSTPisSaida,\n" +
+                    "   p.NaturezaReceita,\n" +
+                    "   p.ncm,\n" +
+                    "   p.codigocest cest,\n" +
+                    "   p.mva,\n" +
+                    "   p.AliquotaICMSST,\n" +
+                    "   p.BaseReduzidaST,\n" +
+                    "   iaa.codgia gia\n" +
                     "from \n" +
-                    "	produtos p\n" +
+                    "   produtos p\n" +
                     "left join Unidades u on p.Unidade = u.Codigo\n" +
                     "left join AliquotasPisCofins pis on p.CodAliquotaPisCofins = pis.codigo\n" +
                     "left join PRODUTO_BARRAS ean on p.codigo = ean.CD_PRODUTO\n" +
                     "left join ProdutoLojas pl on pl.codLoja = " + getLojaOrigem() + " and \n" +
-                    "	p.codigo = pl.codProduto\n" +
+                    "   p.codigo = pl.codProduto\n" +
                     "left join ProdutoEstoqueLoja pe on pl.codLoja = pe.CodLoja and \n" +
-                    "	p.codigo = pe.CodProduto\n" +
+                    "   p.codigo = pe.CodProduto\n" +
                     "left join PRODUTOINFADAPURACAOVIGENCIAS pia on pia.CodProduto = p.codigo and\n" +
-                    "	pia.Excluido = 0\n" +
+                    "   pia.Excluido = 0\n" +
                     "left join INFADICIONAISAPURACAO iaa on pia.CodInfAdicionalApuracao = iaa.CodInfAdicionalApuracao\n" +
+                    "left join\n" +
+                    "	(select\n" +
+                    "		CodProduto,\n" +
+                    "		CustoGerencial,\n" +
+                    "		codloja \n" +
+                    "	from \n" +
+                    "		CustoHistorico ch \n" +
+                    "	where \n" +
+                    "		dtcusto = (select \n" +
+                    "				max(dtcusto) \n" +
+                    "                      from \n" +
+                    "				CustoHistorico \n" +
+                    "			 where\n" +
+                    "				CodProduto = ch.CodProduto and \n" +
+                    "				codloja = ch.codloja and \n" +
+                    "				alteracusto = ch.alteracusto) and\n" +
+                    "		ch.alteracusto = 1) custo on \n" +
+                    "				p.codigo = custo.codproduto and \n" +
+                    "				pl.codLoja = custo.CodLoja\n" +
                     "where \n" +
-                    "	pe.CodTipoEstoque = 1")) {
+                    "   pe.CodTipoEstoque = 1")) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -269,7 +289,7 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3("1");
                     imp.setPrecovenda(rs.getDouble("ValorVenda"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoComImposto(rs.getDouble("CustoGerencial"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setMargem(rs.getDouble("MargemLucro"));
                     imp.setEstoque(rs.getDouble("QtdEstoque"));

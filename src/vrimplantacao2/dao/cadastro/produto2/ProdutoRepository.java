@@ -532,13 +532,14 @@ public class ProdutoRepository {
                 /**
                  * Variaveis foram criadas para facilitar a leitura do código.
                  */
-                boolean eanValido = unificarProdutoBalanca || (ean > 999999);
+                boolean forcarNovo = provider.anterior().forcarNovo(strID);
+                boolean eanValido = unificarProdutoBalanca || (ean > 999999) || forcarNovo;
                 int idProdutoExistente = provider.automacao().getIdProdutoPorEAN(ean);
                 boolean eanExistente = idProdutoExistente > 0;
                 ProdutoVO codigoAtual = null;
                 
                 if (eanValido) {
-                    if (!eanExistente) {
+                    if (!eanExistente || forcarNovo) {
                         /**
                          * Mesmo que um determinado EAN não esteja cadastrado no
                          * sistema (pois o mesmo pode ter sido excluído por um
@@ -594,6 +595,10 @@ public class ProdutoRepository {
                                 }
 
                                 id = idStack.obterID(strID, eBalanca);
+                                
+                                if (forcarNovo) {
+                                    ean = id;
+                                }
 
                                 codigoAtual = converterIMP(imp, id, unidade, eBalanca);
 
@@ -605,7 +610,10 @@ public class ProdutoRepository {
                                 complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                                 provider.salvar(codigoAtual);
-                                obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                                
+                                obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + 
+                                        ProdutoRepository.class.getName().toString();
+                                
                                 //provider.anterior().salvar(anterior);
                                 double estoque = complemento.getEstoque();
                                 for (LojaVO loja : provider.getLojas()) {
@@ -619,6 +627,14 @@ public class ProdutoRepository {
 
                                 }
                                 provider.aliquota().salvar(aliquota);
+                                
+                                if(forcarNovo) {
+                                    obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
+                                    gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
+                                    ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                                    automacao.setProduto(codigoAtual);
+                                    provider.automacao().salvar(automacao);
+                                }
                             } else {
                                 obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                             }
