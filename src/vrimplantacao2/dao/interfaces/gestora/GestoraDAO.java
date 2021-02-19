@@ -203,16 +203,19 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    "select\n"
                     + "	p.pro_codigo id,\n"
                     + "	p.PRO_DATA_CADASTRO datacadastro,\n"
                     + "	ean.ean,\n"
                     + "	ean.qtdEmbalagem,\n"
-                    + "	case p.PRO_BALANCA when 'S' then 1 else 0 end eBalanca,\n"
+                    + "	case\n"
+                    + "		p.PRO_BALANCA when 'S' then 1\n"
+                    + "		else 0\n"
+                    + "	end eBalanca,\n"
                     + "	rtrim(ltrim(p.PRO_UNIDADE)) tipoEmbalagem,\n"
                     + "	p.PRO_VALIDADE validade,\n"
                     + "	p.PRO_DESCRICAO descricaocompleta,\n"
-                    + "	replace(p.pro_desc_etiqueta,'  ','') descricaoreduzida,\n"
+                    + "	replace(p.pro_desc_etiqueta, '  ', '') descricaoreduzida,\n"
                     + "	p.PRO_DESCRICAO descricaocompleta,\n"
                     + "	p.dep_codigo merc1,\n"
                     + "	p.gru_codigo merc2,\n"
@@ -222,35 +225,44 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.PRO_PESOLIQUIDO pesobruto,\n"
                     + "	p.PRO_MINIMO estoqueminimo,\n"
                     + "	p.pro_estoque estoque,\n"
-                    + "	p.PRO_MARGEM margem,\n"
+                    + "	p.PRO_MARGEM p_margem,\n"
+                    + "	sb.sub_margem merc_margem,\n"
                     + "	p.PRO_CUSTO custosemimposto,\n"
                     + "	p.PRO_CUSTOREAL custocomimposto,\n"
                     + "	p.PRO_VENDA precovenda,\n"
-                    + "	case when p.PRO_STATUS in ('E','I') then 0 else 1 end situacaoCadastro,\n"
+                    + "	case\n"
+                    + "		when p.PRO_STATUS in ('E', 'I') then 0 else 1\n"
+                    + "	end situacaoCadastro,\n"
                     + "	coalesce(p.PRO_CLASFISCAL,'') ncm,\n"
                     + "	coalesce(p.PRO_CEST,'') cest,\n"
                     + "	p.PRO_SIT_TRIBUTARIA,\n"
-                    + "	case substring(tri_sweda,1,1)\n"
-                    + "	when 'F' then 60\n"
-                    + "	when 'T' then 0\n"
-                    + "	else 40 end as icmsCst,\n"
+                    + "	case\n"
+                    + "		substring(tri_sweda, 1, 1) when 'F' then 60 when 'T' then 0 else 40\n"
+                    + "	end as icmsCst,\n"
                     + "	t.TRI_ALIQUOTA icmsAliq,\n"
                     + "	t.TRI_REDUCAO icmsRed,\n"
                     + "	p.PRO_CST_PIS_ENTRADA piscofinsCredito,\n"
                     + "	p.PRO_CST_PIS piscofinsSaida,\n"
                     + "	p.natr_codigo piscofinsNatureza\n"
-                    + "from \n"
-                    + "	(select \n"
-                    + "		case when (pro_status = 'B') and (coalesce(pro_pai,0) > 0) then PRO_PAI else PRO_CODIGO end id,\n"
-                    + "		pro_barra ean,\n"
-                    + "		case when PRO_QTDE_BAIXAR < 1 then 1 else pro_qtde_baixar end qtdEmbalagem\n"
-                    + "	from produtos) ean\n"
-                    + "	join produtos p on\n"
-                    + "		p.PRO_CODIGO = ean.id\n"
-                    + "	left join tributacao t on\n"
-                    + "		p.tri_codigo = t.tri_codigo\n"
-                    + "order by\n"
-                    + "	id"
+                    + "from\n"
+                    + "	(select\n"
+                    + "		case\n"
+                    + "			when (pro_status = 'B')\n"
+                    + "			and (coalesce(pro_pai,\n"
+                    + "			0) > 0) then PRO_PAI\n"
+                    + "			else PRO_CODIGO\n"
+                    + "		end id, pro_barra ean,\n"
+                    + "		case\n"
+                    + "			when PRO_QTDE_BAIXAR < 1 then 1\n"
+                    + "			else pro_qtde_baixar\n"
+                    + "		end qtdEmbalagem\n"
+                    + "	from\n"
+                    + "		produtos) ean\n"
+                    + "join produtos p on p.PRO_CODIGO = ean.id\n"
+                    + "join GRU_PRODUTOS gp on p.GRU_CODIGO = gp.GRU_CODIGO\n"
+                    + "join SUBGRUPO_PRODUTOS sb on p.SUB_CODIGO = sb.sub_codigo\n"
+                    + "left join tributacao t on p.tri_codigo = t.tri_codigo\n"
+                    + "order by id"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -275,7 +287,8 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    //imp.setMargem(rst.getDouble("p_margem"));
+                    imp.setMargem(rst.getDouble("merc_margem"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -840,7 +853,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> Result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
+                    /*"SELECT\n"
                     + "	CP.FOR_CODIGO ID_FORNECEDOR,\n"
                     + "	RTRIM(F.FOR_CGC) CNPJ,\n"
                     + "	CP.CON_NLCTO NUMEROCDOCUMENTO,\n"
@@ -864,13 +877,37 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	CONTABIL CP\n"
                     + "JOIN FORNECEDOR F ON CP.FOR_CODIGO = F.FOR_CODIGO\n"
                     + "WHERE CP.CON_STATUS = 'X'\n"
-                    + "	AND CP.EMP_CODIGO = " + getLojaOrigem() + ""
+                    + "	AND CP.EMP_CODIGO = " + getLojaOrigem() + ""*/
+                    "SELECT\n"
+                    + "	CP.FINFAT_REGISTRO ID,	\n"
+                    + "	FF.FOR_CODIGO ID_FORNECEDOR,\n"
+                    + "	RTRIM(F.FOR_CGC) CNPJ,\n"
+                    + "	FF.FIN_NUMERONOTA NUMERODOCUMENTO,\n"
+                    + "	210 AS ID_TIPOENTRADA,\n"
+                    + "	FINFAT_PARCELA PARCELA,\n"
+                    + "	FIN_DTEMISSAO DATAEMISSAO,\n"
+                    + "	FIN_DTLANCAMENTO DATAENTRADA,\n"
+                    + " FIN_ALTERACAO DATAALTERACAO,\n"
+                    + "	FINFAT_VALORTOTAL VALOR,\n"
+                    + "	FINFAT_JURO JUROS,\n"
+                    + "	FINFAT_DESCONTO DESCONTO,\n"
+                    + "	FINFAT_VENCIMENTO DATAVENCIMENTO,\n"
+                    + "	FIN_HISTORICO OBSERVACAO,\n"
+                    + "	FINFAT_OBS OBSERVACAO2\n"
+                    + "FROM\n"
+                    + "	FIN_FINANCEIRO FF\n"
+                    + "JOIN FIN_FATURA CP ON FF.FIN_REGISTRO = CP.FIN_REGISTRO\n"
+                    + "JOIN FORNECEDOR F ON F.FOR_CODIGO = FF.FOR_CODIGO\n"
+                    + "WHERE\n"
+                    + "	FF.FIN_STATUS = 'A'\n"
+                    + "	AND CP.FINFAT_DTPAGAMENTO IS NULL\n"
+                    + "	AND FF.EMP_CODIGO = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
-                    imp.setId(rst.getString("NUMEROCDOCUMENTO"));
-                    String doc = Utils.formataNumero(rst.getString("NUMEROCDOCUMENTO"));
+                    imp.setId(rst.getString("id"));
+                    String doc = Utils.formataNumero(rst.getString("numerodocumento"));
 
                     imp.setNumeroDocumento(doc);
 
@@ -879,19 +916,19 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setNumeroDocumento(doc.substring(0, 6));
                         }
                     }
-                    imp.setIdFornecedor(rst.getString("ID_FORNECEDOR"));
-                    imp.setCnpj(rst.getString("CNPJ"));
-                    imp.setIdTipoEntradaVR(rst.getInt("ID_TIPOENTRADA"));
-                    imp.setDataEmissao(rst.getDate("DATAEMISSAO"));
-                    imp.setDataEntrada(rst.getDate("DATAENTRADA"));
-                    imp.setDataHoraAlteracao(rst.getTimestamp("DATAENTRADA"));
-                    imp.setValor(rst.getDouble("VALOR"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setIdTipoEntradaVR(rst.getInt("id_tipoentrada"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
+                    imp.setValor(rst.getDouble("valor"));
 
-                    imp.setObservacao((rst.getString("CON_HISTORICO1") == null ? "" : rst.getString("CON_HISTORICO1")) + " "
-                            + (rst.getString("CON_HISTORICO2") == null ? "" : rst.getString("CON_HISTORICO2")));
-                    imp.setVencimento(rst.getDate("VENCIMENTO"));
-                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("VENCIMENTO"), imp.getValor());
-                    parc.setNumeroParcela(rst.getInt("PARCELA"));
+                    imp.setObservacao((rst.getString("observacao") == null ? "" : rst.getString("observacao")) + " "
+                            + (rst.getString("observacao2") == null ? "" : rst.getString("observacao2")));
+                    imp.setVencimento(rst.getDate("datavencimento"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("datavencimento"), imp.getValor());
+                    parc.setNumeroParcela(rst.getInt("parcela"));
 
                     Result.add(imp);
                 }
