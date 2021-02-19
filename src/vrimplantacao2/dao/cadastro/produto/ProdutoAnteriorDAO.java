@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -18,6 +17,7 @@ import vrimplantacao2.vo.cadastro.ProdutoVO;
 public class ProdutoAnteriorDAO {
 
     private MultiMap<String, ProdutoAnteriorVO> codigoAnterior;
+    private MultiMap<String, ProdutoAnteriorVO> forcarNovo;
     private final ProdutoAnteriorEanDAO eanAnteriorDAO = new ProdutoAnteriorEanDAO();
     private String importSistema = "";
     private String importLoja = "";
@@ -62,6 +62,13 @@ public class ProdutoAnteriorDAO {
             atualizarCodigoAnteriorLoja();
         }
         return codigoAnterior;
+    }
+    
+    public MultiMap<String, ProdutoAnteriorVO> getForcarNovo() throws Exception {
+        if (forcarNovo == null) {
+            atualizarForcarNovo();
+        }
+        return forcarNovo;
     }
     
     private void createTable() throws Exception {
@@ -1180,4 +1187,52 @@ public class ProdutoAnteriorDAO {
         return null;
     }
     
+    public void atualizarForcarNovo() throws Exception {
+        forcarNovo = new MultiMap<>(3);
+        criarColunaCodAnt();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "	impsistema,\n" +
+                    "	imploja,\n" +
+                    "	impid\n" +
+                    "from \n" +
+                    "	implantacao.codant_produto\n" +
+                    "where \n" +
+                    "	impsistema = '" + getImportSistema() + "' and \n" +
+                    "	imploja = '" + getImportLoja() + "' and \n" +
+                    "	forcarnovo is true"
+            )) {
+                while (rst.next()) {
+                    ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
+                    
+                    vo.setImportSistema(rst.getString("impsistema"));
+                    vo.setImportLoja(rst.getString("imploja"));
+                    vo.setImportId(rst.getString("impid"));
+                    
+                    forcarNovo.put(vo, vo.getChave());
+                }
+            }
+        }
+    }
+    
+    private void criarColunaCodAnt() throws Exception {
+        try(Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "do $$\n" +
+                    "begin\n" +
+                    "	if not exists (\n" +
+                    "       select \n" +
+                    "		* \n" +
+                    "	    from \n" +
+                    "		information_schema.columns\n" +
+                    "       where \n" +
+                    "		table_schema = 'implantacao' and \n" +
+                    "		column_name = 'forcarnovo') then \n" +
+                    "	execute 'alter table implantacao.codant_produto add column forcarnovo boolean default false'; \n" +
+                    "end if;\n" +
+                    "end\n" +
+                    "$$");
+        }
+    }
 }
