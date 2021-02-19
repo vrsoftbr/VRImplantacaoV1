@@ -1077,7 +1077,8 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join TBhistorico_padrao_movto_bancario tpmb on tpmb.DFcod_historico_movto_bancario = ch.DFcod_historico_movto_bancario\n"
                     + "where ch.DFcod_tipo_documento in (2)\n"
                     + "and tpmb.DFnatureza  = 'C'\n"
-                    + "and ch.DFcod_empresa = " + getLojaOrigem()
+                    + "and ch.DFid_movimento_bancario not in (select DFid_movimento_bancario from TBbaixado_receber_movto_bancario)\n"
+                    + "and ch.DFcod_empresa = 1"
             /*"select\n"
                     + "	tr.DFid_titulo_receber id,\n"
                     + "	tr.DFcod_cliente idcliente,\n"
@@ -1098,7 +1099,17 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tr.DFdata_vencimento"*/)) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
-
+                    imp.setId(rs.getString("id"));
+                    imp.setDate(rs.getDate("dataemissao"));
+                    imp.setDataDeposito(rs.getDate("datavencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setNumeroCheque(rs.getString("DFnumero_documento"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setObservacao(
+                            (rs.getString("descricao_historico") == null ? "" : rs.getString("descricao_historico"))
+                            + " "
+                            + (rs.getString("observacao") == null ? "" : rs.getString("observacao")));
+                    result.add(imp);
                 }
             }
         }
