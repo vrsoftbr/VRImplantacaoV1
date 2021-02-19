@@ -18,7 +18,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -27,6 +29,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -364,7 +367,99 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return Result;
     }
+    
+    // FINALIZAR 
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
 
+        try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	pf.cdg_interno id_produto,\n"
+                    + "	ncm.cdg_ncm,\n"
+                    + "	pf.dat_alteracao data_inicio,\n"
+                    + "	val_pvv iva_produto,\n"
+                    + "	pf.pct_aliquota icms_entrada,\n"
+                    + "	cdg_situacaotributariaicms cst_entrada,\n"
+                    + "	0 reducao_entrada,\n"
+                    + "	icm.pct_aliq_icms icms_saida,\n"
+                    + "	cdg_situacaotributariaicms cst_saida,\n"
+                    + "	icm.pct_reducao_bc reducao_saida\n"
+                    + "from\n"
+                    + "	cadpvvpr pf\n"
+                    + "join cadprod p on p.cdg_interno = pf.cdg_interno\n"
+                    + "join cadassoc pa on p.cdg_interno = pa.cdg_interno and pa.cdg_estoque = p.cdg_produto\n"
+                    + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and ncm.dat_ini_vigencia =\n"
+                    + "	(select \n"
+                    + "		max(x.dat_ini_vigencia)\n"
+                    + "	from \n"
+                    + "		cadncmproduto x \n"
+                    + "	where \n"
+                    + "		x.cdg_interno = ncm.cdg_interno and x.dat_ini_vigencia <= current year to fraction(3))\n"
+                    + "join cadicms icm on pa.cdg_icms = icm.cdg_icms\n"
+                    + "join cadsituacoestributariasicms  sticm on icm.idcadsituacaotributariaicms = sticm.idcadsituacaotributariaicms\n"
+                    + "where\n"
+                    + "	pf.dat_alteracao =\n"
+                    + "		(select\n"
+                    + "			max(dat_alteracao)\n"
+                    + "		from\n"
+                    + "			cadpvvpr pf2\n"
+                    + "		where\n"
+                    + "			cdg_interno = pf.cdg_interno)\n"
+                    + "and val_pvv > 0"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+
+                    imp.setId(rst.getString("id_produto"));
+                    imp.setTipoIva(TipoIva.VALOR);
+                    imp.setIva(rst.getDouble("iva_produto"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setNcm(rst.getString("ncm"));
+
+                    // DÉBITO
+                    if ((rst.getDouble("aliquota_debito") > 0) && (rst.getDouble("reducao_debito") == 0)) {
+
+                        imp.setAliquotaDebito(0, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebitoForaEstado(0, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+
+                    } else if ((rst.getDouble("aliquota_debito") > 0) && (rst.getDouble("reducao_debito") > 0)) {
+
+                        imp.setAliquotaDebito(20, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebitoForaEstado(20, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+
+                    } else {
+
+                        imp.setAliquotaDebito(rst.getInt("cst_debito"), rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                    }
+
+                    // CRÉDITO
+                    if ((rst.getDouble("aliquota_credito") > 0) && (rst.getDouble("reducao_credito") == 0)) {
+
+                        imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+
+                    } else if ((rst.getDouble("aliquota_credito") > 0) && (rst.getDouble("reducao_credito") > 0)) {
+
+                        imp.setAliquotaCredito(20, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCreditoForaEstado(20, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+
+                    } else {
+
+                        imp.setAliquotaCredito(rst.getInt("cst_credito"), rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCreditoForaEstado(rst.getInt("cst_credito"), rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
