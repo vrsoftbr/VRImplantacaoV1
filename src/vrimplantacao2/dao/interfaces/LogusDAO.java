@@ -368,7 +368,6 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
         return Result;
     }
     
-    // FINALIZAR 
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
@@ -377,15 +376,16 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	pf.cdg_interno id_produto,\n"
-                    + "	ncm.cdg_ncm,\n"
+                    + "	ncm.cdg_ncm ncm,\n"
                     + "	pf.dat_alteracao data_inicio,\n"
                     + "	val_pvv iva_produto,\n"
-                    + "	pf.pct_aliquota icms_entrada,\n"
-                    + "	cdg_situacaotributariaicms cst_entrada,\n"
-                    + "	0 reducao_entrada,\n"
-                    + "	icm.pct_aliq_icms icms_saida,\n"
-                    + "	cdg_situacaotributariaicms cst_saida,\n"
-                    + "	icm.pct_reducao_bc reducao_saida\n"
+                    + "	pf.pct_aliquota aliquota_credito,\n"
+                    + "	cdg_situacaotributariaicms cst_credito,\n"
+                    //+ " icm.pct_reducao_bc reducao_credito\n"
+                    + "	0 reducao_credito,\n"
+                    + "	icm.pct_aliq_icms aliquota_debito,\n"
+                    + "	cdg_situacaotributariaicms cst_debito,\n"
+                    + "	icm.pct_reducao_bc reducao_debito\n"
                     + "from\n"
                     + "	cadpvvpr pf\n"
                     + "join cadprod p on p.cdg_interno = pf.cdg_interno\n"
@@ -599,7 +599,55 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
+        if (opt == OpcaoProduto.EXCECAO) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                    + "	pf.cdg_interno id_produto,\n"
+                    + "	ncm.cdg_ncm ncm,\n"
+                    + "	pf.dat_alteracao data_inicio,\n"
+                    + "	val_pvv iva_produto,\n"
+                    + "	pf.pct_aliquota aliquota_credito,\n"
+                    + "	cdg_situacaotributariaicms cst_credito,\n"
+                    + "	0 reducao_credito,\n"
+                    + "	icm.pct_aliq_icms aliquota_debito,\n"
+                    + "	cdg_situacaotributariaicms cst_debito,\n"
+                    + "	icm.pct_reducao_bc reducao_debito\n"
+                    + "from\n"
+                    + "	cadpvvpr pf\n"
+                    + "join cadprod p on p.cdg_interno = pf.cdg_interno\n"
+                    + "join cadassoc pa on p.cdg_interno = pa.cdg_interno and pa.cdg_estoque = p.cdg_produto\n"
+                    + "join cadncmproduto ncm on pa.cdg_interno = ncm.cdg_interno and ncm.dat_ini_vigencia =\n"
+                    + "	(select \n"
+                    + "		max(x.dat_ini_vigencia)\n"
+                    + "	from \n"
+                    + "		cadncmproduto x \n"
+                    + "	where \n"
+                    + "		x.cdg_interno = ncm.cdg_interno and x.dat_ini_vigencia <= current year to fraction(3))\n"
+                    + "join cadicms icm on pa.cdg_icms = icm.cdg_icms\n"
+                    + "join cadsituacoestributariasicms  sticm on icm.idcadsituacaotributariaicms = sticm.idcadsituacaotributariaicms\n"
+                    + "where\n"
+                    + "	pf.dat_alteracao =\n"
+                    + "		(select\n"
+                    + "			max(dat_alteracao)\n"
+                    + "		from\n"
+                    + "			cadpvvpr pf2\n"
+                    + "		where\n"
+                    + "			cdg_interno = pf.cdg_interno)\n"
+                    + "and val_pvv > 0"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setPautaFiscalId(imp.getImportId());
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
         if (opt == OpcaoProduto.DESC_COMPLETA) {
             try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
