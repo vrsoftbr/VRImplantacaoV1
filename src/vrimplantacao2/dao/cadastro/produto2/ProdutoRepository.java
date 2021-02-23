@@ -628,7 +628,7 @@ public class ProdutoRepository {
                                 }
                                 provider.aliquota().salvar(aliquota);
                                 
-                                if(forcarNovo) {
+                                if (forcarNovo) {
                                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
                                     gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
                                     ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);

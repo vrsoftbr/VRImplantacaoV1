@@ -91,14 +91,29 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "	codigo,\n" +
-                    "	descricao,\n" +
-                    "	aliquota\n" +
-                    "from\n" +
-                    "	Aliquotas")) {
+                    "   distinct\n" +
+                    "   p.AliquotaIcmsNFSaidas icmsnf,\n" +
+                    "   p.st cstnf,\n" +
+                    "   round(p.BASE_REDUZIDA_ICMS, 2) reducaonf\n" +
+                    "from \n" +
+                    "   produtos p\n" +
+                    "order by \n" +
+                    "	1")) {
                 while(rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codigo"), 
-                            rs.getString("descricao")));
+                    String idIcms = rs.getString("icmsnf") + "-" +
+                            rs.getString("reducaonf") + "-" + 
+                            rs.getString("cstnf");
+                    
+                    String descricao = "ICMS: " + rs.getString("icmsnf") + 
+                            "CST: " + rs.getString("cstnf") + 
+                            "RED: " + rs.getString("reducaonf");
+                    
+                    result.add(new MapaTributoIMP(
+                                        idIcms, 
+                                        descricao,
+                                        rs.getInt("cstnf"),
+                                        rs.getDouble("icmsnf"),
+                                        rs.getDouble("reducaonf")));
                 }
             }
         }
@@ -226,8 +241,9 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   p.QtdMinima,\n" +
                     "   aliquota idicms,\n" +
                     "   p.ICMS_COMPRA,\n" +
-                    "   p.BASE_REDUZIDA_ICMS,\n" +
-                    "   p.st,\n" +
+                    "   round(p.BASE_REDUZIDA_ICMS, 2) reducaonf,\n" +
+                    "   p.AliquotaIcmsNFSaidas icmsnf,\n" +        
+                    "   p.st cstnf,\n" +
                     "   pis.CSTPisEntrada,\n" +
                     "   pis.CSTPisSaida,\n" +
                     "   p.NaturezaReceita,\n" +
@@ -298,7 +314,11 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rs.getString("NaturezaReceita"));
                     imp.setPiscofinsCstDebito(rs.getString("CSTPisSaida"));
                     
-                    imp.setIcmsDebitoId(rs.getString("idicms"));
+                    String idIcmsNF = rs.getString("icmsnf") + "-" + 
+                            rs.getString("reducaonf") + "-" +
+                            rs.getString("cstnf");
+                                        
+                    imp.setIcmsDebitoId(idIcmsNF);
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
