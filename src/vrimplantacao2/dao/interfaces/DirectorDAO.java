@@ -127,7 +127,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                 red
         );
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -169,7 +169,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("icms"),
                             rst.getDouble("icms_reducao")
                     );
-                    
+
                     result.add(new MapaTributoIMP(
                             id,
                             id,
@@ -182,7 +182,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -398,20 +398,20 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("cofins_entrada"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     imp.setCest(rs.getString("cest"));
-                    
+
                     String icms = getAliquotaKey(
                             rs.getString("cst"),
                             rs.getDouble("icms"),
                             rs.getDouble("icms_reducao")
                     );
-                    
+
                     imp.setIcmsDebitoId(icms);
                     imp.setIcmsDebitoForaEstadoId(icms);
                     imp.setIcmsDebitoForaEstadoNfId(icms);
                     imp.setIcmsCreditoId(icms);
                     imp.setIcmsCreditoForaEstadoId(icms);
                     imp.setIcmsConsumidorId(icms);
-                    
+
 
                     /*imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
@@ -436,7 +436,6 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstConsumidor(rs.getInt("cst"));
                     imp.setIcmsAliqConsumidor(rs.getDouble("icms_debito"));
                     imp.setIcmsReducaoConsumidor(rs.getDouble("icms_reducao_debito"));*/
-                    
                     result.add(imp);
                 }
             }
@@ -486,7 +485,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
-        
+
         if (opt == OpcaoProduto.TROCA) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -527,7 +526,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return null;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -598,7 +597,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ct.DFcargo_contato cargo_contato,\n"
                     + "	sc.DFdescricao setor,\n"
                     + " f.DFindicador_IE as indicadoIE,\n"
-                    + " f.DFdata_inativacao\n"        
+                    + " f.DFdata_inativacao\n"
                     + "from\n"
                     + "	TBfornecedor f\n"
                     + "left join \n"
@@ -646,7 +645,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setUf(rs.getString("uf"));
                     imp.setAtivo((rs.getDate("DFdata_inativacao") == null));
-                    
+
                     switch (rs.getInt("indicadoIE")) {
                         case 1:
                             imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS);
@@ -657,8 +656,8 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                         default:
                             imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
                             break;
-                    }                   
-                    
+                    }
+
                     if (rs.getString("telefone") != null
                             && !rs.getString("telefone").trim().isEmpty()) {
                         imp.setTel_principal(rs.getString("telefone"));
@@ -883,7 +882,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cn.DFfax fax,\n"
                     + "	cn.DFtelefone telefone,\n"
                     + "	cn.DFtelefone_celular celular,\n"
-                    + " c.DFid_tipo_cliente tipocliente\n"        
+                    + " c.DFid_tipo_cliente tipocliente\n"
                     + "from\n"
                     + "	TBcliente c\n"
                     + "left join\n"
@@ -942,7 +941,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setFax(rs.getString("fax"));
-                    
+
                     switch (rs.getInt("tipocliente")) {
                         case 9: // CHEQUE
                             imp.setPermiteCreditoRotativo(false);
@@ -961,7 +960,6 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setPermiteCheque(true);
                             break;
                     }
-                    
 
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
@@ -1072,13 +1070,33 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ch.DFnumero_documento as DFnumero_documento,\n"
                     + "	ch.DFnominal as nome,\n"
                     + "	ch.DFobservacao as observacao,\n"
-                    + "	ch.DFid_conta \n"
-                    + "from TBmovimento_bancario ch \n"
-                    + "left join TBhistorico_padrao_movto_bancario tpmb on tpmb.DFcod_historico_movto_bancario = ch.DFcod_historico_movto_bancario\n"
+                    + "	ch.DFid_conta,\n"
+                    + "	chc.DFdata_devolucao,\n"
+                    + "	chc.DFdata_compensacao,\n"
+                    + "	chc.DFcod_alinea_cheque as alinea,\n"
+                    + "	icmbc.DFbanda_magnetica,\n"
+                    + "	cli.DFcod_cliente,\n"
+                    + "	cli.DFnome,\n"
+                    + "	age.DFnumero as numero_agencia,\n"
+                    + "	age.DFdigito_verificador as digito_numero_agencia,\n"
+                    + "	ban.DFcod_banco as idbanco,\n"
+                    + "	ech.DFtelefone as telefone,\n"
+                    + "	ech.DFcnpj_cpf as cpf_cnpj,\n"
+                    + " ech.DFnome_emitente,\n"
+                    + " ech.DFnumero_conta_banda_magnetica,\n" 
+                    + "	ech.DFnumero_conta\n"
+                    + "from TBmovimento_bancario ch\n"
+                    + "left join TBcheque_compensado chc on ch.DFid_movimento_bancario = chc.DFid_movimento_bancario \n"
+                    + "left join TBinformacao_comp_movto_bancario_credito icmbc on ch.DFid_movimento_bancario = icmbc.DFid_informacao_comp_movto_bancario_credito \n"
+                    + "left join TBcliente cli on icmbc.DFcod_cliente = cli.DFcod_cliente \n"
+                    + "join TBemitente_cheque ech on icmbc.DFid_emitente_cheque = ech.DFid_emitente_cheque \n"
+                    + "left join TBagencia age on ech.DFid_agencia = age.DFid_agencia\n"
+                    + "left join TBbanco ban on age.DFcod_banco = ban.DFcod_banco \n"
+                    + "left join TBhistorico_padrao_movto_bancario tpmb on ch.DFcod_historico_movto_bancario = tpmb.DFcod_historico_movto_bancario\n"
                     + "where ch.DFcod_tipo_documento in (2)\n"
                     + "and tpmb.DFnatureza  = 'C'\n"
                     + "and ch.DFid_movimento_bancario not in (select DFid_movimento_bancario from TBbaixado_receber_movto_bancario)\n"
-                    + "and ch.DFcod_empresa = 1"
+                    + "and ch.DFcod_empresa = " + getLojaOrigem()
             /*"select\n"
                     + "	tr.DFid_titulo_receber id,\n"
                     + "	tr.DFcod_cliente idcliente,\n"
@@ -1102,20 +1120,47 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setDate(rs.getDate("dataemissao"));
                     imp.setDataDeposito(rs.getDate("datavencimento"));
+                    imp.setDataDevolucao(rs.getDate("DFdata_devolucao"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setNumeroCheque(rs.getString("DFnumero_documento"));
-                    imp.setNome(rs.getString("nome"));
+                    imp.setCpf(rs.getString("cpf_cnpj"));
+                    imp.setTelefone(rs.getString("telefone"));
+                                        
+                    if (rs.getString("nome") != null && !rs.getString("nome").trim().isEmpty()) {
+                        imp.setNome(rs.getString("nome"));
+                    } else if (rs.getString("DFnome_emitente") != null && !rs.getString("DFnome_emitente").trim().isEmpty()) {
+                        imp.setNome(rs.getString("DFnome_emitente"));
+                    } else {
+                        imp.setNome(rs.getString("DFnome"));
+                    }
+                    
+                    imp.setBanco(rs.getInt("idbanco"));
+                    imp.setAgencia(
+                            (rs.getString("numero_agencia") == null ? "" : rs.getString("numero_agencia"))
+                            + ""
+                            + (rs.getString("digito_numero_agencia") == null ? "" : rs.getString("digito_numero_agencia"))
+                    );
+                    if (rs.getString("DFnumero_conta") != null && !rs.getString("DFnumero_conta").trim().isEmpty()) {
+                        rs.getString("DFnumero_conta");
+                    } else {
+                        rs.getString("DFnumero_conta_banda_magnetica");
+                    }
+
+                    
                     imp.setObservacao(
                             (rs.getString("descricao_historico") == null ? "" : rs.getString("descricao_historico"))
                             + " "
-                            + (rs.getString("observacao") == null ? "" : rs.getString("observacao")));
+                            + (rs.getString("observacao") == null ? "" : rs.getString("observacao"))
+                            + " "
+                            + (rs.getString("DFbanda_magnetica") == null ? "" : rs.getString("DFbanda_magnetica"))
+                    );
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
         List<ReceitaBalancaIMP> result = new ArrayList<>();
@@ -1223,7 +1268,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
-                        
+
                         next.setChaveNfCe(rst.getString("chave"));
                     }
                 }
@@ -1337,7 +1382,6 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                         //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
-                        
 
                         String trib = rst.getString("tributacao");
                         Double aliquota = rst.getDouble("aliquota_icms");

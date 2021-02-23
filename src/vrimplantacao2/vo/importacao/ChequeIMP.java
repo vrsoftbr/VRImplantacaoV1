@@ -33,7 +33,7 @@ public class ChequeIMP {
     private int idLocalCobranca = 0;
     private Timestamp dataHoraAlteracao = new Timestamp(new Date().getTime());
     private TipoVistaPrazo vistaPrazo = TipoVistaPrazo.A_VISTA;
-
+    private Date dataDevolucao = null;
     public void setId(String id) {
         this.id = id;
     }
@@ -217,4 +217,19 @@ public class ChequeIMP {
     public void setIdLocalCobranca(int idLocalCobranca) {
         this.idLocalCobranca = idLocalCobranca;
     }
+    
+    /**
+     * @return the dataDevolucao
+     */
+    public Date getDataDevolucao() {
+        return dataDevolucao;
+    }
+
+    /**
+     * @param dataDevolucao the dataDevolucao to set
+     */
+    public void setDataDevolucao(Date dataDevolucao) {
+        this.dataDevolucao = dataDevolucao;
+    }
+    
 }

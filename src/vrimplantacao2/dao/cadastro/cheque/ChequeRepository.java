@@ -117,6 +117,7 @@ public class ChequeRepository {
         vo.setValorInicial(imp.getValor());
         vo.setDataHoraAlteracao(imp.getDataHoraAlteracao());
         vo.setOperadorClienteNaoCadastrado(null);
+        vo.setDataDevolucao(imp.getDataDevolucao());
         return vo;
     }
 
