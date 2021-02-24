@@ -11,7 +11,7 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 
 /**
  *
- * @author leandro
+ * @author Alan
  */
 public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
 
@@ -69,7 +69,7 @@ public class GestoraVendaIterator extends MultiStatementIterator<VendaIMP> {
                 + "	end cancelado\n"
                 + "from\n"
                 + "	" + getNomeTabela(intervalo.dataInicial) + " as cp \n"
-                + "where com_ncupom != 0 and com_tipo_emissao like 'N'";
+                + "where com_total > 0 and com_ncupom != 0"; /* and com_tipo_emissao like 'N'";*/
 
     }
 

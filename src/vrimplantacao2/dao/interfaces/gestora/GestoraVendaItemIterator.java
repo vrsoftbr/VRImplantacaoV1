@@ -11,7 +11,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
- * @author leandro
+ * @author Alan
  */
 public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIMP> {
 
@@ -88,8 +88,8 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
             VendaItemIMP v = new VendaItemIMP();
 
             v.setVenda(GestoraVendaIterator.formatID(
-                    rs.getInt("id"),
                     rs.getInt("numerocupom"),
+                    rs.getInt("id"),
                     rs.getInt("ecf"),
                     rs.getDate("data")
             ));
