@@ -105,8 +105,8 @@ public class TeleconDAO extends InterfaceDAO implements MapaTributoProvider {
                             rs.getString("cstnf");
                     
                     String descricao = "ICMS: " + rs.getString("icmsnf") + 
-                            "CST: " + rs.getString("cstnf") + 
-                            "RED: " + rs.getString("reducaonf");
+                            " CST: " + rs.getString("cstnf") + 
+                            " RED: " + rs.getString("reducaonf");
                     
                     result.add(new MapaTributoIMP(
                                         idIcms, 
