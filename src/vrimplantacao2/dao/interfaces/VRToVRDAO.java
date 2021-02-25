@@ -245,7 +245,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	union\n" +
                     "	select p.id_aliquotacreditocusto from produtoaliquota p\n" +
                     "	union\n" +
-                    "	select p.id_aliquotadebitoforaestadonf from produtoaliquota p\n" +
+                    "	select p.id_aliquotacreditoforaestado from produtoaliquota p\n" +
                     ")\n" +
                     "select \n" +
                     "	id,\n" +
@@ -256,7 +256,6 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from 	\n" +
                     "	aliquota\n" +
                     "where \n" +
-                    "	id_situacaocadastro = 1 and\n" +
                     "	id in (select id from aliquotasusadas)\n" +
                     "order by\n" +
                     "	descricao"
