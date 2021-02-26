@@ -1140,6 +1140,36 @@ public class LogusDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
 
+        if (opt == OpcaoProduto.MARGEM) {
+            try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + " p.cdg_interno id_interno,\n"
+                        + " mar.pct_margem \n"
+                        + "from \n"
+                        + "	informix.cadprod p\n"
+                        + "join informix.cadassoc pa on p.cdg_interno = pa.cdg_interno and \n"
+                        + "	pa.cdg_estoque = p.cdg_produto\n"
+                        + "join informix.estprfil est on p.cdg_produto = est.cdg_produto\n"
+                        + "join informix.cadgrupo gr on pa.cdg_grupo = gr.cdg_grupo\n"
+                        + "join informix.cadsubgr sg on pa.cdg_subgrupo = sg.cdg_subgrupo \n"
+                        + "join informix.cadmargs mar on sg.cdg_subgrupo = mar.cdg_subgrupo \n"
+                        + "join informix.cadsecao se on gr.cdg_secao = se.cdg_secao\n"
+                        + "join informix.caddepto dp on se.cdg_depto = dp.cdg_depto\n"
+                        + "where est.cdg_filial = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_interno"));
+                        imp.setMargem(rst.getDouble("pct_margem"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
         /*if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
          try (Statement stm = ConexaoInformix.getConexao().createStatement()) {
          try (ResultSet rst = stm.executeQuery(

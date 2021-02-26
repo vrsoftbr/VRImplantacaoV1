@@ -14,6 +14,20 @@ import vrimplantacao2.vo.enums.TipoProduto;
 public class ProdutoIMP {
 
     /**
+     * @return the codigoAtual
+     */
+    public int getCodigoAtual() {
+        return codigoAtual;
+    }
+
+    /**
+     * @param codigoAtual the codigoAtual to set
+     */
+    public void setCodigoAtual(int codigoAtual) {
+        this.codigoAtual = codigoAtual;
+    }
+
+    /**
      * @return the teclaAssociada
      */
     public double getTeclaAssociada() {
@@ -168,6 +182,7 @@ public class ProdutoIMP {
     @DatabaseField private String beneficio = "";
     @DatabaseField private boolean produtoECommerce = false;
     @DatabaseField private String codigoAnp = "";
+    private int codigoAtual;
     
     public String getImportSistema() {
         return importSistema;
