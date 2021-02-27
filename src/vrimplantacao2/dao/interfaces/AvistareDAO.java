@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -49,7 +49,6 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
-                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
@@ -154,85 +153,109 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdCodInterno,\n"
-                    + "	p.ProdCodBarras1 as ean,\n"
-                    + "	un.UnSigla as unidade,\n"
-                    + "	p.ProdDescricao as descricao,\n"
-                    + "	p.ProdEstoqueAtual as estoque,\n"
-                    + "	p.ProdEstoqueDisponivel,\n"
-                    + "	p.ProdEstoqueMin as estoqueminimo,\n"
-                    + "	p.ProdEstoqueMax as estoquemaximo,\n"
-                    + "	p.ProdFabricanteID,\n"
-                    + "	p.ProdFamiliaID,\n"
-                    + "	p.ProdNcm as ncm,\n"
-                    + "	p.ProdCest as cest,\n"
-                    + "	p.ProdPesoBruto as pesobruto,\n"
-                    + "	p.ProdPesoLiquido as pesoliquido,\n"
-                    + "	p.ProdPrecoCompra,\n"
-                    + "	p.ProdPrecoCusto as custo,\n"
-                    + "	p.ProdValorVenda1 as precovenda,\n"
-                    + "	p.ProdMargem1 as margem,\n"
-                    + "	p.ProdDtCadastro as datacadastro,\n"
-                    + "	p.ProdEmbalagemQtde as qtdembalagem,\n"
-                    + "	p.ProdClaFisID as tribicms,\n"
-                    + "	pis.CstPisCofinsCodigo as cstpissaida,\n"
-                    + "	pis.CstPisCofinsDescricao,\n"
-                    + "	cofins.CstPisCofinsCodigo as cstpisentrada,\n"
-                    + "	cofins.CstPisCofinsDescricao,\n"
-                    + "	nat.NatRecPisCofinsCodigo as naturezareceita,\n"
-                    + "	nat.NatRecPisCofinsDescricao\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "left join dbo.TB_CST_PIS_COFINS pis on pis.CstPisCofinsID = p.ProdCstPisID\n"
-                    + "	and pis.CstPisCofinsOperacaoID = 129\n"
-                    + "left join dbo.TB_CST_PIS_COFINS cofins on cofins.CstPisCofinsID = p.ProdCstCofinsCompraID\n"
-                    + "	and cofins.CstPisCofinsOperacaoID = 128\n"
-                    + "left join dbo.TB_NATUREZA_RECEITA_PISCOFINS nat on nat.NatRecPisCofinsID = p.ProdNaturezaReceitaPisCofinsID\n"
-                    + "order by p.ProdCodInterno"
+                    "with ean as (\n" +
+                    "	select\n" +
+                    "		p.ProdID id_produto,\n" +
+                    "		p.ProdCodBarras1 ean\n" +
+                    "	from\n" +
+                    "		TB_PRODUTO p\n" +
+                    "	where\n" +
+                    "		ltrim(rtrim(coalesce(p.ProdCodBarras1,''))) != ''\n" +
+                    "	union\n" +
+                    "	select\n" +
+                    "		p.ProdID id_produto,\n" +
+                    "		p.ProdCodBarras2 ean\n" +
+                    "	from\n" +
+                    "		TB_PRODUTO p\n" +
+                    "	where\n" +
+                    "		ltrim(rtrim(coalesce(p.ProdCodBarras2,''))) != ''\n" +
+                    "	union\n" +
+                    "	select\n" +
+                    "		p.ProdID id_produto,\n" +
+                    "		p.ProdCodBarras3 ean\n" +
+                    "	from\n" +
+                    "		TB_PRODUTO p\n" +
+                    "	where\n" +
+                    "		ltrim(rtrim(coalesce(p.ProdCodBarras3,''))) != ''\n" +
+                    ")\n" +
+                    "select \n" +
+                    "	p.ProdID as id,\n" +
+                    "	p.ProdCodInterno,\n" +
+                    "	ean.ean,\n" +
+                    "	un.UnSigla as unidade,\n" +
+                    "	p.ProdDescricao as descricao,\n" +
+                    "	p.ProdEstoqueAtual as estoque,\n" +
+                    "	p.ProdEstoqueDisponivel,\n" +
+                    "	p.ProdEstoqueMin as estoqueminimo,\n" +
+                    "	p.ProdEstoqueMax as estoquemaximo,\n" +
+                    "	case p.ProdStatusID\n" +
+                    "		when 1053 then 0\n" +
+                    "		else 1\n" +
+                    "	end ativo,\n" +
+                    "	p.ProdFabricanteID,\n" +
+                    "	p.ProdFamiliaID,\n" +
+                    "	p.ProdNcm as ncm,\n" +
+                    "	p.ProdCest as cest,\n" +
+                    "	p.ProdPesoBruto as pesobruto,\n" +
+                    "	p.ProdPesoLiquido as pesoliquido,\n" +
+                    "	p.ProdPrecoCompra,\n" +
+                    "	p.ProdPrecoCusto as custo,\n" +
+                    "	p.ProdValorVenda1 as precovenda,\n" +
+                    "	p.ProdMargem1 as margem,\n" +
+                    "	p.ProdDtCadastro as datacadastro,\n" +
+                    "	p.ProdEmbalagemQtde as qtdembalagem,\n" +
+                    "	p.ProdClaFisID as tribicms,\n" +
+                    "	pis.CstPisCofinsCodigo as cstpissaida,\n" +
+                    "	pis.CstPisCofinsDescricao,\n" +
+                    "	cofins.CstPisCofinsCodigo as cstpisentrada,\n" +
+                    "	cofins.CstPisCofinsDescricao,\n" +
+                    "	nat.NatRecPisCofinsCodigo as naturezareceita,\n" +
+                    "	nat.NatRecPisCofinsDescricao\n" +
+                    "from\n" +
+                    "	dbo.TB_PRODUTO p\n" +
+                    "	left join ean on\n" +
+                    "		p.ProdID = ean.id_produto\n" +
+                    "	left join dbo.TB_UNIDADE_MEDIDA un on\n" +
+                    "		un.UnID = p.ProdUnidadeMedidaID\n" +
+                    "	left join dbo.TB_CST_PIS_COFINS pis on\n" +
+                    "		pis.CstPisCofinsID = p.ProdCstPisID and\n" +
+                    "		pis.CstPisCofinsOperacaoID = 129\n" +
+                    "	left join dbo.TB_CST_PIS_COFINS cofins on\n" +
+                    "		cofins.CstPisCofinsID = p.ProdCstCofinsCompraID and\n" +
+                    "		cofins.CstPisCofinsOperacaoID = 128\n" +
+                    "	left join dbo.TB_NATUREZA_RECEITA_PISCOFINS nat on\n" +
+                    "		nat.NatRecPisCofinsID = p.ProdNaturezaReceitaPisCofinsID\n" +
+                    "order by\n" +
+                    "	p.ProdCodInterno\n"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
 
-                    ProdutoBalancaVO produtoBalanca;
-                    long codigoProduto;
-                    codigoProduto = Long.parseLong(imp.getImportId());
-
-                    if (codigoProduto <= Integer.MAX_VALUE) {
-                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                    } else {
-                        produtoBalanca = null;
-                    }
+                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
+                    ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);                    
 
                     if (produtoBalanca != null) {
+                        imp.setEan(String.valueOf(produtoBalanca.getCodigo()));
                         imp.seteBalanca(true);
-                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 1);
-                    } else {
+                        imp.setTipoEmbalagem("U".equals(produtoBalanca.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(produtoBalanca.getValidade());
+                        imp.setQtdEmbalagem(1);
+                    } else {                        
+                        imp.setEan(rst.getString("ean"));
                         imp.seteBalanca(false);
-                        
-                        if ((imp.getEan() != null)
-                                && (!imp.getEan().trim().isEmpty())) {
-
-                            if (Long.parseLong(Utils.formataNumero(imp.getEan())) <= 999999) {
-                                imp.setManterEAN(true);
-                            } else {
-                                imp.setManterEAN(false);
-                            }
-                        }
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setValidade(0);
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     }
                     
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -244,6 +267,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setNcm(rst.getString("ncm"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpissaida"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
