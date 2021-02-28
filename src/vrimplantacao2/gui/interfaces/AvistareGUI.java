@@ -15,6 +15,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
+import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.OpcaoCreditoRotativo;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.AvistareDAO;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -196,14 +197,15 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                         
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
-                        }
-
-                        if (chkContasPagar.isSelected()) {
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }
-                        
+                        }                        
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }                        
+                        if (chkCreditoRotativoBaixasAgrupadas.isSelected()) {
+                            importador.importarCreditoRotativoBaixasAgrupadas(OpcaoCreditoRotativo.NOVOS);
                         }
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -260,10 +262,10 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
         chkFornPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFornPrazoPedido = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCreditoRotativoBaixasAgrupadas = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -306,14 +308,13 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
         chkProdutoFornecedor.setText("Produto Fornecedor");
         tabFornecedor.add(chkProdutoFornecedor);
 
-        chkContasPagar.setText("Contas à Pagar");
-        tabFornecedor.add(chkContasPagar);
-
         tabImportacao.addTab("Fornecedores", tabFornecedor);
 
         chkClientePreferencial.setText("Cliente Preferencial");
 
         chkCreditoRotativo.setText("Crédito Rotativo");
+
+        chkCreditoRotativoBaixasAgrupadas.setText("Crédito Rotativo (Baixas Agrupadas)");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -323,8 +324,9 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(472, Short.MAX_VALUE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCreditoRotativoBaixasAgrupadas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(361, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -333,7 +335,9 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativoBaixasAgrupadas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(172, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -478,8 +482,8 @@ public class AvistareGUI extends VRInternalFrame implements ConexaoEvent {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativoBaixasAgrupadas;
     private vrframework.bean.checkBox.VRCheckBox chkFornNumeroEnd;
     private vrframework.bean.checkBox.VRCheckBox chkFornPrazoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornPrazoPedido;

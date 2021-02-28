@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,11 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -68,6 +73,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.CUSTO,
                     OpcaoProduto.CUSTO_COM_IMPOSTO,
                     OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
                     OpcaoProduto.ESTOQUE,
                     OpcaoProduto.ATIVO,
                     OpcaoProduto.NCM,
@@ -76,7 +83,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.VOLUME_QTD
                 }
         ));
     }
@@ -184,10 +192,6 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	ean.ean,\n" +
                     "	un.UnSigla as unidade,\n" +
                     "	p.ProdDescricao as descricao,\n" +
-                    "	p.ProdEstoqueAtual as estoque,\n" +
-                    "	p.ProdEstoqueDisponivel,\n" +
-                    "	p.ProdEstoqueMin as estoqueminimo,\n" +
-                    "	p.ProdEstoqueMax as estoquemaximo,\n" +
                     "	case p.ProdStatusID\n" +
                     "		when 1053 then 0\n" +
                     "		else 1\n" +
@@ -201,6 +205,9 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.ProdPrecoCompra,\n" +
                     "	p.ProdPrecoCusto as custo,\n" +
                     "	p.ProdValorVenda1 as precovenda,\n" +
+                    "	p.ProdEstoqueMin as estoqueminimo,\n" +
+                    "	p.ProdEstoqueMax as estoquemaximo,\n" +
+                    "	est.EstConsAtual as estoque,\n" +
                     "	p.ProdMargem1 as margem,\n" +
                     "	p.ProdDtCadastro as datacadastro,\n" +
                     "	p.ProdEmbalagemQtde as qtdembalagem,\n" +
@@ -210,9 +217,12 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	cofins.CstPisCofinsCodigo as cstpisentrada,\n" +
                     "	cofins.CstPisCofinsDescricao,\n" +
                     "	nat.NatRecPisCofinsCodigo as naturezareceita,\n" +
-                    "	nat.NatRecPisCofinsDescricao\n" +
+                    "	nat.NatRecPisCofinsDescricao,\n" +
+                    "	p.ProdCaixaQtde volume\n" +
                     "from\n" +
                     "	dbo.TB_PRODUTO p\n" +
+                    "	left join dbo.TB_ESTOQUE_CONSOLIDADO est on\n" +
+                    "		p.ProdID = est.EstConsProdID\n" +
                     "	left join ean on\n" +
                     "		p.ProdID = ean.id_produto\n" +
                     "	left join dbo.TB_UNIDADE_MEDIDA un on\n" +
@@ -226,7 +236,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join dbo.TB_NATUREZA_RECEITA_PISCOFINS nat on\n" +
                     "		nat.NatRecPisCofinsID = p.ProdNaturezaReceitaPisCofinsID\n" +
                     "order by\n" +
-                    "	p.ProdCodInterno\n"
+                    "	p.ProdCodInterno"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -278,6 +288,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("tribicms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("tribicms"));
                     imp.setIcmsConsumidorId(rst.getString("tribicms"));
+                    imp.setVolume(rst.getDouble("volume"));
+                    
                     result.add(imp);
                 }
             }
@@ -332,40 +344,51 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	f.FornID as id,\n"
-                    + "	f.FornCodInterno,\n"
-                    + "	f.FornDiasEntrega,\n"
-                    + "	pes.PessoaNome as razao,\n"
-                    + "	pes.PessoaFantasia as fantasia,\n"
-                    + "	pes.PessoaCpfCnpj as cnpj,\n"
-                    + "	pes.PessoaIERG as ie_rg,\n"
-                    + "	pes.PessoaIM as inscricaomunicipal,\n"
-                    + "	ende.EndLogradouro as endereco,\n"
-                    + "	ende.EndNumero as numero,\n"
-                    + "	ende.EndComplemento as complemento,\n"
-                    + "	ende.EndBairro as bairro,\n"
-                    + "	ende.EndCEP as cep,\n"
-                    + "	cid.CidNome as municipio,\n"
-                    + "	cid.CidCodigoIBGE as municipio_ibge,\n"
-                    + "	uf.UfSigla as uf,\n"
-                    + "	uf.UfCodigoIBGE as uf_ibge,\n"
-                    + "	pes.PessoaEmail as email,\n"
-                    + "	pes.PessoaSite as site,\n"
-                    + "	pes.PessoaFonePrincipal as telefone,\n"
-                    + "	pes.PessoaFoneCelular as celular,\n"
-                    + "	pes.PessoaFoneFAX as fax,\n"
-                    + "	pes.PessoaFoneOutro as telefone2,\n"
-                    + "	pes.PessoaFonePABX as pabx,\n"
-                    + "	pes.PessoaObservacoes as observacao,\n"
-                    + "	pes.PessoaDtCadastro as datacadastro\n"
-                    + "from dbo.TB_FORNECEDOR f\n"
-                    + "join dbo.TB_PESSOA_PFPJ pes on pes.PessoaID = f.FornID\n"
-                    + "left join dbo.TB_PESSOA_ENDERECOS pend on pend.PessoaID = pes.PessoaID\n"
-                    + "left join dbo.TB_ENDERECO ende on ende.EndID = pend.PessoaEndID\n"
-                    + "left join dbo.TB_CIDADE cid on cid.CidID = ende.EndCidadeID\n"
-                    + "left join dbo.TB_UF uf on uf.UfID = cid.CidUfID\n"
-                    + "order by f.FornID"
+                    "select \n" +
+                    "	f.FornID as id,\n" +
+                    "	f.FornCodInterno,\n" +
+                    "	f.FornDiasEntrega,\n" +
+                    "	pes.PessoaNome as razao,\n" +
+                    "	pes.PessoaFantasia as fantasia,\n" +
+                    "	pes.PessoaCpfCnpj as cnpj,\n" +
+                    "	pes.PessoaIERG as ie_rg,\n" +
+                    "	pes.PessoaIM as inscricaomunicipal,\n" +
+                    "	ende.EndLogradouro as endereco,\n" +
+                    "	ende.EndNumero as numero,\n" +
+                    "	ende.EndComplemento as complemento,\n" +
+                    "	ende.EndBairro as bairro,\n" +
+                    "	ende.EndCEP as cep,\n" +
+                    "	cid.CidNome as municipio,\n" +
+                    "	cid.CidCodigoIBGE as municipio_ibge,\n" +
+                    "	case pes.PessoaSituacaoID\n" +
+                    "		when 51 then 0\n" +
+                    "		else 1\n" +
+                    "	end ativo,\n" +
+                    "	uf.UfSigla as uf,\n" +
+                    "	uf.UfCodigoIBGE as uf_ibge,\n" +
+                    "	pes.PessoaEmail as email,\n" +
+                    "	pes.PessoaSite as site,\n" +
+                    "	pes.PessoaFonePrincipal as telefone,\n" +
+                    "	pes.PessoaFoneCelular as celular,\n" +
+                    "	pes.PessoaFoneFAX as fax,\n" +
+                    "	pes.PessoaFoneOutro as telefone2,\n" +
+                    "	pes.PessoaFonePABX as pabx,\n" +
+                    "	pes.PessoaObservacoes as observacao,\n" +
+                    "	pes.PessoaDtCadastro as datacadastro\n" +
+                    "from\n" +
+                    "	dbo.TB_FORNECEDOR f\n" +
+                    "	join dbo.TB_PESSOA_PFPJ pes on\n" +
+                    "		pes.PessoaID = f.FornID\n" +
+                    "	left join dbo.TB_PESSOA_ENDERECOS pend on\n" +
+                    "		pend.PessoaID = pes.PessoaID\n" +
+                    "	left join dbo.TB_ENDERECO ende on\n" +
+                    "		ende.EndID = pend.PessoaEndID\n" +
+                    "	left join dbo.TB_CIDADE cid on\n" +
+                    "		cid.CidID = ende.EndCidadeID\n" +
+                    "	left join dbo.TB_UF uf on\n" +
+                    "		uf.UfID = cid.CidUfID\n" +
+                    "order by\n" +
+                    "	f.FornID"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -382,7 +405,9 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setIbge_municipio(rst.getInt("municipio_ibge"));
+                    imp.setCep(rst.getString("cep"));
                     imp.setUf(rst.getString("uf"));
                     imp.setIbge_uf(rst.getInt("uf_ibge"));
                     imp.setTel_principal(rst.getString("telefone"));
@@ -446,41 +471,52 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	c.CliID as id,\n"
-                    + "	c.CliCodigoPessoal,\n"
-                    + "	c.CliLimiteTotal as valortotal,\n"
-                    + "	c.CliLimiteSaldo as valorsaldo,\n"
-                    + "	pes.PessoaNome as razao,\n"
-                    + "	pes.PessoaFantasia as fantasia,\n"
-                    + "	pes.PessoaCpfCnpj as cnpj,\n"
-                    + "	pes.PessoaIERG as ie_rg,\n"
-                    + "	pes.PessoaIM as inscricaomunicipal,\n"
-                    + "	ende.EndLogradouro as endereco,\n"
-                    + "	ende.EndNumero as numero,\n"
-                    + "	ende.EndComplemento as complemento,\n"
-                    + "	ende.EndBairro as bairro,\n"
-                    + "	ende.EndCEP as cep,\n"
-                    + "	cid.CidNome as municipio,\n"
-                    + "	cid.CidCodigoIBGE as municipio_ibge,\n"
-                    + "	uf.UfSigla as uf,\n"
-                    + "	uf.UfCodigoIBGE as uf_ibge,\n"
-                    + "	pes.PessoaEmail as email,\n"
-                    + "	pes.PessoaSite as site,\n"
-                    + "	pes.PessoaFonePrincipal as telefone,\n"
-                    + "	pes.PessoaFoneCelular as celular,\n"
-                    + "	pes.PessoaFoneFAX as fax,\n"
-                    + "	pes.PessoaFoneOutro as telefone2,\n"
-                    + "	pes.PessoaFonePABX as pabx,\n"
-                    + "	pes.PessoaObservacoes as observacao,\n"
-                    + "	pes.PessoaDtCadastro as datacadastro\n"
-                    + "from dbo.TB_CLIENTE c\n"
-                    + "join dbo.TB_PESSOA_PFPJ pes on pes.PessoaID = c.CliID\n"
-                    + "left join dbo.TB_PESSOA_ENDERECOS pend on pend.PessoaID = pes.PessoaID\n"
-                    + "left join dbo.TB_ENDERECO ende on ende.EndID = pend.PessoaEndID\n"
-                    + "left join dbo.TB_CIDADE cid on cid.CidID = ende.EndCidadeID\n"
-                    + "left join dbo.TB_UF uf on uf.UfID = cid.CidUfID\n"
-                    + "order by c.CliID"
+                    "select \n" +
+                    "	c.CliID as id,\n" +
+                    "	c.CliCodigoPessoal,\n" +
+                    "	c.CliLimiteTotal as valortotal,\n" +
+                    "	c.CliLimiteSaldo as valorsaldo,\n" +
+                    "	case pes.PessoaSituacaoID\n" +
+                    "		when 51 then 0\n" +
+                    "		else 1\n" +
+                    "	end ativo,\n" +
+                    "	pes.PessoaNome as razao,\n" +
+                    "	pes.PessoaFantasia as fantasia,\n" +
+                    "	pes.PessoaCpfCnpj as cnpj,\n" +
+                    "	pes.PessoaIERG as ie_rg,\n" +
+                    "	pes.PessoaIM as inscricaomunicipal,\n" +
+                    "	ende.EndLogradouro as endereco,\n" +
+                    "	ende.EndNumero as numero,\n" +
+                    "	ende.EndComplemento as complemento,\n" +
+                    "	ende.EndBairro as bairro,\n" +
+                    "	ende.EndCEP as cep,\n" +
+                    "	cid.CidNome as municipio,\n" +
+                    "	cid.CidCodigoIBGE as municipio_ibge,\n" +
+                    "	uf.UfSigla as uf,\n" +
+                    "	uf.UfCodigoIBGE as uf_ibge,\n" +
+                    "	pes.PessoaEmail as email,\n" +
+                    "	pes.PessoaSite as site,\n" +
+                    "	pes.PessoaFonePrincipal as telefone,\n" +
+                    "	pes.PessoaFoneCelular as celular,\n" +
+                    "	pes.PessoaFoneFAX as fax,\n" +
+                    "	pes.PessoaFoneOutro as telefone2,\n" +
+                    "	pes.PessoaFonePABX as pabx,\n" +
+                    "	pes.PessoaObservacoes as observacao,\n" +
+                    "	pes.PessoaDtCadastro as datacadastro\n" +
+                    "from\n" +
+                    "	dbo.TB_CLIENTE c\n" +
+                    "	join dbo.TB_PESSOA_PFPJ pes on\n" +
+                    "		pes.PessoaID = c.CliID\n" +
+                    "	left join dbo.TB_PESSOA_ENDERECOS pend on\n" +
+                    "		pend.PessoaID = pes.PessoaID\n" +
+                    "	left join dbo.TB_ENDERECO ende on\n" +
+                    "		ende.EndID = pend.PessoaEndID\n" +
+                    "	left join dbo.TB_CIDADE cid on\n" +
+                    "		cid.CidID = ende.EndCidadeID\n" +
+                    "	left join dbo.TB_UF uf on\n" +
+                    "		uf.UfID = cid.CidUfID\n" +
+                    "order by\n" +
+                    "	c.CliID"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -499,6 +535,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("uf"));
                     imp.setUfIBGE(rst.getInt("uf_ibge"));
                     imp.setCep(rst.getString("cep"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setCelular(rst.getString("celular"));
@@ -518,6 +555,35 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
+    @Override
+    public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
+        List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
+        
+        try (
+            Statement stm = ConexaoSqlServer.getConexao().createStatement();
+            ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	t.CliSaldoMovCliID as id_cliente,\n" +
+                    "	sum(t.CliSaldoMovValor) as valor\n" +
+                    "from\n" +
+                    "	TB_CLIENTE_SALDO_MOVIMENTO t\n" +
+                    "where\n" +
+                    "	t.CliSaldoMovNaturezaID = 100\n" +
+                    "group by\n" +
+                    "	t.CliSaldoMovCliID"
+            )
+        ) {
+            while (rst.next()) {
+                result.add(new CreditoRotativoPagamentoAgrupadoIMP(
+                        rst.getString("id_cliente"),
+                        rst.getDouble("valor")
+                ));
+            }            
+        }
+        
+        return result;
+    }
     
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
@@ -525,20 +591,37 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "	t.CliSaldoMovID as id,\n" +
+                    "	v.VndDtEmissao as emissao,\n" +
+                    "	v.VndNumeroVenda as numerocupom,\n" +
+                    "	v.VndEstacaoID as ecf,\n" +
+                    "	t.CliSaldoMovValor as valor,\n" +
+                    "	t.CliSaldoMovObservacao as observacao,\n" +
+                    "	t.CliSaldoMovCliID as id_cliente\n" +
+                    "from\n" +
+                    "	TB_CLIENTE_SALDO_MOVIMENTO t\n" +
+                    "	join TB_VENDA v on\n" +
+                    "		t.CliSaldoMovOrigemID = v.VndID\n" +
+                    "where\n" +
+                    "	t.CliSaldoMovNaturezaID = 99 and\n" +
+                    "	v.VndDtCancelamento is null\n" +
+                    "order by\n" +
+                    "	t.CliSaldoMovID "
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setDataEmissao(rst.getDate(null));
-                    imp.setNumeroCupom(rst.getString(null));
-                    imp.setEcf(rst.getString(null));
-                    imp.setValor(rst.getDouble(null));
-                    imp.setObservacao(rst.getString(null));
-                    imp.setIdCliente(rst.getString(null));
-                    imp.setDataVencimento(rst.getDate(null));
-                    imp.setJuros(rst.getDouble(null));
-                    imp.setCnpjCliente(rst.getString(null));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    GregorianCalendar vencimento = new GregorianCalendar();
+                    vencimento.setTime(rst.getDate("emissao"));
+                    vencimento.add(GregorianCalendar.DAY_OF_MONTH, 10);
+                    imp.setDataVencimento(vencimento.getTime());
                     
                     result.add(imp);
                 }
