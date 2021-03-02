@@ -22,17 +22,17 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WinthorDAO;
+import vrimplantacao2.dao.interfaces.Winthor_PcSistemasDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 
-public class WinthorGUI extends VRInternalFrame {
+public class Winthor_PcSistemasGUI extends VRInternalFrame {
 
     private static final String SISTEMA = "WINTHOR";
     private static final String SERVIDOR_SQL = "Oracle";
-    private static WinthorGUI instance;
+    private static Winthor_PcSistemasGUI instance;
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
@@ -76,10 +76,10 @@ public class WinthorGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private WinthorDAO winthorDAO = new WinthorDAO();
+    private Winthor_PcSistemasDAO winthorDAO = new Winthor_PcSistemasDAO();
     private ConexaoOracle connOracle = new ConexaoOracle();
 
-    private WinthorGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private Winthor_PcSistemasGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -186,7 +186,7 @@ public class WinthorGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new WinthorGUI(i_mdiFrame);
+                instance = new Winthor_PcSistemasGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -202,7 +202,7 @@ public class WinthorGUI extends VRInternalFrame {
             i_mdiFrame.setWaitCursor();
 
             if (instance == null || instance.isClosed()) {
-                instance = new WinthorGUI(i_mdiFrame);
+                instance = new Winthor_PcSistemasGUI(i_mdiFrame);
             }
 
             if (lite) {

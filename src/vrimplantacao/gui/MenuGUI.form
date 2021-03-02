@@ -1080,14 +1080,6 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemGCFActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="jMenuItemPCSistemas">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="PCSistemas"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemPCSistemasActionPerformed"/>
-                          </Events>
-                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemConcretize">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Concretize"/>
@@ -1128,12 +1120,12 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRMS_2ActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuRMS_3">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuWinthor_PcSistemas">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Winthor"/>
+                            <Property name="text" type="java.lang.String" value="Winthor (PC Sistemas)"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRMS_3ActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWinthor_PcSistemasActionPerformed"/>
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuApollo">

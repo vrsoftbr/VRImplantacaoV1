@@ -62,7 +62,6 @@ import vrimplantacao.gui.interfaces.InteragemGUI_2;
 import vrimplantacao.gui.interfaces.JMasterGUI;
 import vrimplantacao.gui.interfaces.LogusGUI;
 import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
-import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
 import vrimplantacao2.gui.interfaces.RootacGUI;
@@ -281,7 +280,7 @@ import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
-import vrimplantacao2.gui.interfaces.WinthorGUI;
+import vrimplantacao2.gui.interfaces.Winthor_PcSistemasGUI;
 import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.ZoomboxGUI;
@@ -310,7 +309,6 @@ public final class MenuGUI extends VRMdiFrame {
     public MultiPdvGUI formImportarMultiPdv = null;
     public OrionGUI formImportarOrion = null;
     public RootacGUI formImportarRootac = null;
-    public PCSistemasGUI formImportarPCSistemas = null;
     public BoechatSoftGUI formImportarBoechatSoft = null;
     public UltraSistGUI formImportarUltraSyst = null;
     public IntelliCashGUI formImportarIntelliCash = null;
@@ -455,8 +453,6 @@ public final class MenuGUI extends VRMdiFrame {
                         jMenuItemRMSActionPerformed(null);
                     }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_GCF.getId()) {
                         jMenuItemGCFActionPerformed(null);
-                    }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_PCSISTEMAS.getId()) {
-                        jMenuItemPCSistemasActionPerformed(null);
                     }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_FMSISTEMAS.getId()) {
                         jMenuItemFMSistemasActionPerformed(null);
                     }else if (evt.idFormulario == Formulario.IMPORTACAO_SISTEMA_EVEREST.getId()) {
@@ -737,13 +733,12 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
-        jMenuItemPCSistemas = new javax.swing.JMenuItem();
         jMenuItemConcretize = new javax.swing.JMenuItem();
         jMenuItemSuperus = new javax.swing.JMenuItem();
         jMenuItemArius = new javax.swing.JMenuItem();
         mnuSicom = new javax.swing.JMenuItem();
         mnuRMS_2 = new javax.swing.JMenuItem();
-        mnuRMS_3 = new javax.swing.JMenuItem();
+        mnuWinthor_PcSistemas = new javax.swing.JMenuItem();
         mnuApollo = new javax.swing.JMenuItem();
         mnuLinner = new javax.swing.JMenuItem();
         mnuCPGestor = new javax.swing.JMenuItem();
@@ -2088,14 +2083,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu7.add(jMenuItemGCF);
 
-        jMenuItemPCSistemas.setText("PCSistemas");
-        jMenuItemPCSistemas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemPCSistemasActionPerformed(evt);
-            }
-        });
-        jMenu7.add(jMenuItemPCSistemas);
-
         jMenuItemConcretize.setText("Concretize");
         jMenuItemConcretize.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2136,13 +2123,13 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu7.add(mnuRMS_2);
 
-        mnuRMS_3.setText("Winthor");
-        mnuRMS_3.addActionListener(new java.awt.event.ActionListener() {
+        mnuWinthor_PcSistemas.setText("Winthor (PC Sistemas)");
+        mnuWinthor_PcSistemas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuRMS_3ActionPerformed(evt);
+                mnuWinthor_PcSistemasActionPerformed(evt);
             }
         });
-        jMenu7.add(mnuRMS_3);
+        jMenu7.add(mnuWinthor_PcSistemas);
 
         mnuApollo.setText("Apollo");
         mnuApollo.addActionListener(new java.awt.event.ActionListener() {
@@ -3606,22 +3593,6 @@ public final class MenuGUI extends VRMdiFrame {
 
     }//GEN-LAST:event_jMenuItem29ActionPerformed
 
-    private void jMenuItemPCSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemPCSistemasActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarPCSistemas == null || formImportarPCSistemas.isClosed()) {
-                formImportarPCSistemas = new PCSistemasGUI(this);
-            }
-
-            formImportarPCSistemas.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItemPCSistemasActionPerformed
-
     private void jMenuItemEverastActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEverastActionPerformed
         try {
             this.setWaitCursor();
@@ -4231,9 +4202,9 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_mnuBrainSoftActionPerformed
 
-    private void mnuRMS_3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRMS_3ActionPerformed
-        WinthorGUI.exibir(this);
-    }//GEN-LAST:event_mnuRMS_3ActionPerformed
+    private void mnuWinthor_PcSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWinthor_PcSistemasActionPerformed
+        Winthor_PcSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuWinthor_PcSistemasActionPerformed
 
     private void mnuDelfiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDelfiActionPerformed
         // TODO add your handling code here:
@@ -5169,7 +5140,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItemMilenio;
     private javax.swing.JMenuItem jMenuItemMobility;
     private javax.swing.JMenuItem jMenuItemOrion;
-    private javax.swing.JMenuItem jMenuItemPCSistemas;
     private javax.swing.JMenuItem jMenuItemRMS;
     private javax.swing.JMenuItem jMenuItemSBOMarket;
     private javax.swing.JMenuItem jMenuItemSHI;
@@ -5348,7 +5318,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRKSoftware;
     private javax.swing.JMenuItem mnuRMS_2;
-    private javax.swing.JMenuItem mnuRMS_3;
     private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
@@ -5404,6 +5373,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuW2A;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWinNexus;
+    private javax.swing.JMenuItem mnuWinthor_PcSistemas;
     private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
@@ -5446,7 +5416,7 @@ public final class MenuGUI extends VRMdiFrame {
                 G3_v2GUI.exibir(this, true);
             }*/
             if("winthor".equals(param)) {
-                WinthorGUI.exibir(this, true);
+                Winthor_PcSistemasGUI.exibir(this, true);
             }
         }
     }

@@ -42,7 +42,7 @@ import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
  *
  * @author Leandro
  */
-public class WinthorDAO extends InterfaceDAO implements MapaTributoProvider {
+public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean temArquivoBalanca = false;
     
