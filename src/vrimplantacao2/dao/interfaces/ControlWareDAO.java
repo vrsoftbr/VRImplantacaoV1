@@ -284,14 +284,13 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setPiscofinsCstCredito(rs.getString("idtipopiscofinscredito"));
                     imp.setPiscofinsCstDebito(rs.getString("idtipopiscofinsdebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    /*imp.setIcmsCstSaida(rs.getInt("icms_s_cst"));
-                     imp.setIcmsAliqSaida(rs.getDouble("icms_s_aliq"));
-                     imp.setIcmsReducaoSaida(rs.getDouble("icms_s_reducao"));
-                     imp.setIcmsCstEntrada(rs.getInt("icms_e_cst"));
-                     imp.setIcmsAliqEntrada(rs.getDouble("icms_e_aliq"));
-                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_e_reducao"));*/
+
                     imp.setIcmsCreditoId(rs.getString("idaliquotacredito"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoId(rs.getString("idaliquotadebito"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
 
                     result.add(imp);
                 }
