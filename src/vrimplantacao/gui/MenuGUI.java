@@ -269,6 +269,7 @@ import vrimplantacao2.gui.interfaces.CorrecaoImpostosDSoftGUI;
 import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
+import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
@@ -691,6 +692,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDSoft = new javax.swing.JMenuItem();
         mnuAutocom = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+        mnuFutura = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1765,6 +1767,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu2.add(mnuMercaLite);
+
+        mnuFutura.setText("Futura");
+        mnuFutura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFuturaActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mnuFutura);
 
         mnuDatabase.add(jMenu2);
 
@@ -5078,6 +5088,10 @@ public final class MenuGUI extends VRMdiFrame {
         
     }//GEN-LAST:event_mnuCorrecaoImpostosDSoftActionPerformed
 
+    private void mnuFuturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFuturaActionPerformed
+        FuturaGUI.exibir(this);
+    }//GEN-LAST:event_mnuFuturaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkSysAut;
@@ -5247,6 +5261,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
+    private javax.swing.JMenuItem mnuFutura;
     private javax.swing.JMenuItem mnuG10;
     private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuG4;
