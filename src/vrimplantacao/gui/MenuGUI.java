@@ -286,6 +286,8 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.ZoomboxGUI;
 import vrimplantacao2.gui.interfaces.ZpfGUI;
+import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
+import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 
@@ -875,6 +877,8 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu14 = new javax.swing.JMenu();
         mnupdvvendaitem = new javax.swing.JMenuItem();
         mnuPlanilhaVr = new javax.swing.JMenuItem();
+        jMenuItem10 = new javax.swing.JMenuItem();
+        jMenuItem12 = new javax.swing.JMenuItem();
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         mnuContaPagar = new javax.swing.JMenuItem();
         jMenuItemVRPdv = new javax.swing.JMenuItem();
@@ -3173,6 +3177,22 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu14.add(mnuPlanilhaVr);
 
+        jMenuItem10.setText("Unificação Primeiro Preço");
+        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem10ActionPerformed(evt);
+            }
+        });
+        jMenu14.add(jMenuItem10);
+
+        jMenuItem12.setText("Correção Mercadológico Supermercado Rodrigues");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu14.add(jMenuItem12);
+
         mnuImpSistema.add(jMenu14);
 
         mnuAcertarIdsProdutos.setText("Acertar Ids Produtos");
@@ -5088,9 +5108,21 @@ public final class MenuGUI extends VRMdiFrame {
         
     }//GEN-LAST:event_mnuCorrecaoImpostosDSoftActionPerformed
 
+
     private void mnuFuturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFuturaActionPerformed
         FuturaGUI.exibir(this);
     }//GEN-LAST:event_mnuFuturaActionPerformed
+
+    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
+        // TODO add your handling code here:
+        PrimeiroPrecoGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem10ActionPerformed
+
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        // TODO add your handling code here:
+        SupermercadoRodriguesGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5110,7 +5142,9 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem19;
