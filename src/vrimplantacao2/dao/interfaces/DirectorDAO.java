@@ -84,6 +84,8 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PIS_COFINS,
@@ -283,6 +285,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 pr.DFpreco_venda precovenda,\n"
                     + "	 pr.DFcusto_real custoreal,\n"
                     + "	 pr.DFcusto_contabil custocontabil,\n"
+                    + "  pr.DFcusto_real_ce,\n"
                     + "	 pa.DFcod_classificacao_fiscal ncm,\n"
                     + "	 pa.DFcod_cst_pis pis_saida,\n"
                     + "	 pa.DFcod_cst_cofins cofins_saida,\n"
@@ -392,7 +395,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCustoSemImposto(rs.getDouble("custoreal"));
-                    imp.setCustoComImposto(rs.getDouble("custocontabil"));
+                    imp.setCustoComImposto(rs.getDouble("DFcusto_real_ce"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setPiscofinsCstDebito(rs.getString("cofins_saida"));
                     imp.setPiscofinsCstCredito(rs.getString("cofins_entrada"));
@@ -1061,7 +1064,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                    "select\n"
                     + "	ch.DFid_movimento_bancario as id,\n"
                     + "	ch.DFdata_emissao as dataemissao,\n"
                     + "	ch.DFdata_vencimento as datavencimento,\n"
@@ -1082,21 +1085,31 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ban.DFcod_banco as idbanco,\n"
                     + "	ech.DFtelefone as telefone,\n"
                     + "	ech.DFcnpj_cpf as cpf_cnpj,\n"
-                    + " ech.DFnome_emitente,\n"
-                    + " ech.DFnumero_conta_banda_magnetica,\n" 
+                    + "	ech.DFnome_emitente,\n"
+                    + "	ech.DFnumero_conta_banda_magnetica,\n"
                     + "	ech.DFnumero_conta\n"
                     + "from TBmovimento_bancario ch\n"
                     + "left join TBcheque_compensado chc on ch.DFid_movimento_bancario = chc.DFid_movimento_bancario \n"
+                    + "	and chc.DFdata_compensacao in (select max(DFdata_compensacao) from TBcheque_compensado where DFid_movimento_bancario = ch.DFid_movimento_bancario)\n"
                     + "left join TBinformacao_comp_movto_bancario_credito icmbc on ch.DFid_movimento_bancario = icmbc.DFid_informacao_comp_movto_bancario_credito \n"
                     + "left join TBcliente cli on icmbc.DFcod_cliente = cli.DFcod_cliente \n"
-                    + "join TBemitente_cheque ech on icmbc.DFid_emitente_cheque = ech.DFid_emitente_cheque \n"
+                    + "left join TBemitente_cheque ech on icmbc.DFid_emitente_cheque = ech.DFid_emitente_cheque \n"
                     + "left join TBagencia age on ech.DFid_agencia = age.DFid_agencia\n"
                     + "left join TBbanco ban on age.DFcod_banco = ban.DFcod_banco \n"
                     + "left join TBhistorico_padrao_movto_bancario tpmb on ch.DFcod_historico_movto_bancario = tpmb.DFcod_historico_movto_bancario\n"
                     + "where ch.DFcod_tipo_documento in (2)\n"
                     + "and tpmb.DFnatureza  = 'C'\n"
+                    + "and tpmb.DFcod_historico_movto_bancario in (1, 7, 37, 44, 45)\n"
                     + "and ch.DFid_movimento_bancario not in (select DFid_movimento_bancario from TBbaixado_receber_movto_bancario)\n"
-                    + "and ch.DFcod_empresa = " + getLojaOrigem()
+                    + "and ch.DFid_movimento_bancario not in (select DFid_movimento_bancario from TBbaixado_pagar_movto_bancario)\n"
+                    + "and ch.DFid_movimento_bancario not in (select DFid_movimento_bancario_cancelado from TBmovimento_bancario_cancelado)\n"
+                    + "and ch.DFcod_empresa = " + getLojaOrigem() + "\n"
+                    + "and ch.DFdata_emissao in (select max(DFdata_emissao) \n"
+                    + "                               from TBmovimento_bancario\n"
+                    + "                              where DFvalor = ch.DFvalor\n"
+                    + "                                and DFnumero_documento = ch.DFnumero_documento\n"
+                    + "                                and DFdata_vencimento = ch.DFdata_vencimento)\n"
+                    + "and ch.DFid_conta in (12, 13)"
             /*"select\n"
                     + "	tr.DFid_titulo_receber id,\n"
                     + "	tr.DFcod_cliente idcliente,\n"
@@ -1125,6 +1138,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCheque(rs.getString("DFnumero_documento"));
                     imp.setCpf(rs.getString("cpf_cnpj"));
                     imp.setTelefone(rs.getString("telefone"));
+                    imp.setAlinea(rs.getInt("alinea"));
                                         
                     if (rs.getString("nome") != null && !rs.getString("nome").trim().isEmpty()) {
                         imp.setNome(rs.getString("nome"));
