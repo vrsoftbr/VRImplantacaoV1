@@ -12,7 +12,6 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -34,23 +33,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class UniplusDAO extends InterfaceDAO {
 
-    private int prefixoAtacado = 999;
     private String complemento = "";
-    private boolean forcarIdProdutoQuandoPesavel = false;
     public boolean DUN14Atacado = false;
     public boolean NewEan = false;
     public boolean ProdutoFornecedorNotas = false;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
-    }
-
-    public void setPrefixoAtacado(int prefixoAtacado) {
-        this.prefixoAtacado = prefixoAtacado;
-    }
-
-    public void setForcarIdProdutoQuandoPesavel(boolean forcarIdProdutoQuandoPesavel) {
-        this.forcarIdProdutoQuandoPesavel = forcarIdProdutoQuandoPesavel;
     }
 
     @Override

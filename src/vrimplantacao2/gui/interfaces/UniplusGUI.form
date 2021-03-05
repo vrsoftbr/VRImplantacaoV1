@@ -6,57 +6,6 @@
     </Component>
     <Component class="vrframework.bean.consultaContaContabil.VRConsultaContaContabil" name="vRConsultaContaContabil1">
     </Component>
-    <Container class="vrframework.bean.panel.VRPanel" name="pnlCustom">
-
-      <Layout>
-        <DimensionLayout dim="0">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="lblAtacadoID" max="32767" attributes="0"/>
-                      <Component id="txtIDAtacado" max="32767" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="chkForcarIdProdutoQuandoPesavel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="72" max="32767" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-        <DimensionLayout dim="1">
-          <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="lblAtacadoID" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txtIDAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkForcarIdProdutoQuandoPesavel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="32767" attributes="0"/>
-              </Group>
-          </Group>
-        </DimensionLayout>
-      </Layout>
-      <SubComponents>
-        <Component class="javax.swing.JTextField" name="txtIDAtacado">
-          <Properties>
-            <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="999"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="lblAtacadoID">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Prefixo Atacado"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarIdProdutoQuandoPesavel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="For&#xe7;ar ID como PLU nos produtos pes&#xe1;veis"/>
-          </Properties>
-        </Component>
-      </SubComponents>
-    </Container>
     <Container class="vrframework.bean.panel.VRPanel" name="pnlOutras">
 
       <Layout>

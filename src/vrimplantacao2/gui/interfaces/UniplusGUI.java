@@ -10,7 +10,6 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -39,8 +38,6 @@ public class UniplusGUI extends VRInternalFrame {
         txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
         txtSenhaPostgres.setText(params.getWithNull("620568", NOME_SISTEMA, "SENHA"));
-        txtIDAtacado.setText(params.getWithNull("999", NOME_SISTEMA, "PREFIXO_ATACADO"));
-        chkForcarIdProdutoQuandoPesavel.setSelected(params.getBool(NOME_SISTEMA, "FORCAR_ID_PLU"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
     }
@@ -53,8 +50,6 @@ public class UniplusGUI extends VRInternalFrame {
         params.put(txtPortaPostgres.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioPostgres.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaPostgres.getText(), NOME_SISTEMA, "SENHA");
-        params.put(txtIDAtacado.getText(), NOME_SISTEMA, "PREFIXO_ATACADO");
-        params.put(chkForcarIdProdutoQuandoPesavel.isSelected(), NOME_SISTEMA, "FORCAR_ID_PLU");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
@@ -82,7 +77,7 @@ public class UniplusGUI extends VRInternalFrame {
         carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(uniplusDAO);
-        tabProdutos.tabParametros.add(pnlCustom);
+        tabProdutos.btnMapaTribut.setVisible(false);
         
         centralizarForm();
         this.setMaximum(false);  
@@ -153,9 +148,7 @@ public class UniplusGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-
-                    uniplusDAO.setForcarIdProdutoQuandoPesavel(chkForcarIdProdutoQuandoPesavel.isSelected());
-                    uniplusDAO.setPrefixoAtacado(Utils.stringToInt(txtIDAtacado.getText(), 999));                     
+                
                     uniplusDAO.setComplemento(txtLojaID.getText());
                     uniplusDAO.DUN14Atacado = chkDUN14Atacado.isSelected();
                     uniplusDAO.NewEan = chkNewEan.isSelected();
@@ -248,10 +241,6 @@ public class UniplusGUI extends VRInternalFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
-        pnlCustom = new vrframework.bean.panel.VRPanel();
-        txtIDAtacado = new javax.swing.JTextField();
-        lblAtacadoID = new vrframework.bean.label.VRLabel();
-        chkForcarIdProdutoQuandoPesavel = new vrframework.bean.checkBox.VRCheckBox();
         pnlOutras = new vrframework.bean.panel.VRPanel();
         chkVendas = new vrframework.bean.checkBox.VRCheckBox();
         edtVendaDtIni = new org.jdesktop.swingx.JXDatePicker();
@@ -304,38 +293,6 @@ public class UniplusGUI extends VRInternalFrame {
         txtLojaID = new vrframework.bean.textField.VRTextField();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
-        txtIDAtacado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtIDAtacado.setText("999");
-
-        lblAtacadoID.setText("Prefixo Atacado");
-
-        chkForcarIdProdutoQuandoPesavel.setText("Forçar ID como PLU nos produtos pesáveis");
-
-        javax.swing.GroupLayout pnlCustomLayout = new javax.swing.GroupLayout(pnlCustom);
-        pnlCustom.setLayout(pnlCustomLayout);
-        pnlCustomLayout.setHorizontalGroup(
-            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCustomLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblAtacadoID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtIDAtacado))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chkForcarIdProdutoQuandoPesavel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(72, Short.MAX_VALUE))
-        );
-        pnlCustomLayout.setVerticalGroup(
-            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCustomLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblAtacadoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtIDAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkForcarIdProdutoQuandoPesavel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         chkVendas.setText("Vendas");
         chkVendas.setEnabled(true);
         chkVendas.addActionListener(new java.awt.event.ActionListener() {
@@ -367,20 +324,20 @@ public class UniplusGUI extends VRInternalFrame {
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -900,7 +857,6 @@ public class UniplusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkDUN14Atacado;
-    private vrframework.bean.checkBox.VRCheckBox chkForcarIdProdutoQuandoPesavel;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkLimite;
     private vrframework.bean.checkBox.VRCheckBox chkNewEan;
@@ -911,10 +867,8 @@ public class UniplusGUI extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtIni;
-    private vrframework.bean.label.VRLabel lblAtacadoID;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
-    private vrframework.bean.panel.VRPanel pnlCustom;
     private vrframework.bean.panel.VRPanel pnlOutras;
     private vrframework.bean.panel.VRPanel pnlParam;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
@@ -927,7 +881,6 @@ public class UniplusGUI extends VRInternalFrame {
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.textField.VRTextField txtBancoDadosPostgres;
     private vrframework.bean.textField.VRTextField txtHostPostgres;
-    private javax.swing.JTextField txtIDAtacado;
     private vrframework.bean.textField.VRTextField txtLojaID;
     private vrframework.bean.textField.VRTextField txtPortaPostgres;
     private vrframework.bean.passwordField.VRPasswordField txtSenhaPostgres;
