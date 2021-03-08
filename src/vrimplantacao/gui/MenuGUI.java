@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
+import java.text.SimpleDateFormat;
 import javax.swing.Box;
 import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
@@ -3341,7 +3342,7 @@ public final class MenuGUI extends VRMdiFrame {
             this.setWaitCursor();
             SobreGUI form = new SobreGUI();
 
-            form.setSobre("VR Implantaçao", Global.VERSAO, Global.DATA);
+            form.setSobre("VR Implantaçao", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO.getTime()));
             form.setVisible(true);
 
         } catch (Exception ex) {
