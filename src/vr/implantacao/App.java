@@ -3,6 +3,7 @@ package vr.implantacao;
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import java.awt.Font;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.UIManager;
@@ -124,7 +125,7 @@ public class App {
         try {
 
             SplashScreen.show();
-            SplashScreen.setSobre("VR Implantação", Global.VERSAO, Global.DATA);
+            SplashScreen.setSobre("VR Implantação", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
             SplashScreen.setStatus("Inicializando sistema...");
             
             Global.idLoja = properties.getInt("system.numeroloja");
