@@ -2,4 +2,5 @@ build/
 dist/
 *.db
 nbproject/private/
-*log*
+!*log*.java
+*log/
