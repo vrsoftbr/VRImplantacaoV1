@@ -107,6 +107,7 @@ public class FuturaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	ps.id merc2,\n" +
                     "	ps.DESCRICAO descmerc2,\n" +
                     "	p.STATUS,\n" +
+                    "	est.estoque,\n" +
                     "	p.ESTOQUE_MAXIMO,\n" +
                     "	pe.ESTOQUE_MINIMO,\n" +
                     "	p.PESO_BRUTO,\n" +
@@ -119,9 +120,10 @@ public class FuturaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pp.LUCRO margem,\n" +
                     "	pp.VALOR preco,\n" +
                     "	icm.DESCRICAO icms,\n" +
+                    "   cf.ICMS_PERCENTUAL_SP icmssp,\n" +        
                     "	ce.CODIGO cest,\n" +
                     "	pf.PIS_CST,\n" +
-                    "	pf.COFINS_CST \n" +
+                    "	pf.COFINS_CST\n" +
                     "FROM \n" +
                     "	PRODUTO p\n" +
                     "LEFT JOIN PRODUTO_UNIDADE pu ON p.id = pu.ID\n" +
@@ -134,8 +136,31 @@ public class FuturaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "LEFT JOIN ICMS icm ON pf.FK_ICMS = icm.ID\n" +
                     "LEFT JOIN PRODUTO_SUBGRUPO ps ON p.FK_PRODUTO_SUBGRUPO = ps.ID\n" +
                     "LEFT JOIN PRODUTO_GRUPO pg ON ps.FK_PRODUTO_GRUPO = pg.ID\n" +
+                    "LEFT JOIN \n" +
+                    "	(SELECT\n" +
+                    "		PedIt.FK_PRODUTO,\n" +
+                    "		COALESCE(sum(\n" +
+                    "               CASE WHEN (TpPed.ESTOQUE_ENTRADA_SAIDA = 'E') THEN \n" +
+                    "                   PedIt.QUANTIDADE \n" +
+                    "               WHEN (TpPed.ESTOQUE_ENTRADA_SAIDA = 'S') THEN \n" +
+                    "                   (PedIt.QUANTIDADE * (-1)) ELSE 0 END),\n" +
+                    "		0) estoque\n" +
+                    "	FROM\n" +
+                    "		PEDIDO_ITEM PedIt\n" +
+                    "	INNER JOIN PEDIDO Ped ON\n" +
+                    "		(Ped.ID = PedIt.FK_PEDIDO)\n" +
+                    "	INNER JOIN TIPO_PEDIDO TpPed ON\n" +
+                    "		(TpPed.ID = Ped.FK_TIPO_PEDIDO)\n" +
+                    "	WHERE\n" +
+                    "		TpPed.GERA_ESTOQUE = 'S' AND ((Ped.FK_EMPRESA = " + getLojaOrigem() + ") OR (Ped.FK_EMPRESA = 0)) AND \n" +
+                    "		(((TpPed.STATUS_TP_PEDIDO = 0) AND \n" +
+                    "		(Ped.STATUS IN (2, 4))) OR ((TpPed.STATUS_TP_PEDIDO = 1) AND \n" +
+                    "		(Ped.STATUS <> 3)))\n" +
+                    "	GROUP BY \n" +
+                    "		1) est ON p.ID = est.fk_produto\n" +
                     "WHERE \n" +
-                    "	pp.FK_TABELA_PRECO = 1 and pe.fk_empresa = " + getLojaOrigem())) {
+                    "	pp.FK_TABELA_PRECO = 1 AND	\n" +
+                    "	pe.FK_EMPRESA = " + getLojaOrigem())) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -151,6 +176,7 @@ public class FuturaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3("1");
                     imp.setSituacaoCadastro(rs.getInt("status") == 0 ? 1 : 0);
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("ESTOQUE_MAXIMO"));
                     imp.setEstoqueMinimo(rs.getDouble("ESTOQUE_MINIMO"));
                     imp.setPesoBruto(rs.getDouble("PESO_BRUTO"));
