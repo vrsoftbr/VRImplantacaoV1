@@ -636,7 +636,7 @@ public class ProdutoRepository {
                                     provider.automacao().salvar(automacao);
                                 }
                             } else {
-                                obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                                obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                             }
                         }
                         /**
