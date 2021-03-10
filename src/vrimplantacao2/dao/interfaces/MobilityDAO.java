@@ -188,48 +188,48 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "   p.id,\n"
-                    + "   p.codigo_barras ean,\n"
-                    + "   p.codigo_interno,\n"
-                    + "   p.ativo,\n"
-                    + "   p.descricao descricaocompleta,\n"
-                    + "   p.descricao_resumida descricaoreduzida,\n"
-                    + "   p.grupo merc1,\n"
-                    + "   p.departamento merc2,\n"
-                    + "   p.sessao merc3,\n"
-                    + "   p.familia,\n"
-                    + "   p.unidade,\n"
-                    + "   p.margem,\n"
-                    + "   p.f_ult_preco_compra custoanterior,\n"
-                    + "   p.preco_compra custosemimposto,\n"
-                    + "   p.preco_custo custocomimposto,\n"
-                    + "   p.preco_venda1 precovenda,\n"
-                    + "   p.pesado,\n"
-                    + "   p.validade,\n"
-                    + "   p.estoque_max,\n"
-                    + "   p.estoque_min,\n"
-                    + "   p.estoque_atual,\n"
-                    + "   p.data_inclusao,\n"
-                    + "   p.s_ncm ncm,\n"
-                    + "   p.f_mva_st mva,\n"
-                    + "   p.icms icms_credito,\n"
-                    + "   p.st cst_credito,\n"
-                    + "   p.f_porcent_red_icms icms_red_credito,\n"
-                    + "   a.s_tipo tipoaliquota,\n"
-                    + "   a.f_taxa icms_debito,\n"
-                    + "   a.f_reducao_base_calculo icms_red_debito,\n"
-                    + "   p.s_cod_cst_pis_entrada pis_entrada,\n"
-                    + "   p.s_cod_cst_pis_saida pis_saida,\n"
-                    + "   p.s_cod_cst_cofins_entrada cofins_entrada,\n"
-                    + "   p.s_cod_cst_cofins_saida cofins_saida,\n"
-                    + "   p.s_cest cest,\n"
-                    + "   p.s_cod_pis_saida naturezareceita\n"
-                    + "from\n"
-                    + "    produtos p\n"
-                    + "left join aliquotas a on p.aliquota = a.id\n"
-                    + "order by\n"
-                    + "    p.id"
+                    "SELECT \n" +
+                    "   p.id,\n" +
+                    "   p.codigo_barras ean,\n" +
+                    "   p.codigo_interno,   \n" +
+                    "   p.ativo,   \n" +
+                    "   p.descricao descricaocompleta,\n" +
+                    "   CASE\n" +
+                    "   	WHEN p.id = 31843 THEN p.descricao\n" +
+                    "   	ELSE p.descricao_resumida\n" +
+                    "   END descricaoreduzida, \n" +
+                    "   p.grupo merc1,\n" +
+                    "   p.departamento merc2,\n" +
+                    "   p.sessao merc3,\n" +
+                    "   p.familia,\n" +
+                    "   p.unidade,\n" +
+                    "   p.margem,   \n" +
+                    "   p.f_ult_preco_compra custoanterior,\n" +
+                    "   p.preco_compra custosemimposto,\n" +
+                    "   p.preco_custo custocomimposto,\n" +
+                    "   p.preco_venda1 precovenda,\n" +
+                    "   p.pesado,\n" +
+                    "   p.validade,\n" +
+                    "   p.estoque_max,\n" +
+                    "   p.estoque_min,\n" +
+                    "   p.estoque_atual,\n" +
+                    "   p.data_inclusao,\n" +
+                    "   p.s_ncm ncm,\n" +
+                    "   p.f_mva_st mva,\n" +
+                    "   p.aliquota id_aliquota,\n" +
+                    "   p.icms icms_credito,\n" +
+                    "   p.st cst_credito,\n" +
+                    "   p.f_porcent_red_icms icms_red_credito,\n" +
+                    "   p.s_cod_cst_pis_entrada pis_entrada,\n" +
+                    "   p.s_cod_cst_pis_saida pis_saida,\n" +
+                    "   p.s_cod_cst_cofins_entrada cofins_entrada,\n" +
+                    "   p.s_cod_cst_cofins_saida cofins_saida,\n" +
+                    "   p.s_cest cest,\n" +
+                    "   p.s_cod_pis_saida naturezareceita\n" +
+                    "from\n" +
+                    "    produtos p\n" +
+                    "order by\n" +
+                    "    p.id"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -286,31 +286,10 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
                     // Icms debito
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red_debito"));
-
-                    if (rs.getString("tipoaliquota") != null && !"".equals(rs.getString("tipoaliquota"))) {
-                        switch (rs.getString("tipoaliquota").trim()) {
-                            case "F":
-                                imp.setIcmsCstSaida(60);
-                                break;
-                            case "I":
-                                imp.setIcmsCstSaida(40);
-                                break;
-                            case "N":
-                                imp.setIcmsCstSaida(41);
-                                break;
-                            case "T":
-                                imp.setIcmsCstSaida(0);
-                                break;
-                            default:
-                                imp.setIcmsCstSaida(40);
-                                break;
-                        }
-                    }
-                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
-                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
-                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    imp.setIcmsDebitoId(rs.getString("id_aliquota"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("id_aliquota"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("id_aliquota"));
+                    imp.setIcmsConsumidorId(rs.getString("id_aliquota"));
 
                     //Icms Credito
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
