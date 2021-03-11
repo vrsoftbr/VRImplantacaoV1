@@ -89,6 +89,7 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2.dao.interfaces.IServerDAO;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -274,6 +275,7 @@ import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
+import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
@@ -735,6 +737,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLinear = new javax.swing.JMenuItem();
         mnuSTI = new javax.swing.JMenuItem();
         mnuPlenoKW = new javax.swing.JMenuItem();
+        mnuIServer = new javax.swing.JMenuItem();
         mnuOracle = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -2076,6 +2079,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuMySQL2.add(mnuPlenoKW);
+
+        mnuIServer.setText("IServer");
+        mnuIServer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuIServerActionPerformed(evt);
+            }
+        });
+        mnuMySQL2.add(mnuIServer);
 
         mnuDatabase.add(mnuMySQL2);
 
@@ -5124,6 +5135,11 @@ public final class MenuGUI extends VRMdiFrame {
         SupermercadoRodriguesGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
+    private void mnuIServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIServerActionPerformed
+        // TODO add your handling code here:
+        IServerGUI.exibir(this);
+    }//GEN-LAST:event_mnuIServerActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5298,6 +5314,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuHipicom;
     private javax.swing.JMenuItem mnuHostMundo;
     private javax.swing.JMenuItem mnuIQSistemas;
+    private javax.swing.JMenuItem mnuIServer;
     private javax.swing.JMenuItem mnuIcommerce;
     private javax.swing.JMenuItem mnuIdealSoft;
     private javax.swing.JMenu mnuImpSistema;
