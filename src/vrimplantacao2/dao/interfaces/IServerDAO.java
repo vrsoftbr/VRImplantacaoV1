@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -10,11 +9,10 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -22,7 +20,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 /*
  * @author Alan
  */
-public class IServerDAO extends InterfaceDAO {
+public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -46,7 +44,7 @@ public class IServerDAO extends InterfaceDAO {
         return result;
     }
 
-    //@Override
+    @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
@@ -64,8 +62,8 @@ public class IServerDAO extends InterfaceDAO {
                     result.add(new MapaTributoIMP(rs.getString("codigo"),
                             rs.getString("descricao"),
                             rs.getInt("cst"),
-                            rs.getDouble("aliquota"),
-                            rs.getDouble("reducao")));
+                            Utils.stringToDouble(rs.getString("aliquota")),
+                            Utils.stringToDouble(rs.getString("reducao"))));
                 }
             }
         }

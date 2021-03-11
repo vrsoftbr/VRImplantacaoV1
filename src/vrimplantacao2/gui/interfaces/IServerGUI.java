@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -20,6 +21,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.IServerDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class IServerGUI extends VRInternalFrame {
@@ -70,7 +73,7 @@ public class IServerGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private IServerDAO iserverDAO = new IServerDAO();
+    private IServerDAO dao = new IServerDAO();
     private ConexaoMySQL connMySql = new ConexaoMySQL();
     
     private IServerGUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -79,7 +82,30 @@ public class IServerGUI extends VRInternalFrame {
         
         this.title = "Importação " + SISTEMA;
                 
-        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+            
+        });
 
         carregarParametros();
         
@@ -108,7 +134,8 @@ public class IServerGUI extends VRInternalFrame {
 
         connMySql.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                 txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
-
+        
+        btnMapaTrib.setEnabled(true);
         gravarParametros();
         carregarLojaVR();
         carregarLojaCliente();
@@ -132,7 +159,7 @@ public class IServerGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: iserverDAO.getLojasCliente()) {
+        for (Estabelecimento loja: dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -170,7 +197,7 @@ public class IServerGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
                     
-                    Importador importador = new Importador(iserverDAO);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);     
 
