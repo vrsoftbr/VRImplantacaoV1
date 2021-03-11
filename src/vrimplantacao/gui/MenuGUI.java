@@ -89,7 +89,6 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
-import vrimplantacao2.dao.interfaces.IServerDAO;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -5478,12 +5477,6 @@ public final class MenuGUI extends VRMdiFrame {
             
             if ("lince".equals(param)) {
                 LinceGUI.exibir(this, true);
-            }
-            /*if ("g3".equals(param)) {
-                G3_v2GUI.exibir(this, true);
-            }*/
-            if("winthor".equals(param)) {
-                Winthor_PcSistemasGUI.exibir(this, true);
             }
         }
     }
