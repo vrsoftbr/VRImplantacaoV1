@@ -5,7 +5,9 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +18,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -43,12 +46,74 @@ import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
  * @author Leandro
  */
 public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
+    
+    private String complemento = "";
+    private int idRegiaoDentroEstado;
+    private int idRegiaoForaEstado;
 
-    public boolean temArquivoBalanca = false;
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+
+    public void setIdRegiaoDentroEstado(int idRegiaoDentroEstado) {
+        this.idRegiaoDentroEstado = idRegiaoDentroEstado;
+    }
+
+    public void setIdRegiaoForaEstado(int idRegiaoForaEstado) {
+        this.idRegiaoForaEstado = idRegiaoForaEstado;
+    }
     
     @Override
     public String getSistema() {
-        return "WINTHOR";
+        return "WINTHOR" + (!"".equals(complemento) ? " - " + complemento : "");
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.RECEITA_BALANCA
+        ));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -67,6 +132,43 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("descricao")));
                 }
             }
+        }
+        return result;
+    }
+    
+    public static class Regiao {
+        public final int id;
+        public final String descricao;
+        public Regiao(int id, String descricao) {
+            this.id = id;
+            this.descricao = descricao;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%04d - %s", id, descricao);
+        }
+    }
+    
+    public List<Regiao> getRegioes() {
+        List<Regiao> result = new ArrayList<>();        
+        try (
+                Statement st = ConexaoOracle.createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT\n" +
+                        "	r.NUMREGIAO id,\n" +
+                        "	r.REGIAO || ' - '|| r.UF || ' - filial ' || r.CODFILIAL descricao\n" +
+                        "FROM\n" +
+                        "	pcregiao r\n" +
+                        "ORDER BY\n" +
+                        "	NUMREGIAO"
+                )
+                ) {
+            while (rs.next()) {
+                result.add(new Regiao(rs.getInt("id"), rs.getString("descricao")));
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException("Erro ao carregar as regiões", ex);
         }
         return result;
     }
@@ -160,22 +262,25 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         
         try(Statement stm = ConexaoOracle.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "SELECT  \n" +
-                    "    codst id,\n" +
-                    "    mensagem descricao,\n" +
-                    "    codicm icms,\n" +
-                    "    sittribut cst,\n" +
-                    "    percbasered reducao\n" +
-                    "from\n" +
-                    "    PCTRIBUT\n" +
-                    "order by 1")) {
+                    "SELECT\n" +
+                    "	codst id,\n" +
+                    "	mensagem descricao,\n" +
+                    "	sittribut cst,\n" +
+                    "	codicm aliquota,\n" +
+                    "	COALESCE(NULLIF(100-COALESCE(percbasered, 0), 100), 0) reducao\n" +
+                    "FROM\n" +
+                    "	PCTRIBUT\n" +
+                    "ORDER BY\n" +
+                    "	codst"
+            )) {
                 while(rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("id"), 
                             rs.getString("descricao"), 
                             rs.getInt("cst"), 
-                            rs.getDouble("icms"), 
-                            rs.getDouble("reducao")));
+                            MathUtils.round(rs.getDouble("aliquota"), 2),
+                            MathUtils.round(rs.getDouble("reducao"), 2)
+                    ));
                 }
             }
         }
@@ -435,7 +540,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoOracle.createStatement()) {
+        try (Statement stm = ConexaoOracle.createStatement()) {            
             Map<String, Trib> tribs = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
@@ -473,15 +578,65 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 }
             }
             try (ResultSet rst = stm.executeQuery(
+                    "WITH \n" +
+                    "icms_dentro_estado AS (\n" +
+                    "	SELECT\n" +
+                    "		ic.CODPROD id_produto,\n" +
+                    "		ic.CODST id_tributacao,\n" +
+                    "		PISCOFINS.SITTRIBUT piscofins_s,\n" +
+                    "		piscofins.SITTRIBUTDEV piscofins_e\n" +
+                    "	FROM\n" +
+                    "		pctabpr ic	\n" +
+                    "		LEFT JOIN pctribpiscofins piscofins ON\n" +
+                    "			piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
+                    "	WHERE\n" +
+                    "		ic.NUMREGIAO = " + idRegiaoDentroEstado + "\n" +
+                    "),\n" +
+                    "icms_fora_estado AS (\n" +
+                    "	SELECT\n" +
+                    "		ic.CODPROD id_produto,\n" +
+                    "		ic.CODST id_tributacao\n" +
+                    "	FROM\n" +
+                    "		pctabpr ic\n" +
+                    "	WHERE\n" +
+                    "		ic.NUMREGIAO = " + idRegiaoForaEstado + "\n" +
+                    "),\n" +
+                    "natrec AS (\n" +
+                    "	SELECT\n" +
+                    "		distinct\n" +
+                    "		t.CODPROD id_produto,\n" +
+                    "		REPLACE(t.NCM, '.','') ncm,\n" +
+                    "		t.CODNATREC natrec\n" +
+                    "	FROM\n" +
+                    "		PCTABESCRSPED t\n" +
+                    "	WHERE\n" +
+                    "		NOT (t.CODPROD IS NULL AND t.ncm IS null) and\n" +
+                    "		T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n" +
+                    "		AND (\n" +
+                    "			(T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n" +
+                    "			OR (\n" +
+                    "				T.DATAINIESCR <= current_date\n" +
+                    "				AND T.DATAFINESCR IS NULL\n" +
+                    "			) OR (\n" +
+                    "				(current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR)\n" +
+                    "				AND T.DATAINIESCR IS NOT NULL\n" +
+                    "				AND T.DATAFINESCR IS NOT NULL\n" +
+                    "			)\n" +
+                    "		)\n" +
+                    ")\n" +
                     "SELECT\n" +
                     "	p.codprod id,\n" +
                     "	p.dtcadastro datacadastro, \n" +
                     "	COALESCE(ean.codauxiliar, p.CODAUXILIAR) ean,\n" +
                     "	p.CODAUXILIAR2,\n" +
-                    "	COALESCE((CASE WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1\n" +
-                    "	 THEN ean.QTMINIMAATACADO\n" +
-                    "	--Qtd embalagem por embalagem\n" +
-                    "	WHEN ean.QTUNIT >=2 THEN ean.QTUNIT ELSE 0 END), 1) as qtdembalagem,\n" +
+                    "	COALESCE(\n" +
+                    "		(CASE\n" +
+                    "			WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1 THEN ean.QTMINIMAATACADO\n" +
+                    "			WHEN ean.QTUNIT >=2 THEN ean.QTUNIT\n" +
+                    "			ELSE 0\n" +
+                    "		END), \n" +
+                    "		1\n" +
+                    "	) as qtdembalagem,\n" +
                     "	coalesce(ean.qtunit, 1) embalagemunitario,\n" +
                     "	COALESCE(ean.unidade, 'UN') tipoembalagem,\n" +
                     "	p.qtunitcx qtdembalagemcompra,\n" +
@@ -508,59 +663,38 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "	CASE WHEN pf.ativo = 'N' THEN 0 ELSE 1 END situacaocadastro,\n" +
                     "	p.nbm ncm,\n" +
                     "	coalesce(est.codcest, p.codcest) cest,\n" +
-                    "	piscofins.sittribut piscofins_debito,\n" +
-                    "	piscofins.descricaotribpiscofins,\n" +
-                    "	p.codsittribpiscofins piscofins,\n" +
-                    "	t.codnatrec piscofins_natrec,\n" +
-                    "	tabst.codst idtributacao,\n" +
-                    "	icms.sittributpf icmscstdebito,\n" +
-                    "	icms.codicmpf icmsaliqdebito,\n" +
-                    "	0 icmsreddebito,\n" +
-                    "	trunc(icms.percbasered, 2) icmsredcredito,\n" +
-                    "	icms.codicm icmsaliqcredito,\n" +
-                    "	icms.sittribut icmscstcredito,\n" +
+                    "	icms_dentro_estado.piscofins_s,\n" +
+                    "	icms_dentro_estado.piscofins_e,\n" +
+                    "	(SELECT natrec FROM natrec WHERE (id_produto = p.codprod OR p.nbm LIKE natrec.ncm||'%') AND rownum = 1) piscofins_natrec,\n" +
+                    "	icms_dentro_estado.id_tributacao icms_dentro_estado,\n" +
+                    "	icms_fora_estado.id_tributacao icms_fora_estado,\n" +
                     "	p.codncmex,\n" +
-                    "	p.codfornec fabricante\n" +
+                    "	p.codfornec fabricante,\n" +
+                    "	pf.CODFIGURA\n" +
                     "FROM\n" +
                     "	pcprodut p\n" +
-                    "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n" +
+                    "	JOIN pcfilial emp ON emp.codigo = '1'\n" +
                     "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n" +
                     "	LEFT JOIN PCEMBALAGEM ean ON\n" +
                     "		ean.codprod = p.codprod AND\n" +
-                    "		ean.codfilial = emp.codigo\n" + 
+                    "		ean.codfilial = emp.codigo\n" +
                     "	LEFT JOIN pcest est ON\n" +
                     "		est.codprod = p.codprod AND\n" +
                     "		est.codfilial = emp.codigo\n" +
                     "	LEFT JOIN pcprodfilial pf ON\n" +
                     "		pf.codprod = p.codprod AND\n" +
                     "		pf.codfilial = emp.codigo\n" +
-                    "	LEFT JOIN PCTABESCRSPED t ON\n" +
-                    "		(T.CODPROD = p.codprod OR p.codprod = 0)\n" +
-                    "		AND T.TIPOREGISTRO IN ('M4310','C4311','B4311','A4311','P4312', 'S4316', 'I4314', 'R4313')\n" +
-                    "		AND ((T.DATAINIESCR IS NULL AND T.DATAFINESCR IS NULL)\n" +
-                    "		OR  (T.DATAINIESCR <= current_date AND T.DATAFINESCR IS NULL)\n" +
-                    "		OR  (current_date BETWEEN T.DATAINIESCR AND T.DATAFINESCR AND T.DATAINIESCR IS NOT NULL AND T.DATAFINESCR IS NOT NULL))\n" +
-                    "	LEFT JOIN pctabpr ic ON\n" +
-                    "		ic.codprod = p.codprod\n" +
-                    "		AND ic.NUMREGIAO = 5\n" +
-                    "	LEFT JOIN PCTRIBUT icms ON\n" +
-                    "		ic.codst = icms.codst\n" +
-                    "	LEFT JOIN pctribpiscofins piscofins ON\n" +
-                    "		piscofins.codtribpiscofins = ic.codtribpiscofins\n" +
-                    "	LEFT JOIN (select \n" +
-                    "					icm.codprod,\n" +
-                    "					icm.codst,\n" +
-                    "					reg.codfilial\n" +
-                    "				from \n" +
-                    "					pctabpr icm \n" +
-                    "				left join pcregiao reg on icm.numregiao = reg.numregiao\n" +
-                    "				left join PCTRIBUT trb on icm.codst = trb.codst) tabst on tabst.codprod = p.codprod and\n" +
-                    "				tabst.codfilial = emp.codigo\n" +
-                    "	WHERE coalesce(ean.QTUNIT, 1) = 1\n" +        
-                    "ORDER BY id, ean"
+                    "	LEFT JOIN icms_dentro_estado ON\n" +
+                    "		icms_dentro_estado.id_produto = p.codprod\n" +
+                    "	LEFT JOIN icms_fora_estado ON\n" +
+                    "		icms_fora_estado.id_produto = p.codprod\n" +
+                    "WHERE\n" +
+                    "	coalesce(ean.QTUNIT, 1) = 1\n" +
+                    "ORDER BY\n" +
+                    "	id, ean"
             )) {
                 int cont = 0, cont2 = 0;
-                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -568,31 +702,33 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcompra"));
                     imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcompra"));
+                    
+                    
+                    
                     if(rst.getString("e_balanca") != null && !"".equals(rst.getString("e_balanca"))) {
                         imp.seteBalanca("S".equals(rst.getString("e_balanca").trim()) ? true : false);
                     } else {
                         imp.seteBalanca(false);
                     }
                     
-                    if(temArquivoBalanca && imp.isBalanca() && imp.getEan() != null && !"".equals(imp.getEan())) {
-                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
-                        
-                        if (bal != null) {
-                            imp.setEan(String.valueOf(bal.getCodigo()));
-                            imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
-                            imp.setValidade(bal.getValidade() > 1 ? bal.getValidade() : rst.getInt("validade"));
-                        } else {
-                            imp.setValidade(rst.getInt("validade"));
-                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                            imp.seteBalanca(false);
-                        }
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+                    if (bal != null) {
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.seteBalanca("S".equals(rst.getString("e_balanca")));
+                        imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setValidade(rst.getInt("validade"));                        
                     }
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
@@ -615,12 +751,17 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("situacaocadastro"))));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    //imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
-                    //imp.setPiscofinsCstCredito(0);
-                    imp.setPiscofinsCstCredito(rst.getString("piscofins"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_s"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_e"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natrec"));
-                    
-                    imp.setIcmsCstSaida(rst.getInt("icmscstdebito"));
+                    imp.setIcmsDebitoId(rst.getString("icms_dentro_estado"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("icms_fora_estado"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("icms_fora_estado"));
+                    imp.setIcmsConsumidorId(rst.getString("icms_dentro_estado"));
+                    imp.setIcmsCreditoId(rst.getString("icms_dentro_estado"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("icms_fora_estado"));
+                            
+                    /*imp.setIcmsCstSaida(rst.getInt("icmscstdebito"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsaliqdebito"));
                     imp.setIcmsReducaoSaida(rst.getDouble("icmsreddebito"));
                     
@@ -664,7 +805,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                                     trib.pisCofins                                    
                             ));
                         }
-                    }
+                    }*/
                     
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
 
