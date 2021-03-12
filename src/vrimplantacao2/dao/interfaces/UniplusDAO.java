@@ -34,9 +34,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class UniplusDAO extends InterfaceDAO {
 
     private String complemento = "";
+    private TabelaPreco tabelaPreco = TabelaPreco.TABELA_FORMACAO_PRECO_PRODUTO;
+            
     public boolean DUN14Atacado = false;
     public boolean NewEan = false;
     public boolean ProdutoFornecedorNotas = false;
+    
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
@@ -45,6 +48,14 @@ public class UniplusDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "Uniplus" + ("".equals(this.complemento) ? "" : " - " + this.complemento);
+    }
+
+    public void setTabelaPreco(TabelaPreco tabelaPreco) {
+        this.tabelaPreco = tabelaPreco == null ? TabelaPreco.TABELA_FORMACAO_PRECO_PRODUTO : tabelaPreco;
+    }
+
+    public TabelaPreco getTabelaPreco() {
+        return tabelaPreco;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
@@ -212,7 +223,8 @@ public class UniplusDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with saldoestoque as (\n" +
+                    "with \n" +
+                    "saldoestoque as (\n" +
                     "	select\n" +
                     "	distinct on (idfilial, idproduto,codigoproduto)\n" +
                     "		idfilial,\n" +
@@ -242,13 +254,18 @@ public class UniplusDAO extends InterfaceDAO {
                     "	1 qtdembalagem, \n" +
                     "	p.custoindireto custooperacional,\n" +
                     "	p.percentuallucroajustado margemlucro,\n" +
-                    "   fp.codigo codigofamilia,\n" +
-                    "	p.precocusto, \n" +
-                    "	p.preco,        \n" +
-                    "	p.percentualmarkupajustado margem, \n" +
-                    "	preco.precoultimacompra custosemimposto,\n" +
-                    "	preco.precocusto custocomimposto,\n" +
-                    "	preco.preco as precovenda,\n" +
+                    "	fp.codigo codigofamilia,\n" +
+                    "	p.percentualmarkupajustado margem,\n" +
+                    "	pr1.precoultimacompra csimp,\n" +
+                    "	pr1.precocusto ccimp,\n" +
+                    "	p.precocusto cbkp,\n" +
+                    "	coalesce(pr1.precoultimacompra, p.precocusto) custosemimposto,\n" +
+                    "	coalesce(pr1.precocusto, p.precocusto) custocomimposto,	\n" +
+                    "	pr1.preco p1,\n" +
+                    "	pr2.preco p2,\n" +
+                    "	p.preco pbkp,\n" +
+                    "	coalesce(pr1.preco, pr2.preco, p.preco) as precovenda,\n" +
+                    "	coalesce(pr2.preco, pr1.preco, p.preco) as precovenda2,\n" +
                     "	p.quantidademinima, \n" +
                     "	p.quantidademaxima, \n" +
                     "	e.quantidade, \n" +
@@ -276,18 +293,21 @@ public class UniplusDAO extends InterfaceDAO {
                     "from \n" +
                     "	produto p\n" +
                     "	join filial f on\n" +
-                    "		f.id = 1\n" +
-                    "	left join formacaoprecoproduto preco on\n" +
-                    "		preco.idproduto = p.id and\n" +
-                    "		preco.idfilial = f.id\n" +
+                    "		f.id = " + getLojaOrigem() + "\n" +
+                    "	left join formacaoprecoproduto pr1 on\n" +
+                    "		pr1.idproduto = p.id and\n" +
+                    "		pr1.idfilial = f.id\n" +
+                    "	left join preco pr2 on\n" +
+                    "		pr2.produto = p.codigo and\n" +
+                    "		pr2.filial = f.codigo \n" +
                     "	left join saldoestoque e on\n" +
                     "		e.idproduto = p.id and\n" +
                     "		e.codigoproduto = p.codigo and\n" +
                     "		e.idfilial = f.id\n" +
                     "	left join cest on\n" +
                     "		cest.id = p.idcest\n" +
-                    "	left join\n" +
-                    "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
+                    "	left join receitasemcontribuicao r on\n" +
+                    "		p.idreceitasemcontribuicao = r.id\n" +
                     "	left join familiaproduto fp on\n" +
                     "	        p.idfamilia::bigint = fp.codigo::bigint\n" +
                     "    left join hierarquia merc on\n" +
@@ -324,18 +344,14 @@ public class UniplusDAO extends InterfaceDAO {
                     }
 
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    if ((rs.getDouble("precovenda") == 0) && (rs.getDouble("custocomimposto") == 0)) {
-                        imp.setCustoSemImposto(rs.getDouble("precocusto"));
-                        imp.setCustoComImposto(rs.getDouble("precocusto"));
-                        imp.setPrecovenda(rs.getDouble("preco"));
-                        //imp.setMargem(rs.getDouble("margemlucro"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    if (priorizarPrecoDaTabelaFormacaoPrecoProduto()) {
+                        imp.setPrecovenda(rs.getDouble("precovenda1"));
                     } else {
-                        imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                        imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                        imp.setPrecovenda(rs.getDouble("preco"));
-                        //imp.setPrecovenda(rs.getDouble("precovenda"));
-                        imp.setMargem(rs.getDouble("margem"));
+                        imp.setPrecovenda(rs.getDouble("precovenda2"));
                     }
+                    imp.setMargem(rs.getDouble("margem"));
 
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
@@ -367,6 +383,10 @@ public class UniplusDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    private boolean priorizarPrecoDaTabelaFormacaoPrecoProduto() {
+        return tabelaPreco == TabelaPreco.TABELA_FORMACAO_PRECO_PRODUTO;
     }
 
     @Override
@@ -959,6 +979,20 @@ public class UniplusDAO extends InterfaceDAO {
         }
 
         return result;
+    }
+    
+    public static enum TabelaPreco {
+        TABELA_FORMACAO_PRECO_PRODUTO,
+        TABELA_PRECO;
+
+        public static TabelaPreco getByOrdinal(int ordinal) {
+            for (TabelaPreco preco: values()) {
+                if (preco.ordinal() == ordinal) {
+                    return preco;
+                }
+            }
+            return null;
+        }
     }
 
 }
