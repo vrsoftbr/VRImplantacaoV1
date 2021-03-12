@@ -128,14 +128,14 @@ public class PrimeiroPrecoGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);                    
 
                     if (tabs.getSelectedIndex() == 0) {                        
-                        /*if (tabsImportacao.getSelectedIndex() == 0) {
+                        if (tabsImportacao.getSelectedIndex() == 0) {
                             tabProdutos.setImportador(importador);
                             tabProdutos.executarImportacao();
                         } else if (tabsImportacao.getSelectedIndex() == 1) {
 
                         } else if (tabsImportacao.getSelectedIndex() == 2) {
                         } else if (tabsImportacao.getSelectedIndex() == 3) {
-                        }*/
+                        }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -289,11 +289,11 @@ public class PrimeiroPrecoGUI extends VRInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(8, 8, 8)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel2)))
+                        .addComponent(jLabel2))
+                    .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(13, Short.MAX_VALUE))
         );
 

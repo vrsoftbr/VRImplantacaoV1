@@ -58,6 +58,7 @@ public class PrimeiroPrecoDAO extends InterfaceDAO {
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.CUSTO,
                 OpcaoProduto.PRECO,
+                OpcaoProduto.ESTOQUE,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.NCM,
@@ -127,5 +128,33 @@ public class PrimeiroPrecoDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "codigo_interno, "
+                        + "quantidade "
+                        + "from implantacao.posicao_estoque"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_interno"));
+                        imp.setEstoque(Double.parseDouble(rst.getString("quantidade").replace(".", "").replace(",", ".")));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        return null;
     }
 }

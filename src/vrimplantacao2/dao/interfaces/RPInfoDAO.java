@@ -83,6 +83,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.EAN,
             OpcaoProduto.EAN_EM_BRANCO,
