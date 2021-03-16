@@ -3,14 +3,19 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import static vr.core.utils.StringUtils.LOG;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -39,6 +44,8 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -125,30 +132,30 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "with loja as (\n" +
-                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
-                    ")\n" +
-                    "select\n" +
-                    "	p.prod_codigo idproduto,\n" +
-                    "	coalesce(un.prun_dtinioferta, current_date) datainicio,\n" +
-                    "	un.prun_dtoferta datatermino,\n" +
-                    "	un.prun_prnormal preconormal,\n" +
-                    "	un.prun_prvenda precooferta\n" +
-                    "from\n" +
-                    "	produtos p\n" +
-                    "	join loja on true\n" +
-                    "	left join produn un on\n" +
-                    "		p.prod_codigo = un.prun_prod_codigo and\n" +
-                    "		un.prun_unid_codigo = loja.id\n" +
-                    "where\n" +
-                    "	un.prun_oferta = 'S' and\n" +
-                    "   un.prun_dtoferta > current_date\n" +        
-                    "order by\n" +
-                    "	id"
-                    /*
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "with loja as (\n"
+                    + "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + ")\n"
+                    + "select\n"
+                    + "	p.prod_codigo idproduto,\n"
+                    + "	coalesce(un.prun_dtinioferta, current_date) datainicio,\n"
+                    + "	un.prun_dtoferta datatermino,\n"
+                    + "	un.prun_prnormal preconormal,\n"
+                    + "	un.prun_prvenda precooferta\n"
+                    + "from\n"
+                    + "	produtos p\n"
+                    + "	join loja on true\n"
+                    + "	left join produn un on\n"
+                    + "		p.prod_codigo = un.prun_prod_codigo and\n"
+                    + "		un.prun_unid_codigo = loja.id\n"
+                    + "where\n"
+                    + "	un.prun_oferta = 'S' and\n"
+                    + "   un.prun_dtoferta > current_date\n"
+                    + "order by\n"
+                    + "	id"
+            /*
                     "select \n" +
                     "	a.agof_datai datainicio,\n" +
                     "	a.agof_dataf datatermino,\n" +
@@ -165,17 +172,17 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	a.agof_unidades like '%" + getLojaOrigem() + "%'")) {
                     "	a.agof_dataf >= current_date and\n" +
                     "	a.agof_unidades like '%" + getLojaOrigem() + "%'"
-                    */
-                    )) {
-                while(rs.next()) {
+             */
+            )) {
+                while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    
+
                     imp.setDataInicio(rs.getDate("datainicio"));
                     imp.setDataFim(rs.getDate("datatermino"));
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -338,7 +345,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getEANs() throws Exception {
         if (gerarCodigoAtacado) {
             List<ProdutoIMP> result = new ArrayList<>();
-            
+
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
@@ -369,7 +376,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-            
+
             return result;
         }
         return super.getEANs();
@@ -381,25 +388,25 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "with loja as (\n" +
-                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
-                    ")\n" +
-                    "select \n" +
-                    "	distinct on (tr.trib_codigo)\n" +
-                    "	tr.trib_codigo id_tributacao,\n" +
-                    "	tr.trib_descricao descricao,\n" +
-                    "	tr.trib_codnf cst,\n" +
-                    "	tr.trib_icms aliquota,\n" +
-                    "	tr.trib_redbc reducao,\n" +
-                    "	coalesce(tr.trib_fcpaliq, 0) fcp\n" +
-                    "from\n" +
-                    "	tributacao tr\n" +
-                    "	join loja on true\n" +
-                    "where\n" +
-                    "	tr.trib_uforigem = loja.uf\n" +
-                    "	and tr.trib_mvtos like '%EVP%'\n" +
-                    "order by\n" +
-                    "	tr.trib_codigo, tr.trib_cstpis desc"
+                    "with loja as (\n"
+                    + "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + ")\n"
+                    + "select \n"
+                    + "	distinct on (tr.trib_codigo)\n"
+                    + "	tr.trib_codigo id_tributacao,\n"
+                    + "	tr.trib_descricao descricao,\n"
+                    + "	tr.trib_codnf cst,\n"
+                    + "	tr.trib_icms aliquota,\n"
+                    + "	tr.trib_redbc reducao,\n"
+                    + "	coalesce(tr.trib_fcpaliq, 0) fcp\n"
+                    + "from\n"
+                    + "	tributacao tr\n"
+                    + "	join loja on true\n"
+                    + "where\n"
+                    + "	tr.trib_uforigem = loja.uf\n"
+                    + "	and tr.trib_mvtos like '%EVP%'\n"
+                    + "order by\n"
+                    + "	tr.trib_codigo, tr.trib_cstpis desc"
             )) {
                 while (rst.next()) {
                     result.add(
@@ -414,7 +421,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -424,190 +431,190 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "with loja as (\n" +
-                    "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n" +
-                    "),\n" +
-                    "nf2019 as (\n" +
-                    "	select\n" +
-                    "		distinct on\n" +
-                    "		(mprd_prod_codigo) mprd_prod_codigo,\n" +
-                    "		mprd_datamvto,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n" +
-                    "	from\n" +
-                    "		movprodd19 m\n" +
-                    "		join loja on loja.id = m.mprd_unid_codigo\n" +
-                    "	where\n" +
-                    "		m.mprd_dcto_tipo like '%EAQ%'\n" +
-                    "	order by\n" +
-                    "		mprd_prod_codigo,\n" +
-                    "		mprd_datamvto desc\n" +
-                    "),\n" +
-                    "nf2020 as (\n" +
-                    "	select\n" +
-                    "		distinct on\n" +
-                    "		(mprd_prod_codigo) mprd_prod_codigo,\n" +
-                    "		mprd_datamvto,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n" +
-                    "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n" +
-                    "	from\n" +
-                    "		movprodd20 m\n" +
-                    "		join loja on loja.id = m.mprd_unid_codigo\n" +
-                    "	where\n" +
-                    "		m.mprd_dcto_tipo like '%EAQ%'\n" +
-                    "	order by\n" +
-                    "		mprd_prod_codigo,\n" +
-                    "		mprd_datamvto desc	\n" +
-                    "),\n" +
-                    "nf as (\n" +
-                    "	select\n" +
-                    "	distinct on (mprd_prod_codigo)\n" +
-                    "		*\n" +
-                    "	from\n" +
-                    "		(\n" +
-                    "			select * from nf2019\n" +
-                    "			union all\n" +
-                    "			select * from nf2020\n" +
-                    "		) a\n" +
-                    "	order by\n" +
-                    "		mprd_prod_codigo,\n" +
-                    "		mprd_datamvto desc	\n" +
-                    "),\n" +
-                    "custo as (\n" +
-                    "	select\n" +
-                    "		nf.mprd_prod_codigo,	\n" +
-                    "		nf.custocompra - nf.valoricms - nf.valorpis - nf.valorcofins custosemimposto_nf,\n" +
-                    "		nf.custocompra + nf.valorst + nf.valoripi custocomimposto_nf\n" +
-                    "	from\n" +
-                    "		nf\n" +
-                    "	order by\n" +
-                    "		nf.mprd_prod_codigo\n" +
-                    "),\n" +
-                    "piscofins_s as (\n" +
-                    "	select distinct on (tr.trib_codigo)\n" +
-                    "		tr.trib_codigo id_tributacao,\n" +
-                    "		tr.trib_cstpis cstpiscofins,\n" +
-                    "		tr.trib_natpiscof naturezareceita\n" +
-                    "	from\n" +
-                    "		tributacao tr\n" +
-                    "		join loja on true\n" +
-                    "	where\n" +
-                    "		tr.trib_uforigem = loja.uf\n" +
-                    "		and tr.trib_mvtos like '%EVP%'\n" +
-                    "	order by\n" +
-                    "		tr.trib_codigo, tr.trib_cstpis desc\n" +
-                    "),\n" +
-                    "cest as (\n" +
-                    "	select\n" +
-                    "		distinct on (id_produto)\n" +
-                    "		prau_prod_codigo id_produto,\n" +
-                    "		prau_cest cest\n" +
-                    "	from\n" +
-                    "		prodaux p\n" +
-                    ")\n" +
-                    "select\n" +
-                    "	p.prod_codigo id,\n" +
-                    "	p.prod_datacad datacadastro,\n" +
-                    "	p.prod_dataalt dataalteracao,\n" +
-                    "	ean.ean,\n" +
-                    "	ean.qtdembalagem,\n" +
-                    "	p.prod_qemb embalagemcotacao,\n" +
-                    "	case\n" +
-                    "	when p.prod_balanca = 'P' then 'KG'\n" +
-                    "	when p.prod_balanca = 'U' then 'UN'\n" +
-                    "	when ean.qtdembalagem = 1 then 'UN'\n" +
-                    "	else un.prun_emb end unidade,\n" +
-                    "	case \n" +
-                    "	when p.prod_balanca in ('P', 'U') then 1\n" +
-                    "	else 0 end e_balanca,\n" +
-                    "	coalesce(un.prun_validade, 0) validade,\n" +
-                    "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompletacomplemento,\n" +
-                    "	p.prod_descricao descricaocompleta,        \n" +
-                    "	p.prod_descrpdvs descricaoreduzida,\n" +
-                    "	p.prod_dpto_codigo merc1,\n" +
-                    "	p.prod_grup_codigo merc2,\n" +
-                    "	p.prod_codpreco id_familia,\n" +
-                    "	p.prod_peso pesobruto,\n" +
-                    "	p.prod_pesoliq pesoliquido,\n" +
-                    "	un.prun_estmin estoqueminimo,\n" +
-                    "	un.prun_estmax estoquemaximo,\n" +
-                    "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n" +
-                    "	un.prun_prultcomp,\n" +
-                    "	un.prun_ctcompra custosemimposto,\n" +
-                    "	un.prun_prultcomp custocomimposto,\n" +
-                    "	coalesce(custo.custosemimposto_nf, un.prun_ctcompra, 0) custosemimposto_nf,\n" +
-                    "	coalesce(custo.custocomimposto_nf, un.prun_prultcomp, 0) custocomimposto_nf,\n" +
-                    "	un.prun_margem margem,\n" +
-                    "	un.prun_prvenda precovenda,\n" +
-                    "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n" +
-                    "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n" +
-                    "	p.prod_codigoncm ncm,\n" +
-                    "	cest.cest,\n" +
-                    "	un.prun_setor setor,\n" +
-                    "	un.prun_setordep departamento,\n" +
-                    "	piscofins_s.cstpiscofins piscofins_s,\n" +
-                    "	piscofins_s.naturezareceita piscofins_natrec,\n" +
-                    "	p.prod_trib_codigo id_icms,\n" +
-                    "	p.prod_forn_codigo\n" +
-                    "from\n" +
-                    "	produtos p\n" +
-                    "	join loja on true\n" +
-                    "	left join cest on\n" +
-                    "		p.prod_codigo = cest.id_produto\n" +
-                    "	left join produn un on\n" +
-                    "		p.prod_codigo = un.prun_prod_codigo and\n" +
-                    "		un.prun_unid_codigo = loja.id\n" +
-                    "	left join (\n" +
-                    "		select\n" +
-                    "			prod_codigo id,\n" +
-                    "			prod_codbarras ean,\n" +
-                    "			prod_funcao unidade,\n" +
-                    "			1 qtdembalagem,\n" +
-                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint longean,\n" +
-                    "			'prod_codbarras' tipo\n" +
-                    "		from\n" +
-                    "			produtos\n" +
-                    "		where			\n" +
-                    "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint > 0\n" +
-                    "		union\n" +
-                    "		select\n" +
-                    "			prod_codigo id,\n" +
-                    "			prod_codcaixa ean,\n" +
-                    "			prod_emb unidade,\n" +
-                    "			prod_qemb qtdembalagem,\n" +
-                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint longean,\n" +
-                    "			'prod_codcaixa' tipo\n" +
-                    "		from\n" +
-                    "			produtos\n" +
-                    "		where			\n" +
-                    "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint > 0\n" +
-                    "		union\n" +
-                    "		select\n" +
-                    "			cbal_prod_codigo id,\n" +
-                    "			cbal_prod_codbarras ean,\n" +
-                    "			'UN' unidade,\n" +
-                    "			coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem,\n" +
-                    "			nullif(regexp_replace(cbal_prod_codbarras, '[^0-9]*',''),'')::bigint longean,\n" +
-                    "			'cbal_prod_codbarras' tipo\n" +
-                    "		from\n" +
-                    "			cbalt\n" +
-                    "		where\n" +
-                    "			nullif(regexp_replace(cbal_prod_codbarras, '[^0-9]*',''),'')::bigint > 999999\n" +
-                    "	) ean on ean.id = p.prod_codigo\n" +
-                    "	left join piscofins_s on\n" +
-                    "		piscofins_s.id_tributacao = p.prod_trib_codigo\n" +
-                    "	left join custo on\n" +
-                    "		custo.mprd_prod_codigo = p.prod_codigo\n" +
-                    "order by\n" +
-                    "	longean"
+                    "with loja as (\n"
+                    + "	select unid_codigo id, unid_uf uf from unidades where unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "),\n"
+                    + "nf2019 as (\n"
+                    + "	select\n"
+                    + "		distinct on\n"
+                    + "		(mprd_prod_codigo) mprd_prod_codigo,\n"
+                    + "		mprd_datamvto,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n"
+                    + "	from\n"
+                    + "		movprodd19 m\n"
+                    + "		join loja on loja.id = m.mprd_unid_codigo\n"
+                    + "	where\n"
+                    + "		m.mprd_dcto_tipo like '%EAQ%'\n"
+                    + "	order by\n"
+                    + "		mprd_prod_codigo,\n"
+                    + "		mprd_datamvto desc\n"
+                    + "),\n"
+                    + "nf2020 as (\n"
+                    + "	select\n"
+                    + "		distinct on\n"
+                    + "		(mprd_prod_codigo) mprd_prod_codigo,\n"
+                    + "		mprd_datamvto,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) as custocompra,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_alsubtribinf / 100) valoricms,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqpis / 100) valorpis,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_aliqcofins / 100) valorcofins,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_subtrib / 100) valorst,\n"
+                    + "		(mprd_prcompra / case when mprd_qtde = 0 then 1 else mprd_qtde end) * (mprd_percipi / 100) valoripi\n"
+                    + "	from\n"
+                    + "		movprodd20 m\n"
+                    + "		join loja on loja.id = m.mprd_unid_codigo\n"
+                    + "	where\n"
+                    + "		m.mprd_dcto_tipo like '%EAQ%'\n"
+                    + "	order by\n"
+                    + "		mprd_prod_codigo,\n"
+                    + "		mprd_datamvto desc	\n"
+                    + "),\n"
+                    + "nf as (\n"
+                    + "	select\n"
+                    + "	distinct on (mprd_prod_codigo)\n"
+                    + "		*\n"
+                    + "	from\n"
+                    + "		(\n"
+                    + "			select * from nf2019\n"
+                    + "			union all\n"
+                    + "			select * from nf2020\n"
+                    + "		) a\n"
+                    + "	order by\n"
+                    + "		mprd_prod_codigo,\n"
+                    + "		mprd_datamvto desc	\n"
+                    + "),\n"
+                    + "custo as (\n"
+                    + "	select\n"
+                    + "		nf.mprd_prod_codigo,	\n"
+                    + "		nf.custocompra - nf.valoricms - nf.valorpis - nf.valorcofins custosemimposto_nf,\n"
+                    + "		nf.custocompra + nf.valorst + nf.valoripi custocomimposto_nf\n"
+                    + "	from\n"
+                    + "		nf\n"
+                    + "	order by\n"
+                    + "		nf.mprd_prod_codigo\n"
+                    + "),\n"
+                    + "piscofins_s as (\n"
+                    + "	select distinct on (tr.trib_codigo)\n"
+                    + "		tr.trib_codigo id_tributacao,\n"
+                    + "		tr.trib_cstpis cstpiscofins,\n"
+                    + "		tr.trib_natpiscof naturezareceita\n"
+                    + "	from\n"
+                    + "		tributacao tr\n"
+                    + "		join loja on true\n"
+                    + "	where\n"
+                    + "		tr.trib_uforigem = loja.uf\n"
+                    + "		and tr.trib_mvtos like '%EVP%'\n"
+                    + "	order by\n"
+                    + "		tr.trib_codigo, tr.trib_cstpis desc\n"
+                    + "),\n"
+                    + "cest as (\n"
+                    + "	select\n"
+                    + "		distinct on (id_produto)\n"
+                    + "		prau_prod_codigo id_produto,\n"
+                    + "		prau_cest cest\n"
+                    + "	from\n"
+                    + "		prodaux p\n"
+                    + ")\n"
+                    + "select\n"
+                    + "	p.prod_codigo id,\n"
+                    + "	p.prod_datacad datacadastro,\n"
+                    + "	p.prod_dataalt dataalteracao,\n"
+                    + "	ean.ean,\n"
+                    + "	ean.qtdembalagem,\n"
+                    + "	p.prod_qemb embalagemcotacao,\n"
+                    + "	case\n"
+                    + "	when p.prod_balanca = 'P' then 'KG'\n"
+                    + "	when p.prod_balanca = 'U' then 'UN'\n"
+                    + "	when ean.qtdembalagem = 1 then 'UN'\n"
+                    + "	else un.prun_emb end unidade,\n"
+                    + "	case \n"
+                    + "	when p.prod_balanca in ('P', 'U') then 1\n"
+                    + "	else 0 end e_balanca,\n"
+                    + "	coalesce(un.prun_validade, 0) validade,\n"
+                    + "	p.prod_descricao || ' ' || coalesce(p.prod_complemento, '') descricaocompletacomplemento,\n"
+                    + "	p.prod_descricao descricaocompleta,        \n"
+                    + "	p.prod_descrpdvs descricaoreduzida,\n"
+                    + "	p.prod_dpto_codigo merc1,\n"
+                    + "	p.prod_grup_codigo merc2,\n"
+                    + "	p.prod_codpreco id_familia,\n"
+                    + "	p.prod_peso pesobruto,\n"
+                    + "	p.prod_pesoliq pesoliquido,\n"
+                    + "	un.prun_estmin estoqueminimo,\n"
+                    + "	un.prun_estmax estoquemaximo,\n"
+                    + "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n"
+                    + "	un.prun_prultcomp,\n"
+                    + "	un.prun_ctcompra custosemimposto,\n"
+                    + "	un.prun_prultcomp custocomimposto,\n"
+                    + "	coalesce(custo.custosemimposto_nf, un.prun_ctcompra, 0) custosemimposto_nf,\n"
+                    + "	coalesce(custo.custocomimposto_nf, un.prun_prultcomp, 0) custocomimposto_nf,\n"
+                    + "	un.prun_margem margem,\n"
+                    + "	un.prun_prvenda precovenda,\n"
+                    + "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n"
+                    + "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n"
+                    + "	p.prod_codigoncm ncm,\n"
+                    + "	cest.cest,\n"
+                    + "	un.prun_setor setor,\n"
+                    + "	un.prun_setordep departamento,\n"
+                    + "	piscofins_s.cstpiscofins piscofins_s,\n"
+                    + "	piscofins_s.naturezareceita piscofins_natrec,\n"
+                    + "	p.prod_trib_codigo id_icms,\n"
+                    + "	p.prod_forn_codigo\n"
+                    + "from\n"
+                    + "	produtos p\n"
+                    + "	join loja on true\n"
+                    + "	left join cest on\n"
+                    + "		p.prod_codigo = cest.id_produto\n"
+                    + "	left join produn un on\n"
+                    + "		p.prod_codigo = un.prun_prod_codigo and\n"
+                    + "		un.prun_unid_codigo = loja.id\n"
+                    + "	left join (\n"
+                    + "		select\n"
+                    + "			prod_codigo id,\n"
+                    + "			prod_codbarras ean,\n"
+                    + "			prod_funcao unidade,\n"
+                    + "			1 qtdembalagem,\n"
+                    + "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint longean,\n"
+                    + "			'prod_codbarras' tipo\n"
+                    + "		from\n"
+                    + "			produtos\n"
+                    + "		where			\n"
+                    + "			nullif(regexp_replace(prod_codbarras, '[^0-9]*',''),'')::bigint > 0\n"
+                    + "		union\n"
+                    + "		select\n"
+                    + "			prod_codigo id,\n"
+                    + "			prod_codcaixa ean,\n"
+                    + "			prod_emb unidade,\n"
+                    + "			prod_qemb qtdembalagem,\n"
+                    + "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint longean,\n"
+                    + "			'prod_codcaixa' tipo\n"
+                    + "		from\n"
+                    + "			produtos\n"
+                    + "		where			\n"
+                    + "			nullif(regexp_replace(prod_codcaixa, '[^0-9]*',''),'')::bigint > 0\n"
+                    + "		union\n"
+                    + "		select\n"
+                    + "			cbal_prod_codigo id,\n"
+                    + "			cbal_prod_codbarras ean,\n"
+                    + "			'UN' unidade,\n"
+                    + "			coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem,\n"
+                    + "			nullif(regexp_replace(cbal_prod_codbarras, '[^0-9]*',''),'')::bigint longean,\n"
+                    + "			'cbal_prod_codbarras' tipo\n"
+                    + "		from\n"
+                    + "			cbalt\n"
+                    + "		where\n"
+                    + "			nullif(regexp_replace(cbal_prod_codbarras, '[^0-9]*',''),'')::bigint > 999999\n"
+                    + "	) ean on ean.id = p.prod_codigo\n"
+                    + "	left join piscofins_s on\n"
+                    + "		piscofins_s.id_tributacao = p.prod_trib_codigo\n"
+                    + "	left join custo on\n"
+                    + "		custo.mprd_prod_codigo = p.prod_codigo\n"
+                    + "order by\n"
+                    + "	longean"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
@@ -618,22 +625,22 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    
+
                     long codigoProduto;
                     codigoProduto = Long.parseLong(Utils.stringLong(rst.getString("ean")));
                     String pBalanca = String.valueOf(codigoProduto);
-                    
+
                     ProdutoBalancaVO bal;
                     if (removeDigitoEAN) {
                         bal = balanca.get(Utils.stringToInt(pBalanca.substring(0, pBalanca.length() - 1), -2));
                     } else {
                         bal = balanca.get(Utils.stringToInt(pBalanca, -2));
                     }
-                    
+
                     if (bal != null) {
                         imp.setEan(String.valueOf(bal.getCodigo()));
                         imp.setQtdEmbalagem(1);
-                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN": "KG");
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                         imp.setValidade(bal.getValidade());
                     } else {
                         if (rst.getInt("e_balanca") == 1) {
@@ -652,7 +659,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setEan(rst.getString("ean"));
                         }
                     }
-                    
+
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("embalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
@@ -684,16 +691,16 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_s"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
-                    
+
                     imp.setIcmsConsumidorId(rst.getString("id_icms"));
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("id_icms"));
                     imp.setIcmsDebitoForaEstadoNfId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("id_icms"));
-                    
+
                     imp.setFornecedorFabricante(rst.getString("prod_forn_codigo"));
-                    
+
                     if (rst.getString("setor") != null && !"".equals(rst.getString("setor"))) {
                         if (rst.getString("setor").length() > 2) {
                             imp.setSetor(rst.getString("setor").trim().substring(0, 2));
@@ -708,9 +715,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setPrateleira(rst.getString("departamento").trim());
                         }
                     }
-                    
+
                     long ean = Utils.stringToLong(imp.getEan(), -2);
-                    
+
                     imp.setManterEAN(ean <= 999999 && ean > 0 && !imp.isBalanca());
 
                     result.add(imp);
@@ -911,7 +918,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }*/
     //</editor-fold>
-    
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -1192,9 +1198,9 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.clie_sitconv permitecreditorotativo,\n"
                     + "	c.clie_sitcheque permitecheque,\n"
                     + "	c.clie_senhapdv senhapdv,\n"
-                    + " c.clie_descrestadocivil civil,\n"        
-                    + " c.clie_contacontabil,\n" 
-                    + "	c.clie_contagerencial\n"       
+                    + " c.clie_descrestadocivil civil,\n"
+                    + " c.clie_contacontabil,\n"
+                    + "	c.clie_contagerencial\n"
                     + "from\n"
                     + "	clientes c\n"
                     + "	left join municipios mr on\n"
@@ -1255,10 +1261,10 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
                     imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
                     imp.setBloqueado("I".equals(rst.getString("clie_situacao")));
-                    
-                    if(rst.getString("civil") != null && !"".equals(rst.getString("civil"))) {
+
+                    if (rst.getString("civil") != null && !"".equals(rst.getString("civil"))) {
                         String estCivil = rst.getString("civil");
-                        switch(estCivil.toUpperCase().trim()) {
+                        switch (estCivil.toUpperCase().trim()) {
                             case "SOLTEIRO":
                                 imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
                                 break;
@@ -1271,12 +1277,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                             case "VIÚVO":
                                 imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
                                 break;
-                            default: imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                            default:
+                                imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
                                 break;
                         }
                     }
-                    
-                    if(rst.getString("clie_contacontabil") != null && rst.getString("clie_contagerencial") != null) {
+
+                    if (rst.getString("clie_contacontabil") != null && rst.getString("clie_contagerencial") != null) {
                         imp.setPermiteCreditoRotativo(true);
                         imp.setPermiteCheque(true);
                     }
@@ -1491,47 +1498,47 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             if (importarFuncionario) {
                 try (ResultSet rs = stm.executeQuery(
-                        "select \n" +
-                        "	pfin_operacao id,\n" +
-                        "	pfin_dataemissao emissao,\n" +
-                        "	pfin_datavcto vencimento,\n" +
-                        "	pfin_pdvs_codigo ecf,\n" +
-                        "	pfin_codentidade::varchar idcliente,\n" +
-                        "	c.clie_razaosocial razao,\n" +
-                        "	c.clie_cnpjcpf cnpj,\n" +
-                        "	pfin_complemento observacao,\n" +
-                        "	pfin_numerodcto cupom,\n" +
-                        "	pfin_parcela parcela,\n" +
-                        "	pfin_valor valor\n" +
-                        "from \n" +
-                        "	pendfin\n" +
-                        "	left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n" +
-                        "where\n" +
-                        "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
-                        "	pfin_pr = 'R' and\n" +
-                        "	pfin_status = 'P' and\n" +
-                        "	pfin_pger_conta in (112152) \n" +
-                        "union all \n" +
-                        "select \n" +
-                        "	pfin_operacao id,\n" +
-                        "	pfin_dataemissao emissao,\n" +
-                        "	pfin_datavcto vencimento,\n" +
-                        "	pfin_pdvs_codigo ecf,\n" +
-                        "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n" +
-                        "	f.func_nome razao,\n" +
-                        "	f.func_cpf cnpj,\n" +
-                        "	pfin_complemento observacao,\n" +
-                        "	pfin_numerodcto cupom,\n" +
-                        "	pfin_parcela parcela,\n" +
-                        "	pfin_valor valor\n" +
-                        "from \n" +
-                        "	pendfin\n" +
-                        "	left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n" +
-                        "where\n" +
-                        "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
-                        "	pfin_pr = 'R' and\n" +
-                        "	pfin_status = 'P' and\n" +
-                        "	pfin_pger_conta in (112152) ")) {
+                        "select \n"
+                        + "	pfin_operacao id,\n"
+                        + "	pfin_dataemissao emissao,\n"
+                        + "	pfin_datavcto vencimento,\n"
+                        + "	pfin_pdvs_codigo ecf,\n"
+                        + "	pfin_codentidade::varchar idcliente,\n"
+                        + "	c.clie_razaosocial razao,\n"
+                        + "	c.clie_cnpjcpf cnpj,\n"
+                        + "	pfin_complemento observacao,\n"
+                        + "	pfin_numerodcto cupom,\n"
+                        + "	pfin_parcela parcela,\n"
+                        + "	pfin_valor valor\n"
+                        + "from \n"
+                        + "	pendfin\n"
+                        + "	left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                        + "where\n"
+                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                        + "	pfin_pr = 'R' and\n"
+                        + "	pfin_status = 'P' and\n"
+                        + "	pfin_pger_conta in (112152) \n"
+                        + "union all \n"
+                        + "select \n"
+                        + "	pfin_operacao id,\n"
+                        + "	pfin_dataemissao emissao,\n"
+                        + "	pfin_datavcto vencimento,\n"
+                        + "	pfin_pdvs_codigo ecf,\n"
+                        + "	'FUN' || '' || pfin_codentidade::varchar idcliente,\n"
+                        + "	f.func_nome razao,\n"
+                        + "	f.func_cpf cnpj,\n"
+                        + "	pfin_complemento observacao,\n"
+                        + "	pfin_numerodcto cupom,\n"
+                        + "	pfin_parcela parcela,\n"
+                        + "	pfin_valor valor\n"
+                        + "from \n"
+                        + "	pendfin\n"
+                        + "	left join funcionarios f on (pendfin.pfin_codentidade = f.func_codigo)\n"
+                        + "where\n"
+                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                        + "	pfin_pr = 'R' and\n"
+                        + "	pfin_status = 'P' and\n"
+                        + "	pfin_pger_conta in (112152) ")) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
@@ -1552,32 +1559,32 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             } else {
                 try (ResultSet rs = stm.executeQuery(
-                        "select \n" +
-                        "	pfin_pger_conta conta,\n" +
-                        "       pfin_unid_codigo unidade,\n" +
-                        "	pfin_operacao id,\n" +
-                        "	pfin_dataemissao emissao,\n" +
-                        "	pfin_datavcto vencimento,\n" +
-                        "	pfin_pdvs_codigo ecf,\n" +
-                        "	pfin_codentidade::varchar idcliente,\n" +
-                        "	c.clie_razaosocial razao,\n" +
-                        "	c.clie_cnpjcpf cnpj,\n" +
-                        "	pfin_complemento observacao,\n" +
-                        "	pfin_numerodcto cupom,\n" +
-                        "	pfin_parcela parcela,\n" +
-                        "	pfin_valor valor,\n" +
-                        "	pfin_baixaparcial valorpago,\n" +
-                        "	pfin_juros juros,\n" +
-                        "	pfin_multa multa\n" +
-                        "from \n" +
-                        "	pendfin\n" +
-                        "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n" +
-                        "where\n" +
-                        "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
-                        "	pfin_pr = 'R' and\n" +
-                        "	pfin_status = 'P' and\n" +
-                        "       pfin_catentidade = 'C' and\n" +
-                        "       not pfin_pger_conta in (117301, 112501)\n"
+                        "select \n"
+                        + "	pfin_pger_conta conta,\n"
+                        + "       pfin_unid_codigo unidade,\n"
+                        + "	pfin_operacao id,\n"
+                        + "	pfin_dataemissao emissao,\n"
+                        + "	pfin_datavcto vencimento,\n"
+                        + "	pfin_pdvs_codigo ecf,\n"
+                        + "	pfin_codentidade::varchar idcliente,\n"
+                        + "	c.clie_razaosocial razao,\n"
+                        + "	c.clie_cnpjcpf cnpj,\n"
+                        + "	pfin_complemento observacao,\n"
+                        + "	pfin_numerodcto cupom,\n"
+                        + "	pfin_parcela parcela,\n"
+                        + "	pfin_valor valor,\n"
+                        + "	pfin_baixaparcial valorpago,\n"
+                        + "	pfin_juros juros,\n"
+                        + "	pfin_multa multa\n"
+                        + "from \n"
+                        + "	pendfin\n"
+                        + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                        + "where\n"
+                        + "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n"
+                        + "	pfin_pr = 'R' and\n"
+                        + "	pfin_status = 'P' and\n"
+                        + "       pfin_catentidade = 'C' and\n"
+                        + "       not pfin_pger_conta in (117301, 112501)\n"
                 )) {
                     while (rs.next()) {
                         CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1600,7 +1607,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         );
                         System.out.println(format);
                         imp.setObservacao(format);
-                        
+
                         double valorPago = rs.getDouble("valorpago");
                         if (valorPago > 0) {
                             imp.addPagamento(
@@ -1627,38 +1634,38 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	pg.pfin_transacao,\n" +
-                    "	pg.pfin_operacao,\n" +
-                    "	pg.pfin_codentidade id_fornecedor,\n" +
-                    "	pg.pfin_numerodcto numerodocumento,\n" +
-                    "	pg.pfin_dataemissao dataemissao,\n" +
-                    "	pg.pfin_datalcto dataentrada,\n" +
-                    "	pg.pfin_valor valor,\n" +
-                    "	pg.pfin_datavcto vencimento,\n" +
-                    "	pg.pfin_parcela parcela,\n" +
-                    "	pg.pfin_observacao observacao,\n" +
-                    "	pg.pfin_banco banco,\n" +
-                    "	pg.pfin_agencia agencia,\n" +
-                    "	pg.pfin_espe_codigo id_especie\n" +
-                    "from\n" +
-                    "	pendfin pg\n" +
-                    "    join planoger pl on\n" +
-                    "    	pg.pfin_pger_conta = pl.pger_conta\n" +
-                    "    join fornecedores f on\n" +
-                    "    	pg.pfin_codentidade = f.forn_codigo\n" +
-                    "where\n" +
-                    "	pg.pfin_status = 'P'\n" +
-                    "    and pg.pfin_pr = 'P'\n" +
-                    "    and pg.pfin_catentidade != 'C'\n" +
-                    "    and pg.pfin_seqbaixa is null\n" +
-                    "    and pg.pfin_unid_codigo = '" + getLojaOrigem() + "'\n" +
-                    "order by\n" +
-                    "	1, 2"
+                    "select \n"
+                    + "	pg.pfin_transacao,\n"
+                    + "	pg.pfin_operacao,\n"
+                    + "	pg.pfin_codentidade id_fornecedor,\n"
+                    + "	pg.pfin_numerodcto numerodocumento,\n"
+                    + "	pg.pfin_dataemissao dataemissao,\n"
+                    + "	pg.pfin_datalcto dataentrada,\n"
+                    + "	pg.pfin_valor valor,\n"
+                    + "	pg.pfin_datavcto vencimento,\n"
+                    + "	pg.pfin_parcela parcela,\n"
+                    + "	pg.pfin_observacao observacao,\n"
+                    + "	pg.pfin_banco banco,\n"
+                    + "	pg.pfin_agencia agencia,\n"
+                    + "	pg.pfin_espe_codigo id_especie\n"
+                    + "from\n"
+                    + "	pendfin pg\n"
+                    + "    join planoger pl on\n"
+                    + "    	pg.pfin_pger_conta = pl.pger_conta\n"
+                    + "    join fornecedores f on\n"
+                    + "    	pg.pfin_codentidade = f.forn_codigo\n"
+                    + "where\n"
+                    + "	pg.pfin_status = 'P'\n"
+                    + "    and pg.pfin_pr = 'P'\n"
+                    + "    and pg.pfin_catentidade != 'C'\n"
+                    + "    and pg.pfin_seqbaixa is null\n"
+                    + "    and pg.pfin_unid_codigo = '" + getLojaOrigem() + "'\n"
+                    + "order by\n"
+                    + "	1, 2"
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(String.format("%s-%s", rs.getString("pfin_transacao"), rs.getString("pfin_operacao")));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
@@ -1672,7 +1679,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     parc.setObservacao(rs.getString("observacao"));
                     parc.setId_banco(Utils.stringToInt(rs.getString("banco")));
                     parc.setAgencia(rs.getString("agencia"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -1821,5 +1828,211 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         imp.setProdutos(produtos);
+    }
+
+    /* Migração de vendas */
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+    private String tabelaVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    public void setTabelaVenda(String tabelaVenda) {
+        this.tabelaVenda = tabelaVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new RPInfoDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, tabelaVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new RPInfoDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, tabelaVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+
+                        next.setId(id);
+                        next.setNumeroCupom(rst.getInt("numerocupom"));
+                        next.setEcf(rst.getInt("ecf"));
+                        next.setModeloImpressora(rst.getString("modeloecf"));
+                        next.setNumeroSerie(rst.getString("serieecf"));
+                        next.setData(rst.getDate("datavenda"));
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horatermino");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setChaveNfCe(rst.getString("chavenfce"));
+                        next.setSubTotalImpressora(rst.getDouble("valortotal"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
+            this.sql = "select \n"
+                    + "	v.nfcc_transacao as id,\n"
+                    + "	v.nfcc_modelo as modeloecf,\n"
+                    + "	v.nfcc_serie as serieecf,\n"
+                    + "	v.nfcc_numerodcto as numerocupom,\n"
+                    + "	v.nfcc_idnfce as chavenfce,\n"
+                    + "	v.nfcc_pdv as ecf,\n"
+                    + "	v.nfcc_cupom,\n"
+                    + "	v.nfcc_dataemissao as datavenda,\n"
+                    + " min(vi.vdet_hora) as horainicio,\n"
+                    + "	max(vi.vdet_hora) as horatermino, \n"
+                    + "	sum(vi.vdet_valor) as valortotal\n"
+                    + "from nfcc v\n"
+                    + "join " + tabelaVenda + " vi \n"
+                    + "	on vi.vdet_transacao = v.nfcc_transacao\n"
+                    + "	and vi.vdet_cupom = v.nfcc_cupom\n"
+                    + "	and vi.vdet_datamvto = v.nfcc_dataemissao\n"
+                    + "where v.nfcc_unid_codigo = '" + idLojaCliente + "' \n"
+                    + " and vi.vdet_unid_codigo = '" + idLojaCliente + "' \n"
+                    /*+ " and vi.vdet_datamvto "
+                    + "     between '" + FORMAT.format(dataInicio) + "' "
+                    + "         and '" + FORMAT.format(dataInicio) + "' \n"*/
+                    + "group by \n"
+                    + "	v.nfcc_transacao,\n"
+                    + "	v.nfcc_modelo,\n"
+                    + "	v.nfcc_serie,\n"
+                    + "	v.nfcc_numerodcto,\n"
+                    + "	v.nfcc_idnfce,\n"
+                    + "	v.nfcc_pdv,\n"
+                    + "	v.nfcc_cupom,\n"
+                    + "	v.nfcc_dataemissao";
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoPostgres.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+
+                        String id
+                                = rst.getString("idvenda")
+                                + "-" + rst.getString("numerocupom")
+                                + "-" + rst.getString("datavenda")
+                                + "-" + rst.getString("idproduto");
+
+                        next = new VendaItemIMP();
+
+                        next.setId(id);
+                        next.setVenda(rst.getString("idvenda"));
+                        next.setProduto(rst.getString("idproduto"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setTotalBruto(rst.getDouble("valorvenda"));
+                        next.setSequencia(rst.getInt("sequencia"));
+                        //next.setPrecoVenda(rst.getDouble("precovenda"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
+                        //next.setValorAcrescimo(rst.getDouble("valoracrescimo"));
+                        //next.setValorDesconto(rst.getDouble("valordesconto"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        //next.setUnidadeMedida(rst.getString("unidademedida"));
+                        next.setIcmsCst(rst.getInt("csticms"));
+                        next.setIcmsAliq(rst.getDouble("aliqicms"));
+                        next.setIcmsReduzido(0);
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
+            this.sql = "select \n"
+                    + "	vi.vdet_transacao as idvenda,\n"
+                    + "	vi.vdet_cupom as numerocupom,\n"
+                    + "	vi.vdet_datamvto as datavenda,\n"
+                    + "	vi.vdet_prod_codigo as idproduto,\n"
+                    + "	vi.vdet_codbarras as codigobarras,\n"
+                    + "	vi.vdet_sequencial as sequencia,\n"
+                    + "	vi.vdet_qtde as quantidade,\n"
+                    + "	vi.vdet_valor as valorvenda,\n"
+                    + "	vi.vdet_cst as csticms,\n"
+                    + "	vi.vdet_icms as aliqicms\n"
+                    + "from " + tabelaVenda + " vi \n"
+                    + "where vi.vdet_datamvto "
+                    /*+ " between '" + VendaIterator.FORMAT.format(dataInicio) + "' "
+                    + "     and '" + VendaIterator.FORMAT.format(dataInicio) + "'\n"*/
+                    + "and vi.vdet_unid_codigo = '" + idLojaCliente + "'";
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }
