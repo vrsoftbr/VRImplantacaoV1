@@ -653,7 +653,7 @@ public class ProdutoRepository {
                         id = idProdutoExistente;
                         codigoAtual = new ProdutoVO();
                         codigoAtual.setId(id);
-                        obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
+                        obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
 
                         // gravar codigo atual se for null
                         gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), id, obsImportacao);
