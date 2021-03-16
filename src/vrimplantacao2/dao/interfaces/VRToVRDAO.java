@@ -252,7 +252,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	descricao,\n" +
                     "	situacaotributaria,\n" +
                     "	porcentagem,\n" +
-                    "	reduzido\n" +
+                    "	reduzido,\n" +
+                    "	porcentagemfcp,\n" +
+                    "	icmsdesonerado,\n" +
+                    "	percentualicmsdesonerado \n" +
                     "from 	\n" +
                     "	aliquota\n" +
                     "where \n" +
@@ -261,11 +264,16 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	descricao"
             )) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"),
+                    result.add(new MapaTributoIMP(
+                            rs.getString("id"),
                             rs.getString("descricao"),
                             rs.getInt("situacaotributaria"),
                             rs.getDouble("porcentagem"),
-                            rs.getDouble("reduzido")));
+                            rs.getDouble("reduzido"),
+                            rs.getDouble("porcentagemfcp"),
+                            rs.getBoolean("icmsdesonerado"),
+                            rs.getDouble("percentualicmsdesonerado")
+                    ));
                 }
             }
         }
