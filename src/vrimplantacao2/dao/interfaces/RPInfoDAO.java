@@ -1846,15 +1846,19 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setTabelaVenda(String tabelaVenda) {
         this.tabelaVenda = tabelaVenda;
     }
+    
+    public String getTabelaVenda() {
+        return this.tabelaVenda;
+    }
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new RPInfoDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, tabelaVenda);
+        return new RPInfoDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, getTabelaVenda());
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new RPInfoDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, tabelaVenda);
+        return new RPInfoDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, getTabelaVenda());
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -1870,12 +1874,12 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("id") + "-" + rst.getString("nfcc_cupom");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -1886,8 +1890,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setModeloImpressora(rst.getString("modeloecf"));
                         next.setNumeroSerie(rst.getString("serieecf"));
                         next.setData(rst.getDate("datavenda"));
-                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horatermino");
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " 00:00:00";
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setChaveNfCe(rst.getString("chavenfce"));
@@ -1914,7 +1918,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	max(vi.vdet_hora) as horatermino, \n"
                     + "	sum(vi.vdet_valor) as valortotal\n"
                     + "from nfcc v\n"
-                    + "join " + tabelaVenda + " vi \n"
+                    + "join vdadet" + tabelaVenda + " vi \n"
                     + "	on vi.vdet_transacao = v.nfcc_transacao\n"
                     + "	and vi.vdet_cupom = v.nfcc_cupom\n"
                     + "	and vi.vdet_datamvto = v.nfcc_dataemissao\n"
@@ -1932,6 +1936,8 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.nfcc_pdv,\n"
                     + "	v.nfcc_cupom,\n"
                     + "	v.nfcc_dataemissao";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);            
         }
 
         @Override
@@ -1970,12 +1976,16 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                                 = rst.getString("idvenda")
                                 + "-" + rst.getString("numerocupom")
                                 + "-" + rst.getString("datavenda")
-                                + "-" + rst.getString("idproduto");
+                                + "-" + rst.getString("idproduto")
+                                + "-" + rst.getString("codigobarras")
+                                + "-" + rst.getString("sequencia");
+                        
+                        String idvenda = rst.getString("idvenda") + "-" + rst.getString("numerocupom");
 
                         next = new VendaItemIMP();
 
                         next.setId(id);
-                        next.setVenda(rst.getString("idvenda"));
+                        next.setVenda(idvenda);
                         next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("valorvenda"));
@@ -2009,11 +2019,13 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vi.vdet_valor as valorvenda,\n"
                     + "	vi.vdet_cst as csticms,\n"
                     + "	vi.vdet_icms as aliqicms\n"
-                    + "from " + tabelaVenda + " vi \n"
-                    + "where vi.vdet_datamvto "
-                    /*+ " between '" + VendaIterator.FORMAT.format(dataInicio) + "' "
+                    + "from vdadet" + tabelaVenda + " vi \n"
+                    /*+ "where vi.vdet_datamvto "
+                    + " between '" + VendaIterator.FORMAT.format(dataInicio) + "' "
                     + "     and '" + VendaIterator.FORMAT.format(dataInicio) + "'\n"*/
-                    + "and vi.vdet_unid_codigo = '" + idLojaCliente + "'";
+                    + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
         }
 
         @Override
