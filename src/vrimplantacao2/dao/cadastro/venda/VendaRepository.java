@@ -120,7 +120,7 @@ public class VendaRepository {
             if (steps == 0 && recordsCount > 0)
                 steps = 1;
             LOG.info("Iniciando as vendas: steps " + steps + " recordsCount " + recordsCount); 
-            for (int offSet = 0; offSet < steps; offSet++) { 
+            for (int offSet = 0; offSet <= steps; offSet++) { 
                 provider.begin();
                 try {
                     //<editor-fold defaultstate="collapsed" desc="PROCESSAR AS VENDAS">            

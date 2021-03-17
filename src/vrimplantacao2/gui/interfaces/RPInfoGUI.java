@@ -274,12 +274,15 @@ public class RPInfoGUI extends VRInternalFrame {
                         }
                         if (chkPermiteRotativ.isSelected()) {
                             importador.atualizarClientePreferencial(OpcaoCliente.PERMITE_CREDITOROTATIVO);
-                        }                        
-                        if (chkVendas.isSelected() && !dtVenda.getText().trim().isEmpty()) {
-                            dao.setTabelaVenda(dtVenda.getText().trim());
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        } else {
-                            Util.exibirMensagem("Preencha os campos para importar as vendas.", getTitle());
+                        }
+                        
+                        if (tabParametros.getSelectedIndex() == 3) {
+                            if (chkVendas.isSelected() && !dtVenda.getText().trim().isEmpty()) {
+                                dao.setTabelaVenda(dtVenda.getText().trim());
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            } else {
+                                throw new Exception("Preencha os campos para realizar a importação de vendas.");
+                            }
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
