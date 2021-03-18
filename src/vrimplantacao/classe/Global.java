@@ -4,7 +4,7 @@ import java.util.GregorianCalendar;
 
 public class Global {
 
-    public static String VERSAO = "1.1.7-1";
+    public static String VERSAO = "1.1.7-2";
     /**
      * Data da liberação desta versão.
      */
