@@ -17,6 +17,10 @@ public final class Versao {
     
     private static Integer[] versaoArray;
 
+    public static void carregar(Integer... array) {
+        versaoArray = array;
+    }
+    
     /**
      * Puxa a versão do banco de dados e prepara a classe.
      * @throws Exception 
@@ -67,7 +71,9 @@ public final class Versao {
      * Compara e retorna se a versão informada é menor que a atual.
      * @param versao Versão a ser comparada.
      * @return true se for menor.
+     * @deprecated Utilizar {@link #igualOuMenorQue(int...)}
      */
+    @Deprecated
     public static boolean menorQue(int... versao) {
         for (int i = 0; i < versao.length; i++) {
             if (versao[i] > versaoArray[i]) {
@@ -83,7 +89,9 @@ public final class Versao {
      * Compara e retorna se a versão informada é maior que a atual.
      * @param versao Versão a ser comparada.
      * @return true se for menor.
+     * @deprecated Utilizar {@link #igualOuMaiorQue(int...)}
      */
+    @Deprecated
     public static boolean maiorQue(int... versao) {
         for (int i = 0; i < versao.length; i++) {
             if (versao[i] < versaoArray[i]) {
@@ -101,14 +109,41 @@ public final class Versao {
      * @return true se for menor.
      */
     public static boolean igual(int... versao) {
-        for (int i = 0; i < versao.length; i++) {
-            if (versao[i] < versaoArray[i]) {
+        int menorQtdDePosicoes = obterMenorQtdDePosicoes(versao);
+        for (int i = 0; i < menorQtdDePosicoes; i++) {
+            if (versao[i] != versaoArray[i])
                 return false;
-            } else if (versao[i] > versaoArray[i]) {
-                return true;
-            }
         }
-        return false;
+        return true;
+    }
+
+    public static boolean igualOuMenorQue(int... versao) {
+        int menorQtdDePosicoes = obterMenorQtdDePosicoes(versao);
+        for (int i = 0; i < menorQtdDePosicoes; i++) {
+            final Integer versaoAplicacao = versaoArray[i]; 
+            final int versaoComparativa = versao[i]; 
+            if (versaoAplicacao > versaoComparativa) 
+                return false;
+            if (versaoAplicacao < versaoComparativa) 
+                return true;
+        }
+        return true;
     }
     
+    public static boolean igualOuMaiorQue(int... versao) {
+        int menorQtdDePosicoes = obterMenorQtdDePosicoes(versao);
+        for (int i = 0; i < menorQtdDePosicoes; i++) {
+            final Integer versaoAplicacao = versaoArray[i]; 
+            final int versaoComparativa = versao[i]; 
+            if (versaoAplicacao < versaoComparativa) 
+                return false;
+            if (versaoAplicacao > versaoComparativa) 
+                return true;
+        }
+        return true;
+    }
+
+    private static int obterMenorQtdDePosicoes(int[] versao) {
+        return versao.length < versaoArray.length ? versao.length : versaoArray.length;
+    }
 }
