@@ -36,6 +36,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
+        txtComplemento.setText(params.get(SISTEMA, "COMPLEMENTO"));
         conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -44,6 +45,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(txtComplemento.getText(), SISTEMA, "COMPLEMENTO");
         conexao.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -140,11 +142,13 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     
-                    if(!txtCompLoja.getText().trim().isEmpty()) {
-                        idLojaCliente = txtCompLoja.getText();
+                    if(!txtComplemento.getText().trim().isEmpty()) {
+                        idLojaCliente = txtComplemento.getText();
                     } else {
                         idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     }
+                    
+                    dao.setComplemento(txtComplemento.getText());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -274,7 +278,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         lblCompLoja = new javax.swing.JLabel();
-        txtCompLoja = new javax.swing.JTextField();
+        txtComplemento = new javax.swing.JTextField();
 
         setTitle("Importação SysERP");
         setToolTipText("");
@@ -457,7 +461,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lblCompLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCompLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -474,7 +478,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(lblLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblCompLoja)
-                    .addComponent(txtCompLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(1, 1, 1)
                 .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -528,7 +532,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabOperacoes;
     private javax.swing.JPanel tabParametro;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private javax.swing.JTextField txtCompLoja;
+    private javax.swing.JTextField txtComplemento;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables

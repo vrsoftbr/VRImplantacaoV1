@@ -24,9 +24,18 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class ControlXDAO extends InterfaceDAO {
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
     @Override
     public String getSistema() {
-        return "ControlX";
+        if ("".equals(complemento)) {
+            return "ControlX";
+        }
+        return "ControlX - " + complemento;
     }
 
     public List<Estabelecimento> getLojasCliente() throws SQLException {
