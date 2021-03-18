@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -20,6 +21,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.TstiDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class TstiGUI extends VRInternalFrame {
@@ -78,6 +81,31 @@ public class TstiGUI extends VRInternalFrame {
         initComponents();
         
         this.title = "Importação " + SISTEMA;
+        
+            btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return tstiDAO;
+            }
+
+            @Override
+            public String getSistema() {
+                return tstiDAO.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                tstiDAO.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return tstiDAO.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+
+        });
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -109,6 +137,7 @@ public class TstiGUI extends VRInternalFrame {
         connMySql.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                 txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
 
+        btnMapaTrib.setEnabled(true);
         gravarParametros();
         carregarLojaVR();
         carregarLojaCliente();
@@ -392,6 +421,7 @@ public class TstiGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkOfertas = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -543,6 +573,13 @@ public class TstiGUI extends VRInternalFrame {
 
         chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
 
+        btnMapaTrib.setEnabled(false);
+        btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapaTribActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
         vRPanel7.setLayout(vRPanel7Layout);
         vRPanel7Layout.setHorizontalGroup(
@@ -560,7 +597,8 @@ public class TstiGUI extends VRInternalFrame {
                             .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1Custo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkT1EAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -589,8 +627,8 @@ public class TstiGUI extends VRInternalFrame {
                                     .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(45, Short.MAX_VALUE))
+                    .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
             vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -653,7 +691,8 @@ public class TstiGUI extends VRInternalFrame {
                             .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
@@ -730,7 +769,7 @@ public class TstiGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -818,7 +857,7 @@ public class TstiGUI extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
@@ -868,7 +907,7 @@ public class TstiGUI extends VRInternalFrame {
                 .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(133, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Convênio", tabConvenio);
@@ -912,7 +951,7 @@ public class TstiGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addContainerGap(110, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -1093,7 +1132,7 @@ public class TstiGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -1108,15 +1147,13 @@ public class TstiGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(37, 37, 37))
         );
-
-        vRPanel6.getAccessibleContext().setAccessibleName("Dados Origem - MySQL");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1229,8 +1266,13 @@ public class TstiGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFContasAPagarActionPerformed
 
+    private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
+
+    }//GEN-LAST:event_btnMapaTribActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
+    private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;

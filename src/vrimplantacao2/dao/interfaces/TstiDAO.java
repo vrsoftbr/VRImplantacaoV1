@@ -13,12 +13,14 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -27,7 +29,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author lucasrafael
  */
-public class TstiDAO extends InterfaceDAO {
+public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -82,19 +84,68 @@ public class TstiDAO extends InterfaceDAO {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "p.codigo, p.codbar,\n"
-                    + "upper(p.descpro) descricaocompleta,\n"
-                    + "upper(p.descpdv) descricaoreduzida,\n"
-                    + "p.estoque, p.preco1, p.preco2, p.grupo,\n"
-                    + "p.lucro, p.codst, p.min, p.bala, p.dias,\n"
-                    + "p.icms, p.base, p.lucrob, p.preco3, p.icmsst,\n"
-                    + "p.lucroc, p.ncm, p.custo, p.custofis, p.custocom,\n"
-                    + "p.inativo, p.custom, p.uni, p.tppis, p.tppise,\n"
-                    + "p.tpcofinss, p.tpcofinse, p.pesado, p.qtditemd,\n"
-                    + "p.aliicms, p.cest, reducao, p.natrec, p.estqmax,\n"
-                    + "i.snc_cst, i.snc_alq, i.snc_rbc\n"
-                    + "from tsl.tslc003 p\n"
-                    + "left join tsl.mxf_vw_icms i on i.codigo_produto = p.codigo"
+                    + "	p.codigo,\n"
+                    + "	p.codbar,\n"
+                    + "	upper(p.descpro) descricaocompleta,\n"
+                    + "	upper(p.descpdv) descricaoreduzida,\n"
+                    + "	p.estoque,\n"
+                    + "	p.preco1,\n"
+                    + "	p.preco2,\n"
+                    + "	p.grupo,\n"
+                    + "	p.lucro,\n"
+                    + "	p.codst,\n"
+                    + "	p.min,\n"
+                    + "	p.bala,\n"
+                    + "	p.dias,\n"
+                    + "	p.icms,\n"
+                    + "	p.base,\n"
+                    + "	p.lucrob,\n"
+                    + "	p.preco3,\n"
+                    + "	p.icmsst,\n"
+                    + "	p.lucroc,\n"
+                    + "	p.ncm,\n"
+                    + "	p.custo,\n"
+                    + "	p.custofis,\n"
+                    + "	p.custocom,\n"
+                    + "	p.inativo,\n"
+                    + "	p.custom,\n"
+                    + "	p.uni,\n"
+                    + "	p.tppis,\n"
+                    + "	p.tppise,\n"
+                    + "	p.tpcofinss,\n"
+                    + "	p.tpcofinse,\n"
+                    + "	p.pesado,\n"
+                    + "	p.qtditemd,\n"
+                    + "	p.aliicms,\n"
+                    + "	p.cest,\n"
+                    + "	reducao,\n"
+                    + "	p.natrec,\n"
+                    + "	p.estqmax,\n"
+                    + "	case cst\n"
+                    + "	  when 0 then '40'\n"
+                    + "	  when 1 then '00'\n"
+                    + "	  when 4 then '40'\n"
+                    + "	  when 5 then '60'\n"
+                    + "	end cst,\n"
+                    + " case codst\n"
+                    + "	  when 1  then 18\n"
+                    + "	  when 2  then 7\n"
+                    + "	  when 3  then 12\n"
+                    + "	  when 4  then 25\n"
+                    + "	  when 5  then 0\n"
+                    + "	  when 6  then 0\n"
+                    + "	  when 23 then 11\n"
+                    + "	  when 24 then 4.5\n"
+                    + "	  when 25 then 4\n"
+                    + "	  when 26 then 4.7\n"
+                    + "	  when 27 then 13.3\n"
+                    + "	  when 28 then 4.32\n"
+                    + "	  when 29 then 1.14\n"
+                    + "	end aliquota,"
+                    //+ "	aliicms aliquota,\n"
+                    + "	reducao\n"
+                    + "from\n"
+                    + "	tsl.tslc003 p"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -124,9 +175,11 @@ public class TstiDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getInt("tppis"));
                     imp.setPiscofinsCstCredito(rst.getInt("tppise"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("natrec"));
-                    imp.setIcmsCst(rst.getInt("snc_cst"));
-                    imp.setIcmsAliq(rst.getDouble("snc_alq"));
-                    imp.setIcmsReducao(rst.getDouble("snc_rbc"));
+
+                    imp.setIcmsCst(rst.getInt("cst"));
+                    imp.setIcmsAliq(rst.getDouble("aliquota"));
+                    imp.setIcmsReducao(rst.getDouble("reducao"));
+
                     vResult.add(imp);
                 }
             }
@@ -465,6 +518,33 @@ public class TstiDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	 Cod_Classe codigo,\n"
+                    + "	 Descricao_Classe descricao,\n"
+                    + "	 Cst_Classe cst,\n"
+                    + "	 Ecf_Aliquota_Classe aliquota,\n"
+                    + "	 Nota_Reducao_Classe reducao\n"
+                    + "from tbl_classe"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(
+                            rs.getString("codigo"),
+                            rs.getString("descricao"),
+                            Utils.stringToInt(rs.getString("cst")),
+                            Utils.stringToDouble(rs.getString("aliquota")),
+                            Utils.stringToDouble(rs.getString("reducao"))));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
