@@ -25,6 +25,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -514,7 +515,15 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vend.custosemimposto,\n" +
                     "	vend.custocomimposto,\n" +
                     "	vend.precovenda,\n" +
-                    " 	p.margem,\n" +
+                    (
+                            Versao.igualOuMaiorQue(4) ?
+                                    
+                            " 	vend.margem,\n" +
+                            " 	vend.margemmaxima,\n" +
+                            " 	vend.margemminima,\n" :
+                                    
+                            " 	p.margem,\n"
+                    ) +
                     "	vend.id_situacaocadastro,\n" +
                     "	vend.descontinuado,\n" +
                     "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n" +
@@ -593,6 +602,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setMargem(rs.getDouble("margem"));
+                    if (Versao.igualOuMaiorQue(4)) {
+                        imp.setMargemMaxima(rs.getDouble("margemmaxima"));
+                        imp.setMargemMaxima(rs.getDouble("margemminima"));
+                    }
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
                     imp.setDescontinuado(rs.getBoolean("descontinuado"));
@@ -610,6 +623,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(rs.getString("id_aliquotaconsumidor"));
                     imp.setIcmsCreditoId(rs.getString("id_aliquotacredito"));
                     imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
+                    imp.setFornecedorFabricante(rs.getString(""));
 
                     result.add(imp);
                 }
