@@ -10,7 +10,9 @@ import vrimplantacao.utils.Utils;
 /**
  * Classe que controla e executa operações sobre a versão do VRMaster.
  * @author Leandro
+ * @deprecated Utilize a classe {@link vr.core.parametro.Versao}
  */
+@Deprecated
 public final class Versao {
     
     private Versao(){}
