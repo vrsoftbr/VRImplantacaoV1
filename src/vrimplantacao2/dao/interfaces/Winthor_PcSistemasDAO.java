@@ -112,7 +112,9 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                 OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                OpcaoProduto.RECEITA_BALANCA
+                OpcaoProduto.RECEITA_BALANCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.MARGEM_MINIMA
         ));
     }
 

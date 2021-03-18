@@ -235,6 +235,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
                     
                     dao.setIdRegiaoDentroEstado(((Regiao)cmbDentroUf.getModel().getSelectedItem()).id);
                     dao.setIdRegiaoForaEstado(((Regiao)cmbForaUf.getModel().getSelectedItem()).id);
+                    dao.setComplemento(txtComplemento.getText());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
