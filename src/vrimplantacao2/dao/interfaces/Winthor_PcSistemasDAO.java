@@ -50,6 +50,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
     private String complemento = "";
     private int idRegiaoDentroEstado;
     private int idRegiaoForaEstado;
+    private boolean somenteClienteFidelidade = false;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
@@ -61,6 +62,10 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
 
     public void setIdRegiaoForaEstado(int idRegiaoForaEstado) {
         this.idRegiaoForaEstado = idRegiaoForaEstado;
+    }
+
+    public void setSomenteClienteFidelidade(boolean somenteClienteFidelidade) {
+        this.somenteClienteFidelidade = somenteClienteFidelidade;
     }
     
     @Override
@@ -675,7 +680,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "	pf.CODFIGURA\n" +
                     "FROM\n" +
                     "	pcprodut p\n" +
-                    "	JOIN pcfilial emp ON emp.codigo = '1'\n" +
+                    "	JOIN pcfilial emp ON emp.codigo = '" + getLojaOrigem() + "'\n" +
                     "	JOIN pcfornec f ON emp.codfornec = f.codfornec\n" +
                     "	LEFT JOIN PCEMBALAGEM ean ON\n" +
                     "		ean.codprod = p.codprod AND\n" +
@@ -1252,7 +1257,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
         
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (Statement stm2 = ConexaoOracle.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(                        
+                try (ResultSet rst = stm.executeQuery(
                         "SELECT\n" +
                         "    c.codcli id,\n" +
                         "    c.cgcent cnpj,\n" +
@@ -1311,7 +1316,11 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         "FROM \n" +
                         "    PCCLIENT c\n" +
                         "WHERE\n" +
-                        "    CODCOB <> 'CONV'\n" +
+                        (
+                                somenteClienteFidelidade ?
+                                "    nvl(c.NUMCARTAOFIDELIDADE,0) > 0" :
+                                "    CODCOB <> 'CONV'\n" 
+                        ) +
                         "ORDER BY\n" +
                         "    c.codcli"
                 )) {
