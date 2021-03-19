@@ -349,6 +349,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         btnMapaTribut = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         chkManterDescricaoProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkForcarPrecoCusto = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtualizarSomenteIncluidosUnificacao = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptAssociado = new vrframework.bean.panel.VRPanel();
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -541,6 +542,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkForcarPrecoCusto, "Forçar preço e custo");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkAtualizarSomenteIncluidosUnificacao, "Atualizar somente produtos incluídos pela unificação");
+
         javax.swing.GroupLayout pnlOptProdutoLayout = new javax.swing.GroupLayout(pnlOptProduto);
         pnlOptProduto.setLayout(pnlOptProdutoLayout);
         pnlOptProdutoLayout.setHorizontalGroup(
@@ -567,7 +570,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                             .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                                 .addComponent(chkManterDescricaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(chkForcarPrecoCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(chkForcarPrecoCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
@@ -594,7 +598,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(chkManterDescricaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarPrecoCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 5, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 10, Short.MAX_VALUE))))
         );
 
         tabParametros.add(pnlOptProduto);
@@ -1428,6 +1434,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkAssociadoSomenteAtivos;
     public vrframework.bean.checkBox.VRCheckBox chkAtacado;
+    public vrframework.bean.checkBox.VRCheckBox chkAtualizarSomenteIncluidosUnificacao;
     public vrframework.bean.checkBox.VRCheckBox chkCest;
     public vrframework.bean.checkBox.VRCheckBox chkCodigoBeneficio;
     public vrframework.bean.checkBox.VRCheckBox chkComprador;
@@ -1703,6 +1710,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
             {
                 List<OpcaoProduto> opcoes = new ArrayList<>();
+                importador.setImportarIndividualLoja(chkAtualizarSomenteIncluidosUnificacao.isSelected());
+                if (chkAtualizarSomenteIncluidosUnificacao.isSelected()) {
+                    opcoes.add(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
+                }
+                
                 if (chkSomarEstoqueAoProduto.isSelected()) {
                     opcoes.add(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE);
                 }

@@ -152,6 +152,7 @@
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="chkForcarPrecoCusto" min="-2" max="-2" attributes="0"/>
                                       </Group>
+                                      <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
@@ -187,7 +188,9 @@
                                       <Component id="chkManterDescricaoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkForcarPrecoCusto" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="5" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -257,6 +260,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarPrecoCusto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="For&#xe7;ar pre&#xe7;o e custo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtualizarSomenteIncluidosUnificacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atualizar somente produtos inclu&#xed;dos pela unifica&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>
