@@ -289,10 +289,16 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarCheque();
                         }
                         
-                        if (chkPdvVendas.isSelected()) {
+                        if (chkPdvVendas.isSelected()
+                                && edtDtVendaIni.getDate() != null 
+                                && edtDtVendaFim.getDate() != null
+                                && !txtVersao.getText().trim().isEmpty()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setVersao(txtVersao.getText().trim());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                        } else {
+                            throw new Exception ("Preencha todos os campos para migrar as vendas.");
                         }
                         
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
@@ -381,6 +387,8 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        txtVersao = new vrframework.bean.textField.VRTextField();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -587,15 +595,24 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
             }
         });
 
+        vRLabel1.setText("Versão");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
+            .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
+                        .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtVersao, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -604,7 +621,11 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtVersao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26))
         );
 
         javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
@@ -614,14 +635,14 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(209, Short.MAX_VALUE))
+                .addContainerGap(205, Short.MAX_VALUE))
         );
         tabVendasLayout.setVerticalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(208, Short.MAX_VALUE))
+                .addContainerGap(146, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Vendas", tabVendas);
@@ -830,10 +851,12 @@ public class DirectorGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabVendas;
     private javax.swing.JTextField txtCompLoja;
+    private vrframework.bean.textField.VRTextField txtVersao;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox1;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox2;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
+    private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables

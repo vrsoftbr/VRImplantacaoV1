@@ -1320,6 +1320,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
+    private String versao = "1";
 
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
@@ -1328,15 +1329,23 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
-
+    
+    public void setVersao(String versao) {
+        this.versao = versao;
+    }
+    
+    public String getVersao() {
+        return this.versao;
+    }
+    
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new DirectorDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new DirectorDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, versao);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new DirectorDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new DirectorDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, versao);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -1355,36 +1364,58 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 if (next == null) {
                     if (rst.next()) {
-                        next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
+                        
+                        DirectorDAO dao = new DirectorDAO();
+                        
+                        if ("1".equals(dao.getVersao())) {
+                            next = new VendaIMP();
+                            String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                            if (!uk.add(id)) {
+                                LOG.warning("Venda " + id + " já existe na listagem");
+                            }
+                            next.setId(id);
+                            next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                            next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                            next.setData(rst.getDate("data"));
+                            next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                            String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                            String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                            next.setHoraInicio(timestamp.parse(horaInicio));
+                            next.setHoraTermino(timestamp.parse(horaTermino));
+                            next.setCancelado(rst.getBoolean("cancelado"));
+                            next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                            next.setCpf(rst.getString("cpf"));
+                            next.setNomeCliente(rst.getString("nomecliente"));
+
+                            String endereco
+                                    = Utils.acertarTexto(rst.getString("endereco")) + ","
+                                    + Utils.acertarTexto(rst.getString("numero")) + ","
+                                    + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                    + Utils.acertarTexto(rst.getString("bairro")) + ","
+                                    + Utils.acertarTexto(rst.getString("cidade")) + "-"
+                                    + Utils.acertarTexto(rst.getString("estado")) + ","
+                                    + Utils.acertarTexto(rst.getString("cep"));
+                            next.setEnderecoCliente(endereco);
+
+                            next.setChaveNfCe(rst.getString("chave"));
+                        } else {
+                            next = new VendaIMP();
+                            String id = rst.getString("id");
+                            if (!uk.add(id)) {
+                                LOG.warning("Venda " + id + " já existe na listagem");
+                            }
+                            
+                            next.setId(id);
+                            next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                            next.setData(rst.getDate("data"));
+                            next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                            String horaInicio = timestampDate.format(rst.getDate("data")) + " 00:00";
+                            String horaTermino = timestampDate.format(rst.getDate("data")) + " 00:00";
+                            next.setHoraInicio(timestamp.parse(horaInicio));
+                            next.setHoraTermino(timestamp.parse(horaTermino));                            
+                            next.setCancelado(rst.getInt("cancelado") == 1);
+                            next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
                         }
-                        next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
-
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado")) + ","
-                                + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);
-
-                        next.setChaveNfCe(rst.getString("chave"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -1393,7 +1424,9 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String versao) throws Exception {
+            
+            if ("1".equals(versao)) {
             this.sql
                     = "select\n"
                     + "	DFnumero as numerocupom,\n"
@@ -1446,6 +1479,23 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	dfcod_cep,\n"
                     + " cfe.DFchave_acesso_nfe\n"
                     + "order by numerocupom, dfdata_emissao";
+            } else {
+                this.sql
+                        = "select\n"
+                        + "	v.DFid_cupom_fiscal as id,\n"
+                        + "	v.DFnum_cupom as numerocupom,\n"
+                        + "     '1' as ecf, \n"
+                        + "	convert(date, r.DFdata_emissao, 105) as data,\n"
+                        + "     v.DFcod_cliente as idclientepreferencial, \n"
+                        + "	v.DFcancelado as cancelado	\n"
+                        + "from TBcupom_fiscal v\n"
+                        + "join TBresumo_cupom_fiscal r on r.DFid_resumo_cupom_fiscal = v.DFid_resumo_cupom_fiscal \n"
+                        + "join TBcheck_out_empresa c on c.DFid_check_out_empresa = r.DFid_check_out_empresa \n"
+                        + "where dfdata_emissao "
+                        + "     between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and "
+                        + "                 convert(date, '" + FORMAT.format(dataTermino) + "', 23) and\n"
+                        + "	DFcod_empresa = " + idLojaCliente + "";
+            }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1480,31 +1530,54 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private void obterNext() {
             try {
+                
+                DirectorDAO dao = new DirectorDAO();
+                
                 if (next == null) {
-                    if (rst.next()) {
-                        next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                    
+                    if ("1".equals(dao.getVersao())) {
+                        if (rst.next()) {
+                            next = new VendaItemIMP();
+                            String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
-                        next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("precovenda"));
-                        next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
+                            next.setId(rst.getString("id"));
+                            next.setVenda(id);
+                            next.setProduto(rst.getString("produto"));
+                            next.setUnidadeMedida(rst.getString("unidade"));
+                            next.setDescricaoReduzida(rst.getString("descricao"));
+                            next.setQuantidade(rst.getDouble("quantidade"));
+                            next.setPrecoVenda(rst.getDouble("precovenda"));
+                            next.setTotalBruto(rst.getDouble("total"));
+                            next.setValorDesconto(rst.getDouble("desconto"));
+                            //next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                            //next.setCancelado(rst.getBoolean("cancelado"));
+                            next.setCodigoBarras(rst.getString("codigobarras"));
 
-                        String trib = rst.getString("tributacao");
-                        Double aliquota = rst.getDouble("aliquota_icms");
-                        /*if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
-                        }*/
+                            String trib = rst.getString("tributacao");
+                            Double aliquota = rst.getDouble("aliquota_icms");
+                            /*if (trib == null || "".equals(trib)) {
+                                trib = rst.getString("codaliq_produto");
+                            }*/
 
-                        obterAliquota(next, trib, aliquota);
+                            obterAliquota(next, trib, aliquota);
+                        }
+                    } else {
+                        if (rst.next()) {
+                            next = new VendaItemIMP();
+                            next.setId(rst.getString("id"));
+                            next.setVenda(rst.getString("idvenda"));
+                            next.setProduto(rst.getString("idproduto"));
+                            next.setUnidadeMedida(rst.getString("tipoembalagem"));
+                            next.setQuantidade(rst.getDouble("quantidade"));
+                            next.setCustoComImposto(rst.getDouble("custo"));
+                            next.setCustoSemImposto(rst.getDouble("custo"));
+                            next.setPrecoVenda(rst.getDouble("valor"));
+                            next.setTotalBruto(rst.getDouble("total"));
+                            next.setValorDesconto(rst.getDouble("desconto"));
+                            next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                            next.setIcmsCst(rst.getInt("cst"));
+                            next.setIcmsAliq(rst.getDouble("aliq"));
+                        }                        
                     }
                 }
             } catch (Exception ex) {
@@ -1554,38 +1627,65 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
             item.setIcmsAliq(aliq);
         }
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select\n"
-                    + "icfe.dfid_item_nota_fiscal_saida_nfce as id,\n"
-                    + "	dfnumero as numerocupom,\n"
-                    + "	dfserie as ecf,\n"
-                    + "	convert(date, dfdata_emissao, 105) as data,\n"
-                    + "	ie.DFcod_item_estoque as produto,\n"
-                    + "	un.dfdescricao unidade,\n"
-                    + "	ie.dfdescricao as descricao,    \n"
-                    + "	coalesce(dfqtde, 0) as quantidade,\n"
-                    + "	coalesce(icfe.dfvalor_total, 0) as total,\n"
-                    + "	coalesce(icfe.DFpreco_unitario, 0) as precovenda,\n"
-                    + "	coalesce(icfe.DFvalor_desconto, 0) as desconto,"
-                    + "	case\n"
-                    + "		when LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque)) > 14 \n"
-                    + "		then SUBSTRING((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque), 4, LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) ))\n"
-                    + "	else (select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) end as codigobarras,\n"
-                    + "	icfe.DFcod_tributacao_st  as cst,\n"
-                    + "	icfe.dfaliquota_icms aliquota_icms,\n"
-                    + "	icfe.DFtipo_tributacao as tributacao\n"
-                    + "from\n"
-                    + "	TBitem_nota_fiscal_saida_nfce icfe\n"
-                    + "	left join TBnota_fiscal_saida_nfce cfe on icfe.DFid_nota_fiscal_saida_nfce = cfe.DFid_nota_fiscal_saida_nfce\n"
-                    + "	left join TBunidade_item_estoque uie on icfe.DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque\n"
-                    + "	left join tbitem_estoque ie on ie.DFcod_item_estoque = uie.DFcod_item_estoque\n"
-                    + "	left join TBunidade un on uie.DFcod_unidade = un.DFcod_unidade\n"
-                    + "	left join TBtipo_tributacao tt on icfe.dftipo_tributacao = tt.dftipo_tributacao\n"
-                    + "where \n"
-                    + "	cfe.DFdata_emissao between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23) \n"
-                    + "	and DFcod_empresa_emitente = " + idLojaCliente + "\n"
-                    + "	order by data, numerocupom";
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String versao) throws Exception {
+            
+            if ("1".equals(versao)) {
+                this.sql
+                        = "select\n"
+                        + "icfe.dfid_item_nota_fiscal_saida_nfce as id,\n"
+                        + "	dfnumero as numerocupom,\n"
+                        + "	dfserie as ecf,\n"
+                        + "	convert(date, dfdata_emissao, 105) as data,\n"
+                        + "	ie.DFcod_item_estoque as produto,\n"
+                        + "	un.dfdescricao unidade,\n"
+                        + "	ie.dfdescricao as descricao,    \n"
+                        + "	coalesce(dfqtde, 0) as quantidade,\n"
+                        + "	coalesce(icfe.dfvalor_total, 0) as total,\n"
+                        + "	coalesce(icfe.DFpreco_unitario, 0) as precovenda,\n"
+                        + "	coalesce(icfe.DFvalor_desconto, 0) as desconto,"
+                        + "	case\n"
+                        + "		when LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque)) > 14 \n"
+                        + "		then SUBSTRING((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque), 4, LEN((select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) ))\n"
+                        + "	else (select top 1 dfcodigo_barra from TBcodigo_barra where DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque) end as codigobarras,\n"
+                        + "	icfe.DFcod_tributacao_st  as cst,\n"
+                        + "	icfe.dfaliquota_icms aliquota_icms,\n"
+                        + "	icfe.DFtipo_tributacao as tributacao\n"
+                        + "from\n"
+                        + "	TBitem_nota_fiscal_saida_nfce icfe\n"
+                        + "	left join TBnota_fiscal_saida_nfce cfe on icfe.DFid_nota_fiscal_saida_nfce = cfe.DFid_nota_fiscal_saida_nfce\n"
+                        + "	left join TBunidade_item_estoque uie on icfe.DFid_unidade_item_estoque = uie.DFid_unidade_item_estoque\n"
+                        + "	left join tbitem_estoque ie on ie.DFcod_item_estoque = uie.DFcod_item_estoque\n"
+                        + "	left join TBunidade un on uie.DFcod_unidade = un.DFcod_unidade\n"
+                        + "	left join TBtipo_tributacao tt on icfe.dftipo_tributacao = tt.dftipo_tributacao\n"
+                        + "where \n"
+                        + "	cfe.DFdata_emissao between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23) \n"
+                        + "	and DFcod_empresa_emitente = " + idLojaCliente + "\n"
+                        + "	order by data, numerocupom";
+            } else {
+                this.sql
+                        = "select\n"
+                        + "	v.DFid_cupom_fiscal as idvenda,\n"
+                        + "	i.DFid_item_cupom_fiscal as id,\n"
+                        + "	p.DFcod_item_estoque as idproduto,\n"
+                        + "     u.DFdescricao as tipoembalagem, \n"
+                        + "	i.DFqtde_venda_bruta as quantidade,\n"
+                        + "	i.DFvlr_venda_bruta as valor,\n"
+                        + "	i.DFvlr_custo_bruto as custo,\n"
+                        + "     (coalesce(i.DFvlr_venda_bruta, 0) * coalesce(i.DFqtde_venda_bruta, '1')) as total,\n"
+                        + "	i.DFvlr_acrescimo as acrescimo,\n"
+                        + "	i.DFvlr_desconto as desconto,\n"
+                        + "	i.DFcod_tributacao_st as cst,\n"
+                        + "	i.DFaliquota_icms as aliq\n"
+                        + "from TBitem_cupom_fiscal i\n"
+                        + "join TBunidade_item_estoque ie on ie.DFid_unidade_item_estoque = i.DFid_unidade_item_estoque \n"
+                        + "join TBitem_estoque p on p.DFcod_item_estoque = ie.DFcod_item_estoque \n"
+                        + "left join TBunidade u on u.DFcod_unidade = ie.DFcod_unidade \n"
+                        + "join TBcupom_fiscal v on v.DFid_cupom_fiscal = i.DFid_cupom_fiscal \n"
+                        + "join TBresumo_cupom_fiscal r on r.DFid_resumo_cupom_fiscal = v.DFid_resumo_cupom_fiscal \n"
+                        + "join TBcheck_out_empresa c on c.DFid_check_out_empresa = r.DFid_check_out_empresa \n"
+                        + "where c.DFcod_empresa = " + idLojaCliente + "\n"
+                        + "and r.DFdata_emissao between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23) \n";
+            }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
