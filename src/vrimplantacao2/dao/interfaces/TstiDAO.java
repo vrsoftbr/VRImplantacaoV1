@@ -121,31 +121,13 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	reducao,\n"
                     + "	p.natrec,\n"
                     + "	p.estqmax,\n"
-                    + "	case cst\n"
-                    + "	  when 0 then '40'\n"
-                    + "	  when 1 then '00'\n"
-                    + "	  when 4 then '40'\n"
-                    + "	  when 5 then '60'\n"
-                    + "	end cst,\n"
-                    + " case codst\n"
-                    + "	  when 1  then 18\n"
-                    + "	  when 2  then 7\n"
-                    + "	  when 3  then 12\n"
-                    + "	  when 4  then 25\n"
-                    + "	  when 5  then 0\n"
-                    + "	  when 6  then 0\n"
-                    + "	  when 23 then 11\n"
-                    + "	  when 24 then 4.5\n"
-                    + "	  when 25 then 4\n"
-                    + "	  when 26 then 4.7\n"
-                    + "	  when 27 then 13.3\n"
-                    + "	  when 28 then 4.32\n"
-                    + "	  when 29 then 1.14\n"
-                    + "	end aliquota,"
-                    //+ "	aliicms aliquota,\n"
+                    + "	c.codigo cst,\n"
+                    + "	i.aliquota,\n"
                     + "	reducao\n"
                     + "from\n"
-                    + "	tsl.tslc003 p"
+                    + "	tsl.tslc003 p\n"
+                    + "	join tslc035 i on i.SEQUENCIAL = p.CODST\n"
+                    + " join tslc036 c on i.SEQ036 = c.SEQ"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -474,12 +456,12 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "recseq, reccod, rectitulo, reccli,\n"
-                    + "recemiss, recvenci, recobs, recvalor,\n"
-                    + "recvalpag, recparc\n"
+                    + "  recseq, reccod, rectitulo, reccli,\n"
+                    + "  recemiss, recvenci, recobs, recvalor,\n"
+                    + "  recvalpag, recparc\n"
                     + "from tsl.tsm003\n"
                     + "where recbaixa <> 'S'\n"
-                    + "and recvenci <> '000-00-00'\n"
+                    + "  and horaest = ''"
                     + "order by recvenci desc"
             )) {
                 while (rst.next()) {
@@ -527,20 +509,22 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	 Cod_Classe codigo,\n"
-                    + "	 Descricao_Classe descricao,\n"
-                    + "	 Cst_Classe cst,\n"
-                    + "	 Ecf_Aliquota_Classe aliquota,\n"
-                    + "	 Nota_Reducao_Classe reducao\n"
-                    + "from tbl_classe"
+                    + "	  i.sequencial codigo,\n"
+                    + "	  i.descricao,\n"
+                    + "	  c.codigo cst,\n"
+                    + "	  i.aliquota,\n"
+                    + "	  0 reducao\n"
+                    + " from\n"
+                    + "   tslc035 i\n"
+                    + " join tslc036 c on i.SEQ036 = c.SEQ"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
                             rs.getString("codigo"),
                             rs.getString("descricao"),
                             Utils.stringToInt(rs.getString("cst")),
-                            Utils.stringToDouble(rs.getString("aliquota")),
-                            Utils.stringToDouble(rs.getString("reducao"))));
+                            rs.getInt("aliquota"),
+                            rs.getInt("reducao")));
                 }
             }
         }
