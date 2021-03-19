@@ -212,7 +212,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             String id = linha.getString("id");
             if (id != null && !"".equals(id.trim())) {
                 ProdutoIMP produto = new ProdutoIMP();
-
+            
                 produto.setImportSistema(getSistema());
                 produto.setImportLoja(getLojaOrigem());
                 produto.setImportId(id);
