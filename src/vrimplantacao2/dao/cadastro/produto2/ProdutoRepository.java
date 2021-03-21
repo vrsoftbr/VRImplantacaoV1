@@ -49,6 +49,7 @@ public class ProdutoRepository {
     private static final Logger LOG = Logger.getLogger(ProdutoRepository.class.getName());
 
     private final ProdutoRepositoryProvider provider;
+    private final ProdutoConverter converter;
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private boolean naoTransformarEANemUN = false;
@@ -62,6 +63,7 @@ public class ProdutoRepository {
     public ProdutoRepository(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
         this.divisoes = provider.getDivisoesAnteriores();
+        this.converter = new ProdutoConverter(provider);
     }
 
     public String getSistema() {
@@ -149,7 +151,7 @@ public class ProdutoRepository {
                                     throw new NumberFormatException("ID fora do intervalo permitido");
                                 }
                                 if (idStack.isIdCadastrado(id)) {
-                                    anterior = converterImpEmAnterior(imp);
+                                    anterior = converter.converterImpEmAnterior(imp);
                                     ProdutoVO produtoVO = new ProdutoVO();
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
@@ -188,7 +190,7 @@ public class ProdutoRepository {
 
                         ProdutoVO prod = converterIMP(imp, id, unidade, eBalanca);
 
-                        anterior = converterImpEmAnterior(imp);
+                        anterior = converter.converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
                         anterior.setDataHora(dataHoraImportacao);
                         anterior.setObsImportacao("PRODUTO NOVO - INSERIDO PELO METODO salvar DA CLASSE " + ProdutoRepository.class.getName().toString());
@@ -377,7 +379,7 @@ public class ProdutoRepository {
 
                         ProdutoVO prod = converterIMP(imp, id, unidade, eBalanca);
 
-                        anterior = converterImpEmAnterior(imp);
+                        anterior = converter.converterImpEmAnterior(imp);
                         anterior.setDataHoraAlteracao(dataHoraImportacao);
                         anterior.setCodigoAtual(prod);
 
@@ -687,7 +689,7 @@ public class ProdutoRepository {
                  * anterior deve ser registrado.
                  */
                 if (!provider.anterior().cadastrado(imp.getImportId())) {
-                    ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
+                    ProdutoAnteriorVO anterior = converter.converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
                     anterior.setDataHora(dataHoraImportacao);
 
@@ -1225,77 +1227,6 @@ public class ProdutoRepository {
         }
 
         return result;
-    }
-
-    /**
-     * Transforma os dados de {@link ProdutoIMP} em {@link ProdutoAnteriorVO}
-     *
-     * @param imp Produto de importação a ser transformado.
-     * @return Produto de importação transformado em produto anterior.
-     */
-    public ProdutoAnteriorVO converterImpEmAnterior(ProdutoIMP imp) {
-        ProdutoAnteriorVO destino = new ProdutoAnteriorVO();
-        destino.setImportSistema(imp.getImportSistema());
-        destino.setImportLoja(imp.getImportLoja());
-        destino.setImportId(imp.getImportId());
-        destino.setDescricao(imp.getDescricaoCompleta());
-        destino.setPisCofinsCredito(imp.getPiscofinsCstCredito());
-        destino.setPisCofinsDebito(imp.getPiscofinsCstDebito());
-        destino.setPisCofinsNaturezaReceita(imp.getPiscofinsNaturezaReceita());
-
-        destino.setIcmsCst(imp.getIcmsCst());
-        destino.setIcmsAliq(imp.getIcmsAliq());
-        destino.setIcmsReducao(imp.getIcmsReducao());
-
-        destino.setIcmsCstSaida(imp.getIcmsCstSaida());
-        destino.setIcmsAliqSaida(imp.getIcmsAliqSaida());
-        destino.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
-
-        destino.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaidaForaEstado());
-        destino.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaidaForaEstado());
-        destino.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaidaForaEstado());
-
-        destino.setIcmsCstSaidaForaEstadoNf(imp.getIcmsCstSaidaForaEstadoNF());
-        destino.setIcmsAliqSaidaForaEstadoNf(imp.getIcmsAliqSaidaForaEstadoNF());
-        destino.setIcmsReducaoSaidaForaEstadoNf(imp.getIcmsReducaoSaidaForaEstadoNF());
-
-        destino.setIcmsCstConsumidor(imp.getIcmsCstConsumidor());
-        destino.setIcmsAliqConsumidor(imp.getIcmsAliqConsumidor());
-        destino.setIcmsReducaoConsumidor(imp.getIcmsReducaoConsumidor());
-        
-        destino.setIcmsCstEntrada(imp.getIcmsCstEntrada());
-        destino.setIcmsAliqEntrada(imp.getIcmsAliqEntrada());
-        destino.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
-
-        destino.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntradaForaEstado());
-        destino.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntradaForaEstado());
-        destino.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
-
-        destino.setIcmsDebitoId(imp.getIcmsDebitoId());
-        destino.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoForaEstadoId());
-        destino.setIcmsDebitoForaEstadoIdNf(imp.getIcmsDebitoForaEstadoId());
-
-        destino.setIcmsCreditoId(imp.getIcmsCreditoId());
-        destino.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoForaEstadoId());
-
-        destino.setIcmsConsumidorId(imp.getIcmsConsumidorId());
-
-        destino.setEstoque(imp.getEstoque());
-        destino.seteBalanca(imp.isBalanca());
-        destino.setCustosemimposto(imp.getCustoSemImposto());
-        destino.setCustocomimposto(imp.getCustoComImposto());
-        destino.setMargem(imp.getMargem());
-        destino.setPrecovenda(imp.getPrecovenda());
-        destino.setNcm(imp.getNcm());
-        destino.setCest(imp.getCest());
-        destino.setContadorImportacao(0);
-        if (!"".equals(imp.getCodigoSped().trim())) {
-            destino.setCodigoSped(imp.getCodigoSped());
-        } else {
-            destino.setCodigoSped(imp.getImportId());
-        }
-        destino.setSituacaoCadastro(imp.getSituacaoCadastro());
-        return destino;
     }
 
     /**
