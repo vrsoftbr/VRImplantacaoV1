@@ -500,6 +500,10 @@ public class ProdutoRepository {
             }
         }
     }
+    
+    public void unificar2(List<ProdutoIMP> produtos) throws Exception {
+        
+    }
 
     /**
      * Unifica uma listagem de produtos no sistema.

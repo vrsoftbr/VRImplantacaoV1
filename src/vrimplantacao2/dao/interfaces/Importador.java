@@ -566,7 +566,7 @@ public class Importador {
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
         if (Parametros.OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva()) {
-            throw new UnsupportedOperationException("Funcionalidade ainda não implementada");
+            new ProdutoRepository(provider).unificar2(produtos);
         } else {
             new ProdutoRepository(provider).unificar(produtos);
         }
