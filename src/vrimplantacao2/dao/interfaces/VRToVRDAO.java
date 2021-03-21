@@ -16,10 +16,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.classe.ConexaoPostgres2;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -128,8 +128,12 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
+                    OpcaoProduto.MARGEM_MINIMA,
+                    OpcaoProduto.MARGEM_MAXIMA,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.MAPA_TRIBUTACAO
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.FABRICANTE,
+                    OpcaoProduto.NUMERO_PARCELA
                 }
         ));
     }
@@ -483,6 +487,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        
+        Versao versao = Versao.createFromConnectionInterface(ConexaoPostgres.getConexao());
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -514,7 +520,15 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vend.custosemimposto,\n" +
                     "	vend.custocomimposto,\n" +
                     "	vend.precovenda,\n" +
-                    " 	p.margem,\n" +
+                    (
+                            versao.igualOuMaiorQue(4) ?
+                                    
+                            " 	vend.margem,\n" +
+                            " 	vend.margemmaxima,\n" +
+                            " 	vend.margemminima,\n" :
+                                    
+                            " 	p.margem,\n"
+                    ) +
                     "	vend.id_situacaocadastro,\n" +
                     "	vend.descontinuado,\n" +
                     "	lpad(p.ncm1::varchar,4,'0') || lpad(p.ncm2::varchar,2,'0') || lpad(p.ncm3::varchar,2,'0') ncm,\n" +
@@ -532,7 +546,9 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	case when p.sugestaocotacao then 'S' else 'N' end as sugestaocotacao,\n" +
                     "	case when p.sugestaopedido then 'S' else 'N' end as sugestaopedido,\n" +
                     "	pad.desconto atacadodesconto,\n" +
-                    "	pf.id id_pautafiscal\n" +
+                    "	pf.id id_pautafiscal,\n" +
+                    "	p.id_fornecedorfabricante,\n" +
+                    "	p.numeroparcela\n" +
                     "from\n" +
                     "	produto p\n" +
                     "	join lj on true\n" +
@@ -593,6 +609,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setMargem(rs.getDouble("margem"));
+                    if (versao.igualOuMaiorQue(4)) {
+                        imp.setMargemMaxima(rs.getDouble("margemmaxima"));
+                        imp.setMargemMaxima(rs.getDouble("margemminima"));
+                    }
                     imp.setAtacadoPorcentagem(rs.getDouble("atacadodesconto"));
                     imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
                     imp.setDescontinuado(rs.getBoolean("descontinuado"));
@@ -610,6 +630,8 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsConsumidorId(rs.getString("id_aliquotaconsumidor"));
                     imp.setIcmsCreditoId(rs.getString("id_aliquotacredito"));
                     imp.setIcmsCreditoForaEstadoId(rs.getString("id_aliquotacreditoforaestado"));
+                    imp.setFornecedorFabricante(rs.getString("id_fornecedorfabricante"));
+                    imp.setNumeroparcela(rs.getInt("numeroparcela"));
 
                     result.add(imp);
                 }

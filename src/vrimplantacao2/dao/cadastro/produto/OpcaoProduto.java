@@ -168,6 +168,11 @@ public enum OpcaoProduto {
        public String toString() {
            return "Margem Mínima";
        }
+    }, MARGEM_MAXIMA {
+       @Override
+       public String toString() {
+           return "Margem Máxima";
+       }
     }, MARGEM {
         @Override
         public String toString() {

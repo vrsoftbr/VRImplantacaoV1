@@ -2,7 +2,6 @@ package vrimplantacao2.dao.cadastro.produto;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +9,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -26,6 +25,7 @@ public class ProdutoComplementoDAO {
     private static final Logger LOG = Logger.getLogger(ProdutoComplementoDAO.class.getName());
 
     private MultiMap<Integer, Integer> complementos;
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public MultiMap<Integer, Integer> getComplementos() throws Exception {
         if (complementos == null) {
@@ -74,7 +74,7 @@ public class ProdutoComplementoDAO {
                 sql.put("dataprimeiraentrada", vo.getDataPrimeiraAlteracao());
                 sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
                 
-                if (Versao.maiorQue(3, 21)) {
+                if (versao.igualOuMaiorQue(4)) {
                     sql.put("margemminima", vo.getMargemMinima());
                     sql.put("margemmaxima", vo.getMargemMaxima());
                     sql.put("margem", vo.getMargem());
@@ -107,7 +107,7 @@ public class ProdutoComplementoDAO {
                 sql.put("customediosemimpostoanterior", 0);
                 sql.put("id_tipopiscofinscredito", vo.getProduto().getPisCofinsCredito().getId());
                 sql.put("valoroutrassubstituicao", 0);
-                if (Versao.maiorQue(3, 17, 9)) {
+                if (versao.maiorQue(3, 17, 9)) {
                     sql.put("id_tipoproduto", vo.getTipoProduto().getId());
                     sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                 }
@@ -255,10 +255,16 @@ public class ProdutoComplementoDAO {
                 sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
                 sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
-            if (Versao.maiorQue(3, 21)) {
+            if (versao.igualOuMaiorQue(4)) {
                 if (opt.contains(OpcaoProduto.MARGEM)) {
                     sql.put("margem", complemento.getMargem());
                 }
+                if (opt.contains(OpcaoProduto.MARGEM_MAXIMA)) {
+                    sql.put("margemmaxima", complemento.getMargemMaxima());
+                }
+                if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
+                    sql.put("margemminima", complemento.getMargemMinima());
+                }   
             }
             if (opt.contains(OpcaoProduto.ESTOQUE)) {
                 if (opt.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {
