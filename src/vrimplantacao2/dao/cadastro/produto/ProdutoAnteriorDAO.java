@@ -965,6 +965,39 @@ public class ProdutoAnteriorDAO {
 
         return result;
     }
+    
+    /**
+     * Retorna o código atual dos produtos através do código de importação.
+     *
+     * @param sistema Código do sistema importado.
+     * @param loja Código da loja importada.
+     * @return {@link Map} com os códigos dos produtos mapeados com os códigos
+     * anteriores.
+     * @throws Exception
+     */
+    public Map<String, Integer> getAnterioresIncluindoComCodigoAtualNull(String sistema, String loja) throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	ant.impid,\n"
+                    + "	ant.codigoatual\n"
+                    + "from\n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "where\n"
+                    + "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "	ant.imploja = " + SQLUtils.stringSQL(loja) + "\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("impid"), rst.getInt("codigoatual"));
+                }
+            }
+        }
+
+        return result;
+    }
 
     public Map<String, ProdutoAnteriorVO> getAnterior(String sistema) throws Exception {
         Map<String, ProdutoAnteriorVO> result = new HashMap<>();

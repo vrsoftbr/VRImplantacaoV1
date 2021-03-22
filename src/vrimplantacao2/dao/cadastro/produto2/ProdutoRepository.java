@@ -504,7 +504,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
     }
     
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
-        
+        new UnificadorProdutoRepository(provider).unificar(produtos);        
     }
 
     /**

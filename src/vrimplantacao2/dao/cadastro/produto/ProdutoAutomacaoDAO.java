@@ -233,4 +233,21 @@ public class ProdutoAutomacaoDAO {
             }
         }
     }
+
+    public Map<Long, Integer> getProdutosByEan() throws Exception {
+        Map<Long, Integer> result = new HashMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id_produto, codigobarras from produtoautomacao"
+            )) {
+                while (rst.next()) {
+                    result.put(
+                            rst.getLong("codigobarras"),
+                            rst.getInt("id_produto")
+                    );
+                }
+            }
+        }
+        return result;
+    }
 }
