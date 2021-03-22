@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -26,6 +27,8 @@ import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
 import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
@@ -306,6 +309,30 @@ public class ProdutoRepositoryTest {
         
         return imp;
     }
+
+    @Test
+    public void testConverterEAN_MOCA() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        ProdutoAutomacaoVO actual = new ProdutoRepository(provider).converterEAN(imp, 7891000100103L, TipoEmbalagem.UN);
+        assertEquals(7891000100103l, actual.getCodigoBarras());
+        assertEquals(TipoEmbalagem.UN, actual.getTipoEmbalagem());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertFalse(actual.isDun14());
+        assertEquals(-1, actual.getId()); //Não é para retornar nada
+        assertNull(actual.getProduto());
+    }
+    
+    @Test
+    public void testConverterEAN_ACEM() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_ACEM();
+        ProdutoAutomacaoVO actual = new ProdutoRepository(provider).converterEAN(imp, 18, TipoEmbalagem.KG);
+        assertEquals(18, actual.getCodigoBarras());
+        assertEquals(TipoEmbalagem.KG, actual.getTipoEmbalagem());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertFalse(actual.isDun14());
+        assertEquals(-1, actual.getId()); //Não é para retornar nada
+        assertNull(actual.getProduto());
+    }
     
     @Test
     public void testConverterComplemento_MOCA() throws Exception {
@@ -465,6 +492,88 @@ public class ProdutoRepositoryTest {
         assertEquals("18%", actual.getAliquotaConsumidor().getDescricao());
         assertEquals(0, actual.getAliquotaConsumidor().getReduzido(), 0.01);
         assertEquals(18, actual.getAliquotaConsumidor().getAliquota(), 0.01);    
+    }
+    
+    @Test
+    public void testConverterAnterior_MOCA() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        ProdutoAnteriorVO actual = new ProdutoRepository(provider).converterImpEmAnterior(imp);
+        
+        assertEquals("17.020.00", actual.getCest());
+        assertArrayEquals(new String[] { "TESTE", "LOJA 02", "12345" }, actual.getChave());
+        assertNull(actual.getCodigoAtual());
+        assertEquals(0, actual.getContadorImportacao());
+        assertEquals(4.02d, actual.getCustocomimposto(), 0.01);
+        assertEquals(3.65d, actual.getCustosemimposto(), 0.01);
+        assertEquals("LEITE CONDENSADO CREMOSO MOCA LATA 395G", actual.getDescricao());
+        assertEquals(568, actual.getEstoque(), 0.01);
+        assertEquals(18d, actual.getIcmsAliq(), 0.1);
+        assertEquals(20, actual.getIcmsCst());
+        assertEquals(61.11d, actual.getIcmsReducao(), 0.01);
+        assertEquals("12345", actual.getImportId());
+        assertEquals("LOJA 02", actual.getImportLoja());
+        assertEquals("TESTE", actual.getImportSistema());
+        assertEquals(70, actual.getMargem(), 0.0);
+        assertEquals("0402.99.00", actual.getNcm());
+        assertEquals(71, actual.getPisCofinsCredito());
+        assertEquals(7, actual.getPisCofinsDebito());
+        assertEquals(101, actual.getPisCofinsNaturezaReceita());
+        assertEquals(7.12d, actual.getPrecovenda(),0.01);
+    }
+    
+    @Test
+    public void testConverterAnterior_ACEM() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_ACEM();
+        ProdutoAnteriorVO actual = new ProdutoRepository(provider).converterImpEmAnterior(imp);
+        
+        assertEquals("17.083.00", actual.getCest());
+        assertArrayEquals(new String[] { "TESTE", "LOJA 02", "3214" }, actual.getChave());
+        assertNull(actual.getCodigoAtual());
+        assertEquals(0, actual.getContadorImportacao());
+        assertEquals(14.02d, actual.getCustocomimposto(), 0.01);
+        assertEquals(13.65d, actual.getCustosemimposto(), 0.01);
+        assertEquals("ACEM BOVINO KG", actual.getDescricao());
+        assertEquals(568, actual.getEstoque(), 0.01);
+        assertEquals(18d, actual.getIcmsAliq(), 0.1);
+        assertEquals(0, actual.getIcmsCst());
+        assertEquals(0, actual.getIcmsReducao(), 0.01);
+        assertEquals("3214", actual.getImportId());
+        assertEquals("LOJA 02", actual.getImportLoja());
+        assertEquals("TESTE", actual.getImportSistema());
+        assertEquals(70, actual.getMargem(), 0.0);
+        assertEquals("0210.20.00", actual.getNcm());
+        assertEquals(73, actual.getPisCofinsCredito());
+        assertEquals(6, actual.getPisCofinsDebito());
+        assertEquals(121, actual.getPisCofinsNaturezaReceita());
+        assertEquals(17.12d, actual.getPrecovenda(),0.01);
+    }
+    
+    @Test
+    public void testConverterEANAnterior_MOCA() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        ProdutoAnteriorEanVO actual = new ProdutoRepository(provider).converterAnteriorEAN(imp);
+        
+        assertEquals("7891000100103", actual.getEan());
+        assertEquals("12345", actual.getImportId());
+        assertEquals("LOJA 02", actual.getImportLoja());
+        assertEquals("TESTE", actual.getImportSistema());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertEquals("UN", actual.getTipoEmbalagem());
+        assertEquals(0, actual.getValor(), 0.01);
+    }
+    
+    @Test
+    public void testConverterEANAnterior_ACEM() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_ACEM();
+        ProdutoAnteriorEanVO actual = new ProdutoRepository(provider).converterAnteriorEAN(imp);
+        
+        assertEquals("18", actual.getEan());
+        assertEquals("3214", actual.getImportId());
+        assertEquals("LOJA 02", actual.getImportLoja());
+        assertEquals("TESTE", actual.getImportSistema());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertEquals("KG", actual.getTipoEmbalagem());
+        assertEquals(0, actual.getValor(), 0.01);
     }
     
     @Test

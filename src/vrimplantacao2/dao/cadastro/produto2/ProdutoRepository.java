@@ -49,7 +49,6 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
     private static final Logger LOG = Logger.getLogger(ProdutoRepository.class.getName());
 
     private final ProdutoRepositoryProvider provider;
-    private final ProdutoConverter converter;
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private boolean naoTransformarEANemUN = false;
@@ -63,7 +62,6 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
     public ProdutoRepository(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
         this.divisoes = provider.getDivisoesAnteriores();
-        this.converter = new ProdutoConverter(provider);
     }
 
     public String getSistema() {
@@ -93,7 +91,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
              * Organizando a listagem de dados antes de efetuar a gravação.
              */
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this, getOpcoes()).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -151,7 +149,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                                     throw new NumberFormatException("ID fora do intervalo permitido");
                                 }
                                 if (idStack.isIdCadastrado(id)) {
-                                    anterior = converter.converterImpEmAnterior(imp);
+                                    anterior = converterImpEmAnterior(imp);
                                     ProdutoVO produtoVO = new ProdutoVO();
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
@@ -190,7 +188,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
 
                         ProdutoVO prod = converterIMP(imp, id, unidade, eBalanca);
 
-                        anterior = converter.converterImpEmAnterior(imp);
+                        anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
                         anterior.setDataHora(dataHoraImportacao);
                         anterior.setObsImportacao("PRODUTO NOVO - INSERIDO PELO METODO salvar DA CLASSE " + ProdutoRepository.class.getName().toString());
@@ -225,14 +223,14 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
 
                     if (id > 0 && ean > 0) { //ID e EAN válidos
                         if (!provider.automacao().cadastrado(ean)) {
-                            ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
+                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(anterior.getCodigoAtual());
                             provider.automacao().salvar(automacao);
                         }
                     }
 
                     if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                        ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
+                        ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
                         provider.eanAnterior().salvar(eanAnterior);
                     }
 
@@ -284,7 +282,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
             provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this, getOpcoes()).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
@@ -379,7 +377,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
 
                         ProdutoVO prod = converterIMP(imp, id, unidade, eBalanca);
 
-                        anterior = converter.converterImpEmAnterior(imp);
+                        anterior = converterImpEmAnterior(imp);
                         anterior.setDataHoraAlteracao(dataHoraImportacao);
                         anterior.setCodigoAtual(prod);
 
@@ -390,7 +388,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                         complemento.setProduto(prod);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
-                        ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
+                        ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                         automacao.setProduto(prod);
 
                         ProdutoAutomacaoLojaVO precoAtacadoLoja = converterProdutoAutomacaoLoja(imp);
@@ -411,7 +409,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                             }
 
                             if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                                ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
+                                ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
                                 provider.eanAnterior().salvar(eanAnterior);
                             }
                         }
@@ -502,10 +500,6 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
             }
         }
     }
-    
-    public void unificar2(List<ProdutoIMP> produtos) throws Exception {
-        new UnificadorProdutoRepository(provider).unificar(produtos);        
-    }
 
     /**
      * Unifica uma listagem de produtos no sistema.
@@ -520,7 +514,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
         provider.begin();
         try {
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this, getOpcoes()).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -655,7 +649,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                                 if (forcarNovo) { 
                                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
                                     gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
-                                    ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
+                                    ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                                     automacao.setProduto(codigoAtual);
                                     provider.automacao().salvar(automacao);
                                 }
@@ -667,7 +661,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                          * Cadastra o EAN no sistema.
                          */
                         if (codigoAtual != null) {
-                            ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
+                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
 
@@ -689,7 +683,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                  * anterior deve ser registrado.
                  */
                 if (!provider.anterior().cadastrado(imp.getImportId())) {
-                    ProdutoAnteriorVO anterior = converter.converterImpEmAnterior(imp);
+                    ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
                     anterior.setDataHora(dataHoraImportacao);
 
@@ -701,7 +695,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                     provider.anterior().salvar(anterior);
                 }
                 if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                    ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
+                    ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
                     provider.eanAnterior().salvar(eanAnterior);
                 }
 
@@ -960,6 +954,24 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
         return complemento;
     }
 
+    /**
+     * Converte um {@link ProdutoIMP} em um {@link ProdutoAnteriorEanVO}.
+     *
+     * @param imp {@link ProdutoIMP} a ser convertido.
+     * @return {@link ProdutoAnteriorEanVO} convertido.
+     */
+    public ProdutoAnteriorEanVO converterAnteriorEAN(ProdutoIMP imp) {
+        ProdutoAnteriorEanVO eanAnterior = new ProdutoAnteriorEanVO();
+        eanAnterior.setImportSistema(imp.getImportSistema());
+        eanAnterior.setImportLoja(imp.getImportLoja());
+        eanAnterior.setImportId(imp.getImportId());
+        eanAnterior.setEan(imp.getEan());
+        eanAnterior.setQtdEmbalagem(imp.getQtdEmbalagem());
+        eanAnterior.setTipoEmbalagem(imp.getTipoEmbalagem());
+        eanAnterior.setValor(0);
+        return eanAnterior;
+    }
+
     private Map<String, Integer> fabricantes = null;
     private Map<String, Integer> compradores = null;
     private Map<String, Integer> codigosAnp = null;
@@ -1209,6 +1221,96 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
         }
 
         return result;
+    }
+
+    /**
+     * Transforma os dados de {@link ProdutoIMP} em {@link ProdutoAnteriorVO}
+     *
+     * @param imp Produto de importação a ser transformado.
+     * @return Produto de importação transformado em produto anterior.
+     */
+    public ProdutoAnteriorVO converterImpEmAnterior(ProdutoIMP imp) {
+        ProdutoAnteriorVO destino = new ProdutoAnteriorVO();
+        destino.setImportSistema(imp.getImportSistema());
+        destino.setImportLoja(imp.getImportLoja());
+        destino.setImportId(imp.getImportId());
+        destino.setDescricao(imp.getDescricaoCompleta());
+        destino.setPisCofinsCredito(imp.getPiscofinsCstCredito());
+        destino.setPisCofinsDebito(imp.getPiscofinsCstDebito());
+        destino.setPisCofinsNaturezaReceita(imp.getPiscofinsNaturezaReceita());
+
+        destino.setIcmsCst(imp.getIcmsCst());
+        destino.setIcmsAliq(imp.getIcmsAliq());
+        destino.setIcmsReducao(imp.getIcmsReducao());
+
+        destino.setIcmsCstSaida(imp.getIcmsCstSaida());
+        destino.setIcmsAliqSaida(imp.getIcmsAliqSaida());
+        destino.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
+
+        destino.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaidaForaEstado());
+        destino.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaidaForaEstado());
+        destino.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaidaForaEstado());
+
+        destino.setIcmsCstSaidaForaEstadoNf(imp.getIcmsCstSaidaForaEstadoNF());
+        destino.setIcmsAliqSaidaForaEstadoNf(imp.getIcmsAliqSaidaForaEstadoNF());
+        destino.setIcmsReducaoSaidaForaEstadoNf(imp.getIcmsReducaoSaidaForaEstadoNF());
+
+        destino.setIcmsCstConsumidor(imp.getIcmsCstConsumidor());
+        destino.setIcmsAliqConsumidor(imp.getIcmsAliqConsumidor());
+        destino.setIcmsReducaoConsumidor(imp.getIcmsReducaoConsumidor());
+        
+        destino.setIcmsCstEntrada(imp.getIcmsCstEntrada());
+        destino.setIcmsAliqEntrada(imp.getIcmsAliqEntrada());
+        destino.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
+
+        destino.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntradaForaEstado());
+        destino.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntradaForaEstado());
+        destino.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
+
+        destino.setIcmsDebitoId(imp.getIcmsDebitoId());
+        destino.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoForaEstadoId());
+        destino.setIcmsDebitoForaEstadoIdNf(imp.getIcmsDebitoForaEstadoId());
+
+        destino.setIcmsCreditoId(imp.getIcmsCreditoId());
+        destino.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoForaEstadoId());
+
+        destino.setIcmsConsumidorId(imp.getIcmsConsumidorId());
+
+        destino.setEstoque(imp.getEstoque());
+        destino.seteBalanca(imp.isBalanca());
+        destino.setCustosemimposto(imp.getCustoSemImposto());
+        destino.setCustocomimposto(imp.getCustoComImposto());
+        destino.setMargem(imp.getMargem());
+        destino.setPrecovenda(imp.getPrecovenda());
+        destino.setNcm(imp.getNcm());
+        destino.setCest(imp.getCest());
+        destino.setContadorImportacao(0);
+        if (!"".equals(imp.getCodigoSped().trim())) {
+            destino.setCodigoSped(imp.getCodigoSped());
+        } else {
+            destino.setCodigoSped(imp.getImportId());
+        }
+        destino.setSituacaoCadastro(imp.getSituacaoCadastro());
+        return destino;
+    }
+
+    /**
+     * Converte {@link ProdutoIMP} em {@link ProdutoAutomacaoVO} e inclui no
+     * {@link ProdutoVO}.
+     *
+     * @param imp {@link ProdutoIMP} de origem.
+     * @param ean EAN que será gravado.
+     * @param unidade
+     * @return {@link ProdutoAutomacaoVO} convertido;
+     */
+    public ProdutoAutomacaoVO converterEAN(ProdutoIMP imp, long ean, TipoEmbalagem unidade) {
+        ProdutoAutomacaoVO automacao = new ProdutoAutomacaoVO();
+        automacao.setCodigoBarras(ean);
+        automacao.setPesoBruto(imp.getPesoBruto());
+        automacao.setQtdEmbalagem(imp.getQtdEmbalagem());
+        automacao.setTipoEmbalagem(unidade);
+        automacao.setDun14(String.valueOf(automacao.getCodigoBarras()).length() > 13);
+        return automacao;
     }
 
     public void notificar() throws Exception {
