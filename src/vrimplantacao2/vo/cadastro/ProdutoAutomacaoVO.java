@@ -28,6 +28,15 @@ public class ProdutoAutomacaoVO {
     public void setProduto(ProdutoVO produto) {
         this.produto = produto;
     }
+    
+    public void setProduto(Integer idProduto) {
+        if (idProduto != null) {
+            this.produto = new ProdutoVO();
+            this.produto.setId(idProduto);
+        } else {
+            this.produto = null;
+        }
+    }
 
     public long getCodigoBarras() {
         return codigoBarras;

@@ -7,6 +7,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
+import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -36,8 +38,8 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         produtos = filtrarProdutosEEansJaMapeados(produtos);
         System.gc();        
         
-        gravarProdutosComEanInvalido(produtos);        
-        List<ProdutoIMP> produtosVinculadosComNovosEans         = filtrarProdutosVinculadosComNovosEans(produtos);
+        gravarProdutosComEanInvalido(produtos);
+        gravarProdutosVinculadosComNovosEans(produtos);
         List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);        
         List<ProdutoIMP> produtosNaoVinculadosComEansNovos      = filtrarProdutosNaoVinculadosComEansNovos(produtos);
         System.gc();        
@@ -87,7 +89,25 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
         provider.eanAnterior().salvar(eanAnterior);
         this.codigosAnterioresIdEan.put(codigoAtual, eanAnterior.getImportId(), eanAnterior.getEan());
-    }    
+    }
+    
+    void gravarProdutosVinculadosComNovosEans(List<ProdutoIMP> produtos) throws Exception {        
+        List<ProdutoIMP> produtosVinculadosComNovosEans = filtrarProdutosVinculadosComNovosEans(produtos);
+        
+        for (ProdutoIMP imp: produtosVinculadosComNovosEans) {
+            long ean = Utils.stringToLong(imp.getEan());
+            TipoEmbalagem unidade = TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagem());
+            ProdutoAutomacaoVO produtoAutomacao = this.converter.converterEAN(imp, ean, unidade);
+            int idProduto = this.codant.get(imp.getImportId());
+            produtoAutomacao.setProduto(idProduto);
+            
+            provider.automacao().salvar(produtoAutomacao);
+            this.produtosPorEan.put(produtoAutomacao.getCodigoBarras(), produtoAutomacao.getProduto().getId());
+            
+            gravarEanAnterior(imp, idProduto);
+            
+        }
+    }
     
     List<ProdutoIMP> filtrarProdutosVinculadosComNovosEans(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();

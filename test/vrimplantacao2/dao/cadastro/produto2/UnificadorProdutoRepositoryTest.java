@@ -17,6 +17,7 @@ import org.mockito.stubbing.Answer;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
+import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -133,22 +134,22 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("145", "ALFACE", "78965412"));
         produtos.add(aux.impForTest("146", "COUVE", "789456321"));
         
-        assertEquals(1, databaseMock.codAntProdutoTable.size());
-        assertEquals(0, databaseMock.codAntProdutoEanTable.size());
-        assertEquals("6", databaseMock.codAntProdutoTable.get(0).getImportId());
+        assertEquals(1, databaseMock.implantacao_codant_produto.size());
+        assertEquals(0, databaseMock.implantacao_codant_ean.size());
+        assertEquals("6", databaseMock.implantacao_codant_produto.get(0).getImportId());
         
         new UnificadorProdutoRepository(provider).gravarProdutosComEanInvalido(produtos);
         
-        assertEquals(3, databaseMock.codAntProdutoTable.size());
-        assertEquals("6", databaseMock.codAntProdutoTable.get(0).getImportId());
-        assertEquals("2", databaseMock.codAntProdutoTable.get(1).getImportId());
-        assertEquals("5", databaseMock.codAntProdutoTable.get(2).getImportId());
+        assertEquals(3, databaseMock.implantacao_codant_produto.size());
+        assertEquals("6", databaseMock.implantacao_codant_produto.get(0).getImportId());
+        assertEquals("2", databaseMock.implantacao_codant_produto.get(1).getImportId());
+        assertEquals("5", databaseMock.implantacao_codant_produto.get(2).getImportId());
         
-        assertEquals(4, databaseMock.codAntProdutoEanTable.size());
-        assertEquals("345", databaseMock.codAntProdutoEanTable.get(0).getEan());
-        assertEquals("45", databaseMock.codAntProdutoEanTable.get(1).getEan());
-        assertEquals("698", databaseMock.codAntProdutoEanTable.get(2).getEan());
-        assertEquals("789452", databaseMock.codAntProdutoEanTable.get(3).getEan());
+        assertEquals(4, databaseMock.implantacao_codant_ean.size());
+        assertEquals("345", databaseMock.implantacao_codant_ean.get(0).getEan());
+        assertEquals("45", databaseMock.implantacao_codant_ean.get(1).getEan());
+        assertEquals("698", databaseMock.implantacao_codant_ean.get(2).getEan());
+        assertEquals("789452", databaseMock.implantacao_codant_ean.get(3).getEan());
         
     }
     
@@ -197,31 +198,14 @@ public class UnificadorProdutoRepositoryTest {
     @Test
     public void testFiltrarProdutosVinculadosComNovosEans() throws Exception {
         
-        when(provider.anterior().getAnterioresIncluindoComCodigoAtualNull()).then(
-                new Answer<Map<String, Integer>>() {
-                    @Override
-                    public Map<String, Integer> answer(InvocationOnMock invocation) throws Throwable {
-                        Map<String, Integer> mp = new HashMap<>();
-                        mp.put("1", 1);
-                        mp.put("52", 2);
-                        mp.put("145", 3);
-                        mp.put("10", 5);
-                        mp.put("200", 4);
-                        return mp;
-                    }
-                }
-        );
-        when(provider.automacao().getProdutosByEan()).then(
-                new Answer<Map<Long, Integer>>() {
-                    @Override
-                    public Map<Long, Integer> answer(InvocationOnMock invocation) throws Throwable {
-                        Map<Long, Integer> mp = new HashMap<>();
-                        mp.put(7891000100103L, 1);
-                        mp.put(9874563L, 10);
-                        return mp;
-                    }
-                }
-        );
+        DatabaseMock db = new DatabaseMock(provider);
+        db.addProdutoAnterior("1", "", 1);
+        db.addProdutoAnterior("52", "", 2);
+        db.addProdutoAnterior("145", "", 3);
+        db.addProdutoAnterior("10", "", 4);
+        db.addProdutoAnterior("200", "", 5);        
+        db.addProdutoAutomacao(1, 7891000100103L);
+        db.addProdutoAutomacao(10, 9874563L);
         
         TestAux aux = new TestAux();
         List<ProdutoIMP> produtos = new ArrayList<>();
@@ -241,6 +225,45 @@ public class UnificadorProdutoRepositoryTest {
         assertEquals("17891000100103", produtosVinculadosComNovosEans.get(0).getEan());
         assertEquals("10", produtosVinculadosComNovosEans.get(1).getImportId());
         assertEquals("0007896541", produtosVinculadosComNovosEans.get(1).getEan());
+    }
+    
+    @Test
+    public void testGravarProdutoVinculadosComNovosEans() throws Exception {
+        
+        DatabaseMock db = new DatabaseMock(provider);
+        db.addProdutoAnterior("1", "", 1);
+        db.addProdutoAnterior("52", "", 2);
+        db.addProdutoAnterior("145", "", 3);
+        db.addProdutoAnterior("10", "", 4);
+        db.addProdutoAnterior("200", "", 5);        
+        db.addProdutoAutomacao(1, 7891000100103L);
+        db.addProdutoAutomacao(10, 9874563L);
+        
+        TestAux aux = new TestAux();
+        List<ProdutoIMP> produtos = new ArrayList<>();
+        
+        produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        
+        assertEquals(5, db.implantacao_codant_produto.size());
+        assertEquals(2, db.public_produtoautomacao.size());
+        assertEquals(0, db.implantacao_codant_ean.size());
+        new UnificadorProdutoRepository(provider).gravarProdutosVinculadosComNovosEans(produtos);
+        assertEquals(5, db.implantacao_codant_produto.size());
+        assertEquals(4, db.public_produtoautomacao.size());
+        assertEquals(2, db.implantacao_codant_ean.size());
+        
+        assertEquals("1", db.implantacao_codant_ean.get(0).getImportId());
+        assertEquals("17891000100103", db.implantacao_codant_ean.get(0).getEan());
+        assertEquals("10", db.implantacao_codant_ean.get(1).getImportId());
+        assertEquals("0007896541", db.implantacao_codant_ean.get(1).getEan());
+        
+        assertEquals(17891000100103L, db.public_produtoautomacao.get(2).getCodigoBarras());
+        assertEquals(7896541L, db.public_produtoautomacao.get(3).getCodigoBarras());
     }
     
 }
@@ -267,23 +290,27 @@ class DatabaseMock {
     private final ProdutoRepositoryProvider provider;
     private final ProdutoRepositoryProvider.Anterior anterior;
     private final ProdutoRepositoryProvider.EanAnterior eanAnterior;
+    private final ProdutoRepositoryProvider.Automacao automacao;
 
-    List<ProdutoAnteriorVO> codAntProdutoTable = new ArrayList<>();
-    List<ProdutoAnteriorEanVO> codAntProdutoEanTable = new ArrayList<>();
+    List<ProdutoAnteriorVO> implantacao_codant_produto = new ArrayList<>();
+    List<ProdutoAnteriorEanVO> implantacao_codant_ean = new ArrayList<>();
+    List<ProdutoAutomacaoVO> public_produtoautomacao = new ArrayList<>();
 
     public DatabaseMock(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
         this.anterior = provider.anterior();
-        this.eanAnterior = provider.eanAnterior();            
+        this.eanAnterior = provider.eanAnterior();
+        this.automacao = provider.automacao();
         setAnteriorMock();
         setEanAnteriorMock();
+        setAutomacaoMock();
     }
 
     private void setAnteriorMock() throws Exception {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                codAntProdutoTable.add(invocation.getArgumentAt(0, ProdutoAnteriorVO.class));
+                implantacao_codant_produto.add(invocation.getArgumentAt(0, ProdutoAnteriorVO.class));
                 return null;
             }
         }).when(anterior).salvar(any(ProdutoAnteriorVO.class));
@@ -292,7 +319,7 @@ class DatabaseMock {
             @Override
             public Map<String, Integer> answer(InvocationOnMock invocation) throws Throwable {
                 Map<String, Integer> mp = new HashMap<>();
-                for (ProdutoAnteriorVO ant: DatabaseMock.this.codAntProdutoTable) {
+                for (ProdutoAnteriorVO ant: DatabaseMock.this.implantacao_codant_produto) {
                     mp.put(
                             ant.getImportId(),
                             (ant.getCodigoAtual() == null ? null : ant.getCodigoAtual().getId())
@@ -308,10 +335,43 @@ class DatabaseMock {
         doAnswer(new Answer<Void>() {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                DatabaseMock.this.codAntProdutoEanTable.add(invocation.getArgumentAt(0, ProdutoAnteriorEanVO.class));
+                DatabaseMock.this.implantacao_codant_ean.add(invocation.getArgumentAt(0, ProdutoAnteriorEanVO.class));
                 return null;
             }
         }).when(eanAnterior).salvar(any(ProdutoAnteriorEanVO.class));
+    }
+    
+    private void setAutomacaoMock() throws Exception {
+        doAnswer(new Answer<Map<Long, Integer>>() {
+            @Override
+            public Map<Long, Integer> answer(InvocationOnMock invocation) throws Throwable {
+                Map<Long, Integer> mp = new HashMap<>();
+                for (ProdutoAutomacaoVO ean: DatabaseMock.this.public_produtoautomacao) {
+                    mp.put(
+                            ean.getCodigoBarras(),
+                            ean.getProduto().getId()
+                    );
+                }
+                return mp;
+            }
+        }).when(automacao).getProdutosByEan();
+        
+        doAnswer(new Answer<Void>() {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable {
+                DatabaseMock.this.public_produtoautomacao.add(invocation.getArgumentAt(0, ProdutoAutomacaoVO.class));
+                return null;
+            }
+        }).when(automacao).salvar(any(ProdutoAutomacaoVO.class));
+    }
+    
+    public void addProdutoAutomacao(int id, long ean) {
+        ProdutoAutomacaoVO produtoAutomacao = new ProdutoAutomacaoVO();
+        final ProdutoVO prod = new ProdutoVO();
+        prod.setId(id);
+        produtoAutomacao.setProduto(prod);
+        produtoAutomacao.setCodigoBarras(ean);
+        this.public_produtoautomacao.add(produtoAutomacao);
     }
 
     public void addProdutoAnterior(String id, String descricao, Integer codigoAtual) {
@@ -320,10 +380,7 @@ class DatabaseMock {
         ant.setImportLoja(provider.getLoja());
         ant.setImportId(id);
         ant.setDescricao(descricao);
-        if (codigoAtual != null) {
-            ProdutoVO vo = new ProdutoVO();
-            vo.setId(codigoAtual);
-        }
-        this.codAntProdutoTable.add(ant);
+        ant.setCodigoAtual(codigoAtual);
+        this.implantacao_codant_produto.add(ant);
     }
 }

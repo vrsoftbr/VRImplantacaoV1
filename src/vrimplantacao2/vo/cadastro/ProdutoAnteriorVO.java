@@ -466,6 +466,15 @@ public class ProdutoAnteriorVO {
     public void setCodigoAtual(ProdutoVO codigoAtual) {
         this.codigoAtual = codigoAtual;
     }
+    
+    public void setCodigoAtual(Integer codigoAtual) {
+        if (codigoAtual == null) {
+            this.codigoAtual = null;
+        } else {
+            this.codigoAtual = new ProdutoVO();
+            this.codigoAtual.setId(codigoAtual);
+        }
+    }
 
     public int getPisCofinsCredito() {
         return pisCofinsCredito;
