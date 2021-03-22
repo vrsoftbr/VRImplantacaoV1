@@ -301,6 +301,50 @@ public class UnificadorProdutoRepositoryTest {
         
     }
     
+    @Test
+    public void testGravarProdutosNaoVinculadosComEansExistentes() throws Exception {
+        DatabaseMock db = new DatabaseMock(provider);
+        db.addProdutoAnterior("1", "", 1);
+        db.addProdutoAnterior("52", "", 2);
+        db.addProdutoAnterior("145", "", 3);
+        db.addProdutoAnterior("10", "", 4);
+        db.addProdutoAnterior("200", "", 5);        
+        db.addProdutoAutomacao(1, 7891000100103L);
+        db.addProdutoAutomacao(1, 17891000100103L);
+        db.addProdutoAutomacao(10, 9874563L);
+        db.addProdutoAutomacao(10, 7896541L);
+        db.addProdutoAutomacao(25, 12345678L);
+        db.addProdutoAutomacao(29, 784512963L);
+        
+        TestAux aux = new TestAux();
+        List<ProdutoIMP> produtos = new ArrayList<>();
+        
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("456321", "CAD MANUAL", "000012345678"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        produtos.add(aux.impForTest("789451A", "CAD MANUAL", "784512963L"));
+        
+        assertEquals(5, db.implantacao_codant_produto.size());
+        assertEquals(0, db.implantacao_codant_ean.size());
+        assertEquals(6, db.public_produtoautomacao.size());
+        
+        new UnificadorProdutoRepository(provider).gravarProdutosNaoVinculadosComEansExistentes(produtos);
+        
+        assertEquals(8, db.implantacao_codant_produto.size());
+        assertEquals(3, db.implantacao_codant_ean.size());
+        assertEquals(6, db.public_produtoautomacao.size());
+        
+        assertEquals("456321", db.implantacao_codant_produto.get(5).getImportId());
+        assertEquals("1000", db.implantacao_codant_produto.get(6).getImportId());
+        assertEquals("789451A", db.implantacao_codant_produto.get(7).getImportId());
+        
+        assertEquals("000012345678", db.implantacao_codant_ean.get(0).getEan());
+        assertEquals("0009874563", db.implantacao_codant_ean.get(1).getEan());
+        assertEquals("784512963L", db.implantacao_codant_ean.get(2).getEan());
+    }
+    
 }
 
 class TestAux {

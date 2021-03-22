@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.produto2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import vr.core.utils.StringUtils;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
@@ -40,7 +41,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         
         gravarProdutosComEanInvalido(produtos);
         gravarProdutosVinculadosComNovosEans(produtos);
-        List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);        
+        gravarProdutosNaoVinculadosComEansExistentes(produtos);
         List<ProdutoIMP> produtosNaoVinculadosComEansNovos      = filtrarProdutosNaoVinculadosComEansNovos(produtos);
         System.gc();        
         
@@ -127,6 +128,15 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         return this.produtosPorEan.containsKey(Utils.stringToLong(imp.getEan()));
     }
     
+    public void gravarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) throws Exception {
+        List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);
+        
+        for (ProdutoIMP imp: produtosNaoVinculadosComEansExistentes) {
+            int idProduto = this.produtosPorEan.get(StringUtils.toLong(imp.getEan()));
+            gravarAnterior(imp, idProduto);
+            gravarEanAnterior(imp, idProduto);
+        }
+    }
     List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
         for (ProdutoIMP imp: produtos) {
