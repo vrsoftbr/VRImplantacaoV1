@@ -1,11 +1,9 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -29,7 +27,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         this.codant = provider.anterior().getAnterioresIncluindoComCodigoAtualNull();
         this.produtosPorEan = provider.automacao().getProdutosByEan();
         
-        produtos = new Organizador(this, new HashSet<OpcaoProduto>()).organizarListagem(produtos);
+        produtos = new Organizador(this).organizarListagem(produtos);
         produtos = filtrarEansValidosParaUnificacao(produtos);
         produtos = filtrarProdutosExistentesEVinculados(produtos);
         System.gc();
@@ -53,11 +51,18 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         }
     }
     
-    List<ProdutoIMP> filtrarProdutosExistentesEVinculados(List<ProdutoIMP> produtos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    List<ProdutoIMP> filtrarEansValidosParaUnificacao(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            long ean = Utils.stringToLong(imp.getEan(), -2);
+            if (ean > 999999) {
+                result.add(imp);
+            }
+        }
+        return result;
     }
     
-    List<ProdutoIMP> filtrarEansValidosParaUnificacao(List<ProdutoIMP> produtos) {
+    List<ProdutoIMP> filtrarProdutosExistentesEVinculados(List<ProdutoIMP> produtos) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

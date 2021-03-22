@@ -2,8 +2,8 @@ package vrimplantacao2.dao.cadastro.produto2;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import static org.mockito.Matchers.*;
@@ -34,12 +34,14 @@ public class UnificadorProdutoRepositoryTest {
             }
         }).when(provider).salvar(any(ProdutoVO.class));
         
-        ProdutoRepository repository = new ProdutoRepository(provider);
+        UnificadorProdutoRepository repository = new UnificadorProdutoRepository(provider);
         
         ArrayList<ProdutoIMP> lista = new ArrayList<>();
         lista.add(aux.impForTest("1", "MOCA", "789"));
+        lista.add(aux.impForTest("1", "MOCA", "789"));
+        lista.add(aux.impForTest("1", "MOCA", "789"));
         
-        repository.unificar2(lista);        
+        repository.unificar(lista);        
         
     }
     
@@ -53,6 +55,13 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("5", "PICANHA", "45"));
         produtos.add(aux.impForTest("52", "CANETA BIC", "12345678"));
         
+        UnificadorProdutoRepository rep = new UnificadorProdutoRepository(provider);
+        produtos = rep.filtrarEansValidosParaUnificacao(produtos);
+        
+        assertEquals(3, produtos.size());
+        assertEquals("1", produtos.get(0).getImportId());
+        assertEquals("1", produtos.get(1).getImportId());
+        assertEquals("52", produtos.get(2).getImportId());
         
     }
     
