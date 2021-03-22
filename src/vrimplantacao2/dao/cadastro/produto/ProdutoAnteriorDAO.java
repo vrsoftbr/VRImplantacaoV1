@@ -1271,4 +1271,36 @@ public class ProdutoAnteriorDAO {
                     "$$");
         }
     }
+
+    public MultiMap<String, Integer> getAnterioresPorIdEan(String sistema, String loja) throws Exception {
+        MultiMap<String, Integer> result = new MultiMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	antean.importid,\n" +
+                    "	antean.ean,\n" +
+                    "	ant.codigoatual\n" +
+                    "from\n" +
+                    "	implantacao.codant_produto ant\n" +
+                    "	join implantacao.codant_ean antean on\n" +
+                    "		ant.impsistema = antean.importsistema and\n" +
+                    "		ant.imploja = antean.importloja and\n" +
+                    "		ant.impid = antean.importid \n" +
+                    "where\n" +
+                    "	ant.impsistema = '" + sistema + "' and\n" +
+                    "	ant.imploja = '" + loja + "'\n" +
+                    "order by\n" +
+                    "	1, 2"
+            )) {
+                while (rst.next()) {
+                    result.put(
+                            rst.getInt("codigoatual"),
+                            rst.getString("importid"),
+                            rst.getString("ean")
+                    );
+                }
+            }
+        }
+        return result;
+    }
 }

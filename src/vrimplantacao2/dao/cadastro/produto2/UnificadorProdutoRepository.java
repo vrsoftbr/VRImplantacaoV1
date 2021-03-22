@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -15,21 +16,23 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
     
     private final ProdutoRepositoryProvider provider;   
     private final ProdutoConverter converter;
-    private Map<String, Integer> codant;
-    private Map<Long, Integer> produtosPorEan;
+    private final Map<String, Integer> codant;
+    private final Map<Long, Integer> produtosPorEan;
+    private final MultiMap<String, Integer> codigosAnterioresIdEan;
 
-    public UnificadorProdutoRepository(ProdutoRepositoryProvider provider) {
+    public UnificadorProdutoRepository(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
         this.converter = new ProdutoConverter(provider);
-    }
-    
-    public void unificar(List<ProdutoIMP> produtos) throws Exception {
+        
         this.codant = provider.anterior().getAnterioresIncluindoComCodigoAtualNull();
         this.produtosPorEan = provider.automacao().getProdutosByEan();
-        
+        this.codigosAnterioresIdEan = provider.anterior().getAnterioresPorIdEan();
+    }
+    
+    public void unificar(List<ProdutoIMP> produtos) throws Exception {        
         produtos = new Organizador(this).organizarListagem(produtos);
         produtos = filtrarEansValidosParaUnificacao(produtos);
-        produtos = filtrarProdutosExistentesEVinculados(produtos);
+        produtos = filtrarProdutosEEansJaMapeados(produtos);
         System.gc();
         
         List<ProdutoIMP> produtosExistentesComEansExistentes = filtrarProdutosExistentesComEansExistentes(produtos);        
@@ -55,15 +58,24 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         List<ProdutoIMP> result = new ArrayList<>();
         for (ProdutoIMP imp: produtos) {
             long ean = Utils.stringToLong(imp.getEan(), -2);
-            if (ean > 999999) {
-                result.add(imp);
-            }
+            if (ean <= 999999)
+                continue;
+            result.add(imp);
         }
         return result;
     }
     
-    List<ProdutoIMP> filtrarProdutosExistentesEVinculados(List<ProdutoIMP> produtos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    List<ProdutoIMP> filtrarProdutosEEansJaMapeados(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            if (isEanEIdExistenteNaCodAnt(imp))
+                continue;
+            result.add(imp);
+        }
+        return result;
+    }
+    private boolean isEanEIdExistenteNaCodAnt(ProdutoIMP imp) {
+        return this.codigosAnterioresIdEan.containsKey(imp.getImportId(), imp.getEan());
     }
     
     List<ProdutoIMP> filtrarProdutosExistentesComEansExistentes(List<ProdutoIMP> produtos) {

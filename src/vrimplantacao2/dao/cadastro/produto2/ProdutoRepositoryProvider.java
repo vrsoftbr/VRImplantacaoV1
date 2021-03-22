@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.CestDAO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -287,7 +286,13 @@ public class ProdutoRepositoryProvider {
             dao.setImportLoja(getLoja());
             return dao.getForcarNovo().containsKey(getSistema(), getLoja(), impid);
         }
-    
+        
+        public MultiMap<String, Integer> getAnterioresPorIdEan() throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            return dao.getAnterioresPorIdEan(getSistema(), getLoja());
+        }
+
     }
     
     public class Complemento {
