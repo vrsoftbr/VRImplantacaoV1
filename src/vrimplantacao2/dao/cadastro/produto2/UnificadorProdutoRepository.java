@@ -107,8 +107,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
             gravarEanAnterior(imp, idProduto);
             
         }
-    }
-    
+    }    
     List<ProdutoIMP> filtrarProdutosVinculadosComNovosEans(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
         for (ProdutoIMP imp: produtos) {            
@@ -129,7 +128,18 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
     }
     
     List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            long ean = Utils.stringToLong(imp.getEan());
+            boolean eanNaoExisteNoVR = !this.produtosPorEan.containsKey(ean);
+            
+            if (eanNaoExisteNoVR)
+                continue;
+            
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
     }
     
     List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansNovos(List<ProdutoIMP> produtos) {

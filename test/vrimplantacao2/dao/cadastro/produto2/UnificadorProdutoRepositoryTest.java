@@ -1,9 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import static org.mockito.Mockito.*;
@@ -15,9 +13,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
-import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
-import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -213,13 +208,15 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
         produtos.add(aux.impForTest("146", "COUVE", "789456321"));
         produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("456321", "CAD MANUAL", "000012345678"));
         produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
         produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
         produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        produtos.add(aux.impForTest("789451", "CAD MANUAL", "784512963L"));
         
         List<ProdutoIMP> produtosVinculadosComNovosEans = new UnificadorProdutoRepository(provider).filtrarProdutosVinculadosComNovosEans(produtos);
         
-        assertEquals(4, produtos.size());
+        assertEquals(6, produtos.size());
         assertEquals(2, produtosVinculadosComNovosEans.size());
         assertEquals("1", produtosVinculadosComNovosEans.get(0).getImportId());
         assertEquals("17891000100103", produtosVinculadosComNovosEans.get(0).getEan());
@@ -245,9 +242,11 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
         produtos.add(aux.impForTest("146", "COUVE", "789456321"));
         produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("456321", "CAD MANUAL", "000012345678"));
         produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
         produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
         produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        produtos.add(aux.impForTest("789451", "CAD MANUAL", "784512963L"));
         
         assertEquals(5, db.implantacao_codant_produto.size());
         assertEquals(2, db.public_produtoautomacao.size());
@@ -264,6 +263,42 @@ public class UnificadorProdutoRepositoryTest {
         
         assertEquals(17891000100103L, db.public_produtoautomacao.get(2).getCodigoBarras());
         assertEquals(7896541L, db.public_produtoautomacao.get(3).getCodigoBarras());
+    }
+    
+    @Test
+    public void testFiltrarProdutosNaoVinculadosComEansExistentes() throws Exception {
+        DatabaseMock db = new DatabaseMock(provider);
+        db.addProdutoAnterior("1", "", 1);
+        db.addProdutoAnterior("52", "", 2);
+        db.addProdutoAnterior("145", "", 3);
+        db.addProdutoAnterior("10", "", 4);
+        db.addProdutoAnterior("200", "", 5);        
+        db.addProdutoAutomacao(1, 7891000100103L);
+        db.addProdutoAutomacao(1, 17891000100103L);
+        db.addProdutoAutomacao(10, 9874563L);
+        db.addProdutoAutomacao(10, 7896541L);
+        db.addProdutoAutomacao(25, 12345678L);
+        db.addProdutoAutomacao(29, 784512963L);
+        
+        TestAux aux = new TestAux();
+        List<ProdutoIMP> produtos = new ArrayList<>();
+        
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("456321", "CAD MANUAL", "000012345678"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        produtos.add(aux.impForTest("789451A", "CAD MANUAL", "784512963L"));
+        assertEquals(6, produtos.size());
+        
+        List<ProdutoIMP> produtosNaoVinculados = new UnificadorProdutoRepository(provider).filtrarProdutosNaoVinculadosComEansExistentes(produtos);
+        
+        assertEquals(3, produtos.size());
+        assertEquals(3, produtosNaoVinculados.size());
+        assertEquals("456321", produtosNaoVinculados.get(0).getImportId());
+        assertEquals("1000", produtosNaoVinculados.get(1).getImportId());
+        assertEquals("789451A", produtosNaoVinculados.get(2).getImportId());
+        
     }
     
 }
