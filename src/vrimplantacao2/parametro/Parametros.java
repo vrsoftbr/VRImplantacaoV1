@@ -524,4 +524,17 @@ public final class Parametros implements Iterable<Parametro>{
     public DadosConexaoPostgreSQL getEmpresaAtiva() {
         return empresaAtiva;
     }
+    
+    public static class OpcoesExperimentaisDeProduto {
+        
+        public static void setUnificacaoExperimental(boolean ativo) {
+            Parametros.get().put(ativo, "UNIFICACAO_PRODUTO_EXPERIMENTAL");
+        }
+        
+        public static boolean isUnificacaoExperimentalAtiva() {
+            return Parametros.get().getBool(false, "UNIFICACAO_PRODUTO_EXPERIMENTAL");
+        }
+        
+    }
+   
 }

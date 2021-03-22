@@ -58,6 +58,7 @@ import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
 import vrimplantacao2.dao.cadastro.financeiro.diversos.TipoPagamentoDAO;
 import vrimplantacao2.parametro.Parametros;
+import static vrimplantacao2.parametro.Parametros.OpcoesExperimentaisDeProduto;
 import vrimplantacao2.utils.logging.LoggingConfig;
 import vrimplantacao2.utils.logging.LoggingType;
 import vrimplantacao2.vo.enums.TipoPagamento;
@@ -169,25 +170,28 @@ public class ParametroGUI extends VRInternalFrame {
         btnLogExcluir = new VRButton();
         jScrollPane1 = new JScrollPane();
         tableLogging = new VRTable();
+        tabEngineMigracao = new vr.view.components.panel.VRPanel();
+        pnlProdutoUnificacao = new VRPanel();
+        chkProdutoUnificacaoExperimental = new VRCheckBox();
         btnGravar = new VRButton();
         btnCancelar = new VRButton();
 
         setTitle("Configurar parametros do sistema");
         addInternalFrameListener(new InternalFrameListener() {
-            public void internalFrameActivated(InternalFrameEvent evt) {
+            public void internalFrameOpened(InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(InternalFrameEvent evt) {
             }
             public void internalFrameClosed(InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(InternalFrameEvent evt) {
+            public void internalFrameIconified(InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(InternalFrameEvent evt) {
+            public void internalFrameActivated(InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(InternalFrameEvent evt) {
+            public void internalFrameDeactivated(InternalFrameEvent evt) {
             }
         });
 
@@ -594,7 +598,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(pnlLogDadosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addGroup(pnlLogDadosLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                        .addComponent(pnlNivelLog, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
+                        .addComponent(pnlNivelLog, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 411, Short.MAX_VALUE)
                         .addComponent(pnlTipoLog, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(txtLogNome, GroupLayout.Alignment.TRAILING))))
         );
@@ -661,6 +665,43 @@ public class ParametroGUI extends VRInternalFrame {
         );
 
         tabs.addTab("Logging", tabLogging);
+
+        pnlProdutoUnificacao.setBorder(BorderFactory.createTitledBorder("Unificação de Produtos"));
+
+        chkProdutoUnificacaoExperimental.setText("Utilizar unificação experimental (2.0)");
+        chkProdutoUnificacaoExperimental.setToolTipText("<html>\nNova rotina de unificação de produtos que irá substituir a atual. Em caso de problema desabilite este<br>\ncheckbox para utilizar o antigo método.\n</html>");
+
+        GroupLayout pnlProdutoUnificacaoLayout = new GroupLayout(pnlProdutoUnificacao);
+        pnlProdutoUnificacao.setLayout(pnlProdutoUnificacaoLayout);
+        pnlProdutoUnificacaoLayout.setHorizontalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlProdutoUnificacaoLayout.setVerticalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(9, Short.MAX_VALUE))
+        );
+
+        GroupLayout tabEngineMigracaoLayout = new GroupLayout(tabEngineMigracao);
+        tabEngineMigracao.setLayout(tabEngineMigracaoLayout);
+        tabEngineMigracaoLayout.setHorizontalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(354, Short.MAX_VALUE))
+        );
+        tabEngineMigracaoLayout.setVerticalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(391, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Engine de Migração", tabEngineMigracao);
 
         btnGravar.setText("Gravar");
         btnGravar.addActionListener(new ActionListener() {
@@ -782,6 +823,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkImportarIcmsIsentoMigracaoProduto;
     private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
     private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
+    private VRCheckBox chkProdutoUnificacaoExperimental;
     private VRComboBox cmbMunicipioPadrao;
     private JComboBox cmbTipoPagamento;
     private VRComboBox cmbUfPadrao;
@@ -794,6 +836,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRPanel pnlLocalizacao;
     private VRPanel pnlLogDados;
     private VRPanel pnlNivelLog;
+    private VRPanel pnlProdutoUnificacao;
     private VRPanel pnlTipoLog;
     private JRadioButton rdAll;
     private JRadioButton rdConfig;
@@ -810,6 +853,7 @@ public class ParametroGUI extends VRInternalFrame {
     private ButtonGroup rdgLogType;
     private ButtonGroup rdgTipoConexaoODBC;
     private JScrollPane scroll;
+    private vr.view.components.panel.VRPanel tabEngineMigracao;
     private VRPanel tabLogging;
     private VRPanel tabValorPadrão;
     private VRTable tableLogging;
@@ -893,6 +937,7 @@ public class ParametroGUI extends VRInternalFrame {
         txtNomeDriverODBC.setText(parametros.getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC"));
         chkNfeSaidaProcessarFinalizacoes.setSelected(parametros.getBool(false, "IMPORT_NFE", "PROCESSAR_FINALIZACOES"));
         chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(false, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
+        chkProdutoUnificacaoExperimental.setSelected(OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -914,6 +959,9 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.put(txtNomeDriverODBC.getText(), "ODBC", "DRIVER_ODBC");
             parametros.put(chkNfeSaidaProcessarFinalizacoes.isSelected(), "IMPORT_NFE", "PROCESSAR_FINALIZACOES");
             parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");
+            OpcoesExperimentaisDeProduto.setUnificacaoExperimental(chkProdutoUnificacaoExperimental.isSelected());
+            
+            
             if (optDriver.isSelected()) {
                 parametros.put(0, "ODBC", "TIPO_CONEXAO");
             } else if (optFonteDados.isSelected()) {

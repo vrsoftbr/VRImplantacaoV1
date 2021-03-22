@@ -14,11 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
-import org.mockito.Matchers;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import org.mockito.Mock;
@@ -833,5 +830,10 @@ public class ProdutoRepositoryTest {
         lista.add(getProdutoIMP_ACEM());
         
         rep.salvar(lista);
+    }
+    
+    @Test
+    public void testUnificar2() throws Exception {
+        
     }
 }
