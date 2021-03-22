@@ -38,12 +38,32 @@ public class UnificadorProdutoRepositoryTest {
         
         UnificadorProdutoRepository repository = new UnificadorProdutoRepository(provider);
         
-        ArrayList<ProdutoIMP> lista = new ArrayList<>();
-        lista.add(aux.impForTest("1", "MOCA", "789"));
-        lista.add(aux.impForTest("1", "MOCA", "789"));
-        lista.add(aux.impForTest("1", "MOCA", "789"));
+        ArrayList<ProdutoIMP> produtos = new ArrayList<>();
+        produtos.add(aux.impForTest("1", "MOCA", "7891000100103"));
+        produtos.add(aux.impForTest("1", "MOCA", "7891000100103"));
+        produtos.add(aux.impForTest("1", "MOCA", "7891000100103"));
+        produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
+        produtos.add(aux.impForTest("2", "ACEM", "345"));
+        produtos.add(aux.impForTest("5", "PICANHA", "45"));
+        produtos.add(aux.impForTest("52", "CANETA BIC", "12345678"));
         
-        repository.unificar(lista);        
+        produtos.add(aux.impForTest("1", "MOCA", "7891000100103"));
+        produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
+        produtos.add(aux.impForTest("52", "CANETA BIC", "12345678"));
+        produtos.add(aux.impForTest("145", "ALFACE", "78965412"));
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("200", "ACUCAR", "85236974115987"));
+        
+        produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        
+        repository.unificar(produtos);        
         
     }
     
@@ -56,14 +76,28 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("2", "ACEM", "345"));
         produtos.add(aux.impForTest("5", "PICANHA", "45"));
         produtos.add(aux.impForTest("52", "CANETA BIC", "12345678"));
+        produtos.add(aux.impForTest("145", "ALFACE", "78965412"));
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("200", "ACUCAR", "85236974115987"));
+        produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
         
         UnificadorProdutoRepository rep = new UnificadorProdutoRepository(provider);
         produtos = rep.filtrarEansValidosParaUnificacao(produtos);
         
-        assertEquals(3, produtos.size());
+        assertEquals(10, produtos.size());
         assertEquals("1", produtos.get(0).getImportId());
         assertEquals("1", produtos.get(1).getImportId());
         assertEquals("52", produtos.get(2).getImportId());
+        assertEquals("145", produtos.get(3).getImportId());
+        assertEquals("146", produtos.get(4).getImportId());
+        assertEquals("147", produtos.get(5).getImportId());
+        assertEquals("189", produtos.get(6).getImportId());
+        assertEquals("200", produtos.get(7).getImportId());
+        assertEquals("10", produtos.get(8).getImportId());
+        assertEquals("1000", produtos.get(9).getImportId());
         
     }
     
@@ -94,15 +128,19 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
         produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
         produtos.add(aux.impForTest("200", "ACUCAR", "85236974115987"));
+        produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
         
         produtos = new UnificadorProdutoRepository(provider).filtrarProdutosEEansJaMapeados(produtos);
         
-        assertEquals(4, produtos.size());
+        assertEquals(6, produtos.size());
         assertEquals("1", produtos.get(0).getImportId());
         assertEquals("17891000100103", produtos.get(0).getEan());
         assertEquals("146", produtos.get(1).getImportId());
         assertEquals("147", produtos.get(2).getImportId());
         assertEquals("189", produtos.get(3).getImportId());
+        assertEquals("10", produtos.get(4).getImportId());
+        assertEquals("1000", produtos.get(5).getImportId());
     }
     
     @Test
