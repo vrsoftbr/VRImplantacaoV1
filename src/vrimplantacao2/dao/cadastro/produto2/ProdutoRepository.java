@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.produto2;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -307,6 +308,23 @@ public class ProdutoRepository {
                     OpcaoProduto next = iterator.next();
                     strOpt.append(next.toString()).append(iterator.hasNext() ? ", " : "");
                 }
+                
+                if (importarSomenteLoja) {
+                    provider.setStatus("Filtrando produtos que foram inclusos por unificação ou mapeamento");
+                    List<ProdutoIMP> a =  new ArrayList<>();
+                    for (ProdutoIMP imp: organizados) {
+                        ProdutoAnteriorVO anterior = provider.anterior().getLojaImp(                                
+                                provider.getSistema(),
+                                provider.getLoja(),
+                                imp.getImportId()
+                        );
+                        if (anterior != null) {
+                            a.add(imp);
+                        }
+                    }
+                    organizados = a;
+                }
+                System.gc();
 
                 provider.setStatus("Produtos - Gravando alterações - " + strOpt);
                 provider.setMaximum(organizados.size());

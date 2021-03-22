@@ -36,6 +36,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
+        chkClientePreferenciaSomenteClube.setSelected(params.getBool(SISTEMA, "CLIENTE_SOMENTE_CLUBE"));
         conexao.carregarParametros();
         tabProdutos.carregarParametros(params, SISTEMA);
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
@@ -45,6 +46,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
+        params.put(chkClientePreferenciaSomenteClube.isSelected(), SISTEMA, "CLIENTE_SOMENTE_CLUBE");
         conexao.atualizarParametros();
         tabProdutos.gravarParametros(params, SISTEMA);
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
@@ -236,6 +238,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
                     dao.setIdRegiaoDentroEstado(((Regiao)cmbDentroUf.getModel().getSelectedItem()).id);
                     dao.setIdRegiaoForaEstado(((Regiao)cmbForaUf.getModel().getSelectedItem()).id);
                     dao.setComplemento(txtComplemento.getText());
+                    dao.setSomenteClienteFidelidade(chkClientePreferenciaSomenteClube.isSelected());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -349,6 +352,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
         cmbDentroUf = new javax.swing.JComboBox();
         lblLojaOrigem2 = new javax.swing.JLabel();
         cmbForaUf = new javax.swing.JComboBox();
+        chkClientePreferenciaSomenteClube = new vrframework.bean.checkBox.VRCheckBox();
         tabBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedores = new vrframework.bean.panel.VRPanel();
@@ -403,19 +407,32 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
 
         cmbForaUf.setModel(new DefaultComboBoxModel());
 
+        chkClientePreferenciaSomenteClube.setText("Cliente Preferencial: Importar somente Clube de Vantagens");
+        chkClientePreferenciaSomenteClube.setEnabled(true);
+        chkClientePreferenciaSomenteClube.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClientePreferenciaSomenteClubeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabConvenio1Layout = new javax.swing.GroupLayout(tabConvenio1);
         tabConvenio1.setLayout(tabConvenio1Layout);
         tabConvenio1Layout.setHorizontalGroup(
             tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabConvenio1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblLojaOrigem2)
-                    .addComponent(lblLojaOrigem1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cmbDentroUf, 0, 316, Short.MAX_VALUE)
-                    .addComponent(cmbForaUf, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(tabConvenio1Layout.createSequentialGroup()
+                        .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblLojaOrigem2)
+                            .addComponent(lblLojaOrigem1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbDentroUf, 0, 316, Short.MAX_VALUE)
+                            .addComponent(cmbForaUf, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(tabConvenio1Layout.createSequentialGroup()
+                        .addComponent(chkClientePreferenciaSomenteClube, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabConvenio1Layout.setVerticalGroup(
@@ -429,7 +446,9 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
                 .addGroup(tabConvenio1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(cmbForaUf)
                     .addComponent(lblLojaOrigem2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(152, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkClientePreferenciaSomenteClube, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Parâmetros", tabConvenio1);
@@ -800,10 +819,15 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtComplementoActionPerformed
 
+    private void chkClientePreferenciaSomenteClubeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferenciaSomenteClubeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkClientePreferenciaSomenteClubeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkClientePreferenciaSomenteClube;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;

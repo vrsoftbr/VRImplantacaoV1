@@ -439,43 +439,46 @@ public class ProdutoAnteriorDAO {
         createTable();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "	ant.impsistema, \n"
-                    + "	ant.imploja, \n"
-                    + "	ant.impid, \n"
-                    + "	ant.descricao, \n"
-                    + "	p.descricaocompleta, \n"
-                    + "	p.descricaoreduzida, \n"
-                    + "	p.descricaogondola, \n"
-                    + "	ant.codigoatual, \n"
-                    + "	ant.piscofinscredito, \n"
-                    + "	ant.piscofinsdebito, \n"
-                    + "	ant.piscofinsnaturezareceita, \n"
-                    + "	ant.icmscst, \n"
-                    + "	ant.icmsaliq, \n"
-                    + "	ant.icmsreducao, \n"
-                    + "	ant.estoque, \n"
-                    + "	ant.e_balanca, \n"
-                    + "	ant.custosemimposto, \n"
-                    + "	ant.custocomimposto, \n"
-                    + "	ant.margem, \n"
-                    + "	ant.precovenda, \n"
-                    + "	ant.ncm, \n"
-                    + "	ant.cest,\n"
-                    + "	ant.contadorimportacao,\n"
-                    + "	ant.novo\n"
-                    + "FROM \n"
-                    + "	implantacao.codant_produto ant\n"
-                    + "	left join produto p on ant.codigoatual = p.id\n"
-                    + "where codigoatual not in (select codigoatual from implantacao.codant_produto\n"
-                    + "                        where impsistema <> " + SQLUtils.stringSQL(getImportSistema())
-                    + "                        and imploja = " + SQLUtils.stringSQL(getImportLoja()) + ")\n"
-                    + "                and impsistema = " + SQLUtils.stringSQL(getImportSistema())
-                    + "                and imploja = " + SQLUtils.stringSQL(getImportLoja()) + "\n"
-                    + "order by\n"
-                    + "	ant.impsistema, \n"
-                    + "	ant.imploja, \n"
-                    + "	ant.impid"
+                    "SELECT \n" +
+                    "	ant.impsistema, \n" +
+                    "	ant.imploja, \n" +
+                    "	ant.impid, \n" +
+                    "	ant.descricao, \n" +
+                    "	p.descricaocompleta, \n" +
+                    "	p.descricaoreduzida, \n" +
+                    "	p.descricaogondola, \n" +
+                    "	ant.codigoatual, \n" +
+                    "	ant.piscofinscredito, \n" +
+                    "	ant.piscofinsdebito, \n" +
+                    "	ant.piscofinsnaturezareceita, \n" +
+                    "	ant.icmscst, \n" +
+                    "	ant.icmsaliq, \n" +
+                    "	ant.icmsreducao, \n" +
+                    "	ant.estoque, \n" +
+                    "	ant.e_balanca, \n" +
+                    "	ant.custosemimposto, \n" +
+                    "	ant.custocomimposto, \n" +
+                    "	ant.margem, \n" +
+                    "	ant.precovenda, \n" +
+                    "	ant.ncm, \n" +
+                    "	ant.cest,\n" +
+                    "	ant.contadorimportacao,\n" +
+                    "	ant.novo\n" +
+                    "FROM \n" +
+                    "	implantacao.codant_produto ant\n" +
+                    "	left join produto p on\n" +
+                    "		ant.codigoatual = p.id\n" +
+                    "where\n" +
+                    "    ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n" +
+                    "    ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + " and    \n" +
+                    "	ant.obsimportacao in (\n" +
+                    "		'PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)',\n" +
+                    "		'PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE vrimplantacao2.dao.cadastro.produto2.ProdutoRepository'\n" +
+                    "	)\n" +
+                    "order by\n" +
+                    "	ant.impsistema, \n" +
+                    "	ant.imploja, \n" +
+                    "	ant.impid"
             )) {
                 int cont = 1;
                 while (rst.next()) {

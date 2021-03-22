@@ -152,6 +152,7 @@
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="chkForcarPrecoCusto" min="-2" max="-2" attributes="0"/>
                                       </Group>
+                                      <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
@@ -187,7 +188,9 @@
                                       <Component id="chkManterDescricaoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkForcarPrecoCusto" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="5" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -257,6 +260,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarPrecoCusto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="For&#xe7;ar pre&#xe7;o e custo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtualizarSomenteIncluidosUnificacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atualizar somente produtos inclu&#xed;dos pela unifica&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -753,7 +761,7 @@
                                   <Component id="chkEANemBranco" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="459" max="32767" attributes="0"/>
+                          <EmptySpace pref="520" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -841,17 +849,20 @@
                                   <Component id="chkOferta" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                                   <Component id="chkMargem" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
-                                  <Component id="chkTipoProduto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkMargemMinima" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkMargemMaxima" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFabricacaoPropria" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkMargemMinima" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                                  <Component id="chkTipoProduto" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="chkEstoqueMinimo" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="chkEstoqueMaximo" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                                   <Component id="chkNormaReposicao" min="-2" max="-2" attributes="0"/>
@@ -863,7 +874,7 @@
                                   <Component id="chkTeclaAssociada" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="127" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -893,22 +904,27 @@
                                   <Component id="chkMargem" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkVrAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkTipoProduto" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFabricacaoPropria" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkFabricacaoPropria" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkMargemMinima" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkMargemMaxima" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkMargemMinima" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkEstoqueMinimo" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkEstoqueMaximo" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="chkEstoqueMaximo" max="32767" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkNormaReposicao" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkSecao" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkPrateleira" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkTeclaAssociada" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                  <Component id="chkTipoProduto" alignment="3" max="32767" attributes="0"/>
+                                  <Component id="chkEstoqueMinimo" alignment="3" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="20" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -964,11 +980,6 @@
                     <Property name="text" type="java.lang.String" value="Margem"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoProduto">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo Produto"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFabricacaoPropria">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Fabrica&#xe7;&#xe3;o Pr&#xf3;pria"/>
@@ -977,6 +988,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargemMinima">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Margem M&#xed;nima"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargemMaxima">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Margem M&#xe1;xima"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEstoqueMinimo">
@@ -1025,6 +1041,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEstoqueTroca">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Estoque Troca"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Produto"/>
                   </Properties>
                 </Component>
               </SubComponents>

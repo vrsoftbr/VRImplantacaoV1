@@ -464,7 +464,7 @@ public class Importador {
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLoja(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
-        
+        //TODO: Remover essa duplicidade para informar os parâmetros ao provider.
         if (isImportarIndividualLoja()) {
             provider.getOpcoes().add(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         }
