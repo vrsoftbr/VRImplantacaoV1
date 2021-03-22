@@ -1,14 +1,19 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import vrimplantacao2.dao.cadastro.produto2.converter.ProdutoConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import vr.core.utils.StringUtils;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
+import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
+import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -16,7 +21,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author leandro
  */
-class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
+public class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
     
     private final ProdutoRepositoryProvider provider;   
     private final ProdutoConverter converter;
@@ -42,8 +47,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         gravarProdutosComEanInvalido(produtos);
         gravarProdutosVinculadosComNovosEans(produtos);
         gravarProdutosNaoVinculadosComEansExistentes(produtos);
-        List<ProdutoIMP> produtosNaoVinculadosComEansNovos      = filtrarProdutosNaoVinculadosComEansNovos(produtos);
-        System.gc();        
+        gravarProdutosNaoVinculadosComEansNovos(produtos);      
         
     }
     
@@ -82,7 +86,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         return result;
     }
     void gravarAnterior(ProdutoIMP imp, Integer codigoAtual) throws Exception {
-        ProdutoAnteriorVO anterior = this.converter.converterImpEmAnterior(imp);
+        ProdutoAnteriorVO anterior = this.converter.converterEmAnterior(imp);
         provider.anterior().salvar(anterior);
         this.codant.put(anterior.getImportId(), codigoAtual);
     }
@@ -128,7 +132,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         return this.produtosPorEan.containsKey(Utils.stringToLong(imp.getEan()));
     }
     
-    public void gravarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) throws Exception {
+    void gravarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) throws Exception {
         List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);
         
         for (ProdutoIMP imp: produtosNaoVinculadosComEansExistentes) {
@@ -152,8 +156,36 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         return result;
     }
     
-    List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansNovos(List<ProdutoIMP> produtos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    void gravarProdutosNaoVinculadosComEansNovos(List<ProdutoIMP> produtos) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        ProdutoIDStack idStack = provider.getIDStack();
+        
+        for (ProdutoIMP imp: produtos) {
+            Integer idProduto = this.codant.get(imp.getImportId());
+            boolean produtoAindaNaoExisteNaCodigoAnterior = idProduto == null;
+            
+            if (produtoAindaNaoExisteNaCodigoAnterior) {
+                ProdutoVO produto = this.converter.converterEmProduto(imp);
+                produto.setId(idStack.obterID(imp.getImportId(), imp.isBalanca()));
+                this.provider.salvar(produto);
+                
+                /*
+                ProdutoAutomacaoVO produtoAutomacao = this.converter.converterEAN(imp, ean, unidade);
+                produtoAutomacao.setProduto(produto);
+                ProdutoAliquotaVO produtoAliquota = this.converter.converterEmAliquota(imp);
+                produtoAliquota.setProduto(produto);
+                ProdutoComplementoVO produtoComplemento = this.converter.converterEmComplemento(imp);
+                produtoComplemento.setProduto(produto);
+                ProdutoAnteriorVO anterior = this.converter.converterEmAnterior(imp);
+                anterior.setCodigoAtual(produto);
+                ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
+                */
+                
+                
+            } 
+        }
+        produtos.removeAll(result);
     }
 
     @Override

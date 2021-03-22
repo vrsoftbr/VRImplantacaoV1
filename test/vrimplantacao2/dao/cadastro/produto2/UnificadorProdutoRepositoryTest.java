@@ -69,7 +69,9 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
         produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
         
-        repository.unificar(produtos);        
+        repository.unificar(produtos);  
+        
+        fail("Teste ainda não está pronto");
         
     }
     
@@ -343,6 +345,45 @@ public class UnificadorProdutoRepositoryTest {
         assertEquals("000012345678", db.implantacao_codant_ean.get(0).getEan());
         assertEquals("0009874563", db.implantacao_codant_ean.get(1).getEan());
         assertEquals("784512963L", db.implantacao_codant_ean.get(2).getEan());
+    }
+    
+    @Test
+    public void testGravarProdutosNaoVinculadosComEansNovos() throws Exception {
+        
+        DatabaseMock db = new DatabaseMock(provider);
+        db.addProdutoAnterior("1", "", 1);
+        db.addProdutoAnterior("52", "", 2);
+        db.addProdutoAnterior("145", "", 3);
+        db.addProdutoAnterior("10", "", 4);
+        db.addProdutoAnterior("200", "", 5);        
+        db.addProdutoAnterior("456321", "", 6);        
+        db.addProdutoAnterior("1000", "", 7);        
+        db.addProdutoAnterior("789451A", "", 8);        
+        db.addProdutoAutomacao(1, 7891000100103L);
+        db.addProdutoAutomacao(1, 17891000100103L);
+        db.addProdutoAutomacao(10, 9874563L);
+        db.addProdutoAutomacao(10, 7896541L);
+        db.addProdutoAutomacao(25, 12345678L);
+        db.addProdutoAutomacao(29, 784512963L);
+        
+        TestAux aux = new TestAux();
+        List<ProdutoIMP> produtos = new ArrayList<>();
+        
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        
+        assertEquals(8, db.implantacao_codant_produto.size());
+        assertEquals(0, db.implantacao_codant_ean.size());
+        assertEquals(6, db.public_produtoautomacao.size());
+        
+        new UnificadorProdutoRepository(provider).gravarProdutosNaoVinculadosComEansNovos(produtos);
+        
+        assertEquals(0, produtos.size());
+        assertEquals(11, db.implantacao_codant_produto.size());
+        assertEquals(3, db.implantacao_codant_ean.size());
+        assertEquals(9, db.public_produtoautomacao.size());
+        
     }
     
 }
