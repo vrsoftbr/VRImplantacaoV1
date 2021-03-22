@@ -104,6 +104,56 @@ public class UnificadorProdutoRepositoryTest {
         assertEquals("147", produtos.get(2).getImportId());
         assertEquals("189", produtos.get(3).getImportId());
     }
+    
+    @Test
+    public void testFiltrarProdutosVinculadosComNovosEans() throws Exception {
+        
+        when(provider.anterior().getAnterioresIncluindoComCodigoAtualNull()).then(
+                new Answer<Map<String, Integer>>() {
+                    @Override
+                    public Map<String, Integer> answer(InvocationOnMock invocation) throws Throwable {
+                        Map<String, Integer> mp = new HashMap<>();
+                        mp.put("1", 1);
+                        mp.put("52", 2);
+                        mp.put("145", 3);
+                        mp.put("10", 5);
+                        mp.put("200", 4);
+                        return mp;
+                    }
+                }
+        );
+        when(provider.automacao().getProdutosByEan()).then(
+                new Answer<Map<Long, Integer>>() {
+                    @Override
+                    public Map<Long, Integer> answer(InvocationOnMock invocation) throws Throwable {
+                        Map<Long, Integer> mp = new HashMap<>();
+                        mp.put(7891000100103L, 1);
+                        mp.put(9874563L, 10);
+                        return mp;
+                    }
+                }
+        );
+        
+        TestAux aux = new TestAux();
+        List<ProdutoIMP> produtos = new ArrayList<>();
+        
+        produtos.add(aux.impForTest("1", "MOCA", "17891000100103"));
+        produtos.add(aux.impForTest("146", "COUVE", "789456321"));
+        produtos.add(aux.impForTest("147", "LEITE PARMALAT", "7894569874569"));
+        produtos.add(aux.impForTest("189", "REQUEIJAO", "4569873579514"));
+        produtos.add(aux.impForTest("10", "TESTE1", "0007896541"));
+        produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
+        
+        List<ProdutoIMP> produtosVinculadosComNovosEans = new UnificadorProdutoRepository(provider).filtrarProdutosVinculadosComNovosEans(produtos);
+        
+        assertEquals(4, produtos.size());
+        assertEquals(2, produtosVinculadosComNovosEans.size());
+        assertEquals("1", produtosVinculadosComNovosEans.get(0).getImportId());
+        assertEquals("17891000100103", produtosVinculadosComNovosEans.get(0).getEan());
+        assertEquals("10", produtosVinculadosComNovosEans.get(1).getImportId());
+        assertEquals("0007896541", produtosVinculadosComNovosEans.get(1).getEan());
+    }
+    
 }
 
 class TestAux {

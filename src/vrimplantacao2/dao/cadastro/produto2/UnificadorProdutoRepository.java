@@ -35,6 +35,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         produtos = filtrarProdutosEEansJaMapeados(produtos);
         System.gc();
         
+        List<ProdutoIMP> produtosVinculadosComNovosEans = filtrarProdutosVinculadosComNovosEans(produtos);
         List<ProdutoIMP> produtosExistentesComEansExistentes = filtrarProdutosExistentesComEansExistentes(produtos);        
         List<ProdutoIMP> produtosExistentesEansNovos = filtrarProdutosExistentesComEansNovos(produtos);
         List<ProdutoIMP> produtosNaoExistentes = filtrarProdutosNaoExistentes(produtos);
@@ -43,7 +44,7 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         
         for (ProdutoIMP imp: produtosExistentesComEansExistentes) {
             Integer idProduto = produtosPorEan.get(Utils.stringToLong(imp.getEan()));
-            final boolean anteriorExistentePoremSemCodigoAtual = codant.containsKey(imp.getImportId());
+            final boolean anteriorExistentePoremSemCodigoAtual = isProdutoVinculadoNaCodAnt(imp);
             ProdutoAnteriorVO anterior = converter.converterImpEmAnterior(imp);
             
             if (anteriorExistentePoremSemCodigoAtual) {
@@ -76,6 +77,25 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
     }
     private boolean isEanEIdExistenteNaCodAnt(ProdutoIMP imp) {
         return this.codigosAnterioresIdEan.containsKey(imp.getImportId(), imp.getEan());
+    }
+    
+    List<ProdutoIMP> filtrarProdutosVinculadosComNovosEans(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {            
+            if (!isProdutoVinculadoNaCodAnt(imp))
+                continue;
+            if (isEanExistenteNoVR(imp))
+                continue;
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
+    }
+    private boolean isProdutoVinculadoNaCodAnt(ProdutoIMP imp) {
+        return this.codant.containsKey(imp.getImportId());
+    }
+    private boolean isEanExistenteNoVR(ProdutoIMP imp) {
+        return this.produtosPorEan.containsKey(Utils.stringToLong(imp.getEan()));
     }
     
     List<ProdutoIMP> filtrarProdutosExistentesComEansExistentes(List<ProdutoIMP> produtos) {
