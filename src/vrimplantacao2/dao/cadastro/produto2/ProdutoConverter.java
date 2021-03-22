@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -82,5 +83,22 @@ class ProdutoConverter {
         return destino;
     }
     
+    /**
+     * Converte um {@link ProdutoIMP} em um {@link ProdutoAnteriorEanVO}.
+     *
+     * @param imp {@link ProdutoIMP} a ser convertido.
+     * @return {@link ProdutoAnteriorEanVO} convertido.
+     */
+    public ProdutoAnteriorEanVO converterAnteriorEAN(ProdutoIMP imp) {
+        ProdutoAnteriorEanVO eanAnterior = new ProdutoAnteriorEanVO();
+        eanAnterior.setImportSistema(imp.getImportSistema());
+        eanAnterior.setImportLoja(imp.getImportLoja());
+        eanAnterior.setImportId(imp.getImportId());
+        eanAnterior.setEan(imp.getEan());
+        eanAnterior.setQtdEmbalagem(imp.getQtdEmbalagem());
+        eanAnterior.setTipoEmbalagem(imp.getTipoEmbalagem());
+        eanAnterior.setValor(0);
+        return eanAnterior;
+    }
     
 }

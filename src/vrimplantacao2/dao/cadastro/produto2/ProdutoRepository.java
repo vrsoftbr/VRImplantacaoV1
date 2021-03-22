@@ -232,7 +232,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                     }
 
                     if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                        ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                        ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
                         provider.eanAnterior().salvar(eanAnterior);
                     }
 
@@ -411,7 +411,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                             }
 
                             if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                                ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                                ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
                                 provider.eanAnterior().salvar(eanAnterior);
                             }
                         }
@@ -701,7 +701,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                     provider.anterior().salvar(anterior);
                 }
                 if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                    ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                    ProdutoAnteriorEanVO eanAnterior = this.converter.converterAnteriorEAN(imp);
                     provider.eanAnterior().salvar(eanAnterior);
                 }
 
@@ -958,24 +958,6 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
         complemento.setMargemMaxima(imp.getMargemMaxima());
 
         return complemento;
-    }
-
-    /**
-     * Converte um {@link ProdutoIMP} em um {@link ProdutoAnteriorEanVO}.
-     *
-     * @param imp {@link ProdutoIMP} a ser convertido.
-     * @return {@link ProdutoAnteriorEanVO} convertido.
-     */
-    public ProdutoAnteriorEanVO converterAnteriorEAN(ProdutoIMP imp) {
-        ProdutoAnteriorEanVO eanAnterior = new ProdutoAnteriorEanVO();
-        eanAnterior.setImportSistema(imp.getImportSistema());
-        eanAnterior.setImportLoja(imp.getImportLoja());
-        eanAnterior.setImportId(imp.getImportId());
-        eanAnterior.setEan(imp.getEan());
-        eanAnterior.setQtdEmbalagem(imp.getQtdEmbalagem());
-        eanAnterior.setTipoEmbalagem(imp.getTipoEmbalagem());
-        eanAnterior.setValor(0);
-        return eanAnterior;
     }
 
     private Map<String, Integer> fabricantes = null;

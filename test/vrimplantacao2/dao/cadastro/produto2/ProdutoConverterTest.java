@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import static vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest.getProdutoIMP_ACEM;
 import static vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest.getProdutoIMP_MOCA;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -77,6 +78,34 @@ public class ProdutoConverterTest {
         assertEquals(6, actual.getPisCofinsDebito());
         assertEquals(121, actual.getPisCofinsNaturezaReceita());
         assertEquals(17.12d, actual.getPrecovenda(),0.01);
+    }    
+    
+    @Test
+    public void testConverterEANAnterior_MOCA() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        ProdutoAnteriorEanVO actual = new ProdutoConverter(provider).converterAnteriorEAN(imp);
+        
+        assertEquals("7891000100103", actual.getEan());
+        assertEquals("12345", actual.getImportId());
+        assertEquals("LOJA 02", actual.getImportLoja());
+        assertEquals("TESTE", actual.getImportSistema());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertEquals("UN", actual.getTipoEmbalagem());
+        assertEquals(0, actual.getValor(), 0.01);
+    }
+    
+    @Test
+    public void testConverterEANAnterior_ACEM() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_ACEM();
+        ProdutoAnteriorEanVO actual = new ProdutoConverter(provider).converterAnteriorEAN(imp);
+        
+        assertEquals("18", actual.getEan());
+        assertEquals("3214", actual.getImportId());
+        assertEquals("LOJA 02", actual.getImportLoja());
+        assertEquals("TESTE", actual.getImportSistema());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertEquals("KG", actual.getTipoEmbalagem());
+        assertEquals(0, actual.getValor(), 0.01);
     }
     
 }

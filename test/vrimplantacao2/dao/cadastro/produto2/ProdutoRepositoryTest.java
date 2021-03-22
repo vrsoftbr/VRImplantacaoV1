@@ -493,34 +493,6 @@ public class ProdutoRepositoryTest {
     }
     
     @Test
-    public void testConverterEANAnterior_MOCA() throws Exception {
-        ProdutoIMP imp = getProdutoIMP_MOCA();
-        ProdutoAnteriorEanVO actual = new ProdutoRepository(provider).converterAnteriorEAN(imp);
-        
-        assertEquals("7891000100103", actual.getEan());
-        assertEquals("12345", actual.getImportId());
-        assertEquals("LOJA 02", actual.getImportLoja());
-        assertEquals("TESTE", actual.getImportSistema());
-        assertEquals(1, actual.getQtdEmbalagem());
-        assertEquals("UN", actual.getTipoEmbalagem());
-        assertEquals(0, actual.getValor(), 0.01);
-    }
-    
-    @Test
-    public void testConverterEANAnterior_ACEM() throws Exception {
-        ProdutoIMP imp = getProdutoIMP_ACEM();
-        ProdutoAnteriorEanVO actual = new ProdutoRepository(provider).converterAnteriorEAN(imp);
-        
-        assertEquals("18", actual.getEan());
-        assertEquals("3214", actual.getImportId());
-        assertEquals("LOJA 02", actual.getImportLoja());
-        assertEquals("TESTE", actual.getImportSistema());
-        assertEquals(1, actual.getQtdEmbalagem());
-        assertEquals("KG", actual.getTipoEmbalagem());
-        assertEquals(0, actual.getValor(), 0.01);
-    }
-    
-    @Test
     public void testConverterIMP_MOCA() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA();
         ProdutoVO actual = new ProdutoRepository(provider).converterIMP(imp, 12345, TipoEmbalagem.UN, false);
