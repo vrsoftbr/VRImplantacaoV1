@@ -65,6 +65,7 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepository;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.produto2.UnificadorProdutoRepository;
 import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepository;
 import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
@@ -566,7 +567,7 @@ public class Importador {
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
         if (Parametros.OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva()) {
-            new ProdutoRepository(provider).unificar2(produtos);
+            new UnificadorProdutoRepository(provider).unificar(produtos);
         } else {
             new ProdutoRepository(provider).unificar(produtos);
         }
