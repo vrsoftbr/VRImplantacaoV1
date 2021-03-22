@@ -2,6 +2,9 @@ package vrimplantacao2.dao.cadastro.produto2;
 
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
+import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
+import vrimplantacao2.vo.cadastro.ProdutoVO;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 class ProdutoConverter {
@@ -99,6 +102,25 @@ class ProdutoConverter {
         eanAnterior.setTipoEmbalagem(imp.getTipoEmbalagem());
         eanAnterior.setValor(0);
         return eanAnterior;
+    }
+    
+    /**
+     * Converte {@link ProdutoIMP} em {@link ProdutoAutomacaoVO} e inclui no
+     * {@link ProdutoVO}.
+     *
+     * @param imp {@link ProdutoIMP} de origem.
+     * @param ean EAN que será gravado.
+     * @param unidade
+     * @return {@link ProdutoAutomacaoVO} convertido;
+     */
+    public ProdutoAutomacaoVO converterEAN(ProdutoIMP imp, long ean, TipoEmbalagem unidade) {
+        ProdutoAutomacaoVO automacao = new ProdutoAutomacaoVO();
+        automacao.setCodigoBarras(ean);
+        automacao.setPesoBruto(imp.getPesoBruto());
+        automacao.setQtdEmbalagem(imp.getQtdEmbalagem());
+        automacao.setTipoEmbalagem(unidade);
+        automacao.setDun14(String.valueOf(automacao.getCodigoBarras()).length() > 13);
+        return automacao;
     }
     
 }

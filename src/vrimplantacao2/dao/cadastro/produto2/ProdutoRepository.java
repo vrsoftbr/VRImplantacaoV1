@@ -225,7 +225,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
 
                     if (id > 0 && ean > 0) { //ID e EAN válidos
                         if (!provider.automacao().cadastrado(ean)) {
-                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                            ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
                             automacao.setProduto(anterior.getCodigoAtual());
                             provider.automacao().salvar(automacao);
                         }
@@ -390,7 +390,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                         complemento.setProduto(prod);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
-                        ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                        ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
                         automacao.setProduto(prod);
 
                         ProdutoAutomacaoLojaVO precoAtacadoLoja = converterProdutoAutomacaoLoja(imp);
@@ -655,7 +655,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                                 if (forcarNovo) { 
                                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
                                     gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
-                                    ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                                    ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
                                     automacao.setProduto(codigoAtual);
                                     provider.automacao().salvar(automacao);
                                 }
@@ -667,7 +667,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                          * Cadastra o EAN no sistema.
                          */
                         if (codigoAtual != null) {
-                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                            ProdutoAutomacaoVO automacao = this.converter.converterEAN(imp, ean, unidade);
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
 
@@ -1209,25 +1209,6 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
         }
 
         return result;
-    }
-
-    /**
-     * Converte {@link ProdutoIMP} em {@link ProdutoAutomacaoVO} e inclui no
-     * {@link ProdutoVO}.
-     *
-     * @param imp {@link ProdutoIMP} de origem.
-     * @param ean EAN que será gravado.
-     * @param unidade
-     * @return {@link ProdutoAutomacaoVO} convertido;
-     */
-    public ProdutoAutomacaoVO converterEAN(ProdutoIMP imp, long ean, TipoEmbalagem unidade) {
-        ProdutoAutomacaoVO automacao = new ProdutoAutomacaoVO();
-        automacao.setCodigoBarras(ean);
-        automacao.setPesoBruto(imp.getPesoBruto());
-        automacao.setQtdEmbalagem(imp.getQtdEmbalagem());
-        automacao.setTipoEmbalagem(unidade);
-        automacao.setDun14(String.valueOf(automacao.getCodigoBarras()).length() > 13);
-        return automacao;
     }
 
     public void notificar() throws Exception {

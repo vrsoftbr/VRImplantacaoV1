@@ -15,6 +15,8 @@ import static vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest.getProd
 import static vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest.getProdutoIMP_MOCA;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
+import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -106,6 +108,30 @@ public class ProdutoConverterTest {
         assertEquals(1, actual.getQtdEmbalagem());
         assertEquals("KG", actual.getTipoEmbalagem());
         assertEquals(0, actual.getValor(), 0.01);
+    }
+
+    @Test
+    public void testConverterEAN_MOCA() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        ProdutoAutomacaoVO actual = new ProdutoConverter(provider).converterEAN(imp, 7891000100103L, TipoEmbalagem.UN);
+        assertEquals(7891000100103l, actual.getCodigoBarras());
+        assertEquals(TipoEmbalagem.UN, actual.getTipoEmbalagem());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertFalse(actual.isDun14());
+        assertEquals(-1, actual.getId()); //Não é para retornar nada
+        assertNull(actual.getProduto());
+    }
+    
+    @Test
+    public void testConverterEAN_ACEM() throws Exception {
+        ProdutoIMP imp = getProdutoIMP_ACEM();
+        ProdutoAutomacaoVO actual = new ProdutoConverter(provider).converterEAN(imp, 18, TipoEmbalagem.KG);
+        assertEquals(18, actual.getCodigoBarras());
+        assertEquals(TipoEmbalagem.KG, actual.getTipoEmbalagem());
+        assertEquals(1, actual.getQtdEmbalagem());
+        assertFalse(actual.isDun14());
+        assertEquals(-1, actual.getId()); //Não é para retornar nada
+        assertNull(actual.getProduto());
     }
     
 }

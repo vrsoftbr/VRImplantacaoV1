@@ -26,7 +26,6 @@ import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
-import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
 import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
@@ -306,30 +305,6 @@ public class ProdutoRepositoryTest {
         imp.setIcmsReducao(0);
         
         return imp;
-    }
-
-    @Test
-    public void testConverterEAN_MOCA() throws Exception {
-        ProdutoIMP imp = getProdutoIMP_MOCA();
-        ProdutoAutomacaoVO actual = new ProdutoRepository(provider).converterEAN(imp, 7891000100103L, TipoEmbalagem.UN);
-        assertEquals(7891000100103l, actual.getCodigoBarras());
-        assertEquals(TipoEmbalagem.UN, actual.getTipoEmbalagem());
-        assertEquals(1, actual.getQtdEmbalagem());
-        assertFalse(actual.isDun14());
-        assertEquals(-1, actual.getId()); //Não é para retornar nada
-        assertNull(actual.getProduto());
-    }
-    
-    @Test
-    public void testConverterEAN_ACEM() throws Exception {
-        ProdutoIMP imp = getProdutoIMP_ACEM();
-        ProdutoAutomacaoVO actual = new ProdutoRepository(provider).converterEAN(imp, 18, TipoEmbalagem.KG);
-        assertEquals(18, actual.getCodigoBarras());
-        assertEquals(TipoEmbalagem.KG, actual.getTipoEmbalagem());
-        assertEquals(1, actual.getQtdEmbalagem());
-        assertFalse(actual.isDun14());
-        assertEquals(-1, actual.getId()); //Não é para retornar nada
-        assertNull(actual.getProduto());
     }
     
     @Test
