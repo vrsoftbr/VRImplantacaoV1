@@ -191,15 +191,15 @@ public class HiperDAO extends InterfaceDAO {
                     "    left join hierarquia_produto m on m.id_hierarquia_produto = p.id_hierarquia_produto\n" +
                     "    left join situacao_tributaria_pis pis on pis.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis\n" +
                     "    left join situacao_tributaria_cofins cofins on cofins.id_situacao_tributaria_cofins = p.id_situacao_tributaria_cofins\n" +
-                    "	left join situacao_tributaria_pis pis_e on pis_e.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis_entrada\n" +
+                    "	 left join situacao_tributaria_pis pis_e on pis_e.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis_entrada\n" +
                     "    left join situacao_tributaria_cofins cofins_e on cofins_e.id_situacao_tributaria_cofins = p.id_situacao_tributaria_cofins_entrada\n" +
                     "    left join saldo_estoque est on est.id_produto = p.id_produto\n" +
                     "    left join natureza_receita_pis_cofins nat on nat.id_natureza_receita_pis_cofins = p.id_natureza_receita_pis\n" +
                     "    left join natureza_receita_pis_cofins nat2 on nat2.id_natureza_receita_pis_cofins = p.id_natureza_receita_cofins\n" +
                     "    left join view_hiperpdv_produto_tributacao_icms icm on icm.id_produto = p.id_produto\n" +
                     "    left join situacao_tributaria_icms cst_icms on cst_icms.id_situacao_tributaria_icms = icm.id_situacao_tributaria_icms\n" +
-                    "    	and icm.uf_de = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ") and \n" +
-                    "		icm.uf_para = (select c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ")\n" +
+                    "    	and icm.uf_de = (select distinct c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ") and \n" +
+                    "		icm.uf_para = (select distinct c.uf from filial f, cidade c where f.id_cidade = c.id_cidade and codigo_filial = " + getLojaOrigem() + ")\n" +
                     "left join regra_tributacao_produto rp on p.id_produto = rp.id_produto\n" +
                     "left join regra_tributacao rt on rp.id_regra_tributacao = rt.id_regra_tributacao\n" +       
                     "order by id_produto"
@@ -279,7 +279,7 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("red_icms"));
                     
                     //Consumidor
-                    imp.setIcmsCstConsumidor(imp.getIcmsCstEntrada());
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
                     imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
                     imp.setIcmsReducaoConsumidor(rst.getDouble("red_icms"));
                     

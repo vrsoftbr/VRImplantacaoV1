@@ -1357,6 +1357,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         private String sql;
         private VendaIMP next;
         private Set<String> uk = new HashSet<>();
+        private String versaoVenda = "1";
 
         private void obterNext() {
             try {
@@ -1365,9 +1366,7 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         
-                        DirectorDAO dao = new DirectorDAO();
-                        
-                        if ("1".equals(dao.getVersao())) {
+                        if ("1".equals(versaoVenda)) {
                             next = new VendaIMP();
                             String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
                             if (!uk.add(id)) {
@@ -1425,6 +1424,8 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String versao) throws Exception {
+            
+            this.versaoVenda = versao;
             
             if ("1".equals(versao)) {
             this.sql
@@ -1527,15 +1528,12 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
+        private String versaoVenda = "1";
 
         private void obterNext() {
             try {
-                
-                DirectorDAO dao = new DirectorDAO();
-                
                 if (next == null) {
-                    
-                    if ("1".equals(dao.getVersao())) {
+                    if ("1".equals(versaoVenda)) {
                         if (rst.next()) {
                             next = new VendaItemIMP();
                             String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
@@ -1628,6 +1626,8 @@ public class DirectorDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String versao) throws Exception {
+            
+            this.versaoVenda = versao;
             
             if ("1".equals(versao)) {
                 this.sql
