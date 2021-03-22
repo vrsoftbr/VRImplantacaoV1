@@ -31,18 +31,16 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
     
     public void unificar(List<ProdutoIMP> produtos) throws Exception {        
         produtos = new Organizador(this).organizarListagem(produtos);
-        produtos = filtrarEansValidosParaUnificacao(produtos);
         produtos = filtrarProdutosEEansJaMapeados(produtos);
         System.gc();
         
-        List<ProdutoIMP> produtosVinculadosComNovosEans = filtrarProdutosVinculadosComNovosEans(produtos);
-        List<ProdutoIMP> produtosExistentesComEansExistentes = filtrarProdutosExistentesComEansExistentes(produtos);        
-        List<ProdutoIMP> produtosExistentesEansNovos = filtrarProdutosExistentesComEansNovos(produtos);
-        List<ProdutoIMP> produtosNaoExistentes = filtrarProdutosNaoExistentes(produtos);
-        List<ProdutoIMP> produtosNaoEncontrados = filtrarProdutosNaoEncontrados(produtos);
+        List<ProdutoIMP> produtosComEanInvalido                 = filtrarProdutosComEanInvalido(produtos);
+        List<ProdutoIMP> produtosVinculadosComNovosEans         = filtrarProdutosVinculadosComNovosEans(produtos);
+        List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);        
+        List<ProdutoIMP> produtosNaoVinculadosComEansNovos      = filtrarProdutosNaoVinculadosComEansNovos(produtos);
         System.gc();        
         
-        for (ProdutoIMP imp: produtosExistentesComEansExistentes) {
+        for (ProdutoIMP imp: produtosNaoVinculadosComEansExistentes) {
             Integer idProduto = produtosPorEan.get(Utils.stringToLong(imp.getEan()));
             final boolean anteriorExistentePoremSemCodigoAtual = isProdutoVinculadoNaCodAnt(imp);
             ProdutoAnteriorVO anterior = converter.converterImpEmAnterior(imp);
@@ -55,14 +53,15 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         }
     }
     
-    List<ProdutoIMP> filtrarEansValidosParaUnificacao(List<ProdutoIMP> produtos) {
+    List<ProdutoIMP> filtrarProdutosComEanInvalido(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
         for (ProdutoIMP imp: produtos) {
             long ean = Utils.stringToLong(imp.getEan(), -2);
-            if (ean <= 999999)
+            if (ean > 999999)
                 continue;
             result.add(imp);
         }
+        produtos.removeAll(result);
         return result;
     }
     
@@ -98,19 +97,11 @@ class UnificadorProdutoRepository implements Organizador.OrganizadorNotifier {
         return this.produtosPorEan.containsKey(Utils.stringToLong(imp.getEan()));
     }
     
-    List<ProdutoIMP> filtrarProdutosExistentesComEansExistentes(List<ProdutoIMP> produtos) {
+    List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    List<ProdutoIMP> filtrarProdutosExistentesComEansNovos(List<ProdutoIMP> produtos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    List<ProdutoIMP> filtrarProdutosNaoExistentes(List<ProdutoIMP> produtos) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    List<ProdutoIMP> filtrarProdutosNaoEncontrados(List<ProdutoIMP> produtos) {
+    List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansNovos(List<ProdutoIMP> produtos) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

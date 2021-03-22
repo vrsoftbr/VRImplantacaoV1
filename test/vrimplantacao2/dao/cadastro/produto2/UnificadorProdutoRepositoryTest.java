@@ -85,7 +85,7 @@ public class UnificadorProdutoRepositoryTest {
         produtos.add(aux.impForTest("1000", "TESTE2", "0009874563"));
         
         UnificadorProdutoRepository rep = new UnificadorProdutoRepository(provider);
-        produtos = rep.filtrarEansValidosParaUnificacao(produtos);
+        List<ProdutoIMP> invalidos = rep.filtrarProdutosComEanInvalido(produtos);
         
         assertEquals(10, produtos.size());
         assertEquals("1", produtos.get(0).getImportId());
@@ -98,6 +98,10 @@ public class UnificadorProdutoRepositoryTest {
         assertEquals("200", produtos.get(7).getImportId());
         assertEquals("10", produtos.get(8).getImportId());
         assertEquals("1000", produtos.get(9).getImportId());
+        
+        assertEquals(2, invalidos.size());
+        assertEquals("2", invalidos.get(0).getImportId());
+        assertEquals("5", invalidos.get(1).getImportId());
         
     }
     
