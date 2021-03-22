@@ -18,12 +18,19 @@ public class Organizador {
     
     private static final Logger LOG = Logger.getLogger(Organizador.class.getName());
     
-    private final ProdutoRepository repository;
+    private final OrganizadorNotifier notifier;
+    private final Set<OpcaoProduto> opcoes;
     private final Set<Long> existentes = new HashSet<>();
     private final Set<Long> idsValidos = new HashSet<>();
     
-    public Organizador(ProdutoRepository repository) {
-        this.repository = repository;
+    public Organizador(OrganizadorNotifier repository, Set<OpcaoProduto> opcoes) {
+        this.notifier = repository;
+        this.opcoes = opcoes;
+    }
+    
+    public Organizador(OrganizadorNotifier repository) {
+        this.notifier = repository;
+        this.opcoes = new HashSet<>();
     }
 
     /**
@@ -35,14 +42,14 @@ public class Organizador {
     public List<ProdutoIMP> organizarListagem(List<ProdutoIMP> produtos) throws Exception {
         existentes.clear();
         LOG.info("Organizando a listagem de produtos. Total: " + produtos.size());
-        repository.setNotify("Produtos - Organizando produtos", produtos.size());
+        notifier.setNotify("Produtos - Organizando produtos", produtos.size());
 
         List<ProdutoIMP> filtrados = eliminarDuplicados(produtos);
         produtos.clear();
         System.gc();
 
-        List<ProdutoIMP> balanca = separarProdutosBalanca(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
-        List<ProdutoIMP> manterEAN = separarManterEAN(filtrados, repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
+        List<ProdutoIMP> balanca = separarProdutosBalanca(filtrados, opcoes.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
+        List<ProdutoIMP> manterEAN = separarManterEAN(filtrados, opcoes.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
         List<ProdutoIMP> validos = separarIdsValidos(filtrados);
         
         List<ProdutoIMP> result = new ArrayList<>();
@@ -249,7 +256,7 @@ public class Organizador {
      */
     public List<ProdutoIMP> eliminarDuplicados(List<ProdutoIMP> produtos) throws Exception {
         LOG.info("Eliminando produtos duplicados");
-        repository.setNotify("Produtos - Eliminando duplicados...", 0);
+        notifier.setNotify("Produtos - Eliminando duplicados...", 0);
         MultiMap<String, ProdutoIMP> result = new MultiMap<>();
         for (ProdutoIMP produto : produtos) {
             result.put(produto, produto.getImportId(), produto.getEan());
@@ -257,4 +264,7 @@ public class Organizador {
         return new ArrayList<>(result.values());
     }
     
+    public static interface OrganizadorNotifier {
+        public void setNotify(String message, int count) throws Exception;
+    }
 }

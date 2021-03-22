@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -28,7 +27,6 @@ import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
-import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.cadastro.ProdutoAutomacaoVO;
 import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
@@ -495,60 +493,6 @@ public class ProdutoRepositoryTest {
     }
     
     @Test
-    public void testConverterAnterior_MOCA() throws Exception {
-        ProdutoIMP imp = getProdutoIMP_MOCA();
-        ProdutoAnteriorVO actual = new ProdutoRepository(provider).converterImpEmAnterior(imp);
-        
-        assertEquals("17.020.00", actual.getCest());
-        assertArrayEquals(new String[] { "TESTE", "LOJA 02", "12345" }, actual.getChave());
-        assertNull(actual.getCodigoAtual());
-        assertEquals(0, actual.getContadorImportacao());
-        assertEquals(4.02d, actual.getCustocomimposto(), 0.01);
-        assertEquals(3.65d, actual.getCustosemimposto(), 0.01);
-        assertEquals("LEITE CONDENSADO CREMOSO MOCA LATA 395G", actual.getDescricao());
-        assertEquals(568, actual.getEstoque(), 0.01);
-        assertEquals(18d, actual.getIcmsAliq(), 0.1);
-        assertEquals(20, actual.getIcmsCst());
-        assertEquals(61.11d, actual.getIcmsReducao(), 0.01);
-        assertEquals("12345", actual.getImportId());
-        assertEquals("LOJA 02", actual.getImportLoja());
-        assertEquals("TESTE", actual.getImportSistema());
-        assertEquals(70, actual.getMargem(), 0.0);
-        assertEquals("0402.99.00", actual.getNcm());
-        assertEquals(71, actual.getPisCofinsCredito());
-        assertEquals(7, actual.getPisCofinsDebito());
-        assertEquals(101, actual.getPisCofinsNaturezaReceita());
-        assertEquals(7.12d, actual.getPrecovenda(),0.01);
-    }
-    
-    @Test
-    public void testConverterAnterior_ACEM() throws Exception {
-        ProdutoIMP imp = getProdutoIMP_ACEM();
-        ProdutoAnteriorVO actual = new ProdutoRepository(provider).converterImpEmAnterior(imp);
-        
-        assertEquals("17.083.00", actual.getCest());
-        assertArrayEquals(new String[] { "TESTE", "LOJA 02", "3214" }, actual.getChave());
-        assertNull(actual.getCodigoAtual());
-        assertEquals(0, actual.getContadorImportacao());
-        assertEquals(14.02d, actual.getCustocomimposto(), 0.01);
-        assertEquals(13.65d, actual.getCustosemimposto(), 0.01);
-        assertEquals("ACEM BOVINO KG", actual.getDescricao());
-        assertEquals(568, actual.getEstoque(), 0.01);
-        assertEquals(18d, actual.getIcmsAliq(), 0.1);
-        assertEquals(0, actual.getIcmsCst());
-        assertEquals(0, actual.getIcmsReducao(), 0.01);
-        assertEquals("3214", actual.getImportId());
-        assertEquals("LOJA 02", actual.getImportLoja());
-        assertEquals("TESTE", actual.getImportSistema());
-        assertEquals(70, actual.getMargem(), 0.0);
-        assertEquals("0210.20.00", actual.getNcm());
-        assertEquals(73, actual.getPisCofinsCredito());
-        assertEquals(6, actual.getPisCofinsDebito());
-        assertEquals(121, actual.getPisCofinsNaturezaReceita());
-        assertEquals(17.12d, actual.getPrecovenda(),0.01);
-    }
-    
-    @Test
     public void testConverterEANAnterior_MOCA() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA();
         ProdutoAnteriorEanVO actual = new ProdutoRepository(provider).converterAnteriorEAN(imp);
@@ -832,8 +776,5 @@ public class ProdutoRepositoryTest {
         rep.salvar(lista);
     }
     
-    @Test
-    public void testUnificar2() throws Exception {
-        
-    }
+    
 }

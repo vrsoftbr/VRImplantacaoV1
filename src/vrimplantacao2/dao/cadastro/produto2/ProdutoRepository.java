@@ -44,7 +44,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class ProdutoRepository {
+public class ProdutoRepository implements Organizador.OrganizadorNotifier {
 
     private static final Logger LOG = Logger.getLogger(ProdutoRepository.class.getName());
 
@@ -93,7 +93,7 @@ public class ProdutoRepository {
              * Organizando a listagem de dados antes de efetuar a gravação.
              */
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this, getOpcoes()).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -284,7 +284,7 @@ public class ProdutoRepository {
             provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this, getOpcoes()).organizarListagem(produtos);
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
@@ -520,7 +520,7 @@ public class ProdutoRepository {
         provider.begin();
         try {
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            List<ProdutoIMP> organizados = new Organizador(this, getOpcoes()).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -1252,6 +1252,7 @@ public class ProdutoRepository {
         provider.next();
     }
 
+    @Override
     public void setNotify(String descricao, int size) throws Exception {
         provider.setStatus(descricao);
         provider.setMaximum(size);

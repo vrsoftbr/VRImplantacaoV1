@@ -39,13 +39,13 @@ public class OrganizadorTest {
         System.out.print("OrganizadorTest.testOrganizarListagem()...");
         List<ProdutoIMP> imports = new ArrayList<>();
         
-        when(repository.getOpcoes()).thenReturn(new HashSet<>(Arrays.asList(
-                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
-                OpcaoProduto.IMPORTAR_MANTER_BALANCA
-        )));
-        
         imports.add(newProduto("1", "123", "UN", true, false));        
-        List<ProdutoIMP> result = new Organizador(repository).organizarListagem(imports);
+        List<ProdutoIMP> result = new Organizador(repository,
+                new HashSet<>(Arrays.asList(
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA
+                )
+        )).organizarListagem(imports);
         
         assertTrue(imports.isEmpty());
         assertEquals(1, result.size());
