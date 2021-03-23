@@ -486,8 +486,11 @@ public class ProdutoRepositoryProvider {
             return ncmDAO.getNcm(ncmStr);
         }
         
-        private Map<String, Icms> icms;
+        private Map<String, Icms> icms;        
         public Icms getAliquotaByMapaId(String icmsId) throws Exception {
+            return getAliquotaByMapaId(icmsId, false);
+        }
+        public Icms getAliquotaByMapaId(String icmsId, boolean returnNull) throws Exception {
             if (icms == null) {
                 icms = new HashMap<>();
                 for (MapaTributoVO vo: mapaDao.getMapa(getSistema(), getLoja())) {
@@ -498,12 +501,14 @@ public class ProdutoRepositoryProvider {
             }
             
             Icms icm = icms.get(icmsId);
-            if (icm == null) {                
+            if (icm == null) {
                 if (Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
                     icm = Icms.getIsento();
+                } else if (returnNull) {
+                    return null;
                 } else {
                     throw new Exception("Icms não existe: " + icmsId);
-                }                
+                }
             }
             
             return icm;

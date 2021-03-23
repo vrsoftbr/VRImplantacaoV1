@@ -19,6 +19,7 @@ import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -537,12 +538,19 @@ public class ProdutoRepository {
         }
     }
     
+    private static class AliquotaICMS {
+        
+    }
+    
     Map<String, Integer> codant;
     Map<Long, Integer> produtosPorEan;
     MultiMap<String, Integer> codigosAnterioresIdEan;
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        
+        verificarAliquotasMapeadas(produtos);
+        verificarAliquotasNaoMapeadas(produtos);
         
         setNotify("Carregando os dados necessários...", 3);
         this.codant = provider.anterior().getAnterioresIncluindoComCodigoAtualNull();
@@ -551,13 +559,11 @@ public class ProdutoRepository {
         notificar();
         this.codigosAnterioresIdEan = provider.anterior().getAnterioresPorIdEan();
         notificar();
+        int a = 0;
 
         provider.begin();
         try {
-            System.gc();
-            produtos.clear();
-            System.gc();
-
+            setNotify("Carregando ids livres...", 0);
             ProdutoIDStack idStack = provider.getIDStack();
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
 
@@ -606,6 +612,98 @@ public class ProdutoRepository {
             throw e;
         }
     }
+
+    private void verificarAliquotasNaoMapeadas(List<ProdutoIMP> produtos) throws Exception, NullPointerException {
+        Set<IcmsWraper> icmss = new HashSet<>();
+        for (ProdutoIMP imp: produtos) {
+            icmss.add(new IcmsWraper(imp.getIcmsCstSaida(), imp.getIcmsAliqSaida(), imp.getIcmsReducaoSaida()));
+        }
+        StringBuilder builder = new StringBuilder();
+        for (IcmsWraper icms: icmss) {
+            Icms ret = Icms.getIcmsPorValor(icms.cst, icms.aliquota, icms.reducao);
+            if (ret == null) {
+                builder.append(String.format("(cst:%d aliq: %.2f red: %.2f)", icms.cst, icms.aliquota, icms.reducao)).append("\n");
+            }
+        }
+        if (!builder.toString().isEmpty()) {
+            String msg = "Os seguintes ICMSs não foram encontrados:\n" + builder.toString();
+            System.out.println(msg);
+            if (!Parametros.get().isImportarIcmsIsentoMigracaoProduto())
+                throw new NullPointerException(msg);
+        }
+    }
+    
+    private void verificarAliquotasMapeadas(List<ProdutoIMP> produtos) throws Exception, NullPointerException {
+        Set<String> icmsIds = new HashSet<>();
+        for (ProdutoIMP imp: produtos) {
+            icmsIds.add(imp.getIcmsDebitoId());
+            icmsIds.add(imp.getIcmsDebitoForaEstadoId());
+            icmsIds.add(imp.getIcmsDebitoForaEstadoNfId());
+            icmsIds.add(imp.getIcmsConsumidorId());
+            icmsIds.add(imp.getIcmsCreditoId());
+            icmsIds.add(imp.getIcmsCreditoForaEstadoId());
+        }
+        StringBuilder builder = new StringBuilder();
+        for (String icmsId: icmsIds) {
+            if (icmsId != null && !"".equals(icmsId.trim())) {
+                Icms icms = this.provider.tributo().getAliquotaByMapaId(icmsId, true);
+                if (icms == null) {
+                    builder.append(icmsId).append(",");
+                }
+            }
+        }
+        if (!builder.toString().isEmpty()) {
+            String msg = "Os seguintes ids de alíquota não foram encontrados no mapeamento:\n" + builder.toString();
+            System.out.println(msg);
+            if (!Parametros.get().isImportarIcmsIsentoMigracaoProduto())
+                throw new NullPointerException(msg);
+        }
+    }
+    private static class IcmsWraper {
+
+        private final int cst;
+        private final double aliquota;
+        private final double reducao;
+        
+        public IcmsWraper(int cst, double aliquota, double reducao) {
+            this.cst = cst;
+            this.aliquota = aliquota;
+            this.reducao = reducao;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 53 * hash + this.cst;
+            hash = 53 * hash + (int) (Double.doubleToLongBits(this.aliquota) ^ (Double.doubleToLongBits(this.aliquota) >>> 32));
+            hash = 53 * hash + (int) (Double.doubleToLongBits(this.reducao) ^ (Double.doubleToLongBits(this.reducao) >>> 32));
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final IcmsWraper other = (IcmsWraper) obj;
+            if (this.cst != other.cst) {
+                return false;
+            }
+            if (Double.doubleToLongBits(this.aliquota) != Double.doubleToLongBits(other.aliquota)) {
+                return false;
+            }
+            return Double.doubleToLongBits(this.reducao) == Double.doubleToLongBits(other.reducao);
+        }
+        
+        
+    }
+    
     List<ProdutoIMP> filtrarProdutosEEansJaMapeados(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
         for (ProdutoIMP imp: produtos) {
