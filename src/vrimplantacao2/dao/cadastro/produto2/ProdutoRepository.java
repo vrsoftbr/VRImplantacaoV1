@@ -537,14 +537,20 @@ public class ProdutoRepository {
         }
     }
     
+    Map<String, Integer> codant;
+    Map<Long, Integer> produtosPorEan;
+    MultiMap<String, Integer> codigosAnterioresIdEan;
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        
+        this.codant = provider.anterior().getAnterioresIncluindoComCodigoAtualNull();
+        this.produtosPorEan = provider.automacao().getProdutosByEan();
+        this.codigosAnterioresIdEan = provider.anterior().getAnterioresPorIdEan();
 
         provider.begin();
         try {
             System.gc();
-            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
             produtos.clear();
             System.gc();
 
@@ -555,18 +561,105 @@ public class ProdutoRepository {
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
                 this.naoTransformarEANemUN = true;
             }
-
-            setNotify("Gravando os produtos...", organizados.size());
-            for (ProdutoIMP imp : organizados) {
+            
+            produtos = new Organizador(this).organizarListagem(produtos);
+            produtos = filtrarProdutosEEansJaMapeados(produtos);
+            System.gc();
+            
+            List<ProdutoIMP> produtosComEanInvalido = filtrarProdutosComEanInvalido(produtos);
+            setNotify("Registrando na codant ou forçando a gravação de EANs inválidos...", produtosComEanInvalido.size());
+            for (ProdutoIMP imp: produtosComEanInvalido) {
                 processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
             }
+            produtosComEanInvalido.clear();
+            System.gc();
+            
+            List<ProdutoIMP> produtosVinculadosComNovosEans = filtrarProdutosVinculadosComNovosEans(produtos);
+            setNotify("Incluindo novos EANs de produtos já importados...", produtosVinculadosComNovosEans.size());
+            for (ProdutoIMP imp: produtosVinculadosComNovosEans) {
+                processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            }
+            produtosVinculadosComNovosEans.clear();
+            System.gc();
+            
+            List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);
+            setNotify("Vinculando os produtos com EANs que já existem no VR...", produtosNaoVinculadosComEansExistentes.size());
+            for (ProdutoIMP imp: produtosNaoVinculadosComEansExistentes) {
+                processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);                
+            }
+            produtosNaoVinculadosComEansExistentes.clear();
+            System.gc();
+            
+            setNotify("Gravando os produtos novos...", produtos.size());
+            for (ProdutoIMP imp : produtos) {
+                processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            }
+            
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
     }
-
+    List<ProdutoIMP> filtrarProdutosEEansJaMapeados(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            if (isEanEIdExistenteNaCodAnt(imp))
+                continue;
+            result.add(imp);
+        }
+        return result;
+    }
+    private boolean isEanEIdExistenteNaCodAnt(ProdutoIMP imp) {
+        return this.codigosAnterioresIdEan.containsKey(imp.getImportId(), imp.getEan());
+    }
+    
+    List<ProdutoIMP> filtrarProdutosComEanInvalido(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            long ean = Utils.stringToLong(imp.getEan(), -2);
+            if (ean > 999999)
+                continue;
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
+    }
+    
+    List<ProdutoIMP> filtrarProdutosVinculadosComNovosEans(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {            
+            if (!isProdutoVinculadoNaCodAnt(imp))
+                continue;
+            if (isEanExistenteNoVR(imp))
+                continue;
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
+    }
+    private boolean isProdutoVinculadoNaCodAnt(ProdutoIMP imp) {
+        return this.codant.containsKey(imp.getImportId());
+    }
+    private boolean isEanExistenteNoVR(ProdutoIMP imp) {
+        return this.produtosPorEan.containsKey(Utils.stringToLong(imp.getEan()));
+    }
+    
+    List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            long ean = Utils.stringToLong(imp.getEan());
+            boolean eanNaoExisteNoVR = !this.produtosPorEan.containsKey(ean);
+            
+            if (eanNaoExisteNoVR)
+                continue;
+            
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
+    }
+    
     private void processarProdutoIMPParaUnificacao(ProdutoIMP imp, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
         String obsImportacao = "";
         imp.setManterEAN(false);
