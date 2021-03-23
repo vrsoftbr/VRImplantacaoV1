@@ -500,7 +500,7 @@ public class ProdutoRepository {
             }
         }
     }
-
+    
     /**
      * Unifica uma listagem de produtos no sistema.
      *
@@ -528,7 +528,37 @@ public class ProdutoRepository {
 
             setNotify("Gravando os produtos...", organizados.size());
             for (ProdutoIMP imp : organizados) {
-                processarImpUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
+                processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            }
+            provider.commit();
+        } catch (Exception e) {
+            provider.rollback();
+            throw e;
+        }
+    }
+    
+    public void unificar2(List<ProdutoIMP> produtos) throws Exception {
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+
+        provider.begin();
+        try {
+            System.gc();
+            List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            produtos.clear();
+            System.gc();
+
+            ProdutoIDStack idStack = provider.getIDStack();
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+
+            boolean unificarProdutoBalanca = provider.getOpcoes().contains(OpcaoProduto.UNIFICAR_PRODUTO_BALANCA);
+            if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
+                this.naoTransformarEANemUN = true;
+            }
+
+            setNotify("Gravando os produtos...", organizados.size());
+            for (ProdutoIMP imp : organizados) {
+                processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
             }
             provider.commit();
         } catch (Exception e) {
@@ -537,7 +567,7 @@ public class ProdutoRepository {
         }
     }
 
-    private void processarImpUnificacao(ProdutoIMP imp, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
+    private void processarProdutoIMPParaUnificacao(ProdutoIMP imp, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
         String obsImportacao = "";
         imp.setManterEAN(false);
         //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
