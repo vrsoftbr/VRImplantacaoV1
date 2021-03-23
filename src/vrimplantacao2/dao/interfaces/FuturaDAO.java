@@ -21,9 +21,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class FuturaDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public String complemento = "";
+    
     @Override
     public String getSistema() {
-        return "Futura";
+        return "Futura" + complemento;
     }
     
     public List<Estabelecimento> getLojaCliente() throws SQLException {
