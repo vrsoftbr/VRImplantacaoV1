@@ -648,7 +648,7 @@ public class ProdutoRepository {
                                 
                                 if (forcarNovo) { 
                                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
-                                    gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
+                                    gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
                                     ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                                     automacao.setProduto(codigoAtual);
                                     provider.automacao().salvar(automacao);
@@ -665,7 +665,7 @@ public class ProdutoRepository {
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
 
-                            gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual.getId(), obsImportacao);
+                            gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
                         }
                     } else {
                         id = idProdutoExistente;
@@ -674,7 +674,7 @@ public class ProdutoRepository {
                         obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
 
                         // gravar codigo atual se for null
-                        gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), id, obsImportacao);
+                        gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
                     }
                 }
 
@@ -708,7 +708,7 @@ public class ProdutoRepository {
         }
     }
 
-    public void gravarCodigoAtual(String impsistema, String imploja, String impid, int codigoatual, String obsimportacao) throws Exception {
+    public void gravarCodigoAtual(String impsistema, String imploja, String impid, ProdutoVO codigoAtual, String obsimportacao) throws Exception {
         try {
             Conexao.begin();
 
@@ -722,11 +722,15 @@ public class ProdutoRepository {
                         + " and impsistema = '" + impsistema + "'"
                         + " and codigoatual is null"
                 );
-                sql.put("codigoatual", codigoatual);
+                sql.put("codigoatual", codigoAtual.getId());
                 sql.put("obsimportacao", obsimportacao);
 
                 stm.execute(sql.getUpdate());
-                
+                provider.anterior().get(
+                        impsistema,
+                        imploja,
+                        impid
+                ).setCodigoAtual(codigoAtual);
             }
             Conexao.commit();
         } catch (Exception ex) {
