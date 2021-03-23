@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.CestDAO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -242,6 +241,10 @@ public class ProdutoRepositoryProvider {
         public Map<String, Integer> getAnteriores() throws Exception {
             return dao.getAnteriores(getSistema(), getLoja());
         }
+        
+        public Map<String, Integer> getAnterioresIncluindoComCodigoAtualNull() throws Exception {
+            return dao.getAnterioresIncluindoComCodigoAtualNull(getSistema(), getLoja());
+        }
 
         public ProdutoAnteriorVO getLojaImp(String... keys) throws Exception {
             dao.setImportSistema(getSistema());
@@ -283,7 +286,13 @@ public class ProdutoRepositoryProvider {
             dao.setImportLoja(getLoja());
             return dao.getForcarNovo().containsKey(getSistema(), getLoja(), impid);
         }
-    
+        
+        public MultiMap<String, Integer> getAnterioresPorIdEan() throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            return dao.getAnterioresPorIdEan(getSistema(), getLoja());
+        }
+
     }
     
     public class Complemento {
@@ -392,6 +401,10 @@ public class ProdutoRepositoryProvider {
 
         public void atualizar(ProdutoAutomacaoVO automacao, Set<OpcaoProduto> opt) throws Exception {
             dao.atualizar(automacao, opt);
+        }
+
+        public Map<Long, Integer> getProdutosByEan() throws Exception {
+            return dao.getProdutosByEan();
         }
     
     }

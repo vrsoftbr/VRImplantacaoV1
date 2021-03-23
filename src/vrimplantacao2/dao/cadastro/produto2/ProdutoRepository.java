@@ -544,9 +544,13 @@ public class ProdutoRepository {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
+        setNotify("Carregando os dados necessários...", 3);
         this.codant = provider.anterior().getAnterioresIncluindoComCodigoAtualNull();
+        notificar();
         this.produtosPorEan = provider.automacao().getProdutosByEan();
+        notificar();
         this.codigosAnterioresIdEan = provider.anterior().getAnterioresPorIdEan();
+        notificar();
 
         provider.begin();
         try {
@@ -562,6 +566,7 @@ public class ProdutoRepository {
                 this.naoTransformarEANemUN = true;
             }
             
+            setNotify("Removendo da listagem produtos já importados e vinculados...", 0);
             produtos = new Organizador(this).organizarListagem(produtos);
             produtos = filtrarProdutosEEansJaMapeados(produtos);
             System.gc();
