@@ -83,7 +83,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
-            OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+            /*OpcaoProduto.MERCADOLOGICO_POR_NIVEL,*/
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
@@ -958,7 +958,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
 
-        if (opt == OpcaoProduto.MERCADOLOGICO) {
+        /*if (opt == OpcaoProduto.MERCADOLOGICO) {
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
@@ -984,7 +984,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             return result;
-        }
+        }*/
 
         return null;
     }
