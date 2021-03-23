@@ -726,11 +726,22 @@ public class ProdutoRepository {
                 sql.put("obsimportacao", obsimportacao);
 
                 stm.execute(sql.getUpdate());
-                provider.anterior().get(
+                ProdutoAnteriorVO anterior = provider.anterior().get(
                         impsistema,
                         imploja,
                         impid
-                ).setCodigoAtual(codigoAtual);
+                );
+                if (anterior != null) {
+                    anterior.setCodigoAtual(codigoAtual);
+                } else {
+                    System.out.println("Anterior não encontrado: " + String.format(
+                            "%s-%s-%s - ca %d",
+                            impsistema,
+                            imploja,
+                            impid,
+                            codigoAtual.getId()
+                    ));
+                }
             }
             Conexao.commit();
         } catch (Exception ex) {
