@@ -708,6 +708,7 @@ public class ProdutoRepository {
         }
     }
 
+    private int countSemAnterior = 0;
     public void gravarCodigoAtual(String impsistema, String imploja, String impid, ProdutoVO codigoAtual, String obsimportacao) throws Exception {
         try {
             Conexao.begin();
@@ -734,7 +735,8 @@ public class ProdutoRepository {
                 if (anterior != null) {
                     anterior.setCodigoAtual(codigoAtual);
                 } else {
-                    System.out.println("Anterior não encontrado: " + String.format(
+                    countSemAnterior++;
+                    System.out.println(countSemAnterior + " - Anterior não encontrado: " + String.format(
                             "%s-%s-%s - ca %d",
                             impsistema,
                             imploja,
