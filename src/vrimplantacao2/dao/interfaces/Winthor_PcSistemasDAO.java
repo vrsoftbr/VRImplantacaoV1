@@ -660,7 +660,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "	round(coalesce(p.pesoliq, 0),2) pesoliquido,\n" +
                     "	coalesce(est.estmin, 0) estoqueminimo,\n" +
                     "	coalesce(est.estmax, 0) estoquemaximo,    \n" +
-                    "	coalesce(est.qtest,0) estoque,\n" +
+                    "	coalesce(est.qtestger,0) estoque,\n" +
                     "	coalesce(ean.margem,0) margem,\n" +
                     "	coalesce(est.CUSTOULTENTCONT,0) custosemimposto,\n" +
                     "	coalesce(est.VLULTPCOMPRA,0) custocomimposto,\n" +
