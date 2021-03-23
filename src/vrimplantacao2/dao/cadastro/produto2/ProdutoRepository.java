@@ -932,6 +932,7 @@ public class ProdutoRepository {
         notificar();
     }
 
+    private int countSemAnterior = 0;
     public void gravarCodigoAtual(String impsistema, String imploja, String impid, ProdutoVO codigoAtual, String obsimportacao) throws Exception {
         try {
             Conexao.begin();
@@ -950,11 +951,23 @@ public class ProdutoRepository {
                 sql.put("obsimportacao", obsimportacao);
 
                 stm.execute(sql.getUpdate());
-                provider.anterior().get(
+                ProdutoAnteriorVO anterior = provider.anterior().get(
                         impsistema,
                         imploja,
                         impid
-                ).setCodigoAtual(codigoAtual);
+                );
+                if (anterior != null) {
+                    anterior.setCodigoAtual(codigoAtual);
+                } else {
+                    countSemAnterior++;
+                    System.out.println(countSemAnterior + " - Anterior não encontrado: " + String.format(
+                            "%s-%s-%s - ca %d",
+                            impsistema,
+                            imploja,
+                            impid,
+                            codigoAtual.getId()
+                    ));
+                }
             }
             Conexao.commit();
         } catch (Exception ex) {
