@@ -885,6 +885,27 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         }
     }
 
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new SuperControle_SuperServerDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new SuperControle_SuperServerDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -902,7 +923,7 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -957,8 +978,8 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     + "	v.fkCliente idcliente,\n"
                     + "	fkPDV ecf,\n"
                     + "	CAST(CONVERT(NVARCHAR, dtInicio, 23) as date) data,\n"
-                    + " CAST(CONVERT(NVARCHAR, dtInicio, 8) as time) horainicio,\n"
-                    + " CAST(CONVERT(NVARCHAR, dtFim, 8) as time) horatermino,\n"
+                    + "	CAST(CONVERT(NVARCHAR, dtInicio, 8) as time) horainicio,\n"
+                    + "	CAST(CONVERT(NVARCHAR, dtFim, 8) as time) horatermino,\n"
                     + "	vlSubTotal subtotalimpressora,\n"
                     + "	cpfCnpj cpf,\n"
                     + "	vlDesconto desconto,\n"
@@ -974,13 +995,14 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                     + "from\n"
                     + "	Comercial.Venda v\n"
                     + "	left join Cadastro.Entidade c on v.fkCliente = c.id\n"
-                    + "	left join Cadastro.Endereco ender on ender.fkEntidade = c.id and ender.id in (select max(id) id from Cadastro.Endereco group by fkEntidade)\n"
+                    + "	left join Cadastro.Endereco ender on ender.fkEntidade = c.id\n"
+                    + "		and ender.id in (select max(id) id from Cadastro.Endereco group by fkEntidade)\n"
                     + "	left join Cadastro.Municipio cid on cid.cdMunicipio = ender.fkmunicipio\n"
                     + "	left join Cadastro.UF est on est.cdUF = cid.fkUF\n"
                     + "where\n"
                     + "	fkLoja = " + idLojaCliente + " \n"
                     + "	and CONVERT(NVARCHAR, dtInicio, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                    + "	order by 5,2";
+                    + "	order by dtInicio, coo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1018,11 +1040,13 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id_venda");
+                        String idItem = rst.getString("id_item");
 
-                        next.setId(rst.getString("id"));
                         next.setVenda(id);
+                        next.setId(idItem);
                         next.setProduto(rst.getString("produto"));
+                        next.setSequencia(rst.getInt("nroitem"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
@@ -1041,38 +1065,31 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select\n"
-                    + "    cx.id,\n"
-                    + "    cx.coo as numerocupom,\n"
-                    + "    cx.codcaixa as ecf,\n"
-                    + "    cx.data as data,\n"
-                    + "    cx.codprod as produto,\n"
-                    + "    pr.DESC_PDV as descricao,    \n"
-                    + "    isnull(cx.qtd, 0) as quantidade,\n"
-                    + "    isnull(cx.totitem, 0) as total,\n"
-                    + "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n"
-                    + "    isnull(cx.descitem, 0) as desconto,\n"
-                    + "    isnull(cx.acrescitem, 0) as acrescimo,\n"
-                    + "    case\n"
-                    + "     when LEN(cx.barra) > 14 \n"
-                    + "     then SUBSTRING(cx.BARRA, 4, LEN(cx.barra))\n"
-                    + "    else cx.BARRA end as codigobarras,\n"
-                    + "    pr.unidade,\n"
-                    + "    cx.codaliq codaliq_venda,\n"
-                    + "    pr.codaliq codaliq_produto,\n"
-                    + "    ic.DESCRICAO trib_desc\n"
+                    = "select \n"
+                    + "	i.fkVenda id_venda,\n"
+                    + "	CONCAT(i.fkVenda,v.coo,i.fkOrdem) id_item,\n"
+                    + "	i.fkOrdem nroitem,\n"
+                    + "	v.coo numerocupom,\n"
+                    + "	i.fkProduto produto,\n"
+                    + " SUBSTRING(prod.id,0,14) codigobarras,\n"
+                    + "	prod.unidade unidade,\n"
+                    + "	descricaoCompleta descricao,\n"
+                    + "	i.qtdade quantidade,\n"
+                    + "	vlUnit precovenda,\n"
+                    + "	i.vlTotal total,\n"
+                    + "	i.vlDesconto desconto,\n"
+                    + "	i.vlAcrescimo acrescimo,\n"
+                    + "	cancelado,\n"
+                    + "	v.fkPDV ecf,\n"
+                    + "	v.dtInicio data\n"
                     + "from\n"
-                    + "    caixageral as cx\n"
-                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
-                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
-                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
-                    + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
+                    + "	Comercial.ItemVendido i\n"
+                    + "left join Comercial.Venda v on v.id = i.fkVenda\n"
+                    + "left join (select distinct id,unidade from CadProduto.Produto) prod on i.fkproduto = prod.id\n"
                     + "where\n"
-                    + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
-                    + "    cx.codloja = " + idLojaCliente + " and\n"
-                    + "    cx.atualizado = 'S' and\n"
-                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
+                    + "	fkLoja = " + idLojaCliente + "\n"
+                    + "	and CONVERT(NVARCHAR, dtInicio, 23) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "order BY v.coo,i.fkOrdem";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
