@@ -92,6 +92,7 @@ public class MercaLiteGUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
+                dao.setIdLojaComplemento(txtComplemento.getText().trim());
                 return dao.getSistema();
             }
 
@@ -178,6 +179,7 @@ public class MercaLiteGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     dao.setEncoding(txtEncoding.getText());
+                    dao.setIdLojaComplemento(txtComplemento.getText().trim());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
@@ -198,13 +200,7 @@ public class MercaLiteGUI extends VRInternalFrame {
                         }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(
-                                    OpcaoCliente.DADOS,
-                                    OpcaoCliente.CONTATOS,
-                                    OpcaoCliente.VALOR_LIMITE,
-                                    OpcaoCliente.SITUACAO_CADASTRO,
-                                    OpcaoCliente.EMAIL,
-                                    OpcaoCliente.BAIRRO);
+                            importador.importarClientePreferencial();
                         }
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
@@ -237,11 +233,6 @@ public class MercaLiteGUI extends VRInternalFrame {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        /*if(chkPdvVendas.isSelected()) {
-                         dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                         dao.setDataTerminoVenda(edtDtVendaFim.getDate());
-                         importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                         }*/
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
