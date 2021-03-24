@@ -267,6 +267,7 @@
                               <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFContasAPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="226" max="32767" attributes="0"/>
                       </Group>
@@ -288,7 +289,9 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFContasAPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="98" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -347,6 +350,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCondicaoPagamentoActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFContasAPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas &#xe0; Pagar"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFContasAPagarActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
