@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vr.core.utils.StringUtils;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
@@ -1276,7 +1277,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         "    c.cepent cep,\n" +
                         "    c.dtnasc datanascimento,\n" +
                         "    c.dtcadastro datacadastro,\n" +
-                        "    CASE c.sexo WHEN 'F' THEN 0 ELSE 1 END sexo,\n" +
+                        "    c.sexo,\n" +
                         "    c.empresa,\n" +
                         "    c.enderempr empresaendereco,\n" +
                         "    c.municempr empresamunicipio,\n" +
@@ -1344,7 +1345,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setCep(rst.getString("cep"));
                         imp.setDataNascimento(rst.getDate("datanascimento"));
                         imp.setDataCadastro(rst.getDate("datacadastro"));
-                        switch (rst.getString("sexo")) {
+                        switch (StringUtils.acertarTexto(rst.getString("sexo"), "M")) {
                             case "F": imp.setSexo(TipoSexo.FEMININO); break;
                             default: imp.setSexo(TipoSexo.MASCULINO); break;
                         }
@@ -1379,7 +1380,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         if (rst.getString("emailnfe") != null) {
                             imp.addContato("1", "NFE", "", "", rst.getString("emailnfe"));
                         }
-                        
+                        imp.setEmail(rst.getString("email"));
                         imp.setCobrancaEndereco(rst.getString("endercob"));
                         imp.setCobrancaNumero(rst.getString("numerocob"));
                         imp.setCobrancaComplemento(rst.getString("complementocob"));
