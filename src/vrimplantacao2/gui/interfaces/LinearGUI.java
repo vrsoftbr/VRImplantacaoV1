@@ -43,6 +43,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         chkSomenteEansUnitarios.setSelected(params.getBool(SISTEMA, "SOMENTE_PRODUTOS_UNITARIOS"));
         edtDtVendaIni.setDate(params.getDate(SISTEMA, "VENDAS_INI"));
         edtDtVendaFim.setDate(params.getDate(SISTEMA, "VENDAS_FIM"));
+        chkUtilizarEs1ParaCotacao.setSelected(params.getBool(false, SISTEMA, "UTILIZAR_ES!_PARA_COTACAO"));
         conexaoMySQL.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -54,6 +55,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         params.put(chkSomenteEansUnitarios.isSelected(), SISTEMA, "SOMENTE_PRODUTOS_UNITARIOS");
         params.put(edtDtVendaIni.getDate(), SISTEMA, "VENDAS_INI");
         params.put(edtDtVendaFim.getDate(), SISTEMA, "VENDAS_FIM");
+        params.put(chkUtilizarEs1ParaCotacao.isSelected(), SISTEMA, "UTILIZAR_ES!_PARA_COTACAO");
         conexaoMySQL.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -176,6 +178,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    dao.setUtilizarEs1ParaCotacao(chkUtilizarEs1ParaCotacao.isSelected());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -271,6 +274,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
         txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
         pnlOutros = new vrframework.bean.panel.VRPanel();
         chkSomenteEansUnitarios = new vrframework.bean.checkBox.VRCheckBox();
+        chkUtilizarEs1ParaCotacao = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
@@ -308,13 +312,17 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkSomenteEansUnitarios.setText("Somente EANs unitários");
 
+        chkUtilizarEs1ParaCotacao.setText("Utilizar qtd. embalagem da tabela es1p para cotação");
+
         javax.swing.GroupLayout pnlOutrosLayout = new javax.swing.GroupLayout(pnlOutros);
         pnlOutros.setLayout(pnlOutrosLayout);
         pnlOutrosLayout.setHorizontalGroup(
             pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlOutrosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlOutrosLayout.setVerticalGroup(
@@ -322,6 +330,8 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(pnlOutrosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -658,6 +668,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkUtilizarEs1ParaCotacao;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;

@@ -3,6 +3,7 @@ package vrimplantacao2.dao.interfaces.linear;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,6 +40,12 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private Date vendaDataIni;
     private Date vendaDataFim;
+    private boolean utilizarEs1ParaCotacao = false;
+        
+
+    public void setUtilizarEs1ParaCotacao(boolean utilizarEs1ParaCotacao) {
+        this.utilizarEs1ParaCotacao = utilizarEs1ParaCotacao;
+    }
 
     public void setVendaDataIni(Date vendaDataIni) {
         this.vendaDataIni = vendaDataIni;
@@ -225,7 +232,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.Es1_UM unidade,\n" +
                     "	pc.ES1_QEMBV qtdembalagem,\n" +
                     "	pc.Es1_UM2 unidadecompra,\n" +
-                    "	pc.es1_qembc qtdembalagemcompra,\n" +
+                    "	pc.es1_qembc qtdembalagemcompra,	\n" +
+                    "	pr.es1_embalagem unidade_p,\n" +
+                    "	pr.es1_convun qtdembalagem_p,	\n" +
                     "	pr.es1_familia merc1,\n" +
                     "	pr.es1_departamento merc2,\n" +
                     "	pr.es1_secao merc3,\n" +
@@ -233,7 +242,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
                     "	pc.Es1_Ativo situacao,\n" +
-                    "	pc.ES1_DTCAD cadastro,\n" +
+                    "	case \n" +
+                    "		when pc.ES1_DTCAD < '1999-01-01' then '1995-01-01'\n" +
+                    "		else pc.es1_dtcad \n" +
+                    "	end cadastro,\n" +
                     "	pc.ES1_TRIBUTACAO idicms,\n" +
                     "	pc.es1_margemcom margempadrao,\n" +
                     "	pc.es1_ultmargem margemvarejo,\n" +
@@ -255,11 +267,14 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.pis_natreceita naturezareceita\n" +
                     "FROM\n" +
                     "	es1p pr\n" +
-                    "JOIN es1 pc ON pr.es1_cod = pc.ES1_COD\n" +
-                    "LEFT JOIN es1a ean ON pr.es1_cod = ean.ES1_COD\n" +
+                    "	JOIN es1 pc ON\n" +
+                    "		pr.es1_cod = pc.ES1_COD\n" +
+                    "	LEFT JOIN es1a ean ON\n" +
+                    "		pr.es1_cod = ean.ES1_COD\n" +
                     "WHERE \n" +
                     "	pc.es1_empresa = " + getLojaOrigem())) {
                 //"   length(cast(convert(ean.es1_codbarra, UNSIGNED INTEGER) AS char)) > 6"
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -274,8 +289,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagemCotacao(rs.getString("unidadecompra"));
-                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcompra"));
+                    if (this.utilizarEs1ParaCotacao) {                        
+                        imp.setTipoEmbalagemCotacao(rs.getString("unidade_p"));
+                        imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagem_p"));
+                    } else {
+                        imp.setTipoEmbalagemCotacao(rs.getString("unidadecompra"));
+                        imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcompra"));
+                    }
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
@@ -283,7 +303,11 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
-                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    if (!"0000-00-00".equals(rs.getString("cadastro"))) {
+                        imp.setDataCadastro(rs.getDate("cadastro"));
+                    } else {
+                        imp.setDataCadastro(format.parse("2000-01-01"));
+                    }
                     imp.setIcmsDebitoId(rs.getString("idicms"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
@@ -781,6 +805,6 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new LinearVendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
-    }    
+    }
     
 }
