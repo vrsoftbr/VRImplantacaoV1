@@ -45,6 +45,7 @@ public class MercaLiteGUI extends VRInternalFrame {
         txtPortaFirebird.setText(params.getWithNull("3050", NOME_SISTEMA, "PORTA"));
         txtUsuarioFirebird.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
         txtSenhaFirebird.setText(params.getWithNull("masterkey", NOME_SISTEMA, "SENHA"));
+        txtComplemento.setText(params.get(NOME_SISTEMA, "COMPLEMENTO"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
@@ -58,6 +59,7 @@ public class MercaLiteGUI extends VRInternalFrame {
         params.put(txtPortaFirebird.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioFirebird.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaFirebird.getText(), NOME_SISTEMA, "SENHA");
+        params.put(txtComplemento.getText(), NOME_SISTEMA, "COMPLEMENTO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");

@@ -35,17 +35,17 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(MercaLiteDAO.class.getName());
     private String idLojaComplemento = "";
-    
+
     public String getIdLojaComplemento() {
         return this.idLojaComplemento;
     }
-    
+
     public void setIdLojaComplemento(String idLojaComplemento) {
         this.idLojaComplemento = idLojaComplemento;
     }
 
     @Override
-    public String getSistema() {        
+    public String getSistema() {
         if (!getIdLojaComplemento().trim().isEmpty()) {
             return "MercaLite - " + getIdLojaComplemento();
         } else {
@@ -194,10 +194,7 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
-                    imp.setImportId(rs.getString("importid").trim());
-                    imp.setEan(imp.getImportId());
-                    
+                    imp.setImportId(rs.getString("importid"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -211,26 +208,62 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("m1"));
                     imp.setCodMercadologico2(rs.getString("m2"));
                     imp.setCodMercadologico3(rs.getString("m3"));
-                    
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                    } else {
+                        if (imp.getImportId() != null
+                                && !imp.getImportId().trim().trim().isEmpty()
+                                && imp.getImportId().trim().length() == 7
+                                && imp.getImportId().startsWith("20")) {
+
+                            String ean;
+                            ean = imp.getImportId().trim().substring(1, imp.getImportId().trim().length() - 1);
+                            imp.seteBalanca(true);
+                            imp.setEan(ean);
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setEan(imp.getImportId());
+                        }
                     }
 
                     String idIcms = getAliquotaKey(
-                            rs.getString("icms_cst"), 
-                            rs.getDouble("icms_aliq"), 
+                            rs.getString("icms_cst"),
+                            rs.getDouble("icms_aliq"),
                             0
                     );
-                    
+
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
                     imp.setIcmsConsumidorId(idIcms);
-                    
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT COD, UND FROM CADPROD c "
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("COD"));
+                    imp.setEan(imp.getImportId());
+                    imp.setTipoEmbalagem(rst.getString("UND"));
                     result.add(imp);
                 }
             }
@@ -243,28 +276,28 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n" +
-                    "	codprod idproduto,\n" +
-                    "	per1 datainicio,\n" +
-                    "	per2 datafim,\n" +
-                    "	pr_unit preconormal,\n" +
-                    "	pr_per precooferta\n" +
-                    "FROM\n" +
-                    "	ATAKREJO\n" +
-                    "WHERE \n" +
-                    "	pr_per > 0\n" +
-                    "	AND pr_unit > 0\n" +
-                    "	AND CAST(CASE WHEN per2 = '  .  .       :  ' THEN CURRENT_date \n" +
-                    "       WHEN per2 = '' THEN current_date ELSE per2 end AS timestamp) >= current_date")) {
+                    "SELECT\n"
+                    + "	codprod idproduto,\n"
+                    + "	per1 datainicio,\n"
+                    + "	per2 datafim,\n"
+                    + "	pr_unit preconormal,\n"
+                    + "	pr_per precooferta\n"
+                    + "FROM\n"
+                    + "	ATAKREJO\n"
+                    + "WHERE \n"
+                    + "	pr_per > 0\n"
+                    + "	AND pr_unit > 0\n"
+                    + "	AND CAST(CASE WHEN per2 = '  .  .       :  ' THEN CURRENT_date \n"
+                    + "       WHEN per2 = '' THEN current_date ELSE per2 end AS timestamp) >= current_date")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    
+
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setDataInicio(Utils.convertStringToDate("dd.MM.yyyy HH:mm", rs.getString("datainicio")));
                     imp.setDataFim(Utils.convertStringToDate("dd.MM.yyyy HH:mm", rs.getString("datafim")));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -405,7 +438,7 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                 red
         );
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -429,13 +462,13 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                             0
                     );
                     result.add(
-                        new MapaTributoIMP(
-                            id,
-                            id,
-                            rst.getInt("cst"),
-                            rst.getDouble("icms"),
-                            0
-                        )
+                            new MapaTributoIMP(
+                                    id,
+                                    id,
+                                    rst.getInt("cst"),
+                                    rst.getDouble("icms"),
+                                    0
+                            )
                     );
                 }
             }
