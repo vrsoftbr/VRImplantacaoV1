@@ -730,7 +730,8 @@ public class ProdutoRepository {
         return result;
     }
     private boolean isEanEIdExistenteNaCodAnt(ProdutoIMP imp) {
-        return this.codigosAnterioresIdEan.containsKey(imp.getImportId(), imp.getEan());
+        Integer codigoatual = this.codigosAnterioresIdEan.get(imp.getImportId(), imp.getEan());
+        return codigoatual != null;
     }
     
     List<ProdutoIMP> filtrarProdutosComEanInvalido(List<ProdutoIMP> produtos) {

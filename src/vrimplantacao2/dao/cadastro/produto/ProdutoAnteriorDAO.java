@@ -1294,7 +1294,7 @@ public class ProdutoAnteriorDAO {
             )) {
                 while (rst.next()) {
                     result.put(
-                            rst.getInt("codigoatual"),
+                            rst.getInt("codigoatual") == 0 ? null : rst.getInt("codigoatual"),
                             rst.getString("importid"),
                             rst.getString("ean")
                     );
