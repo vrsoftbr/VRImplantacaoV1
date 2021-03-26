@@ -38,10 +38,19 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
     private Date vendaDataIni;
     private Date vendaDataFim;
     private boolean utilizarEs1ParaCotacao = false;
-        
+    private boolean filtrarProdutos = false;
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
+    public void setFiltrarProdutos(boolean filtrarProdutos) {
+        this.filtrarProdutos = filtrarProdutos;
+    }   
 
     public void setUtilizarEs1ParaCotacao(boolean utilizarEs1ParaCotacao) {
         this.utilizarEs1ParaCotacao = utilizarEs1ParaCotacao;
@@ -53,10 +62,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
-    }    
+    }
     
     @Override
     public String getSistema() {
+        if (!"".equals(this.complemento)) {
+            return "Linear - " + this.complemento;
+        }
         return "Linear";
     }
     
@@ -272,6 +284,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	LEFT JOIN es1a ean ON\n" +
                     "		pr.es1_cod = ean.ES1_COD\n" +
                     "WHERE \n" +
+                    (this.filtrarProdutos ? "   not pr.id_central is null and\n": "") +
                     "	pc.es1_empresa = " + getLojaOrigem())) {
                 //"   length(cast(convert(ean.es1_codbarra, UNSIGNED INTEGER) AS char)) > 6"
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -540,7 +553,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cg1_email_boleto emailboleto,\n" +
                     "	c.cg1_pai pai,\n" +
                     "	c.cg1_mae mae,\n" +
-                    "	c.cg1_data nascimento,\n" +
+                    "	case \n" +
+                    "		when c.cg1_data < '1999-01-01' then '1995-01-01'\n" +
+                    "		else c.cg1_data \n" +
+                    "	end nascimento,\n" +
                     "	c.cg1_profissao profissao,\n" +
                     "	c.CG1_EstCivil estadocivil,\n" +
                     "	case\n" +
@@ -565,7 +581,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cg1_empresacliente empresa,\n" +
                     "	c.cg1_nomeconjuge conjuge\n" +
                     "FROM\n" +
-                    "	cg1 c")) {
+                    "	cg1 c")) {                
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
@@ -615,7 +632,11 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmail(rs.getString("email"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
-                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    if (!"0000-00-00".equals(rs.getString("nascimento"))) {
+                        imp.setDataNascimento(rs.getDate("nascimento"));
+                    } else {
+                        imp.setDataNascimento(format.parse("2000-01-01"));
+                    }
                     imp.setEstadoCivil(rs.getString("estadocivil"));
                     
                     String limite = rs.getString("limite");
