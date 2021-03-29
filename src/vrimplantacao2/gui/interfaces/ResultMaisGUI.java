@@ -126,8 +126,6 @@ public class ResultMaisGUI extends VRInternalFrame {
 
         carregarLojaVR();
         carregarLojaCliente();
-        //carregaEspecieReceber();
-        //carregaEspeciePagar();
         gravarParametros();
 
         btnMapaTrib.setEnabled(true);
@@ -161,19 +159,6 @@ public class ResultMaisGUI extends VRInternalFrame {
         cmbLojaOrigem.setSelectedIndex(index);
     }
 
-    /*public void carregaEspecieReceber() throws Exception {
-     cmbPlanoContas.setModel(new DefaultComboBoxModel());
-     for(RMSistemasDAO.PlanoConta esp : rmsistemasDAO.getEspecie()) {
-     cmbPlanoContas.addItem(esp);
-     }
-     }
-    
-     public void carregaEspeciePagar() throws Exception {
-     cmbContaPagar.setModel(new DefaultComboBoxModel());
-     for(RMSistemasDAO.PlanoConta esp : rmsistemasDAO.getEspecie()) {
-     cmbContaPagar.addItem(esp);
-     }
-     }*/
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
@@ -300,16 +285,6 @@ public class ResultMaisGUI extends VRInternalFrame {
                             importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
                         }
 
-                        if (chkRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
-
-                        /*
-                         if(chkPdvVendas.isSelected()) {
-                         rmsistemasDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                         rmsistemasDAO.setDataFimVenda(edtDtVendaFim.getDate());
-                         importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                         }*/
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -405,14 +380,6 @@ public class ResultMaisGUI extends VRInternalFrame {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkLimite = new vrframework.bean.checkBox.VRCheckBox();
-        tablCreditoRotativo = new javax.swing.JPanel();
-        chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        tabCliVenda = new javax.swing.JPanel();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
-        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
-        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
-        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -536,7 +503,7 @@ public class ResultMaisGUI extends VRInternalFrame {
 
         chkMargem.setText("Margem");
 
-        chkTipoEmbalagem.setText("Tp. Emb. (Produto)");
+        chkTipoEmbalagem.setText("Tipo Emb. (Produto)");
 
         pnlImpProd.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -605,7 +572,6 @@ public class ResultMaisGUI extends VRInternalFrame {
             .addGroup(tabDadosLayout.createSequentialGroup()
                 .addGap(9, 9, 9)
                 .addComponent(pnlImpProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabDadosLayout.createSequentialGroup()
                         .addGap(46, 46, 46)
@@ -627,7 +593,7 @@ public class ResultMaisGUI extends VRInternalFrame {
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkT1ICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -685,7 +651,7 @@ public class ResultMaisGUI extends VRInternalFrame {
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(319, Short.MAX_VALUE))
+                .addContainerGap(322, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -737,103 +703,6 @@ public class ResultMaisGUI extends VRInternalFrame {
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
-
-        chkRotativo.setText("Crédito Rotativo");
-
-        javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
-        tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
-        tablCreditoRotativoLayout.setHorizontalGroup(
-            tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(388, Short.MAX_VALUE))
-        );
-        tablCreditoRotativoLayout.setVerticalGroup(
-            tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(316, Short.MAX_VALUE))
-        );
-
-        tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
-
-        vRPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
-
-        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtDtVendaIniActionPerformed(evt);
-            }
-        });
-
-        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtDtVendaFimActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnlPdvVendaDatasLayout = new javax.swing.GroupLayout(pnlPdvVendaDatas);
-        pnlPdvVendaDatas.setLayout(pnlPdvVendaDatasLayout);
-        pnlPdvVendaDatasLayout.setHorizontalGroup(
-            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPdvVendaDatasLayout.createSequentialGroup()
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnlPdvVendaDatasLayout.setVerticalGroup(
-            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        chkPdvVendas.setEnabled(true);
-        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkPdvVendasActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout tabCliVendaLayout = new javax.swing.GroupLayout(tabCliVenda);
-        tabCliVenda.setLayout(tabCliVendaLayout);
-        tabCliVendaLayout.setHorizontalGroup(
-            tabCliVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabCliVendaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(192, Short.MAX_VALUE))
-        );
-        tabCliVendaLayout.setVerticalGroup(
-            tabCliVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabCliVendaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(266, Short.MAX_VALUE))
-        );
-
-        tabCliente.addTab("Venda", tabCliVenda);
 
         tab.addTab("Clientes", tabCliente);
 
@@ -1029,7 +898,7 @@ public class ResultMaisGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
+                .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(1, 1, 1)
@@ -1088,14 +957,6 @@ public class ResultMaisGUI extends VRInternalFrame {
         instance = null;
     }//GEN-LAST:event_onClose
 
-    private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
-
-    }//GEN-LAST:event_chkClienteEventualActionPerformed
-
-    private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
-
-    }//GEN-LAST:event_chkClientePreferencialActionPerformed
-
     private void chkProdutoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkProdutoFornecedorActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkProdutoFornecedorActionPerformed
@@ -1108,22 +969,6 @@ public class ResultMaisGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtLojaIDActionPerformed
 
-    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
-        if (edtDtVendaIni.getDate() == null) {
-            edtDtVendaIni.setDate(new Date());
-        }
-    }//GEN-LAST:event_edtDtVendaIniActionPerformed
-
-    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
-        if (edtDtVendaFim.getDate() == null) {
-            edtDtVendaFim.setDate(new Date());
-        }
-    }//GEN-LAST:event_edtDtVendaFimActionPerformed
-
-    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkPdvVendasActionPerformed
-
     private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
 
     }//GEN-LAST:event_btnMapaTribActionPerformed
@@ -1131,6 +976,14 @@ public class ResultMaisGUI extends VRInternalFrame {
     private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
+
+    private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
+
+    }//GEN-LAST:event_chkClienteEventualActionPerformed
+
+    private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
+
+    }//GEN-LAST:event_chkClientePreferencialActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarPostgres;
@@ -1151,12 +1004,10 @@ public class ResultMaisGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
     private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;
@@ -1174,20 +1025,15 @@ public class ResultMaisGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
-    private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private javax.swing.JPanel pnlImpProd;
-    private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
-    private javax.swing.JPanel tabCliVenda;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrframework.bean.panel.VRPanel tabUnificacao;
-    private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.textField.VRTextField txtBancoDadosPostgres;
     private vrframework.bean.textField.VRTextField txtHostPostgres;
     private vrframework.bean.textField.VRTextField txtLojaID;
@@ -1203,7 +1049,6 @@ public class ResultMaisGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
