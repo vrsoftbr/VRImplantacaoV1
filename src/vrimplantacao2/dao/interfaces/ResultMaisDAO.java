@@ -40,7 +40,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select distinct\n"
                     + "	valor_taxa || '-' || st || '-' || valor_reducao codigo,\n"
                     + "	valor_taxa || '%' ||\n"
                     + "	case\n"
