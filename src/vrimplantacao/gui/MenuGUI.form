@@ -1535,7 +1535,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuRMSistemas">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="RMSistemas"/>
+                            <Property name="text" type="java.lang.String" value="ResultMais"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuRMSistemasActionPerformed"/>

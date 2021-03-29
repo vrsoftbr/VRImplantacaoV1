@@ -2536,7 +2536,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuPostgres2.add(mnuCervantes);
 
-        mnuRMSistemas.setText("RMSistemas");
+        mnuRMSistemas.setText("ResultMais");
         mnuRMSistemas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuRMSistemasActionPerformed(evt);
