@@ -1950,6 +1950,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and vi.vdet_datamvto = v.nfcc_dataemissao\n"
                     + "where v.nfcc_unid_codigo = '" + idLojaCliente + "' \n"
                     + " and vi.vdet_unid_codigo = '" + idLojaCliente + "' \n"
+                    + " and vi.vdet_status = 'N'\n"
                     /*+ " and vi.vdet_datamvto "
                     + "     between '" + FORMAT.format(dataInicio) + "' "
                     + "         and '" + FORMAT.format(dataInicio) + "' \n"*/
@@ -1999,14 +2000,14 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.next()) {
 
                         String id
-                                = rst.getString("idvenda")
+                                = rst.getString("id")
                                 + "-" + rst.getString("numerocupom")
                                 + "-" + rst.getString("datavenda")
                                 + "-" + rst.getString("idproduto")
                                 + "-" + rst.getString("codigobarras")
                                 + "-" + rst.getString("sequencia");
                         
-                        String idvenda = rst.getString("idvenda") + "-" + rst.getString("numerocupom");
+                        String idvenda = rst.getString("id") + "-" + rst.getString("numerocupom");
 
                         next = new VendaItemIMP();
 
@@ -2014,14 +2015,14 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setVenda(idvenda);
                         next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("valorvenda"));
                         next.setSequencia(rst.getInt("sequencia"));
-                        //next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+                        next.setTotalBruto(rst.getDouble("valortotal"));
                         //next.setCancelado(rst.getBoolean("cancelado"));
                         //next.setValorAcrescimo(rst.getDouble("valoracrescimo"));
                         //next.setValorDesconto(rst.getDouble("valordesconto"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
-                        //next.setUnidadeMedida(rst.getString("unidademedida"));
+                        next.setUnidadeMedida(rst.getString("tipoembalagem"));
                         next.setIcmsCst(rst.getInt("csticms"));
                         next.setIcmsAliq(rst.getDouble("aliqicms"));
                         next.setIcmsReduzido(0);
@@ -2035,21 +2036,26 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, String tabelaVenda) throws Exception {
             this.sql = "select \n"
-                    + "	vi.vdet_transacao as idvenda,\n"
+                    + "	vi.vdet_transacao as id,	\n"
                     + "	vi.vdet_cupom as numerocupom,\n"
                     + "	vi.vdet_datamvto as datavenda,\n"
                     + "	vi.vdet_prod_codigo as idproduto,\n"
                     + "	vi.vdet_codbarras as codigobarras,\n"
+                    + " un.prun_emb as tipoembalagem, \n"
                     + "	vi.vdet_sequencial as sequencia,\n"
                     + "	vi.vdet_qtde as quantidade,\n"
-                    + "	vi.vdet_valor as valorvenda,\n"
+                    + "	vi.vdet_valor as valortotal,\n"
+                    + "	trunc((coalesce(vi.vdet_valor, 0) / coalesce(vi.vdet_qtde, 1)), 2) as precovenda,\n"
                     + "	vi.vdet_cst as csticms,\n"
                     + "	vi.vdet_icms as aliqicms\n"
                     + "from vdadet" + tabelaVenda + " vi \n"
+                    + " join produtos p on p.prod_codigo = vi.vdet_prod_codigo\n"
+                    + " left join produn un on p.prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'"
                     /*+ "where vi.vdet_datamvto "
                     + " between '" + VendaIterator.FORMAT.format(dataInicio) + "' "
                     + "     and '" + VendaIterator.FORMAT.format(dataInicio) + "'\n"*/
-                    + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'";
+                    + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'\n"
+                    + " and vi.vdet_status = 'N'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
