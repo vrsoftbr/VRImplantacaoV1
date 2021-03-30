@@ -51,7 +51,7 @@
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-              <Component id="vRTabbedPane1" pref="152" max="32767" attributes="0"/>
+              <Component id="vRTabbedPane1" pref="153" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="tab" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
@@ -151,6 +151,7 @@
                                           <Group type="103" groupAlignment="0" attributes="0">
                                               <Component id="chkFamiliaProduto" alignment="1" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkAssociado" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="chkT1ProdMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkT1Custo" min="-2" max="-2" attributes="0"/>
@@ -216,7 +217,9 @@
                           <Component id="chkQtdEmbCotacao" min="-2" max="-2" attributes="0"/>
                           <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="25" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkAssociado" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="5" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chkT1ICMS" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkT1Preco" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -393,6 +396,17 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTribActionPerformed"/>
               </Events>
             </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAssociado">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Associado"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkAssociadoActionPerformed"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="tabFornecedor">
@@ -431,7 +445,7 @@
                       <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="322" max="32767" attributes="0"/>
+                      <EmptySpace pref="325" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

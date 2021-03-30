@@ -40,19 +40,19 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select distinct\n"
-                     + "	st || '-' || valor_taxa || '-' || valor_reducao codigo,\n"
-                     + "	valor_taxa || '%' ||\n"
-                     + "	case\n"
-                     + "	  when st = '20' then ' RED'\n"
-                     + "	  when st = '60' then ' SUBS'\n"
-                     + "	  else ''\n"
-                     + "	end descricao,\n"
-                     + "	st cst,\n"
-                     + "	valor_taxa aliquota,\n"
-                     + "	valor_reducao reducao\n"
-                     + "from\n"
-                     + "	produto_tributo pt\n"
-                     + "order by 1,2"
+                    + "	st || '-' || valor_taxa || '-' || valor_reducao codigo,\n"
+                    + "	valor_taxa || '%' ||\n"
+                    + "	case\n"
+                    + "	  when st = '20' then ' RED'\n"
+                    + "	  when st = '60' then ' SUBS'\n"
+                    + "	  else ''\n"
+                    + "	end descricao,\n"
+                    + "	st cst,\n"
+                    + "	valor_taxa aliquota,\n"
+                    + "	valor_reducao reducao\n"
+                    + "from\n"
+                    + "	produto_tributo pt\n"
+                    + "order by 1,2"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codigo"),
