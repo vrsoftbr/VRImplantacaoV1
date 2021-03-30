@@ -89,6 +89,7 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2.dao.interfaces.ResultMaisDAO;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -278,6 +279,7 @@ import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
+import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -795,6 +797,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPostgres2 = new javax.swing.JMenu();
         mnuAthos = new javax.swing.JMenuItem();
         mnuCervantes = new javax.swing.JMenuItem();
+        mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
@@ -2532,6 +2535,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuCervantes);
+
+        mnuRMSistemas.setText("ResultMais");
+        mnuRMSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRMSistemasActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuRMSistemas);
 
         mnuViggo.setText("Viggo");
         mnuViggo.addActionListener(new java.awt.event.ActionListener() {
@@ -5139,6 +5150,11 @@ public final class MenuGUI extends VRMdiFrame {
         IServerGUI.exibir(this);
     }//GEN-LAST:event_mnuIServerActionPerformed
 
+    private void mnuRMSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRMSistemasActionPerformed
+        // TODO add your handling code here:
+        ResultMaisGUI.exibir(this);
+    }//GEN-LAST:event_mnuRMSistemasActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5378,6 +5394,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRKSoftware;
     private javax.swing.JMenuItem mnuRMS_2;
+    private javax.swing.JMenuItem mnuRMSistemas;
     private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
