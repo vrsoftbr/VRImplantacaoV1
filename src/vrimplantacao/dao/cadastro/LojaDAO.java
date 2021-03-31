@@ -240,7 +240,8 @@ public class LojaDAO {
 
                 sql = new StringBuilder();
                 sql.append("INSERT INTO pdv.parametrovalor (id_loja,id_parametro,valor)");
-                sql.append(" (SELECT " + i_loja.id + ",id_parametro,valor FROM pdv.parametrovalor WHERE id_loja = " + i_loja.idCopiarLoja + ")");
+                sql.append(" (SELECT " + i_loja.id + ",id_parametro,valor FROM pdv.parametrovalor WHERE id_loja = " + i_loja.idCopiarLoja + "");
+                sql.append("    AND id_parametro not in (67, 97))");
 
                 stm.execute(sql.toString());
 
