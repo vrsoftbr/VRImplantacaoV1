@@ -16,6 +16,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SuperControle_SuperServerDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -24,10 +25,10 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class SuperControle_SuperServerGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "SuperServer";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static SuperControle_SuperServerGUI instance;    
+    private static SuperControle_SuperServerGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private SuperControle_SuperServerDAO dao = new SuperControle_SuperServerDAO();
@@ -40,7 +41,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexao.atualizarParametros();
@@ -58,28 +59,28 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private SuperControle_SuperServerGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         this.title = "Importação " + SISTEMA;
-        
+
         conexao.setSistema(SISTEMA);
-        
+
         conexao.host = "localhost";
         conexao.database = "sc2010";
         conexao.user = "sc2010";
         conexao.pass = "P0sa4P0s0";
         conexao.port = "1433";
-        
+
         conexao.setOnConectar(new ConexaoEvent() {
             @Override
             public void executar() throws Exception {
                 validarDadosAcesso();
             }
         });
-        
+
         pnlProdutos.setOpcoesDisponiveis(dao);
         pnlProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -105,15 +106,15 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
             }
         });
         pnlProdutos.btnMapaTribut.setEnabled(false);
-        
+
         pnlBalanca.setSistema(SISTEMA);
         pnlBalanca.setLoja(vLojaCliente);
-        
+
         carregarParametros();
-        
+
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -123,18 +124,18 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
     }
 
-    public void validarDadosAcesso() throws Exception {        
+    public void validarDadosAcesso() throws Exception {
         pnlProdutos.btnMapaTribut.setEnabled(true);
         gravarParametros();
         carregarLojaCliente();
         carregarLojaVR();
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: dao.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -143,7 +144,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -157,10 +158,10 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new SuperControle_SuperServerGUI(i_mdiFrame);
             }
@@ -176,29 +177,30 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id; 
-                    
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+
                     Importador importador = new Importador(dao);
                     updateDaoSistemaLoja();
-                    importador.setLojaVR(idLojaVR);                    
+                    importador.setLojaVR(idLojaVR);
 
-                    if (tabs.getSelectedIndex() == 0) {                        
+                    if (tabs.getSelectedIndex() == 0) {
                         pnlProdutos.setImportador(importador);
                         pnlProdutos.executarImportacao();
-                        
+
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
-                        
+
                         {
                             List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                            
+
                             if (chkFornFantasia.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.NOME_FANTASIA);
                             }
@@ -211,25 +213,33 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                             }
-                        }                        
-                        
+                        }
+
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE, 
-                                    OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL);
+                            importador.importarClientePreferencial(
+                                    OpcaoCliente.DADOS,
+                                    OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.SITUACAO_CADASTRO,
+                                    OpcaoCliente.INSCRICAO_ESTADUAL);
                         }
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
+                        }
+                        if (chkPdvVendas.isSelected()) {
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -240,10 +250,10 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
@@ -252,7 +262,7 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
                             dao.importarDigitoVerificador();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -773,7 +783,5 @@ public class SuperControle_SuperServerGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.textArea.VRTextArea vRTextArea1;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

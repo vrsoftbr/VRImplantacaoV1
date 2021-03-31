@@ -3,7 +3,6 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,10 +34,23 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(MercaLiteDAO.class.getName());
+    private String idLojaComplemento = "";
+
+    public String getIdLojaComplemento() {
+        return this.idLojaComplemento;
+    }
+
+    public void setIdLojaComplemento(String idLojaComplemento) {
+        this.idLojaComplemento = idLojaComplemento;
+    }
 
     @Override
     public String getSistema() {
-        return "MercaLite";
+        if (!getIdLojaComplemento().trim().isEmpty()) {
+            return "MercaLite - " + getIdLojaComplemento();
+        } else {
+            return "MercaLite";
+        }
     }
 
     private String Encoding = "WIN1252";
@@ -56,6 +68,7 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
@@ -89,7 +102,6 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
                     OpcaoProduto.CODIGO_BENEFICIO
                 }
         ));
@@ -182,9 +194,7 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
-                    imp.setImportId(rs.getString("importid").trim());
-                    imp.setEan(imp.getImportId());
+                    imp.setImportId(rs.getString("importid"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -198,36 +208,39 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("m1"));
                     imp.setCodMercadologico2(rs.getString("m2"));
                     imp.setCodMercadologico3(rs.getString("m3"));
-                    
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
-                        if (bal != null) {
+
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getImportId(), -2));
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                    } else {
+                        if (imp.getImportId() != null
+                                && !imp.getImportId().trim().trim().isEmpty()
+                                && imp.getImportId().trim().length() == 7
+                                && imp.getImportId().startsWith("20")) {
+
+                            String ean;
+                            ean = imp.getImportId().trim().substring(1, imp.getImportId().trim().length() - 1);
                             imp.seteBalanca(true);
-                            imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                            imp.setEan(ean);
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setEan(imp.getImportId());
                         }
+                    }
 
-                    //imp.seteBalanca("S".equals(rs.getString("balanca")));
-                    
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_aliq"));
-                    imp.setIcmsCstSaida(rs.getInt("icms_cst"));
-                    imp.setIcmsReducaoSaida(0);
+                    String idIcms = getAliquotaKey(
+                            rs.getString("icms_cst"),
+                            rs.getDouble("icms_aliq"),
+                            0
+                    );
 
-                    imp.setIcmsAliqConsumidor(rs.getDouble("icms_aliq"));
-                    imp.setIcmsCstConsumidor(rs.getInt("icms_cst"));
-                    imp.setIcmsReducaoConsumidor(0);
-
-                    /*String icmsDeb = rs.getString("tabicm");
-                     imp.setIcmsDebitoId(icmsDeb);
-                     imp.setIcmsDebitoForaEstadoId(icmsDeb);
-                     imp.setIcmsDebitoForaEstadoNfId(icmsDeb);
-                     imp.setIcmsConsumidorId(icmsDeb);
-
-                     String icmsCre = getAliquotaCreditoKey(
-                     rs.getString("icms_cst_credito"),
-                     rs.getDouble("icms_credito"),
-                     rs.getDouble("icms_reducao_credito")
-                     );
-                     imp.setIcmsCreditoId(icmsCre);
-                     imp.setIcmsCreditoForaEstadoId(icmsCre);*/
+                    imp.setIcmsDebitoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                    imp.setIcmsCreditoId(idIcms);
+                    imp.setIcmsCreditoForaEstadoId(idIcms);
+                    imp.setIcmsConsumidorId(idIcms);
 
                     result.add(imp);
                 }
@@ -236,13 +249,26 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private String getAliquotaCreditoKey(String cst, double aliq, double red) throws SQLException {
-        return String.format(
-                "%s-%.2f-%.2f",
-                cst,
-                aliq,
-                red
-        );
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT COD, UND FROM CADPROD c "
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("COD"));
+                    imp.setEan(imp.getImportId());
+                    imp.setTipoEmbalagem(rst.getString("UND"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -250,28 +276,28 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         List<OfertaIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n" +
-                    "	codprod idproduto,\n" +
-                    "	per1 datainicio,\n" +
-                    "	per2 datafim,\n" +
-                    "	pr_unit preconormal,\n" +
-                    "	pr_per precooferta\n" +
-                    "FROM\n" +
-                    "	ATAKREJO\n" +
-                    "WHERE \n" +
-                    "	pr_per > 0\n" +
-                    "	AND pr_unit > 0\n" +
-                    "	AND CAST(CASE WHEN per2 = '  .  .       :  ' THEN CURRENT_date \n" +
-                    "       WHEN per2 = '' THEN current_date ELSE per2 end AS timestamp) >= current_date")) {
+                    "SELECT\n"
+                    + "	codprod idproduto,\n"
+                    + "	per1 datainicio,\n"
+                    + "	per2 datafim,\n"
+                    + "	pr_unit preconormal,\n"
+                    + "	pr_per precooferta\n"
+                    + "FROM\n"
+                    + "	ATAKREJO\n"
+                    + "WHERE \n"
+                    + "	pr_per > 0\n"
+                    + "	AND pr_unit > 0\n"
+                    + "	AND CAST(CASE WHEN per2 = '  .  .       :  ' THEN CURRENT_date \n"
+                    + "       WHEN per2 = '' THEN current_date ELSE per2 end AS timestamp) >= current_date")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    
+
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setDataInicio(Utils.convertStringToDate("dd.MM.yyyy HH:mm", rs.getString("datainicio")));
                     imp.setDataFim(Utils.convertStringToDate("dd.MM.yyyy HH:mm", rs.getString("datafim")));
                     imp.setPrecoNormal(rs.getDouble("preconormal"));
                     imp.setPrecoOferta(rs.getDouble("precooferta"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -279,85 +305,6 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*@Override
-     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
-     List<PautaFiscalIMP> result = new ArrayList<>();
-
-     try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "    id_produto,\n"
-     + "    nome_produto,\n"
-     + "    ncm,\n"
-     + "    tabicm aliquota_debito_id,\n"
-     + "    icm.tabicm_st cst_debito,\n"
-     + "    icm.tabicm_aliq icms_aliquota_debito,\n"
-     + "    icm.tabicm_pbc icms_aliquota_debito_reducao,\n"
-     + "    icm_aliq aliquota_credito,\n"
-     + "    icm_cst cst_credito,\n"
-     + "    icm_pbc aliquota_reducao_credito,\n"
-     + "    icm_stperc aliquota_final_credito,\n"
-     + "    icm_mva\n"
-     + "from\n"
-     + "    est_produtos p\n"
-     + "join tab_icm icm on p.tabicm = icm.id_tabicm\n"
-     + "where\n"
-     + "    icm_mva > 0\n"
-     + "order by\n"
-     + "    2"
-     )) {
-     while (rst.next()) {
-     PautaFiscalIMP imp = new PautaFiscalIMP();
-                    
-     if ("7891000100103".equals(rst.getString("id_produto"))) {
-     System.out.println("ACHOU");
-     }
-
-     imp.setId(rst.getString("id_produto"));
-     imp.setIva(rst.getDouble("icm_mva"));
-     imp.setIvaAjustado(imp.getIva());
-     imp.setNcm(rst.getString("ncm"));
-                    
-     int cst;
-     double aliquota = rst.getDouble("aliquota_credito");
-     double reduzido = 0;
-                    
-     if (rst.getDouble("aliquota_reducao_credito") == 100) {
-     reduzido = 0;
-     } else {
-     reduzido = rst.getDouble("aliquota_reducao_credito");
-     }
-                    
-     if (reduzido > 0) {
-     cst = 20;
-     } else if (aliquota == 0) {
-     cst = rst.getInt("cst_debito");
-     } else {
-     cst = 0;
-     }
-                    
-     imp.setAliquotaDebito(cst, aliquota, reduzido);
-     imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
-     imp.setAliquotaCredito(cst, aliquota, reduzido);
-     imp.setAliquotaCreditoForaEstado(cst, aliquota, reduzido);
-                    
-     //imp.setAliquotaDebito(rst.getInt("icms_aliquota_debito") > 0 ? 0 : rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
-     //imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
-
-     //if (rst.getDouble("aliquota_reducao_credito") == 100) {
-     //    reducao = 0;
-     //} else {
-     //    reducao = rst.getDouble("aliquota_reducao_credito");
-     //}
-     //imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), reducao);
-     //imp.setAliquotaCreditoForaEstado(reducao > 0 ? 20 : 0, rst.getDouble("aliquota_credito"), reducao);
-                                        
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }*/
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -470,7 +417,6 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
-                    //imp.setEcf(rs.getString("ecf"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setObservacao(rs.getString("observacao"));
@@ -484,44 +430,46 @@ public class MercaLiteDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private String getAliquotaKey(String cst, double aliq, double red) throws SQLException {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    id_tabicm id,\n"
-                    + "    tabicm_descricao descricao\n"
-                    + "from\n"
-                    + "    tab_icm"
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT DISTINCT \n"
+                    + "CASE trib \n"
+                    + "	WHEN 'T' THEN '00'\n"
+                    + "	WHEN 'I' THEN '40'\n"
+                    + "	WHEN 'N' THEN '41'\n"
+                    + "	WHEN 'F' THEN '60'\n"
+                    + "END cst, \n"
+                    + "TAXA AS icms, \n"
+                    + "0 AS reducao FROM CADPROD"
             )) {
-                while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
-                }
-            }
-            try (ResultSet rs = stm.executeQuery(
-                    "select DISTINCT\n"
-                    + "    icm_cst as icms_cst_credito,\n"
-                    + "    icm_aliq as icms_credito,\n"
-                    + "    icm_pbc icms_reducao_credito\n"
-                    + "from\n"
-                    + "    est_produtos p\n"
-                    + "order by\n"
-                    + "    p.icm_cst"
-            )) {
-                while (rs.next()) {
-                    String id = getAliquotaCreditoKey(
-                            rs.getString("icms_cst_credito"),
-                            rs.getDouble("icms_credito"),
-                            rs.getDouble("icms_reducao_credito")
+                while (rst.next()) {
+                    String id = getAliquotaKey(
+                            rst.getString("cst"),
+                            rst.getDouble("icms"),
+                            0
                     );
-                    result.add(new MapaTributoIMP(
-                            id,
-                            id,
-                            Utils.stringToInt(rs.getString("icms_cst_credito")),
-                            rs.getDouble("icms_credito"),
-                            rs.getDouble("icms_reducao_credito")
-                    ));
+                    result.add(
+                            new MapaTributoIMP(
+                                    id,
+                                    id,
+                                    rst.getInt("cst"),
+                                    rst.getDouble("icms"),
+                                    0
+                            )
+                    );
                 }
             }
         }

@@ -2,9 +2,13 @@ package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
@@ -20,6 +24,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.HiperDAO;
+import vrimplantacao2.dao.interfaces.SysPdvDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -36,6 +41,8 @@ public class HiperGUI extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private int vTipoVenda = -1;
+    
+    private Set<String> rotativoSelecionado = new HashSet<>();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -69,6 +76,26 @@ public class HiperGUI extends VRInternalFrame {
         params.salvar();
     }
 
+    private FinalizadoraTableModel rotativoModel = new FinalizadoraTableModel(new ArrayList<SysPdvDAO.FinalizadoraRecord>());
+    private void carregarFinalizadora() throws Exception {
+        this.rotativoModel = new FinalizadoraTableModel(this.dao.getFinalizadora());
+        for (SysPdvDAO.FinalizadoraRecord f: this.rotativoModel.getItens()) {
+            f.selected = rotativoSelecionado.contains(f.id);
+        }
+        this.rotativoModel.addTableModelListener(new TableModelListener(){
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                SysPdvDAO.FinalizadoraRecord item = rotativoModel.getItens().get(e.getLastRow());
+                if (item.selected) {
+                    rotativoSelecionado.add(item.id);
+                } else {
+                    rotativoSelecionado.remove(item.id);
+                }
+            }
+        });
+        tblRotativo.setModel(this.rotativoModel);
+    }
+    
     private HiperGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
@@ -134,6 +161,7 @@ public class HiperGUI extends VRInternalFrame {
         carregarLojaVR();
         carregarLojaCliente();
         gravarParametros();
+        carregarFinalizadora();
     }
 
     public void carregarLojaVR() throws Exception {
@@ -189,6 +217,7 @@ public class HiperGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
+                    dao.setFinalizadorasRotativo(rotativoSelecionado);
 
                     if (tab.getSelectedIndex() == 0) {
                         if (chkFamiliaProduto.isSelected()) {
@@ -418,7 +447,8 @@ public class HiperGUI extends VRInternalFrame {
         chkCliCpfCNPJ = new javax.swing.JCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        scrollRotativo = new javax.swing.JScrollPane();
+        tblRotativo = new vrframework.bean.table.VRTable();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -806,7 +836,18 @@ public class HiperGUI extends VRInternalFrame {
 
         chkRotativo.setText("Crédito Rotativo");
 
-        chkCheque.setText("Cheque");
+        tblRotativo.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        scrollRotativo.setViewportView(tblRotativo);
 
         javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
         tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
@@ -814,19 +855,21 @@ public class HiperGUI extends VRInternalFrame {
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(416, Short.MAX_VALUE))
+                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+                .addGap(12, 12, 12))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(151, Short.MAX_VALUE))
+                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
+                        .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 171, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
@@ -1151,7 +1194,6 @@ public class HiperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutoForn;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private javax.swing.JCheckBox chkCliCpfCNPJ;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
@@ -1189,6 +1231,7 @@ public class HiperGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
+    private javax.swing.JScrollPane scrollRotativo;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
@@ -1196,6 +1239,7 @@ public class HiperGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private javax.swing.JPanel tablCreditoRotativo;
+    private vrframework.bean.table.VRTable tblRotativo;
     private vrframework.bean.textField.VRTextField txtBancoDadosSQLServer;
     private vrframework.bean.textField.VRTextField txtHostSQLServer;
     private vrframework.bean.textField.VRTextField txtInstance;
