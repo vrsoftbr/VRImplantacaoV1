@@ -565,7 +565,12 @@ public class Importador {
         provider.setLoja(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
-        new ProdutoRepository(provider).unificar(produtos);
+        if (Parametros.OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva()) {
+            new ProdutoRepository(provider).unificar2(produtos);
+        } else {
+            new ProdutoRepository(provider).unificar(produtos);
+        }
+        
     }
     
     /**
