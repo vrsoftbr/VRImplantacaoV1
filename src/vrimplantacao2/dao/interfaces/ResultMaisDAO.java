@@ -4,17 +4,21 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -152,6 +156,84 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	p.cd_produto idproduto,\n"
+                    + "	ncm,\n"
+                    + "	p_mva_st per_mva,\n"
+                    + "	pt.st cst_debito,\n"
+                    + "	pt.valor_taxa aliquota_debito,\n"
+                    + "	pt.valor_reducao reducao_debito,\n"
+                    + "	case\n"
+                    + "		when pt.valor_reducao > 0 then 20\n"
+                    + "		else 0\n"
+                    + "	end cst_credito,\n"
+                    + "	p_st_ret aliquota_credito,\n"
+                    + "	p_red_bc_efet reducao_credito\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
+                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
+                    + "where\n"
+                    + "	p_mva_st > 0\n"
+                    + "order by\n"
+                    + "	p.cd_produto"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+
+                    imp.setId(rst.getString("idproduto"));
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                    imp.setIva(rst.getDouble("per_mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setNcm(rst.getString("ncm"));
+
+                    // DÉBITO
+                    if ((rst.getDouble("aliquota_debito") > 0) && (rst.getDouble("reducao_debito") == 0)) {
+
+                        imp.setAliquotaDebito(0, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebitoForaEstado(0, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+
+                    } else if ((rst.getDouble("aliquota_debito") > 0) && (rst.getDouble("reducao_debito") > 0)) {
+
+                        imp.setAliquotaDebito(20, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebitoForaEstado(20, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+
+                    } else {
+
+                        imp.setAliquotaDebito(rst.getInt("cst_debito"), rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                    }
+
+                    // CRÉDITO
+                    if ((rst.getDouble("aliquota_credito") > 0) && (rst.getDouble("reducao_credito") == 0)) {
+
+                        imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+
+                    } else if ((rst.getDouble("aliquota_credito") > 0) && (rst.getDouble("reducao_credito") > 0)) {
+
+                        imp.setAliquotaCredito(20, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCreditoForaEstado(20, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+
+                    } else {
+
+                        imp.setAliquotaCredito(rst.getInt("cst_credito"), rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCreditoForaEstado(rst.getInt("cst_credito"), rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 

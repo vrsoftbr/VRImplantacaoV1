@@ -144,20 +144,20 @@
                           <Component id="pnlImpProd" alignment="0" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkFamiliaProduto" alignment="1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="chkT1ProdMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkT1Custo" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkMargem" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkT1Estoque" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="chkFamiliaProduto" alignment="1" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkAssociado" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Component id="chkT1ProdMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkT1Custo" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkMargem" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
@@ -165,6 +165,7 @@
                                           <Component id="chkT1ICMS" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkT1PisCofins" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkT1NatReceita" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkPautaFiscalProduto" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
@@ -176,9 +177,9 @@
                                           <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
-                                  <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkPautaFiscal" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="75" max="32767" attributes="0"/>
+                              <EmptySpace pref="61" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -217,9 +218,7 @@
                           <Component id="chkQtdEmbCotacao" min="-2" max="-2" attributes="0"/>
                           <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkAssociado" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="5" max="32767" attributes="0"/>
+                      <EmptySpace pref="28" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chkT1ICMS" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkT1Preco" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -236,9 +235,15 @@
                           <Component id="chkMargem" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkT1Estoque" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkPautaFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkPautaFiscalProduto" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace min="-2" pref="90" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -396,16 +401,15 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTribActionPerformed"/>
               </Events>
             </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAssociado">
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscal">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Associado"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
+                <Property name="text" type="java.lang.String" value="Pauta Fiscal"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkAssociadoActionPerformed"/>
-              </Events>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscalProduto">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Pauta Fiscal x Produto"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>
