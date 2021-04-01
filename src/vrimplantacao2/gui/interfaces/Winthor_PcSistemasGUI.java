@@ -16,6 +16,7 @@ import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.Winthor_PcSistemasDAO;
@@ -272,6 +273,10 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
+                        
+                        if (chkFContasAPagar.isSelected()) {
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
 
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
@@ -361,6 +366,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
+        chkFContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -497,6 +503,14 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
             }
         });
 
+        chkFContasAPagar.setText("Contas à Pagar");
+        chkFContasAPagar.setEnabled(true);
+        chkFContasAPagar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFContasAPagarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabFornecedoresLayout = new javax.swing.GroupLayout(tabFornecedores);
         tabFornecedores.setLayout(tabFornecedoresLayout);
         tabFornecedoresLayout.setHorizontalGroup(
@@ -510,7 +524,8 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(226, Short.MAX_VALUE))
         );
         tabFornecedoresLayout.setVerticalGroup(
@@ -527,7 +542,9 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedores);
@@ -823,6 +840,10 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkClientePreferenciaSomenteClubeActionPerformed
 
+    private void chkFContasAPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContasAPagarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFContasAPagarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
@@ -833,6 +854,7 @@ public class Winthor_PcSistemasGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
+    private vrframework.bean.checkBox.VRCheckBox chkFContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
