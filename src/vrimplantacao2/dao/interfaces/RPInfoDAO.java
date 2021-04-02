@@ -2049,7 +2049,7 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vi.vdet_cst as csticms,\n"
                     + "	vi.vdet_icms as aliqicms\n"
                     + "from vdadet" + tabelaVenda + " vi \n"
-                    + " join produtos p on p.prod_codigo = vi.vdet_prod_codigo\n"
+                    + " join produtos p on p.prod_codigo = vi.vdet_prod_codigo \n"
                     + " left join produn un on p.prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'"
                     /*+ "where vi.vdet_datamvto "
                     + " between '" + VendaIterator.FORMAT.format(dataInicio) + "' "
