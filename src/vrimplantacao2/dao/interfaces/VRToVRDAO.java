@@ -112,6 +112,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PRECO,
                     OpcaoProduto.CUSTO,
                     OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.TROCA,
                     OpcaoProduto.ATIVO,
                     OpcaoProduto.DESCONTINUADO,
                     OpcaoProduto.NCM,
@@ -605,6 +606,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setTroca(rs.getDouble("troca"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
