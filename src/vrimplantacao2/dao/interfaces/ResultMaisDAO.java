@@ -247,17 +247,21 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	codigo codigobarras,\n"
                     + "	upper(p.descricao) descricao,\n"
                     + "	u.simbolo embalagem,\n"
-                    + "	case when length(codigo) <= 6  then 1 else 0 end e_balanca,\n"
+                    + "	case\n"
+                    + "		when length(codigo) <= 6 then 1\n"
+                    + "		else 0\n"
+                    + "	end e_balanca,\n"
                     + "	cd_grupo merc1,\n"
                     + "	cd_grupo merc2,\n"
                     + "	cd_grupo merc3,\n"
-                    + "	round(perc_lucro,2) margem,\n"
+                    + "	round(perc_lucro, 2) margem,\n"
                     + "	pr_compra custosemimposto,\n"
                     + "	pr_custo custocomimposto,\n"
                     + "	pr_venda precovenda,\n"
                     + "	situacao situacaocadastro,\n"
                     + "	dt_cadastro datacadastro,\n"
                     + "	p.dh_ult_alteracao dataalteracao,\n"
+                    + "	saldo_fisico estoque,\n"
                     + "	est_minimo estoquemin,\n"
                     + "	est_maximo estoquemax,\n"
                     + "	peso,\n"
@@ -270,10 +274,14 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	t.cest\n"
                     + "from\n"
                     + "	produto p\n"
-                    + "	left join unidade u on u.cd_unidade = p.cd_unidade\n"
-                    + "	left join tributo t on p.cd_tributo = t.cd_tributo\n"
-                    + "	left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
-                    + "order by p.cd_produto"
+                    + "left join saldo_prod sp on sp.cd_produto = p.cd_produto\n"
+                    + "left join unidade u on u.cd_unidade = p.cd_unidade\n"
+                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
+                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
+                    + "where \n"
+                    + "	ano_mes = (select max(ano_mes) from saldo_prod)\n"
+                    + "order by\n"
+                    + "	p.cd_produto"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -304,7 +312,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
 
-                    //imp.setEstoque(rs.getDouble("estoqueatual"));
+                    imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
                     imp.setPesoBruto(rs.getDouble("peso"));
