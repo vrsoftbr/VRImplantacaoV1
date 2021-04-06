@@ -4,11 +4,11 @@ import java.util.GregorianCalendar;
 
 public class Global {
 
-    public static String VERSAO = "1.1.9";
+    public static String VERSAO = "1.1.10";
     /**
      * Data da liberação desta versão.
      */
-    public static final GregorianCalendar DATA_VERSAO = new GregorianCalendar(2021, 3, 1); //2021-4-1
+    public static final GregorianCalendar DATA_VERSAO = new GregorianCalendar(2021, 3, 6); //2021-4-6
     public static int idLoja = 0;
     public static String loja = "";
     public static int idEstado = 0;
