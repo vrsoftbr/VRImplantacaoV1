@@ -106,6 +106,12 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
@@ -259,6 +265,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		else pc.es1_dtcad \n" +
                     "	end cadastro,\n" +
                     "	pc.ES1_TRIBUTACAO idicms,\n" +
+                    "	pc.es1_icmsent idicmsentrada,\n" +
                     "	pc.es1_margemcom margempadrao,\n" +
                     "	pc.es1_ultmargem margemvarejo,\n" +
                     "	pc.es1_prvarejo preco,\n" +
@@ -275,7 +282,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_pesol pesoliquido,\n" +
                     "	pc.es1_pesob pesobruto,\n" +
                     "	pc.es1_cstpis cstpis,\n" +
-                    "	pc.es1_cstcofins cstcofins,\n" +
+                    "	pc.es1_cstpisent cstpisent,\n" +
                     "	pc.pis_natreceita naturezareceita\n" +
                     "FROM\n" +
                     "	es1p pr\n" +
@@ -325,8 +332,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(rs.getString("idicmsentrada"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
                     imp.setMargem(rs.getDouble("margemvarejo"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoMedioComImposto(rs.getDouble("customedio"));
@@ -339,6 +346,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
+                    imp.setPiscofinsCstCredito(rs.getString("cstpisent"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     
                     long ean = Utils.stringToLong(imp.getEan());
