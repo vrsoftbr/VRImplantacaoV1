@@ -765,7 +765,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "        on c.id_cliente = cr.cliente\n"
                     + "where\n"
                     + "    cr.quitado = 'F' and\n"
-                    + "    loja = " + getLojaOrigem() + "\n"
+                    + "    cr.loja = " + getLojaOrigem() + "\n"
                     + "order by dt_vcto"
             )) {
                 while (rs.next()) {

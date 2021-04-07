@@ -8,9 +8,11 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -27,6 +29,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class HiperDAO extends InterfaceDAO {
 
     public String id_loja;
+    private Set<String> finalizadorasRotativo;
+    
+    public void setFinalizadorasRotativo(Set<String> finalizadorasRotativo) {
+        this.finalizadorasRotativo = finalizadorasRotativo;
+    }   
 
     @Override
     public String getSistema() {
@@ -493,11 +500,43 @@ public class HiperDAO extends InterfaceDAO {
         return result;
     }
 
+    public List<SysPdvDAO.FinalizadoraRecord> getFinalizadora() throws Exception {
+        List<SysPdvDAO.FinalizadoraRecord> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "	id_tipo_documento_financeiro as id,\n"
+                    + "	nome as descricao\n"
+                    + "from tipo_documento_financeiro tdf 	\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new SysPdvDAO.FinalizadoraRecord(
+                            rst.getString("id"),
+                            rst.getString("descricao")
+                    ));
+                }
+            }
+        }
+
+        return result;
+    }
+    
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            StringBuilder builder = new StringBuilder();
+            for(Iterator<String> iterator = this.finalizadorasRotativo.iterator(); iterator.hasNext();) {
+                builder
+                        .append("'")
+                        .append(iterator.next())
+                        .append("'");
+                if (iterator.hasNext())
+                    builder.append(",");
+            }
             try(ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
                     "	id_documento_receber,\n" +
@@ -517,7 +556,9 @@ public class HiperDAO extends InterfaceDAO {
                     "	documento_receber\n" +
                     "where\n" +
                     "	situacao = 1 and \n" +
-                    "	id_filial_geracao = " + getLojaOrigem() + ""/*and \n" +
+                    "	id_filial_geracao = " + getLojaOrigem() + " and\n" +
+                    "   id_tipo_documento_financeiro in (" + builder.toString() + ")"
+                    /*and \n" +
                     "	id_entidade not in (6, 90, 91, 92, 96, 93)"*/)) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.produto2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -24,6 +25,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
@@ -832,5 +834,67 @@ public class ProdutoRepositoryTest {
         rep.salvar(lista);
     }
     
+    @Test
+    public void testUnificar2() throws Exception {
+        
+    }
     
+    @Test
+    public void testResetarIdsSomenteBalanca() throws Exception {
+        ProdutoRepository rep = new ProdutoRepository(provider);
+        HashSet<OpcaoProduto> hash = new HashSet<>();
+        hash.add(OpcaoProduto.IMPORTAR_RESETAR_BALANCA);
+        when(provider.getOpcoes()).thenReturn(hash);
+        String[] ids = new String[]{"265", "123569", "789654", "2"};
+        boolean[] bal = new boolean[]{true, true, false, false};
+        
+        assertEquals("-1",rep.resetarIds(ids[0], bal[0]));
+        assertEquals("-1",rep.resetarIds(ids[1], bal[1]));
+        assertEquals("789654",rep.resetarIds(ids[2], bal[2]));
+        assertEquals("2",rep.resetarIds(ids[3], bal[3]));
+    }
+    
+    @Test
+    public void testResetarIdsSomenteNormais() throws Exception {
+        ProdutoRepository rep = new ProdutoRepository(provider);
+        HashSet<OpcaoProduto> hash = new HashSet<>();
+        hash.add(OpcaoProduto.IMPORTAR_RESETAR_NORMAIS);
+        when(provider.getOpcoes()).thenReturn(hash);
+        String[] ids = new String[]{"265", "123569", "789654", "2"};
+        boolean[] bal = new boolean[]{true, true, false, false};
+        
+        assertEquals("265",rep.resetarIds(ids[0], bal[0]));
+        assertEquals("123569",rep.resetarIds(ids[1], bal[1]));
+        assertEquals("-1",rep.resetarIds(ids[2], bal[2]));
+        assertEquals("-1",rep.resetarIds(ids[3], bal[3]));
+    }
+  
+    @Test
+    public void testResetarIdsNormaisEBalanca() throws Exception {
+        ProdutoRepository rep = new ProdutoRepository(provider);
+        HashSet<OpcaoProduto> hash = new HashSet<>();
+        hash.add(OpcaoProduto.IMPORTAR_RESETAR_NORMAIS);
+        hash.add(OpcaoProduto.IMPORTAR_RESETAR_BALANCA);
+        when(provider.getOpcoes()).thenReturn(hash);
+        String[] ids = new String[]{"265", "123569", "789654", "2"};
+        boolean[] bal = new boolean[]{true, true, false, false};
+        
+        assertEquals("-1",rep.resetarIds(ids[0], bal[0]));
+        assertEquals("-1",rep.resetarIds(ids[1], bal[1]));
+        assertEquals("-1",rep.resetarIds(ids[2], bal[2]));
+        assertEquals("-1",rep.resetarIds(ids[3], bal[3]));
+    }
+    
+    @Test
+    public void testResetarIdsNenhum() throws Exception {
+        ProdutoRepository rep = new ProdutoRepository(provider);
+        String[] ids = new String[]{"265", "123569", "789654", "2"};
+        boolean[] bal = new boolean[]{true, true, false, false};
+        
+        assertEquals("265",rep.resetarIds(ids[0], bal[0]));
+        assertEquals("123569",rep.resetarIds(ids[1], bal[1]));
+        assertEquals("789654",rep.resetarIds(ids[2], bal[2]));
+        assertEquals("2",rep.resetarIds(ids[3], bal[3]));
+    }
+
 }

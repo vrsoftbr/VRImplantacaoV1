@@ -227,6 +227,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     produto.setQtdEmbalagemCotacao(produto.getQtdEmbalagem());
                 }
                 produto.setTipoEmbalagem(linha.getString("unidade"));
+                produto.setTipoEmbalagemCotacao(linha.getString("unidadecotacao"));
+                if (produto.getTipoEmbalagemCotacao() == null) {
+                    produto.setTipoEmbalagemCotacao(produto.getTipoEmbalagem());
+                }
                 switch (Utils.acertarTexto(linha.getString("balanca"))) {
                     case "S": {
                         produto.seteBalanca(true);

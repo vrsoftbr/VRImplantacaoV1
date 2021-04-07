@@ -330,7 +330,18 @@ public enum OpcaoProduto {
     NUTRICIONAL, 
     COMPRADOR,
     MAPA_TRIBUTACAO,
-    IMPORTAR_RESETAR_BALANCA, 
+    IMPORTAR_RESETAR_BALANCA {
+        @Override
+        public String toString() {
+            return "(Param.) Resetar ids dos produtos de balança";
+        }        
+    }, 
+    IMPORTAR_RESETAR_NORMAIS {
+        @Override
+        public String toString() {
+            return "(Param.) Resetar ids dos produtos normais";
+        }        
+    },
     IMPORTAR_GERAR_SUBNIVEL_MERC, 
     IMPORTAR_MANTER_BALANCA, 
     UNIFICAR_PRODUTO_BALANCA, 

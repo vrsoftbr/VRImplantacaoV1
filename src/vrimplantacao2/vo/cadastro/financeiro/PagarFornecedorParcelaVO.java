@@ -84,7 +84,7 @@ public class PagarFornecedorParcelaVO {
     }
 
     public void setObservacao(String observacao) {
-        this.observacao = Utils.acertarTexto(observacao, 280);
+        this.observacao = Utils.acertarTextoMultiLinha(observacao, 280);
     }
 
     public SituacaoPagarFornecedorParcela getSituacaopagarfornecedorparcela() {

@@ -3,6 +3,7 @@ package vrimplantacao2.dao.interfaces.linear;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,8 +38,23 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento = "";
     private Date vendaDataIni;
     private Date vendaDataFim;
+    private boolean utilizarEs1ParaCotacao = false;
+    private boolean filtrarProdutos = false;
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
+    public void setFiltrarProdutos(boolean filtrarProdutos) {
+        this.filtrarProdutos = filtrarProdutos;
+    }   
+
+    public void setUtilizarEs1ParaCotacao(boolean utilizarEs1ParaCotacao) {
+        this.utilizarEs1ParaCotacao = utilizarEs1ParaCotacao;
+    }
 
     public void setVendaDataIni(Date vendaDataIni) {
         this.vendaDataIni = vendaDataIni;
@@ -46,10 +62,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
-    }    
+    }
     
     @Override
     public String getSistema() {
+        if (!"".equals(this.complemento)) {
+            return "Linear - " + this.complemento;
+        }
         return "Linear";
     }
     
@@ -87,6 +106,12 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PIS_COFINS,
                     OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
@@ -225,7 +250,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.Es1_UM unidade,\n" +
                     "	pc.ES1_QEMBV qtdembalagem,\n" +
                     "	pc.Es1_UM2 unidadecompra,\n" +
-                    "	pc.es1_qembc qtdembalagemcompra,\n" +
+                    "	pc.es1_qembc qtdembalagemcompra,	\n" +
+                    "	pr.es1_embalagem unidade_p,\n" +
+                    "	pr.es1_convun qtdembalagem_p,	\n" +
                     "	pr.es1_familia merc1,\n" +
                     "	pr.es1_departamento merc2,\n" +
                     "	pr.es1_secao merc3,\n" +
@@ -233,8 +260,12 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
                     "	pc.Es1_Ativo situacao,\n" +
-                    "	pc.ES1_DTCAD cadastro,\n" +
+                    "	case \n" +
+                    "		when pc.ES1_DTCAD < '1999-01-01' then '1995-01-01'\n" +
+                    "		else pc.es1_dtcad \n" +
+                    "	end cadastro,\n" +
                     "	pc.ES1_TRIBUTACAO idicms,\n" +
+                    "	pc.es1_icmsent idicmsentrada,\n" +
                     "	pc.es1_margemcom margempadrao,\n" +
                     "	pc.es1_ultmargem margemvarejo,\n" +
                     "	pc.es1_prvarejo preco,\n" +
@@ -251,15 +282,19 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_pesol pesoliquido,\n" +
                     "	pc.es1_pesob pesobruto,\n" +
                     "	pc.es1_cstpis cstpis,\n" +
-                    "	pc.es1_cstcofins cstcofins,\n" +
+                    "	pc.es1_cstpisent cstpisent,\n" +
                     "	pc.pis_natreceita naturezareceita\n" +
                     "FROM\n" +
                     "	es1p pr\n" +
-                    "JOIN es1 pc ON pr.es1_cod = pc.ES1_COD\n" +
-                    "LEFT JOIN es1a ean ON pr.es1_cod = ean.ES1_COD\n" +
+                    "	JOIN es1 pc ON\n" +
+                    "		pr.es1_cod = pc.ES1_COD\n" +
+                    "	LEFT JOIN es1a ean ON\n" +
+                    "		pr.es1_cod = ean.ES1_COD\n" +
                     "WHERE \n" +
+                    (this.filtrarProdutos ? "   not pr.id_central is null and\n": "") +
                     "	pc.es1_empresa = " + getLojaOrigem())) {
                 //"   length(cast(convert(ean.es1_codbarra, UNSIGNED INTEGER) AS char)) > 6"
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -274,8 +309,13 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagemCotacao(rs.getString("unidadecompra"));
-                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcompra"));
+                    if (this.utilizarEs1ParaCotacao) {                        
+                        imp.setTipoEmbalagemCotacao(rs.getString("unidade_p"));
+                        imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagem_p"));
+                    } else {
+                        imp.setTipoEmbalagemCotacao(rs.getString("unidadecompra"));
+                        imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcompra"));
+                    }
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
@@ -283,13 +323,17 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setSituacaoCadastro(rs.getInt("situacao"));
-                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    if (!"0000-00-00".equals(rs.getString("cadastro"))) {
+                        imp.setDataCadastro(rs.getDate("cadastro"));
+                    } else {
+                        imp.setDataCadastro(format.parse("2000-01-01"));
+                    }
                     imp.setIcmsDebitoId(rs.getString("idicms"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(rs.getString("idicmsentrada"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
                     imp.setMargem(rs.getDouble("margemvarejo"));
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoMedioComImposto(rs.getDouble("customedio"));
@@ -302,6 +346,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
+                    imp.setPiscofinsCstCredito(rs.getString("cstpisent"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     
                     long ean = Utils.stringToLong(imp.getEan());
@@ -516,7 +561,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cg1_email_boleto emailboleto,\n" +
                     "	c.cg1_pai pai,\n" +
                     "	c.cg1_mae mae,\n" +
-                    "	c.cg1_data nascimento,\n" +
+                    "	case \n" +
+                    "		when c.cg1_data < '1999-01-01' then '1995-01-01'\n" +
+                    "		else c.cg1_data \n" +
+                    "	end nascimento,\n" +
                     "	c.cg1_profissao profissao,\n" +
                     "	c.CG1_EstCivil estadocivil,\n" +
                     "	case\n" +
@@ -541,7 +589,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cg1_empresacliente empresa,\n" +
                     "	c.cg1_nomeconjuge conjuge\n" +
                     "FROM\n" +
-                    "	cg1 c")) {
+                    "	cg1 c")) {                
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
@@ -591,7 +640,11 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmail(rs.getString("email"));
                     imp.setNomePai(rs.getString("pai"));
                     imp.setNomeMae(rs.getString("mae"));
-                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    if (!"0000-00-00".equals(rs.getString("nascimento"))) {
+                        imp.setDataNascimento(rs.getDate("nascimento"));
+                    } else {
+                        imp.setDataNascimento(format.parse("2000-01-01"));
+                    }
                     imp.setEstadoCivil(rs.getString("estadocivil"));
                     
                     String limite = rs.getString("limite");
@@ -781,6 +834,6 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new LinearVendaItemIterator(getLojaOrigem(), this.vendaDataIni, this.vendaDataFim);
-    }    
+    }
     
 }

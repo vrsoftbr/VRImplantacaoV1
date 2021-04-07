@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vr.core.utils.StringUtils;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
@@ -28,6 +29,8 @@ import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -660,7 +663,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "	round(coalesce(p.pesoliq, 0),2) pesoliquido,\n" +
                     "	coalesce(est.estmin, 0) estoqueminimo,\n" +
                     "	coalesce(est.estmax, 0) estoquemaximo,    \n" +
-                    "	coalesce(est.qtest,0) estoque,\n" +
+                    "	coalesce(est.qtestger,0) estoque,\n" +
                     "	coalesce(ean.margem,0) margem,\n" +
                     "	coalesce(est.CUSTOULTENTCONT,0) custosemimposto,\n" +
                     "	coalesce(est.VLULTPCOMPRA,0) custocomimposto,\n" +
@@ -1276,7 +1279,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         "    c.cepent cep,\n" +
                         "    c.dtnasc datanascimento,\n" +
                         "    c.dtcadastro datacadastro,\n" +
-                        "    CASE c.sexo WHEN 'F' THEN 0 ELSE 1 END sexo,\n" +
+                        "    c.sexo,\n" +
                         "    c.empresa,\n" +
                         "    c.enderempr empresaendereco,\n" +
                         "    c.municempr empresamunicipio,\n" +
@@ -1344,7 +1347,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         imp.setCep(rst.getString("cep"));
                         imp.setDataNascimento(rst.getDate("datanascimento"));
                         imp.setDataCadastro(rst.getDate("datacadastro"));
-                        switch (rst.getString("sexo")) {
+                        switch (StringUtils.acertarTexto(rst.getString("sexo"), "M")) {
                             case "F": imp.setSexo(TipoSexo.FEMININO); break;
                             default: imp.setSexo(TipoSexo.MASCULINO); break;
                         }
@@ -1379,7 +1382,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         if (rst.getString("emailnfe") != null) {
                             imp.addContato("1", "NFE", "", "", rst.getString("emailnfe"));
                         }
-                        
+                        imp.setEmail(rst.getString("email"));
                         imp.setCobrancaEndereco(rst.getString("endercob"));
                         imp.setCobrancaNumero(rst.getString("numerocob"));
                         imp.setCobrancaComplemento(rst.getString("complementocob"));
@@ -1391,6 +1394,66 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                         result.add(imp);
                     }
                 }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (
+                Statement st = ConexaoOracle.createStatement();
+                ResultSet rs = st.executeQuery(
+                        "SELECT\n" +
+                        "	cp.RECNUM id,\n" +
+                        "	f.CODFORNEC id_fornecedor,\n" +
+                        "	f.cgc cnpj,\n" +
+                        "	cp.NUMNOTA numerodocumento,\n" +
+                        "	cp.DTEMISSAO dataemissao,\n" +
+                        "	cp.DTLANC dataentrada,\n" +
+                        "	cp.DTULTALTER datahoraalteracao,\n" +
+                        "	cp.DTVENC datavencimento,\n" +
+                        "	cp.VALOR,\n" +
+                        "	cp.VALORDEV,\n" +
+                        "	cp.DUPLIC parcela,\n" +
+                        "	coalesce(cp.HISTORICO,'') observacoes,\n" +
+                        "	coalesce(cp.HISTORICO2,'') observacoes2\n" +
+                        "FROM\n" +
+                        "	PCLANC cp\n" +
+                        "	JOIN PCFORNEC f ON\n" +
+                        "		cp.CODFORNEC  = f.CODFORNEC \n" +
+                        "WHERE\n" +
+                        "	cp.vpago IS NULL AND\n" +
+                        "	cp.CODFILIAL = " + getLojaOrigem() + "\n" +
+                        "ORDER BY\n" +
+                        "	cp.RECNUM"
+                )
+        ) {
+            while (rs.next()) {
+                ContaPagarIMP imp = new ContaPagarIMP();
+                
+                imp.setId(rs.getString("id"));
+                imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                imp.setCnpj(rs.getString("cnpj"));
+                imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                imp.setDataEmissao(rs.getDate("dataemissao"));
+                imp.setDataEntrada(rs.getDate("dataentrada"));
+                imp.setDataHoraAlteracao(rs.getTimestamp("datahoraalteracao"));
+                String observacoes = 
+                        rs.getString("observacoes") +
+                        "\n" +
+                        rs.getString("observacoes2");
+                ContaPagarVencimentoIMP parcela = imp.addVencimento(
+                        rs.getDate("datavencimento"),
+                        rs.getDouble("valor"),
+                        StringUtils.toInt(rs.getString("parcela"))                        
+                );
+                parcela.setObservacao(observacoes);
+                
+                result.add(imp);
             }
         }
         

@@ -132,9 +132,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkManterBalanca" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkResetarCodigoBalanca" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="104" max="32767" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -154,7 +152,7 @@
                                       </Group>
                                       <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="195" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -170,10 +168,7 @@
                                   <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkManterBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkResetarCodigoBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="chkManterBalanca" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnMapaTribut" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
@@ -234,11 +229,6 @@
                     <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="true" type="code"/>
                     </Property>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkResetarCodigoBalanca">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Resetar C&#xf3;digo Balan&#xe7;a"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterEANsMenores">
@@ -519,6 +509,61 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlResetarIds">
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Component id="jLabel14" min="-2" pref="132" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkResetarCodigoBalanca" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkResetarIdsNormais" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="242" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabel14" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                              <Component id="chkResetarCodigoBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkResetarIdsNormais" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jLabel14">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="horizontalAlignment" type="int" value="4"/>
+                    <Property name="text" type="java.lang.String" value="RESET IDs"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[132, 14]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkResetarCodigoBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Resetar C&#xf3;digo Balan&#xe7;a"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkResetarIdsNormais">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Resetar Ids Normais"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
           <LayoutCode>
             <CodeStatement>
@@ -634,6 +679,22 @@
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
                       <ComponentRef name="pnlOptOptNutricional"/>
+                    </ExpressionProvider>
+                  </ExpressionOrigin>
+                </CodeExpression>
+              </Parameters>
+            </CodeStatement>
+            <CodeStatement>
+              <CodeExpression id="1_tabParametros"/>
+              <StatementProvider type="CodeMethod">
+                <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
+              </StatementProvider>
+              <Parameters>
+                <CodeExpression id="9_pnlResetarIds">
+                  <CodeVariable name="pnlResetarIds" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
+                  <ExpressionOrigin>
+                    <ExpressionProvider type="ComponentRef">
+                      <ComponentRef name="pnlResetarIds"/>
                     </ExpressionProvider>
                   </ExpressionOrigin>
                 </CodeExpression>
@@ -1682,7 +1743,7 @@
           </SubComponents>
           <LayoutCode>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao">
+              <CodeExpression id="10_tabImportacao">
                 <CodeVariable name="tabImportacao" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                 <ExpressionOrigin>
                   <ExpressionProvider type="ComponentRef">
@@ -1694,7 +1755,7 @@
                 <CodeMethod name="setLayout" class="java.awt.Container" parameterTypes="java.awt.LayoutManager"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="10">
+                <CodeExpression id="11">
                   <ExpressionOrigin>
                     <ExpressionProvider type="CodeConstructor">
                       <CodeConstructor class="org.jdesktop.swingx.VerticalLayout" parameterTypes=""/>
@@ -1704,12 +1765,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="11_pnlImpMercadologico">
+                <CodeExpression id="12_pnlImpMercadologico">
                   <CodeVariable name="pnlImpMercadologico" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1720,12 +1781,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="12_pnlImpProduto">
+                <CodeExpression id="13_pnlImpProduto">
                   <CodeVariable name="pnlImpProduto" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1736,12 +1797,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="13_pnlImpCompl">
+                <CodeExpression id="14_pnlImpCompl">
                   <CodeVariable name="pnlImpCompl" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1752,12 +1813,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="14_pnlImpTributacao">
+                <CodeExpression id="15_pnlImpTributacao">
                   <CodeVariable name="pnlImpTributacao" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1768,12 +1829,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="15_pnlImpPautaFiscal">
+                <CodeExpression id="16_pnlImpPautaFiscal">
                   <CodeVariable name="pnlImpPautaFiscal" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1784,12 +1845,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="16_pnlImpInfoAdic">
+                <CodeExpression id="17_pnlImpInfoAdic">
                   <CodeVariable name="pnlImpInfoAdic" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1800,12 +1861,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="9_tabImportacao"/>
+              <CodeExpression id="10_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="17_pnlImpOutrosDados">
+                <CodeExpression id="18_pnlImpOutrosDados">
                   <CodeVariable name="pnlImpOutrosDados" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">

@@ -75,7 +75,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         tabParametros.removeAll();
                 
         chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
-        chkResetarCodigoBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA));
         chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
         chkManterEANsMenores.setVisible(opt.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS));
         chkManterDescricaoProduto.setVisible(opt.contains(OpcaoProduto.MANTER_DESCRICAO_PRODUTO));
@@ -297,7 +296,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
             tabImportacao.add(pnlImpOutrosDados);
         }
-        
+        tabParametros.add(pnlResetarIds);
         tabImportacao.revalidate();
         
     }
@@ -344,7 +343,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jLabel1 = new javax.swing.JLabel();
         chkNaoTransformarEANemUN = new vrframework.bean.checkBox.VRCheckBox();
         chkSomarEstoqueAoProduto = new vrframework.bean.checkBox.VRCheckBox();
-        chkResetarCodigoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkManterEANsMenores = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         chkManterDescricaoProduto = new vrframework.bean.checkBox.VRCheckBox();
@@ -366,6 +364,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         pnlOptOptNutricional = new vrframework.bean.panel.VRPanel();
         jLabel13 = new javax.swing.JLabel();
         chkNutricionalResetarIDs = new vrframework.bean.checkBox.VRCheckBox();
+        pnlResetarIds = new vrframework.bean.panel.VRPanel();
+        jLabel14 = new javax.swing.JLabel();
+        chkResetarCodigoBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkResetarIdsNormais = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -532,8 +534,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkSomarEstoqueAoProduto.setToolTipText("<html>\nAo contrario do procedimento normal de atualização do estoque onde o valor dele é substítuido<br>\npelo importado, ao marcar esta opção o valor importado serásomado ao estoque atual.\n</html>");
         chkSomarEstoqueAoProduto.setEnabled(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkResetarCodigoBalanca, "Resetar Código Balança");
-
         org.openide.awt.Mnemonics.setLocalizedText(chkManterEANsMenores, "Manter EANs menores");
         chkManterEANsMenores.setToolTipText("<html>\nMantem os EANs menores que <b>7</> dígitos nos produtos unitários.<br>\n<i>Diferentemente da opção \"Manter código PLU dos produtos de balança\", <br>\nessa rotina não muda o código interno dos produtos unitário.</i>\n</html>");
         chkManterEANsMenores.setEnabled(true);
@@ -555,9 +555,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                         .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkResetarCodigoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(104, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                         .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlOptProdutoLayout.createSequentialGroup()
@@ -572,7 +570,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkForcarPrecoCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(chkAtualizarSomenteIncluidosUnificacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(0, 195, Short.MAX_VALUE))))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -583,9 +581,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(5, 5, 5))
                     .addGroup(pnlOptProdutoLayout.createSequentialGroup()
-                        .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkResetarCodigoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(5, 5, 5)
@@ -772,6 +768,41 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         );
 
         tabParametros.add(pnlOptOptNutricional);
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel14, "RESET IDs");
+        jLabel14.setPreferredSize(new java.awt.Dimension(132, 14));
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkResetarCodigoBalanca, "Resetar Código Balança");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkResetarIdsNormais, "Resetar Ids Normais");
+
+        javax.swing.GroupLayout pnlResetarIdsLayout = new javax.swing.GroupLayout(pnlResetarIds);
+        pnlResetarIds.setLayout(pnlResetarIdsLayout);
+        pnlResetarIdsLayout.setHorizontalGroup(
+            pnlResetarIdsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlResetarIdsLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkResetarCodigoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkResetarIdsNormais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(242, Short.MAX_VALUE))
+        );
+        pnlResetarIdsLayout.setVerticalGroup(
+            pnlResetarIdsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlResetarIdsLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(pnlResetarIdsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkResetarCodigoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkResetarIdsNormais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabParametros.add(pnlResetarIds);
 
         scrollParametros.setViewportView(tabParametros);
 
@@ -1514,6 +1545,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkReceitaProduto;
     public vrframework.bean.checkBox.VRCheckBox chkReceitaToledo;
     public vrframework.bean.checkBox.VRCheckBox chkResetarCodigoBalanca;
+    public vrframework.bean.checkBox.VRCheckBox chkResetarIdsNormais;
     public vrframework.bean.checkBox.VRCheckBox chkSecao;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkSomarEstoqueAoProduto;
@@ -1534,6 +1566,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel12;
     public javax.swing.JLabel jLabel13;
+    public javax.swing.JLabel jLabel14;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1555,6 +1588,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlOptOptNutricional;
     public vrframework.bean.panel.VRPanel pnlOptPautaFiscal;
     public vrframework.bean.panel.VRPanel pnlOptProduto;
+    public vrframework.bean.panel.VRPanel pnlResetarIds;
     public vrframework.bean.radioButton.VRRadioButton rdbPautaEan;
     public vrframework.bean.radioButton.VRRadioButton rdbPautaIdPauta;
     public vrframework.bean.radioButton.VRRadioButton rdbPautaIdProduto;
@@ -1599,6 +1633,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         }
         parametros.put(chkPautaUsarEansMenores.isSelected(), concat(params, "PAUTA_USAR_EANS_MENORES" ));
         parametros.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), concat(params, "COPIAR_DEBITO_NO_CREDITO" ));
+        parametros.put(chkResetarCodigoBalanca.isSelected(), concat(params, "RESETAR_BALANCA"));
+        parametros.put(chkResetarIdsNormais.isSelected(), concat(params, "RESETAR_NORMAIS"));
         
     }
 
@@ -1620,6 +1656,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         rdbPautaEanActionPerformed(null);
         chkPautaUsarEansMenores.setSelected(parametros.getBool(concat(params, "PAUTA_USAR_EANS_MENORES" )));
         chkCopiarIcmsDebitoNaEntrada.setSelected(parametros.getBool(concat(params, "COPIAR_DEBITO_NO_CREDITO" )));
+        chkResetarCodigoBalanca.setSelected(parametros.getBool(concat(params, "RESETAR_BALANCA")));
+        chkResetarIdsNormais.setSelected(parametros.getBool(concat(params, "RESETAR_NORMAIS")));
         
     }
     
@@ -1642,6 +1680,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkResetarCodigoBalanca.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_RESETAR_BALANCA);
+                }
+                if (chkResetarIdsNormais.isSelected()) {
+                    opt.add(OpcaoProduto.IMPORTAR_RESETAR_NORMAIS);
                 }
                 if (chkManterEANsMenores.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
