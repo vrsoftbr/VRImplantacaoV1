@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vr.core.utils.StringUtils;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
@@ -986,9 +987,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setIe_rg(rs.getString("rgie"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setPrazoVisita(rs.getInt("prazovisita"));
-                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
-                    imp.setPrazoSeguranca(rs.getInt("prazoseguranca"));
+                    imp.setPrazoVisita(StringUtils.toInt(rs.getString("prazovisita")));
+                    imp.setPrazoEntrega(StringUtils.toInt(rs.getString("prazoentrega")));
+                    imp.setPrazoSeguranca(StringUtils.toInt(rs.getString("prazoseguranca")));
                     switch (rs.getString("microempre")) {
                         case "S": imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES); break;
                         //case "N": imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL); break;
