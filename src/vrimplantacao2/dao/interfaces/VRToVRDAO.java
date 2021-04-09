@@ -518,6 +518,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vend.estoquemaximo,\n" +
                     "	vend.estoqueminimo,\n" +
                     "	vend.estoque,\n" +
+                    "	vend.troca,\n" +
                     "	vend.custosemimposto,\n" +
                     "	vend.custocomimposto,\n" +
                     "	vend.precovenda,\n" +
