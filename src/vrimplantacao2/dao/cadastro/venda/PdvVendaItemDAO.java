@@ -125,8 +125,7 @@ public class PdvVendaItemDAO {
             LOG.info("Carregando produtos pelo codigo anterior");
             produtosPorCodigoAnterior = new HashMap<>();
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
+                String sql = "select\n" +
                         "	ant.impid,\n" +
                         "	ant.codigoatual\n" +
                         "from \n" +
@@ -134,8 +133,9 @@ public class PdvVendaItemDAO {
                         "	join produto p on ant.codigoatual = p.id\n" +
                         "where\n" +
                         "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                        "	ant.imploja = " + SQLUtils.stringSQL(loja)
-                )) {
+                        "	ant.imploja = " + SQLUtils.stringSQL(loja);
+                LOG.info(sql);
+                try (ResultSet rst = stm.executeQuery(sql)) {
                     while (rst.next()) {
                         produtosPorCodigoAnterior.put(rst.getString("impid"), rst.getInt("codigoatual"));
                     }

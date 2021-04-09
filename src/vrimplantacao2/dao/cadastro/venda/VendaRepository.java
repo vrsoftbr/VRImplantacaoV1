@@ -63,6 +63,15 @@ public class VendaRepository {
     
     public boolean importar(Set<OpcaoVenda> opt) throws Exception {
         
+        if (
+                !opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) &&
+                !opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR) &&
+                !opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL)                        
+        ) {
+            opt.add(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+            System.out.println("Atribuindo opção padrão para as vendas IMPORTAR_POR_CODIGO_ANTERIOR");
+        }
+        
         if (!existeProdutosDivergentes(opt)) {
         
             Map<String, ClientePreferencialVO> cliPreferencialAnterior;
