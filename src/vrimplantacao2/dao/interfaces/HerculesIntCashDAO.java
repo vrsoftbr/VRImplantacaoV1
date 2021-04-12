@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
@@ -29,10 +24,30 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author lucasrafael
  */
 public class HerculesIntCashDAO extends InterfaceDAO {
+    
+    private String complemento = "";
+    private int filial = 1;
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+
+    public void setFilial(int filial) {
+        this.filial = filial;
+    }
+    
+    public String getIdEmpresa() {
+        return this.getLojaOrigem().split("\\-")[0];
+    }
+    
+    public String getIdFilial() {
+        return this.getLojaOrigem().split("\\-")[1];
+    }
+    
 
     @Override
     public String getSistema() {
-        return "HerculesIntCash";
+        return "HerculesIntCash" + (!"".equals(complemento) ? " - " + complemento : "");
     }
 
     @Override
@@ -69,8 +84,8 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         }));
     }
 
-    public List<Estabelecimento> getLojasCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
+    public List<Filial> getLojasCliente() throws Exception {
+        List<Filial> result = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -83,14 +98,57 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     + "order by f.Fil_CodEmp, f.Fil_CodFil"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(
+                    result.add(new Filial(
                             rst.getString("Fil_CodEmp"),
-                            rst.getString("Fil_CodFil") + " - " + rst.getString("Fil_NomFan")
+                            rst.getString("Fil_CodFil"),
+                            rst.getString("Fil_NomFan")
                     ));
                 }
             }
         }
         return result;
+    }
+    
+    public static class Filial {
+        
+        private final String idEmpresa;
+        private final String idFilial;
+        private final String nome;
+        
+        public Filial(String idEmpresa, String idFilial, String nome) {
+            this.idEmpresa = idEmpresa;
+            this.idFilial = idFilial;
+            this.nome = nome;
+        }
+        
+        public String getKey() {
+            return idEmpresa + "-" + idFilial;
+        }
+
+        public String getIdEmpresa() {
+            return idEmpresa;
+        }
+
+        public String getIdFilial() {
+            return idFilial;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+        
+
+        @Override
+        public String toString() {
+            return String.format("EMP: %s FIL: %s - %s", idEmpresa, idFilial, nome);
+        }
+        
+        public Estabelecimento toEstabelecimento() {
+            return new Estabelecimento(
+                    this.getKey(), 
+                    this.toString()
+            );
+        }
     }
 
     @Override
@@ -137,36 +195,39 @@ public class HerculesIntCashDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "p.Prd_CodPrd as id,\n"
-                    + "p.Prd_CodBar as barras,\n"
-                    + "p.Prd_TipVen as balanca,\n"
-                    + "p.Prd_DesPrd as descricao,\n"
-                    + "p.Prd_CodUnd as unidade,\n"
-                    + "p.Prd_PesLiq as pesoliquido,\n"
-                    + "p.Prd_PesBru as pesobruto,\n"
-                    + "p.Prd_SitPrd as situacaocadastro,\n"
-                    + "p.Prd_DatAtu as datacadastro,\n"
-                    + "p.Prd_PrdNcm as ncm,\n"
-                    + "p.Prd_CodCes as cest,\n"
-                    + "trib.Afs_SitPis as pis,\n"
-                    + "trib.Afs_SitCof as cofins,\n"
-                    + "trib.Afs_NatPis as naturezareceita,\n"
-                    + "trib.Afs_SitTri as cstIcms,\n"
-                    + "trib.Afs_AlqIcm as aliqIcms,\n"
-                    + "trib.Afs_FatRed as reduIcms,\n"
-                    + "p.Prd_CodGrp as merc1,\n"
-                    + "p.Prd_CodSub as merc2,\n"
-                    + "pr.Pvp_PreVen as precovenda\n"
-                    + "from dbo.IntPrd p\n"
-                    + "left join dbo.IntPvp pr on pr.Pvp_CodPrd = p.Prd_CodPrd\n"
-                    + "	and p.Prd_CodEmp = '" + getLojaOrigem() + "'"
-                    + "	and pr.Pvp_CodEmp = '" + getLojaOrigem() + "'\n"
-                    + "left join dbo.IntAfs trib on trib.Afs_PrdNcm = p.Prd_PrdNcm \n"
-                    + "and trib.Afs_CodTcl = 1\n"
-                    + "and trib.Afs_CodTme in ('PDV')\n"
-                    + "and trib.Afs_CodCfo = 5102 \n"
-                    + "and trib.Afs_CodEmp = '" + getLojaOrigem() + "'"
+                    "select\n" +
+                    "	p.Prd_CodPrd as id,\n" +
+                    "	p.Prd_CodBar as barras,\n" +
+                    "	p.Prd_TipVen as balanca,\n" +
+                    "	p.Prd_DesPrd as descricao,\n" +
+                    "	p.Prd_CodUnd as unidade,\n" +
+                    "	p.Prd_PesLiq as pesoliquido,\n" +
+                    "	p.Prd_PesBru as pesobruto,\n" +
+                    "	p.Prd_SitPrd as situacaocadastro,\n" +
+                    "	p.Prd_DatAtu as datacadastro,\n" +
+                    "	p.Prd_PrdNcm as ncm,\n" +
+                    "	p.Prd_CodCes as cest,\n" +
+                    "	trib.Afs_SitPis as pis,\n" +
+                    "	trib.Afs_SitCof as cofins,\n" +
+                    "	trib.Afs_NatPis as naturezareceita,\n" +
+                    "	trib.Afs_SitTri as cstIcms,\n" +
+                    "	trib.Afs_AlqIcm as aliqIcms,\n" +
+                    "	trib.Afs_FatRed as reduIcms,\n" +
+                    "	p.Prd_CodGrp as merc1,\n" +
+                    "	p.Prd_CodSub as merc2,\n" +
+                    "	pr.Pvp_PreVen as precovenda\n" +
+                    "from dbo.IntPrd p\n" +
+                    "	left join dbo.IntPvp pr on\n" +
+                    "		pr.Pvp_CodPrd = p.Prd_CodPrd\n" +
+                    "	left join dbo.IntAfs trib on\n" +
+                    "		trib.Afs_PrdNcm = p.Prd_PrdNcm \n" +
+                    "		and trib.Afs_CodTcl = 1\n" +
+                    "		and trib.Afs_CodTme in ('PDV')\n" +
+                    "		and trib.Afs_CodCfo = 5102\n" +
+                    "		and trib.Afs_CodFil=pr.Pvp_CodFil\n" +
+                    "where\n" +
+                    "	pr.Pvp_CodEmp = " + getLojaOrigem() + " --codempresa\n" +
+                    "	and pr.Pvp_CodFil = " + this.filial + " -- codfilial"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -208,17 +269,43 @@ public class HerculesIntCashDAO extends InterfaceDAO {
 
         if (opt == OpcaoProduto.ESTOQUE) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "est.Fmp_CodPrd as idproduto, \n"
-                        + "est.Fmp_DatMov,\n"
-                        + "est.Fmp_TipEst,\n"
-                        + "est.Fmp_QtdMov,\n"
-                        + "est.Fmp_QtdEst as estoque\n"
-                        + "from dbo.IntFmp est\n"
-                        + "where est.Fmp_DatMov in (select MAX(Fmp_DatMov) from dbo.IntFmp where Fmp_CodPrd = est.Fmp_CodPrd)\n"
-                        + "and est.Fmp_CodEmp = '" + getLojaOrigem() + "'\n"
-                        + "order by Fmp_CodPrd"
+                try (ResultSet rst = stm.executeQuery("with\n" +
+                        "loja as (\n" +
+                        "	select '" + getIdEmpresa() + "' as idEmpresa, '" + getIdFilial() + "' as idFilial, '01' as idLocal\n" +
+                        "),\n" +
+                        "ultimamov as (\n" +
+                        "	select\n" +
+                        "		est.Fmp_CodPrd,\n" +
+                        "		max(est.Fmp_DatMov) Fmp_DatMov\n" +
+                        "	from\n" +
+                        "		dbo.IntFmp est\n" +
+                        "		join loja on 1 = 1\n" +
+                        "	where\n" +
+                        "		est.Fmp_CodEmp = loja.idEmpresa and\n" +
+                        "		est.Fmp_CodFil = loja.idFilial and\n" +
+                        "		est.Fmp_CodLoc = loja.idLocal\n" +
+                        "	group by\n" +
+                        "		est.Fmp_CodPrd\n" +
+                        ")	\n" +
+                        "select\n" +
+                        "	est.Fmp_CodPrd as idproduto,\n" +
+                        "	est.Fmp_DatMov,\n" +
+                        "	est.Fmp_TipEst,\n" +
+                        "	est.Fmp_QtdMov,\n" +
+                        "	est.Fmp_QtdEst as estoque\n" +
+                        "from\n" +
+                        "	dbo.IntFmp est\n" +
+                        "	join loja on 1 = 1\n" +
+                        "	join ultimamov on\n" +
+                        "		ultimamov.Fmp_CodPrd = est.Fmp_CodPrd and\n" +
+                        "		ultimamov.Fmp_DatMov = est.Fmp_DatMov\n" +
+                        "where\n" +
+                        "	est.Fmp_CodEmp = loja.idEmpresa and\n" +
+                        "	est.Fmp_CodFil = loja.idFilial and\n" +
+                        "	est.Fmp_CodLoc = loja.idLocal\n" +
+                        "order by\n" +
+                        "	est.Fmp_CodPrd,\n" +
+                        "	est.Fmp_DatMov desc"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
