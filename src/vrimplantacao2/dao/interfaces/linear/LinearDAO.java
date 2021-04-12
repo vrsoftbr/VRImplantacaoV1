@@ -78,6 +78,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC,
                     OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
@@ -253,9 +254,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_qembc qtdembalagemcompra,	\n" +
                     "	pr.es1_embalagem unidade_p,\n" +
                     "	pr.es1_convun qtdembalagem_p,	\n" +
-                    "	pr.es1_familia merc1,\n" +
-                    "	pr.es1_departamento merc2,\n" +
-                    "	pr.es1_secao merc3,\n" +
+                    "   if (pr.es1_familia = 0, null, pr.es1_familia) merc1,\n" +
+                    "	if (pr.es1_departamento = 0, null, pr.es1_departamento) merc2,\n" +
+                    "	if (pr.es1_secao = 0, null, pr.es1_secao) merc3," +
                     "	pr.es1_semelhante idfamilia,\n" +
                     "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
