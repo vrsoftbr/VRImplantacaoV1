@@ -1007,7 +1007,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     
                     Endereco end = obterEnderecoFOR(rs.getString("id_fornecedor"), rs.getString("cep"));
                     if (end == null) {
-                        end = obterEnderecoHRCep(rs.getString("cep"));
+                        //end = obterEnderecoHRCep(rs.getString("cep"));
                         if (end != null) {
                             end.numero = rs.getString("numero");
                         } else {
@@ -1205,15 +1205,14 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                 "select top 1\n" +
-                "        titulo,\n" +
-                "        nomelograd logradouro,\n" +
-                "        complemento,\n" +
-                "        bairro,\n" +
-                "        cidade,\n" +
-                "        estado,\n" +
-                "        codigocep cep\n" +
-                "    from\n" +
-                "        hrcep..flcepcep\n" +
+                "    titulo,\n" +
+                "    LOGRADOURO logradouro,\n" +
+                "    bairro,\n" +
+                "    cidade,\n" +
+                "    estado,\n" +
+                "    CODIGOCEP cep\n" +
+                "from\n" +
+                "    dbo.FL423CEP\n" +
                 "    where\n" +
                 "        ltrim(rtrim(coalesce(codigocep,''))) != '' and\n" +
                 "        codigocep = '" + codigoCep + "'"
