@@ -26,22 +26,22 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class HerculesIntCashDAO extends InterfaceDAO {
     
     private String complemento = "";
-    private int filial = 1;
+    private Filial filial;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
 
-    public void setFilial(int filial) {
+    public void setFilial(Filial filial) {
         this.filial = filial;
     }
     
     public String getIdEmpresa() {
-        return this.getLojaOrigem().split("\\-")[0];
+        return filial.getIdEmpresa();
     }
     
     public String getIdFilial() {
-        return this.getLojaOrigem().split("\\-")[1];
+        return filial.getIdFilial();
     }
     
 
@@ -219,15 +219,14 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     "from dbo.IntPrd p\n" +
                     "	left join dbo.IntPvp pr on\n" +
                     "		pr.Pvp_CodPrd = p.Prd_CodPrd\n" +
+                    "		and pr.Pvp_CodEmp = '" + getIdEmpresa() + "' --codempresa\n" +
+                    "		and pr.Pvp_CodFil = '" + getIdFilial() + "' -- codfilial\n" +
                     "	left join dbo.IntAfs trib on\n" +
                     "		trib.Afs_PrdNcm = p.Prd_PrdNcm \n" +
                     "		and trib.Afs_CodTcl = 1\n" +
                     "		and trib.Afs_CodTme in ('PDV')\n" +
                     "		and trib.Afs_CodCfo = 5102\n" +
-                    "		and trib.Afs_CodFil=pr.Pvp_CodFil\n" +
-                    "where\n" +
-                    "	pr.Pvp_CodEmp = " + getLojaOrigem() + " --codempresa\n" +
-                    "	and pr.Pvp_CodFil = " + this.filial + " -- codfilial"
+                    "		and trib.Afs_CodFil=pr.Pvp_CodFil"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -269,7 +268,8 @@ public class HerculesIntCashDAO extends InterfaceDAO {
 
         if (opt == OpcaoProduto.ESTOQUE) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery("with\n" +
+                try (ResultSet rst = stm.executeQuery(
+                        "with\n" +
                         "loja as (\n" +
                         "	select '" + getIdEmpresa() + "' as idEmpresa, '" + getIdFilial() + "' as idFilial, '01' as idLocal\n" +
                         "),\n" +
@@ -322,21 +322,45 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         if (opt == OpcaoProduto.CUSTO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select "
-                        + "  b.Pnf_CodPrd as id_produto,\n"
-                        + "  b.Pnf_ValUni as custo\n"
-                        + "from dbo.IntNfe a\n"
-                        + "inner join dbo.IntPnf b on b.Pnf_NumNot = a.Nfe_NumNot\n"
-                        + "where b.Pnf_CodTme = 'ENT'\n"
-                        + "  and b.Pnf_CodEmp = '" + getLojaOrigem() + "'\n"
-                        + "  and a.Nfe_DatEnt in (select \n"
-                        + "	max(nf.Nfe_DatEnt) as ult_data\n"
-                        + "  from dbo.IntPnf nfp\n"
-                        + "  inner join dbo.IntNfe nf on nf.Nfe_NumNot = nfp.Pnf_NumNot\n"
-                        + "  where nfp.Pnf_CodTme = 'ENT'\n"
-                        + "  and nfp.Pnf_CodPrd = b.Pnf_CodPrd\n"
-                        + "  and nfp.Pnf_CodEmp = '" + getLojaOrigem() + "')\n"
-                        + "order by b.Pnf_CodPrd"
+                        "with\n" +
+                        "loja as (\n" +
+                        "	select '" + getIdEmpresa() + "' as idEmpresa, '" + getIdFilial() + "' as idFilial\n" +
+                        "),\n" +
+                        "custos as (\n" +
+                        "	select\n" +
+                        "		nfp.Pnf_CodPrd,\n" +
+                        "		max(nf.Nfe_DatEnt) as Nfe_DatEnt\n" +
+                        "	from\n" +
+                        "		dbo.IntPnf nfp\n" +
+                        "		join loja on 1 = 1\n" +
+                        "		inner join dbo.IntNfe nf on\n" +
+                        "			nf.Nfe_NumNot = nfp.Pnf_NumNot\n" +
+                        "	where\n" +
+                        "		nfp.Pnf_CodTme = 'ENT'\n" +
+                        "		and nfp.Pnf_CodEmp = loja.idEmpresa\n" +
+                        "		and nfp.Pnf_CodFil = loja.idFilial\n" +
+                        "	group by\n" +
+                        "		nfp.Pnf_CodPrd\n" +
+                        ")\n" +
+                        "select\n" +
+                        "	b.Pnf_CodPrd as id_produto,\n" +
+                        "	max(b.Pnf_ValUni) as custo\n" +
+                        "from\n" +
+                        "	dbo.IntNfe a\n" +
+                        "	join loja on 1 = 1\n" +
+                        "	join dbo.IntPnf b on\n" +
+                        "		b.Pnf_NumNot = a.Nfe_NumNot\n" +
+                        "	join custos on\n" +
+                        "		custos.Pnf_CodPrd = b.Pnf_CodPrd and\n" +
+                        "		custos.Nfe_DatEnt = a.Nfe_DatEnt\n" +
+                        "where\n" +
+                        "	b.Pnf_CodTme = 'ENT'\n" +
+                        "	and b.Pnf_CodEmp = loja.idEmpresa\n" +
+                        "	and b.Pnf_CodFil = loja.idFilial\n" +
+                        "group by\n" +
+                        "	b.Pnf_CodPrd\n" +
+                        "order by\n" +
+                        "	b.Pnf_CodPrd"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
