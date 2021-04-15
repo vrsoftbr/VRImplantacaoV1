@@ -750,12 +750,12 @@ public class SuperControle_SuperServerDAO extends InterfaceDAO implements MapaTr
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "id, \n"
-                    + "(descricaoLoja + ' - ' + cnpjLoja) as descricao\n"
-                    + "from MultiLoja.Loja\n"
-                    + "where fkCliente = 1\n"
-                    + "order by id"
+                    "select\n"
+                    + "lj.id id,\n"
+                    + "(descricaoLoja + ' - ' + f.cnpj) as descricao\n"
+                    + "from MultiLoja.Loja lj\n"
+                    + "join Cadastro.Entidade f on lj.fkCliente = f.id\n"
+                    + "order by lj.id"
             )) {
                 while (rst.next()) {
                     result.add(
