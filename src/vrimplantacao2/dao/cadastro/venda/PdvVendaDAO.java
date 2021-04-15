@@ -394,6 +394,26 @@ public class PdvVendaDAO {
             stm.execute(sql);
         }
     }
+
+    public Integer encontrarVenda(int id_loja, int ecf, int numeroCupom, Date data, double subTotalImpressora) throws Exception {
+        try (
+                Statement st = Conexao.createStatement();
+                ResultSet rs = st.executeQuery(
+                        "	select id from pdv.venda \n" +
+                        "	where\n" +
+                        "		id_loja = " + id_loja + " and \n" +
+                        "		numerocupom = " + numeroCupom + " and \n" +
+                        "		ecf = " + ecf + " and \n" +
+                        "		data = " + SQLUtils.stringSQL(DATE_FORMAT.format(data)) + "\n" +
+                        "limit 1"
+                )
+        ) {
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        }
+        return null;
+    }
     
     public List<Integer> getIdsPorData(int idLoja, Date dt) throws Exception {
         List<Integer> result = new ArrayList<>();

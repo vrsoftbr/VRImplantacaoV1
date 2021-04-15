@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.venda;
 
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +63,8 @@ public class VendaRepository {
     }
     
     public boolean importar(Set<OpcaoVenda> opt) throws Exception {
+        
+        boolean atualizarCustos = opt.contains(OpcaoVenda.ATUALIZAR_CUSTOS);
         
         if (
                 !opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) &&
@@ -252,26 +255,50 @@ public class VendaRepository {
                             continue;
                         }
 
-                        /**
-                         * Se a venda já existir, elimina ela do cadastro.
-                         */
-                        provider.eliminarVenda(
+                        if (atualizarCustos) {
+                            Integer idVenda = provider.venda().encontrarVenda(
                                 venda.getEcf(),
                                 venda.getNumeroCupom(),
                                 venda.getData(),
                                 venda.getSubTotalImpressora()
-                        );
+                            );
+                            if (idVenda != null) {
+                                for (PdvVendaItemVO item: venda.getItens()) {
+                                    provider.item().atualizar(idVenda, item);
+                                }
+                            } else {
+                                String msg = MessageFormat.format(
+                                        "Venda não encontrada: {0} - {1} - {2} - {3}",
+                                        venda.getEcf(),
+                                        venda.getNumeroCupom(),
+                                        venda.getData(),
+                                        venda.getSubTotalImpressora()
+                                );
+                                LOG.warning(msg);
+                                System.out.println(msg);
+                            }
+                        } else {
+                            /**
+                             * Se a venda já existir, elimina ela do cadastro.
+                             */
+                            provider.eliminarVenda(
+                                    venda.getEcf(),
+                                    venda.getNumeroCupom(),
+                                    venda.getData(),
+                                    venda.getSubTotalImpressora()
+                            );
 
-                        /**
-                         * Efetua a gravação da venda, dos seus itens e registra como
-                         * uma venda importada para facilitar futuras operações no
-                         * banco de dados.
-                         */
-                        provider.gravar(venda);
-                        for (PdvVendaItemVO item: venda.getItens()) {
-                            provider.gravar(item);
+                            /**
+                             * Efetua a gravação da venda, dos seus itens e registra como
+                             * uma venda importada para facilitar futuras operações no
+                             * banco de dados.
+                             */
+                            provider.gravar(venda);
+                            for (PdvVendaItemVO item: venda.getItens()) {
+                                provider.gravar(item);
+                            }
+                            provider.logarVendaImportadas(venda.getId());
                         }
-                        provider.logarVendaImportadas(venda.getId());
 
                         provider.notificar();
 

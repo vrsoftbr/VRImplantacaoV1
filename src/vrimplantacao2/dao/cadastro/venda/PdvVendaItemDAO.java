@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
@@ -226,6 +227,38 @@ public class PdvVendaItemDAO {
             LOG.info("Produtos por EAN carregados");
         }
         return produtoPorEANAtual.get(ean);
+    }
+
+    public void atualizar(int idVenda, PdvVendaItemVO item) throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("pdv");
+            sql.setTableName("vendaitem");
+            final String format = String.format(
+                    "id_venda = %d and sequencia = %d and id_produto = %d",
+                    idVenda,
+                    item.getSequencia(),
+                    item.getId_produto()
+            );
+            sql.setWhere(format);
+            sql.put("custoComImposto", item.getCustoComImposto(), 0);
+            sql.put("custoSemImposto", item.getCustoSemImposto(), 0);
+            sql.put("custoMedioComimposto", item.getCustoMedioComImposto(), 0);
+            sql.put("custoMedioSemImposto", item.getCustoMedioSemImposto(), 0);
+            String update = sql.getUpdate();
+            LOG.finer(update);
+            int alterados = st.executeUpdate(update);
+            if (alterados > 1) {
+                throw new Exception(alterados + " item de venda foi alterado: " + format);
+            } else if (alterados == 0) {
+                LOG.finest(new Supplier<String>() {
+                    @Override
+                    public String get() {
+                        return "Item não foi encontrado: " + format;
+                    }
+                });
+            }
+        }
     }
 
 }

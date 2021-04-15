@@ -21,5 +21,9 @@ public enum OpcaoVenda {
     /**
      * Caso o produto não seja encontrado na venda, será utilizado um item padrão para importar.
      */
-    UTILIZAR_ITEM_PADRAO
+    UTILIZAR_ITEM_PADRAO,
+    /**
+     * Não elimina as vendas encontradas, apenas atualiza seu custo
+     */
+    ATUALIZAR_CUSTOS
 }

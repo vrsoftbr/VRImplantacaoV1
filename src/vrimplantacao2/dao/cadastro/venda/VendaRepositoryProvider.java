@@ -33,6 +33,9 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class VendaRepositoryProvider {
     
+    private final VendaItemFacade item = new VendaItemFacade();
+    private final VendaProviderFacade venda = new VendaProviderFacade();
+    
     private JdbcConnectionSource source;
     private final String sistema;
     private final String loja;
@@ -67,6 +70,15 @@ public class VendaRepositoryProvider {
         this.vendaItemImpDao = new VendaItemImpDao(this.source);
     }
 
+    public VendaItemFacade item() {
+        return item;
+    }
+    
+    public VendaProviderFacade venda() {
+        return venda;
+    }
+    
+    
     public String getSistema() {
         return sistema;
     }
@@ -236,5 +248,20 @@ public class VendaRepositoryProvider {
         return vendaItemImpDao.getProdutosVendidos();
     }
     
+    public final class VendaItemFacade {
+        private VendaItemFacade() {}
+
+        public void atualizar(int idVenda, PdvVendaItemVO item) throws Exception {
+            vendaItemDAO.atualizar(idVenda, item);
+        }
+    }
+    
+    public final class VendaProviderFacade {
+        private VendaProviderFacade() {}
+
+        public Integer encontrarVenda(int ecf, int numeroCupom, Date data, double subTotalImpressora) throws Exception {
+            return vendaDAO.encontrarVenda(getLojaVR(), ecf, numeroCupom, data, subTotalImpressora);
+        }
+    }
 
 }

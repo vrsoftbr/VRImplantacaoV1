@@ -515,7 +515,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="pnlPdvVendaDatas" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkPdvVendasCustos" min="-2" max="-2" attributes="0"/>
+                              <Component id="pnlPdvVendaDatas" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -527,7 +530,9 @@
                               <Component id="chkPdvVendas" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="pnlPdvVendaDatas" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkPdvVendasCustos" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="119" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -575,6 +580,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPdvVendasActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPdvVendasCustos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atualizar custos da vendas"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPdvVendasCustosActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
