@@ -518,6 +518,7 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vend.estoquemaximo,\n" +
                     "	vend.estoqueminimo,\n" +
                     "	vend.estoque,\n" +
+                    "	vend.troca,\n" +
                     "	vend.custosemimposto,\n" +
                     "	vend.custocomimposto,\n" +
                     "	vend.precovenda,\n" +
@@ -1751,6 +1752,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorDesconto(rst.getDouble("valordesconto"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidademedida"));
+                        next.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                        next.setCustoComImposto(rst.getDouble("custocomimposto"));
+                        next.setCustoMedioSemImposto(rst.getDouble("customediosemimposto"));
+                        next.setCustoMedioComImposto(rst.getDouble("customediocomimposto"));
                         next.setIcmsAliq(rst.getDouble("icms_aliq"));
                         next.setIcmsCst(rst.getInt("icms_cst"));
                         next.setIcmsReduzido(rst.getDouble("icms_red"));
@@ -1779,6 +1784,10 @@ public class VRToVRDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	vi.valoracrescimo,\n"
                     + "	vi.codigobarras,\n"
                     + "	vi.unidademedida,\n"
+                    + "	vi.custosemimposto,\n"
+                    + "	vi.custocomimposto,\n"
+                    + "	vi.customediosemimposto,\n"
+                    + "	vi.customediocomimposto,\n"
                     + "	vi.id_tipodesconto tipodesconto,\n"
                     + "	aliq.situacaotributaria icms_cst,\n"
                     + "	aliq.porcentagem icms_aliq,\n"
