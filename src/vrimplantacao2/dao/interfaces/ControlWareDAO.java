@@ -15,8 +15,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
+import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -29,6 +32,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -180,7 +184,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            //stm.executeUpdate("set client_encoding to 'WIN1252';");
+            stm.executeUpdate("set client_encoding to 'WIN1252';");
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	p.codproduto id,\n"
@@ -206,7 +210,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	un.sigla id_tipoEmbalagem,\n"
                     + "	piscofinsent.codcst idTipoPisCofinsCredito,\n"
                     + "	piscofinssai.codcst idTipoPisCofinsDebito,\n"
-                    + "	natr.codigo naturezaReceita,\n"
+                    + "	coalesce(natr.codigo, p.natreceita::integer) naturezaReceita,\n"
                     + "	pe.precovrj precovenda,\n"
                     + "	pe.custorep custocomnota,\n"
                     + "	pe.custorep custosemnota,\n"
@@ -278,6 +282,12 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     } else {
                         imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     }
+                    
+                    /*
+                        Calcular Margem sobre custo se necessário no campo margem
+                        margem = round((precovenda / (custocomimposto / 100)) - 100, 2)
+                    */
+                    
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("id_tipoembalagem"));
@@ -300,9 +310,113 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     }
 
     @Override
+    public List<NutricionalToledoVO> getNutricionalToledo() throws Exception {
+        List<NutricionalToledoVO> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            stm.executeUpdate("set client_encoding to 'WIN1252';");
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codnutricional id,\n" +
+                    "	descricao,\n" +
+                    "	qtdeporcao qtdporcao,\n" +
+                    "	qtdecal qtdcaloria,\n" +
+                    "	perccal,\n" +
+                    "	qtdecarbo qtdcarboidrato,\n" +
+                    "	perccarbo,\n" +
+                    "	qtdeprot qtdproteina,\n" +
+                    "	percprot,\n" +
+                    "	qtdegord qtdgordura,\n" +
+                    "	percgord,\n" +
+                    "	qtdegordsat qtdgordurasaturada,\n" +
+                    "	percgordsat,\n" +
+                    "	qtdecolest qtdcolesterol,\n" +
+                    "	perccolest,\n" +
+                    "	qtdefibra qtdfibra,\n" +
+                    "	percfibra,\n" +
+                    "	qtdeferro qtdferro,\n" +
+                    "	percferro,\n" +
+                    "	qtdecal qtdcalcio,\n" +
+                    "	perccalcio,\n" +
+                    "	qtdesodio qtdsodio,\n" +
+                    "	percsodio,\n" +
+                    "	qtdegordtrans qtdgordtrans,\n" +
+                    "	percgordtrans,\n" +
+                    "	unidporcao unidade,\n" +
+                    "	intmedcas medidaint,\n" +
+                    "	decmedcas decimalmedidacase,\n" +
+                    "	medcaseira\n" +
+                    "from \n" +
+                    "	nutricional")) {
+                while(rs.next()) {
+                    NutricionalToledoVO vo = new NutricionalToledoVO();
+                    
+                    vo.setId(rs.getInt("id"));
+                    vo.setDescricao(rs.getString("descricao"));
+                    vo.setQuantidade(rs.getInt("qtdporcao"));
+                    vo.setCaloria(rs.getInt("qtdcaloria"));
+                    vo.setPercentualcaloria(rs.getInt("perccal"));
+                    vo.setCarboidrato(rs.getDouble("qtdcarboidrato"));
+                    vo.setPercentualcarboidrato(rs.getInt("perccarbo"));
+                    vo.setProteina(rs.getDouble("qtdproteina"));
+                    vo.setPercentualproteina(rs.getInt("percprot"));
+                    vo.setGordura(rs.getDouble("qtdgordura"));
+                    vo.setPercentualgordura(rs.getInt("percgord"));
+                    vo.setGordurasaturada(rs.getDouble("qtdgordurasaturada"));
+                    vo.setPercentualgordurasaturada(rs.getInt("percgordsat"));
+                    vo.setFibra(rs.getDouble("qtdfibra"));
+                    vo.setPercentualfibra(rs.getInt("percfibra"));
+                    vo.setFerro(rs.getDouble("qtdferro"));
+                    vo.setPercentualferro(rs.getInt("percferro"));
+                    vo.setCalcio(rs.getDouble("qtdcalcio"));
+                    vo.setPercentualcalcio(rs.getInt("perccalcio"));
+                    vo.setSodio(rs.getDouble("qtdsodio"));
+                    vo.setPercentualsodio(rs.getInt("percsodio"));
+                    vo.setGorduratrans(rs.getDouble("qtdgordtrans"));
+                    vo.setMedidainteira(rs.getInt("medidaint"));
+                    vo.setId_tipounidadeporcao(rs.getInt("unidade"));
+                    vo.setId_tipomedida(rs.getInt("medcaseira"));
+                    vo.setId_tipomedidadecimal(rs.getInt("decimalmedidacase"));
+                    
+                    addItemNutricional(vo);
+                    
+                    result.add(vo);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private void addItemNutricional(NutricionalToledoVO vo) throws SQLException {
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            stm.executeUpdate("set client_encoding to 'WIN1252';");
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codproduto,\n" +
+                    "	codnutricional\n" +
+                    "from \n" +
+                    "	produto\n" +
+                    "where \n" +
+                    "	codnutricional is not null and \n" +
+                    "	codnutricional = " + vo.getId())) {
+                while(rs.next()) {
+                    NutricionalToledoItemVO voItem = new NutricionalToledoItemVO();
+                    
+                    voItem.setId_nutricionaltoledo(rs.getInt("codnutricional"));
+                    voItem.setStrID(rs.getString("codproduto"));
+                    
+                    vo.vNutricionalToledoItem.add(voItem);
+                }
+            }
+        }
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            stm.executeUpdate("set client_encoding to 'WIN1252';");
             try (ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	f.codfornec id,\n" +
@@ -407,6 +521,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            stm.executeUpdate("set client_encoding to 'WIN1252';");
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	codprodfornec id,\n"
@@ -436,6 +551,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            stm.executeUpdate("set client_encoding to 'WIN1252';");
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	c.codcliente id,\n"

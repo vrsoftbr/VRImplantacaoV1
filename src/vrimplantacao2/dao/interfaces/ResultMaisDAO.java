@@ -242,46 +242,49 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	p.cd_produto idproduto,\n"
-                    + "	codigo codigobarras,\n"
-                    + "	upper(p.descricao) descricao,\n"
-                    + "	u.simbolo embalagem,\n"
-                    + "	case\n"
-                    + "		when length(codigo) <= 6 then 1\n"
-                    + "		else 0\n"
-                    + "	end e_balanca,\n"
-                    + "	cd_grupo merc1,\n"
-                    + "	cd_grupo merc2,\n"
-                    + "	cd_grupo merc3,\n"
-                    + "	round(perc_lucro, 2) margem,\n"
-                    + "	pr_compra custosemimposto,\n"
-                    + "	pr_custo custocomimposto,\n"
-                    + "	pr_venda precovenda,\n"
-                    + "	situacao situacaocadastro,\n"
-                    + "	dt_cadastro datacadastro,\n"
-                    + "	p.dh_ult_alteracao dataalteracao,\n"
-                    + "	saldo_fisico estoque,\n"
-                    + "	est_minimo estoquemin,\n"
-                    + "	est_maximo estoquemax,\n"
-                    + "	peso,\n"
-                    + "	pt.valor_taxa aliqicms,\n"
-                    + "	pt.st cst,\n"
-                    + "	pt.valor_reducao reducao,\n"
-                    + "	p.cod_pis pc_saida,\n"
-                    + "	p.cod_pis_ent pc_entrada,\n"
-                    + "	ncm,\n"
-                    + "	t.cest\n"
-                    + "from\n"
-                    + "	produto p\n"
-                    + "left join saldo_prod sp on sp.cd_produto = p.cd_produto\n"
-                    + "left join unidade u on u.cd_unidade = p.cd_unidade\n"
-                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
-                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
-                    + "where \n"
-                    + "	ano_mes = (select max(ano_mes) from saldo_prod)\n"
-                    + "order by\n"
-                    + "	p.cd_produto"
+                    "select\n" +
+                    "	p.cd_produto idproduto,\n" +
+                    "	p.codigo codigobarras,\n" +
+                    "	upper(p.descricao) descricao,\n" +
+                    "	u.simbolo embalagem,\n" +
+                    "	case\n" +
+                    "		when length(p.codigo) <= 6 then 1\n" +
+                    "		else 0\n" +
+                    "	end e_balanca,\n" +
+                    "	cd_grupo merc1,\n" +
+                    "	cd_grupo merc2,\n" +
+                    "	cd_grupo merc3,\n" +
+                    "	round(perc_lucro, 2) margem,\n" +
+                    "	pr_compra custosemimposto,\n" +
+                    "	pr_custo custocomimposto,\n" +
+                    "	pr_venda precovenda,\n" +
+                    "	situacao situacaocadastro,\n" +
+                    "	dt_cadastro datacadastro,\n" +
+                    "	p.dh_ult_alteracao dataalteracao,\n" +
+                    "	saldo_fisico estoque,\n" +
+                    "	est_minimo estoquemin,\n" +
+                    "	est_maximo estoquemax,\n" +
+                    "	peso,\n" +
+                    "	coalesce(pt.valor_taxa, 0) aliqicms,\n" +
+                    "	coalesce(pt.st, '40') cst,\n" +
+                    "	coalesce(pt.valor_reducao, 0) reducao,\n" +
+                    "	pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao idaliquota,\n" +
+                    "	p.cod_pis pc_saida,\n" +
+                    "	p.cod_pis_ent pc_entrada,\n" +
+                    "	ncm,\n" +
+                    "	t.cest,\n" +
+                    "	bf.codigo beneficio\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "left join saldo_prod sp on sp.cd_produto = p.cd_produto\n" +
+                    "left join unidade u on u.cd_unidade = p.cd_unidade\n" +
+                    "left join tributo t on p.cd_tributo = t.cd_tributo\n" +
+                    "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n" +
+                    "left join beneficio_fiscal bf on p.cd_beneficio_fiscal = bf.cd_beneficio_fiscal\n" +
+                    "where \n" +
+                    "	to_char(ano_mes, 'mm/yyyy') = (select to_char(max(ano_mes), 'mm/yyyy') from saldo_prod)\n" +
+                    "order by\n" +
+                    "	p.cd_produto"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -323,9 +326,40 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("pc_entrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pc_saida"));
 
-                    imp.setIcmsCst(rs.getInt("cst"));
+                    imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getInt("aliqicms"));
-                    imp.setIcmsReducao(rs.getDouble("reducao"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
+                    
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstEntrada(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqEntrada(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    
+                    /*imp.setIcmsConsumidorId(rs.getString("idaliquota"));
+                    imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
+                    
+                    imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());*/
+                    
+                    imp.setBeneficio(rs.getString("beneficio"));
 
                     result.add(imp);
                 }

@@ -50,18 +50,20 @@ public class NutricionalToledoDAO {
                     toledo.setPesavel("P");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
-                    toledo.setCodigo(toledo.getNutricional());
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    //toledo.setCodigo(toledo.getNutricional());
+                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                 } else {
                     //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
                     //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
                     toledo.setPesavel("U");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
-                    toledo.setCodigo(toledo.getNutricional());
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    //toledo.setCodigo(toledo.getNutricional());
+                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                 }
             }
             result.add(toledo);
@@ -203,10 +205,10 @@ public class NutricionalToledoDAO {
                 if (vo.getNutricional() != 0) {
                     System.out.println("Aqui");
                     sql.put("nutricional", vo.getNutricional());
-                } else {
+                } /*else {
                     System.out.println("Aqui 2");
                     sql.put("nutricional", vo.getCodigo());
-                }
+                }*/
 
                 stm.execute(sql.getInsert());
             }

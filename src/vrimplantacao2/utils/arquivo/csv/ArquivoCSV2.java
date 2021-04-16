@@ -69,6 +69,10 @@ public class ArquivoCSV2 implements Closeable, Iterator<LinhaArquivo>, Iterable<
                         value = "";
                     }
                     String name = cabecalho.get(i);
+                    
+                    if(name.contains("\"")) {
+                        name = name.replace("\"", "");
+                    }
 
                     linha.putString(name, value);
                 }
