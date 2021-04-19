@@ -366,36 +366,6 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	es1_cod id,\n" +
-                    "	es1_codbarra ean,\n" +
-                    "	es1_umvenda unidade,\n" +
-                    "	es1_qtvenda qtd\n" +
-                    "FROM \n" +
-                    "	es1a")) {
-                while(rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtd"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
