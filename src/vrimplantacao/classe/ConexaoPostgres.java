@@ -59,7 +59,7 @@ public class ConexaoPostgres {
             * Descomentar a propriedade "allowEncodingChanges" caso ocorrer o erro abixo
             * ERROR: character with byte sequence 0x81 in encoding "WIN1252" has no equivalent in encoding "UTF8"
             */
-            props.put("allowEncodingChanges", "true");
+            //props.put("allowEncodingChanges", "true");
             con = DriverManager.getConnection("jdbc:postgresql://" + i_ip + ":" + i_porta + "/" + i_database, props);
         } catch (Exception ex) {
             if (!ipSec.isEmpty()) {
