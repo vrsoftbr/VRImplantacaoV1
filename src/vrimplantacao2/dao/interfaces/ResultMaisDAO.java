@@ -323,9 +323,40 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("pc_entrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pc_saida"));
 
-                    imp.setIcmsCst(rs.getInt("cst"));
+                    imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getInt("aliqicms"));
-                    imp.setIcmsReducao(rs.getDouble("reducao"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
+                    
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstEntrada(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqEntrada(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoSaida());
+                    
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    
+                    /*imp.setIcmsConsumidorId(rs.getString("idaliquota"));
+                    imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
+                    
+                    imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());*/
+                    
+                    imp.setBeneficio(rs.getString("beneficio"));
 
                     result.add(imp);
                 }

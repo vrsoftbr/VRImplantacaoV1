@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.venda;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -226,6 +227,86 @@ public class PdvVendaItemDAO {
             LOG.info("Produtos por EAN carregados");
         }
         return produtoPorEANAtual.get(ean);
+    }
+
+    public void atualizar(int idVenda, PdvVendaItemVO item) throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("pdv");
+            sql.setTableName("vendaitem");
+            sql.setWhere(String.format(
+                    "id_venda = %d and sequencia = %d and id_produto = %d",
+                    idVenda,
+                    item.getSequencia(),
+                    item.getId_produto()
+            ));
+            sql.put("custoComImposto", item.getCustoComImposto(), 0);
+            sql.put("custoSemImposto", item.getCustoSemImposto(), 0);
+            sql.put("custoMedioComimposto", item.getCustoMedioComImposto(), 0);
+            sql.put("custoMedioSemImposto", item.getCustoMedioSemImposto(), 0);
+            String update = sql.getUpdate();
+            LOG.finer(update);
+            int alterados = st.executeUpdate(update);
+            
+            String message = "id_venda = {0} and sequencia = {1} and id_produto = {2}";
+            Object[] params = new Object[]{idVenda, item.getSequencia(), item.getId_produto()};            
+            
+            if (isMaisQueUmItemAlterado(alterados)) {                
+                throw new MultiplosItensDeVendaAlteradosException(
+                        idVenda,
+                        item.getSequencia(), 
+                        item.getId_produto(), 
+                        alterados
+                );
+            } else if (nenhumItemFoiLocalizado(alterados)) {
+                LOG.log(Level.FINEST, message, params);
+            }
+        }
+    }
+    
+    private static class MultiplosItensDeVendaAlteradosException extends RuntimeException {
+        private final int idVenda;
+        private final int sequencia;
+        private final int idProduto;
+        private final int qtdAlterada;
+
+        public MultiplosItensDeVendaAlteradosException(int idVenda, int sequencia, int idProduto, int qtdAlterada) {
+            this.idVenda = idVenda;
+            this.sequencia = sequencia;
+            this.idProduto = idProduto;
+            this.qtdAlterada = qtdAlterada;
+            LOG.log(
+                    Level.SEVERE,
+                    MESSAGE,
+                    new Object[]{
+                        idVenda, 
+                        sequencia,
+                        idProduto,
+                        qtdAlterada
+                    }
+            );
+        }
+        
+        @Override
+        public String getMessage() {
+            return MessageFormat.format(
+                    MESSAGE, 
+                    qtdAlterada,
+                    idVenda,
+                    sequencia,
+                    idProduto
+            );
+        }        
+        private static final String MESSAGE = "Quantidade alterada {0} - id_venda = {1} and sequencia = {2} and id_produto = {3}";
+    }
+
+    private static boolean nenhumItemFoiLocalizado(int alterados) {
+        return alterados == 0;
+    }
+
+    private boolean isMaisQueUmItemAlterado(int alterados) {
+        return alterados > 1;
     }
 
 }

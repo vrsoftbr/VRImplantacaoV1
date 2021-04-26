@@ -279,6 +279,7 @@ import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
+import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
@@ -699,6 +700,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDSoft = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+        mnuPlenus = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1785,6 +1787,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuMercaLite);
+
+        mnuPlenus.setText("Plenus");
+        mnuPlenus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlenusActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuPlenus);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -5155,6 +5165,10 @@ public final class MenuGUI extends VRMdiFrame {
         ResultMaisGUI.exibir(this);
     }//GEN-LAST:event_mnuRMSistemasActionPerformed
 
+    private void mnuPlenusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlenusActionPerformed
+        PlenusGUI.exibir(this);
+    }//GEN-LAST:event_mnuPlenusActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5386,6 +5400,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
     private javax.swing.JMenuItem mnuPlenoKW;
+    private javax.swing.JMenuItem mnuPlenus;
     private javax.swing.JMenu mnuPostgres;
     private javax.swing.JMenu mnuPostgres2;
     private javax.swing.JMenuItem mnuProton;

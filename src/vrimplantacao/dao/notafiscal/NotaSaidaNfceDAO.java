@@ -20,6 +20,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import vr.core.parametro.versao.Versao;
+import vr.database.SQLBuilder;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
@@ -57,6 +59,7 @@ public class NotaSaidaNfceDAO {
     private ArrayList<DivergenciaVO> vDivergencia = null;
     
     public boolean incluirEcfInexistente = false;
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public void eliminarVenda(long idVenda) throws Exception{
         try (Statement stm = Conexao.createStatement()) {
@@ -578,16 +581,16 @@ public class NotaSaidaNfceDAO {
             }
 
             for (VendaFinalizadoraVO oFinalizadora : i_oVenda.vFinalizadora) {
-                sql = new StringBuilder();
-                sql.append("INSERT INTO pdv.vendafinalizadora (id_venda, id_finalizadora, id_tipotef, id_tipoticket, valor, troco) VALUES (");
-                sql.append(idVenda + ", ");
-                sql.append(oFinalizadora.idFinalizadora + ", ");
-                sql.append((oFinalizadora.idTipoTef == -1 ? "NULL" : oFinalizadora.idTipoTef) + ", ");
-                sql.append((oFinalizadora.idTipoTicket == -1 ? "NULL" : oFinalizadora.idTipoTicket) + ", ");
-                sql.append(Utils.arredondar(oFinalizadora.valor, 2) + ", ");
-                sql.append(Utils.arredondar(oFinalizadora.troco, 2) + ")");
-
-                stm.execute(sql.toString());
+                SQLBuilder sqlBuilder = SQLBuilder.make("pdv", "vendafinalizadora")
+                        .put("id_venda", idVenda)
+                        .put("id_finalizadora", oFinalizadora.idFinalizadora)
+                        .put("id_tipotef", (oFinalizadora.idTipoTef == -1 ? null : oFinalizadora.idTipoTef))
+                        .put("id_tipoticket", (oFinalizadora.idTipoTicket == -1 ? null : oFinalizadora.idTipoTicket))
+                        .put("valor", Utils.arredondar(oFinalizadora.valor, 2))
+                        .put("troco", Utils.arredondar(oFinalizadora.troco, 2));
+                if (versao.igualOuMaiorQue(3,21,14)) {
+                    sqlBuilder.put("doacao", 0);
+                }
             }
 
             if (i_oVenda.chaveNfce != null && !i_oVenda.chaveNfce.trim().isEmpty()) {

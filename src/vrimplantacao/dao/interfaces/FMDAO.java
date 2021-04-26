@@ -25,6 +25,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class FMDAO extends InterfaceDAO {
     
+    public String lojaID = "";
     private static final Logger LOG = Logger.getLogger(FMDAO.class.getName());
 
     @Override
@@ -452,7 +453,11 @@ public class FMDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "FM";
+        if(lojaID != null && !"".equals(lojaID)) {
+            return "FM" + lojaID;
+        } else {
+            return "FM";
+        }
     }
     
 }
