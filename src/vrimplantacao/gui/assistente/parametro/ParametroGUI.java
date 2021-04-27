@@ -173,6 +173,8 @@ public class ParametroGUI extends VRInternalFrame {
         tabEngineMigracao = new vr.view.components.panel.VRPanel();
         pnlProdutoUnificacao = new VRPanel();
         chkProdutoUnificacaoExperimental = new VRCheckBox();
+        pnlMercadologicoImportacao = new VRPanel();
+        chkMercadologicoImportacao2 = new VRCheckBox();
         btnGravar = new VRButton();
         btnCancelar = new VRButton();
 
@@ -637,7 +639,7 @@ public class ParametroGUI extends VRInternalFrame {
         tabLoggingLayout.setHorizontalGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
@@ -686,18 +688,42 @@ public class ParametroGUI extends VRInternalFrame {
                 .addContainerGap(9, Short.MAX_VALUE))
         );
 
+        pnlMercadologicoImportacao.setBorder(BorderFactory.createTitledBorder("Importação de Mercadológico"));
+
+        chkMercadologicoImportacao2.setText("Utilizar a importação experimental (2.0)");
+        chkMercadologicoImportacao2.setToolTipText("<html>\nNova rotina de unificação de produtos que irá substituir a atual. Em caso de problema desabilite este<br>\ncheckbox para utilizar o antigo método.\n</html>");
+
+        GroupLayout pnlMercadologicoImportacaoLayout = new GroupLayout(pnlMercadologicoImportacao);
+        pnlMercadologicoImportacao.setLayout(pnlMercadologicoImportacaoLayout);
+        pnlMercadologicoImportacaoLayout.setHorizontalGroup(pnlMercadologicoImportacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMercadologicoImportacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkMercadologicoImportacao2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlMercadologicoImportacaoLayout.setVerticalGroup(pnlMercadologicoImportacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMercadologicoImportacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkMercadologicoImportacao2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(9, Short.MAX_VALUE))
+        );
+
         GroupLayout tabEngineMigracaoLayout = new GroupLayout(tabEngineMigracao);
         tabEngineMigracao.setLayout(tabEngineMigracaoLayout);
         tabEngineMigracaoLayout.setHorizontalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(354, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(90, Short.MAX_VALUE))
         );
         tabEngineMigracaoLayout.setVerticalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(391, Short.MAX_VALUE))
         );
 
@@ -821,6 +847,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkIgnorarClienteImpVenda;
     private VRCheckBox chkImportarBancoImplantacao;
     private VRCheckBox chkImportarIcmsIsentoMigracaoProduto;
+    private VRCheckBox chkMercadologicoImportacao2;
     private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
     private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
     private VRCheckBox chkProdutoUnificacaoExperimental;
@@ -835,6 +862,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRPanel pnlDriverODBC;
     private VRPanel pnlLocalizacao;
     private VRPanel pnlLogDados;
+    private VRPanel pnlMercadologicoImportacao;
     private VRPanel pnlNivelLog;
     private VRPanel pnlProdutoUnificacao;
     private VRPanel pnlTipoLog;
@@ -938,6 +966,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkNfeSaidaProcessarFinalizacoes.setSelected(parametros.getBool(false, "IMPORT_NFE", "PROCESSAR_FINALIZACOES"));
         chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(false, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
         chkProdutoUnificacaoExperimental.setSelected(OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva());
+        chkMercadologicoImportacao2.setSelected(OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -960,6 +989,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.put(chkNfeSaidaProcessarFinalizacoes.isSelected(), "IMPORT_NFE", "PROCESSAR_FINALIZACOES");
             parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");
             OpcoesExperimentaisDeProduto.setUnificacaoExperimental(chkProdutoUnificacaoExperimental.isSelected());
+            OpcoesExperimentaisDeProduto.setImportacaoMercadologicoExperimental(chkMercadologicoImportacao2.isSelected());
             
             
             if (optDriver.isSelected()) {

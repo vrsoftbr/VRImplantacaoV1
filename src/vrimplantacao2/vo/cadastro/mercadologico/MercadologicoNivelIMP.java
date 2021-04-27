@@ -64,8 +64,12 @@ public class MercadologicoNivelIMP {
         MercadologicoNivelIMP merc = new MercadologicoNivelIMP();
         merc.setId(id);
         merc.setDescricao(descricao);
+        return addFilho(merc);
+    }
+    
+    public MercadologicoNivelIMP addFilho(MercadologicoNivelIMP merc) {
         merc.setMercadologicoPai(this);
-        this.getNiveis().put(id, merc);
+        this.getNiveis().put(merc.getId(), merc);
         return merc;
     }
 
