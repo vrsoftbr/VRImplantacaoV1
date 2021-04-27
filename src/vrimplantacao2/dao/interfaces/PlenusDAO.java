@@ -141,6 +141,9 @@ public class PlenusDAO extends InterfaceDAO {
                     "    A.QUANT_TRIB,\n" +
                     "    A.QUANT_ENTR,\n" +
                     "    A.CEST,\n" +
+                    "    su.cst_pis_venda pisdebito,\n" +
+                    "    su.cst_cofins_venda cofinsdebito,\n" + 
+                    "    su.flagsubstituicaotributaria esubstituido,\n" +        
                     "    A.trib_aprox_municipal,\n" +
                     "    A.trib_aprox_estadual,\n" +
                     "    A.trib_aprox_importado\n" +        
@@ -187,6 +190,13 @@ public class PlenusDAO extends InterfaceDAO {
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
+                    imp.setPiscofinsCstDebito(rs.getString("pisdebito"));
+                    
+                    if(rs.getString("esubstituido") != null && rs.getString("esubstituido").equals("T")) {
+                        imp.setIcmsAliq(0);
+                        imp.setIcmsCst(60);
+                        imp.setIcmsReducao(0);
+                    }
                     
                     result.add(imp);
                 }
