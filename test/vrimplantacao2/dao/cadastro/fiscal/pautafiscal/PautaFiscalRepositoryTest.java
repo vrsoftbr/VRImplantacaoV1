@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
@@ -19,6 +20,7 @@ import org.mockito.stubbing.Answer;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
+import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
@@ -30,7 +32,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 @RunWith(MockitoJUnitRunner.class)
 public class PautaFiscalRepositoryTest {
     
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private PautaFiscalRepositoryProvider provider;
     
     public PautaFiscalRepositoryTest() {
@@ -49,9 +51,9 @@ public class PautaFiscalRepositoryTest {
         when(provider.getSistema()).thenReturn("TESTE");
         when(provider.getLoja()).thenReturn("1");
         when(provider.getLojaVR()).thenReturn(1);
-        //when(provider.getAliquota(eq(0), eq(7d), eq(0d))).thenReturn(0);
-        //when(provider.getAliquota(eq(0), eq(12d), eq(0d))).thenReturn(1);
-        //when(provider.getAliquota(eq(0), eq(25d), eq(0d))).thenReturn(3);
+        when(provider.getAliquota(eq(0), eq(7d), eq(0d))).thenReturn(new Icms(0, "7%", 0, 7, 0));
+        when(provider.getAliquota(eq(0), eq(12d), eq(0d))).thenReturn(new Icms(1, "12%", 0, 12, 0));
+        when(provider.getAliquota(eq(0), eq(25d), eq(0d))).thenReturn(new Icms(3, "25%", 0, 25, 0));
         when(provider.getUfPadrao()).thenReturn(new EstadoVO(35, "SP", "SAO PAULO"));
         Map<String, EstadoVO> ufs = new LinkedHashMap<>();
         ufs.put("SP", new EstadoVO(35, "SP", "SAO PAULO"));

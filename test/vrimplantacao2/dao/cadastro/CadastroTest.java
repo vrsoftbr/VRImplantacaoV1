@@ -6,6 +6,7 @@ import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialIDStackTest;
 import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryTest;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroTest;
 import vrimplantacao2.dao.cadastro.fiscal.FiscalTest;
+import vrimplantacao2.dao.cadastro.mercadologico.ImportadorMercadologicoNormalTest;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepositoryTest;
 import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepositoryTest;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStackTest;
@@ -19,6 +20,7 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest;
     ClientePreferencialIDStackTest.class,
     ClienteRepositoryTest.class,
     MercadologicoRepositoryTest.class,
+    ImportadorMercadologicoNormalTest.class,
     FiscalTest.class,
     NutricionalRepositoryTest.class
 })
