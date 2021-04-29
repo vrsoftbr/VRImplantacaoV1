@@ -280,6 +280,7 @@ import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
+import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
@@ -863,6 +864,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuVisualMix = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuSQLServer3 = new javax.swing.JMenu();
+        mnuPoligon = new javax.swing.JMenuItem();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         mnuSysAut = new javax.swing.JMenuItem();
         mnuTelecon = new javax.swing.JMenuItem();
@@ -3043,6 +3045,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuSQLServer3.setText("SQL Server 3");
 
+        mnuPoligon.setText("Poligon");
+        mnuPoligon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPoligonActionPerformed(evt);
+            }
+        });
+        mnuSQLServer3.add(mnuPoligon);
+
         mnuSTSistemas_v2.setText("ST Sistemas");
         mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -5169,6 +5179,10 @@ public final class MenuGUI extends VRMdiFrame {
         PlenusGUI.exibir(this);
     }//GEN-LAST:event_mnuPlenusActionPerformed
 
+    private void mnuPoligonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPoligonActionPerformed
+        PoligonGUI.exibir(this);
+    }//GEN-LAST:event_mnuPoligonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5401,6 +5415,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaVr;
     private javax.swing.JMenuItem mnuPlenoKW;
     private javax.swing.JMenuItem mnuPlenus;
+    private javax.swing.JMenuItem mnuPoligon;
     private javax.swing.JMenu mnuPostgres;
     private javax.swing.JMenu mnuPostgres2;
     private javax.swing.JMenuItem mnuProton;
