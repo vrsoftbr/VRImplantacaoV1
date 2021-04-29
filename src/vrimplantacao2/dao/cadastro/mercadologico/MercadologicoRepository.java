@@ -7,6 +7,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
 /**
  *
@@ -26,6 +27,10 @@ public class MercadologicoRepository {
     
     public MercadologicoRepository(MercadologicoRepositoryProvider provider) throws Exception {
         this.provider = provider;
+    }
+    
+    public void salvarNormal(List<MercadologicoIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {
+        new ImportadorMercadologicoNormal(this).salvar(mercadologicos, opt);
     }
 
     public void salvar(List<MercadologicoNivelIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {

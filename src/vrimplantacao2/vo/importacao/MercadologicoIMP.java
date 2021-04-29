@@ -10,16 +10,14 @@ public class MercadologicoIMP {
     private String importLoja;
     
     private String Merc1ID = "";
-    private String Merc2ID = "";
-    private String Merc3ID = "";
-    private String Merc4ID = "";
-    private String Merc5ID = "";
-    
-    
     private String Merc1Descricao;
+    private String Merc2ID = "";
     private String Merc2Descricao;
+    private String Merc3ID = "";
     private String Merc3Descricao;
+    private String Merc4ID = "";
     private String Merc4Descricao;
+    private String Merc5ID = "";
     private String Merc5Descricao;
 
     public void setImportSistema(String importSistema) {
@@ -159,6 +157,11 @@ public class MercadologicoIMP {
             return false;
         }
         return Objects.equals(this.Merc5ID, other.Merc5ID);
+    }
+
+    @Override
+    public String toString() {
+        return "MercadologicoIMP{" + "importSistema=" + importSistema + ", importLoja=" + importLoja + ", Merc1ID=" + Merc1ID + ", Merc1Descricao=" + Merc1Descricao + ", Merc2ID=" + Merc2ID + ", Merc2Descricao=" + Merc2Descricao + ", Merc3ID=" + Merc3ID + ", Merc3Descricao=" + Merc3Descricao + ", Merc4ID=" + Merc4ID + ", Merc4Descricao=" + Merc4Descricao + ", Merc5ID=" + Merc5ID + ", Merc5Descricao=" + Merc5Descricao + '}';
     }
     
 }

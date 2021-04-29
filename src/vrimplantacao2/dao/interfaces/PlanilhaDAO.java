@@ -104,6 +104,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PRODUTOS);
         result.add(OpcaoProduto.EAN);
         result.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);        
+        result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);        
 
         return result;
     }

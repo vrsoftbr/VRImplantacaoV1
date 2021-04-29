@@ -50,6 +50,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.ProdutoFornecedorDAO;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepository;
+import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepositoryProvider;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepository;
 import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
@@ -194,9 +195,19 @@ public class Importador {
      */
     public void importarMercadologico(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();
-        MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvar(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();        
+        Set<OpcaoProduto> opt = new HashSet<>(Arrays.asList(opcoes));
+        if (Parametros.OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva()) {
+            MercadologicoRepository repository = new MercadologicoRepository(
+                    getSistema(),
+                    getLojaOrigem(),
+                    getLojaVR()
+            );
+            repository.salvarNormal(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
+        } else {
+            MercadologicoDAO dao = new MercadologicoDAO();
+            dao.salvar(mercadologicos, opt);
+        }
     }
 
     /**

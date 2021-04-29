@@ -532,7 +532,15 @@ public final class Parametros implements Iterable<Parametro>{
         }
         
         public static boolean isUnificacaoExperimentalAtiva() {
-            return Parametros.get().getBool(false, "UNIFICACAO_PRODUTO_EXPERIMENTAL");
+            return Parametros.get().getBool(true, "UNIFICACAO_PRODUTO_EXPERIMENTAL");
+        }
+        
+        public static void setImportacaoMercadologicoExperimental(boolean ativo) {
+            Parametros.get().put(ativo, "IMPORTACAO_MERCADOLOGICO_EXPERIMENTAL");
+        }
+        
+        public static boolean isImportacaoMercadologicoExperimentalAtiva() {
+            return Parametros.get().getBool(false, "IMPORTACAO_MERCADOLOGICO_EXPERIMENTAL");
         }
         
     }
