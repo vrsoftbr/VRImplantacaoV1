@@ -282,6 +282,7 @@ import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
+import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -1800,6 +1801,11 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFirebird3.add(mnuPlenus);
 
         chkSGMaster.setText("SG Master");
+        chkSGMaster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSGMasterActionPerformed(evt);
+            }
+        });
         mnuFirebird3.add(chkSGMaster);
 
         mnuDatabase.add(mnuFirebird3);
@@ -5186,6 +5192,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuPoligonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPoligonActionPerformed
         PoligonGUI.exibir(this);
     }//GEN-LAST:event_mnuPoligonActionPerformed
+
+    private void chkSGMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSGMasterActionPerformed
+        SGMasterGUI.exibir(this);
+    }//GEN-LAST:event_chkSGMasterActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
