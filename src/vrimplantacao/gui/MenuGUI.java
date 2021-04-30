@@ -701,6 +701,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFutura = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
+        chkSGMaster = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1795,6 +1796,9 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuPlenus);
+
+        chkSGMaster.setText("SG Master");
+        mnuFirebird3.add(chkSGMaster);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -5172,6 +5176,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
