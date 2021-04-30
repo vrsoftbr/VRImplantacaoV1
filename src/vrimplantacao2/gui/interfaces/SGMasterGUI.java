@@ -17,7 +17,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.PlenusDAO;
+import vrimplantacao2.dao.interfaces.SGMasterDAO;
 import vrimplantacao2.parametro.Parametros;
 
 public class SGMasterGUI extends VRInternalFrame {
@@ -26,7 +26,7 @@ public class SGMasterGUI extends VRInternalFrame {
     private static final String SERVIDOR_SQL = "Firebird";
     private static SGMasterGUI instance;
 
-    private final PlenusDAO dao = new PlenusDAO();
+    private final SGMasterDAO dao = new SGMasterDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
 
     private String vLojaCliente = "-1";
@@ -147,10 +147,6 @@ public class SGMasterGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    
-                    /*if(!txtComplemento.getText().isEmpty()) {
-                        dao.complemento = " - " + txtComplemento.getText();
-                    }*/
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
