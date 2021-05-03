@@ -282,6 +282,7 @@ import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
+import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -702,6 +703,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFutura = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
+        chkSGMaster = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1797,6 +1799,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuPlenus);
+
+        chkSGMaster.setText("SG Master");
+        chkSGMaster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSGMasterActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkSGMaster);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -5183,9 +5193,14 @@ public final class MenuGUI extends VRMdiFrame {
         PoligonGUI.exibir(this);
     }//GEN-LAST:event_mnuPoligonActionPerformed
 
+    private void chkSGMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSGMasterActionPerformed
+        SGMasterGUI.exibir(this);
+    }//GEN-LAST:event_chkSGMasterActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
