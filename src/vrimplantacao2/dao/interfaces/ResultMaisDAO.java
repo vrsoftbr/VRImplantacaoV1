@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -159,6 +160,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
@@ -280,7 +282,8 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cod_pis pc_saida,\n"
                     + "	p.cod_pis_ent pc_entrada,\n"
                     + "	ncm,\n"
-                    + "	t.cest\n"
+                    + "	t.cest, \n"
+                    + " pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib \n"
                     + "from\n"
                     + "	produto p\n"
                     + "left join est on est.idproduto = p.cd_produto\n"
@@ -353,7 +356,6 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstSaida());
                     imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqSaida());
                     imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoSaida());
-                    
                     
                     /*imp.setIcmsConsumidorId(rs.getString("idaliquota"));
                     imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
@@ -555,4 +557,50 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.EXCECAO) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	p.cd_produto idproduto,\n"
+                    + "	ncm,\n"
+                    + "	p_mva_st per_mva,\n"
+                    + "	pt.st cst_debito,\n"
+                    + "	pt.valor_taxa aliquota_debito,\n"
+                    + "	pt.valor_reducao reducao_debito,\n"
+                    + "	case\n"
+                    + "		when pt.valor_reducao > 0 then 20\n"
+                    + "		else 0\n"
+                    + "	end cst_credito,\n"
+                    + "	p_st_ret aliquota_credito,\n"
+                    + "	p_red_bc_efet reducao_credito\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
+                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
+                    + "where\n"
+                    + "	p_mva_st > 0\n"
+                    + "order by\n"
+                    + "	p.cd_produto"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setPautaFiscalId(rst.getString("idproduto"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+    
 }

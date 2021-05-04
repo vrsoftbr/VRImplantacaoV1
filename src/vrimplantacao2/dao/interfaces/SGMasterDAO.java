@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -117,8 +120,10 @@ public class SGMasterDAO extends InterfaceDAO {
                     "	pr.PERCREDUCAOBC reducao\n" +
                     "FROM \n" +
                     "	testoque pr")) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
@@ -132,9 +137,35 @@ public class SGMasterDAO extends InterfaceDAO {
                     
                     String pesado = Utils.acertarTexto(rs.getString("pesado"));
                     
-                    if(pesado != null && "SIM".equals(pesado.trim())) {
-                        imp.seteBalanca(true);
-                    }
+                    if (produtosBalanca.isEmpty()) {
+                        if (pesado != null && "SIM".equals(pesado.trim())) {
+                            imp.seteBalanca(true);
+                        }                        
+                    } else {
+                        long codigoProduto;
+                        
+                        if (imp.getEan() != null && !imp.getEan().trim().isEmpty()) {
+
+                            codigoProduto = Long.parseLong(imp.getEan());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                            } else {
+                                imp.setValidade(rs.getInt("validade"));
+                                imp.seteBalanca(false);
+                            }
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setValidade(rs.getInt("validade"));
+                        }
+
+                    }                    
                     
                     imp.setSituacaoCadastro("SIM".equals(rs.getString("ativo")) ? 1 : 0);
                     imp.setEstoque(rs.getDouble("estoque"));
@@ -151,6 +182,26 @@ public class SGMasterDAO extends InterfaceDAO {
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsCstSaida(rs.getInt("cst"));
                     imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
+                 
+                    imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icmsdebito"));
+                    imp.setIcmsCstSaidaForaEstado(rs.getInt("cst"));
+                    imp.setIcmsReducaoSaidaForaEstado(rs.getDouble("reducao"));
+                    
+                    imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("icmsdebito"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rs.getInt("cst"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rs.getDouble("reducao"));
+                    
+                    imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
+                    imp.setIcmsCstEntrada(rs.getInt("cst"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("reducao"));
+                    
+                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icmsdebito"));
+                    imp.setIcmsCstEntradaForaEstado(rs.getInt("cst"));
+                    imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("reducao"));
+
+                    imp.setIcmsAliqConsumidor(rs.getDouble("icmsdebito"));
+                    imp.setIcmsCstConsumidor(rs.getInt("cst"));
+                    imp.setIcmsReducaoConsumidor(rs.getDouble("reducao"));
                     
                     result.add(imp);
                 }
