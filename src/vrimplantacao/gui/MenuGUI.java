@@ -282,6 +282,7 @@ import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
+import vrimplantacao2.gui.interfaces.ResultMais_V2GUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
@@ -5182,7 +5183,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuRMSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRMSistemasActionPerformed
         // TODO add your handling code here:
-        ResultMaisGUI.exibir(this);
+        ResultMais_V2GUI.exibir(this);
     }//GEN-LAST:event_mnuRMSistemasActionPerformed
 
     private void mnuPlenusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlenusActionPerformed

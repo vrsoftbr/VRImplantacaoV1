@@ -187,7 +187,7 @@ public class ResultMaisGUI extends VRInternalFrame {
                     Importador importador = new Importador(resultmaisDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    resultmaisDAO.complemento = lojaMesmoID;
+                    resultmaisDAO.setComplemento(lojaMesmoID);
 
                     if (tab.getSelectedIndex() == 0) {
                         if (chkFamiliaProduto.isSelected()) {
