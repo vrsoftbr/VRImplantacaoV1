@@ -19,16 +19,15 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.PoligonDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
 
-public class PoligonGUI extends VRInternalFrame {
+public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
 
     private static final String SISTEMA = "Poligon";
     private static final String SERVIDOR_SQL = "Sql Server";
@@ -60,16 +59,7 @@ public class PoligonGUI extends VRInternalFrame {
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
-        params.put(chkInverterAssociado.isSelected(), SISTEMA, "INVERTER_ASSOCIADO");
         params.put(chkManterBalanca.isSelected(), SISTEMA, "MANTER_BALANCA");
-        params.put(chkUsarMargemBruta.isSelected(), SISTEMA, "USAR_MARGEM_BRUTA");
-        params.put(chkDesconsiderarSetorBalanca.isSelected(), SISTEMA, "DESCONSIDERAR_SETOR_BALANCA");
-        params.put(chkPesquisarKG.isSelected(), SISTEMA, "PESQUISAR_KG_DESCRICAO");
-        params.put(chkUsarQtdCotacaoProdFornecedor.isSelected(), SISTEMA, "USAR_QTD_COTACAO_NO_PRODFORN");
-        params.put(chkAssociadoSomenteAtivos.isSelected(), SISTEMA, "ASSOCIADO_SOMENTE_ATIVO");
-        params.put(chkUtilizarEmbalagemCompra.isSelected(), SISTEMA, "UTILIZAR_EMBALAGEM_DE_COMPRA");
-        params.put((txtDataFimOferta.getDate() != null ? new java.sql.Date(txtDataFimOferta.getDate().getTime()) : null), SISTEMA, "DATA_FIM_OFERTA");
-        params.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), SISTEMA, "COPIAR_ICMS_DEBITO");
 
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -87,36 +77,10 @@ public class PoligonGUI extends VRInternalFrame {
     private PoligonGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        //ConexaoFirebird.encoding = "WIN1252";        
 
         this.title = "Importação " + SISTEMA;
 
-        //cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         carregarParametros();
-        /*
-        btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
-            @Override
-            public MapaTributoProvider getProvider() {
-                return dao;
-            }
-
-            @Override
-            public String getSistema() {
-                dao.setComplemento(txtLojaMesmoID.getText());
-                return dao.getSistema();
-            }
-
-            @Override
-            public String getLoja() {
-                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
-                return dao.getLojaOrigem();
-            }
-
-            @Override
-            public Frame getFrame() {
-                return mdiFrame;
-            }
-        });*/
 
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
@@ -150,7 +114,7 @@ public class PoligonGUI extends VRInternalFrame {
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
-        btnMapaTrib.setEnabled(true);
+        //btnMapaTrib.setEnabled(true);
         gravarParametros();
         carregarLojaCliente();
         carregarLojaVR();
@@ -1688,4 +1652,9 @@ public class PoligonGUI extends VRInternalFrame {
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
 
+    @Override
+    public void executar() throws Exception {
+        gravarParametros();
+        carregarLojaVR();
+    }
 }
