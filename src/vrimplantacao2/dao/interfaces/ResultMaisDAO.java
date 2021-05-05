@@ -3,12 +3,16 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -18,6 +22,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -28,7 +33,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public String complemento = "";
+    private String complemento = "";
+    
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
 
     private static final Logger LOG = Logger.getLogger(ResultMaisDAO.class.getName());
 
@@ -37,6 +46,50 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         return "RMSistemas" + complemento;
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.PRODUTOS_BALANCA,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.DATA_ALTERACAO,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.EXCECAO
+        ));
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -127,7 +180,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	 cd_produto idproduto,\n"
+                    + "	 codigo idproduto,\n"
                     + "	 ean codigobarras,\n"
                     + "	 1 qtdembalagem\n"
                     + "from\n"
@@ -135,14 +188,13 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where ean != 'SEM GTIN'\n"
                     + "	 union\n"
                     + "select\n"
-                    + "	 cd_produto idproduto,\n"
+                    + "	 codigo idproduto,\n"
                     + "	 ean_trib codigobarras,\n"
                     + "	 1 qtdembalagem\n"
                     + "from\n"
                     + "	 produto p2\n"
                     + "where ean_trib != 'SEM GTIN'\n"
-                    + "  order by 1"
-            )) {
+                    + "  order by 1"            )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
@@ -159,12 +211,13 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                    /*"select\n"
                     + "	p.cd_produto idproduto,\n"
                     + "	ncm,\n"
                     + "	p_mva_st per_mva,\n"
@@ -180,7 +233,20 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	produto p\n"
                     + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
-                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
+                    + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
+                    + "where\n"
+                    + "	p_mva_st > 0\n"
+                    + "order by\n"
+                    + "	p.cd_produto"*/
+                    "select\n"
+                    + " p.codigo, \n"        
+                    + "	ncm,\n"
+                    + "	p_mva_st per_mva,\n"
+                    + "	p_st_ret aliquota,\n"
+                    + "	p_red_bc_efet reducao\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
                     + "where\n"
                     + "	p_mva_st > 0\n"
                     + "order by\n"
@@ -189,44 +255,36 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
 
-                    imp.setId(rst.getString("idproduto"));
+                    imp.setId(rst.getString("codigo"));
                     imp.setTipoIva(TipoIva.PERCENTUAL);
                     imp.setIva(rst.getDouble("per_mva"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setNcm(rst.getString("ncm"));
 
                     // DÉBITO
-                    if ((rst.getDouble("aliquota_debito") > 0) && (rst.getDouble("reducao_debito") == 0)) {
+                    if ((rst.getDouble("aliquota") > 0) && (rst.getDouble("reducao") == 0)) {
 
-                        imp.setAliquotaDebito(0, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
-                        imp.setAliquotaDebitoForaEstado(0, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebito(0, rst.getDouble("aliquota"), rst.getDouble("reducao"));
+                        imp.setAliquotaDebitoForaEstado(0, rst.getDouble("aliquota"), rst.getDouble("reducao"));
 
-                    } else if ((rst.getDouble("aliquota_debito") > 0) && (rst.getDouble("reducao_debito") > 0)) {
+                    } else if ((rst.getDouble("aliquota") > 0) && (rst.getDouble("reducao") > 0)) {
 
-                        imp.setAliquotaDebito(20, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
-                        imp.setAliquotaDebitoForaEstado(20, rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
+                        imp.setAliquotaDebito(20, rst.getDouble("aliquota"), rst.getDouble("reducao"));
+                        imp.setAliquotaDebitoForaEstado(20, rst.getDouble("aliquota"), rst.getDouble("reducao"));
 
-                    } else {
-
-                        imp.setAliquotaDebito(rst.getInt("cst_debito"), rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
-                        imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("aliquota_debito"), rst.getDouble("reducao_debito"));
                     }
 
                     // CRÉDITO
-                    if ((rst.getDouble("aliquota_credito") > 0) && (rst.getDouble("reducao_credito") == 0)) {
+                    if ((rst.getDouble("aliquota") > 0) && (rst.getDouble("reducao") == 0)) {
 
-                        imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
-                        imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCredito(0, rst.getDouble("aliquota"), rst.getDouble("reducao"));
+                        imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliquota"), rst.getDouble("reducao"));
 
-                    } else if ((rst.getDouble("aliquota_credito") > 0) && (rst.getDouble("reducao_credito") > 0)) {
+                    } else if ((rst.getDouble("aliquota") > 0) && (rst.getDouble("reducao") > 0)) {
 
-                        imp.setAliquotaCredito(20, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
-                        imp.setAliquotaCreditoForaEstado(20, rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
+                        imp.setAliquotaCredito(20, rst.getDouble("aliquota"), rst.getDouble("reducao"));
+                        imp.setAliquotaCreditoForaEstado(20, rst.getDouble("aliquota"), rst.getDouble("reducao"));
 
-                    } else {
-
-                        imp.setAliquotaCredito(rst.getInt("cst_credito"), rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
-                        imp.setAliquotaCreditoForaEstado(rst.getInt("cst_credito"), rst.getDouble("aliquota_credito"), rst.getDouble("reducao_credito"));
                     }
 
                     result.add(imp);
@@ -238,7 +296,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getProdutos() throws Exception {
+    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -253,7 +311,8 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by cd_produto)\n"
                     + " select\n"
                     + "	p.cd_produto idproduto,\n"
-                    + "	codigo codigobarras,\n"
+                    + "	codigo,\n"
+                    + " p.ean, \n"        
                     + "	upper(p.descricao) descricao,\n"
                     + "	u.simbolo embalagem,\n"
                     + "	case\n"
@@ -280,32 +339,49 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cod_pis pc_saida,\n"
                     + "	p.cod_pis_ent pc_entrada,\n"
                     + "	ncm,\n"
-                    + "	t.cest\n"
+                    + "	t.cest, \n"
+                    + " pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib \n"
                     + "from\n"
                     + "	produto p\n"
                     + "left join est on est.idproduto = p.cd_produto\n"
                     + "left join unidade u on u.cd_unidade = p.cd_unidade\n"
                     + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
-                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
+                    + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
+                    + "where char_length(codigo) = 6 \n"
+                    + "and codigo != '000000' \n"
+                    + "and codigo like '%0' \n"        
                     + "order by\n"
-                    + "	p.cd_produto"
+                    + "	p.codigo"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("idproduto"));
-                    imp.setEan(rs.getString("codigobarras"));
+                    imp.setImportId(rs.getString("codigo"));
+                                        
+                    String ean = rs.getString("codigo");                    
+                    
                     imp.setDescricaoCompleta(rs.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
+                    
+                    if (ean!= null && !ean.trim().isEmpty()) {
+                        
+                        if (ean.trim().length() == 6 && !"000000".equals(ean.trim())) {
+                            
+                            if (ean.startsWith("00") && ean.endsWith("0")) {
+                                imp.setEan(ean.substring(2, ean.trim().length() - 1));
+                            } else if (ean.startsWith("0") && ean.endsWith("0")) {
+                                imp.setEan(ean.substring(1, ean.trim().length() - 1));
+                            } else if (ean.endsWith("0")) {
+                                imp.setEan(ean.substring(0, ean.trim().length() - 1));
+                            } 
+                        }
+                    }
+                    
                     imp.seteBalanca(rs.getBoolean("e_balanca"));
-                    /*
-                     if (imp.isBalanca()) {
-                     imp.setEan(imp.getImportId());
-                     }
-                     */
+                                        
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
@@ -315,7 +391,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
 
-                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
 
@@ -330,43 +406,130 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("pc_entrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pc_saida"));
 
-                    imp.setIcmsCstSaida(rs.getInt("cst"));
-                    imp.setIcmsAliqSaida(rs.getInt("aliqicms"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
+                    imp.setIcmsDebitoId(rs.getString("codigo_trib"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("codigo_trib"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("codigo_trib"));
+                    imp.setIcmsCreditoId(rs.getString("codigo_trib"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("codigo_trib"));
+                    imp.setIcmsConsumidorId(rs.getString("codigo_trib"));
                     
-                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
-                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
-                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
-                    
-                    imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
-                    imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
-                    imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
-                    
-                    imp.setIcmsCstConsumidor(imp.getIcmsCstSaida());
-                    imp.setIcmsAliqConsumidor(imp.getIcmsAliqSaida());
-                    imp.setIcmsReducaoSaida(imp.getIcmsReducaoSaida());
-                    
-                    imp.setIcmsCstEntrada(imp.getIcmsCstSaida());
-                    imp.setIcmsAliqEntrada(imp.getIcmsAliqSaida());
-                    imp.setIcmsReducaoEntrada(imp.getIcmsReducaoSaida());
-                    
-                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstSaida());
-                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqSaida());
-                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoSaida());
-                    
-                    
-                    /*imp.setIcmsConsumidorId(rs.getString("idaliquota"));
-                    imp.setIcmsDebitoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsConsumidorId());
-                    
-                    imp.setIcmsCreditoId(imp.getIcmsConsumidorId());
-                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsConsumidorId());*/
-                    
-                    //imp.setBeneficio(rs.getString("beneficio"));
-
                     result.add(imp);
                 }
+                
+                return result;
+            }
+        }
+    }
+       
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "with est as (\n"
+                    + "select\n"
+                    + "	cd_produto idproduto,\n"
+                    + "	saldo_fisico estoque\n"
+                    + "from\n"
+                    + "	saldo_prod sp\n"
+                    + "where\n"
+                    + "	ano_mes = (select max(ano_mes) from saldo_prod est where sp.cd_produto = est.cd_produto)\n"
+                    + "order by cd_produto)\n"
+                    + " select\n"
+                    + "	p.cd_produto idproduto,\n"
+                    + "	codigo,\n"
+                    + " p.ean, \n"        
+                    + "	upper(p.descricao) descricao,\n"
+                    + "	u.simbolo embalagem,\n"
+                    + "	case\n"
+                    + "		when length(codigo) <= 6 then 1\n"
+                    + "		else 0\n"
+                    + "	end e_balanca,\n"
+                    + "	cd_grupo merc1,\n"
+                    + "	cd_grupo merc2,\n"
+                    + "	cd_grupo merc3,\n"
+                    + "	round(perc_lucro, 2) margem,\n"
+                    + "	pr_compra custosemimposto,\n"
+                    + "	pr_custo custocomimposto,\n"
+                    + "	pr_venda precovenda,\n"
+                    + "	situacao situacaocadastro,\n"
+                    + "	dt_cadastro datacadastro,\n"
+                    + "	p.dh_ult_alteracao dataalteracao,\n"
+                    + " est.estoque estoque,\n"
+                    + "	est_minimo estoquemin,\n"
+                    + "	est_maximo estoquemax,\n"
+                    + "	peso,\n"
+                    + "	pt.valor_taxa aliqicms,\n"
+                    + "	pt.st cst,\n"
+                    + "	pt.valor_reducao reducao,\n"
+                    + "	p.cod_pis pc_saida,\n"
+                    + "	p.cod_pis_ent pc_entrada,\n"
+                    + "	ncm,\n"
+                    + "	t.cest, \n"
+                    + " pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib \n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "left join est on est.idproduto = p.cd_produto\n"
+                    + "left join unidade u on u.cd_unidade = p.cd_unidade\n"
+                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
+                    + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
+                    + "order by\n"
+                    + "	p.codigo"
+            )) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codigo"));                    
+                    
+                    
+                    if ("SEM GTIN".equals(rs.getString("ean"))) {
+                        
+                        imp.setEan(rs.getString("codigo"));
+                        
+                    } else {
+                        imp.setEan(rs.getString("ean"));
+                    }
+                    
+                    imp.setDescricaoCompleta(rs.getString("descricao"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rs.getString("embalagem"));                    
+                    imp.seteBalanca(rs.getBoolean("e_balanca"));                                        
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3(rs.getString("merc3"));
+
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+
+                    imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
+                    imp.setPesoBruto(rs.getDouble("peso"));
+
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+
+                    imp.setPiscofinsCstCredito(rs.getString("pc_entrada"));
+                    imp.setPiscofinsCstDebito(rs.getString("pc_saida"));
+
+                    imp.setIcmsDebitoId(rs.getString("codigo_trib"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("codigo_trib"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("codigo_trib"));
+                    imp.setIcmsCreditoId(rs.getString("codigo_trib"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("codigo_trib"));
+                    imp.setIcmsConsumidorId(rs.getString("codigo_trib"));
+                    
+                    result.add(imp);
+                }
+                
                 return result;
             }
         }
@@ -451,10 +614,11 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	pf.cd_pessoa fornecedor,\n"
-                    + "	cd_produto idproduto,\n"
+                    + "	p.codigo idproduto,\n"
                     + "	cd_fornec_prod codexterno\n"
                     + "from\n"
                     + "	fornec_prod pf\n"
+                    + " join produto p on cd_produto = pf.cd_produto \n"        
                     + "	join pessoa f on f.cd_pessoa = pf.cd_pessoa\n"
                     + "order by pf.cd_pessoa, cd_produto")) {
                 while (rs.next()) {
@@ -555,4 +719,79 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.EXCECAO) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	p.codigo idproduto,\n"
+                    + "	ncm,\n"
+                    + "	p_mva_st per_mva,\n"
+                    + "	pt.st cst_debito,\n"
+                    + "	pt.valor_taxa aliquota_debito,\n"
+                    + "	pt.valor_reducao reducao_debito,\n"
+                    + "	case\n"
+                    + "		when pt.valor_reducao > 0 then 20\n"
+                    + "		else 0\n"
+                    + "	end cst_credito,\n"
+                    + "	p_st_ret aliquota_credito,\n"
+                    + "	p_red_bc_efet reducao_credito\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
+                    + "left join produto_tributo pt on p.cd_tributo = pt.cd_produto\n"
+                    + "where\n"
+                    + "	p_mva_st > 0\n"
+                    + "order by\n"
+                    + "	p.cd_produto"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setPautaFiscalId(rst.getString("idproduto"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	codigo as idproduto,\n"
+                    + "	pr_venda as precovenda, \n"
+                    + "	pr_venda2 as precooferta, \n"
+                    + "	current_date + 1 as datainicio,\n"
+                    + "	dt_limite_pr2 as datafim \n"
+                    + "from produto \n"
+                    + "where pr_venda2 > 0\n"
+                    + "and dt_limite_pr2 > now()"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoNormal(rst.getDouble("precovenda"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
 }
