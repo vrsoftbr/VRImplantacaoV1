@@ -569,6 +569,18 @@ public class Importador {
      * @throws Exception
      */
     public void unificarProdutos(OpcaoProduto... opcoes) throws Exception {
+        unificarProdutos(new HashSet<>(Arrays.asList(opcoes)));
+    }
+    
+    /**
+     * Unifica o cadastro de produtos. Todos os produtos com EAN válido serão
+     * importados e aqueles que não possuirem EAN maior que 999999 são gravados
+     * apenas na tabela implantacao.codant_produto.
+     *
+     * @param opcoes
+     * @throws Exception
+     */
+    public void unificarProdutos(Set<OpcaoProduto> opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos (Unificação)...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
