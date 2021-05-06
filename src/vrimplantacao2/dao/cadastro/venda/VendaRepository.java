@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,11 @@ public class VendaRepository {
             opt.add(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
             System.out.println("Atribuindo opção padrão para as vendas IMPORTAR_POR_CODIGO_ANTERIOR");
         }
+
+        produtoIDStack = new ProdutoIDStack(new ProdutoIDStackProvider());
+        lojas = new LojaDAO().carregar();
+        providerProduto = new ProdutoRepositoryProvider();
+        produtoAnteriorDAO = new ProdutoAnteriorDAO();
         
         if (!existeProdutosDivergentes(opt)) {
         
@@ -110,11 +116,6 @@ public class VendaRepository {
                 produtoPadrao = Parametros.get().getItemVendaPadrao();
                 ignorarClienteImpVenda = Parametros.get().isIgnorarClienteImpVenda();
                 forcarCadastroProdutoNaoExistente = Parametros.get().isForcarCadastroProdutoNaoExistente();
-
-                produtoIDStack = new ProdutoIDStack(new ProdutoIDStackProvider());
-                lojas = new LojaDAO().carregar();
-                providerProduto = new ProdutoRepositoryProvider();
-                produtoAnteriorDAO = new ProdutoAnteriorDAO();
 
                 if (opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR)) {
                     provider.vincularMapaDivergenciaComAnteriores();
@@ -509,7 +510,7 @@ public class VendaRepository {
         boolean forcarCadastroProdutoNaoExistente = Parametros.get().isForcarCadastroProdutoNaoExistente();
         List<VendaItemIMP> produtos = provider.getProdutosVendidos();
         boolean haDivergencia = false;
-        List<VendaItemIMP> divergentes = new ArrayList<>();
+        Set<String> produtosNaoEncontrados = new HashSet<>();
         
         for (VendaItemIMP impItem: produtos) {
             PdvVendaItemVO item = converter(impItem, false);
@@ -532,18 +533,23 @@ public class VendaRepository {
                 produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
             }
             if ( produto == null ) {
-                haDivergencia = true;                
-                if (!forcarCadastroProdutoNaoExistente) {
+                haDivergencia = true;
+                final boolean produtoNaoEncontradoAnteriormente = !produtosNaoEncontrados.contains(impItem.getProduto());
+                
+                if (!forcarCadastroProdutoNaoExistente && produtoNaoEncontradoAnteriormente) {
                     final String msg = String.format(
                             "Produto não encontrado - código:%s ean:%s descricao:%s",
                             impItem.getProduto(),
                             impItem.getCodigoBarras(),
                             impItem.getDescricaoReduzida()
                     );
+                    provider.gravarMapa(
+                            impItem.getProduto(),
+                            impItem.getCodigoBarras(),
+                            impItem.getDescricaoReduzida()
+                    );
                     LOG.warning(msg);
-
-                    divergentes.add(impItem);
-
+                    produtosNaoEncontrados.add(impItem.getProduto());
                 } else {
                     //<editor-fold defaultstate="collapsed" desc="Inclusão de Produto">
                     LOG.warning(
@@ -554,7 +560,6 @@ public class VendaRepository {
                                     impItem.getDescricaoReduzida()
                             )
                     );
-                    divergentes.add(impItem);
 
                     try {
 
@@ -749,18 +754,6 @@ public class VendaRepository {
                 }
             }
             
-        }
-        
-        if (forcarCadastroProdutoNaoExistente) {
-            if (!divergentes.isEmpty()) {
-                for (VendaItemIMP impItem : divergentes) {
-                    provider.gravarMapa(
-                            impItem.getProduto(),
-                            impItem.getCodigoBarras(),
-                            impItem.getDescricaoReduzida()
-                    );
-                }
-            }
         }
         
         return haDivergencia;
