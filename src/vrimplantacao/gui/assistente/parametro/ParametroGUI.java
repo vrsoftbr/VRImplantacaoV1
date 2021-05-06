@@ -173,6 +173,7 @@ public class ParametroGUI extends VRInternalFrame {
         tabEngineMigracao = new vr.view.components.panel.VRPanel();
         pnlProdutoUnificacao = new VRPanel();
         chkProdutoUnificacaoExperimental = new VRCheckBox();
+        chkProdutoForcarNovo = new VRCheckBox();
         pnlMercadologicoImportacao = new VRPanel();
         chkMercadologicoImportacao2 = new VRCheckBox();
         btnGravar = new VRButton();
@@ -266,7 +267,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
 
         pnlLocalizacao.setBorder(BorderFactory.createTitledBorder("Localização"));
@@ -613,7 +614,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlTipoLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlNivelLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(123, Short.MAX_VALUE))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
 
         btnLogExcluir.setText("Excluir");
@@ -639,7 +640,7 @@ public class ParametroGUI extends VRInternalFrame {
         tabLoggingLayout.setHorizontalGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
@@ -673,19 +674,26 @@ public class ParametroGUI extends VRInternalFrame {
         chkProdutoUnificacaoExperimental.setText("Utilizar unificação experimental (2.0)");
         chkProdutoUnificacaoExperimental.setToolTipText("<html>\nNova rotina de unificação de produtos que irá substituir a atual. Em caso de problema desabilite este<br>\ncheckbox para utilizar o antigo método.\n</html>");
 
+        chkProdutoForcarNovo.setText("<html>\nUnificar somente produtos<br>\nmarcados com <b>\"forcarnovo\"</b>\n</html>");
+        chkProdutoForcarNovo.setToolTipText("");
+
         GroupLayout pnlProdutoUnificacaoLayout = new GroupLayout(pnlProdutoUnificacao);
         pnlProdutoUnificacao.setLayout(pnlProdutoUnificacaoLayout);
         pnlProdutoUnificacaoLayout.setHorizontalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                    .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chkProdutoForcarNovo))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlProdutoUnificacaoLayout.setVerticalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(9, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoForcarNovo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pnlMercadologicoImportacao.setBorder(BorderFactory.createTitledBorder("Importação de Mercadológico"));
@@ -716,7 +724,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(90, Short.MAX_VALUE))
+                .addContainerGap(185, Short.MAX_VALUE))
         );
         tabEngineMigracaoLayout.setVerticalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
@@ -724,7 +732,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(391, Short.MAX_VALUE))
+                .addContainerGap(370, Short.MAX_VALUE))
         );
 
         tabs.addTab("Engine de Migração", tabEngineMigracao);
@@ -850,6 +858,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkMercadologicoImportacao2;
     private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
     private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
+    private VRCheckBox chkProdutoForcarNovo;
     private VRCheckBox chkProdutoUnificacaoExperimental;
     private VRComboBox cmbMunicipioPadrao;
     private JComboBox cmbTipoPagamento;
@@ -967,6 +976,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(false, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
         chkProdutoUnificacaoExperimental.setSelected(OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva());
         chkMercadologicoImportacao2.setSelected(OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva());
+        chkProdutoForcarNovo.setSelected(OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -990,7 +1000,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");
             OpcoesExperimentaisDeProduto.setUnificacaoExperimental(chkProdutoUnificacaoExperimental.isSelected());
             OpcoesExperimentaisDeProduto.setImportacaoMercadologicoExperimental(chkMercadologicoImportacao2.isSelected());
-            
+            OpcoesExperimentaisDeProduto.setUnificarSomenteProdutosComForcarNovo(chkProdutoForcarNovo.isSelected());            
             
             if (optDriver.isSelected()) {
                 parametros.put(0, "ODBC", "TIPO_CONEXAO");

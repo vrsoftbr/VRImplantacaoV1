@@ -16,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.EmpresaVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
@@ -541,6 +540,14 @@ public final class Parametros implements Iterable<Parametro>{
         
         public static boolean isImportacaoMercadologicoExperimentalAtiva() {
             return Parametros.get().getBool(false, "IMPORTACAO_MERCADOLOGICO_EXPERIMENTAL");
+        }
+        
+        public static void setUnificarSomenteProdutosComForcarNovo(boolean ativo) {
+            Parametros.get().put(ativo, "UNIFICAR_SOMENTE_PRODUTOS_COM_FORCAR_NOVO");
+        }
+        
+        public static boolean isUnificarSomenteProdutosComForcarNovo() {
+            return Parametros.get().getBool(false, "UNIFICAR_SOMENTE_PRODUTOS_COM_FORCAR_NOVO");
         }
         
     }

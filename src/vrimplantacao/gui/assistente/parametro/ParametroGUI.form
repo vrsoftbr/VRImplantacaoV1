@@ -207,7 +207,7 @@
                                   <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="10" max="32767" attributes="0"/>
+                                  <EmptySpace pref="31" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -551,7 +551,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="189" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="284" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
@@ -638,7 +638,7 @@
                           <Component id="pnlTipoLog" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlNivelLog" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="123" max="32767" attributes="0"/>
+                          <EmptySpace pref="137" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1029,7 +1029,7 @@
                       <Component id="pnlProdutoUnificacao" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="pnlMercadologicoImportacao" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="90" max="32767" attributes="0"/>
+                      <EmptySpace pref="185" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1041,7 +1041,7 @@
                           <Component id="pnlProdutoUnificacao" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="pnlMercadologicoImportacao" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="391" max="32767" attributes="0"/>
+                      <EmptySpace pref="370" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1059,9 +1059,12 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkProdutoUnificacaoExperimental" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="chkProdutoUnificacaoExperimental" max="32767" attributes="0"/>
+                              <Component id="chkProdutoForcarNovo" max="32767" attributes="0"/>
+                          </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -1071,7 +1074,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutoUnificacaoExperimental" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="9" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkProdutoForcarNovo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1081,6 +1086,12 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Utilizar unifica&#xe7;&#xe3;o experimental (2.0)"/>
                     <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Nova rotina de unifica&#xe7;&#xe3;o de produtos que ir&#xe1; substituir a atual. Em caso de problema desabilite este&lt;br&gt;&#xa;checkbox para utilizar o antigo m&#xe9;todo.&#xa;&lt;/html&gt;"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoForcarNovo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;Unificar somente produtos&lt;br&gt;&#xa;marcados com &lt;b&gt;&quot;forcarnovo&quot;&lt;/b&gt;&#xa;&lt;/html&gt;"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -556,6 +556,7 @@ public class ProdutoRepository {
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean manterSomenteOsProdutosForcarNovo = Parametros.OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo();
         
         verificarAliquotasMapeadas(produtos);
         verificarAliquotasNaoMapeadas(produtos);
@@ -583,6 +584,9 @@ public class ProdutoRepository {
             setNotify("Removendo da listagem produtos já importados e vinculados...", 0);
             produtos = new Organizador(this).organizarListagem(produtos);
             produtos = filtrarProdutosEEansJaMapeados(produtos);
+            if (manterSomenteOsProdutosForcarNovo) {
+                produtos = filtrarSomenteForcarNovo(produtos);
+            }
             System.gc();
             
             vincularProdutoComEanInvalido(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
@@ -598,6 +602,28 @@ public class ProdutoRepository {
             provider.rollback();
             throw e;
         }
+    }
+    
+    List<ProdutoIMP> filtrarSomenteForcarNovo(List<ProdutoIMP> produtos) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            if (!isProdutoVinculadoNaCodAnt(imp))
+                continue;
+            if (isCodigoAnteriorComCodigoAtualPreenchido(imp))
+                continue;
+            if (!isForcarNovo(imp))
+                continue;
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
+    }
+    boolean isCodigoAnteriorComCodigoAtualPreenchido(ProdutoIMP imp) {
+        Integer codigoAtual = this.codant.get(imp.getImportId());
+        return codigoAtual != null && codigoAtual != 0;
+    }
+    boolean isForcarNovo(ProdutoIMP imp) throws Exception {
+        return provider.anterior().forcarNovo(imp.getImportId());
     }
 
     private void incluirProdutosComEansNovos(List<ProdutoIMP> produtos, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
