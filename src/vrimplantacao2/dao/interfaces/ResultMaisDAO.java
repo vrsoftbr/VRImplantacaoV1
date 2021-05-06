@@ -19,6 +19,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -86,7 +87,9 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.OFERTA,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.EXCECAO
+                OpcaoProduto.EXCECAO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO
         ));
     }
     
@@ -141,6 +144,31 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	cd_grupo_vinculo_preco id,\n"
+                    + "	nome\n"
+                    + "from grupo_vinculo_preco\n"
+                    + "order by 1"
+            )) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setDescricao(rs.getString("nome"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -454,6 +482,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cd_grupo merc1,\n"
                     + "	cd_grupo merc2,\n"
                     + "	cd_grupo merc3,\n"
+                    + " p.cd_grupo_vinculo_preco idfamilia, \n"        
                     + "	round(perc_lucro, 2) margem,\n"
                     + "	pr_compra custosemimposto,\n"
                     + "	pr_custo custocomimposto,\n"
@@ -505,6 +534,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
 
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));

@@ -15,17 +15,18 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
  * @author guilhermegomes
  */
-public class SGMasterDAO extends InterfaceDAO {
+public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -66,6 +67,7 @@ public class SGMasterDAO extends InterfaceDAO {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_CONSUMIDOR,
                 OpcaoProduto.ATACADO,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
@@ -86,6 +88,34 @@ public class SGMasterDAO extends InterfaceDAO {
         return Arrays.asList(new Estabelecimento("1", "LOJA 01"));
     }
 
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT \n"
+                    + "	CSOSN cst,\n"
+                    + "	COALESCE(ALIQUOTAICMSECF, 0) icms,\n"
+                    + "	COALESCE(PERCREDUCAOBC, 0) reducao\n"
+                    + "FROM TESTOQUE\n"
+                    + "ORDER BY 1, 2, 3"
+            )) {
+                while (rs.next()) {
+                    String id = rs.getString("cst") + "-" + rs.getString("icms") + "-" + rs.getString("reducao");
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            rs.getInt("cst"),
+                            rs.getDouble("icms"),
+                            rs.getDouble("reducao")
+                        )
+                    );
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -116,8 +146,8 @@ public class SGMasterDAO extends InterfaceDAO {
                     "	pr.CODTRIBUTACAOPIS pis,\n" +
                     "	pr.tributado,\n" +
                     "	pr.CSOSN cst,\n" +
-                    "	pr.ALIQUOTAICMSECF icmsdebito,\n" +
-                    "	pr.PERCREDUCAOBC reducao\n" +
+                    "   COALESCE(pr.ALIQUOTAICMSECF, 0) icms, \n" +
+                    "	COALESCE(PERCREDUCAOBC, 0) reducao \n" +
                     "FROM \n" +
                     "	testoque pr")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -179,29 +209,14 @@ public class SGMasterDAO extends InterfaceDAO {
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("pis"));
                     
-                    imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstSaida(rs.getInt("cst"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("reducao"));
-                 
-                    imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstSaidaForaEstado(rs.getInt("cst"));
-                    imp.setIcmsReducaoSaidaForaEstado(rs.getDouble("reducao"));
+                    String idIcms = rs.getString("cst") + "-" + rs.getString("icms") + "-" + rs.getString("reducao");
                     
-                    imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstSaidaForaEstadoNF(rs.getInt("cst"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rs.getDouble("reducao"));
-                    
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstEntrada(rs.getInt("cst"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("reducao"));
-                    
-                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstEntradaForaEstado(rs.getInt("cst"));
-                    imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("reducao"));
-
-                    imp.setIcmsAliqConsumidor(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstConsumidor(rs.getInt("cst"));
-                    imp.setIcmsReducaoConsumidor(rs.getDouble("reducao"));
+                    imp.setIcmsDebitoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                    imp.setIcmsCreditoId(idIcms);
+                    imp.setIcmsCreditoForaEstadoId(idIcms);
+                    //imp.setIcmsConsumidorId(idIcms);
                     
                     result.add(imp);
                 }
@@ -211,6 +226,44 @@ public class SGMasterDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ICMS_CONSUMIDOR) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n"
+                        + "	pr.controle id,\n"
+                        + "	pr.ALIQUOTAICMSECF icms\n"
+                        + "FROM \n"
+                        + "	testoque pr"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        
+                        imp.setIcmsDebitoId(null);
+                        
+                        imp.setIcmsCstSaida(0);
+                        imp.setIcmsAliqSaida(rst.getDouble("icms"));
+                        imp.setIcmsReducaoSaida(0);
+                        imp.setIcmsCstConsumidor(0);
+                        imp.setIcmsAliqConsumidor(rst.getDouble("icms"));
+                        imp.setIcmsReducaoConsumidor(0);
+                        
+                        result.add(imp);
+                        
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();

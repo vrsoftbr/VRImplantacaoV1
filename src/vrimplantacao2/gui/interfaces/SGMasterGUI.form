@@ -36,7 +36,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="tab" alignment="0" max="32767" attributes="0"/>
+                  <Component id="tab" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Component id="vRTabbedPane1" alignment="0" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
               </Group>
@@ -159,7 +159,7 @@
                           <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="491" max="32767" attributes="0"/>
+                      <EmptySpace pref="467" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -234,27 +234,10 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="chkRazao" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-                                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="txtEncoding" min="-2" pref="89" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Component id="chkEnderecoCompleto" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
+                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="480" max="32767" attributes="0"/>
+                          <EmptySpace pref="464" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -262,22 +245,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkRazao" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtEncoding" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkCliIERG" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkEnderecoCompleto" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCVencimento" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="154" max="32767" attributes="0"/>
+                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="214" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -294,46 +265,16 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClientePreferencialActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueado">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Bloqueado"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliIERG">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="IE/RG"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JCheckBox" name="chkCVencimento">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Vencimento Rotativo"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRazao">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Raz&#xe3;o Social"/>
+                    <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRazaoActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClienteEventualActionPerformed"/>
                   </Events>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEnderecoCompleto">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Endere&#xe7;o Completo"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkEnderecoCompletoActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JTextField" name="txtEncoding">
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtEncodingActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JLabel" name="jLabel1">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Encoding"/>
-                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -352,7 +293,7 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="506" max="32767" attributes="0"/>
+                          <EmptySpace pref="482" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -396,7 +337,7 @@
                           <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifProdFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="578" max="32767" attributes="0"/>
+                      <EmptySpace pref="291" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -477,7 +418,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtBancoDadosFirebird" pref="300" max="32767" attributes="0"/>
+                                  <Component id="txtBancoDadosFirebird" pref="276" max="32767" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
