@@ -136,7 +136,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	Id_prd importid,\n"
+                    + "	p.codigo importid,\n"
                     + "	p.Descricao descricaocompleta,\n"
                     + "	ref_prd ean,\n"
                     + "	Id_grupo mercadologico1,\n"
