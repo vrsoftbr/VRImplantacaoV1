@@ -194,6 +194,12 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	 produto p2\n"
                     + "where ean_trib != 'SEM GTIN'\n"
+                    + "  union \n"
+                    + "select \n"
+                    + "  codigo idproduto,\n "
+                    + "  codigo codigobarras, \n"
+                    + "  1 qtdembalagem\n"        
+                    + "from produto p3\n"        
                     + "  order by 1"            )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -618,9 +624,9 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cd_fornec_prod codexterno\n"
                     + "from\n"
                     + "	fornec_prod pf\n"
-                    + " join produto p on cd_produto = pf.cd_produto \n"        
+                    + " join produto p on p.cd_produto = pf.cd_produto \n"        
                     + "	join pessoa f on f.cd_pessoa = pf.cd_pessoa\n"
-                    + "order by pf.cd_pessoa, cd_produto")) {
+                    + "order by pf.cd_pessoa, p.cd_produto")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
