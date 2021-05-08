@@ -113,7 +113,7 @@ public class PautaFiscalRepositoryProvider {
     }
 
     public NcmVO getNcm(String ncm) throws Exception {
-        return ncmDAO.getNcm(ncm);
+        return ncmDAO.getNcmSemPadrao(ncm);
     }
 
     public EstadoVO getUfPadrao() {
