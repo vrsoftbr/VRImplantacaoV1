@@ -7,19 +7,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
  * @author guilhermegomes
  */
-public class PlenusDAO extends InterfaceDAO {
+public class PlenusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -53,8 +58,6 @@ public class PlenusDAO extends InterfaceDAO {
                 OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.CUSTO,
-                OpcaoProduto.CUSTO_COM_IMPOSTO,
-                OpcaoProduto.CUSTO_SEM_IMPOSTO,
                 OpcaoProduto.PRECO,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.PIS_COFINS,
@@ -98,6 +101,35 @@ public class PlenusDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT \n"
+                    + "    su.flagsubstituicaotributaria AS codTrib,\n"
+                    + "    A.trib_aprox_estadual AS aliquota\n"
+                    + "from\n"
+                    + "    PRODUTOS A\n"
+                    + "    left join PRODUTO_BASE B on A.ID_PRODUTO_BASE = B.ID_PRODUTO_BASE\n"
+                    + "    left join SUBGRUPO SU on SU.ID_SUBGRUPO = B.ID_SUBGRUPO\n"
+                    + "    left join PRODUTO_ADICIONAIS PA on A.ID_PRODUTO = PA.ID_PRODUTO \n"
+                    + "where\n"
+                    + "    A.ID_PRODUTO > 0\n"
+                    + "ORDER BY 1, 2   "
+            )) {
+                while (rs.next()) {
+                    String idTrib = rs.getString("codTrib") + "-" + rs.getString("aliquota");
+                    result.add(new MapaTributoIMP(
+                            idTrib,
+                            idTrib));
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
@@ -123,7 +155,7 @@ public class PlenusDAO extends InterfaceDAO {
                     "        id_produto = a.id_produto), 0) estoque,\n" +
                     "    A.PRECOVENDAVAREJO precovenda,\n" +
                     "    B.PERCMARGEMVAREJO margem,\n" +
-                    "    A.CUSTOREPOSICAO custo,\n" +
+                    "    PA.CUSTOMEDIO custo, \n" +
                     "    S.DESCRICAO secao,\n" +
                     "    G.DESCRICAO grupo,\n" +
                     "    SU.DESCRICAO subgrupo,\n" +
@@ -154,6 +186,7 @@ public class PlenusDAO extends InterfaceDAO {
                     "    left join SECAO S on S.ID_SECAO = B.ID_SECAO\n" +
                     "    left join GRUPO G on G.ID_GRUPO = B.ID_GRUPO\n" +
                     "    left join SUBGRUPO SU on SU.ID_SUBGRUPO = B.ID_SUBGRUPO\n" +
+                    "    left join PRODUTO_ADICIONAIS PA on A.ID_PRODUTO = PA.ID_PRODUTO \n" +
                     "where\n" +
                     "    A.ID_PRODUTO > 0")) {
                 while(rs.next()) {
@@ -170,14 +203,6 @@ public class PlenusDAO extends InterfaceDAO {
                     imp.setTipoEmbalagemCotacao(rs.getString("UN_ENTR"));
                     imp.setEan(rs.getString("EAN"));
                     
-                    if(rs.getString("balanca") != null && "T".equals(rs.getString("balanca").trim())) {
-                        imp.seteBalanca(true);
-                        
-                        if(imp.getEan() != null && !"".equals(imp.getEan())) {
-                            imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 1));
-                        }
-                    }
-                    
                     imp.setSituacaoCadastro("T".equals(rs.getString("ATIVO")) ? 1 : 0);
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
@@ -192,11 +217,20 @@ public class PlenusDAO extends InterfaceDAO {
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsCstDebito(rs.getString("pisdebito"));
                     
-                    if(rs.getString("esubstituido") != null && rs.getString("esubstituido").equals("T")) {
+                    String idTrib = rs.getString("esubstituido") + "-" + rs.getString("trib_aprox_estadual");
+                    
+                    imp.setIcmsDebitoId(idTrib);
+                    imp.setIcmsDebitoForaEstadoId(idTrib);
+                    imp.setIcmsDebitoForaEstadoNfId(idTrib);
+                    imp.setIcmsCreditoId(idTrib);
+                    imp.setIcmsCreditoForaEstadoId(idTrib);
+                    imp.setIcmsConsumidorId(idTrib);                    
+                    
+                    /*if(rs.getString("esubstituido") != null && rs.getString("esubstituido").equals("T")) {
                         imp.setIcmsAliq(0);
                         imp.setIcmsCst(60);
                         imp.setIcmsReducao(0);
-                    }
+                    }*/
                     
                     result.add(imp);
                 }

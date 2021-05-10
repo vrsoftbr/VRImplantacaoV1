@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -18,6 +19,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -334,7 +336,7 @@ public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
@@ -394,6 +396,78 @@ public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(imp);
                 }
             }
+        }
+        return result;
+    }*/
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	nome,\n"
+                    + "	fantasia,\n"
+                    + "	replace(substring(endereco, 1, position(',' in endereco)), ',', '') as endereco,\n"
+                    + "	trim(replace(substring(endereco, position(',' in endereco)), ',', '')) as numero,\n"
+                    + "	bairro,\n"
+                    + "	cep,\n"
+                    + "	cnpj,\n"
+                    + "	cpf,\n"
+                    + "	rg,\n"
+                    + "	telefone,\n"
+                    + "	totalcontas\n"
+                    + "from implantacao.clientepreferencial\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("nome"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(rst.getString("fantasia"));                    
+                    imp.setCnpj(rst.getString("cpf") == null ? rst.getString("cnpj") : rst.getString("cpf"));                    
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setPermiteCheque(true);
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	nome,\n"
+                    + " current_date + 1 as dataemissao, \n"
+                    + " current_date + 32 as datavencimento, \n"
+                    + "	totalcontas as valor\n"
+                    + "from implantacao.clientepreferencial\n"
+                    + "where totalcontas is not null \n"        
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("nome"));
+                    imp.setIdCliente(rst.getString("nome"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setValor(Double.parseDouble(rst.getString("valor").replace(",", ".")));
+                    result.add(imp);
+                }
+            }            
         }
         return result;
     }

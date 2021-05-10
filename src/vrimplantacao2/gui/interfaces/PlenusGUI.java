@@ -80,9 +80,8 @@ public class PlenusGUI extends VRInternalFrame {
 
         carregarParametros();
 
-        tabProdutos.setOpcoesDisponiveis(dao);
-        
-        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setOpcoesDisponiveis(dao);        
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -105,7 +104,7 @@ public class PlenusGUI extends VRInternalFrame {
                 return mdiFrame;
             }
             
-        });*/
+        });
         
         centralizarForm();
         this.setMaximum(false);
