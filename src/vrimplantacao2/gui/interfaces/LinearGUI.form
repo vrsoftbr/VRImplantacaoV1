@@ -111,7 +111,7 @@
                           <Component id="chkUtilizarEs1ParaCotacao" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkFiltrarProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="221" max="32767" attributes="0"/>
+                      <EmptySpace pref="154" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -137,7 +137,7 @@
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarEs1ParaCotacao">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Utilizar qtd. embalagem da tabela es1p para cota&#xe7;&#xe3;o"/>
+                <Property name="text" type="java.lang.String" value="Utilizar volume x qtdembalagem na produto e produtofornecedor"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFiltrarProdutos">

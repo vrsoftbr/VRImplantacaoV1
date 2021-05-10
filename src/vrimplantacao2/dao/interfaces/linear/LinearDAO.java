@@ -41,7 +41,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     private String complemento = "";
     private Date vendaDataIni;
     private Date vendaDataFim;
-    private boolean utilizarEs1ParaCotacao = false;
+    private boolean multiplicarQtdEmbalagemPeloVolume = false;
     private boolean filtrarProdutos = false;
 
     public void setComplemento(String complemento) {
@@ -52,8 +52,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         this.filtrarProdutos = filtrarProdutos;
     }   
 
-    public void setUtilizarEs1ParaCotacao(boolean utilizarEs1ParaCotacao) {
-        this.utilizarEs1ParaCotacao = utilizarEs1ParaCotacao;
+    public void setMultiplicarQtdEmbalagemPeloVolume(boolean multiplicarQtdEmbalagemPeloVolume) {
+        this.multiplicarQtdEmbalagemPeloVolume = multiplicarQtdEmbalagemPeloVolume;
     }
 
     public void setVendaDataIni(Date vendaDataIni) {
@@ -172,7 +172,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+ @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         
@@ -190,7 +190,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	es1p pr\n" +
                     "JOIN st_familia f ON pr.es1_familia = f.TAB_COD\n" +
                     "JOIN st_departamento d ON pr.es1_departamento = d.TAB_COD\n" +
-                    "JOIN st_secao s ON pr.es1_secao = s.tab_cod")) {
+                    "JOIN st_secao s ON pr.es1_secao = s.tab_cod\n" +
+                    "order by f.TAB_DESC, d.TAB_DESC, s.tab_desc"
+            )) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
@@ -310,7 +312,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    if (this.utilizarEs1ParaCotacao) {                        
+                    if (this.multiplicarQtdEmbalagemPeloVolume) {                        
                         imp.setTipoEmbalagemCotacao(rs.getString("unidade_p"));
                         imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagem_p"));
                     } else {
@@ -372,11 +374,22 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
-                    "	es1_cod idproduto,\n" +
-                    "	cg2_cod idfornecedor,\n" +
-                    "	es1_codforn codigoexterno\n" +
+                    "	a.es1_cod idproduto,\n" +
+                    "	a.cg2_cod idfornecedor,\n" +
+                    "	a.es1_codforn codigoexterno,\n" +
+                    "	b.cg2_data dataalteracao,\n" +
+                    "	(case when p.es1_convun = 0 then 1 else p.es1_convun end) volume,\n" +
+                    "	(case when b.es1_qemb = 0 then 1 else b.es1_qemb end) qtdembalagem,\n" +
+                    "	b.cg2_valor custotabela\n" +
                     "FROM \n" +
-                    "	es1i")) {
+                    "	es1i a\n" +
+                    "	left join es1h b on\n" +
+                    "		a.es1_cod = b.es1_cod and\n" +
+                    "		a.cg2_cod = b.cg2_cod \n" +
+                    "	join es1p p on\n" +
+                    "		a.es1_cod = p.es1_cod\n" +
+                    "where b.es1_empresa = " + getLojaOrigem()
+            )) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
@@ -385,6 +398,15 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setCustoTabela(rs.getDouble("custotabela"));
+                    double volume = rs.getDouble("volume");
+                    double qtdEmbalagem = rs.getDouble("qtdembalagem");
+                    if (multiplicarQtdEmbalagemPeloVolume) {
+                        imp.setQtdEmbalagem(qtdEmbalagem * volume);
+                    } else {
+                        imp.setQtdEmbalagem(qtdEmbalagem);                        
+                    }
                     
                     result.add(imp);
                 }
