@@ -71,7 +71,7 @@ public class ProdutoFornecedorVO {
     }
 
     public void setCodigoExterno(String codigoExterno) {
-        this.codigoExterno = Utils.acertarTexto(codigoExterno, 50);
+        this.codigoExterno = Utils.acertarObservacao(codigoExterno, 50);
     }
 
     public void setDataAlteracao(Date dataAlteracao) {
