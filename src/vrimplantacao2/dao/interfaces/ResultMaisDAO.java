@@ -19,6 +19,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -89,7 +90,8 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                 OpcaoProduto.EXCECAO,
                 OpcaoProduto.FAMILIA,
-                OpcaoProduto.FAMILIA_PRODUTO
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.CODIGO_BENEFICIO
         ));
     }
     
@@ -281,12 +283,12 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by cd_produto)\n"
                     + " select\n"
                     + "	p.cd_produto idproduto,\n"
-                    + "	codigo,\n"
+                    + "	p.codigo,\n"
                     + " p.ean, \n"        
                     + "	upper(p.descricao) descricao,\n"
                     + "	u.simbolo embalagem,\n"
                     + "	case\n"
-                    + "		when length(codigo) <= 6 then 1\n"
+                    + "		when length(p.codigo) <= 6 then 1\n"
                     + "		else 0\n"
                     + "	end e_balanca,\n"
                     + "	cd_grupo merc1,\n"
@@ -310,16 +312,18 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cod_pis_ent pc_entrada,\n"
                     + "	ncm,\n"
                     + "	t.cest, \n"
-                    + " pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib \n"
+                    + " pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib, \n"
+                    + " bene.codigo as codbeneficio \n"        
                     + "from\n"
                     + "	produto p\n"
                     + "left join est on est.idproduto = p.cd_produto\n"
                     + "left join unidade u on u.cd_unidade = p.cd_unidade\n"
                     + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
                     + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
-                    + "where char_length(codigo) = 6 \n"
-                    + "and codigo != '000000' \n"
-                    + "and codigo like '%0' \n"        
+                    + "left join beneficio_fiscal bene on bene.cd_beneficio_fiscal = p.cd_beneficio_fiscal \n"        
+                    + "where char_length(p.codigo) = 6 \n"
+                    + "and p.codigo != '000000' \n"
+                    + "and p.codigo like '%0' \n"        
                     + "order by\n"
                     + "	p.codigo"
             )) {
@@ -383,6 +387,8 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rs.getString("codigo_trib"));
                     imp.setIcmsConsumidorId(rs.getString("codigo_trib"));
                     
+                    imp.setBeneficio(rs.getString("codbeneficio"));
+                    
                     result.add(imp);
                 }
                 
@@ -415,12 +421,12 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     ")\n" +
                     "select\n" +
                     "	p.cd_produto idproduto,\n" +
-                    "	codigo,\n" +
+                    "	p.codigo,\n" +
                     "	p.ean,\n" +
                     "	upper(p.descricao) descricao,\n" +
                     "	u.simbolo embalagem,\n" +
                     "	case\n" +
-                    "		when length(codigo) <= 6 then 1\n" +
+                    "		when length(p.codigo) <= 6 then 1\n" +
                     "		else 0\n" +
                     "	end e_balanca,\n" +
                     "	cd_grupo merc1,\n" +
@@ -445,7 +451,8 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.cod_pis_ent pc_entrada,\n" +
                     "	ncm,\n" +
                     "	t.cest,\n" +
-                    "	pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib\n" +
+                    "	pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib, \n" +
+                    "   bene.codigo as codbeneficio \n" + 
                     "from\n" +
                     "	produto p\n" +
                     "	left join est on\n" +
@@ -456,6 +463,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		p.cd_tributo = t.cd_tributo\n" +
                     "	left join produto_tributo pt on\n" +
                     "		p.cd_produto = pt.cd_produto\n" +
+                    "   left join beneficio_fiscal bene on bene.cd_beneficio_fiscal = p.cd_beneficio_fiscal " + 
                     "order by\n" +
                     "	p.codigo"
             )) {
@@ -501,6 +509,8 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rs.getString("codigo_trib"));
                     imp.setIcmsCreditoForaEstadoId(rs.getString("codigo_trib"));
                     imp.setIcmsConsumidorId(rs.getString("codigo_trib"));
+                    
+                    imp.setBeneficio(rs.getString("codbeneficio"));
                     
                     result.add(imp);
                 }
@@ -762,6 +772,49 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataFim(rst.getDate("datafim"));
                     imp.setPrecoNormal(rst.getDouble("precovenda"));
                     imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	r.cd_mov_cpr as id,\n"
+                    + "	r.dt_movto as dataemissao,\n"
+                    + "	r.dt_vcto as datavencimento,\n"
+                    + "	r.valor,\n"
+                    + "	r.nr_docto as numerodocumento,\n"
+                    + "	r.nr_parcela as parcela,\n"
+                    + "	r.tipo,\n"
+                    + "	r.cd_caixa as ecf,\n"
+                    + "	r.cd_pessoa as idcliente,\n"
+                    + " r.total_parcelas \n"        
+                    + "from mov_cpr r\n"
+                    + "join pessoa p on p.cd_pessoa = r.cd_pessoa \n"
+                    + "	and p.cliente = true\n"
+                    + "where r.cd_empresa = " + getLojaOrigem() + "\n"
+                    + "and r.tipo = 'R'\n"
+                    + "and r.dt_pagto is null\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNumeroCupom(rst.getString("numerodocumento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setObservacao("TOTAL DE PARCELAS " + rst.getString("total_parcelas"));
                     result.add(imp);
                 }
             }
