@@ -174,11 +174,12 @@
                                       </Group>
                                       <Group type="102" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkNaoImportarPautaSeAlgumNcmNaoExistir" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkIgnorarClienteImpVenda" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                          <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -207,7 +208,9 @@
                                   <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="31" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkNaoImportarPautaSeAlgumNcmNaoExistir" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace pref="9" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -248,6 +251,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarIcmsIsentoMigracaoProduto">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Importar Icms ISENTO quando n&#xe3;o encontrar a tributa&#xe7;&#xe3;o de Icms na migra&#xe7;&#xe3;o do produto"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNaoImportarPautaSeAlgumNcmNaoExistir">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="N&#xe3;o importar PAUTA se algum NCM n&#xe3;o existir no VR no momento da importa&#xe7;&#xe3;o"/>
                           </Properties>
                         </Component>
                       </SubComponents>

@@ -523,6 +523,14 @@ public final class Parametros implements Iterable<Parametro>{
     public DadosConexaoPostgreSQL getEmpresaAtiva() {
         return empresaAtiva;
     }
+
+    public void setNaoImportarPautaSeNcmNaoExistir(boolean ativo) {
+        Parametros.get().put(ativo, "PAUTA","NAO_IMPORTAR_SE_NCM_NAO_EXISTIR");
+    }
+
+    public boolean isNaoImportarPautaSeAlgumNcmNaoExistir() {
+        return Parametros.get().getBool(true, "PAUTA","NAO_IMPORTAR_SE_NCM_NAO_EXISTIR");
+    }
     
     public static class OpcoesExperimentaisDeProduto {
         
