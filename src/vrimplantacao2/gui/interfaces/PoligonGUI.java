@@ -200,6 +200,19 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
                             } else {
                                 importador.importarMercadologico();
                             }
+                        }                        
+                        
+                        if (chkProdutos.isSelected()) {
+                            {
+                                ArrayList<OpcaoProduto> opcoes = new ArrayList<>();
+                                if (chkManterBalanca.isSelected()) {
+                                    opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                                }
+                                if (chkManterEAN.isSelected()) {
+                                    opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                                }
+                                importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
+                            }
                         }
 
                         {
@@ -243,7 +256,6 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkT1NCM.isSelected()) {
                                 opcoes.add(OpcaoProduto.NCM);
                             }
-
                             if (chkT1CEST.isSelected()) {
                                 opcoes.add(OpcaoProduto.CEST);
                             }
@@ -287,9 +299,6 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
 
                         if (chkOfertas.isSelected()) {
                             importador.importarOfertas(txtDataFimOferta.getDate());
-                        }
-                        if (chkProdutos.isSelected()) {
-                            importador.importarProduto();
                         }
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
@@ -451,21 +460,14 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
         tabParametros = new javax.swing.JPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
-        chkAssociadoSomenteAtivos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkUsarMargemBruta = new vrframework.bean.checkBox.VRCheckBox();
         txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
-        chkUsarQtdCotacaoProdFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         jLabel3 = new javax.swing.JLabel();
-        chkDesconsiderarSetorBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkPesquisarKG = new vrframework.bean.checkBox.VRCheckBox();
         chkForcarUnidade = new vrframework.bean.checkBox.VRCheckBox();
-        chkUtilizarEmbalagemCompra = new vrframework.bean.checkBox.VRCheckBox();
-        chkCopiarIcmsDebitoNaEntrada = new vrframework.bean.checkBox.VRCheckBox();
-        chkMetodoAliquota = new javax.swing.JCheckBox();
         chkSomarEstoque = new javax.swing.JCheckBox();
-        chkCopiaDescComplGondola = new vrframework.bean.checkBox.VRCheckBox();
         chkManterEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkNaoExcluirMercadologico = new javax.swing.JCheckBox();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
@@ -731,19 +733,12 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
         chkInverterAssociado.setText("Inverter Associado");
         chkInverterAssociado.setToolTipText("Selecione essa opção para que ao importar o associado, seja gerado também o associado para preço e custo.");
 
-        chkAssociadoSomenteAtivos.setText("Somente produtos ativos (Associado)");
-        chkAssociadoSomenteAtivos.setToolTipText("Selecione essa opção para que ao importar o associado, seja gerado também o associado para preço e custo.");
-
         chkManterBalanca.setText("Manter código PLU dos produtos de balança");
         chkManterBalanca.setEnabled(true);
 
         chkUsarMargemBruta.setText("Usar Margem Bruta");
         chkUsarMargemBruta.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
         chkUsarMargemBruta.setEnabled(true);
-
-        chkUsarQtdCotacaoProdFornecedor.setText("Usar qtd. de cotação no produto fornecedor");
-        chkUsarQtdCotacaoProdFornecedor.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
-        chkUsarQtdCotacaoProdFornecedor.setEnabled(true);
 
         btnMapaTrib.setEnabled(false);
         btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
@@ -754,27 +749,13 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
 
         jLabel3.setText("Importar ofertas apartir da data");
 
-        chkDesconsiderarSetorBalanca.setText("Desconsiderar setor de balança");
-        chkDesconsiderarSetorBalanca.setToolTipText("<html>\n<p>Selecione essa opção caso o cliente não utilize setor de balança para determinar quais são os produtos pesáveis.</p>\n<p>Caso o cliente não envie carga para a balança, pode ser que o campo setor de balança não esteja preenchido,<br>neste caso é necessário utilizar o tipo de embalagem para determinar o que é de KG ou UN.<br>\n<b>OBS: Nesta opção, não será possível importar os pesáveis unitários.</b> \n</html>");
-
         chkPesquisarKG.setText("Pesquisar flag KG na descrição");
         chkPesquisarKG.setToolTipText("<html>\n<p>Selecione essa opção caso o cliente não utilize setor de balança para determinar quais são os produtos pesáveis.</p>\n<p>Caso o cliente não envie carga para a balança, pode ser que o campo setor de balança não esteja preenchido<br> \ne nem o campo tipo de embalagem está correto, neste caso a rotina irá verificar se a palavra KG pode ser encontrado nos produtos<br>\n<b>OBS: Nesta opção, não será possível importar os pesáveis unitários.</b> \n</html>");
 
         chkForcarUnidade.setText("Forçar Unidade");
         chkForcarUnidade.setToolTipText("<html>\n<p>Selecione essa opção caso o cliente não utilize setor de balança para determinar quais são os produtos pesáveis.</p>\n<p>Caso o cliente não envie carga para a balança, pode ser que o campo setor de balança não esteja preenchido<br> \ne nem o campo tipo de embalagem está correto, neste caso a rotina irá verificar se a palavra KG pode ser encontrado nos produtos<br>\n<b>OBS: Nesta opção, não será possível importar os pesáveis unitários.</b> \n</html>");
 
-        chkUtilizarEmbalagemCompra.setText("Utilizar embalagem de compra");
-        chkUtilizarEmbalagemCompra.setToolTipText("<html>\n<p>Selecione essa opção caso o cliente não utilize setor de balança para determinar quais são os produtos pesáveis.</p>\n<p>Caso o cliente não envie carga para a balança, pode ser que o campo setor de balança não esteja preenchido<br> \ne nem o campo tipo de embalagem está correto, neste caso a rotina irá verificar se a palavra KG pode ser encontrado nos produtos<br>\n<b>OBS: Nesta opção, não será possível importar os pesáveis unitários.</b> \n</html>");
-
-        chkCopiarIcmsDebitoNaEntrada.setText("Copiar ICMS débito na entrada");
-        chkCopiarIcmsDebitoNaEntrada.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
-        chkCopiarIcmsDebitoNaEntrada.setEnabled(true);
-
-        chkMetodoAliquota.setText("Utiliza Método Aliquota");
-
         chkSomarEstoque.setText("Somar Estoque na Atualização");
-
-        chkCopiaDescComplGondola.setText("Copiar Descrição Completa para Gôndola");
 
         chkManterEAN.setText("Manter EAN");
 
@@ -787,36 +768,29 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabParametrosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 777, Short.MAX_VALUE)
                     .addGroup(tabParametrosLayout.createSequentialGroup()
                         .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(tabParametrosLayout.createSequentialGroup()
                                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(tabParametrosLayout.createSequentialGroup()
-                                        .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(chkAssociadoSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkCopiaDescComplGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(17, 17, 17)
+                                    .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(tabParametrosLayout.createSequentialGroup()
+                                        .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(chkManterEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(21, 21, 21)
                                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chkSomarEstoque)
                                     .addComponent(chkForcarUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkMetodoAliquota)
-                                    .addComponent(chkDesconsiderarSetorBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkNaoExcluirMercadologico)
-                                    .addComponent(chkManterEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(chkNaoExcluirMercadologico)))
                             .addGroup(tabParametrosLayout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 267, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabParametrosLayout.setVerticalGroup(
@@ -825,23 +799,16 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkAssociadoSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkDesconsiderarSetorBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabParametrosLayout.createSequentialGroup()
-                        .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkManterEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkCopiaDescComplGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(74, 74, 74)
                         .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -851,17 +818,11 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkForcarUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(23, 23, 23)
                         .addComponent(chkSomarEstoque)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkMetodoAliquota)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkManterEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(49, 49, 49)
                         .addComponent(chkNaoExcluirMercadologico)))
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addContainerGap(51, Short.MAX_VALUE))
         );
 
         tabs.addTab("Parâmetros", tabParametros);
@@ -1545,17 +1506,13 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JToggleButton btnConectar;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkAssociadoSomenteAtivos;
     private vrframework.bean.checkBox.VRCheckBox chkCContato;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkComplemento;
-    private vrframework.bean.checkBox.VRCheckBox chkCopiaDescComplGondola;
-    private vrframework.bean.checkBox.VRCheckBox chkCopiarIcmsDebitoNaEntrada;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
-    private vrframework.bean.checkBox.VRCheckBox chkDesconsiderarSetorBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFFantasia;
@@ -1571,7 +1528,6 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkManterEAN;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private javax.swing.JCheckBox chkMetodoAliquota;
     private javax.swing.JCheckBox chkNaoExcluirMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkOfertas;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
@@ -1608,8 +1564,6 @@ public class PoligonGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
-    private vrframework.bean.checkBox.VRCheckBox chkUsarQtdCotacaoProdFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkUtilizarEmbalagemCompra;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private vrframework.bean.checkBox.VRCheckBox chkValorLimite;
     private javax.swing.JComboBox cmbLojaOrigem;

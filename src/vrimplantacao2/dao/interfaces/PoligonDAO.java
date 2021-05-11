@@ -10,11 +10,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -138,11 +141,13 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     "select\n"
                     + "	p.codigo importid,\n"
                     + "	p.Descricao descricaocompleta,\n"
-                    + "	ref_prd ean,\n"
+                    + "	ref_prd cod_balanca,\n"
+                    + " cartela codigobarras,\n"
                     + "	Id_grupo mercadologico1,\n"
                     + "	Id_grupo mercadologico2,\n"
                     + "	Id_grupo mercadologico3,\n"
                     + "	u.Unidade unidade,\n"
+                    + " case when u.Unidade = 'KG' then 'S' else 'N' end pesavel,\n"
                     + "	PrecoCusto custosemimposto,\n"
                     + "	PrecoVenda,\n"
                     + "	Markup margem,\n"
@@ -161,20 +166,63 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	p.Obs1 observacao\n"
                     + "from\n"
                     + "	Produto p\n"
-                    + "	join unidade u on u.Id_unidade = p.Id_Unidade \n"
-                    + "	join SitTribut i on i.Id_Sittrib = p.Id_Sittrib \n"
-                    + "	join ClasFiscal cf on cf.Id_clasfisc = p.Id_Clasfisc\n"
+                    + "	left join unidade u on u.Id_unidade = p.Id_Unidade \n"
+                    + "	left join SitTribut i on i.Id_Sittrib = p.Id_Sittrib \n"
+                    + "	left join ClasFiscal cf on cf.Id_clasfisc = p.Id_Clasfisc\n"
                     + "order by 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("importid"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setEan(rst.getString("ean"));
+                    
+                    
+                    if ("S".equals(rst.getString("pesavel"))) {                        
+                        imp.setEan(rst.getString("cod_balanca"));                        
+                    } else {                    
+                        imp.setEan(rst.getString("codigobarras"));
+                    }
+                    
+                    
+                    if ("S".equals(rst.getString("pesavel"))) {
+                        
+                        String pesavel = Utils.acertarTexto(rst.getString("pesavel"));
+                        if (produtosBalanca.isEmpty()) {
+                            if (pesavel != null && "S".equals(pesavel.trim())) {
+                                imp.seteBalanca(true);
+                            }
+                        } else {
+                            long codigoProduto;
+                            if (imp.getEan() != null && !imp.getEan().trim().isEmpty() && imp.getEan().trim().length() <= 6) {
+
+                                codigoProduto = Long.parseLong(imp.getEan());
+                                if (codigoProduto <= Integer.MAX_VALUE) {
+                                    produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                                } else {
+                                    produtoBalanca = null;
+                                }
+
+                                if (produtoBalanca != null) {
+                                    imp.seteBalanca(true);
+                                    imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                                } else {
+                                    imp.setValidade(0);
+                                    imp.seteBalanca(false);
+                                }
+                            } else {
+                                imp.seteBalanca(false);
+                                imp.setValidade(0);
+                            }
+
+                        }
+                    }
+
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
@@ -187,7 +235,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setSituacaoCadastro(rst.getInt("Ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rst.getInt("ativo") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     
                     imp.setIcmsCst(rst.getInt("cst_saida"));
                     imp.setIcmsAliq(rst.getDouble("aliq_saida"));
@@ -200,12 +248,8 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     
-                    //imp.seteBalanca("S".equals(rst.getString("bala")));
-                   
-                    //imp.setPiscofinsCstDebito(rst.getInt("tppis"));
-                    //imp.setPiscofinsCstCredito(rst.getInt("tppise"));
-                    //imp.setPiscofinsNaturezaReceita(rst.getInt("natrec"));
-
+                    
+                    
                     vResult.add(imp);
                 }
             }
@@ -466,7 +510,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	join Cliente c on c.Id_cli = cr.Id_cli \n"
                     + "where\n"
                     + "	cr.Id_loja = " + getLojaOrigem() + " \n"
-                    + "	and Dt_rcto is NULL\n"
+                    + "	and Dt_rcto is NULL and Status != 'cancelado'\n"
                     + "order by 1,2,3"
             )) {
                 while (rst.next()) {
