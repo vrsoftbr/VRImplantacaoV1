@@ -558,6 +558,7 @@ public class ProdutoRepository {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         boolean manterSomenteOsProdutosForcarNovo = Parametros.OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo();
+        boolean incluirProdutosNovos = Parametros.OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes(); 
         
         verificarAliquotasMapeadas(produtos);
         verificarAliquotasNaoMapeadas(produtos);
@@ -596,7 +597,9 @@ public class ProdutoRepository {
             
             vincularProdutosQueSoExistemNoVrPorEan(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
             
-            incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            if (incluirProdutosNovos) {
+                incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            }
             
             provider.commit();
         } catch (Exception e) {

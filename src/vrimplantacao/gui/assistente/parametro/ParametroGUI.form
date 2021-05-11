@@ -1126,10 +1126,10 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="pnlProdutoUnificacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="pnlProdutoUnificacao" alignment="3" min="-2" pref="114" max="-2" attributes="0"/>
                           <Component id="pnlMercadologicoImportacao" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="370" max="32767" attributes="0"/>
+                      <EmptySpace pref="352" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1149,11 +1149,17 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="chkProdutoUnificacaoExperimental" max="32767" attributes="0"/>
-                              <Component id="chkProdutoForcarNovo" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="chkProdutoUnificacaoExperimental" max="32767" attributes="0"/>
+                                      <Component id="chkProdutoForcarNovo" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="chkProdutoIncluirNovos" alignment="0" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1165,6 +1171,8 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutoForcarNovo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
+                          <Component id="chkProdutoIncluirNovos" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1179,6 +1187,12 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoForcarNovo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;Unificar somente produtos&lt;br&gt;&#xa;marcados com &lt;b&gt;&quot;forcarnovo&quot;&lt;/b&gt;&#xa;&lt;/html&gt;"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoIncluirNovos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Incluir produtos com EANs novos"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </Component>

@@ -181,6 +181,7 @@ public class ParametroGUI extends VRInternalFrame {
         pnlProdutoUnificacao = new VRPanel();
         chkProdutoUnificacaoExperimental = new VRCheckBox();
         chkProdutoForcarNovo = new VRCheckBox();
+        chkProdutoIncluirNovos = new VRCheckBox();
         pnlMercadologicoImportacao = new VRPanel();
         chkMercadologicoImportacao2 = new VRCheckBox();
         btnGravar = new VRButton();
@@ -738,15 +739,22 @@ public class ParametroGUI extends VRInternalFrame {
         chkProdutoForcarNovo.setText("<html>\nUnificar somente produtos<br>\nmarcados com <b>\"forcarnovo\"</b>\n</html>");
         chkProdutoForcarNovo.setToolTipText("");
 
+        chkProdutoIncluirNovos.setText("Incluir produtos com EANs novos");
+        chkProdutoIncluirNovos.setToolTipText("");
+
         GroupLayout pnlProdutoUnificacaoLayout = new GroupLayout(pnlProdutoUnificacao);
         pnlProdutoUnificacao.setLayout(pnlProdutoUnificacaoLayout);
         pnlProdutoUnificacaoLayout.setHorizontalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chkProdutoForcarNovo))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
+                        .addGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                            .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(chkProdutoForcarNovo))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(chkProdutoIncluirNovos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         pnlProdutoUnificacaoLayout.setVerticalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
@@ -754,7 +762,9 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoForcarNovo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chkProdutoIncluirNovos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
         );
 
         pnlMercadologicoImportacao.setBorder(BorderFactory.createTitledBorder("Importação de Mercadológico"));
@@ -791,9 +801,9 @@ public class ParametroGUI extends VRInternalFrame {
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(370, Short.MAX_VALUE))
+                .addContainerGap(352, Short.MAX_VALUE))
         );
 
         tabs.addTab("Engine de Migração", tabEngineMigracao);
@@ -929,6 +939,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
     private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
     private VRCheckBox chkProdutoForcarNovo;
+    private VRCheckBox chkProdutoIncluirNovos;
     private VRCheckBox chkProdutoUnificacaoExperimental;
     private VRComboBox cmbMunicipioPadrao;
     private JComboBox cmbTipoPagamento;
@@ -1061,6 +1072,7 @@ public class ParametroGUI extends VRInternalFrame {
                 optSqlServerJTDS.setSelected(true);
                 break;
         }
+        chkProdutoIncluirNovos.setSelected(OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -1085,7 +1097,8 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setNaoImportarPautaSeNcmNaoExistir(chkNaoImportarPautaSeAlgumNcmNaoExistir.isSelected());
             OpcoesExperimentaisDeProduto.setUnificacaoExperimental(chkProdutoUnificacaoExperimental.isSelected());
             OpcoesExperimentaisDeProduto.setImportacaoMercadologicoExperimental(chkMercadologicoImportacao2.isSelected());
-            OpcoesExperimentaisDeProduto.setUnificarSomenteProdutosComForcarNovo(chkProdutoForcarNovo.isSelected());            
+            OpcoesExperimentaisDeProduto.setUnificarSomenteProdutosComForcarNovo(chkProdutoForcarNovo.isSelected());
+            OpcoesExperimentaisDeProduto.setIncluirProdutosNaoExistentes(chkProdutoIncluirNovos.isSelected());
             
             if (optDriver.isSelected()) {
                 parametros.put(0, "ODBC", "TIPO_CONEXAO");
