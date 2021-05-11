@@ -203,75 +203,11 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	 codigo idproduto,\n"
-                    + "	 ean codigobarras,\n"
-                    + "	 1 qtdembalagem\n"
-                    + "from\n"
-                    + "	 produto p1\n"
-                    + "where ean != 'SEM GTIN'\n"
-                    + "	 union\n"
-                    + "select\n"
-                    + "	 codigo idproduto,\n"
-                    + "	 ean_trib codigobarras,\n"
-                    + "	 1 qtdembalagem\n"
-                    + "from\n"
-                    + "	 produto p2\n"
-                    + "where ean_trib != 'SEM GTIN'\n"
-                    + "  union \n"
-                    + "select \n"
-                    + "  codigo idproduto,\n "
-                    + "  codigo codigobarras, \n"
-                    + "  1 qtdembalagem\n"        
-                    + "from produto p3\n"        
-                    + "  order by 1"            )) {
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("idproduto"));
-                    imp.setEan(rs.getString("codigobarras"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*"select\n"
-                    + "	p.cd_produto idproduto,\n"
-                    + "	ncm,\n"
-                    + "	p_mva_st per_mva,\n"
-                    + "	pt.st cst_debito,\n"
-                    + "	pt.valor_taxa aliquota_debito,\n"
-                    + "	pt.valor_reducao reducao_debito,\n"
-                    + "	case\n"
-                    + "		when pt.valor_reducao > 0 then 20\n"
-                    + "		else 0\n"
-                    + "	end cst_credito,\n"
-                    + "	p_st_ret aliquota_credito,\n"
-                    + "	p_red_bc_efet reducao_credito\n"
-                    + "from\n"
-                    + "	produto p\n"
-                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
-                    + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
-                    + "where\n"
-                    + "	p_mva_st > 0\n"
-                    + "order by\n"
-                    + "	p.cd_produto"*/
                     "select\n"
                     + " p.codigo, \n"        
                     + "	ncm,\n"
@@ -460,72 +396,75 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "with est as (\n"
-                    + "select\n"
-                    + "	cd_produto idproduto,\n"
-                    + "	saldo_fisico estoque\n"
-                    + "from\n"
-                    + "	saldo_prod sp\n"
-                    + "where\n"
-                    + "	ano_mes = (select max(ano_mes) from saldo_prod est where sp.cd_produto = est.cd_produto)\n"
-                    + "order by cd_produto)\n"
-                    + " select\n"
-                    + "	p.cd_produto idproduto,\n"
-                    + "	codigo,\n"
-                    + " p.ean, \n"        
-                    + "	upper(p.descricao) descricao,\n"
-                    + "	u.simbolo embalagem,\n"
-                    + "	case\n"
-                    + "		when length(codigo) <= 6 then 1\n"
-                    + "		else 0\n"
-                    + "	end e_balanca,\n"
-                    + "	cd_grupo merc1,\n"
-                    + "	cd_grupo merc2,\n"
-                    + "	cd_grupo merc3,\n"
-                    + " p.cd_grupo_vinculo_preco idfamilia, \n"        
-                    + "	round(perc_lucro, 2) margem,\n"
-                    + "	pr_compra custosemimposto,\n"
-                    + "	pr_custo custocomimposto,\n"
-                    + "	pr_venda precovenda,\n"
-                    + "	situacao situacaocadastro,\n"
-                    + "	dt_cadastro datacadastro,\n"
-                    + "	p.dh_ult_alteracao dataalteracao,\n"
-                    + " est.estoque estoque,\n"
-                    + "	est_minimo estoquemin,\n"
-                    + "	est_maximo estoquemax,\n"
-                    + "	peso,\n"
-                    + "	pt.valor_taxa aliqicms,\n"
-                    + "	pt.st cst,\n"
-                    + "	pt.valor_reducao reducao,\n"
-                    + "	p.cod_pis pc_saida,\n"
-                    + "	p.cod_pis_ent pc_entrada,\n"
-                    + "	ncm,\n"
-                    + "	t.cest, \n"
-                    + " pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib \n"
-                    + "from\n"
-                    + "	produto p\n"
-                    + "left join est on est.idproduto = p.cd_produto\n"
-                    + "left join unidade u on u.cd_unidade = p.cd_unidade\n"
-                    + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
-                    + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
-                    + "order by\n"
-                    + "	p.codigo"
+                    "with est as (\n" +
+                    "	select\n" +
+                    "		cd_produto idproduto,\n" +
+                    "		saldo_fisico estoque\n" +
+                    "	from\n" +
+                    "		saldo_prod sp\n" +
+                    "	where\n" +
+                    "		ano_mes = (\n" +
+                    "		select\n" +
+                    "			max(ano_mes)\n" +
+                    "		from\n" +
+                    "			saldo_prod est\n" +
+                    "		where\n" +
+                    "			sp.cd_produto = est.cd_produto)\n" +
+                    "	order by\n" +
+                    "		cd_produto\n" +
+                    ")\n" +
+                    "select\n" +
+                    "	p.cd_produto idproduto,\n" +
+                    "	codigo,\n" +
+                    "	p.ean,\n" +
+                    "	upper(p.descricao) descricao,\n" +
+                    "	u.simbolo embalagem,\n" +
+                    "	case\n" +
+                    "		when length(codigo) <= 6 then 1\n" +
+                    "		else 0\n" +
+                    "	end e_balanca,\n" +
+                    "	cd_grupo merc1,\n" +
+                    "	cd_grupo merc2,\n" +
+                    "	cd_grupo merc3,\n" +
+                    "	p.cd_grupo_vinculo_preco idfamilia,\n" +
+                    "	round(perc_lucro, 2) margem,\n" +
+                    "	pr_compra custosemimposto,\n" +
+                    "	pr_custo custocomimposto,\n" +
+                    "	pr_venda precovenda,\n" +
+                    "	situacao situacaocadastro,\n" +
+                    "	dt_cadastro datacadastro,\n" +
+                    "	p.dh_ult_alteracao dataalteracao,\n" +
+                    "	est.estoque estoque,\n" +
+                    "	est_minimo estoquemin,\n" +
+                    "	est_maximo estoquemax,\n" +
+                    "	peso,\n" +
+                    "	pt.valor_taxa aliqicms,\n" +
+                    "	pt.st cst,\n" +
+                    "	pt.valor_reducao reducao,\n" +
+                    "	p.cod_pis pc_saida,\n" +
+                    "	p.cod_pis_ent pc_entrada,\n" +
+                    "	ncm,\n" +
+                    "	t.cest,\n" +
+                    "	pt.st || '-' || pt.valor_taxa || '-' || pt.valor_reducao as codigo_trib\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "	left join est on\n" +
+                    "		est.idproduto = p.cd_produto\n" +
+                    "	left join unidade u on\n" +
+                    "		u.cd_unidade = p.cd_unidade\n" +
+                    "	left join tributo t on\n" +
+                    "		p.cd_tributo = t.cd_tributo\n" +
+                    "	left join produto_tributo pt on\n" +
+                    "		p.cd_produto = pt.cd_produto\n" +
+                    "order by\n" +
+                    "	p.codigo"
             )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codigo"));                    
-                    
-                    
-                    if ("SEM GTIN".equals(rs.getString("ean"))) {
-                        
-                        imp.setEan(rs.getString("codigo"));
-                        
-                    } else {
-                        imp.setEan(rs.getString("ean"));
-                    }
-                    
+                    imp.setEan(rs.getString("codigo"));                    
                     imp.setDescricaoCompleta(rs.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());

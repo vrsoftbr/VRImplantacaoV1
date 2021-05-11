@@ -184,7 +184,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    dao.setUtilizarEs1ParaCotacao(chkUtilizarEs1ParaCotacao.isSelected());
+                    dao.setMultiplicarQtdEmbalagemPeloVolume(chkUtilizarEs1ParaCotacao.isSelected());
                     dao.setFiltrarProdutos(chkFiltrarProdutos.isSelected());
                     dao.setComplemento(txtComplemento.getText());
 
@@ -337,7 +337,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkSomenteEansUnitarios.setText("Somente EANs unitários");
 
-        chkUtilizarEs1ParaCotacao.setText("Utilizar qtd. embalagem da tabela es1p para cotação");
+        chkUtilizarEs1ParaCotacao.setText("Utilizar volume x qtdembalagem na produto e produtofornecedor");
 
         chkFiltrarProdutos.setText("Rede Paranaíba: Filtrar produtos");
 
@@ -351,7 +351,7 @@ public class LinearGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(221, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
         pnlOutrosLayout.setVerticalGroup(
             pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -65,6 +66,7 @@ public class ProdutoFornecedorDAO {
      * @throws Exception
      */
     public void salvar(List<ProdutoFornecedorIMP> produtos, Set<OpcaoProdutoFornecedor> opt) throws Exception {
+        Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
         //Caregando as listas.
         MultiMap<Integer, ProdutoFornecedorVO> produtoFornecedorExistentes = new MultiMap<>();
         MultiMap<Integer, ProdutoFornecedorVO> produtoFornecedorPreLancamentoExistentes = new MultiMap<>();
@@ -334,13 +336,15 @@ public class ProdutoFornecedorDAO {
                                         produtoFornecedor.setCustoTabela(custoTabela.custoSemImposto);
                                     }
                                 }
+                                
+                                produtoFornecedor.setQtdEmbalagem(imp.getQtdEmbalagem());
+                                /*
                                 if (imp.getQtdEmbalagem() > 1) {
-                                    produtoFornecedor.setQtdEmbalagem(imp.getQtdEmbalagem());
                                 } else {
                                     if (custoTabela != null) {
                                         produtoFornecedor.setQtdEmbalagem(custoTabela.qtdEmbalagem);
                                     }
-                                }
+                                }*/
                                 produtoFornecedor.setCodigoExterno(imp.getCodigoExterno());
                                 produtoFornecedor.setPesoEmbalagem(imp.getPesoEmbalagem());
                                 produtoFornecedor.setFatorEmbalagem(imp.getFatorEmbalagem());
@@ -398,13 +402,23 @@ public class ProdutoFornecedorDAO {
                                 ProdutoFornecedorCodigoExternoVO vo = new ProdutoFornecedorCodigoExternoVO();
                                 vo.setCodigoExterno(imp.getCodigoExterno());
                                 vo.setProdutoFornecedor(produtoFornecedor);
+                                vo.setQtdEmbalagem(Math.round((float) imp.getQtdEmbalagem()));
+                                vo.setPesoEmbalagem(imp.getPesoEmbalagem());
+                                vo.setFatorEmbalagem(imp.getFatorEmbalagem());
                                 codigoExterno = vo.getCodigoExterno();
-
+                                if (vo.getCodigoExterno().equals("33532") || vo.getCodigoExterno().equals("113402"))
+                                    System.out.println(vo);
                                 //<editor-fold defaultstate="collapsed" desc="Gravando o ProdutoFornecedorCodigoExternoVO">
                                 SQLBuilder sql = new SQLBuilder();
                                 sql.setTableName("produtofornecedorcodigoexterno");
                                 sql.put("id_produtofornecedor", vo.getProdutoFornecedor().getId());
                                 sql.put("codigoexterno", vo.getCodigoExterno());
+                                if (versao.igualOuMaiorQue(4)) {
+                                    sql.put("qtdembalagem", vo.getQtdEmbalagem());
+                                    sql.put("pesoembalagem", vo.getPesoEmbalagem());
+                                    sql.put("fatorembalagem", vo.getFatorEmbalagem());
+                                }
+                                //TODO: VERIFICAR A VERDADEIRA NECESSIDADE DE RETORNAR O ID :(
                                 sql.getReturning().add("id");
 
                                 try (Statement stm = Conexao.createStatement()) {

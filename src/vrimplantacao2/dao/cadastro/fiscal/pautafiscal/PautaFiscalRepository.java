@@ -1,9 +1,12 @@
 package vrimplantacao2.dao.cadastro.fiscal.pautafiscal;
 
+import java.io.FileWriter;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vr.view.dialogs.Alerts;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
@@ -55,6 +58,49 @@ public class PautaFiscalRepository {
             }
             
             provider.createLog();
+            
+            provider.notificar("Pauta Fiscal...Verificando NCMs", organizados.size());
+            Set<String> ncmsNaoEncontrados = new HashSet<>();
+            for (PautaFiscalIMP imp: organizados.values()) {
+                PautaFiscalAnteriorVO anterior = anteriores.get(imp.getId());
+                NcmVO ncm;
+                ProdutoPautaVO ppauta = null;
+                if (isIdProduto) {
+                    ppauta = ncmsProduto.get(imp.getId());
+                    if (ppauta == null) {
+                        continue;
+                    }
+                    ncm = ppauta.getNcm();
+                } else if (isEan) {
+                    long ean = Utils.stringToLong(imp.getId());
+                    if (ean > 999999L || utilizarEansMenores) {
+                        ppauta = ncmsEan.get(ean);
+                        ncm = ppauta.getNcm();
+                    } else {                        
+                        anterior = converterPautaAnterior(imp);
+                        provider.gravarAnterior(anterior);
+                        anteriores.put(anterior.getId(), anterior);
+                        continue;
+                    }
+                } else {
+                    ncm = provider.getNcm(imp.getNcm());
+                }
+                if (ncm == null) {
+                    ncmsNaoEncontrados.add(imp.getNcm());
+                }
+                
+                provider.notificar();
+            }
+            
+            if (!ncmsNaoEncontrados.isEmpty()) {
+                try (FileWriter fw = new FileWriter("ncms-nao-encontrados.log")) {
+                    for (String ncm: ncmsNaoEncontrados) {
+                        fw.write(ncm + "\n");
+                    }
+                }
+                Alerts.aviso("Alguns NCMs não foram encontrados no banco. Verifique o arquivo \"ncms-nao-encontrados.log\"");
+                return;
+            }
             
             provider.notificar("Pauta Fiscal...Gravando...", organizados.size());
             for (PautaFiscalIMP imp: organizados.values()) {
