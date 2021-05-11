@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import vr.view.dialogs.Alerts;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
@@ -45,6 +46,7 @@ public class PautaFiscalRepository {
             boolean isIdProduto = opt.contains(OpcaoFiscal.USAR_IDPRODUTO);
             boolean isEan = opt.contains(OpcaoFiscal.USAR_EAN);
             boolean utilizarEansMenores = opt.contains(OpcaoFiscal.UTILIZAR_EANS_MENORES);
+            boolean naoImportarPautaSeAlgumNcmNaoExistir = Parametros.get().isNaoImportarPautaSeAlgumNcmNaoExistir();
             
             Map<String, PautaFiscalAnteriorVO> anteriores = provider.getAnteriores();
             Set<Integer> pautasAlteradasPeloUsuario = provider.getPautasAlteradasPelousuario();
@@ -98,8 +100,10 @@ public class PautaFiscalRepository {
                         fw.write(ncm + "\n");
                     }
                 }
-                Alerts.aviso("Alguns NCMs não foram encontrados no banco. Verifique o arquivo \"ncms-nao-encontrados.log\"");
-                return;
+                if (naoImportarPautaSeAlgumNcmNaoExistir) {                    
+                    Alerts.aviso("Alguns NCMs não foram encontrados no banco. Verifique o arquivo \"ncms-nao-encontrados.log\"");
+                    return;
+                }
             }
             
             provider.notificar("Pauta Fiscal...Gravando...", organizados.size());

@@ -126,6 +126,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkIgnorarClienteImpVenda = new VRCheckBox();
         chkForcarCadastroProdutoVenda = new VRCheckBox();
         chkImportarIcmsIsentoMigracaoProduto = new VRCheckBox();
+        chkNaoImportarPautaSeAlgumNcmNaoExistir = new VRCheckBox();
         pnlLocalizacao = new VRPanel();
         vRLabel1 = new VRLabel();
         vRLabel2 = new VRLabel();
@@ -226,6 +227,8 @@ public class ParametroGUI extends VRInternalFrame {
 
         chkImportarIcmsIsentoMigracaoProduto.setText("Importar Icms ISENTO quando não encontrar a tributação de Icms na migração do produto");
 
+        chkNaoImportarPautaSeAlgumNcmNaoExistir.setText("Não importar PAUTA se algum NCM não existir no VR no momento da importação");
+
         GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
         pnlDiversos.setLayout(pnlDiversosLayout);
         pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -244,10 +247,11 @@ public class ParametroGUI extends VRInternalFrame {
                             .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlDiversosLayout.createSequentialGroup()
                         .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 113, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -267,7 +271,9 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         pnlLocalizacao.setBorder(BorderFactory.createTitledBorder("Localização"));
@@ -856,6 +862,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkImportarBancoImplantacao;
     private VRCheckBox chkImportarIcmsIsentoMigracaoProduto;
     private VRCheckBox chkMercadologicoImportacao2;
+    private VRCheckBox chkNaoImportarPautaSeAlgumNcmNaoExistir;
     private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
     private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
     private VRCheckBox chkProdutoForcarNovo;
@@ -977,6 +984,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkProdutoUnificacaoExperimental.setSelected(OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva());
         chkMercadologicoImportacao2.setSelected(OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva());
         chkProdutoForcarNovo.setSelected(OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo());
+        chkNaoImportarPautaSeAlgumNcmNaoExistir.setSelected(parametros.isNaoImportarPautaSeAlgumNcmNaoExistir());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -998,6 +1006,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.put(txtNomeDriverODBC.getText(), "ODBC", "DRIVER_ODBC");
             parametros.put(chkNfeSaidaProcessarFinalizacoes.isSelected(), "IMPORT_NFE", "PROCESSAR_FINALIZACOES");
             parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");
+            parametros.setNaoImportarPautaSeNcmNaoExistir(chkNaoImportarPautaSeAlgumNcmNaoExistir.isSelected());
             OpcoesExperimentaisDeProduto.setUnificacaoExperimental(chkProdutoUnificacaoExperimental.isSelected());
             OpcoesExperimentaisDeProduto.setImportacaoMercadologicoExperimental(chkMercadologicoImportacao2.isSelected());
             OpcoesExperimentaisDeProduto.setUnificarSomenteProdutosComForcarNovo(chkProdutoForcarNovo.isSelected());            
