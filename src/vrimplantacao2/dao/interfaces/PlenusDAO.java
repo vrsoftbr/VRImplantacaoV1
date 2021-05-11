@@ -151,7 +151,7 @@ public class PlenusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    from\n" +
                     "        produto_saldoestoque\n" +
                     "    where\n" +
-                    "        id_empresa = 1 and\n" +
+                    "        id_empresa = " + getLojaOrigem() + " and\n" +
                     "        id_produto = a.id_produto), 0) estoque,\n" +
                     "    A.PRECOVENDAVAREJO precovenda,\n" +
                     "    B.PERCMARGEMVAREJO margem,\n" +
@@ -186,7 +186,7 @@ public class PlenusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    left join SECAO S on S.ID_SECAO = B.ID_SECAO\n" +
                     "    left join GRUPO G on G.ID_GRUPO = B.ID_GRUPO\n" +
                     "    left join SUBGRUPO SU on SU.ID_SUBGRUPO = B.ID_SUBGRUPO\n" +
-                    "    left join PRODUTO_ADICIONAIS PA on A.ID_PRODUTO = PA.ID_PRODUTO \n" +
+                    "    left join PRODUTO_ADICIONAIS PA on A.ID_PRODUTO = PA.ID_PRODUTO and ID_EMPRESA = " + getLojaOrigem() + " \n" +
                     "where\n" +
                     "    A.ID_PRODUTO > 0")) {
                 while(rs.next()) {
