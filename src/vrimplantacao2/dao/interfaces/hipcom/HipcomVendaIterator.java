@@ -39,31 +39,32 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
 
         return
             "select\n" +
-            "	v.id_cupom id,\n" +
-            "	v.numero_cupom,\n" +
-            "	v.caixa,\n" +
+            "   v.loja, \n" +
+            //"	v.id_cupom id,\n" +
+            "	v.numero_cupom_fiscal,\n" +
+            "	v.codigo_caixa as caixa,\n" +
             "	v.`data`,\n" +
             "	min(v.hora) horainicio,\n" +
             "	max(v.hora) horafim,\n" +
             "	min(case when v.cupom_cancelado = 'S' then 1 else 0 end) cancelado,\n" +
-            "	sum(v.valor_total) subtotalimpressora,\n" +
-            "	sum(v.valor_acrescimo_cupom) valoracrescimo,\n" +
-            "	sum(v.valor_desconto_cupom) valordesconto,\n" +
-            "	v.serie_aparelho numeroserie,\n" +
-            "	v.tipo_fiscal modeloimpressora\n" +
+            "	sum(v.valor_total_item) subtotalimpressora,\n" +
+            //"	sum(v.valor_acrescimo_cupom) valoracrescimo,\n" +
+            "	sum(v.valor_desconto_item) valordesconto,\n" +
+            "	v.serie numeroserie,\n" +
+            "	v.modelo_documento_fiscal modeloimpressora\n" +
             "from\n" +
-            "	view_vendas_pdv_antiga v\n" +
+            "	vendasantigas v\n" +
             "where\n" +
             "	v.`data` >= '{DATA_INICIO}' and\n" +
             "	v.`data` <= '{DATA_TERMINO}' and\n" +
             "	v.loja = " + idLojaCliente + "\n" +
             "group by\n" +
-            "	v.id_cupom,\n" +
-            "	v.numero_cupom,\n" +
-            "	v.caixa,\n" +
+            //"	v.id_cupom,\n" +
+            "	v.numero_cupom_fiscal,\n" +
+            "	v.codigo_caixa,\n" +
             "	v.`data`,\n" +
-            "	v.serie_aparelho,\n" +
-            "	v.tipo_fiscal";
+            "	v.serie,\n" +
+            "	v.modelo_documento_fiscal";
     }
     
     private static class CustomNextBuilder implements NextBuilder<VendaIMP> {
@@ -71,15 +72,17 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
         public VendaIMP makeNext(ResultSet rs) throws Exception {
             VendaIMP next = new VendaIMP();
             
-            next.setId(rs.getString("id"));
-            next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom")));
+            String id = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data");
+            
+            next.setId(id);
+            next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom_fiscal")));
             next.setEcf(Utils.stringToInt(rs.getString("caixa")));
             next.setData(rs.getDate("data"));
             next.setHoraInicio(rs.getTime("horainicio"));
             next.setHoraTermino(rs.getTime("horafim"));
             next.setCancelado(rs.getBoolean("cancelado"));
             next.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
-            next.setValorAcrescimo(rs.getDouble("valoracrescimo"));
+            //next.setValorAcrescimo(rs.getDouble("valoracrescimo"));
             next.setValorDesconto(rs.getDouble("valordesconto"));
             next.setNumeroSerie(rs.getString("numeroserie"));
             next.setModeloImpressora(rs.getString("modeloimpressora"));

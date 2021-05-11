@@ -43,17 +43,20 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
 
         return
                 "select\n" +
-                "	i.id_cupom,\n" +
+                "       i.loja, \n" + 
+                //"	i.id_cupom,\n" +
+                "       i.numero_cupom_fiscal, \n" +
+                "       i.`data`,\n" +
                 "	i.sequencia,\n" +
                 "	i.codigo_plu_bar ean,\n" +
-                "	i.quantidade,\n" +
+                "	i.quantidade_itens as quantidade,\n" +
                 "	i.valor_unitario,\n" +
-                "	i.valor_total,\n" +
+                "	i.valor_total_item as valor_total,\n" +
                 "	i.valor_desconto_item,\n" +
-                "	i.item_cancelado, \n" +
-                "	i.promocao\n" +
+                "	i.item_cancelado \n" +
+                //"	i.promocao\n" +
                 "from\n" +
-                "	view_vendas_pdv_antiga i	\n" +
+                "	vendasantigas i	\n" +
                 "where\n" +
                 "	i.`data` >= '{DATA_INICIO}' and\n" +
                 "	i.`data` <= '{DATA_TERMINO}' and\n" +
@@ -106,8 +109,12 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
 
             VendaItemIMP next = new VendaItemIMP();
 
-            next.setId(rs.getString("id_cupom") + "-" + rs.getString("sequencia"));
-            next.setVenda(rs.getString("id_cupom"));
+            String id = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + "-" + rs.getString("ean") + "-" + rs.getString("sequencia");
+            next.setId(id);
+            
+            String idVenda = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data");
+            
+            next.setVenda(idVenda);
             
             String ean = rs.getString("ean");
             if (ean == null) ean = "";
@@ -147,7 +154,7 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             next.setTotalBruto(rs.getDouble("valor_total")/* + rs.getDouble("valor_desconto_item")*/);
             next.setCancelado("S".equals(rs.getString("item_cancelado")));
             //next.setValorDesconto(rs.getDouble("valor_desconto_item"));
-            next.setOferta("S".equals(rs.getString("promocao")));
+            //next.setOferta("S".equals(rs.getString("promocao")));
 
             return next;
         }
