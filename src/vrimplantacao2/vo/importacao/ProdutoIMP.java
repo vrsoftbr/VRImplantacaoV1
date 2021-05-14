@@ -5,6 +5,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.NormaCompra;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoAtacado;
@@ -1102,5 +1103,20 @@ public class ProdutoIMP {
 
     public void setCustoMedioSemImposto(double custoMedioSemImposto) {
         this.custoMedioSemImposto = custoMedioSemImposto;
+    }
+    
+    public boolean from(ProdutoBalancaVO bal) {
+        if (bal == null) return false;        
+        setEan(String.valueOf(bal.getCodigo()));
+        setQtdEmbalagem(1);
+        setValidade(bal.getValidade());
+        if ("U".equals(bal.getPesavel())) {
+            setTipoEmbalagem("UN");
+            seteBalanca(true);
+        } else {
+            setTipoEmbalagem("KG");
+            seteBalanca(false);
+        }
+        return true;
     }
 }

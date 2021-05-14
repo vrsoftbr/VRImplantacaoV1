@@ -89,7 +89,6 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
-import vrimplantacao2.dao.interfaces.ResultMaisDAO;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -274,6 +273,7 @@ import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
@@ -281,7 +281,6 @@ import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
-import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.ResultMais_V2GUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
@@ -392,22 +391,6 @@ public final class MenuGUI extends VRMdiFrame {
         atualizarRodape();
         configurarBusca();
         atualizarJanela();
-
-        /*jMenu1.setVisible(false);
-        jMenu3.setVisible(false);
-        jMenu4.setVisible(false);
-        jMenuItem9.setVisible(false);
-        jMenuItem13.setVisible(false);
-        jMenuItem15.setVisible(false);
-        jMenu11.setVisible(false);
-        jMenuItem17.setVisible(false);
-        mnuPlanilhaPadrao.setVisible(false);
-        jMenuItem20.setVisible(false);
-        jMenuItem6.setVisible(false);
-        jMenuItem7.setVisible(false);
-        jMenuItem30.setVisible(false);
-        jMenuItem21.setVisible(false);
-        jMenuItem22.setVisible(false);*/
     }
 
     @Override
@@ -702,6 +685,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutocom = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
+        chkGigatron = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
@@ -1784,6 +1768,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuFutura);
+
+        chkGigatron.setText("Gigatron");
+        chkGigatron.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkGigatronActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkGigatron);
 
         mnuMercaLite.setText("MercaLite");
         mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
@@ -5198,9 +5190,14 @@ public final class MenuGUI extends VRMdiFrame {
         SGMasterGUI.exibir(this);
     }//GEN-LAST:event_chkSGMasterActionPerformed
 
+    private void chkGigatronActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkGigatronActionPerformed
+        GigatronGUI.exibir(this);
+    }//GEN-LAST:event_chkGigatronActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
