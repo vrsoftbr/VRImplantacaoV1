@@ -22,9 +22,9 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
     
     private static final Logger LOG = Logger.getLogger(HipcomVendaItemIterator.class.getName());
     
-    public HipcomVendaItemIterator(boolean vendaUtilizaDigito, String idLoja, Date dataInicial, Date dataTermino) throws Exception {
+    public HipcomVendaItemIterator(boolean vendaUtilizaDigito, String idLoja, Date dataInicial, Date dataTermino, Integer versaoVenda) throws Exception {
         super(
-            new CustomNextBuilder(vendaUtilizaDigito),
+            new CustomNextBuilder(vendaUtilizaDigito, versaoVenda),
             new StatementBuilder() {
                 @Override
                 public Statement makeStatement() throws Exception {
@@ -33,43 +33,63 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             }
         );
         
-        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
+        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLoja, versaoVenda), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
             this.addStatement(statement);
         }
         
     }
 
-    private String getFullSQL(String idLojaCliente) throws Exception {
+    private String getFullSQL(String idLojaCliente, Integer versaoVenda) throws Exception {
 
-        return
-                "select\n" +
-                "       i.loja, \n" + 
-                //"	i.id_cupom,\n" +
-                "       i.numero_cupom_fiscal, \n" +
-                "       i.`data`,\n" +
+        if (versaoVenda == 1) {
+            return "select\n"
+                    + " i.loja, \n"
+                    + " i.numero_cupom_fiscal, \n"
+                    + " i.`data`,\n"
+                    + "	i.sequencia,\n"
+                    + "	i.codigo_plu_bar ean,\n"
+                    + "	i.quantidade_itens as quantidade,\n"
+                    + "	i.valor_unitario,\n"
+                    + "	i.valor_total_item as valor_total,\n"
+                    + "	i.valor_desconto_item,\n"
+                    + "	i.item_cancelado \n"
+                    + "from\n"
+                    + "	vendasantigas i	\n"
+                    + "where\n"
+                    + "	i.`data` >= '{DATA_INICIO}' and\n"
+                    + "	i.`data` <= '{DATA_TERMINO}' and\n"
+                    + "	i.loja = " + idLojaCliente + " and\n"
+                    + "       i.quantidade_itens > 0";
+
+        } else {
+            return "select\n" +
+                "	i.id_cupom,\n" +
                 "	i.sequencia,\n" +
                 "	i.codigo_plu_bar ean,\n" +
-                "	i.quantidade_itens as quantidade,\n" +
+                "	i.quantidade,\n" +
                 "	i.valor_unitario,\n" +
-                "	i.valor_total_item as valor_total,\n" +
+                "	i.valor_total,\n" +
                 "	i.valor_desconto_item,\n" +
-                "	i.item_cancelado \n" +
-                //"	i.promocao\n" +
+                "	i.item_cancelado, \n" +
+                "	i.promocao\n" +
                 "from\n" +
-                "	vendasantigas i	\n" +
+                "	hipcom_cupom_tr i	\n" +
                 "where\n" +
                 "	i.`data` >= '{DATA_INICIO}' and\n" +
                 "	i.`data` <= '{DATA_TERMINO}' and\n" +
                 "	i.loja = " + idLojaCliente;
+        }
     }
     
     private static class CustomNextBuilder implements NextBuilder<VendaItemIMP> {
         
         private Map<String, HipProduto> produtos;
         private boolean vendaUtilizaDigito;
+        private Integer versaoVenda;
 
-        public CustomNextBuilder(boolean vendaUtilizaDigito) throws Exception {
+        public CustomNextBuilder(boolean vendaUtilizaDigito, Integer versaoVenda) throws Exception {
             this.vendaUtilizaDigito = vendaUtilizaDigito;
+            this.versaoVenda = versaoVenda;
             try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rs = st.executeQuery(
                         "select\n" +
@@ -108,12 +128,18 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
         public VendaItemIMP makeNext(ResultSet rs) throws Exception {
 
             VendaItemIMP next = new VendaItemIMP();
+            
+            String id, idVenda;
 
-            String id = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + "-" + rs.getString("ean") + "-" + rs.getString("sequencia");
+            if (this.versaoVenda == 1) {
+                id = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + "-" + rs.getString("ean") + "-" + rs.getString("sequencia");
+                idVenda = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data");
+            } else {
+                id = rs.getString("id_cupom") + "-" + rs.getString("sequencia");
+                idVenda = rs.getString("id_cupom");
+            }
+            
             next.setId(id);
-            
-            String idVenda = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data");
-            
             next.setVenda(idVenda);
             
             String ean = rs.getString("ean");
@@ -146,15 +172,23 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 next.setDescricaoReduzida("SEM DESCRICAO");
                 next.setUnidadeMedida("UN");
                 next.setCodigoBarras(ean);
-            }
+            }            
             
-           
-            next.setSequencia(rs.getInt("sequencia"));
-            next.setQuantidade(rs.getDouble("quantidade"));
-            next.setTotalBruto(rs.getDouble("valor_total")/* + rs.getDouble("valor_desconto_item")*/);
-            next.setCancelado("S".equals(rs.getString("item_cancelado")));
-            //next.setValorDesconto(rs.getDouble("valor_desconto_item"));
-            //next.setOferta("S".equals(rs.getString("promocao")));
+            next.setPrecoVenda(rs.getDouble("valor_unitario"));
+            
+            if (this.versaoVenda == 1) {
+                next.setSequencia(rs.getInt("sequencia"));
+                next.setQuantidade(rs.getDouble("quantidade"));
+                next.setTotalBruto(rs.getDouble("valor_total"));
+                next.setCancelado("S".equals(rs.getString("item_cancelado")));
+            } else {
+                next.setSequencia(rs.getInt("sequencia"));
+                next.setQuantidade(rs.getDouble("quantidade"));
+                next.setTotalBruto(rs.getDouble("valor_total"));
+                next.setCancelado("S".equals(rs.getString("item_cancelado")));
+                next.setValorDesconto(rs.getDouble("valor_desconto_item"));
+                next.setOferta("S".equals(rs.getString("promocao")));
+            }
 
             return next;
         }
