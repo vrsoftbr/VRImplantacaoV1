@@ -271,6 +271,7 @@ import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.FuturaGUI;
+import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
@@ -689,6 +690,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
+        mnuGCom = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1800,6 +1802,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
+
+        mnuGCom.setText("GCom");
+        mnuGCom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGComActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuGCom);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -5194,6 +5204,11 @@ public final class MenuGUI extends VRMdiFrame {
         GigatronGUI.exibir(this);
     }//GEN-LAST:event_chkGigatronActionPerformed
 
+    private void mnuGComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGComActionPerformed
+        // TODO add your handling code here:
+        GComGUI.exibir(this);
+    }//GEN-LAST:event_mnuGComActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -5356,6 +5371,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG10;
     private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuG4;
+    private javax.swing.JMenuItem mnuGCom;
     private javax.swing.JMenuItem mnuGDI;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;

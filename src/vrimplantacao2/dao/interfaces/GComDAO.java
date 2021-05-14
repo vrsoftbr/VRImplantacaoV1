@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -68,6 +71,10 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.EXCECAO,
                 OpcaoProduto.CODIGO_BENEFICIO
         ));
+    }
+
+    public List<Estabelecimento> getLojaCliente() throws SQLException {
+        return Arrays.asList(new Estabelecimento("1", "LOJA 01"));
     }
     
     @Override
@@ -258,11 +265,50 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
-
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    
+                    if (rst.getString("cnpj") != null && !rst.getString("qtdembalagem").trim().isEmpty() && "  .   .   /    -".equals(rst.getString("cnpj"))) {
+                        imp.setCnpj_cpf(rst.getString("cnpj"));                    
+                    } else {
+                        imp.setCnpj_cpf(rst.getString("cpf"));
+                    }
+                    
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    
+                    if (rst.getString("contato") != null && !rst.getString("contato").trim().isEmpty()) {
+                        imp.setObservacao(imp.getObservacao() + " CONTATO - " + rst.getString("contato"));
+                    }
+                    
+                    if (rst.getString("telefone2") != null && !rst.getString("telefone2").trim().isEmpty()) {
+                        imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
+                    }
+                    
+                    if (rst.getString("email") != null && !rst.getString("email").trim().isEmpty()) {
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.COMERCIAL);
+                    }
+                    
+                    result.add(imp);
+                    
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -344,10 +390,46 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ORDER by 1"
             )) {
                 while (rst.next()) {
-
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    
+                    if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty() && ".   .   /    -".equals(rst.getString("cnpj"))) {
+                        imp.setCnpj(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj(rst.getString("cpf"));
+                    }
+                    
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email") != null ? rst.getString("email").toLowerCase() : "");
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setNomeConjuge(rst.getString("nomeconjuge"));
+                    
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    
+                    
                 }
             }
         }
-        return null;
+        return result;
     }
 }
