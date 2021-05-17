@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -41,7 +44,6 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.PRODUTOS,
-                OpcaoProduto.PRODUTOS_BALANCA,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.DATA_ALTERACAO,
                 OpcaoProduto.EAN,
@@ -120,6 +122,8 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("merc1"));
 
@@ -143,7 +147,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        String icmsCreditoId, icmsDeditoId;
+        String icmsCreditoId, icmsDeditoId, ean;
         
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -173,7 +177,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    icm_s.tr_codigo AS codicms_s,\n"
                     + "    icm_s.tr_descricao AS descicms_s,\n"
                     + "    icm_s.tr_aliquota AS aliqicms_s,\n"
-                    + "    coalesce(t.tr_identificador, '') AS identicms_s, \n"        
+                    + "    coalesce(icm_s.tr_identificador, '') AS identicms_s, \n"        
                     + "    icm_e.tr_codigo AS codicms_e,\n"
                     + "    icm_e.tr_descricao AS descicms_e,\n"
                     + "    icm_e.tr_aliquota AS aliqicms_e,\n"
@@ -183,8 +187,10 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN cr_tributacaocompra icm_e ON p.pr_cod_icmscompra = icm_e.tr_codigo\n"
                     + "ORDER BY 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     
                     icmsCreditoId = rst.getString("codicms_e") + "-" + rst.getString("descicms_e") + "-" + rst.getString("aliqicms_e");
                     icmsDeditoId = rst.getString("codicms_s") + "-" + rst.getString("descicms_s") + "-" + rst.getString("aliqicms_s") + "-" + rst.getString("identicms_s");
@@ -192,9 +198,44 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("codigobarras"));
-                    imp.seteBalanca(rst.getInt("ebalanca") == 1);
-                    imp.setValidade(rst.getInt("validade"));
+
+                    ean = rst.getString("codigobarras");
+                    
+                    if (!produtosBalanca.isEmpty()) {
+                        
+                        if (ean != null && !ean.trim().isEmpty() && ean.startsWith("00000002") && ean.endsWith("0")) {
+                            imp.setEan(ean.substring(8, ean.trim().length() - 1));
+                            
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getEan());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                            } else {
+                                imp.setValidade(rst.getInt("validade"));
+                                imp.seteBalanca(false);
+                            }
+                        } else {
+                            imp.setEan(ean);
+                            imp.seteBalanca(rst.getInt("ebalanca") == 1);
+                            imp.setValidade(rst.getInt("validade"));
+                        }
+                    } else {
+                        if (ean != null && !ean.trim().isEmpty() && ean.startsWith("00000002") && ean.endsWith("0")) {
+                            imp.setEan(ean.substring(8, ean.trim().length() - 1));
+                        } else {                        
+                            imp.setEan(ean);
+                        }
+                        imp.seteBalanca(rst.getInt("ebalanca") == 1);
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -214,9 +255,9 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("piscofinssaida"));
-                    imp.setPiscofinsCstCredito(rst.getInt("piscofinsentrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("naturezareceita"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofinsentrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                     imp.setBeneficio(rst.getString("codigobeneficio"));
                     imp.setIcmsDebitoId(icmsDeditoId);
                     imp.setIcmsDebitoForaEstadoId(icmsDeditoId);
@@ -272,7 +313,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     
-                    if (rst.getString("cnpj") != null && !rst.getString("qtdembalagem").trim().isEmpty() && "  .   .   /    -".equals(rst.getString("cnpj"))) {
+                    if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty() && !"  .   .   /    -".equals(rst.getString("cnpj"))) {
                         imp.setCnpj_cpf(rst.getString("cnpj"));                    
                     } else {
                         imp.setCnpj_cpf(rst.getString("cpf"));
@@ -320,7 +361,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     "SELECT\n"
                     + "    pf.pf_codigofornecedor AS idfornecedor,\n"
                     + "    p.pr_idl AS idproduto,\n"
-                    + "    pf.pf_codigoproduto AS codigoexterno,\n"
+                    + "    REPLACE(pf.pf_codigoproduto, '\\', '') AS codigoexterno,\n"
                     + "    pf.pf_valor AS custo,\n"
                     + "    pf.pf_quantidade AS qtdembalagem,\n"
                     + "    pf.pf_ultimacompra AS dataalteracao\n"
@@ -334,7 +375,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
-                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno").replace("\"", ""));
                     imp.setCustoTabela(rst.getDouble("custo"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
@@ -364,7 +405,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.cl_numero AS numero,\n"
                     + "    c.cl_bairro AS bairro,\n"
                     + "    c.cl_cep AS cep,\n"
-                    + "    c.cl_cidade AS cidade,\n"
+                    + "    c.cl_cidade AS municipio,\n"
                     + "    c.cl_estado AS uf,\n"
                     + "    c.cl_codmunicipio AS municipioibge,\n"
                     + "    c.cl_telefone AS telefone,\n"
@@ -395,7 +436,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     
-                    if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty() && ".   .   /    -".equals(rst.getString("cnpj"))) {
+                    if (rst.getString("cnpj") != null && !rst.getString("cnpj").trim().isEmpty() && !".   .   /    -".equals(rst.getString("cnpj"))) {
                         imp.setCnpj(rst.getString("cnpj"));
                     } else {
                         imp.setCnpj(rst.getString("cpf"));
@@ -407,7 +448,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
-                    imp.setMunicipioIBGE(rst.getInt("municipioibge"));
+                    imp.setMunicipioIBGE(rst.getString("municipioibge"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setTelefone(rst.getString("telefone"));
@@ -426,6 +467,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
                     
+                    result.add(imp);
                     
                 }
             }
