@@ -225,7 +225,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NORMA_REPOSICAO,
                 OpcaoProduto.TIPO_PRODUTO,
                 OpcaoProduto.FABRICACAO_PROPRIA,
-                OpcaoProduto.RECEITA
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST
         ));
     }
 
