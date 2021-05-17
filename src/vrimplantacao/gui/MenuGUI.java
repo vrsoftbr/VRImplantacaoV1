@@ -5205,7 +5205,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_chkGigatronActionPerformed
 
     private void mnuGComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGComActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code heregti :
         GComGUI.exibir(this);
     }//GEN-LAST:event_mnuGComActionPerformed
 
