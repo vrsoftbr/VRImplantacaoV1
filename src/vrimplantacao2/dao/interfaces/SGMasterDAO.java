@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,12 +10,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
 import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -22,6 +28,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -30,6 +37,16 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String arquivo;
+
+    public String getArquivo() {
+        return this.arquivo;
+    }
+    
+    public void setArquivo(String arquivo) {
+        this.arquivo = arquivo;
+    }    
+    
     @Override
     public String getSistema() {
         return "SG Master";
@@ -82,7 +99,8 @@ public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.RECEITA_BALANCA,
-                OpcaoProduto.MAPA_TRIBUTACAO
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.NUTRICIONAL
         ));
     }
     
@@ -469,6 +487,109 @@ public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }            
         }
+        return result;
+    }
+    
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        int linha;
+    
+        setArquivo("C:\\vr\\implantacao\\nutricional\\nutricional_filizola.xls");
+        
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        Workbook arquivo = Workbook.getWorkbook(new File(getArquivo()), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        
+        for (int sh = 0; sh < sheets.length; sh++) {
+            Sheet sheet = arquivo.getSheet(sh);
+            linha = 0;
+
+            for (int i = 0; i < sheet.getRows(); i++) {
+                linha++;
+
+                //ignora o cabeçalho
+                if (linha == 1) {
+                    continue;
+                }
+                
+                Cell id = sheet.getCell(0, i);
+                Cell descricao = sheet.getCell(1, i);
+                Cell validade = sheet.getCell(10, i);
+                Cell porcao = sheet.getCell(11, i);
+                Cell valorCalorico = sheet.getCell(12, i);
+                Cell carboidratos = sheet.getCell(13, i);
+                Cell proteinas = sheet.getCell(14, i);
+                Cell gordurasTotais = sheet.getCell(15, i);
+                Cell gordurassaturadas = sheet.getCell(16, i);
+                Cell colesterol = sheet.getCell(17, i);
+                Cell fibraAlimentar = sheet.getCell(18, i);
+                Cell calcio = sheet.getCell(19, i);
+                Cell ferro = sheet.getCell(20, i);
+                Cell sodio = sheet.getCell(21, i);
+                
+                try (Statement stm = Conexao.createStatement()) {
+                    try (ResultSet rst = stm.executeQuery(
+                            "select \n"
+                            + " ant.impid, \n"        
+                            + "	ean.ean,\n"
+                            + "	p.id,\n"
+                            + "	p.descricaocompleta\n"
+                            + "from produto p\n"
+                            + "join implantacao.codant_produto ant on ant.codigoatual = p.id\n"
+                            + "join implantacao.codant_ean ean on ean.importid = ant.impid\n"
+                            + "     and ean.importloja = ant.imploja \n"
+                            + "     and ean.importsistema = ant.impsistema \n"        
+                            + "where ean = '" + id.getContents().trim() + "' \n"
+                            + "and ant.impsistema = '" + getSistema() + "' \n"
+                            + "and ant.imploja = '" + getLojaOrigem() + "'"
+                    )) {
+                        while (rst.next()) {                            
+                            NutricionalIMP imp = new NutricionalIMP();
+
+                            imp.setId(id.getContents().trim());
+                            imp.setDescricao(descricao.getContents().trim());
+                            
+                            if (valorCalorico.getContents() != null && !valorCalorico.getContents().trim().isEmpty()) {
+                                imp.setCaloria(Integer.parseInt(valorCalorico.getContents().substring(0, valorCalorico.getContents().indexOf(".")).trim().replace("\"", "")));
+                            }                            
+                            if (carboidratos.getContents() != null && !carboidratos.getContents().trim().isEmpty()) {
+                                imp.setCarboidrato(Double.parseDouble(carboidratos.getContents().trim().replace("\"", "")));
+                            }                            
+                            if (proteinas.getContents() != null && !proteinas.getContents().trim().isEmpty()) {
+                                imp.setProteina(Double.parseDouble(proteinas.getContents().trim().replace("\"", "")));
+                            }
+                            if (gordurasTotais.getContents() != null && !gordurasTotais.getContents().trim().isEmpty()) {
+                                imp.setGordura(Double.parseDouble(gordurasTotais.getContents().trim().replace("\"", "")));
+                            }
+                            if (gordurassaturadas.getContents() != null && !gordurassaturadas.getContents().trim().isEmpty()) {
+                                imp.setGorduraSaturada(Double.parseDouble(gordurassaturadas.getContents().trim().replace("\"", "")));
+                            }
+                            if (fibraAlimentar.getContents() != null && !fibraAlimentar.getContents().trim().isEmpty()) {
+                                imp.setFibra(Double.parseDouble(fibraAlimentar.getContents().trim().replace("\"", "")));
+                            }
+                            if (sodio.getContents() != null && !sodio.getContents().trim().isEmpty()) {
+                                imp.setSodio(Double.parseDouble(sodio.getContents().trim().replace("\"", "")));
+                            }
+                            
+                            imp.setPorcao(porcao.getContents().trim().replace("\"", ""));
+                            
+                            if (calcio.getContents() != null && !calcio.getContents().trim().isEmpty()) {
+                                imp.setCalcio(Double.parseDouble(calcio.getContents().trim().replace("\"", "")));
+                            }
+                            if (ferro.getContents() != null && !ferro.getContents().trim().isEmpty()) {
+                                imp.setFerro(Double.parseDouble(ferro.getContents().trim().replace("\"", "")));
+                            }
+                            
+                            imp.addProduto(rst.getString("impid"));
+
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+        }       
         return result;
     }
 }

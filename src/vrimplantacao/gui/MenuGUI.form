@@ -748,12 +748,21 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuFuturaActionPerformed"/>
                           </Events>
                         </MenuItem>
+<<<<<<< HEAD
                         <MenuItem class="javax.swing.JMenuItem" name="chkLogicBox">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="LogicBox"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLogicBoxActionPerformed"/>
+=======
+                        <MenuItem class="javax.swing.JMenuItem" name="chkGigatron">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Gigatron"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkGigatronActionPerformed"/>
+>>>>>>> e89b9b69a4c2ad963c01f2defa3ee35903b278be
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuMercaLite">
@@ -778,6 +787,14 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkSGMasterActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuGCom">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="GCom"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuGComActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
