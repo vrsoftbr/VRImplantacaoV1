@@ -20,18 +20,18 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.WeberDAO;
+import vrimplantacao2.dao.interfaces.LogicboxDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class WeberGUI extends VRInternalFrame {
+public class LogicboxGUI extends VRInternalFrame {
 
-    private static final String NOME_SISTEMA = "Weber";
+    private static final String NOME_SISTEMA = "LogicBox";
     private static final String SERVIDOR_SQL = "Firebird";
-    private static WeberGUI instance;
+    private static LogicboxGUI instance;
 
-    private final WeberDAO dao = new WeberDAO();
+    private final LogicboxDAO dao = new LogicboxDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
 
     private String vLojaCliente = "-1";
@@ -72,7 +72,7 @@ public class WeberGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private WeberGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private LogicboxGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "UTF-8";
@@ -275,7 +275,7 @@ public class WeberGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new WeberGUI(i_mdiFrame);
+                instance = new LogicboxGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -346,8 +346,7 @@ public class WeberGUI extends VRInternalFrame {
         txtBancoDadosFirebird = new vrframework.bean.fileChooser.VRFileChooser();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
-        setResizable(true);
-        setTitle("Importação Weber");
+        setTitle("Importação LogicBox");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

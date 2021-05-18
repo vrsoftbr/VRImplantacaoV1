@@ -8,8 +8,7 @@
     </Component>
   </NonVisualComponents>
   <Properties>
-    <Property name="resizable" type="boolean" value="true"/>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Weber"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o LogicBox"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
