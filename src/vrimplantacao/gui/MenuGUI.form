@@ -748,6 +748,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuFuturaActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="chkLogicBox">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="LogicBox"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLogicBoxActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuMercaLite">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="MercaLite"/>

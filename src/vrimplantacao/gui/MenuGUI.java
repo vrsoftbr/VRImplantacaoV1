@@ -276,6 +276,7 @@ import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
@@ -702,6 +703,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutocom = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
+        chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
@@ -1784,6 +1786,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuFutura);
+
+        chkLogicBox.setText("LogicBox");
+        chkLogicBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkLogicBoxActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkLogicBox);
 
         mnuMercaLite.setText("MercaLite");
         mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
@@ -5198,9 +5208,14 @@ public final class MenuGUI extends VRMdiFrame {
         SGMasterGUI.exibir(this);
     }//GEN-LAST:event_chkSGMasterActionPerformed
 
+    private void chkLogicBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLogicBoxActionPerformed
+        LogicboxGUI.exibir(this);
+    }//GEN-LAST:event_chkLogicBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
