@@ -1,7 +1,7 @@
 package vrimplantacao.classe;
 
-import java.time.LocalDate;
-import java.time.Month;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Global {
 
@@ -9,7 +9,7 @@ public class Global {
     /**
      * Data da liberação desta versão.
      */
-    public static final LocalDate DATA_VERSAO = LocalDate.of(2021, Month.MAY, 19);
+    public static final Date DATA_VERSAO = new GregorianCalendar(2021, 04, 19).getTime();
     public static int idLoja = 0;
     public static String loja = "";
     public static int idEstado = 0;
