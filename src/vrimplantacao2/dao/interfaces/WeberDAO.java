@@ -66,6 +66,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
                     OpcaoProduto.EAN_EM_BRANCO,
@@ -96,10 +97,10 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.EXCECAO,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.MAPA_TRIBUTACAO,
-                    OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
                     OpcaoProduto.CODIGO_BENEFICIO
                 }
         ));
@@ -408,7 +409,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	id_produto idProduto,\n"
-                    + "	pre_promocao_datai dataInicio,\n"
+                    + "	cast('Now' as date) + 1 As dataInicio,\n"
                     + "	pre_promocao_dataf dataFim,\n"
                     + "	pre_promocao_preco precooferta,\n"
                     + "	preco_venda precoNormal\n"
@@ -417,7 +418,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pre_promocao_datai is not null\n"
                     + "	and pre_promocao_dataf is not null\n"
                     + "	and pre_promocao_datai <> '1899-12-30'\n"
-                    + "	and pre_promocao_dataf >= current_date"
+                    + "	and pre_promocao_dataf > current_date"
             )) {
 
                 while (rs.next()) {
@@ -466,10 +467,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     
-                    if ("7891000100103".equals(rst.getString("id_produto"))) {
-                        System.out.println("ACHOU");
-                    }
-
                     imp.setId(rst.getString("id_produto"));
                     imp.setIva(rst.getDouble("icm_mva"));
                     imp.setIvaAjustado(imp.getIva());
@@ -578,7 +575,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     imp.setCnpj_cpf(Utils.formataNumero(rs.getString("cnpj")));
                     imp.setIe_rg(rs.getString("inscricaoestadual"));
-                    //imp.setAtivo(rs.getInt("situacao") == 1);
                     imp.setAtivo("N".equals(rs.getString("bloqueado")));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -694,19 +690,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    /*"select\n"
-                    + "    c.id_cliente as idFornecedor,\n"
-                    + "    cf.cod_prod as idProduto,\n"
-                    + "    fator as qtdEmbalagem,\n"
-                    + "    cf.id_cod codigoexterno\n"
-                    + "from\n"
-                    + "    codigo_fornec cf\n"
-                    + "        left join clie_dados c\n"
-                    + "            on cf.id_cnpj = replace(replace(replace(c.cnpj_cpf,'.',''), '/', ''), '-', '')\n"
-                    + "where\n"
-                    + "    cf.cod_prod is not null\n"
-                    + "order by\n"
-                    + "    idFornecedor"*/
                     "select\n"
                     + "c.id_cliente as idFornecedor,\n"
                     + "cf.cod_prod as idProduto,\n"
