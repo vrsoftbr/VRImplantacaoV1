@@ -277,6 +277,7 @@ import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
@@ -686,6 +687,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutocom = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
+        chkLogicBox = new javax.swing.JMenuItem();
         chkGigatron = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
@@ -1771,6 +1773,15 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuFutura);
 
+<<<<<<< HEAD
+        chkLogicBox.setText("LogicBox");
+        chkLogicBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkLogicBoxActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkLogicBox);
+=======
         chkGigatron.setText("Gigatron");
         chkGigatron.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1778,6 +1789,7 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkGigatron);
+>>>>>>> e89b9b69a4c2ad963c01f2defa3ee35903b278be
 
         mnuMercaLite.setText("MercaLite");
         mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
@@ -5200,6 +5212,9 @@ public final class MenuGUI extends VRMdiFrame {
         SGMasterGUI.exibir(this);
     }//GEN-LAST:event_chkSGMasterActionPerformed
 
+    private void chkLogicBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLogicBoxActionPerformed
+        LogicboxGUI.exibir(this);
+    }//GEN-LAST:event_chkLogicBoxActionPerformed
     private void chkGigatronActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkGigatronActionPerformed
         GigatronGUI.exibir(this);
     }//GEN-LAST:event_chkGigatronActionPerformed
@@ -5210,9 +5225,14 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuGComActionPerformed
 
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+<<<<<<< HEAD
+    private javax.swing.JMenuItem chkLogicBox;
+=======
     private javax.swing.JMenuItem chkGigatron;
+>>>>>>> e89b9b69a4c2ad963c01f2defa3ee35903b278be
     private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;

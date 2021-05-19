@@ -58,6 +58,8 @@ public class VendaRepository {
     private ProdutoAnteriorDAO produtoAnteriorDAO;
     public boolean idProdutoSemUltimoDigito = false;
     public boolean eBancoUnificado = false;
+    private int matricula;
+    
     
     public VendaRepository(VendaRepositoryProvider provider) {
         this.provider = provider;
@@ -96,9 +98,10 @@ public class VendaRepository {
 
             provider.begin();
             try {
-
+                this.matricula = provider.getMatricula();
+                
                 LOG.info("Iniciando o processo de importação das vendas");        
-                LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));   
+                LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));
 
                 provider.notificar("Vendas...Carregando listas auxiliares");
                 LOG.info("Carregando listas auxiliares"); 
@@ -410,7 +413,7 @@ public class VendaRepository {
         vo.setTipoDesconto(venda.getTipoDesconto());
         vo.setXml(venda.getXml());
         
-        vo.setMatricula(provider.getMatricula());
+        vo.setMatricula(matricula);
         
         if (vo.getChaveCfe() != null && vo.getChaveCfe().length() == 44) {            
             /**
@@ -477,7 +480,7 @@ public class VendaRepository {
         item.setCancelado(imp.isCancelado() || cupomCancelado);
         if (item.isCancelado()) {
             item.setValorCancelado(item.getValorTotal() - item.getValorDesconto() + item.getValorAcrescimo());
-            item.setMatriculaCancelamento(provider.getMatricula());
+            item.setMatriculaCancelamento(matricula);
             item.setTipoCancelamento(imp.getTipoCancelamento());
             if (item.getTipoCancelamento() == null) {
                 item.setTipoCancelamento(TipoCancelamento.ERRO_DE_REGISTRO);

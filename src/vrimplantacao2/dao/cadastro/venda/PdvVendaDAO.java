@@ -141,7 +141,10 @@ public class PdvVendaDAO {
     public int getMatricula(int lojaVR) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT matricula FROM pdv.operador WHERE id_loja = " + lojaVR + " and id_situacaocadastro = 1 order by id limit 1"
+                    "SELECT matricula FROM pdv.operador WHERE id_loja = " + lojaVR + " and upper(nome) like '%ADMIN%' and id_situacaocadastro = 1\n" +
+                    "union\n" +
+                    "SELECT matricula FROM pdv.operador WHERE id_loja = " + lojaVR + " and upper(nome) like '%ADMIN%'\n" +
+                    "limit 1"
             )) {
                 if (rst.next()) {
                     return rst.getInt("matricula");
