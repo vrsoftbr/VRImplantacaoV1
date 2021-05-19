@@ -1,14 +1,15 @@
 package vrimplantacao.classe;
 
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.Month;
 
 public class Global {
 
-    public static String VERSAO = "1.1.13";
+    public static String VERSAO = "1.1.14";
     /**
      * Data da liberação desta versão.
      */
-    public static final GregorianCalendar DATA_VERSAO = new GregorianCalendar(2021, 4, 7); //2021-5-7
+    public static final LocalDate DATA_VERSAO = LocalDate.of(2021, Month.MAY, 19);
     public static int idLoja = 0;
     public static String loja = "";
     public static int idEstado = 0;
