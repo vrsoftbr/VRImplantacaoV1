@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -71,7 +70,14 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 "	i.valor_total,\n" +
                 "	i.valor_desconto_item,\n" +
                 "	i.item_cancelado, \n" +
-                "	i.promocao\n" +
+                "	i.promocao, \n" +
+                "       case substring(i.legenda,1,1) \n" +
+                "		when 'T' then 0 \n" + 
+                "		when 'F' then 60 \n" +
+                "		when 'I' then 40 \n" +
+                "		when 'N' then 41 \n" +
+                "	ELSE 40 END cst, \n" +    
+                "       i.aliquota_icms as aliquota \n" +
                 "from\n" +
                 "	hipcom_cupom_tr i	\n" +
                 "where\n" +
@@ -174,8 +180,6 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 next.setCodigoBarras(ean);
             }            
             
-            next.setPrecoVenda(rs.getDouble("valor_unitario"));
-            
             if (this.versaoVenda == 1) {
                 next.setSequencia(rs.getInt("sequencia"));
                 next.setQuantidade(rs.getDouble("quantidade"));
@@ -188,6 +192,8 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 next.setCancelado("S".equals(rs.getString("item_cancelado")));
                 next.setValorDesconto(rs.getDouble("valor_desconto_item"));
                 next.setOferta("S".equals(rs.getString("promocao")));
+                next.setIcmsCst(rs.getInt("cst"));
+                next.setIcmsAliq(rs.getDouble("aliquota"));
             }
 
             return next;
