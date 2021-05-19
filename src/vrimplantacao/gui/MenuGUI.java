@@ -3406,7 +3406,7 @@ public final class MenuGUI extends VRMdiFrame {
             this.setWaitCursor();
             SobreGUI form = new SobreGUI();
 
-            form.setSobre("VR Implantaçao", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO.getTime()));
+            form.setSobre("VR Implantaçao", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
             form.setVisible(true);
 
         } catch (Exception ex) {
