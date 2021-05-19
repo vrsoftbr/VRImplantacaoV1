@@ -1773,7 +1773,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuFutura);
 
-<<<<<<< HEAD
         chkLogicBox.setText("LogicBox");
         chkLogicBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1781,7 +1780,7 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkLogicBox);
-=======
+
         chkGigatron.setText("Gigatron");
         chkGigatron.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1789,7 +1788,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkGigatron);
->>>>>>> e89b9b69a4c2ad963c01f2defa3ee35903b278be
 
         mnuMercaLite.setText("MercaLite");
         mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
@@ -5228,11 +5226,8 @@ public final class MenuGUI extends VRMdiFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
-<<<<<<< HEAD
     private javax.swing.JMenuItem chkLogicBox;
-=======
     private javax.swing.JMenuItem chkGigatron;
->>>>>>> e89b9b69a4c2ad963c01f2defa3ee35903b278be
     private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;

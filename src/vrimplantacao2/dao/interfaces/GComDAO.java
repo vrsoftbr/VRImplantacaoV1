@@ -63,6 +63,7 @@ public class GComDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ESTOQUE,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
                 OpcaoProduto.ATIVO,
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
