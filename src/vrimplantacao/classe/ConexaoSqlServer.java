@@ -4,19 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import vrimplantacao2.parametro.Parametros;
 
 public class ConexaoSqlServer {
-
-    public static Connection getNewConnection(String host, int port, String database, String user, String pass, String encoding) throws Exception {
-        Class.forName("net.sourceforge.jtds.jdbc.Driver");
-
-        try {
-            return DriverManager.getConnection("jdbc:jtds:sqlserver://" + host + ":" + port + "/" + database, user, pass);
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
 
     private int contBegin = 0;
     private static Connection con;
@@ -26,31 +18,36 @@ public class ConexaoSqlServer {
     private String dataBase = "";
     private String usuario = "";
     private String senha = "";
-    private String strCon;
-    private boolean usandoString = false;
     public String instance = "";
 
+    public static Connection getNewConnection(String host, int port, String database, String user, String pass, String encoding) throws Exception {
+        Class.forName(Driver.get().getDriver());
+        try {
+            return DriverManager.getConnection(Driver.get().getConnectionString(host, port, database), user, pass);
+        } catch (SQLException ex) {
+            throw ex;
+        }
+    }
+    
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         abrirConexao(i_ip, "", i_porta, i_database, i_usuario, i_senha);
     }
 
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Class.forName(Driver.get().getDriver());
         
         usuario = i_usuario;
         senha = i_senha;
-        strCon = conString;
-        usandoString = true;
 
         try {
             con = DriverManager.getConnection(conString, i_usuario, i_senha);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             throw ex;
         }
     }
 
     public void abrirConexao(String i_ip, String i_ipSec, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Class.forName(Driver.get().getDriver());
 
         ip = i_ip;
         ipSec = i_ipSec;
@@ -58,20 +55,12 @@ public class ConexaoSqlServer {
         dataBase = i_database;
         usuario = i_usuario;
         senha = i_senha;
-
-        try {
-            if (!instance.trim().isEmpty()) {
-                con = DriverManager.getConnection("jdbc:sqlserver://" + i_ip + "\\" + instance + ":" + i_porta + ";databaseName=" + i_database, i_usuario, i_senha);
-            } else {
-                con = DriverManager.getConnection("jdbc:sqlserver://" + i_ip + ":" + i_porta + ";databaseName=" + i_database, i_usuario, i_senha);
-            }
-
-        } catch (Exception ex) {
-            if (!ipSec.isEmpty()) {
-                con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + i_ipSec + ":" + i_porta + "/" + i_database, i_usuario, i_senha);
-            } else {
-                throw ex;
-            }
+        
+        if (!instance.trim().isEmpty()) {
+            Class.forName(Driver.get().getDriver());
+            con = DriverManager.getConnection(Driver.get().getConnectionString(i_ip + "\\" + instance, porta, dataBase), i_usuario, i_senha);
+        } else {
+            con = DriverManager.getConnection(Driver.get().getConnectionString(i_ip, porta, dataBase), i_usuario, i_senha);
         }
     }
 
@@ -137,7 +126,7 @@ public class ConexaoSqlServer {
             stm.execute("SELECT 1");
             stm.close();
 
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             close();
             abrirConexao(ip, ipSec, porta, dataBase, usuario, senha);
         }
@@ -150,4 +139,52 @@ public class ConexaoSqlServer {
     public void forceCommit() throws Exception {
         con.createStatement().execute("commit");
     }
+    
+    
+    
+    public static enum Driver {
+        
+        MICROSOFT (
+            "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+            "jdbc:sqlserver://{host}:{port};databaseName={database}"
+        ),
+        JTDS (
+            "net.sourceforge.jtds.jdbc.Driver",
+            "jdbc:jtds:sqlserver://{host}:{port}/{database}"
+        );
+
+        public static Driver get() {
+            return get(Parametros.get().get("SQLServer","Driver"));
+        }
+        
+        public static Driver get(String driver) {
+            for (Driver d: values()) {
+                if (d.getDriver().equals(driver)) {
+                    return d;
+                }
+            }
+            return MICROSOFT;
+        }
+        
+        private final String driver;
+        private final String connectionString;
+
+        private Driver(String driver, String connectionString) {
+            this.driver = driver;
+            this.connectionString = connectionString;
+        }
+
+        public String getDriver() {
+            return driver;
+        }
+
+        public String getConnectionString(String host, int port, String database) {
+            return connectionString
+                    .replace("{host}", host)
+                    .replace("{port}", String.valueOf(port))
+                    .replace("{database}", database);
+        }
+        
+    }
+    
 }

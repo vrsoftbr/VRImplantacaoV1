@@ -51,6 +51,7 @@ import vrframework.bean.table.VRTable;
 import vrframework.bean.textField.VRTextField;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.classe.TipoConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
@@ -114,6 +115,7 @@ public class ParametroGUI extends VRInternalFrame {
         rdgLogLevel = new ButtonGroup();
         rdgLogType = new ButtonGroup();
         rdgTipoConexaoODBC = new ButtonGroup();
+        rdgTipoConexaoSqlServer = new ButtonGroup();
         tabs = new VRTabbedPane();
         tabValorPadrão = new VRPanel();
         scroll = new JScrollPane();
@@ -147,6 +149,10 @@ public class ParametroGUI extends VRInternalFrame {
         vRPanel5 = new VRPanel();
         chkNfeSaidaVerificarFechamentoPeriodo = new VRCheckBox();
         chkNfeSaidaProcessarFinalizacoes = new VRCheckBox();
+        pnlDriverSQLServer = new VRPanel();
+        vRLabel8 = new VRLabel();
+        optSqlServerMicrosoft = new JRadioButton();
+        optSqlServerJTDS = new JRadioButton();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -251,7 +257,7 @@ public class ParametroGUI extends VRInternalFrame {
                             .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 113, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -273,7 +279,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(9, Short.MAX_VALUE))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pnlLocalizacao.setBorder(BorderFactory.createTitledBorder("Localização"));
@@ -350,7 +356,6 @@ public class ParametroGUI extends VRInternalFrame {
         });
 
         rdgTipoConexaoODBC.add(optDriver);
-        optDriver.setSelected(true);
         optDriver.setText("Driver");
         optDriver.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -435,10 +440,55 @@ public class ParametroGUI extends VRInternalFrame {
         );
         vRPanel5Layout.setVerticalGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(chkNfeSaidaVerificarFechamentoPeriodo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkNfeSaidaProcessarFinalizacoes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+
+        pnlDriverSQLServer.setBorder(BorderFactory.createTitledBorder("Opções do driver SQL Server"));
+
+        vRLabel8.setText("Tipo de Conexão");
+
+        rdgTipoConexaoSqlServer.add(optSqlServerMicrosoft);
+        optSqlServerMicrosoft.setSelected(true);
+        optSqlServerMicrosoft.setText("Microsoft");
+        optSqlServerMicrosoft.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optSqlServerMicrosoftActionPerformed(evt);
+            }
+        });
+
+        rdgTipoConexaoSqlServer.add(optSqlServerJTDS);
+        optSqlServerJTDS.setText("JTDS");
+        optSqlServerJTDS.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optSqlServerJTDSoptFonteDadosActionPerformed(evt);
+            }
+        });
+
+        GroupLayout pnlDriverSQLServerLayout = new GroupLayout(pnlDriverSQLServer);
+        pnlDriverSQLServer.setLayout(pnlDriverSQLServerLayout);
+        pnlDriverSQLServerLayout.setHorizontalGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDriverSQLServerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDriverSQLServerLayout.createSequentialGroup()
+                        .addComponent(optSqlServerMicrosoft)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(optSqlServerJTDS))
+                    .addComponent(vRLabel8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(50, Short.MAX_VALUE))
+        );
+        pnlDriverSQLServerLayout.setVerticalGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDriverSQLServerLayout.createSequentialGroup()
+                .addComponent(vRLabel8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(optSqlServerMicrosoft)
+                    .addComponent(optSqlServerJTDS))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         GroupLayout vRPanel2Layout = new GroupLayout(vRPanel2);
@@ -451,7 +501,10 @@ public class ParametroGUI extends VRInternalFrame {
                     .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel5, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(vRPanel2Layout.createSequentialGroup()
+                        .addComponent(pnlDriverSQLServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         vRPanel2Layout.setVerticalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -461,12 +514,14 @@ public class ParametroGUI extends VRInternalFrame {
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(pnlDriverSQLServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         scroll.setViewportView(vRPanel2);
@@ -850,6 +905,14 @@ public class ParametroGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_optFonteDadosActionPerformed
 
+    private void optSqlServerMicrosoftActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optSqlServerMicrosoftActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_optSqlServerMicrosoftActionPerformed
+
+    private void optSqlServerJTDSoptFonteDadosActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optSqlServerJTDSoptFonteDadosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_optSqlServerJTDSoptFonteDadosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private VRButton btnCancelar;
     private VRButton btnGravar;
@@ -874,8 +937,11 @@ public class ParametroGUI extends VRInternalFrame {
     private JScrollPane jScrollPane1;
     private JRadioButton optDriver;
     private JRadioButton optFonteDados;
+    private JRadioButton optSqlServerJTDS;
+    private JRadioButton optSqlServerMicrosoft;
     private VRPanel pnlDiversos;
     private VRPanel pnlDriverODBC;
+    private VRPanel pnlDriverSQLServer;
     private VRPanel pnlLocalizacao;
     private VRPanel pnlLogDados;
     private VRPanel pnlMercadologicoImportacao;
@@ -896,6 +962,7 @@ public class ParametroGUI extends VRInternalFrame {
     private ButtonGroup rdgLogLevel;
     private ButtonGroup rdgLogType;
     private ButtonGroup rdgTipoConexaoODBC;
+    private ButtonGroup rdgTipoConexaoSqlServer;
     private JScrollPane scroll;
     private vr.view.components.panel.VRPanel tabEngineMigracao;
     private VRPanel tabLogging;
@@ -914,6 +981,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRLabel vRLabel5;
     private VRLabel vRLabel6;
     private VRLabel vRLabel7;
+    private VRLabel vRLabel8;
     private VRPanel vRPanel1;
     private VRPanel vRPanel2;
     private VRPanel vRPanel3;
@@ -985,6 +1053,14 @@ public class ParametroGUI extends VRInternalFrame {
         chkMercadologicoImportacao2.setSelected(OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva());
         chkProdutoForcarNovo.setSelected(OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo());
         chkNaoImportarPautaSeAlgumNcmNaoExistir.setSelected(parametros.isNaoImportarPautaSeAlgumNcmNaoExistir());
+        switch (ConexaoSqlServer.Driver.get(parametros.get("SQLServer","Driver"))) {
+            case MICROSOFT:
+                optSqlServerMicrosoft.setSelected(true);
+                break;
+            case JTDS:
+                optSqlServerJTDS.setSelected(true);
+                break;
+        }
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -1016,6 +1092,13 @@ public class ParametroGUI extends VRInternalFrame {
             } else if (optFonteDados.isSelected()) {
                 parametros.put(1, "ODBC", "TIPO_CONEXAO");
             }
+            
+            if (optSqlServerJTDS.isSelected()) {
+                parametros.put(ConexaoSqlServer.Driver.JTDS.getDriver(),"SQLServer","Driver");
+            } else if (optSqlServerMicrosoft.isSelected()) {
+                parametros.put(ConexaoSqlServer.Driver.MICROSOFT.getDriver(),"SQLServer","Driver");
+            }
+            
             parametros.salvar();
             Util.exibirMensagem("Parâmetros gravados com sucesso!", title);
         } else {
