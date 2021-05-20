@@ -278,12 +278,7 @@ public class MapaTributacaoView extends JDialog {
     }//GEN-LAST:event_txtBuscaKeyRelesed
 
     private void btnIncluirOnClick(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIncluirOnClick
-        try {
-            controller.incluirTributo();
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-            throw new RuntimeException(ex);
-        }
+        controller.incluirTributo();
     }//GEN-LAST:event_btnIncluirOnClick
 
 
