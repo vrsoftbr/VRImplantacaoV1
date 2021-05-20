@@ -230,7 +230,8 @@ public class MapaTributacaoDAO {
         }
         texto = texto.trim().toUpperCase();
         boolean somenteId = texto.startsWith("@");
-        texto = texto.substring(1);
+        if(somenteId)
+            texto = texto.substring(1);
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
