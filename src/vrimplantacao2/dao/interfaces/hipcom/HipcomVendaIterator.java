@@ -108,7 +108,7 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
             
             if (this.versaoVenda == 1) {
                 
-                next.setId(rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data"));
+                next.setId(rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + rs.getString("caixa"));
                 next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom_fiscal")));
                 next.setEcf(Utils.stringToInt(rs.getString("caixa")));
                 next.setData(rs.getDate("data"));

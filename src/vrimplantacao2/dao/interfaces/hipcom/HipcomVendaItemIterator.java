@@ -44,6 +44,7 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             return "select\n"
                     + " i.loja, \n"
                     + " i.numero_cupom_fiscal, \n"
+                    + " i.codigo_caixa as caixa, \n"
                     + " i.`data`,\n"
                     + "	i.sequencia,\n"
                     + "	i.codigo_plu_bar ean,\n"
@@ -51,7 +52,14 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                     + "	i.valor_unitario,\n"
                     + "	i.valor_total_item as valor_total,\n"
                     + "	i.valor_desconto_item,\n"
-                    + "	i.item_cancelado \n"
+                    + "	i.item_cancelado, \n"
+                    + "       case substring(i.legenda,1,1) \n"
+                    + "		when 'T' then 0 \n"
+                    + "		when 'F' then 60 \n"
+                    + "		when 'I' then 40 \n"
+                    + "		when 'N' then 41 \n"
+                    + "	ELSE 40 END cst, \n"
+                    + "       i.aliquota as aliquota \n"
                     + "from\n"
                     + "	vendasantigas i	\n"
                     + "where\n"
@@ -138,8 +146,15 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
             String id, idVenda;
 
             if (this.versaoVenda == 1) {
-                id = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + "-" + rs.getString("ean") + "-" + rs.getString("sequencia");
-                idVenda = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data");
+                id = 
+                        rs.getString("loja") + "-" + 
+                        rs.getString("numero_cupom_fiscal") + 
+                        rs.getString("data") + "-" + 
+                        rs.getString("ean") + "-" + 
+                        rs.getString("sequencia") + "-" + 
+                        rs.getString("caixa");
+                
+                idVenda = rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + rs.getString("caixa");
             } else {
                 id = rs.getString("id_cupom") + "-" + rs.getString("sequencia");
                 idVenda = rs.getString("id_cupom");
@@ -196,6 +211,8 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 next.setIcmsAliq(rs.getDouble("aliquota"));
             }
 
+            next.setIcmsCst(rs.getInt("cst"));
+            next.setIcmsAliq(rs.getDouble("aliquota"));
             return next;
         }
     }

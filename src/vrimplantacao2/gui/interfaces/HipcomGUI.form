@@ -226,7 +226,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel6" pref="114" max="32767" attributes="0"/>
+                                      <Component id="jLabel6" pref="156" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtOtRecDtIni" alignment="0" max="32767" attributes="0"/>
@@ -234,7 +234,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel7" pref="125" max="32767" attributes="0"/>
+                                      <Component id="jLabel7" pref="168" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtOtRecDtFim" alignment="0" max="32767" attributes="0"/>
@@ -375,7 +375,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel2" pref="111" max="32767" attributes="0"/>
+                                      <Component id="jLabel2" pref="153" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtRotDtIni" alignment="0" max="32767" attributes="0"/>
@@ -383,7 +383,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel3" pref="122" max="32767" attributes="0"/>
+                                      <Component id="jLabel3" pref="165" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtRotDtFim" alignment="0" max="32767" attributes="0"/>
@@ -529,11 +529,13 @@
                                       <Component id="txtDtVendaFim" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="rdbVendasV1" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="rdbVendasV2" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="75" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="rdbVendasV2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkBancoUnificado" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="13" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -547,6 +549,7 @@
                                   <Component id="txtDtVendaFim" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="rdbVendasV1" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="rdbVendasV2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkBancoUnificado" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkVendaUtilizaDigito" min="-2" max="-2" attributes="0"/>
@@ -588,6 +591,11 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbVendasV2tipoVendaSelect"/>
                       </Events>
                     </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBancoUnificado">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Banco Hipcom &#xe9; Unificado"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
               </SubComponents>
@@ -605,7 +613,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" pref="370" max="32767" attributes="0"/>
+                  <Component id="cmbLojaVR" pref="455" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
