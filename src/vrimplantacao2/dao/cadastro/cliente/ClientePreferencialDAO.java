@@ -7,8 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 
@@ -18,6 +18,8 @@ import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
  * @author Leandro
  */
 public class ClientePreferencialDAO {
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public void salvar(ClientePreferencialVO cliente) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -91,7 +93,7 @@ public class ClientePreferencialDAO {
             sql.put("cargoconjuge", "");
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
-            if (Versao.maiorQue(3,17)) {
+            if (versao.igualOuMaiorQue(3,17)) {
                 sql.put("utilizaappdescontos", false);
             }
             sql.putNull("id_grupo");
