@@ -1,4 +1,4 @@
-package vrimplantacao2.dao.interfaces;
+package vrimplantacao2.dao.interfaces.winthor;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -6,8 +6,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +20,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
@@ -43,17 +46,26 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-/**
- *
- * @author Leandro
- */
 public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private String complemento = "";
     private int idRegiaoDentroEstado;
     private int idRegiaoForaEstado;
     private boolean somenteClienteFidelidade = false;
+    
+    private Date dataVendaInicial;
+    private Date dataVendaFinal;
+
+    public void setDataVendaInicial(Date dataVendaInicial) {
+        this.dataVendaInicial = dataVendaInicial;
+    }
+
+    public void setDataVendaFinal(Date dataVendaFinal) {
+        this.dataVendaFinal = dataVendaFinal;
+    }
 
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
@@ -643,7 +655,7 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "		(CASE\n" +
                     "			WHEN ean.QTUNIT = 1 AND ean.QTMINIMAATACADO > 1 THEN ean.QTMINIMAATACADO\n" +
                     "			WHEN ean.QTUNIT >=2 THEN ean.QTUNIT\n" +
-                    "			ELSE 0\n" +
+                    "			ELSE 1\n" +
                     "		END), \n" +
                     "		1\n" +
                     "	) as qtdembalagem,\n" +
@@ -698,8 +710,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     "		icms_dentro_estado.id_produto = p.codprod\n" +
                     "	LEFT JOIN icms_fora_estado ON\n" +
                     "		icms_fora_estado.id_produto = p.codprod\n" +
-                    "WHERE\n" +
-                    "	coalesce(ean.QTUNIT, 1) = 1\n" +
                     "ORDER BY\n" +
                     "	id, ean"
             )) {
@@ -770,52 +780,6 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
                     imp.setIcmsConsumidorId(rst.getString("icms_dentro_estado"));
                     imp.setIcmsCreditoId(rst.getString("icms_dentro_estado"));
                     imp.setIcmsCreditoForaEstadoId(rst.getString("icms_fora_estado"));
-                            
-                    /*imp.setIcmsCstSaida(rst.getInt("icmscstdebito"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icmsaliqdebito"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("icmsreddebito"));
-                    
-                    imp.setIcmsCstConsumidor(rst.getInt("icmscstdebito"));
-                    imp.setIcmsAliqConsumidor(rst.getDouble("icmsaliqdebito"));
-                    imp.setIcmsReducaoConsumidor(rst.getDouble("icmsreddebito"));
-                    
-                    imp.setIcmsCstSaidaForaEstado(rst.getInt("icmscstdebito"));
-                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icmsaliqdebito"));
-                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icmsreddebito"));
-                    
-                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icmscstdebito"));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icmsaliqdebito"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icmsreddebito"));
-                    
-                    imp.setIcmsCstEntrada(rst.getInt("icmscstcredito"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icmsaliqcredito"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("icmsredcredito"));
-                    
-                    imp.setIcmsCstEntradaForaEstado(rst.getInt("icmscstcredito"));
-                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icmsaliqcredito"));
-                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icmsredcredito"));
-                    
-                    //imp.setIcmsDebitoId(rst.getString("idtributacao"));
-                    //imp.setIcmsCreditoId(imp.getIcmsDebitoId());
-                    //imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    
-                    Trib trib = tribs.get(rst.getString("codncmex"));
-                    if (trib != null) {
-                        imp.setPiscofinsCstDebito(0);
-                        imp.setPiscofinsCstCredito(trib.pisCofins);
-                        imp.setIcmsCst(trib.icmsCst);
-                        imp.setIcmsAliq(trib.icmsAliq);
-                        imp.setIcmsReducao(trib.icmsRed);
-                        if ("561421".equals(imp.getImportId())) {
-                            System.out.println(String.format(
-                                    "cst=%d aliq=%f red=%f piscofins=%d",
-                                    trib.icmsCst,
-                                    trib.icmsAliq,
-                                    trib.icmsRed,
-                                    trib.pisCofins                                    
-                            ));
-                        }
-                    }*/
                     
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
 
@@ -1792,4 +1756,24 @@ public class Winthor_PcSistemasDAO extends InterfaceDAO implements MapaTributoPr
             }
         }
     }
+    
+    private void testarDatasDaVenda() throws NullPointerException {
+        if (this.dataVendaInicial == null && this.dataVendaFinal == null) {
+            throw new NullPointerException("Por favor informe o intervalo das vendas a serem importadas");
+        }
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        testarDatasDaVenda();
+        return new WinthorVendaIterator(getLojaOrigem(), this.dataVendaInicial, this.dataVendaFinal);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        testarDatasDaVenda();
+        return new WinthorVendaItemIterator(getLojaOrigem(), this.dataVendaInicial, this.dataVendaFinal);
+    }
+    
+    
 }
