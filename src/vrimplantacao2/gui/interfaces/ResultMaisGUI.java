@@ -22,6 +22,7 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 
 public class ResultMaisGUI extends VRInternalFrame {
 
@@ -186,7 +187,7 @@ public class ResultMaisGUI extends VRInternalFrame {
                     Importador importador = new Importador(resultmaisDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    resultmaisDAO.complemento = lojaMesmoID;
+                    resultmaisDAO.setComplemento(lojaMesmoID);
 
                     if (tab.getSelectedIndex() == 0) {
                         if (chkFamiliaProduto.isSelected()) {
@@ -200,6 +201,10 @@ public class ResultMaisGUI extends VRInternalFrame {
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }
+                        
+                        if (chkPautaFiscal.isSelected()){
+                            importador.importarPautaFiscal(OpcaoFiscal.USAR_IDPRODUTO, OpcaoFiscal.NOVOS);
+                        }   
 
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -217,12 +222,9 @@ public class ResultMaisGUI extends VRInternalFrame {
                             }
                             if (chkT1NatReceita.isSelected()) {
                                 opcoes.add(OpcaoProduto.NATUREZA_RECEITA);
-                            }
-                            if (chkPautaFiscal.isSelected()){
-                                opcoes.add(OpcaoProduto.PAUTA_FISCAL);
-                                if (chkPautaFiscalProduto.isSelected()){
-                                    opcoes.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
-                                }
+                            }                         
+                            if (chkPautaFiscalProduto.isSelected()){
+                                opcoes.add(OpcaoProduto.EXCECAO);
                             }
                             if (chkT1ICMS.isSelected()) {
                                 opcoes.add(OpcaoProduto.ICMS);

@@ -2,6 +2,8 @@ package vrimplantacao2.gui.component.mapatributacao;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.openide.util.Exceptions;
+import vrframework.classe.Util;
 import vrimplantacao2.gui.component.mapatributacao.incluiraliquota.IncluirAliquotaGUI;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.Icms;
@@ -13,8 +15,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
  */
 public class MapaTributacaoController {
 
-    private MapaTributacaoView view;
-    private MapaTributacaoDAO dao = new MapaTributacaoDAO();
+    private final MapaTributacaoView view;
+    private final MapaTributacaoDAO dao = new MapaTributacaoDAO();
     private List<MapaTributoVO> mapa;
     private String sistema;
     private String agrupador;
@@ -77,10 +79,15 @@ public class MapaTributacaoController {
         view.refresh();
     }
 
-    void buscar(String texto) throws Exception {
-        aliquotas = dao.getTributacaoVR(texto);
-        //Atualiza a view
-        view.refreshBusca();
+    void buscar(String texto) {
+        try {
+            aliquotas = dao.getTributacaoVR(texto);
+            //Atualiza a view
+            view.refreshBusca();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, "Erro ao gravar a aliquota");
+        }
     }
 
     void previousTributVR() throws Exception {
@@ -156,13 +163,13 @@ public class MapaTributacaoController {
         }
     }
 
-    public void incluirTributo() throws Exception {        
+    public void incluirTributo() {        
         int mapaIndex = view.tblMapa.getLinhaSelecionada();
         MapaTributoVO map = this.mapa.get(mapaIndex);
         
-        int id = IncluirAliquotaGUI.exibir(0, 0, 0, map.getOrigDescricao());
+        int id = IncluirAliquotaGUI.exibir(map.converterEmVo());
         if (id > 0) {
-            buscar(String.valueOf(id));
+            buscar("@" + String.valueOf(id));
         }
     }
 

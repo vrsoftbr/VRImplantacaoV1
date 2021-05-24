@@ -229,6 +229,9 @@ public class MapaTributacaoDAO {
             texto = "";
         }
         texto = texto.trim().toUpperCase();
+        boolean somenteId = texto.startsWith("@");
+        if(somenteId)
+            texto = texto.substring(1);
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -244,8 +247,8 @@ public class MapaTributacaoDAO {
                     + "	aliquota\n"
                     + "where\n"
                     + "	id_situacaocadastro = 1 and\n"
-                    + "	(id::varchar = " + SQLUtils.stringSQL(texto) + " or \n"
-                    + "	descricao like " + SQLUtils.stringSQL("%" + texto + "%") + ")\n"
+                    + "	(id::varchar = " + SQLUtils.stringSQL(texto) + "\n"
+                    + (somenteId ? " " : "	or descricao like " + SQLUtils.stringSQL("%" + texto + "%") ) + ")\n"
                     + "order by\n"
                     + "	descricao\n"
                     + "limit 10"

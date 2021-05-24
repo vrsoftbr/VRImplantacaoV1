@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
@@ -27,6 +27,8 @@ import vrimplantacao2.vo.enums.NcmVO;
 public class ProdutoDAO {
 
     private static final Logger LOG = Logger.getLogger(ProdutoDAO.class.getName());
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     /**
      * Retorna um {@link IDStack} com todos os IDs disponíveis maiores que 0 e
@@ -124,7 +126,7 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
-            if (Versao.menorQue(4)) {
+            if (versao.igualOuMenorQue(4)) {
                 sql.put("margemminima", vo.getMargemMinima());
                 sql.put("margemmaxima", vo.getMargemMaxima());
                 sql.put("margem", vo.getMargem());
@@ -138,7 +140,7 @@ public class ProdutoDAO {
             sql.put("descricaogondola", vo.getDescricaoGondola());
             sql.put("dataalteracao", new Date());
             sql.putNull("id_produtovasilhame");
-            if (Versao.menorQue(3, 19, 1, 64)) {
+            if (versao.igualOuMenorQue(3, 19, 1, 64)) {
                 sql.put("excecao", vo.getExcecao());
             }
             sql.put("id_tipomercadoria", 99);
@@ -162,7 +164,7 @@ public class ProdutoDAO {
             sql.put("permitetroca", true);
             sql.put("temperatura", 0);
             sql.put("id_tipoorigemmercadoria", 0);
-            if (Versao.maiorQue(3, 18, 2)) {
+            if (versao.igualOuMaiorQue(3, 18, 2)) {
                 sql.put("id_tipoorigemmercadoriaentrada", 0);
             }
             sql.put("ipi", 0);
@@ -201,7 +203,7 @@ public class ProdutoDAO {
             sql.put("verificapesopdv", false);
             sql.put("produtoecommerce", vo.isProdutoecommerce());
             sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
-            if (Versao.menorQue(3, 17, 10)) {
+            if (versao.igualOuMenorQue(3, 17, 10)) {
                 sql.put("id_tipoproduto", 0);
                 sql.put("fabricacaopropria", false);
             }
@@ -269,7 +271,7 @@ public class ProdutoDAO {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
         }
-        if (Versao.menorQue(4)) {
+        if (versao.igualOuMenorQue(4)) {
             if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
                 sql.put("margemminima", vo.getMargemMinima());
                 sql.put("margemmaxima", vo.getMargemMaxima());

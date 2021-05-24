@@ -53,7 +53,7 @@ public class ClienteEventualContatoVO {
     }
 
     public void setNome(String nome) {
-        this.nome = Utils.acertarTexto(nome, 40, "SEM NOME");
+        this.nome = Utils.acertarTexto(nome, 30, "SEM NOME");
     }
 
     public void setTelefone(String telefone) {

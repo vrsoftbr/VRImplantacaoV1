@@ -89,7 +89,6 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
-import vrimplantacao2.dao.interfaces.ResultMaisDAO;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -272,14 +271,20 @@ import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
 import vrimplantacao2.gui.interfaces.FuturaGUI;
+import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
-import vrimplantacao2.gui.interfaces.ResultMaisGUI;
+import vrimplantacao2.gui.interfaces.PlenusGUI;
+import vrimplantacao2.gui.interfaces.PoligonGUI;
+import vrimplantacao2.gui.interfaces.ResultMais_V2GUI;
+import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -388,22 +393,6 @@ public final class MenuGUI extends VRMdiFrame {
         atualizarRodape();
         configurarBusca();
         atualizarJanela();
-
-        /*jMenu1.setVisible(false);
-        jMenu3.setVisible(false);
-        jMenu4.setVisible(false);
-        jMenuItem9.setVisible(false);
-        jMenuItem13.setVisible(false);
-        jMenuItem15.setVisible(false);
-        jMenu11.setVisible(false);
-        jMenuItem17.setVisible(false);
-        mnuPlanilhaPadrao.setVisible(false);
-        jMenuItem20.setVisible(false);
-        jMenuItem6.setVisible(false);
-        jMenuItem7.setVisible(false);
-        jMenuItem30.setVisible(false);
-        jMenuItem21.setVisible(false);
-        jMenuItem22.setVisible(false);*/
     }
 
     @Override
@@ -698,7 +687,12 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutocom = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
+        chkLogicBox = new javax.swing.JMenuItem();
+        chkGigatron = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+        mnuPlenus = new javax.swing.JMenuItem();
+        chkSGMaster = new javax.swing.JMenuItem();
+        mnuGCom = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -861,6 +855,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuVisualMix = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuSQLServer3 = new javax.swing.JMenu();
+        mnuPoligon = new javax.swing.JMenuItem();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         mnuSysAut = new javax.swing.JMenuItem();
         mnuTelecon = new javax.swing.JMenuItem();
@@ -1778,6 +1773,22 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuFutura);
 
+        chkLogicBox.setText("LogicBox");
+        chkLogicBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkLogicBoxActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkLogicBox);
+
+        chkGigatron.setText("Gigatron");
+        chkGigatron.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkGigatronActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkGigatron);
+
         mnuMercaLite.setText("MercaLite");
         mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1785,6 +1796,30 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuMercaLite);
+
+        mnuPlenus.setText("Plenus");
+        mnuPlenus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlenusActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuPlenus);
+
+        chkSGMaster.setText("SG Master");
+        chkSGMaster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkSGMasterActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkSGMaster);
+
+        mnuGCom.setText("GCom");
+        mnuGCom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGComActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuGCom);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -3033,6 +3068,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuSQLServer3.setText("SQL Server 3");
 
+        mnuPoligon.setText("Poligon");
+        mnuPoligon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPoligonActionPerformed(evt);
+            }
+        });
+        mnuSQLServer3.add(mnuPoligon);
+
         mnuSTSistemas_v2.setText("ST Sistemas");
         mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3363,7 +3406,7 @@ public final class MenuGUI extends VRMdiFrame {
             this.setWaitCursor();
             SobreGUI form = new SobreGUI();
 
-            form.setSobre("VR Implantaçao", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO.getTime()));
+            form.setSobre("VR Implantaçao", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
             form.setVisible(true);
 
         } catch (Exception ex) {
@@ -5152,12 +5195,40 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuRMSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRMSistemasActionPerformed
         // TODO add your handling code here:
-        ResultMaisGUI.exibir(this);
+        ResultMais_V2GUI.exibir(this);
     }//GEN-LAST:event_mnuRMSistemasActionPerformed
+
+    private void mnuPlenusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlenusActionPerformed
+        PlenusGUI.exibir(this);
+    }//GEN-LAST:event_mnuPlenusActionPerformed
+
+    private void mnuPoligonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPoligonActionPerformed
+        PoligonGUI.exibir(this);
+    }//GEN-LAST:event_mnuPoligonActionPerformed
+
+    private void chkSGMasterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkSGMasterActionPerformed
+        SGMasterGUI.exibir(this);
+    }//GEN-LAST:event_chkSGMasterActionPerformed
+
+    private void chkLogicBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLogicBoxActionPerformed
+        LogicboxGUI.exibir(this);
+    }//GEN-LAST:event_chkLogicBoxActionPerformed
+    private void chkGigatronActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkGigatronActionPerformed
+        GigatronGUI.exibir(this);
+    }//GEN-LAST:event_chkGigatronActionPerformed
+
+    private void mnuGComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGComActionPerformed
+        // TODO add your handling code heregti :
+        GComGUI.exibir(this);
+    }//GEN-LAST:event_mnuGComActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenuItem chkLogicBox;
+    private javax.swing.JMenuItem chkGigatron;
+    private javax.swing.JMenuItem chkSGMaster;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
@@ -5315,6 +5386,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG10;
     private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuG4;
+    private javax.swing.JMenuItem mnuGCom;
     private javax.swing.JMenuItem mnuGDI;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
@@ -5386,6 +5458,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
     private javax.swing.JMenuItem mnuPlenoKW;
+    private javax.swing.JMenuItem mnuPlenus;
+    private javax.swing.JMenuItem mnuPoligon;
     private javax.swing.JMenu mnuPostgres;
     private javax.swing.JMenu mnuPostgres2;
     private javax.swing.JMenuItem mnuProton;

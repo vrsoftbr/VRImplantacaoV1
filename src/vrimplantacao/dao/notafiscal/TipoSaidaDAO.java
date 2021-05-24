@@ -2,13 +2,15 @@ package vrimplantacao.dao.notafiscal;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import vr.core.parametro.versao.Versao;
 import vrimplantacao.vo.notafiscal.CfopVO;
 import vrimplantacao.vo.notafiscal.TipoSaidaVO;
 import vrframework.classe.Conexao;
 import vrframework.classe.VRException;
-import vrimplantacao2.parametro.Versao;
 
 public class TipoSaidaDAO {
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public TipoSaidaVO carregar(int i_id) throws Exception {
         Statement stm = null;
@@ -30,7 +32,7 @@ public class TipoSaidaDAO {
         oTipoSaida.id = rst.getInt("id");
         oTipoSaida.descricao = rst.getString("descricao");
         //oTipoSaida.serie = rst.getString("serie");
-        if (Versao.maiorQue(3,17,10)) {
+        if (versao.igualOuMaiorQue(3,17,10)) {
             oTipoSaida.especie = rst.getString("especie");
         }
         oTipoSaida.idHistoricoPadrao = rst.getObject("id_historicopadrao") == null ? -1 : rst.getInt("id_historicopadrao");

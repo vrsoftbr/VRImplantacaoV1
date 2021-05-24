@@ -2,12 +2,13 @@ package vrimplantacao2.dao.cadastro.venda;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
@@ -21,6 +22,7 @@ public class PdvVendaItemDAO {
     private static final Logger LOG = Logger.getLogger(PdvVendaItemDAO.class.getName());
     private final String sistema;
     private final String loja;
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public PdvVendaItemDAO(String sistema, String loja) {
         this.sistema = sistema;
@@ -59,7 +61,7 @@ public class PdvVendaItemDAO {
             sql.put("valorAcrescimoFixo", item.getValorAcrescimoFixo());
             sql.put("valorDescontoPromocao", item.getValorDescontoPromocao());
             sql.put("oferta", item.isOferta());
-            if (Versao.menorQue(3, 18, 3)) {
+            if (versao.igualOuMenorQue(3, 18, 3)) {
                 if (item.getTipoDesconto() != null) {
                     sql.put("tipoDesconto", item.getTipoDesconto().getId());
                 }
@@ -73,7 +75,7 @@ public class PdvVendaItemDAO {
             sql.put("id_tipoOferta", item.getId_tipoOferta(), -1);
             sql.put("atacado", item.isAtacado());
             
-            if (Versao.maiorQue(3, 21, 10)) {
+            if (versao.igualOuMaiorQue(3, 21, 10)) {
                 if (item.getData() != null) {
                     sql.put("data", item.getData());
                 }
@@ -125,8 +127,7 @@ public class PdvVendaItemDAO {
             LOG.info("Carregando produtos pelo codigo anterior");
             produtosPorCodigoAnterior = new HashMap<>();
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
+                String sql = "select\n" +
                         "	ant.impid,\n" +
                         "	ant.codigoatual\n" +
                         "from \n" +
@@ -134,8 +135,9 @@ public class PdvVendaItemDAO {
                         "	join produto p on ant.codigoatual = p.id\n" +
                         "where\n" +
                         "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                        "	ant.imploja = " + SQLUtils.stringSQL(loja)
-                )) {
+                        "	ant.imploja = " + SQLUtils.stringSQL(loja);
+                LOG.info(sql);
+                try (ResultSet rst = stm.executeQuery(sql)) {
                     while (rst.next()) {
                         produtosPorCodigoAnterior.put(rst.getString("impid"), rst.getInt("codigoatual"));
                     }
@@ -226,6 +228,86 @@ public class PdvVendaItemDAO {
             LOG.info("Produtos por EAN carregados");
         }
         return produtoPorEANAtual.get(ean);
+    }
+
+    public void atualizar(int idVenda, PdvVendaItemVO item) throws Exception {
+        try (Statement st = Conexao.createStatement()) {
+            
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("pdv");
+            sql.setTableName("vendaitem");
+            sql.setWhere(String.format(
+                    "id_venda = %d and sequencia = %d and id_produto = %d",
+                    idVenda,
+                    item.getSequencia(),
+                    item.getId_produto()
+            ));
+            sql.put("custoComImposto", item.getCustoComImposto(), 0);
+            sql.put("custoSemImposto", item.getCustoSemImposto(), 0);
+            sql.put("custoMedioComimposto", item.getCustoMedioComImposto(), 0);
+            sql.put("custoMedioSemImposto", item.getCustoMedioSemImposto(), 0);
+            String update = sql.getUpdate();
+            LOG.finer(update);
+            int alterados = st.executeUpdate(update);
+            
+            String message = "id_venda = {0} and sequencia = {1} and id_produto = {2}";
+            Object[] params = new Object[]{idVenda, item.getSequencia(), item.getId_produto()};            
+            
+            if (isMaisQueUmItemAlterado(alterados)) {                
+                throw new MultiplosItensDeVendaAlteradosException(
+                        idVenda,
+                        item.getSequencia(), 
+                        item.getId_produto(), 
+                        alterados
+                );
+            } else if (nenhumItemFoiLocalizado(alterados)) {
+                LOG.log(Level.FINEST, message, params);
+            }
+        }
+    }
+    
+    private static class MultiplosItensDeVendaAlteradosException extends RuntimeException {
+        private final int idVenda;
+        private final int sequencia;
+        private final int idProduto;
+        private final int qtdAlterada;
+
+        public MultiplosItensDeVendaAlteradosException(int idVenda, int sequencia, int idProduto, int qtdAlterada) {
+            this.idVenda = idVenda;
+            this.sequencia = sequencia;
+            this.idProduto = idProduto;
+            this.qtdAlterada = qtdAlterada;
+            LOG.log(
+                    Level.SEVERE,
+                    MESSAGE,
+                    new Object[]{
+                        idVenda, 
+                        sequencia,
+                        idProduto,
+                        qtdAlterada
+                    }
+            );
+        }
+        
+        @Override
+        public String getMessage() {
+            return MessageFormat.format(
+                    MESSAGE, 
+                    qtdAlterada,
+                    idVenda,
+                    sequencia,
+                    idProduto
+            );
+        }        
+        private static final String MESSAGE = "Quantidade alterada {0} - id_venda = {1} and sequencia = {2} and id_produto = {3}";
+    }
+
+    private static boolean nenhumItemFoiLocalizado(int alterados) {
+        return alterados == 0;
+    }
+
+    private boolean isMaisQueUmItemAlterado(int alterados) {
+        return alterados > 1;
     }
 
 }

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import vr.core.collection.Properties;
+import vr.core.parametro.versao.Versao;
 import vr.implantacao.App;
 import vrframework.bean.dialog.VRDialog;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -21,7 +22,6 @@ import vrimplantacao.vo.loja.FornecedorVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.UsuarioVO;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.parametro.Versao;
 
 public class LoginGUI extends VRDialog {
 
@@ -39,9 +39,8 @@ public class LoginGUI extends VRDialog {
         cboLoja.setId(Global.idLoja);
 
         carregarEmpresa();
-        
-        Versao.carregar();
-        lblVersao.setText("Versão do banco " + Versao.getVersao());
+
+        lblVersao.setText("Versão do banco " + Versao.createFromConnectionInterface(Conexao.getConexao()).getVersao());
 
         this.setModal(true);
     }
@@ -154,8 +153,7 @@ public class LoginGUI extends VRDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     conectarEmpresa();
-                    Versao.carregar();
-                    lblVersao.setText("Versão do banco " + Versao.getVersao());
+                    lblVersao.setText("Versão do banco " + Versao.createFromConnectionInterface(Conexao.getConexao()).getVersao());
                 } catch (Exception ex) {
                     Util.exibirMensagemErro(ex, getTitle());
                 }

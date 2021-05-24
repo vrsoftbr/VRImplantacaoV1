@@ -17,6 +17,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -27,6 +28,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -41,7 +43,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     private String complemento = "";
     private Date vendaDataIni;
     private Date vendaDataFim;
-    private boolean utilizarEs1ParaCotacao = false;
+    private boolean multiplicarQtdEmbalagemPeloVolume = false;
     private boolean filtrarProdutos = false;
 
     public void setComplemento(String complemento) {
@@ -52,8 +54,8 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         this.filtrarProdutos = filtrarProdutos;
     }   
 
-    public void setUtilizarEs1ParaCotacao(boolean utilizarEs1ParaCotacao) {
-        this.utilizarEs1ParaCotacao = utilizarEs1ParaCotacao;
+    public void setMultiplicarQtdEmbalagemPeloVolume(boolean multiplicarQtdEmbalagemPeloVolume) {
+        this.multiplicarQtdEmbalagemPeloVolume = multiplicarQtdEmbalagemPeloVolume;
     }
 
     public void setVendaDataIni(Date vendaDataIni) {
@@ -78,6 +80,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                 new OpcaoProduto[]{
                     OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC,
                     OpcaoProduto.MERCADOLOGICO,
                     OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.FAMILIA,
@@ -115,7 +118,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA
+                    OpcaoProduto.OFERTA,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO
                 }
         ));
     }
@@ -171,7 +176,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+ @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         
@@ -189,7 +194,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	es1p pr\n" +
                     "JOIN st_familia f ON pr.es1_familia = f.TAB_COD\n" +
                     "JOIN st_departamento d ON pr.es1_departamento = d.TAB_COD\n" +
-                    "JOIN st_secao s ON pr.es1_secao = s.tab_cod")) {
+                    "JOIN st_secao s ON pr.es1_secao = s.tab_cod\n" +
+                    "order by f.TAB_DESC, d.TAB_DESC, s.tab_desc"
+            )) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
@@ -253,9 +260,9 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_qembc qtdembalagemcompra,	\n" +
                     "	pr.es1_embalagem unidade_p,\n" +
                     "	pr.es1_convun qtdembalagem_p,	\n" +
-                    "	pr.es1_familia merc1,\n" +
-                    "	pr.es1_departamento merc2,\n" +
-                    "	pr.es1_secao merc3,\n" +
+                    "   if (pr.es1_familia = 0, null, pr.es1_familia) merc1,\n" +
+                    "	if (pr.es1_departamento = 0, null, pr.es1_departamento) merc2,\n" +
+                    "	if (pr.es1_secao = 0, null, pr.es1_secao) merc3,\n" +
                     "	pr.es1_semelhante idfamilia,\n" +
                     "	pc.es1_ncm ncm,\n" +
                     "	pc.es1_cest cest,\n" +
@@ -283,13 +290,20 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.es1_pesob pesobruto,\n" +
                     "	pc.es1_cstpis cstpis,\n" +
                     "	pc.es1_cstpisent cstpisent,\n" +
-                    "	pc.pis_natreceita naturezareceita\n" +
+                    "	pc.pis_natreceita naturezareceita,\n" +
+                    "	st.tab_valor iva,\n" +
+                    "	pc.es1_icmsent idicmspauta,\n" +
+                    "	icmsst.cst cstst\n" +
                     "FROM\n" +
                     "	es1p pr\n" +
                     "	JOIN es1 pc ON\n" +
                     "		pr.es1_cod = pc.ES1_COD\n" +
                     "	LEFT JOIN es1a ean ON\n" +
                     "		pr.es1_cod = ean.ES1_COD\n" +
+                    "   left join st_margemst st on\n" +
+                    "		pc.es1_margemst = st.tab_cod\n" +
+                    "   left join (select * from icms where cst = '060') icmsst on\n" +
+                    "		icmsst.codigo = pc.ES1_TRIBUTACAO\n"+
                     "WHERE \n" +
                     (this.filtrarProdutos ? "   not pr.id_central is null and\n": "") +
                     "	pc.es1_empresa = " + getLojaOrigem())) {
@@ -309,7 +323,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    if (this.utilizarEs1ParaCotacao) {                        
+                    if (this.multiplicarQtdEmbalagemPeloVolume) {                        
                         imp.setTipoEmbalagemCotacao(rs.getString("unidade_p"));
                         imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagem_p"));
                     } else {
@@ -332,7 +346,7 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    imp.setIcmsCreditoId(rs.getString("idicmsentrada"));
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
                     imp.setMargem(rs.getDouble("margemvarejo"));
                     imp.setPrecovenda(rs.getDouble("preco"));
@@ -348,6 +362,10 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setPiscofinsCstCredito(rs.getString("cstpisent"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    
+                    if (rs.getString("cstst") != null) {
+                        imp.setPautaFiscalId(buildPautaKey(rs.getString("ncm"), rs.getDouble("iva"), rs.getString("idicmspauta")));
+                    }
                     
                     long ean = Utils.stringToLong(imp.getEan());
                     
@@ -365,35 +383,49 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
         
-        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "	es1_cod id,\n" +
-                    "	es1_codbarra ean,\n" +
-                    "	es1_umvenda unidade,\n" +
-                    "	es1_qtvenda qtd\n" +
-                    "FROM \n" +
-                    "	es1a")) {
-                while(rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtd"));
-                    
-                    result.add(imp);
-                }
+        try (
+                Statement st = ConexaoMySQL.getConexao().createStatement();
+                ResultSet rs = st.executeQuery(
+                        "select distinct\n" +
+                        "	pc.es1_ncm ncm,\n" +
+                        "	st.tab_valor iva,\n" +
+                        "	pc.es1_icmsent idicmspauta\n" +
+                        "FROM\n" +
+                        "	es1p pr\n" +
+                        "	JOIN es1 pc ON\n" +
+                        "		pr.es1_cod = pc.ES1_COD\n" +
+                        "	join st_margemst st on\n" +
+                        "		pc.es1_margemst = st.tab_cod\n" +
+                        "	join (select * from icms where cst = '060') icms on\n" +
+                        "		icms.codigo = pc.ES1_TRIBUTACAO"
+                )                
+        ) {
+            while (rs.next()) {
+                PautaFiscalIMP imp = new PautaFiscalIMP();
+                
+                imp.setId(buildPautaKey(rs.getString("ncm"), rs.getDouble("iva"), rs.getString("idicmspauta")));
+                imp.setNcm(rs.getString("ncm"));
+                imp.setIva(rs.getDouble("iva"));
+                imp.setIvaAjustado(rs.getDouble("iva"));
+                imp.setAliquotaDebitoId(rs.getString("idicmspauta"));
+                imp.setAliquotaDebitoForaEstadoId(rs.getString("idicmspauta"));
+                imp.setAliquotaCreditoId(rs.getString("idicmspauta"));
+                imp.setAliquotaCreditoForaEstadoId(rs.getString("idicmspauta"));
+                
+                result.add(imp);
             }
         }
+        
         return result;
     }
-
+    
+    private String buildPautaKey(String ncm, double iva, String idIcmsPauta) {
+        return String.format("%s-%.2f-%s", ncm, iva, idIcmsPauta);
+    }
+    
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -401,11 +433,22 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
-                    "	es1_cod idproduto,\n" +
-                    "	cg2_cod idfornecedor,\n" +
-                    "	es1_codforn codigoexterno\n" +
+                    "	a.es1_cod idproduto,\n" +
+                    "	a.cg2_cod idfornecedor,\n" +
+                    "	a.es1_codforn codigoexterno,\n" +
+                    "	b.cg2_data dataalteracao,\n" +
+                    "	(case when p.es1_convun = 0 then 1 else p.es1_convun end) volume,\n" +
+                    "	(case when b.es1_qemb = 0 then 1 else b.es1_qemb end) qtdembalagem,\n" +
+                    "	b.cg2_valor custotabela\n" +
                     "FROM \n" +
-                    "	es1i")) {
+                    "	es1i a\n" +
+                    "	left join es1h b on\n" +
+                    "		a.es1_cod = b.es1_cod and\n" +
+                    "		a.cg2_cod = b.cg2_cod \n" +
+                    "	join es1p p on\n" +
+                    "		a.es1_cod = p.es1_cod\n" +
+                    "where b.es1_empresa = " + getLojaOrigem()
+            )) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
@@ -414,6 +457,15 @@ public class LinearDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rs.getString("idproduto"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setCustoTabela(rs.getDouble("custotabela"));
+                    double volume = rs.getDouble("volume");
+                    double qtdEmbalagem = rs.getDouble("qtdembalagem");
+                    if (multiplicarQtdEmbalagemPeloVolume) {
+                        imp.setQtdEmbalagem(qtdEmbalagem * volume);
+                    } else {
+                        imp.setQtdEmbalagem(qtdEmbalagem);                        
+                    }
                     
                     result.add(imp);
                 }

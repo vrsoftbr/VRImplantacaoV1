@@ -8,6 +8,8 @@
     </Component>
     <Component class="javax.swing.ButtonGroup" name="rdgTipoConexaoODBC">
     </Component>
+    <Component class="javax.swing.ButtonGroup" name="rdgTipoConexaoSqlServer">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="title" type="java.lang.String" value="Configurar parametros do sistema"/>
@@ -118,7 +120,11 @@
                                   <Component id="pnlDiversos" alignment="0" max="32767" attributes="0"/>
                                   <Component id="vRPanel1" alignment="1" max="32767" attributes="0"/>
                                   <Component id="pnlDriverODBC" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="vRPanel5" alignment="1" max="32767" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="pnlDriverSQLServer" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="vRPanel5" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -132,12 +138,15 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="pnlDiversos" max="32767" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="pnlDriverODBC" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="vRPanel5" min="-2" max="-2" attributes="0"/>
+                              <Component id="pnlDiversos" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="pnlDriverODBC" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="pnlDriverSQLServer" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="vRPanel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -174,6 +183,7 @@
                                       </Group>
                                       <Group type="102" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkNaoImportarPautaSeAlgumNcmNaoExistir" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkIgnorarClienteImpVenda" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -207,7 +217,9 @@
                                   <Component id="chkForcarCadastroProdutoVenda" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkImportarIcmsIsentoMigracaoProduto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="10" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkNaoImportarPautaSeAlgumNcmNaoExistir" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -248,6 +260,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarIcmsIsentoMigracaoProduto">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Importar Icms ISENTO quando n&#xe3;o encontrar a tributa&#xe7;&#xe3;o de Icms na migra&#xe7;&#xe3;o do produto"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNaoImportarPautaSeAlgumNcmNaoExistir">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="N&#xe3;o importar PAUTA se algum NCM n&#xe3;o existir no VR no momento da importa&#xe7;&#xe3;o"/>
                           </Properties>
                         </Component>
                       </SubComponents>
@@ -425,7 +442,6 @@
                             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                               <ComponentRef name="rdgTipoConexaoODBC"/>
                             </Property>
-                            <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Driver"/>
                           </Properties>
                           <Events>
@@ -509,11 +525,12 @@
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkNfeSaidaVerificarFechamentoPeriodo" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkNfeSaidaProcessarFinalizacoes" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace pref="20" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -528,6 +545,77 @@
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Processar finaliza&#xe7;&#xf5;es das notas"/>
                           </Properties>
+                        </Component>
+                      </SubComponents>
+                    </Container>
+                    <Container class="vrframework.bean.panel.VRPanel" name="pnlDriverSQLServer">
+                      <Properties>
+                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                            <TitledBorder title="Op&#xe7;&#xf5;es do driver SQL Server"/>
+                          </Border>
+                        </Property>
+                      </Properties>
+
+                      <Layout>
+                        <DimensionLayout dim="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="optSqlServerMicrosoft" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="optSqlServerJTDS" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="vRLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace pref="50" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                        </DimensionLayout>
+                        <DimensionLayout dim="1">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="optSqlServerMicrosoft" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="optSqlServerJTDS" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace pref="11" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                        </DimensionLayout>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Tipo de Conex&#xe3;o"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JRadioButton" name="optSqlServerMicrosoft">
+                          <Properties>
+                            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                              <ComponentRef name="rdgTipoConexaoSqlServer"/>
+                            </Property>
+                            <Property name="selected" type="boolean" value="true"/>
+                            <Property name="text" type="java.lang.String" value="Microsoft"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="optSqlServerMicrosoftActionPerformed"/>
+                          </Events>
+                        </Component>
+                        <Component class="javax.swing.JRadioButton" name="optSqlServerJTDS">
+                          <Properties>
+                            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                              <ComponentRef name="rdgTipoConexaoSqlServer"/>
+                            </Property>
+                            <Property name="text" type="java.lang.String" value="JTDS"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="optSqlServerJTDSoptFonteDadosActionPerformed"/>
+                          </Events>
                         </Component>
                       </SubComponents>
                     </Container>
@@ -551,7 +639,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="87" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="284" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
@@ -638,7 +726,7 @@
                           <Component id="pnlTipoLog" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlNivelLog" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="123" max="32767" attributes="0"/>
+                          <EmptySpace pref="137" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1027,7 +1115,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="pnlProdutoUnificacao" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="354" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="pnlMercadologicoImportacao" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="185" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1035,8 +1125,11 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="pnlProdutoUnificacao" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="391" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="pnlProdutoUnificacao" alignment="3" min="-2" pref="114" max="-2" attributes="0"/>
+                          <Component id="pnlMercadologicoImportacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="352" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1054,10 +1147,19 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkProdutoUnificacaoExperimental" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="chkProdutoUnificacaoExperimental" max="32767" attributes="0"/>
+                                      <Component id="chkProdutoForcarNovo" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="chkProdutoIncluirNovos" alignment="0" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1066,7 +1168,11 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkProdutoUnificacaoExperimental" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="9" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkProdutoForcarNovo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="chkProdutoIncluirNovos" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1075,6 +1181,56 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoUnificacaoExperimental">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Utilizar unifica&#xe7;&#xe3;o experimental (2.0)"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Nova rotina de unifica&#xe7;&#xe3;o de produtos que ir&#xe1; substituir a atual. Em caso de problema desabilite este&lt;br&gt;&#xa;checkbox para utilizar o antigo m&#xe9;todo.&#xa;&lt;/html&gt;"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoForcarNovo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="&lt;html&gt;&#xa;Unificar somente produtos&lt;br&gt;&#xa;marcados com &lt;b&gt;&quot;forcarnovo&quot;&lt;/b&gt;&#xa;&lt;/html&gt;"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoIncluirNovos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Incluir produtos com EANs novos"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlMercadologicoImportacao">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Importa&#xe7;&#xe3;o de Mercadol&#xf3;gico"/>
+                  </Border>
+                </Property>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkMercadologicoImportacao2" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkMercadologicoImportacao2" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="9" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologicoImportacao2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Utilizar a importa&#xe7;&#xe3;o experimental (2.0)"/>
                     <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Nova rotina de unifica&#xe7;&#xe3;o de produtos que ir&#xe1; substituir a atual. Em caso de problema desabilite este&lt;br&gt;&#xa;checkbox para utilizar o antigo m&#xe9;todo.&#xa;&lt;/html&gt;"/>
                   </Properties>
                 </Component>

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vr.core.utils.StringUtils;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
@@ -986,9 +987,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setIe_rg(rs.getString("rgie"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setPrazoVisita(rs.getInt("prazovisita"));
-                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
-                    imp.setPrazoSeguranca(rs.getInt("prazoseguranca"));
+                    imp.setPrazoVisita(StringUtils.toInt(rs.getString("prazovisita")));
+                    imp.setPrazoEntrega(StringUtils.toInt(rs.getString("prazoentrega")));
+                    imp.setPrazoSeguranca(StringUtils.toInt(rs.getString("prazoseguranca")));
                     switch (rs.getString("microempre")) {
                         case "S": imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES); break;
                         //case "N": imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL); break;
@@ -1006,7 +1007,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     
                     Endereco end = obterEnderecoFOR(rs.getString("id_fornecedor"), rs.getString("cep"));
                     if (end == null) {
-                        end = obterEnderecoHRCep(rs.getString("cep"));
+                        //end = obterEnderecoHRCep(rs.getString("cep"));
                         if (end != null) {
                             end.numero = rs.getString("numero");
                         } else {
@@ -1204,15 +1205,14 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
                 "select top 1\n" +
-                "        titulo,\n" +
-                "        nomelograd logradouro,\n" +
-                "        complemento,\n" +
-                "        bairro,\n" +
-                "        cidade,\n" +
-                "        estado,\n" +
-                "        codigocep cep\n" +
-                "    from\n" +
-                "        hrcep..flcepcep\n" +
+                "    titulo,\n" +
+                "    LOGRADOURO logradouro,\n" +
+                "    bairro,\n" +
+                "    cidade,\n" +
+                "    estado,\n" +
+                "    CODIGOCEP cep\n" +
+                "from\n" +
+                "    dbo.FL423CEP\n" +
                 "    where\n" +
                 "        ltrim(rtrim(coalesce(codigocep,''))) != '' and\n" +
                 "        codigocep = '" + codigoCep + "'"

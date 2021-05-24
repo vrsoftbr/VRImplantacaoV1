@@ -62,6 +62,14 @@ public class NcmDAO {
         return result;
     }
     
+    public NcmVO getNcmSemPadrao(String ncmStr) throws Exception {
+        if (ncms == null) {
+            obterNcms();
+        }
+        ncmStr = String.format("%08d", Utils.stringToInt(ncmStr));
+        return ncms.get(ncmStr);
+    }
+    
     
     
 }

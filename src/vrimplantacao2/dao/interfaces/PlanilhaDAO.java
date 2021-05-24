@@ -104,6 +104,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PRODUTOS);
         result.add(OpcaoProduto.EAN);
         result.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);        
+        result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);        
 
         return result;
     }
@@ -502,7 +503,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setIe_rg(linha.getString("ie_rg"));
                 forn.setInsc_municipal(linha.getString("insc_municipal"));
                 forn.setSuframa(linha.getString("suframa"));
-                forn.setAtivo(!"N".equals(linha.getString("ativo")));
+                forn.setBloqueado("S".equals(linha.getString("bloqueado")));
+                forn.setAtivo("S".equals(linha.getString("ativo")));
 
                 forn.setEndereco(linha.getString("endereco"));
                 forn.setNumero(linha.getString("numero"));
@@ -1141,6 +1143,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setTipoIva(TipoIva.getByTipo(linha.getString("tipoiva")));
             imp.setIcmsRecolhidoAntecipadamente(linha.getBoolean("recolhidoantecipado"));
             imp.setExcecao(linha.getInt("excecao"));
+            imp.setUf(linha.getString("uf"));
             if (linha.existsColumn("pauta_debito_id")) {
                 imp.setAliquotaDebitoId(linha.getString("pauta_debito_id"));
             } else {

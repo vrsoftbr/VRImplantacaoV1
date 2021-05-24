@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -14,7 +15,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAutomacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -342,6 +342,7 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     public void importarAtacadoPorEAN(int lojaVR) throws Exception {
         ProgressBar.setStatus("Preparando para gravar atacado...");
+        Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
         Map<String, Integer> anteriores = new ProdutoAnteriorDAO().getAnteriores(getSistema(), getLojaOrigem());        
         Map<Long, Integer> eans = new ProdutoAutomacaoDAO().getEansCadastrados();
         Set<Long> atac = new ProdutoAutomacaoDAO().getEansCadastradosAtacado(lojaVR);
@@ -376,7 +377,7 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             }
                             if (precoVenda != precoAtacado) {
                                 double desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
-                                if (Versao.menorQue(3, 18)) {
+                                if (versao.igualOuMenorQue(3, 18)) {
                                     stm.execute("insert into produtoautomacaoloja (codigobarras, precovenda, id_loja) values (" + ean + ", " + precoAtacado + ", " + lojaVR + ")");
                                     stm.execute("insert into produtoautomacaodesconto (codigobarras, id_loja, desconto) values (" + ean + ", " + lojaVR + ", " + desconto + ")");
                                 } else {

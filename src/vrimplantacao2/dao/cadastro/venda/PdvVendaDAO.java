@@ -141,7 +141,10 @@ public class PdvVendaDAO {
     public int getMatricula(int lojaVR) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT matricula FROM pdv.operador WHERE id_loja = " + lojaVR + " and id_situacaocadastro = 1 order by id limit 1"
+                    "SELECT matricula FROM pdv.operador WHERE id_loja = " + lojaVR + " and upper(nome) like '%ADMIN%' and id_situacaocadastro = 1\n" +
+                    "union\n" +
+                    "SELECT matricula FROM pdv.operador WHERE id_loja = " + lojaVR + " and upper(nome) like '%ADMIN%'\n" +
+                    "limit 1"
             )) {
                 if (rst.next()) {
                     return rst.getInt("matricula");
@@ -393,6 +396,26 @@ public class PdvVendaDAO {
             LOG.finer(sql);
             stm.execute(sql);
         }
+    }
+
+    public Integer encontrarVenda(int id_loja, int ecf, int numeroCupom, Date data, double subTotalImpressora) throws Exception {
+        try (
+                Statement st = Conexao.createStatement();
+                ResultSet rs = st.executeQuery(
+                        "	select id from pdv.venda \n" +
+                        "	where\n" +
+                        "		id_loja = " + id_loja + " and \n" +
+                        "		numerocupom = " + numeroCupom + " and \n" +
+                        "		ecf = " + ecf + " and \n" +
+                        "		data = " + SQLUtils.stringSQL(DATE_FORMAT.format(data)) + "\n" +
+                        "limit 1"
+                )
+        ) {
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        }
+        return null;
     }
     
     public List<Integer> getIdsPorData(int idLoja, Date dt) throws Exception {

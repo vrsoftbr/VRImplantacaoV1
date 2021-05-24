@@ -4,40 +4,17 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import vr.database.SQLBuilder;
 import vrimplantacao.vo.cadastro.SituacaoCadastro;
 import vrimplantacao.vo.cadastro.SituacaoTributaria;
-import vrimplantacao.vo.interfaces.AliquotaVO;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 
 public class AliquotaDAO {
-
-    public AliquotaVO carregar(int i_id) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
-
-        stm = Conexao.createStatement();
-
-        rst = stm.executeQuery("SELECT * FROM aliquota WHERE id = " + i_id);
-
-        if (!rst.next()) {
-            throw new VRException("Alíquota " + i_id + " não encontrada!");
-        }
-
-        AliquotaVO oAliquota = new AliquotaVO();
-        oAliquota.descricao = rst.getString("descricao");
-        oAliquota.id = rst.getInt("id");
-        oAliquota.situacaoTributaria = rst.getInt("situacaotributaria");
-        oAliquota.porcentagem = rst.getDouble("porcentagem");
-        oAliquota.reduzido = rst.getDouble("reduzido");
-
-        stm.close();
-
-        return oAliquota;
-    }
 
     public int getId(int i_situacaoTributaria, double i_porcentagem, double i_reduzido) throws Exception {
         Statement stm = null;
@@ -228,6 +205,34 @@ public class AliquotaDAO {
         }
         
         return result;
+    }
+
+    public int insert(AliquotaVO aliquota) throws Exception {
+        SQLBuilder sql = new SQLBuilder("public", "aliquota")
+                .putSql("id", "(select coalesce(max(id) + 1, 1) from aliquota)")
+                .put("descricao", aliquota.getDescricao())
+                .put("situacaotributaria", aliquota.getCst())
+                .put("porcentagem", aliquota.getAliquota())
+                .put("reduzido", aliquota.getReduzido())
+                .put("porcentagemfinal", aliquota.getAliquotaFinal())
+                .put("porcentagemfcp", aliquota.getFcp())
+                .put("icmsdesonerado", aliquota.isDesonerado())
+                .put("percentualicmsdesonerado", aliquota.getPorcentagemDesonerado())
+                .put("id_situacaocadastro", 1)
+                .putNull("id_aliquotapdv")
+                .put("mensagemnf", "")
+                .put("csosn", 101)
+                .returning("id");
+        try (
+                Statement st = Conexao.createStatement();
+                ResultSet rs = st.executeQuery(
+                        sql.insert()
+                )
+        ) {
+            rs.next();
+            return rs.getInt("id");
+                
+        }
     }
 
     public MultiMap<Comparable, Integer> getIdAliquotasPorCstAliqReduz() throws Exception {

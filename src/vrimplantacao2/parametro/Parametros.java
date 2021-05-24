@@ -16,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.EmpresaVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
@@ -524,6 +523,14 @@ public final class Parametros implements Iterable<Parametro>{
     public DadosConexaoPostgreSQL getEmpresaAtiva() {
         return empresaAtiva;
     }
+
+    public void setNaoImportarPautaSeNcmNaoExistir(boolean ativo) {
+        Parametros.get().put(ativo, "PAUTA","NAO_IMPORTAR_SE_NCM_NAO_EXISTIR");
+    }
+
+    public boolean isNaoImportarPautaSeAlgumNcmNaoExistir() {
+        return Parametros.get().getBool(true, "PAUTA","NAO_IMPORTAR_SE_NCM_NAO_EXISTIR");
+    }
     
     public static class OpcoesExperimentaisDeProduto {
         
@@ -532,7 +539,31 @@ public final class Parametros implements Iterable<Parametro>{
         }
         
         public static boolean isUnificacaoExperimentalAtiva() {
-            return Parametros.get().getBool(false, "UNIFICACAO_PRODUTO_EXPERIMENTAL");
+            return Parametros.get().getBool(true, "UNIFICACAO_PRODUTO_EXPERIMENTAL");
+        }
+        
+        public static void setImportacaoMercadologicoExperimental(boolean ativo) {
+            Parametros.get().put(ativo, "IMPORTACAO_MERCADOLOGICO_EXPERIMENTAL");
+        }
+        
+        public static boolean isImportacaoMercadologicoExperimentalAtiva() {
+            return Parametros.get().getBool(false, "IMPORTACAO_MERCADOLOGICO_EXPERIMENTAL");
+        }
+        
+        public static void setUnificarSomenteProdutosComForcarNovo(boolean ativo) {
+            Parametros.get().put(ativo, "UNIFICAR_SOMENTE_PRODUTOS_COM_FORCAR_NOVO");
+        }
+        
+        public static boolean isUnificarSomenteProdutosComForcarNovo() {
+            return Parametros.get().getBool(false, "UNIFICAR_SOMENTE_PRODUTOS_COM_FORCAR_NOVO");
+        }
+
+        public static boolean isIncluirProdutosNaoExistentes() {
+            return Parametros.get().getBool(true, "UNIFICAR_INCLUIR_PRODUTOS_NOVOS");
+        }
+
+        public static void setIncluirProdutosNaoExistentes(boolean ativo) {
+            Parametros.get().put(ativo, "UNIFICAR_INCLUIR_PRODUTOS_NOVOS");
         }
         
     }

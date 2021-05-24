@@ -2,9 +2,11 @@ package vrimplantacao2.dao.cadastro.venda;
 
 import java.sql.Statement;
 import java.sql.Time;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,12 +58,30 @@ public class VendaRepository {
     private ProdutoAnteriorDAO produtoAnteriorDAO;
     public boolean idProdutoSemUltimoDigito = false;
     public boolean eBancoUnificado = false;
+    private int matricula;
+    
     
     public VendaRepository(VendaRepositoryProvider provider) {
         this.provider = provider;
     }
     
     public boolean importar(Set<OpcaoVenda> opt) throws Exception {
+        
+        boolean atualizarCustos = opt.contains(OpcaoVenda.ATUALIZAR_CUSTOS);
+        
+        if (
+                !opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) &&
+                !opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ANTERIOR) &&
+                !opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL)                        
+        ) {
+            opt.add(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+            System.out.println("Atribuindo opção padrão para as vendas IMPORTAR_POR_CODIGO_ANTERIOR");
+        }
+
+        produtoIDStack = new ProdutoIDStack(new ProdutoIDStackProvider());
+        lojas = new LojaDAO().carregar();
+        providerProduto = new ProdutoRepositoryProvider();
+        produtoAnteriorDAO = new ProdutoAnteriorDAO();
         
         if (!existeProdutosDivergentes(opt)) {
         
@@ -78,9 +98,10 @@ public class VendaRepository {
 
             provider.begin();
             try {
-
+                this.matricula = provider.getMatricula();
+                
                 LOG.info("Iniciando o processo de importação das vendas");        
-                LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));   
+                LOG.config("Opções de importação: " + Arrays.toString(opt.toArray()));
 
                 provider.notificar("Vendas...Carregando listas auxiliares");
                 LOG.info("Carregando listas auxiliares"); 
@@ -98,11 +119,6 @@ public class VendaRepository {
                 produtoPadrao = Parametros.get().getItemVendaPadrao();
                 ignorarClienteImpVenda = Parametros.get().isIgnorarClienteImpVenda();
                 forcarCadastroProdutoNaoExistente = Parametros.get().isForcarCadastroProdutoNaoExistente();
-
-                produtoIDStack = new ProdutoIDStack(new ProdutoIDStackProvider());
-                lojas = new LojaDAO().carregar();
-                providerProduto = new ProdutoRepositoryProvider();
-                produtoAnteriorDAO = new ProdutoAnteriorDAO();
 
                 if (opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR)) {
                     provider.vincularMapaDivergenciaComAnteriores();
@@ -243,26 +259,50 @@ public class VendaRepository {
                             continue;
                         }
 
-                        /**
-                         * Se a venda já existir, elimina ela do cadastro.
-                         */
-                        provider.eliminarVenda(
+                        if (atualizarCustos) {
+                            Integer idVenda = provider.venda().encontrarVenda(
                                 venda.getEcf(),
                                 venda.getNumeroCupom(),
                                 venda.getData(),
                                 venda.getSubTotalImpressora()
-                        );
+                            );
+                            if (idVenda != null) {
+                                for (PdvVendaItemVO item: venda.getItens()) {
+                                    provider.item().atualizar(idVenda, item);
+                                }
+                            } else {
+                                String msg = MessageFormat.format(
+                                        "Venda não encontrada: {0} - {1} - {2} - {3}",
+                                        venda.getEcf(),
+                                        venda.getNumeroCupom(),
+                                        venda.getData(),
+                                        venda.getSubTotalImpressora()
+                                );
+                                LOG.warning(msg);
+                                System.out.println(msg);
+                            }
+                        } else {
+                            /**
+                             * Se a venda já existir, elimina ela do cadastro.
+                             */
+                            provider.eliminarVenda(
+                                    venda.getEcf(),
+                                    venda.getNumeroCupom(),
+                                    venda.getData(),
+                                    venda.getSubTotalImpressora()
+                            );
 
-                        /**
-                         * Efetua a gravação da venda, dos seus itens e registra como
-                         * uma venda importada para facilitar futuras operações no
-                         * banco de dados.
-                         */
-                        provider.gravar(venda);
-                        for (PdvVendaItemVO item: venda.getItens()) {
-                            provider.gravar(item);
+                            /**
+                             * Efetua a gravação da venda, dos seus itens e registra como
+                             * uma venda importada para facilitar futuras operações no
+                             * banco de dados.
+                             */
+                            provider.gravar(venda);
+                            for (PdvVendaItemVO item: venda.getItens()) {
+                                provider.gravar(item);
+                            }
+                            provider.logarVendaImportadas(venda.getId());
                         }
-                        provider.logarVendaImportadas(venda.getId());
 
                         provider.notificar();
 
@@ -336,7 +376,7 @@ public class VendaRepository {
                 "{ecf:" + venda.getEcf() + 
                 ",cupom:" + venda.getNumeroCupom() + 
                 ",data:" + DATE_FORMAT.format(venda.getData()) +
-                ",hora:" + TIME_FORMAT.format(venda.getHoraInicio()) +
+                //",hora:" + TIME_FORMAT.format(venda.getHoraInicio()) +
                 ",idclientepreferencial:" + venda.getIdClientePreferencial() +
                 ",subtotalimpressora:" + String.format("%.2f", venda.getSubTotalImpressora()) + "}";
     }
@@ -373,7 +413,7 @@ public class VendaRepository {
         vo.setTipoDesconto(venda.getTipoDesconto());
         vo.setXml(venda.getXml());
         
-        vo.setMatricula(provider.getMatricula());
+        vo.setMatricula(matricula);
         
         if (vo.getChaveCfe() != null && vo.getChaveCfe().length() == 44) {            
             /**
@@ -440,7 +480,7 @@ public class VendaRepository {
         item.setCancelado(imp.isCancelado() || cupomCancelado);
         if (item.isCancelado()) {
             item.setValorCancelado(item.getValorTotal() - item.getValorDesconto() + item.getValorAcrescimo());
-            item.setMatriculaCancelamento(provider.getMatricula());
+            item.setMatriculaCancelamento(matricula);
             item.setTipoCancelamento(imp.getTipoCancelamento());
             if (item.getTipoCancelamento() == null) {
                 item.setTipoCancelamento(TipoCancelamento.ERRO_DE_REGISTRO);
@@ -473,7 +513,7 @@ public class VendaRepository {
         boolean forcarCadastroProdutoNaoExistente = Parametros.get().isForcarCadastroProdutoNaoExistente();
         List<VendaItemIMP> produtos = provider.getProdutosVendidos();
         boolean haDivergencia = false;
-        List<VendaItemIMP> divergentes = new ArrayList<>();
+        Set<String> produtosNaoEncontrados = new HashSet<>();
         
         for (VendaItemIMP impItem: produtos) {
             PdvVendaItemVO item = converter(impItem, false);
@@ -496,18 +536,23 @@ public class VendaRepository {
                 produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
             }
             if ( produto == null ) {
-                haDivergencia = true;                
-                if (!forcarCadastroProdutoNaoExistente) {
+                haDivergencia = true;
+                final boolean produtoNaoEncontradoAnteriormente = !produtosNaoEncontrados.contains(impItem.getProduto());
+                
+                if (!forcarCadastroProdutoNaoExistente && produtoNaoEncontradoAnteriormente) {
                     final String msg = String.format(
                             "Produto não encontrado - código:%s ean:%s descricao:%s",
                             impItem.getProduto(),
                             impItem.getCodigoBarras(),
                             impItem.getDescricaoReduzida()
                     );
+                    provider.gravarMapa(
+                            impItem.getProduto(),
+                            impItem.getCodigoBarras(),
+                            impItem.getDescricaoReduzida()
+                    );
                     LOG.warning(msg);
-
-                    divergentes.add(impItem);
-
+                    produtosNaoEncontrados.add(impItem.getProduto());
                 } else {
                     //<editor-fold defaultstate="collapsed" desc="Inclusão de Produto">
                     LOG.warning(
@@ -518,7 +563,6 @@ public class VendaRepository {
                                     impItem.getDescricaoReduzida()
                             )
                     );
-                    divergentes.add(impItem);
 
                     try {
 
@@ -713,18 +757,6 @@ public class VendaRepository {
                 }
             }
             
-        }
-        
-        if (forcarCadastroProdutoNaoExistente) {
-            if (!divergentes.isEmpty()) {
-                for (VendaItemIMP impItem : divergentes) {
-                    provider.gravarMapa(
-                            impItem.getProduto(),
-                            impItem.getCodigoBarras(),
-                            impItem.getDescricaoReduzida()
-                    );
-                }
-            }
         }
         
         return haDivergencia;

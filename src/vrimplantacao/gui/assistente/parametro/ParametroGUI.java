@@ -51,6 +51,7 @@ import vrframework.bean.table.VRTable;
 import vrframework.bean.textField.VRTextField;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.classe.TipoConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
@@ -114,6 +115,7 @@ public class ParametroGUI extends VRInternalFrame {
         rdgLogLevel = new ButtonGroup();
         rdgLogType = new ButtonGroup();
         rdgTipoConexaoODBC = new ButtonGroup();
+        rdgTipoConexaoSqlServer = new ButtonGroup();
         tabs = new VRTabbedPane();
         tabValorPadrão = new VRPanel();
         scroll = new JScrollPane();
@@ -126,6 +128,7 @@ public class ParametroGUI extends VRInternalFrame {
         chkIgnorarClienteImpVenda = new VRCheckBox();
         chkForcarCadastroProdutoVenda = new VRCheckBox();
         chkImportarIcmsIsentoMigracaoProduto = new VRCheckBox();
+        chkNaoImportarPautaSeAlgumNcmNaoExistir = new VRCheckBox();
         pnlLocalizacao = new VRPanel();
         vRLabel1 = new VRLabel();
         vRLabel2 = new VRLabel();
@@ -146,6 +149,10 @@ public class ParametroGUI extends VRInternalFrame {
         vRPanel5 = new VRPanel();
         chkNfeSaidaVerificarFechamentoPeriodo = new VRCheckBox();
         chkNfeSaidaProcessarFinalizacoes = new VRCheckBox();
+        pnlDriverSQLServer = new VRPanel();
+        vRLabel8 = new VRLabel();
+        optSqlServerMicrosoft = new JRadioButton();
+        optSqlServerJTDS = new JRadioButton();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -173,6 +180,10 @@ public class ParametroGUI extends VRInternalFrame {
         tabEngineMigracao = new vr.view.components.panel.VRPanel();
         pnlProdutoUnificacao = new VRPanel();
         chkProdutoUnificacaoExperimental = new VRCheckBox();
+        chkProdutoForcarNovo = new VRCheckBox();
+        chkProdutoIncluirNovos = new VRCheckBox();
+        pnlMercadologicoImportacao = new VRPanel();
+        chkMercadologicoImportacao2 = new VRCheckBox();
         btnGravar = new VRButton();
         btnCancelar = new VRButton();
 
@@ -223,6 +234,8 @@ public class ParametroGUI extends VRInternalFrame {
 
         chkImportarIcmsIsentoMigracaoProduto.setText("Importar Icms ISENTO quando não encontrar a tributação de Icms na migração do produto");
 
+        chkNaoImportarPautaSeAlgumNcmNaoExistir.setText("Não importar PAUTA se algum NCM não existir no VR no momento da importação");
+
         GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
         pnlDiversos.setLayout(pnlDiversosLayout);
         pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -241,6 +254,7 @@ public class ParametroGUI extends VRInternalFrame {
                             .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlDiversosLayout.createSequentialGroup()
                         .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -264,7 +278,9 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pnlLocalizacao.setBorder(BorderFactory.createTitledBorder("Localização"));
@@ -341,7 +357,6 @@ public class ParametroGUI extends VRInternalFrame {
         });
 
         rdgTipoConexaoODBC.add(optDriver);
-        optDriver.setSelected(true);
         optDriver.setText("Driver");
         optDriver.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -426,10 +441,55 @@ public class ParametroGUI extends VRInternalFrame {
         );
         vRPanel5Layout.setVerticalGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(chkNfeSaidaVerificarFechamentoPeriodo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkNfeSaidaProcessarFinalizacoes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
+
+        pnlDriverSQLServer.setBorder(BorderFactory.createTitledBorder("Opções do driver SQL Server"));
+
+        vRLabel8.setText("Tipo de Conexão");
+
+        rdgTipoConexaoSqlServer.add(optSqlServerMicrosoft);
+        optSqlServerMicrosoft.setSelected(true);
+        optSqlServerMicrosoft.setText("Microsoft");
+        optSqlServerMicrosoft.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optSqlServerMicrosoftActionPerformed(evt);
+            }
+        });
+
+        rdgTipoConexaoSqlServer.add(optSqlServerJTDS);
+        optSqlServerJTDS.setText("JTDS");
+        optSqlServerJTDS.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optSqlServerJTDSoptFonteDadosActionPerformed(evt);
+            }
+        });
+
+        GroupLayout pnlDriverSQLServerLayout = new GroupLayout(pnlDriverSQLServer);
+        pnlDriverSQLServer.setLayout(pnlDriverSQLServerLayout);
+        pnlDriverSQLServerLayout.setHorizontalGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDriverSQLServerLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDriverSQLServerLayout.createSequentialGroup()
+                        .addComponent(optSqlServerMicrosoft)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(optSqlServerJTDS))
+                    .addComponent(vRLabel8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(50, Short.MAX_VALUE))
+        );
+        pnlDriverSQLServerLayout.setVerticalGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDriverSQLServerLayout.createSequentialGroup()
+                .addComponent(vRLabel8, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDriverSQLServerLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(optSqlServerMicrosoft)
+                    .addComponent(optSqlServerJTDS))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
         GroupLayout vRPanel2Layout = new GroupLayout(vRPanel2);
@@ -442,7 +502,10 @@ public class ParametroGUI extends VRInternalFrame {
                     .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel5, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(vRPanel2Layout.createSequentialGroup()
+                        .addComponent(pnlDriverSQLServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         vRPanel2Layout.setVerticalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -452,12 +515,14 @@ public class ParametroGUI extends VRInternalFrame {
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(pnlDriverSQLServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         scroll.setViewportView(vRPanel2);
@@ -611,7 +676,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlTipoLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlNivelLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(123, Short.MAX_VALUE))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
 
         btnLogExcluir.setText("Excluir");
@@ -637,7 +702,7 @@ public class ParametroGUI extends VRInternalFrame {
         tabLoggingLayout.setHorizontalGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
@@ -671,18 +736,54 @@ public class ParametroGUI extends VRInternalFrame {
         chkProdutoUnificacaoExperimental.setText("Utilizar unificação experimental (2.0)");
         chkProdutoUnificacaoExperimental.setToolTipText("<html>\nNova rotina de unificação de produtos que irá substituir a atual. Em caso de problema desabilite este<br>\ncheckbox para utilizar o antigo método.\n</html>");
 
+        chkProdutoForcarNovo.setText("<html>\nUnificar somente produtos<br>\nmarcados com <b>\"forcarnovo\"</b>\n</html>");
+        chkProdutoForcarNovo.setToolTipText("");
+
+        chkProdutoIncluirNovos.setText("Incluir produtos com EANs novos");
+        chkProdutoIncluirNovos.setToolTipText("");
+
         GroupLayout pnlProdutoUnificacaoLayout = new GroupLayout(pnlProdutoUnificacao);
         pnlProdutoUnificacao.setLayout(pnlProdutoUnificacaoLayout);
         pnlProdutoUnificacaoLayout.setHorizontalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
+                        .addGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                            .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(chkProdutoForcarNovo))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(chkProdutoIncluirNovos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         pnlProdutoUnificacaoLayout.setVerticalGroup(pnlProdutoUnificacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkProdutoUnificacaoExperimental, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoForcarNovo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chkProdutoIncluirNovos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
+        );
+
+        pnlMercadologicoImportacao.setBorder(BorderFactory.createTitledBorder("Importação de Mercadológico"));
+
+        chkMercadologicoImportacao2.setText("Utilizar a importação experimental (2.0)");
+        chkMercadologicoImportacao2.setToolTipText("<html>\nNova rotina de unificação de produtos que irá substituir a atual. Em caso de problema desabilite este<br>\ncheckbox para utilizar o antigo método.\n</html>");
+
+        GroupLayout pnlMercadologicoImportacaoLayout = new GroupLayout(pnlMercadologicoImportacao);
+        pnlMercadologicoImportacao.setLayout(pnlMercadologicoImportacaoLayout);
+        pnlMercadologicoImportacaoLayout.setHorizontalGroup(pnlMercadologicoImportacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMercadologicoImportacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkMercadologicoImportacao2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlMercadologicoImportacaoLayout.setVerticalGroup(pnlMercadologicoImportacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMercadologicoImportacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkMercadologicoImportacao2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(9, Short.MAX_VALUE))
         );
 
@@ -692,13 +793,17 @@ public class ParametroGUI extends VRInternalFrame {
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(354, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(185, Short.MAX_VALUE))
         );
         tabEngineMigracaoLayout.setVerticalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(391, Short.MAX_VALUE))
+                .addGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(352, Short.MAX_VALUE))
         );
 
         tabs.addTab("Engine de Migração", tabEngineMigracao);
@@ -810,6 +915,14 @@ public class ParametroGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_optFonteDadosActionPerformed
 
+    private void optSqlServerMicrosoftActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optSqlServerMicrosoftActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_optSqlServerMicrosoftActionPerformed
+
+    private void optSqlServerJTDSoptFonteDadosActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optSqlServerJTDSoptFonteDadosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_optSqlServerJTDSoptFonteDadosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private VRButton btnCancelar;
     private VRButton btnGravar;
@@ -821,8 +934,12 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkIgnorarClienteImpVenda;
     private VRCheckBox chkImportarBancoImplantacao;
     private VRCheckBox chkImportarIcmsIsentoMigracaoProduto;
+    private VRCheckBox chkMercadologicoImportacao2;
+    private VRCheckBox chkNaoImportarPautaSeAlgumNcmNaoExistir;
     private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
     private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
+    private VRCheckBox chkProdutoForcarNovo;
+    private VRCheckBox chkProdutoIncluirNovos;
     private VRCheckBox chkProdutoUnificacaoExperimental;
     private VRComboBox cmbMunicipioPadrao;
     private JComboBox cmbTipoPagamento;
@@ -831,10 +948,14 @@ public class ParametroGUI extends VRInternalFrame {
     private JScrollPane jScrollPane1;
     private JRadioButton optDriver;
     private JRadioButton optFonteDados;
+    private JRadioButton optSqlServerJTDS;
+    private JRadioButton optSqlServerMicrosoft;
     private VRPanel pnlDiversos;
     private VRPanel pnlDriverODBC;
+    private VRPanel pnlDriverSQLServer;
     private VRPanel pnlLocalizacao;
     private VRPanel pnlLogDados;
+    private VRPanel pnlMercadologicoImportacao;
     private VRPanel pnlNivelLog;
     private VRPanel pnlProdutoUnificacao;
     private VRPanel pnlTipoLog;
@@ -852,6 +973,7 @@ public class ParametroGUI extends VRInternalFrame {
     private ButtonGroup rdgLogLevel;
     private ButtonGroup rdgLogType;
     private ButtonGroup rdgTipoConexaoODBC;
+    private ButtonGroup rdgTipoConexaoSqlServer;
     private JScrollPane scroll;
     private vr.view.components.panel.VRPanel tabEngineMigracao;
     private VRPanel tabLogging;
@@ -870,6 +992,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRLabel vRLabel5;
     private VRLabel vRLabel6;
     private VRLabel vRLabel7;
+    private VRLabel vRLabel8;
     private VRPanel vRPanel1;
     private VRPanel vRPanel2;
     private VRPanel vRPanel3;
@@ -938,6 +1061,18 @@ public class ParametroGUI extends VRInternalFrame {
         chkNfeSaidaProcessarFinalizacoes.setSelected(parametros.getBool(false, "IMPORT_NFE", "PROCESSAR_FINALIZACOES"));
         chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(false, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
         chkProdutoUnificacaoExperimental.setSelected(OpcoesExperimentaisDeProduto.isUnificacaoExperimentalAtiva());
+        chkMercadologicoImportacao2.setSelected(OpcoesExperimentaisDeProduto.isImportacaoMercadologicoExperimentalAtiva());
+        chkProdutoForcarNovo.setSelected(OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo());
+        chkNaoImportarPautaSeAlgumNcmNaoExistir.setSelected(parametros.isNaoImportarPautaSeAlgumNcmNaoExistir());
+        switch (ConexaoSqlServer.Driver.get(parametros.get("SQLServer","Driver"))) {
+            case MICROSOFT:
+                optSqlServerMicrosoft.setSelected(true);
+                break;
+            case JTDS:
+                optSqlServerJTDS.setSelected(true);
+                break;
+        }
+        chkProdutoIncluirNovos.setSelected(OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -959,14 +1094,24 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.put(txtNomeDriverODBC.getText(), "ODBC", "DRIVER_ODBC");
             parametros.put(chkNfeSaidaProcessarFinalizacoes.isSelected(), "IMPORT_NFE", "PROCESSAR_FINALIZACOES");
             parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");
+            parametros.setNaoImportarPautaSeNcmNaoExistir(chkNaoImportarPautaSeAlgumNcmNaoExistir.isSelected());
             OpcoesExperimentaisDeProduto.setUnificacaoExperimental(chkProdutoUnificacaoExperimental.isSelected());
-            
+            OpcoesExperimentaisDeProduto.setImportacaoMercadologicoExperimental(chkMercadologicoImportacao2.isSelected());
+            OpcoesExperimentaisDeProduto.setUnificarSomenteProdutosComForcarNovo(chkProdutoForcarNovo.isSelected());
+            OpcoesExperimentaisDeProduto.setIncluirProdutosNaoExistentes(chkProdutoIncluirNovos.isSelected());
             
             if (optDriver.isSelected()) {
                 parametros.put(0, "ODBC", "TIPO_CONEXAO");
             } else if (optFonteDados.isSelected()) {
                 parametros.put(1, "ODBC", "TIPO_CONEXAO");
             }
+            
+            if (optSqlServerJTDS.isSelected()) {
+                parametros.put(ConexaoSqlServer.Driver.JTDS.getDriver(),"SQLServer","Driver");
+            } else if (optSqlServerMicrosoft.isSelected()) {
+                parametros.put(ConexaoSqlServer.Driver.MICROSOFT.getDriver(),"SQLServer","Driver");
+            }
+            
             parametros.salvar();
             Util.exibirMensagem("Parâmetros gravados com sucesso!", title);
         } else {

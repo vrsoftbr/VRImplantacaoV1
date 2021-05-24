@@ -15,12 +15,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
@@ -252,6 +252,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
     }
 
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
+        Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
         Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
@@ -458,7 +459,7 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
                             }
                         }
 
-                        if (Versao.menorQue(3, 18, 1)) {
+                        if (versao.igualOuMenorQue(3, 18, 1)) {
                             if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
                                 provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
                             }
@@ -556,6 +557,8 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean manterSomenteOsProdutosForcarNovo = Parametros.OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo();
+        boolean incluirProdutosNovos = Parametros.OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes(); 
         
         verificarAliquotasMapeadas(produtos);
         verificarAliquotasNaoMapeadas(produtos);
@@ -583,6 +586,9 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
             setNotify("Removendo da listagem produtos já importados e vinculados...", 0);
             produtos = new Organizador(this).organizarListagem(produtos);
             produtos = filtrarProdutosEEansJaMapeados(produtos);
+            if (manterSomenteOsProdutosForcarNovo) {
+                produtos = filtrarSomenteForcarNovo(produtos);
+            }
             System.gc();
             
             vincularProdutoComEanInvalido(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
@@ -591,13 +597,37 @@ public class ProdutoRepository implements Organizador.OrganizadorNotifier {
             
             vincularProdutosQueSoExistemNoVrPorEan(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
             
-            incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            if (incluirProdutosNovos) {
+                incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            }
             
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
+    }
+    
+    List<ProdutoIMP> filtrarSomenteForcarNovo(List<ProdutoIMP> produtos) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            if (!isProdutoVinculadoNaCodAnt(imp))
+                continue;
+            if (isCodigoAnteriorComCodigoAtualPreenchido(imp))
+                continue;
+            if (!isForcarNovo(imp))
+                continue;
+            result.add(imp);
+        }
+        produtos.removeAll(result);
+        return result;
+    }
+    boolean isCodigoAnteriorComCodigoAtualPreenchido(ProdutoIMP imp) {
+        Integer codigoAtual = this.codant.get(imp.getImportId());
+        return codigoAtual != null && codigoAtual != 0;
+    }
+    boolean isForcarNovo(ProdutoIMP imp) throws Exception {
+        return provider.anterior().forcarNovo(imp.getImportId());
     }
 
     private void incluirProdutosComEansNovos(List<ProdutoIMP> produtos, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {

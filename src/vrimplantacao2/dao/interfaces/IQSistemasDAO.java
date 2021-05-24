@@ -89,7 +89,9 @@ public class IQSistemasDAO extends InterfaceDAO {
             OpcaoProduto.ESTOQUE_MINIMO,
             OpcaoProduto.ESTOQUE_MAXIMO,
             OpcaoProduto.ESTOQUE,
-            OpcaoProduto.CUSTO,
+            OpcaoProduto.CUSTO_COM_IMPOSTO,
+            OpcaoProduto.CUSTO_SEM_IMPOSTO,
+            OpcaoProduto.CUSTO_ANTERIOR,
             OpcaoProduto.PRECO,
             OpcaoProduto.NCM,
             OpcaoProduto.CEST,
@@ -165,7 +167,9 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.grupo,\n"
                     + "s.codigosubgrupo,\n"
                     + "p.subgrupo,\n"
-                    + "p.custofornecedor as custo,\n"
+                    + "p.custofornecedor as custoanterior,\n"
+                    + "p.custo,\n"
+                    + "p.customedio,\n"
                     + "p.margemlucro,\n"
                     + "p.precovenda,\n"
                     + "p.estminimo,\n"
@@ -203,8 +207,12 @@ public class IQSistemasDAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rst.getString("codigosubgrupo"));
                     imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("margemlucro"));
+                    imp.setCustoAnteriorComImposto(rst.getDouble("custoanterior"));
+                    imp.setCustoAnteriorSemImposto(rst.getDouble("custoanterior"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setCustoMedioComImposto(rst.getDouble("customedio"));
+                    imp.setCustoMedioSemImposto(rst.getDouble("customedio"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));

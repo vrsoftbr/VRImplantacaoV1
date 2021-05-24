@@ -748,12 +748,52 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuFuturaActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="chkLogicBox">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="LogicBox"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLogicBoxActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="chkGigatron">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Gigatron"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkGigatronActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuMercaLite">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="MercaLite"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMercaLiteActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuPlenus">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Plenus"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPlenusActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="chkSGMaster">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="SG Master"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkSGMasterActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuGCom">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="GCom"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuGComActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
@@ -2042,6 +2082,14 @@
                         <Property name="text" type="java.lang.String" value="SQL Server 3"/>
                       </Properties>
                       <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuPoligon">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Poligon"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPoligonActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuSTSistemas_v2">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="ST Sistemas"/>

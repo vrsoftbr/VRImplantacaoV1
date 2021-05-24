@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
-  <Properties>
-    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[460, 168]"/>
-    </Property>
-  </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
   </SyntheticProperties>
   <AuxValues>
-    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
-    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
@@ -27,219 +22,252 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtCst" linkSize="1" min="-2" pref="51" max="-2" attributes="0"/>
-                          <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                  <Component id="jPanel2" max="32767" attributes="0"/>
+                  <Component id="jPanel1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="btnIncluir" min="-2" pref="80" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtAliquota" linkSize="1" alignment="0" min="-2" pref="58" max="-2" attributes="0"/>
-                          <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtReduzido" linkSize="1" alignment="0" min="-2" pref="61" max="-2" attributes="0"/>
-                          <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="vRLabel5" max="32767" attributes="0"/>
-                          <Component id="txtAliqFinal" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="vRLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="txtAliquotaFCP" min="-2" pref="58" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
-                                      <Component id="btnIncluir" min="-2" pref="80" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="chkGerarPDV" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                          <Component id="txtDescricao" alignment="1" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkGerarPDV" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtDescricao" min="-2" pref="375" max="-2" attributes="0"/>
-                  </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" attributes="0">
+              <EmptySpace max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="vRLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDescricao" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="vRLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="vRLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txtAliquota" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtReduzido" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtCst" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtAliqFinal" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="txtAliquotaFCP" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkGerarPDV" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtDescricao" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="btnIncluir" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="btnIncluir" min="-2" pref="32" max="-2" attributes="0"/>
-              <EmptySpace pref="14" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="28" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtDescricao">
-      <Properties>
-        <Property name="columns" type="int" value="15"/>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtDescricao.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtCst">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtCst.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="mascara" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtCst.mascara" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtAliquota">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtAliquota.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="mascara" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtAliquota.mascara" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAliquotaFocusLost"/>
-      </Events>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtReduzido">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtReduzido.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="mascara" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtReduzido.mascara" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAliquotaFocusLost"/>
-      </Events>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtAliqFinal">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtAliqFinal.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="enabled" type="boolean" value="false"/>
-        <Property name="mascara" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtAliqFinal.mascara" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarPDV">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.chkGerarPDV.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
     <Component class="vrframework.bean.button.VRButton" name="btnIncluir">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.btnIncluir.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
+        <Property name="text" type="java.lang.String" value="Incluir"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnIncluirActionPerformed"/>
       </Events>
     </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarPDV">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.vRLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.vRLabel2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.vRLabel3.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
+        <Property name="text" type="java.lang.String" value="Gerar aliq. PDV"/>
       </Properties>
     </Component>
     <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.vRLabel4.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
+        <Property name="text" type="java.lang.String" value="Descri&#xe7;&#xe3;o"/>
       </Properties>
     </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
+    <Component class="vrframework.bean.textField.VRTextField" name="txtDescricao">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.vRLabel5.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
+        <Property name="columns" type="int" value="15"/>
       </Properties>
     </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtAliquotaFCP">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtAliquotaFCP.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-        <Property name="mascara" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.txtAliquotaFCP.mascara" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAliquotaFCPFocusLost"/>
-      </Events>
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="vRLabel6">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="vrimplantacao2/gui/component/mapatributacao/incluiraliquota/Bundle.properties" key="IncluirAliquotaGUI.vRLabel6.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
+    <Container class="javax.swing.JPanel" name="jPanel1">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="txtCst" linkSize="1" alignment="0" min="-2" pref="51" max="-2" attributes="0"/>
+                      <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="txtAliquota" linkSize="1" alignment="0" min="-2" pref="58" max="-2" attributes="0"/>
+                      <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="txtReduzido" linkSize="1" min="-2" pref="61" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Component id="txtAliqFinal" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="txtAliquota" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtReduzido" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtCst" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtAliqFinal" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="CST"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtCst">
+          <Properties>
+            <Property name="mascara" type="java.lang.String" value="Numero"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Al&#xed;quota"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtAliquota">
+          <Properties>
+            <Property name="mascara" type="java.lang.String" value="Decimal 2"/>
+          </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAliquotaFocusLost"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Reduzido"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtReduzido">
+          <Properties>
+            <Property name="mascara" type="java.lang.String" value="Decimal 3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAliquotaFocusLost"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Aliq. Final"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtAliqFinal">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="mascara" type="java.lang.String" value="Decimal 2"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="jPanel2">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="vRLabel6" max="32767" attributes="0"/>
+                      <Component id="txtAliquotaFCP" min="-2" pref="70" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="chkDesonerado" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="vRLabel7" min="-2" pref="70" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                      <Component id="txtPercDesonerado" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
+                  <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="txtPercDesonerado" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="1" attributes="0">
+                  <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="txtAliquotaFCP" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkDesonerado" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel6">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Al&#xed;quota FCP"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtAliquotaFCP">
+          <Properties>
+            <Property name="mascara" type="java.lang.String" value="Decimal 2"/>
+          </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtAliquotaFCPFocusLost"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDesonerado">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Desonerado"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkDesoneradoActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Perc. Deson"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtPercDesonerado">
+          <Properties>
+            <Property name="mascara" type="java.lang.String" value="Decimal 2"/>
+          </Properties>
+          <Events>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtPercDesoneradoFocusLost"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
   </SubComponents>
 </Form>

@@ -10,9 +10,9 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.HerculesIntCashDAO;
+import vrimplantacao2.dao.interfaces.HerculesIntCashDAO.Filial;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
@@ -31,6 +31,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
+        txtComplemento.setText(params.get(SISTEMA, "COMPLEMENTO"));
         tabProdutos.carregarParametros(params, SISTEMA);
         conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
@@ -40,11 +41,12 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(txtComplemento.getText(), SISTEMA, "COMPLEMENTO");
         conexao.atualizarParametros();
-        Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
+        Filial cliente = (Filial) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
-            params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
-            vLojaCliente = cliente.cnpj;
+            params.put(cliente.getIdEmpresa(), SISTEMA, "LOJA_CLIENTE");
+            vLojaCliente = cliente.getIdEmpresa();
         }
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
@@ -71,6 +73,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.btnMapaTribut.setVisible(false);
 
         conexao.setOnConectar(this);
 
@@ -98,9 +101,9 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : dao.getLojasCliente()) {
+        for (Filial loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
-            if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
+            if (vLojaCliente != null && vLojaCliente.equals(loja.getKey())) {
                 index = cont;
             }
             cont++;
@@ -125,20 +128,20 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
     public void importarTabelas() throws Exception {
         
         Thread thread = new Thread() {
-            int idLojaVR;
-            String idLojaCliente;
-
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    int idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    Filial filial = (Filial) cmbLojaOrigem.getSelectedItem();                    
+                    
+                    dao.setFilial(filial);
+                    dao.setComplemento(txtComplemento.getText());
 
                     Importador importador = new Importador(dao);
-                    importador.setLojaOrigem(idLojaCliente);
+                    importador.setLojaOrigem(filial.getIdEmpresa());
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
 
@@ -210,6 +213,8 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
 
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
         conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
+        txtComplemento = new vrframework.bean.textField.VRTextField();
+        vRLabel3 = new vrframework.bean.label.VRLabel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
@@ -238,6 +243,8 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
         setToolTipText("");
 
         conexao.setSistema("JM2Online");
+
+        vRLabel3.setText("Compl.");
 
         vRLabel1.setText("Loja (Cliente):");
 
@@ -271,7 +278,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(313, Short.MAX_VALUE))
+                .addContainerGap(380, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -282,7 +289,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(207, Short.MAX_VALUE))
+                .addContainerGap(214, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -311,7 +318,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap(238, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -326,7 +333,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addContainerGap(197, Short.MAX_VALUE))
         );
 
         tabOperacoes.addTab("Unificação", vRPanel2);
@@ -376,10 +383,14 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
                         .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabOperacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
@@ -392,8 +403,10 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                 .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -442,8 +455,10 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.textField.VRTextField txtComplemento;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel3;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
 

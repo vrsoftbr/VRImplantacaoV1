@@ -280,16 +280,26 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="chkUnifProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkUnifFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkUnifProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUnifFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                              <Component id="lblLojaID" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtLojaID" min="-2" pref="90" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="305" max="32767" attributes="0"/>
+                      <EmptySpace pref="271" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -306,7 +316,12 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="209" max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblLojaID" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtLojaID" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="143" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -336,6 +351,13 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cliente Eventual (Somente com CPF/CNPJ)"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="lblLojaID">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Loja ID:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="txtLojaID">
             </Component>
           </SubComponents>
         </Container>

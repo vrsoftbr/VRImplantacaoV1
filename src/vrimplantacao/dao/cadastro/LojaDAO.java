@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
@@ -13,7 +14,6 @@ import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.parametro.Versao;
 
 public class LojaDAO {
 
@@ -165,6 +165,7 @@ public class LojaDAO {
         ResultSet rst = null;
         ResultSet rst2 = null;
         ResultSet rst3 = null;
+        Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
         try {
             Conexao.begin();
@@ -195,7 +196,7 @@ public class LojaDAO {
                 sql.append(" customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado,");
                 sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao,");
                 sql.append("id_tipocalculoddv");
-                if (Versao.maiorQue(3,17,10)) {
+                if (versao.igualOuMaiorQue(3,17,10)) {
                     sql.append(", id_tipoproduto, fabricacaopropria");
                 }
                 sql.append(")");
@@ -204,7 +205,7 @@ public class LojaDAO {
                 sql.append("  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,");
                 sql.append(" null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,");
                 sql.append(" valoricmssubstituicao, null, cestabasica, 0, 3");
-                if (Versao.maiorQue(3,17,10)) {
+                if (versao.igualOuMaiorQue(3,17,10)) {
                     sql.append(", 0, false");
                 }
                 sql.append(" from produtocomplemento where id_loja = " + i_loja.idCopiarLoja + ")");
