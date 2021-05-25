@@ -83,6 +83,16 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date cpDataFinal;
     
     private boolean vendaUtilizaDigito = false;
+    
+    private Integer versaoVenda = 2;
+    
+    public Integer getVersaoVenda() {
+        return this.versaoVenda;
+    }
+    
+    public void setVersaoVenda(Integer versaoVenda) {
+        this.versaoVenda = versaoVenda;
+    }
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -215,7 +225,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NORMA_REPOSICAO,
                 OpcaoProduto.TIPO_PRODUTO,
                 OpcaoProduto.FABRICACAO_PROPRIA,
-                OpcaoProduto.RECEITA
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST
         ));
     }
 
@@ -527,6 +539,48 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	p.procodplu id,\n"
+                    + "	p.prorefloja as ean,\n"
+                    + " 1 as qtdembalagem, \n"        
+                    + "	substring(p.proembu, 1,2) tipoembalagem\n"
+                    + "FROM hippro p\n"
+                    + "WHERE p.prorefloja IS NOT NULL\n"
+                    + "UNION ALL \n"
+                    + "SELECT\n"
+                    + "	p.procodplu id,\n"
+                    + "	ean.barcodbar as ean,\n"
+                    + "	coalesce(ean.barqtemb, 1) qtdembalagem,\n"
+                    + "	substring(p.proembu, 1,2) tipoembalagem\n"
+                    + "from\n"
+                    + "	hippro p\n"
+                    + "	left join hiploj l on\n"
+                    + "		l.lojcod = "+getLojaOrigem()+"\n"
+                    + "	left join hipbar ean on\n"
+                    + "		ean.barcodplu = p.procodplu\n"
+                    + "order BY \n"
+                    + "	1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         
@@ -616,6 +670,19 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             int dia = Utils.stringToInt(parc);
                             imp.addCondicaoPagamento(dia);
                         }
+                    }
+                    
+                    
+                    imp.addContato(
+                            rst.getString("contato"), 
+                            rst.getString("fonecontato"), 
+                            null, 
+                            TipoContato.COMERCIAL, 
+                            rst.getString("email") != null ? rst.getString("email").toLowerCase() : ""
+                    );
+                    
+                    if (rst.getString("emailnfe") != null && !rst.getString("emailnfe").trim().isEmpty()) {
+                        imp.addEmail("NFE", rst.getString("emailnfe"), TipoContato.NFE);
                     }
                     
                     gravarContatoFornecedor(imp);
@@ -1254,12 +1321,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal, this.getVersaoVenda());
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal, this.getVersaoVenda());
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {

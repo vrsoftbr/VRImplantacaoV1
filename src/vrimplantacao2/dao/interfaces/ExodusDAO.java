@@ -972,12 +972,12 @@ public class ExodusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         //return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
-        return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal, 1);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal, 1);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {

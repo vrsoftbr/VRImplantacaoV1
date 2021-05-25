@@ -294,6 +294,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cd_grupo merc1,\n"
                     + "	cd_grupo merc2,\n"
                     + "	cd_grupo merc3,\n"
+                    + "	p.cd_grupo_vinculo_preco idfamilia,\n"
                     + "	round(perc_lucro, 2) margem,\n"
                     + "	pr_compra custosemimposto,\n"
                     + "	pr_custo custocomimposto,\n"
@@ -359,6 +360,7 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setIdFamiliaProduto(rs.getString("idfamilia"));
 
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
@@ -520,6 +522,41 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	codigo,\n"
+                    + "	ean as codigobarras\n"
+                    + "from produto\n"
+                    + "where ean != 'SEM GTIN'\n"
+                    + "and ean is not null\n"
+                    + "and ean != ''\n"
+                    + "union all\n"
+                    + "select \n"
+                    + "	codigo,\n"
+                    + "	ean_trib as codigobarras\n"
+                    + "from produto\n"
+                    + "where ean_trib != 'SEM GTIN'\n"
+                    + "and ean_trib is not null\n"
+                    + "and ean_trib != ''"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
