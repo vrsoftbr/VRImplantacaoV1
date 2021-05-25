@@ -18,6 +18,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import static vrimplantacao2.dao.cadastro.produto.OpcaoProduto.INVENTARIO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -45,6 +46,7 @@ import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -104,7 +106,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PRODUTOS);
         result.add(OpcaoProduto.EAN);
         result.add(OpcaoProduto.MANTER_CODIGO_MERCADOLOGICO);        
-        result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);        
+        result.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
+        result.add(OpcaoProduto.ASSOCIADO);
 
         return result;
     }
@@ -296,6 +299,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setDataAlteracao(getData(linha.getString("dataalteracao")));
                 produto.setValidade(linha.getInt("validade"));
                 produto.setMargem(linha.getDouble("margem"));
+                produto.setMargemMaxima(linha.getDouble("margemmaxima"));
+                produto.setMargemMinima(linha.getDouble("margemminima"));
                 produto.setEstoqueMaximo(linha.getDouble("estoquemaximo"));
                 produto.setEstoqueMinimo(linha.getDouble("estoqueminimo"));
                 produto.setEstoque(linha.getDouble("estoque"));
@@ -602,11 +607,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setImportLoja(getLojaOrigem());
             imp.setIdFornecedor(linha.getString("id_fornecedor"));
             imp.setIdProduto(linha.getString("id_produto"));
-            imp.setDataAlteracao(getData(linha.getString("dataalteracao")));
             imp.setCodigoExterno(linha.getString("codigoexterno"));
-            imp.setPesoEmbalagem(linha.getDouble("pesoembalagem"));
             imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
             imp.setCustoTabela(linha.getDouble("custo_tabelado"));
+            imp.setDataAlteracao(getData(linha.getString("dataalteracao")));
+            imp.setPesoEmbalagem(linha.getDouble("pesoembalagem"));
             result.add(imp);
             cont2++;
             cont1++;
@@ -799,10 +804,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addPagamento(
                                 imp.getId(),
                                 linha.getDouble("valorrecebido"),
-                                0,
-                                0,
+                                linha.getDouble("descontopagamento"),
+                                linha.getDouble("multapagamento"),
                                 getData(linha.getString("datapagamento")),
-                                ""
+                                linha.getString("observacaopagamento")
                         );
                     }
                 }
@@ -885,11 +890,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
 
                 ContaPagarVencimentoIMP parc = imp.addVencimento(linha.getData("vencimento"), linha.getDouble("valor"));
-                parc.setAgencia(linha.getString("agencia"));
-                parc.setConferido(false);
-                parc.setConta(linha.getString("conta"));
-                parc.setDataPagamento(linha.getData("pagoem"));
                 parc.setId(linha.getString("parcelaid"));
+                parc.setNumeroParcela(linha.getInt("numeroparcela") == 0 ? 1 : linha.getInt("numeroparcela"));
+                parc.setDataPagamento(linha.getData("pagoem"));
+                parc.setObservacao(linha.getString("observacao"));
+                parc.setPago(linha.getBoolean("pago"));
                 if (linha.getString("tipopagamentovr") != null) {
                     TipoPagamento tp = new TipoPagamento(Utils.stringToInt(linha.getString("tipopagamentovr")), "");
                     parc.setTipoPagamento(tp);
@@ -897,12 +902,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     parc.setTipoPagamento(TipoPagamento.BOLETO_BANCARIO);
                 }
                 parc.setId_banco(linha.getInt("banco"));
-                parc.setNumeroParcela(linha.getInt("numeroparcela") == 0 ? 1 : linha.getInt("numeroparcela"));
+                parc.setAgencia(linha.getString("agencia"));
+                parc.setConta(linha.getString("conta"));
                 parc.setNumerocheque(linha.getInt("numerocheque"));
-                parc.setObservacao(linha.getString("observacao"));
-                parc.setPago(linha.getBoolean("pago"));
-
-                System.out.println("ID: " + imp.getId() + " - Valor: " + imp.getValor() + " Emissão: " + imp.getDataEmissao());
+                parc.setConferido(false);
             }
         }
         return new ArrayList<>(contas.values());
@@ -1123,6 +1126,35 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
         }
+    }
+
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
+        ProgressBar.setStatus("Carregando Associados");
+
+        for (LinhaArquivo linha : produtos) {
+            AssociadoIMP imp = new AssociadoIMP();
+            
+            imp.setId(linha.getString("idproduto_principal"));
+            imp.setDescricao(linha.getString("descricaoproduto_principal"));
+            imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
+            imp.setProdutoAssociadoId(linha.getString("idproduto_item"));
+            imp.setDescricaoProdutoAssociado(linha.getString("descproduto_item"));
+            imp.setQtdEmbalagemItem(linha.getInt("qtdembalagem_item"));
+            imp.setPercentualPreco(linha.getDouble("percentualpreco"));
+            imp.setAplicaPreco(linha.getBoolean("aplicapreco"));
+            imp.setAplicaCusto(linha.getBoolean("aplicacusto"));
+            imp.setAplicaEstoque(linha.getBoolean("aplicaestoque"));
+            imp.setPercentualCusto(linha.getDouble("percentualcustoestoque"));
+            
+            result.add(imp);
+        }
+        
+        return result;
     }
 
     @Override
