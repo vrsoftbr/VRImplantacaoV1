@@ -1,5 +1,8 @@
 package vrimplantacao2.vo.cadastro.tributacao;
 
+import vr.core.utils.MathUtils;
+import vr.core.utils.StringUtils;
+
 /**
  *
  * @author Leandro
@@ -8,11 +11,14 @@ public class AliquotaVO {
     
     public static final AliquotaVO OUTRAS = new AliquotaVO(8, "OUTRAS", 90, 0, 0);
     
-    private int id;
+    private int id = -1;
     private String descricao;
     private int cst;
     private double aliquota;
     private double reduzido;
+    private double fcp;
+    private boolean desonerado;
+    private double porcentagemDesonerado;
 
     public AliquotaVO() {
     }
@@ -43,7 +49,7 @@ public class AliquotaVO {
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = StringUtils.acertarTexto(descricao, 15);
     }
 
     public int getCst() {
@@ -68,6 +74,34 @@ public class AliquotaVO {
 
     public void setReduzido(double reduzido) {
         this.reduzido = reduzido;
+    }
+    
+    public double getAliquotaFinal() {
+        return MathUtils.round(aliquota * (100 - reduzido) / 100, 2);
+    }
+
+    public double getFcp() {
+        return fcp;
+    }
+
+    public void setFcp(double fcp) {
+        this.fcp = fcp;
+    }
+
+    public boolean isDesonerado() {
+        return desonerado;
+    }
+
+    public void setDesonerado(boolean desonerado) {
+        this.desonerado = desonerado;
+    }
+
+    public double getPorcentagemDesonerado() {
+        return porcentagemDesonerado;
+    }
+
+    public void setPorcentagemDesonerado(double porcentagemDesonerado) {
+        this.porcentagemDesonerado = porcentagemDesonerado;
     }
 
     @Override

@@ -1,11 +1,13 @@
 package vrimplantacao2.gui.component.mapatributacao.incluiraliquota;
 
-import java.awt.Dimension;
 import org.openide.util.Exceptions;
+import vr.core.utils.StringUtils;
+import vr.view.dialogs.Alerts;
 import vrframework.bean.dialog.VRDialog;
 import vrimplantacao.dao.cadastro.AliquotaDAO;
-import vrimplantacao.utils.Utils;
-import vrimplantacao2.utils.MathUtils;
+import vrimplantacao.dao.cadastro.AliquotaPdvDAO;
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaPdvVO;
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 
 /**
  *
@@ -13,37 +15,27 @@ import vrimplantacao2.utils.MathUtils;
  */
 public class IncluirAliquotaGUI extends VRDialog {
 
-    public static int exibir(int cst, double aliquota, double reduzido, String descricao) throws Exception {
-        IncluirAliquotaGUI gui = new IncluirAliquotaGUI();
-        
+    public static int exibir(AliquotaVO vo) {
+        IncluirAliquotaGUI gui = new IncluirAliquotaGUI(vo);
         gui.setModal(true);
         gui.setTitle("Incluir alíquota");
+        gui.pack();
         gui.centralizarForm();
-        
-        gui.setMinimumSize(new Dimension(390, 126));
-        
-        gui.txtCst.setInt(cst);
-        gui.txtAliquota.setDouble(aliquota);
-        gui.txtReduzido.setDouble(reduzido);
-        gui.txtDescricao.setText(Utils.acertarTexto(descricao, 15));
-        
-        gui.setVisible(true);        
-        
+        gui.setVisible(true);
         return gui.getResult();
     }
 
-    private int result = -1;
+    private final Controller controller;    
 
     public int getResult() {
-        return result;
+        return controller.aliquota.getId();
     }
     
-    /**
-     * Creates new form IncluirAliquotaGUI
-     * @throws java.lang.Exception
-     */
-    public IncluirAliquotaGUI() throws Exception {
+    public IncluirAliquotaGUI(AliquotaVO vo) {
+        super();
         initComponents();
+        controller = new Controller(this, vo);
+        controller.loadView();
     }
 
     /**
@@ -55,77 +47,164 @@ public class IncluirAliquotaGUI extends VRDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        txtDescricao = new vrframework.bean.textField.VRTextField();
-        txtCst = new vrframework.bean.textField.VRTextField();
-        txtAliquota = new vrframework.bean.textField.VRTextField();
-        txtReduzido = new vrframework.bean.textField.VRTextField();
-        txtAliqFinal = new vrframework.bean.textField.VRTextField();
-        chkGerarPDV = new vrframework.bean.checkBox.VRCheckBox();
         btnIncluir = new vrframework.bean.button.VRButton();
-        vRLabel1 = new vrframework.bean.label.VRLabel();
-        vRLabel2 = new vrframework.bean.label.VRLabel();
-        vRLabel3 = new vrframework.bean.label.VRLabel();
+        chkGerarPDV = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel4 = new vrframework.bean.label.VRLabel();
+        txtDescricao = new vrframework.bean.textField.VRTextField();
+        jPanel1 = new javax.swing.JPanel();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        txtCst = new vrframework.bean.textField.VRTextField();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
+        txtAliquota = new vrframework.bean.textField.VRTextField();
+        vRLabel3 = new vrframework.bean.label.VRLabel();
+        txtReduzido = new vrframework.bean.textField.VRTextField();
         vRLabel5 = new vrframework.bean.label.VRLabel();
-        txtAliquotaFCP = new vrframework.bean.textField.VRTextField();
+        txtAliqFinal = new vrframework.bean.textField.VRTextField();
+        jPanel2 = new javax.swing.JPanel();
         vRLabel6 = new vrframework.bean.label.VRLabel();
+        txtAliquotaFCP = new vrframework.bean.textField.VRTextField();
+        chkDesonerado = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel7 = new vrframework.bean.label.VRLabel();
+        txtPercDesonerado = new vrframework.bean.textField.VRTextField();
 
-        setMinimumSize(new java.awt.Dimension(460, 168));
-
-        txtDescricao.setColumns(15);
-        txtDescricao.setText(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtDescricao.text")); // NOI18N
-
-        txtCst.setText(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtCst.text")); // NOI18N
-        txtCst.setMascara(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtCst.mascara")); // NOI18N
-
-        txtAliquota.setText(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtAliquota.text")); // NOI18N
-        txtAliquota.setMascara(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtAliquota.mascara")); // NOI18N
-        txtAliquota.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtAliquotaFocusLost(evt);
-            }
-        });
-
-        txtReduzido.setText(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtReduzido.text")); // NOI18N
-        txtReduzido.setMascara(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtReduzido.mascara")); // NOI18N
-        txtReduzido.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtAliquotaFocusLost(evt);
-            }
-        });
-
-        txtAliqFinal.setText(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtAliqFinal.text")); // NOI18N
-        txtAliqFinal.setEnabled(false);
-        txtAliqFinal.setMascara(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtAliqFinal.mascara")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkGerarPDV, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.chkGerarPDV.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(btnIncluir, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.btnIncluir.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnIncluir, "Incluir");
         btnIncluir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnIncluirActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.vRLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkGerarPDV, "Gerar aliq. PDV");
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel2, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.vRLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel4, "Descrição");
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel3, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.vRLabel3.text")); // NOI18N
+        txtDescricao.setColumns(15);
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel4, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.vRLabel4.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "CST");
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.vRLabel5.text")); // NOI18N
+        txtCst.setMascara("Numero");
 
-        txtAliquotaFCP.setText(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtAliquotaFCP.text")); // NOI18N
-        txtAliquotaFCP.setMascara(org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.txtAliquotaFCP.mascara")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel2, "Alíquota");
+
+        txtAliquota.setMascara("Decimal 2");
+        txtAliquota.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtAliquotaFocusLost(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel3, "Reduzido");
+
+        txtReduzido.setMascara("Decimal 3");
+        txtReduzido.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtAliquotaFocusLost(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, "Aliq. Final");
+
+        txtAliqFinal.setEnabled(false);
+        txtAliqFinal.setMascara("Decimal 2");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtCst, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(5, 5, 5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(5, 5, 5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtReduzido, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addComponent(txtAliqFinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(0, 0, 0))))
+        );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtAliquota, txtCst, txtReduzido});
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtReduzido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCst, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtAliqFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel6, "Alíquota FCP");
+
+        txtAliquotaFCP.setMascara("Decimal 2");
         txtAliquotaFCP.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtAliquotaFCPFocusLost(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel6, org.openide.util.NbBundle.getMessage(IncluirAliquotaGUI.class, "IncluirAliquotaGUI.vRLabel6.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkDesonerado, "Desonerado");
+        chkDesonerado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkDesoneradoActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Perc. Deson");
+
+        txtPercDesonerado.setMascara("Decimal 2");
+        txtPercDesonerado.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtPercDesoneradoFocusLost(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(vRLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtAliquotaFCP, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkDesonerado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addComponent(txtPercDesonerado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtPercDesonerado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtAliquotaFCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDesonerado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -134,101 +213,73 @@ public class IncluirAliquotaGUI extends VRDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtCst, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtReduzido, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(vRLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtAliqFinal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDescricao, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtAliquotaFCP, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(21, 21, 21)
-                                        .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(chkGerarPDV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkGerarPDV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addContainerGap())
         );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {txtAliquota, txtCst, txtReduzido});
-
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkGerarPDV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtAliquota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtReduzido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtCst, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtAliqFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtAliquotaFCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkGerarPDV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                        .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnIncluir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(28, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtAliquotaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAliquotaFocusLost
-        calcularAliquotaFinal();
+        controller.executarCalculos();
     }//GEN-LAST:event_txtAliquotaFocusLost
 
     private void btnIncluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIncluirActionPerformed
-        try {
-            result = new AliquotaDAO().aliquota(txtCst.getInt(), txtAliquota.getDouble(), txtReduzido.getDouble(), txtDescricao.getText(), chkGerarPDV.isSelected(), txtAliquotaFCP.getDouble());
-            this.setVisible(false);
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-            throw new RuntimeException(ex);
-        }
+        controller.incluirAliquota();
     }//GEN-LAST:event_btnIncluirActionPerformed
 
     private void txtAliquotaFCPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtAliquotaFCPFocusLost
-        // TODO add your handling code here:
+        controller.executarCalculos();
     }//GEN-LAST:event_txtAliquotaFCPFocusLost
+
+    private void txtPercDesoneradoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtPercDesoneradoFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPercDesoneradoFocusLost
+
+    private void chkDesoneradoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkDesoneradoActionPerformed
+        controller.toggleDesonerado();
+    }//GEN-LAST:event_chkDesoneradoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnIncluir;
+    private vrframework.bean.checkBox.VRCheckBox chkDesonerado;
     private vrframework.bean.checkBox.VRCheckBox chkGerarPDV;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private vrframework.bean.textField.VRTextField txtAliqFinal;
     private vrframework.bean.textField.VRTextField txtAliquota;
     private vrframework.bean.textField.VRTextField txtAliquotaFCP;
     private vrframework.bean.textField.VRTextField txtCst;
     private vrframework.bean.textField.VRTextField txtDescricao;
+    private vrframework.bean.textField.VRTextField txtPercDesonerado;
     private vrframework.bean.textField.VRTextField txtReduzido;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
@@ -236,15 +287,70 @@ public class IncluirAliquotaGUI extends VRDialog {
     private vrframework.bean.label.VRLabel vRLabel4;
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel6;
+    private vrframework.bean.label.VRLabel vRLabel7;
     // End of variables declaration//GEN-END:variables
 
-    private void calcularAliquotaFinal() {
-        try {
-            double aliquotaFinal = MathUtils.round(txtAliquota.getDouble() * ((100 - txtReduzido.getDouble()) / 100), 2);
-            txtAliqFinal.setDouble(aliquotaFinal);
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-            throw new RuntimeException(ex);
+    private static class Controller {
+
+        private final IncluirAliquotaGUI view;
+        private final AliquotaVO aliquota;
+
+        private Controller(IncluirAliquotaGUI view, AliquotaVO vo) {            
+            this.view = view;
+            this.aliquota = vo;
         }
+        
+        void executarCalculos() {
+            view.txtAliqFinal.setDouble(aliquota.getAliquotaFinal());
+        }
+
+        void incluirAliquota() {
+            try {
+                loadModel();
+                AliquotaDAO dao = new AliquotaDAO();
+                aliquota.setId(dao.insert(this.aliquota));
+                if (view.chkGerarPDV.isSelected() && Alerts.confirmar("Confirma a criação da aliquota pdv?")) {
+                    AliquotaPdvDAO pdvDao = new AliquotaPdvDAO();
+                    pdvDao.incluir(AliquotaPdvVO.of(aliquota));
+                }
+                dispose();
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+                Alerts.erro("Erro ao gravar a alíquota", ex);
+            }
+        }
+        
+        void dispose() {
+            view.setVisible(false);
+        }
+        
+        void loadModel() {
+            aliquota.setDescricao(view.txtDescricao.getText());
+            aliquota.setCst(StringUtils.toInt(view.txtCst.getText()));
+            aliquota.setAliquota(StringUtils.toDouble(view.txtAliquota.getText()));
+            aliquota.setReduzido(StringUtils.toDouble(view.txtReduzido.getText()));
+            aliquota.setFcp(StringUtils.toDouble(view.txtAliquotaFCP.getText()));
+            aliquota.setDesonerado(view.chkDesonerado.isSelected());
+            aliquota.setPorcentagemDesonerado(StringUtils.toDouble(view.txtPercDesonerado.getText()));
+        }
+        
+        void loadView() {
+            view.txtDescricao.setText(StringUtils.acertarTexto(aliquota.getDescricao(), 15));
+            view.txtCst.setInt(aliquota.getCst());
+            view.txtAliquota.setDouble(aliquota.getAliquota());
+            view.txtReduzido.setDouble(aliquota.getReduzido());
+            view.txtAliqFinal.setDouble(aliquota.getAliquotaFinal());
+            view.txtAliquotaFCP.setDouble(aliquota.getFcp());
+            view.chkDesonerado.setSelected(aliquota.isDesonerado());            
+            view.txtPercDesonerado.setEnabled(aliquota.isDesonerado());
+            view.txtPercDesonerado.setDouble(aliquota.getPorcentagemDesonerado());
+        }
+
+        void toggleDesonerado() {
+            aliquota.setDesonerado(view.chkDesonerado.isSelected());
+            view.txtPercDesonerado.setEnabled(view.chkDesonerado.isSelected());
+        }
+        
     }
+    
 }

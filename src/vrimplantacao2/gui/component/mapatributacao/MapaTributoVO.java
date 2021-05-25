@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.component.mapatributacao;
 
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 import vrimplantacao2.vo.enums.Icms;
 
 /**
@@ -107,4 +108,18 @@ public class MapaTributoVO {
         this.origPorcentagemDesonerado = origPorcentagemDesonerado;
     }
     
+    public AliquotaVO converterEmVo() {
+        AliquotaVO vo = new AliquotaVO();
+        
+        vo.setId(aliquota != null ? this.aliquota.getId() : -1);
+        vo.setDescricao(this.origDescricao);
+        vo.setCst(this.origCst);
+        vo.setAliquota(this.origAliquota);
+        vo.setReduzido(this.origReduzido);
+        vo.setFcp(this.origFcp);
+        vo.setDesonerado(this.origDesonerado);
+        vo.setPorcentagemDesonerado(this.origPorcentagemDesonerado);
+        
+        return vo;
+    }
 }

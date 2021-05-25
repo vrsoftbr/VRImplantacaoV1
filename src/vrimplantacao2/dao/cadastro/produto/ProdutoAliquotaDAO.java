@@ -6,14 +6,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 
 public class ProdutoAliquotaDAO {
+    
+    private final Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
 
     public void salvar(ProdutoAliquotaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -31,10 +33,10 @@ public class ProdutoAliquotaDAO {
             sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
             sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
             sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
-            if (!Versao.menorQue(3, 18, 3)) {
+            if (!versao.igualOuMenorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
             }
-            if (Versao.maiorQue(3, 19, 1, 64)) {
+            if (versao.igualOuMaiorQue(3, 19, 1, 64)) {
                 sql.put("excecao", vo.getExcecao());
             }
 
@@ -89,7 +91,7 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                     sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
-                    if (!Versao.menorQue(3, 18, 3)) {
+                    if (!versao.igualOuMenorQue(3, 18, 3)) {
                         sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                     }
                 } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
@@ -97,7 +99,7 @@ public class ProdutoAliquotaDAO {
                 } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA)) {
                     sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
-                    if (!Versao.menorQue(3, 18, 3)) {
+                    if (!versao.igualOuMenorQue(3, 18, 3)) {
                         sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                     }
                 } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO)) {
@@ -120,7 +122,7 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 }
                 if (opt.contains(OpcaoProduto.EXCECAO)) {
-                    if (Versao.maiorQue(3, 19, 1, 64)) {
+                    if (versao.igualOuMaiorQue(3, 19, 1, 64)) {
                         sql.put("excecao", vo.getExcecao());
                     }
                 }
@@ -168,7 +170,7 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 }                
                 
-                if (!Versao.menorQue(3, 18, 3)) {
+                if (!versao.igualOuMenorQue(3, 18, 3)) {
                     sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                 }
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
@@ -219,7 +221,7 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                 }                
                 
-                if (!Versao.menorQue(3, 18, 3)) {
+                if (!versao.igualOuMenorQue(3, 18, 3)) {
                     sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
                 }
             } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO)) {
@@ -260,7 +262,7 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
             }
             if (opt.contains(OpcaoProduto.EXCECAO)) {
-                if (Versao.maiorQue(3, 19, 1, 64)) {
+                if (versao.igualOuMaiorQue(3, 19, 1, 64)) {
                     sql.put("excecao", vo.getExcecao());
                 }
             }
@@ -306,7 +308,7 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             }
 
-            if (!Versao.menorQue(3, 18, 3)) {
+            if (!versao.igualOuMenorQue(3, 18, 3)) {
                 sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
             }
             

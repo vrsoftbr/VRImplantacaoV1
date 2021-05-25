@@ -275,9 +275,8 @@ public class RPInfoGUI extends VRInternalFrame {
                         if (chkPermiteRotativ.isSelected()) {
                             importador.atualizarClientePreferencial(OpcaoCliente.PERMITE_CREDITOROTATIVO);
                         }
-                        
-                        if (tabParametros.getSelectedIndex() == 3) {
-                            if (chkVendas.isSelected() && !dtVenda.getText().trim().isEmpty()) {
+                        if (chkVendas.isSelected()) {
+                            if (!dtVenda.getText().trim().isEmpty()) {
                                 dao.setTabelaVenda(dtVenda.getText().trim());
                                 importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                             } else {

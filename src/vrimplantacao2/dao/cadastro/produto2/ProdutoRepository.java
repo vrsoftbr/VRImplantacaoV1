@@ -15,12 +15,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.AtacadoProdutoComplementoVO;
@@ -252,6 +252,7 @@ public class ProdutoRepository {
     }
 
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
+        Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
         Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
@@ -458,7 +459,7 @@ public class ProdutoRepository {
                             }
                         }
 
-                        if (Versao.menorQue(3, 18, 1)) {
+                        if (versao.igualOuMenorQue(3, 18, 1)) {
                             if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
                                 provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
                             }
@@ -557,6 +558,7 @@ public class ProdutoRepository {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         boolean manterSomenteOsProdutosForcarNovo = Parametros.OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo();
+        boolean incluirProdutosNovos = Parametros.OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes(); 
         
         verificarAliquotasMapeadas(produtos);
         verificarAliquotasNaoMapeadas(produtos);
@@ -595,7 +597,9 @@ public class ProdutoRepository {
             
             vincularProdutosQueSoExistemNoVrPorEan(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
             
-            incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            if (incluirProdutosNovos) {
+                incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
+            }
             
             provider.commit();
         } catch (Exception e) {

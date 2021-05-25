@@ -1951,9 +1951,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where v.nfcc_unid_codigo = '" + idLojaCliente + "' \n"
                     + " and vi.vdet_unid_codigo = '" + idLojaCliente + "' \n"
                     + " and vi.vdet_status = 'N'\n"
-                    /*+ " and vi.vdet_datamvto "
-                    + "     between '" + FORMAT.format(dataInicio) + "' "
-                    + "         and '" + FORMAT.format(dataInicio) + "' \n"*/
                     + "group by \n"
                     + "	v.nfcc_transacao,\n"
                     + "	v.nfcc_modelo,\n"
@@ -2051,9 +2048,6 @@ public class RPInfoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from vdadet" + tabelaVenda + " vi \n"
                     + " join produtos p on p.prod_codigo = vi.vdet_prod_codigo \n"
                     + " left join produn un on p.prod_codigo = un.prun_prod_codigo and un.prun_unid_codigo = '" + idLojaCliente + "'"
-                    /*+ "where vi.vdet_datamvto "
-                    + " between '" + VendaIterator.FORMAT.format(dataInicio) + "' "
-                    + "     and '" + VendaIterator.FORMAT.format(dataInicio) + "'\n"*/
                     + "where vi.vdet_unid_codigo = '" + idLojaCliente + "'\n"
                     + " and vi.vdet_status = 'N'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

@@ -557,6 +557,14 @@ public final class Parametros implements Iterable<Parametro>{
         public static boolean isUnificarSomenteProdutosComForcarNovo() {
             return Parametros.get().getBool(false, "UNIFICAR_SOMENTE_PRODUTOS_COM_FORCAR_NOVO");
         }
+
+        public static boolean isIncluirProdutosNaoExistentes() {
+            return Parametros.get().getBool(true, "UNIFICAR_INCLUIR_PRODUTOS_NOVOS");
+        }
+
+        public static void setIncluirProdutosNaoExistentes(boolean ativo) {
+            Parametros.get().put(ativo, "UNIFICAR_INCLUIR_PRODUTOS_NOVOS");
+        }
         
     }
    
