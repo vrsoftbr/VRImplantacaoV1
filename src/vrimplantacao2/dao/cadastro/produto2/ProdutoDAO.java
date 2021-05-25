@@ -126,7 +126,7 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
-            if (versao.igualOuMenorQue(4)) {
+            if (versao.menorQue(4)) {
                 sql.put("margemminima", vo.getMargemMinima());
                 sql.put("margemmaxima", vo.getMargemMaxima());
                 sql.put("margem", vo.getMargem());
@@ -271,9 +271,11 @@ public class ProdutoDAO {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
         }
-        if (versao.igualOuMenorQue(4)) {
+        if (versao.menorQue(4)) {
             if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
                 sql.put("margemminima", vo.getMargemMinima());
+            }
+            if (opt.contains(OpcaoProduto.MARGEM_MAXIMA)) {
                 sql.put("margemmaxima", vo.getMargemMaxima());
             }
             if (opt.contains(OpcaoProduto.MARGEM)) {
