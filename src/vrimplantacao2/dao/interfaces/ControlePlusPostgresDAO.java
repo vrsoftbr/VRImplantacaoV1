@@ -6,6 +6,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import vrframework.classe.Conexao;
+import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -42,6 +44,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
@@ -73,11 +76,15 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
         ));
     }
 
+    public List<Estabelecimento> getLojaCliente() throws SQLException {
+        return Arrays.asList(new Estabelecimento("1", "LOJA 01"));
+    }
+    
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "	substring(se_codig, 1, 2) as merc1,\n"
@@ -173,7 +180,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	p.pr_codint as id,\n"
@@ -205,7 +212,31 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "order by p.pr_codint::bigint"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.seteBalanca("S".equals(rst.getString("balanca")));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcotacao"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
+                    imp.setCodMercadologico4(rst.getString("mercadologico4"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    
+                    result.add(imp);
                 }
             }
         }
@@ -216,7 +247,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "	f.cf_codig as id,\n"
@@ -247,7 +278,26 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "order by f.cf_codig::bigint"
             )) {
                 while (rst.next()) {
-
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
                 }
             }
         }
@@ -258,7 +308,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "	cf_codig as idfornecedor,\n"
@@ -269,7 +319,13 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "order by cf_codig::bigint, pr_codint::bigint"
             )) {
                 while (rst.next()) {
-
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    result.add(imp);
                 }
             }
         }
@@ -280,7 +336,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
 
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "	c.cf_codig as id,\n"
@@ -311,7 +367,24 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "order by c.cf_codig::bigint"
             )) {
                 while (rst.next()) {
-                    
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setAtivo(rst.getInt("ativo") == 1);
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
                 }
             }
         }

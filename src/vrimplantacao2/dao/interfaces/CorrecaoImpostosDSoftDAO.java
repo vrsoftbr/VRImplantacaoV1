@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
