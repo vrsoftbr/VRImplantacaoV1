@@ -44,6 +44,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
@@ -179,6 +180,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        Double qtdEmbalagem, qtdEmbalagemCotacao;
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -212,6 +214,10 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "order by p.pr_codint::bigint"
             )) {
                 while (rst.next()) {
+                    
+                    qtdEmbalagem = Double.parseDouble(rst.getString("qtdembalagem").replace(".", "").replace(",", "."));
+                    qtdEmbalagemCotacao = Double.parseDouble(rst.getString("qtdembalagemcotacao").replace(".", "").replace(",", "."));
+                    
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -223,17 +229,27 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
                     imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcotacao"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
+                    imp.setQtdEmbalagemCotacao(qtdEmbalagemCotacao.intValue());
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagem(qtdEmbalagem.intValue());
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setCodMercadologico4(rst.getString("mercadologico4"));
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    
+                    if (rst.getString("custocomimposto") != null && !rst.getString("custocomimposto").trim().isEmpty()) {
+                        imp.setCustoComImposto(Double.parseDouble(rst.getString("custocomimposto").replace(".", "").replace(",", ".")));
+                    }
+                    
+                    if (rst.getString("custosemimposto") != null && !rst.getString("custosemimposto").trim().isEmpty()) {
+                        imp.setCustoSemImposto(Double.parseDouble(rst.getString("custosemimposto").replace(".", "").replace(",", ".")));
+                    }
+                    
+                    if (rst.getString("precovenda") != null && !rst.getString("precovenda").trim().isEmpty()) {
+                        imp.setPrecovenda(Double.parseDouble(rst.getString("precovenda").replace(".", "").replace(",", ".")));
+                    }
+                    
                     imp.setNcm(rst.getString("ncm"));
                     
                     result.add(imp);
@@ -362,7 +378,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "	c.cf_telef1 as telefone,\n"
                     + "	c.cf_telef2 as telefone2,\n"
                     + "	c.cf_fax as fax\n"
-                    + "select * from implantacao.clientes_fornecedores_ondas c\n"
+                    + "from implantacao.clientes_fornecedores_ondas c\n"
                     + "where c.cf_tipo = 'C'\n"
                     + "order by c.cf_codig::bigint"
             )) {
