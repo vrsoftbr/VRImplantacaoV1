@@ -111,7 +111,7 @@ public class PisCofinsDAO {
                 "	cst,\n" +
                 "	id_tipoentradasaida = 0 credito\n" +
                 "from tipopiscofins\n" +
-                "order by cst"    
+                "order by cst, id desc"    
             )) {
                 while (rst.next()) {
                     PisCofinsVO pisCofins = new PisCofinsVO(
