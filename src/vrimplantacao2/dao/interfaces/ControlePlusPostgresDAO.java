@@ -61,6 +61,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
@@ -80,7 +81,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     public List<Estabelecimento> getLojaCliente() throws SQLException {
         return Arrays.asList(new Estabelecimento("1", "LOJA 01"));
     }
-    
+
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
@@ -204,20 +205,37 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     + "	case p.pr_ativo when 'S' then 1 else 0 end situacaocadastro,\n"
                     + "	p.pr_data_alteracao as dataalteracao,\n"
                     + "	p.data_inc as datacadastro,\n"
+                    + " p.pr_margem_bruta_scusto as margem, \n"
                     + "	p.pr_ult_precocusto as custocomimposto,\n"
                     + "	p.pr_custo_sem_icms as custosemimposto,\n"
                     + "	p.pr_precovenda_atual as precovenda,\n"
-                    + "	p.ncm as ncm\n"
+                    + " p.estoque_minimo as estoqueminimo, \n"
+                    + "	p.ncm as ncm,\n"
+                    + " pis.pis_cst_e as piscofinsentrada,\n"
+                    + "	pis.pis_cst_s as piscofinssaida, \n"
+                    + " pis.cod_natureza_receita as naturezareceita, \n"
+                    + " icm_s.sac_cst as cstdebito,\n"
+                    + " icm_s.sac_alq as aliquotadebito, \n"
+                    + " icm_s.sac_rbc as reducaodebito, \n"
+                    + " icm_e.ei_cst as cstcredito, \n"
+                    + " icm_e.ei_alq as aliquotacredito, \n"
+                    + " icm_e.ei_rbc as reducaocredito \n"
                     + "from implantacao.produtos_ondas p \n"
                     + "left join implantacao.produtoscodigobarras_ondas ean\n"
                     + "	on ean.pr_codint = p.pr_codint\n"
+                    + "left join implantacao.produtos_piscofins pis\n"
+                    + "	on pis.codigo_produto = p.pr_codint \n"
+                    + "left join implantacao.produtos_icms_saida icm_s\n"
+                    + "	on icm_s.codigo_produto = p.pr_codint\n"
+                    + "left join implantacao.produtos_icms_entrada icm_e \n"
+                    + "	on icm_e.codigo_produto = p.pr_codint "
                     + "order by p.pr_codint::bigint"
             )) {
                 while (rst.next()) {
-                    
+
                     qtdEmbalagem = Double.parseDouble(rst.getString("qtdembalagem").replace(".", "").replace(",", "."));
                     qtdEmbalagemCotacao = Double.parseDouble(rst.getString("qtdembalagemcotacao").replace(".", "").replace(",", "."));
-                    
+
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -237,21 +255,67 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setCodMercadologico4(rst.getString("mercadologico4"));
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-                    
+
+                    if (rst.getString("estoqueminimo") != null && !rst.getString("estoqueminimo").trim().isEmpty()) {
+                        imp.setEstoqueMinimo(Double.parseDouble(rst.getString("estoqueminimo").replace(".", "").replace(",", ".")));
+                    }
+
+                    if (rst.getString("margem") != null && !rst.getString("margem").trim().isEmpty()) {
+                        imp.setMargem(Double.parseDouble(rst.getString("margem").replace(".", ",").replace(",", ".")));
+                    }
+
                     if (rst.getString("custocomimposto") != null && !rst.getString("custocomimposto").trim().isEmpty()) {
                         imp.setCustoComImposto(Double.parseDouble(rst.getString("custocomimposto").replace(".", "").replace(",", ".")));
                     }
-                    
+
                     if (rst.getString("custosemimposto") != null && !rst.getString("custosemimposto").trim().isEmpty()) {
                         imp.setCustoSemImposto(Double.parseDouble(rst.getString("custosemimposto").replace(".", "").replace(",", ".")));
                     }
-                    
+
                     if (rst.getString("precovenda") != null && !rst.getString("precovenda").trim().isEmpty()) {
                         imp.setPrecovenda(Double.parseDouble(rst.getString("precovenda").replace(".", "").replace(",", ".")));
                     }
-                    
+
                     imp.setNcm(rst.getString("ncm"));
-                    
+                    imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofinsentrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+
+                    if (rst.getString("cstdebito") != null && !rst.getString("cstdebito").trim().isEmpty()) {
+                        imp.setIcmsCstSaida(rst.getInt("cstdebito"));
+                        imp.setIcmsCstSaidaForaEstado(rst.getInt("cstdebito"));
+                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cstdebito"));
+                        imp.setIcmsCstConsumidor(rst.getInt("cstdebito"));
+                    }
+
+                    if (rst.getString("aliquotadebito") != null && !rst.getString("aliquotadebito").trim().isEmpty()) {
+                        imp.setIcmsAliqSaida(Double.parseDouble(rst.getString("aliquotadebito").replace(",", ".")));
+                        imp.setIcmsAliqSaidaForaEstado(Double.parseDouble(rst.getString("aliquotadebito").replace(",", ".")));
+                        imp.setIcmsAliqSaidaForaEstadoNF(Double.parseDouble(rst.getString("aliquotadebito").replace(",", ".")));
+                        imp.setIcmsAliqConsumidor(Double.parseDouble(rst.getString("aliquotadebito").replace(",", ".")));
+                    }
+
+                    if (rst.getString("reducaodebito") != null && !rst.getString("reducaodebito").trim().isEmpty()) {
+                        imp.setIcmsReducaoSaida(Double.parseDouble(rst.getString("reducaodebito").replace(",", ".")));
+                        imp.setIcmsReducaoSaidaForaEstado(Double.parseDouble(rst.getString("reducaodebito").replace(",", ".")));
+                        imp.setIcmsReducaoSaidaForaEstadoNF(Double.parseDouble(rst.getString("reducaodebito").replace(",", ".")));
+                        imp.setIcmsReducaoConsumidor(Double.parseDouble(rst.getString("reducaodebito").replace(",", ".")));
+                    }
+
+                    if (rst.getString("cstcredito") != null && !rst.getString("cstcredito").trim().isEmpty()) {
+                        imp.setIcmsCstEntrada(rst.getInt("cstcredito"));
+                        imp.setIcmsCstEntradaForaEstado(rst.getInt("cstcredito"));
+                    }
+
+                    if (rst.getString("aliquotacredito") != null && !rst.getString("aliquotacredito").trim().isEmpty()) {
+                        imp.setIcmsAliqEntrada(Double.parseDouble(rst.getString("aliquotacredito").replace(",", ".")));
+                        imp.setIcmsAliqEntradaForaEstado(Double.parseDouble(rst.getString("aliquotacredito").replace(",", ".")));
+                    }
+
+                    if (rst.getString("reducaocredito") != null && !rst.getString("reducaocredito").trim().isEmpty()) {
+                        imp.setIcmsReducaoEntrada(Double.parseDouble(rst.getString("reducaocredito").replace(",", ".")));
+                        imp.setIcmsReducaoEntradaForaEstado(Double.parseDouble(rst.getString("reducaocredito").replace(",", ".")));
+                    }
                     result.add(imp);
                 }
             }
