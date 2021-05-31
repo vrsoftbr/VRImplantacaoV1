@@ -415,7 +415,7 @@
                                           <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="109" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -645,6 +645,8 @@
                                       <Component id="chkT1Custo" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                                       <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkT1ForcarprecoCusto" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
                                       <Component id="chkTrocaEstoque" min="-2" max="-2" attributes="0"/>
@@ -753,7 +755,10 @@
                                   <Component id="chkMercadologico" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkProdutos" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkT1Custo" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkT1Preco" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkT1ForcarprecoCusto" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace min="5" pref="5" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -870,6 +875,12 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Preco">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Pre&#xe7;o"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1ForcarprecoCusto">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="(For&#xe7;ar Pre&#xe7;o e/ou Custo)"/>
+                        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;b&gt;For&#xe7;a&lt;/b&gt; a altera&#xe7;&#xe3;o do pre&#xe7;o e/ou custo mesmo&lt;br&gt;&#xa;que os mesmos tenham sido alterados no VR.&#xa;&lt;/html&gt;"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JCheckBox" name="chkTrocaEstoque">
@@ -1145,7 +1156,7 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="294" max="32767" attributes="0"/>
+                              <EmptySpace pref="258" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1336,7 +1347,7 @@
                                   <Component id="chkFTelefone" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkFFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="494" max="32767" attributes="0"/>
+                              <EmptySpace pref="458" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1480,7 +1491,7 @@
                                   <Component id="chkConvConveniado" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="616" max="32767" attributes="0"/>
+                              <EmptySpace pref="580" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1554,7 +1565,7 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="485" max="32767" attributes="0"/>
+                              <EmptySpace pref="449" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1678,7 +1689,7 @@
                               <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="402" max="32767" attributes="0"/>
+                          <EmptySpace pref="366" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

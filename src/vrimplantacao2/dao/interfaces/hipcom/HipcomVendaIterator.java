@@ -19,9 +19,9 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
     
     private static final Logger LOG = Logger.getLogger(HipcomVendaIterator.class.getName());
 
-     public HipcomVendaIterator(String idLojas, Date dataInicial, Date dataTermino) throws Exception {
+     public HipcomVendaIterator(String idLojas, Date dataInicial, Date dataTermino, Integer versaoVenda) throws Exception {
         super(
-            new CustomNextBuilder(),
+            new CustomNextBuilder(versaoVenda),
             new StatementBuilder() {
                 @Override
                 public Statement makeStatement() throws Exception {
@@ -30,59 +30,111 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
             }
         );
         
-        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLojas), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
+        for (String statement : SQLUtils.quebrarSqlEmMeses(getFullSQL(idLojas, versaoVenda), dataInicial, dataTermino, new SimpleDateFormat("yyyy-MM-dd"))) {
             this.addStatement(statement);
         }
     }
 
-    private String getFullSQL(String idLojaCliente) throws Exception {
+    private String getFullSQL(String idLojaCliente, Integer versaoVenda) throws Exception {
 
-        return
-            "select\n" +
-            "	v.id_cupom id,\n" +
-            "	v.numero_cupom,\n" +
-            "	v.caixa,\n" +
-            "	v.`data`,\n" +
-            "	min(v.hora) horainicio,\n" +
-            "	max(v.hora) horafim,\n" +
-            "	min(case when v.cupom_cancelado = 'S' then 1 else 0 end) cancelado,\n" +
-            "	sum(v.valor_total) subtotalimpressora,\n" +
-            "	sum(v.valor_acrescimo_cupom) valoracrescimo,\n" +
-            "	sum(v.valor_desconto_cupom) valordesconto,\n" +
-            "	v.serie_aparelho numeroserie,\n" +
-            "	v.tipo_fiscal modeloimpressora\n" +
-            "from\n" +
-            "	view_vendas_pdv_antiga v\n" +
-            "where\n" +
-            "	v.`data` >= '{DATA_INICIO}' and\n" +
-            "	v.`data` <= '{DATA_TERMINO}' and\n" +
-            "	v.loja = " + idLojaCliente + "\n" +
-            "group by\n" +
-            "	v.id_cupom,\n" +
-            "	v.numero_cupom,\n" +
-            "	v.caixa,\n" +
-            "	v.`data`,\n" +
-            "	v.serie_aparelho,\n" +
-            "	v.tipo_fiscal";
+        if (versaoVenda == 1) {
+            return
+                "select\n" +
+                "   v.loja, \n" +
+                "	v.numero_cupom_fiscal,\n" +
+                "	v.codigo_caixa as caixa,\n" +
+                "	v.`data`,\n" +
+                "	min(v.hora) horainicio,\n" +
+                "	max(v.hora) horafim,\n" +
+                "	min(case when v.cupom_cancelado = 'S' then 1 else 0 end) cancelado,\n" +
+                "	sum(v.valor_total_item) subtotalimpressora,\n" +
+                "	sum(v.valor_desconto_item) valordesconto,\n" +
+                "	v.serie numeroserie,\n" +
+                "	v.modelo_documento_fiscal modeloimpressora\n" +
+                "from\n" +
+                "	vendasantigas v\n" +
+                "where\n" +
+                "	v.`data` >= '{DATA_INICIO}' and\n" +
+                "	v.`data` <= '{DATA_TERMINO}' and\n" +
+                "	v.loja = " + idLojaCliente + "\n" +
+                "group by\n" +
+                "	v.numero_cupom_fiscal,\n" +
+                "	v.codigo_caixa,\n" +
+                "	v.`data`,\n" +
+                "	v.serie,\n" +
+                "	v.modelo_documento_fiscal";
+        } else {
+            return
+                "select\n" +
+                "	v.id_cupom id,\n" +
+                "	v.numero_cupom,\n" +
+                "	v.caixa,\n" +
+                "	v.`data`,\n" +
+                "	min(v.hora) horainicio,\n" +
+                "	max(v.hora) horafim,\n" +
+                "	min(case when v.cupom_cancelado = 'S' then 1 else 0 end) cancelado,\n" +
+                "	sum(v.valor_total) subtotalimpressora,\n" +
+                "	sum(v.valor_acrescimo_cupom) valoracrescimo,\n" +
+                "	sum(v.valor_desconto_cupom) valordesconto,\n" +
+                "	v.serie_aparelho numeroserie,\n" +
+                "	v.tipo_fiscal modeloimpressora\n" +
+                "from\n" +
+                "	hipcom_cupom_tr v\n" +
+                "where\n" +
+                "	v.`data` >= '{DATA_INICIO}' and\n" +
+                "	v.`data` <= '{DATA_TERMINO}' and\n" +
+                "	v.loja = " + idLojaCliente + "\n" +
+                "group by\n" +
+                "	v.id_cupom,\n" +
+                "	v.numero_cupom,\n" +
+                "	v.caixa,\n" +
+                "	v.`data`,\n" +
+                "	v.serie_aparelho,\n" +
+                "	v.tipo_fiscal";            
+        }
     }
     
     private static class CustomNextBuilder implements NextBuilder<VendaIMP> {
+        
+        private Integer versaoVenda;
+        
+        public CustomNextBuilder(Integer versaoVenda) {
+            this.versaoVenda = versaoVenda;
+        }
+        
         @Override
         public VendaIMP makeNext(ResultSet rs) throws Exception {
             VendaIMP next = new VendaIMP();
             
-            next.setId(rs.getString("id"));
-            next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom")));
-            next.setEcf(Utils.stringToInt(rs.getString("caixa")));
-            next.setData(rs.getDate("data"));
-            next.setHoraInicio(rs.getTime("horainicio"));
-            next.setHoraTermino(rs.getTime("horafim"));
-            next.setCancelado(rs.getBoolean("cancelado"));
-            next.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
-            next.setValorAcrescimo(rs.getDouble("valoracrescimo"));
-            next.setValorDesconto(rs.getDouble("valordesconto"));
-            next.setNumeroSerie(rs.getString("numeroserie"));
-            next.setModeloImpressora(rs.getString("modeloimpressora"));
+            if (this.versaoVenda == 1) {
+                
+                next.setId(rs.getString("loja") + "-" + rs.getString("numero_cupom_fiscal") + rs.getString("data") + rs.getString("caixa"));
+                next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom_fiscal")));
+                next.setEcf(Utils.stringToInt(rs.getString("caixa")));
+                next.setData(rs.getDate("data"));
+                next.setHoraInicio(rs.getTime("horainicio"));
+                next.setHoraTermino(rs.getTime("horafim"));
+                next.setCancelado(rs.getBoolean("cancelado"));
+                next.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
+                next.setValorDesconto(rs.getDouble("valordesconto"));
+                next.setNumeroSerie(rs.getString("numeroserie"));
+                next.setModeloImpressora(rs.getString("modeloimpressora"));
+                
+            } else {
+                
+                next.setId(rs.getString("id"));
+                next.setNumeroCupom(Utils.stringToInt(rs.getString("numero_cupom")));
+                next.setEcf(Utils.stringToInt(rs.getString("caixa")));
+                next.setData(rs.getDate("data"));
+                next.setHoraInicio(rs.getTime("horainicio"));
+                next.setHoraTermino(rs.getTime("horafim"));
+                next.setCancelado(rs.getBoolean("cancelado"));
+                next.setSubTotalImpressora(rs.getDouble("subtotalimpressora"));
+                next.setValorAcrescimo(rs.getDouble("valoracrescimo"));
+                next.setValorDesconto(rs.getDouble("valordesconto"));
+                next.setNumeroSerie(rs.getString("numeroserie"));
+                next.setModeloImpressora(rs.getString("modeloimpressora"));                
+            }
             
             return next;
         }

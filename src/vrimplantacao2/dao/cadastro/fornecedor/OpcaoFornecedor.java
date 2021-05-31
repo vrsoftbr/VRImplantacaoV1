@@ -1,6 +1,9 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 
 public enum OpcaoFornecedor {
@@ -59,5 +62,55 @@ public enum OpcaoFornecedor {
 
     public void setListaEspecial(List<FornecedorIMP> listaEspecial) {
         this.listaEspecial = listaEspecial;
+    }
+
+    public static Set<OpcaoFornecedor> getDados() {
+        return new HashSet<>(Arrays.asList(
+                DADOS,
+                RAZAO_SOCIAL,
+                NOME_FANTASIA,
+                CNPJ_CPF,
+                INSCRICAO_ESTADUAL,
+                INSCRICAO_MUNICIPAL
+        ));
+    }
+    
+    public static Set<OpcaoFornecedor> getEndereco() {
+        return new HashSet<>(Arrays.asList(
+                ENDERECO,
+                NUMERO,
+                COMPLEMENTO,
+                BAIRRO,
+                MUNICIPIO,
+                UF,
+                CEP
+        ));
+    }
+    
+    public static Set<OpcaoFornecedor> getContato() {
+        return new HashSet<>(Arrays.asList(
+                TELEFONE,
+                CONTATOS
+        ));
+    }
+    
+    public static Set<OpcaoFornecedor> getDadosComplementares() {
+        return new HashSet<>(Arrays.asList(
+                SITUACAO_CADASTRO,
+                PRAZO_FORNECEDOR,
+                CONDICAO_PAGAMENTO,
+                TIPO_INDICADOR_IE,
+                OBSERVACAO
+        ));
+    }
+    
+    public static Set<OpcaoFornecedor> getPadrao() {
+        Set<OpcaoFornecedor> result = new HashSet<>();
+        result.addAll(getDados());
+        result.addAll(getEndereco());
+        result.addAll(getContato());
+        result.addAll(getDadosComplementares());
+        
+        return result;
     }
 }

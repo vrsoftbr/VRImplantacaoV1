@@ -535,11 +535,11 @@ public class VendaRepository {
             if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL)) {
                 produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
             }
-            if ( produto == null ) {
-                haDivergencia = true;
+            if ( produto == null ) {                
                 final boolean produtoNaoEncontradoAnteriormente = !produtosNaoEncontrados.contains(impItem.getProduto());
                 
                 if (!forcarCadastroProdutoNaoExistente && produtoNaoEncontradoAnteriormente) {
+                    haDivergencia = true;
                     final String msg = String.format(
                             "Produto não encontrado - código:%s ean:%s descricao:%s",
                             impItem.getProduto(),

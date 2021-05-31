@@ -111,6 +111,12 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_CONSUMIDOR,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.CEST,
@@ -428,8 +434,10 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 System.out.println(eans.size());
                 while (rst.next()) {
                     
-                    
-                    Set<Ean> e = eans.get(!rst.getString("id").trim().isEmpty() ? rst.getString("id") : null);
+                    String id = rst.getString("id");
+                    if (id != null && id.trim().isEmpty())
+                        id = null;
+                    Set<Ean> e = eans.get(id);
 
                     if (e != null) {
                         for (Ean ean : e) {
