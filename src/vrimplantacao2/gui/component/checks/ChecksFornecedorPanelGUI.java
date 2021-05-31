@@ -452,6 +452,11 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         getAccessibleContext().setAccessibleName("Importação de Fornecedores");
     }// </editor-fold>//GEN-END:initComponents
 
+    private void chkMunicipioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMunicipioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkMunicipioActionPerformed
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.ButtonGroup btgPautaFiscal;
     public vrframework.bean.checkBox.VRCheckBox chkBairro;
