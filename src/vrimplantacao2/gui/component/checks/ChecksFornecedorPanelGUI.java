@@ -411,7 +411,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkTelefone, "Telefone");
         chkTelefone.setEnabled(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkContatoAdicional, "Contato Adicionaal");
+        org.openide.awt.Mnemonics.setLocalizedText(chkContatoAdicional, "Contato Adicional");
         chkContatoAdicional.setEnabled(true);
 
         javax.swing.GroupLayout pnlContatoLayout = new javax.swing.GroupLayout(pnlContato);
@@ -428,7 +428,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlContatoLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addComponent(jLabel8)))
-                .addContainerGap(398, Short.MAX_VALUE))
+                .addContainerGap(404, Short.MAX_VALUE))
         );
         pnlContatoLayout.setVerticalGroup(
             pnlContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
