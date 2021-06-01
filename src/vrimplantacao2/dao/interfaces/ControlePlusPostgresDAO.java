@@ -87,16 +87,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
-                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
-                OpcaoFornecedor.ENDERECO,
-                OpcaoFornecedor.NUMERO,
-                OpcaoFornecedor.COMPLEMENTO,
-                OpcaoFornecedor.BAIRRO,
-                OpcaoFornecedor.MUNICIPIO,
-                OpcaoFornecedor.UF,
-                OpcaoFornecedor.CEP,
-                OpcaoFornecedor.TELEFONE,
-                OpcaoFornecedor.SITUACAO_CADASTRO
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL
         ));        
     }
 
