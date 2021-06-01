@@ -8,8 +8,11 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -34,7 +37,6 @@ public class LiteciDAO extends InterfaceDAO {
 
     private String idLoja = "";
     public String v_lojaMesmoId;
-    public boolean utilizaArquivoBalanca = false;
     public boolean gerarCodigoAtacado = false;
     private ProdutoRepositoryProvider repository = new ProdutoRepositoryProvider();
 
@@ -83,6 +85,49 @@ public class LiteciDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_SAIDA,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_NF,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ATACADO
+        ));
     }
 
     @Override
@@ -147,9 +192,9 @@ public class LiteciDAO extends InterfaceDAO {
 
                         if (produtoBalanca != null) {
                             imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                            imp.setValidade(produtoBalanca.getValidade());
                         } else {
-                            imp.setValidade(0);
+                            imp.setValidade(rst.getInt("validade"));
                             imp.seteBalanca(false);
                         }
                     } else {
