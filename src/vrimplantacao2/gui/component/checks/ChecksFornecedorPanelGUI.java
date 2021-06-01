@@ -61,6 +61,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             chkCep.setVisible(opt.contains(OpcaoFornecedor.CEP));
 
             tabImportacao.add(pnlEndereco);
+        } else {
+            pnlEndereco.setVisible(false);
         }
         
         if (opt.contains(OpcaoFornecedor.TELEFONE)
@@ -70,6 +72,8 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             chkContatoAdicional.setVisible(opt.contains(OpcaoFornecedor.CONTATOS));
 
             tabImportacao.add(pnlContato);
+        } else {
+            pnlContato.setVisible(false);
         }
 
         if (opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO)
@@ -85,12 +89,16 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             chkObservacao.setVisible(opt.contains(OpcaoFornecedor.OBSERVACAO));
 
             tabImportacao.add(pnlDadosComplementares);
+        } else {
+            pnlDadosComplementares.setVisible(false);
         }
         
         if (opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR)) {
             chkProdutoFornecedor.setVisible(opt.contains(OpcaoFornecedor.PRODUTO_FORNECEDOR));
             
             tabImportacao.add(pnlProdutoFornecedor);
+        } else {
+            pnlProdutoFornecedor.setVisible(false);
         }
         
         tabImportacao.revalidate();
