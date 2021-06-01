@@ -58,10 +58,7 @@
                           <Component id="pnlDados" alignment="0" max="32767" attributes="0"/>
                           <Component id="pnlEndereco" alignment="0" max="32767" attributes="0"/>
                           <Component id="pnlContato" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="pnlProdutoFornecedor" max="32767" attributes="0"/>
-                              <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="pnlProdutoFornecedor" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
                   </Group>
