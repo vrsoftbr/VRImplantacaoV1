@@ -227,11 +227,22 @@ public class LojaDAO {
                 sql.append(" FROM fornecedorprazopedido WHERE id_loja = " + i_loja.idCopiarLoja + ");");
                 stm.execute(sql.toString());
 
-                sql = new StringBuilder();
-                sql.append("INSERT INTO parametrovalor (id_loja, id_parametro, valor)");
-                sql.append(" (SELECT " + i_loja.id + ", id_parametro, valor FROM parametrovalor WHERE id_loja = " + i_loja.idCopiarLoja + ")");
-
-                stm.execute(sql.toString());
+                stm.execute(
+                        "insert into parametrovalor (\n" +
+                        "	id_loja,\n" +
+                        "	id_parametro,\n" +
+                        "	valor\n" +
+                        ") \n" +
+                        "select\n" +
+                        "	" + i_loja.id + ",\n" +
+                        "	id_parametro,\n" +
+                        "	valor\n" +
+                        "from\n" +
+                        "	parametrovalor\n" +
+                        "where\n" +
+                        "	id_loja = " + i_loja.idCopiarLoja + "\n" +
+                        "	and id_parametro not in (456, 485, 486)"
+                );
                 
                 sql = new StringBuilder();
                 sql.append("INSERT INTO pdv.funcaoniveloperador (id_loja, id_funcao, id_tiponiveloperador)");
