@@ -1454,8 +1454,9 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd-MM-yyyy");
-        public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        //public final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
         private Statement stm = ConexaoFirebird.getConexao().createStatement();
         private ResultSet rst;
@@ -1478,19 +1479,16 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setCpf(rst.getString("cnpj"));
-                        String horaInicio = FORMAT.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("horatermino");
-                        next.setHoraInicio(TIMESTAMP.parse(horaInicio));
-                        next.setHoraTermino(TIMESTAMP.parse(horaTermino));
+                        //next.setCpf(rst.getString("cnpj"));
+                        //String horaInicio = FORMAT.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                        //String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        //next.setHoraInicio(TIMESTAMP.parse(horaInicio));
+                        //next.setHoraTermino(TIMESTAMP.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
-                        //next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        //next.setNomeCliente(rst.getString("nomecliente"));
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -1499,13 +1497,11 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n"
-                    + "	TRNSEQEQP||CXANUM||REPLACE(SUBSTRING(TRNDATVEN FROM 1 FOR 10),'-','') id_venda,\n"
+                    + "	v.TRNSEQEQP || v.CXANUM || v.TRNDAT id_venda,\n"
                     + "	TRNSEQEQP numerocupom,\n"
                     + "	CXANUM ecf,\n"
-                    //+ "	SUBSTRING(TRNDATVEN FROM 1 FOR 10) AS data,\n"
-                    + "	TRNDATVEN as data,\n"
+                    + " cast(TRNDATVEN as timestamp) AS DATA,\n"
                     + "	v.CLICOD id_cliente,\n"
-                    + " clicpfcgc cnpj,\n"
                     + " SUBSTRING(TRNHORINI FROM 11 FOR 6) horainicio,\n"
                     + " SUBSTRING(TRNHORFIN FROM 11 FOR 6) horatermino,\n"
                     + "	TRNVLR subtotalimpressora,\n"
@@ -1516,7 +1512,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHERE\n"
                     + "	LOJCOD = " + idLojaCliente + "\n"
                     + "	AND TRNSEQEQP != 0\n"
-                    + "	AND TRNDAT BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n"
+                    + "	AND cast(TRNDATVEN as date) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n"
                     + "ORDER BY 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1544,7 +1540,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
         public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
         
         private Statement stm = ConexaoFirebird.getConexao().createStatement();
@@ -1566,7 +1562,6 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setTotalBruto(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("embalagem"));
 
@@ -1581,7 +1576,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n"
-                    + "	v.TRNSEQEQP||v.CXANUM||REPLACE(SUBSTRING(v.TRNDATVEN FROM 1 FOR 10),'-','') id_venda,\n"
+                    + "	v.TRNSEQEQP || v.CXANUM || v.TRNDAT id_venda,\n"
                     + "	id id_vendaitem,\n"
                     + "	ITVSEQ item,\n"
                     + "	iv.PROCOD id_produto,\n"
@@ -1596,9 +1591,10 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	LEFT JOIN TRANSACAO v ON v.TRNSEQ = iv.TRNSEQ AND iv.CXANUM = v.CXANUM \n"
                     + "	LEFT JOIN PRODUTO p ON p.PROCOD = iv.PROCOD \n"
                     + "WHERE \n"
-                    + "	iv.LOJCOD = " + idLojaCliente + "\n"
+                    + "	iv.LOJCOD = '" + idLojaCliente + "'\n"
                     + "	AND v.TRNSEQEQP != 0\n"
-                    + "	AND v.TRNDAT BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n"
+                    + "	AND v.TRNDAT BETWEEN '" + FORMAT.format(dataInicio) +
+                                    "' and '" + FORMAT.format(dataTermino) + "'\n"
                     + "ORDER BY 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
