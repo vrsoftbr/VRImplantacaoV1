@@ -4,14 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 
-/**
- *
- * @author Leandro
- */
 public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
     public Importador importador;
@@ -20,12 +15,11 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public void setImportador(Importador importador) {
         this.importador = importador;
     }
-    
-    
+
     public void setOpcoesDisponiveis(InterfaceDAO dao) {
         this.opt = dao.getOpcoesDisponiveisCliente();
         tabImportacao.removeAll();
-                
+
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
                 || opt.contains(OpcaoCliente.FANTASIA)
@@ -33,14 +27,15 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 || opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
 
             chkClientePreferencial.setVisible(opt.contains(OpcaoCliente.DADOS));
-            chkRazao.setVisible(opt.contains(OpcaoCliente.RAZAO));
-            chkFantasia.setVisible(opt.contains(OpcaoCliente.FANTASIA));
+            chkNome.setVisible(opt.contains(OpcaoCliente.RAZAO));
             chkCnpj.setVisible(opt.contains(OpcaoCliente.CNPJ));
             chkIE.setVisible(opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL));
 
             tabImportacao.add(pnlDados);
+        } else {
+            pnlDados.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoCliente.ENDERECO)
                 || opt.contains(OpcaoCliente.NUMERO)
                 || opt.contains(OpcaoCliente.COMPLEMENTO)
@@ -63,16 +58,67 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlEndereco.setVisible(false);
         }
-        
+
         if (opt.contains(OpcaoCliente.TELEFONE)
+                || opt.contains(OpcaoCliente.CELULAR)
+                || opt.contains(OpcaoCliente.EMAIL)
                 || opt.contains(OpcaoCliente.CONTATOS)) {
 
             chkTelefone.setVisible(opt.contains(OpcaoCliente.TELEFONE));
+            chkCelular.setVisible(opt.contains(OpcaoCliente.CELULAR));
+            chkEmail.setVisible(opt.contains(OpcaoCliente.EMAIL));
             chkContatoAdicional.setVisible(opt.contains(OpcaoCliente.CONTATOS));
 
             tabImportacao.add(pnlContato);
         } else {
             pnlContato.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.DATA_CADASTRO)
+                || opt.contains(OpcaoCliente.SITUACAO_CADASTRO)
+                || opt.contains(OpcaoCliente.BLOQUEADO)
+                || opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)
+                || opt.contains(OpcaoCliente.PERMITE_CHEQUE)
+                || opt.contains(OpcaoCliente.VALOR_LIMITE)
+                || opt.contains(OpcaoCliente.NOME_PAI)
+                || opt.contains(OpcaoCliente.NOME_MAE)
+                || opt.contains(OpcaoCliente.NOME_CONJUGE)
+                || opt.contains(OpcaoCliente.DATA_NASCIMENTO)
+                || opt.contains(OpcaoCliente.OBSERVACOES)
+                || opt.contains(OpcaoCliente.OBSERVACOES2)) {
+
+            chkDataCadastro.setVisible(opt.contains(OpcaoCliente.DATA_CADASTRO));
+            chkSituacaoCadastro.setVisible(opt.contains(OpcaoCliente.SITUACAO_CADASTRO));
+            chkBloqueado.setVisible(opt.contains(OpcaoCliente.BLOQUEADO));
+            chkPermiteCreditoRotativo.setVisible(opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO));
+            chkPermiteCheque.setVisible(opt.contains(OpcaoCliente.PERMITE_CHEQUE));
+            chkValorLimite.setVisible(opt.contains(OpcaoCliente.VALOR_LIMITE));
+            chkNomePai.setVisible(opt.contains(OpcaoCliente.NOME_PAI));
+            chkNomeMae.setVisible(opt.contains(OpcaoCliente.NOME_MAE));
+            chkNomeConjuge.setVisible(opt.contains(OpcaoCliente.NOME_CONJUGE));
+            chkDataNascimento.setVisible(opt.contains(OpcaoCliente.DATA_NASCIMENTO));
+            chkObservacao.setVisible(opt.contains(OpcaoCliente.OBSERVACOES));
+            chkObservacao2.setVisible(opt.contains(OpcaoCliente.OBSERVACOES2));
+
+            tabImportacao.add(pnlDadosComplementares);
+
+        } else {
+            pnlDadosComplementares.setVisible(false);
+        }
+
+        if (opt.contains(OpcaoCliente.EMPRESA)
+                || opt.contains(OpcaoCliente.CARGO)
+                || opt.contains(OpcaoCliente.DATA_ADMISSAO)
+                || opt.contains(OpcaoCliente.SALARIO)) {
+
+            chkEmpresa.setVisible(opt.contains(OpcaoCliente.EMPRESA));
+            chkCargo.setVisible(opt.contains(OpcaoCliente.CARGO));
+            chkDataAdmissao.setVisible(opt.contains(OpcaoCliente.DATA_ADMISSAO));
+            chkSalario.setVisible(opt.contains(OpcaoCliente.SALARIO));
+
+            tabImportacao.add(pnlDadosEmpresa);
+        } else {
+            pnlDadosEmpresa.setVisible(false);
         }
 
         tabImportacao.revalidate();
@@ -81,7 +127,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public Set<OpcaoCliente> getOpcoesDisponiveis() {
         return opt;
     }
-    
+
     /**
      * Creates new form ChecksFornecedorPanelGUI
      */
@@ -89,21 +135,18 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         super();
         initComponents();
     }
-    
+
     public void importar() throws Exception {
-        
+
         if (chkClientePreferencial.isSelected()) {
             importador.importarClientePreferencial();
         }
-        
+
         {
             List<OpcaoCliente> opcao = new ArrayList<>();
-            
-            if (chkRazao.isSelected()) {
+
+            if (chkNome.isSelected()) {
                 opcao.add(OpcaoCliente.RAZAO);
-            }
-            if (chkFantasia.isSelected()) {
-                opcao.add(OpcaoCliente.FANTASIA);
             }
             if (chkCnpj.isSelected()) {
                 opcao.add(OpcaoCliente.CNPJ);
@@ -135,21 +178,75 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             if (chkTelefone.isSelected()) {
                 opcao.add(OpcaoCliente.TELEFONE);
             }
+            if (chkCelular.isSelected()) {
+                opcao.add(OpcaoCliente.CELULAR);
+            }
+            if (chkEmail.isSelected()) {
+                opcao.add(OpcaoCliente.EMAIL);
+            }
             if (chkContatoAdicional.isSelected()) {
                 opcao.add(OpcaoCliente.CONTATOS);
             }
-            
+            if (chkDataCadastro.isSelected()) {
+                opcao.add(OpcaoCliente.DATA_CADASTRO);
+            }
+            if (chkSituacaoCadastro.isSelected()) {
+                opcao.add(OpcaoCliente.SITUACAO_CADASTRO);
+            }
+            if (chkBloqueado.isSelected()) {
+                opcao.add(OpcaoCliente.BLOQUEADO);
+            }
+            if (chkPermiteCreditoRotativo.isSelected()) {
+                opcao.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
+            }
+            if (chkPermiteCheque.isSelected()) {
+                opcao.add(OpcaoCliente.PERMITE_CHEQUE);
+            }
+            if (chkValorLimite.isSelected()) {
+                opcao.add(OpcaoCliente.VALOR_LIMITE);
+            }
+            if (chkObservacao.isSelected()) {
+                opcao.add(OpcaoCliente.OBSERVACOES);
+            }
+            if (chkObservacao2.isSelected()) {
+                opcao.add(OpcaoCliente.OBSERVACOES2);
+            }
+            if (chkNomePai.isSelected()) {
+                opcao.add(OpcaoCliente.NOME_PAI);
+            }
+            if (chkNomeMae.isSelected()) {
+                opcao.add(OpcaoCliente.NOME_MAE);
+            }
+            if (chkNomeConjuge.isSelected()) {
+                opcao.add(OpcaoCliente.NOME_CONJUGE);
+            }
+            if (chkDataNascimento.isSelected()) {
+                opcao.add(OpcaoCliente.DATA_NASCIMENTO);
+            }
+            if (chkEmpresa.isSelected()) {
+                opcao.add(OpcaoCliente.EMPRESA);
+            }
+            if (chkCargo.isSelected()) {
+                opcao.add(OpcaoCliente.CARGO);
+            }
+            if (chkDataAdmissao.isSelected()) {
+                opcao.add(OpcaoCliente.DATA_ADMISSAO);
+            }
+            if (chkSalario.isSelected()) {
+                opcao.add(OpcaoCliente.SALARIO);
+            }
+
             if (!opcao.isEmpty()) {
                 importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
             }
         }
-        
+
     }
-    
+
     public void executarImportacao() throws Exception {
         importar();
     }
-        
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -165,11 +262,9 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlDados = new vrframework.bean.panel.VRPanel();
         jLabel5 = new javax.swing.JLabel();
-        chkRazao = new vrframework.bean.checkBox.VRCheckBox();
-        chkFantasia = new vrframework.bean.checkBox.VRCheckBox();
+        chkNome = new vrframework.bean.checkBox.VRCheckBox();
         chkCnpj = new vrframework.bean.checkBox.VRCheckBox();
         chkIE = new vrframework.bean.checkBox.VRCheckBox();
-        chkIM = new vrframework.bean.checkBox.VRCheckBox();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         pnlEndereco = new vrframework.bean.panel.VRPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -186,6 +281,28 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         jLabel8 = new javax.swing.JLabel();
         chkTelefone = new vrframework.bean.checkBox.VRCheckBox();
         chkContatoAdicional = new vrframework.bean.checkBox.VRCheckBox();
+        chkCelular = new vrframework.bean.checkBox.VRCheckBox();
+        chkEmail = new vrframework.bean.checkBox.VRCheckBox();
+        pnlDadosComplementares = new vrframework.bean.panel.VRPanel();
+        jLabel9 = new javax.swing.JLabel();
+        chkSituacaoCadastro = new vrframework.bean.checkBox.VRCheckBox();
+        chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
+        chkPermiteCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkPermiteCheque = new vrframework.bean.checkBox.VRCheckBox();
+        chkObservacao = new vrframework.bean.checkBox.VRCheckBox();
+        chkObservacao2 = new vrframework.bean.checkBox.VRCheckBox();
+        chkValorLimite = new vrframework.bean.checkBox.VRCheckBox();
+        chkNomePai = new vrframework.bean.checkBox.VRCheckBox();
+        chkNomeMae = new vrframework.bean.checkBox.VRCheckBox();
+        chkNomeConjuge = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataNascimento = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
+        pnlDadosEmpresa = new vrframework.bean.panel.VRPanel();
+        jLabel10 = new javax.swing.JLabel();
+        chkEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCargo = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataAdmissao = new vrframework.bean.checkBox.VRCheckBox();
+        chkSalario = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -194,19 +311,14 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, "DADOS");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkRazao, "Razão");
-        chkRazao.setEnabled(true);
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkFantasia, "Fantasia");
+        org.openide.awt.Mnemonics.setLocalizedText(chkNome, "Nome");
+        chkNome.setEnabled(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(chkCnpj, "CNPJ");
         chkCnpj.setEnabled(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(chkIE, "Inscrição Estadual");
         chkIE.setToolTipText("Corrige o relacionamento entre o produto e a família.");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkIM, "Inscrição Municipal");
-        chkIM.setToolTipText("Corrige o relacionamento entre o produto e a família.");
 
         org.openide.awt.Mnemonics.setLocalizedText(chkClientePreferencial, "Cliente Preferencial");
         chkClientePreferencial.setEnabled(true);
@@ -224,31 +336,25 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addContainerGap()
                         .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkRazao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkIM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(415, Short.MAX_VALUE))
+                        .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(808, Short.MAX_VALUE))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlDadosLayout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkRazao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkIM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
@@ -345,6 +451,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkContatoAdicional, "Contato Adicional");
         chkContatoAdicional.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCelular, "Celular");
+        chkCelular.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkEmail, "Email");
+        chkEmail.setEnabled(true);
+
         javax.swing.GroupLayout pnlContatoLayout = new javax.swing.GroupLayout(pnlContato);
         pnlContato.setLayout(pnlContatoLayout);
         pnlContatoLayout.setHorizontalGroup(
@@ -355,11 +467,15 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addContainerGap()
                         .addComponent(chkTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkContatoAdicional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlContatoLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addComponent(jLabel8)))
-                .addContainerGap(761, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlContatoLayout.setVerticalGroup(
             pnlContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -369,8 +485,159 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkContatoAdicional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkContatoAdicional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCelular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(30, 30, 30))
+        );
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel9, "DADOS COMPLEMENTARES");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkSituacaoCadastro, "Situação Cadastro");
+        chkSituacaoCadastro.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkBloqueado, "Bloqueado");
+        chkBloqueado.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPermiteCreditoRotativo, "Permite Crédito Rotativo");
+        chkPermiteCreditoRotativo.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPermiteCheque, "Permite Cheque");
+        chkPermiteCheque.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkObservacao, "Observação");
+        chkObservacao.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkObservacao2, "Observação 2");
+        chkObservacao2.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkValorLimite, "Valor Limite");
+        chkValorLimite.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkNomePai, "Nome Pai");
+        chkNomePai.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkNomeMae, "Nome Mãe");
+        chkNomeMae.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkNomeConjuge, "Nome Conjuge");
+        chkNomeConjuge.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkDataNascimento, "Data Nascimento");
+        chkDataNascimento.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkDataCadastro, "Data Cadastro");
+        chkDataCadastro.setEnabled(true);
+
+        javax.swing.GroupLayout pnlDadosComplementaresLayout = new javax.swing.GroupLayout(pnlDadosComplementares);
+        pnlDadosComplementares.setLayout(pnlDadosComplementaresLayout);
+        pnlDadosComplementaresLayout.setHorizontalGroup(
+            pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                .addGroup(pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkDataCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPermiteCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPermiteCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel9))
+                    .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkNomePai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkNomeMae, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkNomeConjuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(538, Short.MAX_VALUE))
+        );
+        pnlDadosComplementaresLayout.setVerticalGroup(
+            pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkSituacaoCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPermiteCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPermiteCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkValorLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataCadastro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkNomePai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNomeMae, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNomeConjuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "EMPRESA");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkEmpresa, "Empresa");
+        chkEmpresa.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCargo, "Cargo");
+        chkCargo.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkDataAdmissao, "Data Admissão");
+        chkDataAdmissao.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkSalario, "Salário");
+        chkSalario.setEnabled(true);
+
+        javax.swing.GroupLayout pnlDadosEmpresaLayout = new javax.swing.GroupLayout(pnlDadosEmpresa);
+        pnlDadosEmpresa.setLayout(pnlDadosEmpresaLayout);
+        pnlDadosEmpresaLayout.setHorizontalGroup(
+            pnlDadosEmpresaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosEmpresaLayout.createSequentialGroup()
+                .addGroup(pnlDadosEmpresaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDadosEmpresaLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkDataAdmissao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSalario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlDadosEmpresaLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel10)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlDadosEmpresaLayout.setVerticalGroup(
+            pnlDadosEmpresaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosEmpresaLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDadosEmpresaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataAdmissao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkSalario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout tabImportacaoLayout = new javax.swing.GroupLayout(tabImportacao);
@@ -379,20 +646,26 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabImportacaoLayout.createSequentialGroup()
                 .addGroup(tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlDados, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlEndereco, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlContato, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pnlContato, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDadosComplementares, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDadosEmpresa, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, 0))
         );
         tabImportacaoLayout.setVerticalGroup(
             tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabImportacaoLayout.createSequentialGroup()
                 .addComponent(pnlDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(3, 3, 3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlContato, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(120, 120, 120))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlDadosComplementares, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlDadosEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(76, Short.MAX_VALUE))
         );
 
         scrollImportação.setViewportView(tabImportacao);
@@ -410,27 +683,47 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.ButtonGroup btgPautaFiscal;
     public vrframework.bean.checkBox.VRCheckBox chkBairro;
+    public vrframework.bean.checkBox.VRCheckBox chkBloqueado;
+    public vrframework.bean.checkBox.VRCheckBox chkCargo;
+    public vrframework.bean.checkBox.VRCheckBox chkCelular;
     public vrframework.bean.checkBox.VRCheckBox chkCep;
     public vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     public vrframework.bean.checkBox.VRCheckBox chkCnpj;
     public vrframework.bean.checkBox.VRCheckBox chkComplemento;
     public vrframework.bean.checkBox.VRCheckBox chkContatoAdicional;
+    public vrframework.bean.checkBox.VRCheckBox chkDataAdmissao;
+    public vrframework.bean.checkBox.VRCheckBox chkDataCadastro;
+    public vrframework.bean.checkBox.VRCheckBox chkDataNascimento;
+    public vrframework.bean.checkBox.VRCheckBox chkEmail;
+    public vrframework.bean.checkBox.VRCheckBox chkEmpresa;
     public vrframework.bean.checkBox.VRCheckBox chkEndereco;
-    public vrframework.bean.checkBox.VRCheckBox chkFantasia;
     public vrframework.bean.checkBox.VRCheckBox chkIE;
-    public vrframework.bean.checkBox.VRCheckBox chkIM;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipio;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
+    public vrframework.bean.checkBox.VRCheckBox chkNome;
+    public vrframework.bean.checkBox.VRCheckBox chkNomeConjuge;
+    public vrframework.bean.checkBox.VRCheckBox chkNomeMae;
+    public vrframework.bean.checkBox.VRCheckBox chkNomePai;
     public vrframework.bean.checkBox.VRCheckBox chkNumero;
-    public vrframework.bean.checkBox.VRCheckBox chkRazao;
+    public vrframework.bean.checkBox.VRCheckBox chkObservacao;
+    public vrframework.bean.checkBox.VRCheckBox chkObservacao2;
+    public vrframework.bean.checkBox.VRCheckBox chkPermiteCheque;
+    public vrframework.bean.checkBox.VRCheckBox chkPermiteCreditoRotativo;
+    public vrframework.bean.checkBox.VRCheckBox chkSalario;
+    public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkTelefone;
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
+    public vrframework.bean.checkBox.VRCheckBox chkValorLimite;
+    public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel8;
+    public javax.swing.JLabel jLabel9;
     public vrframework.bean.panel.VRPanel pnlContato;
     public vrframework.bean.panel.VRPanel pnlDados;
+    public vrframework.bean.panel.VRPanel pnlDadosComplementares;
+    public vrframework.bean.panel.VRPanel pnlDadosEmpresa;
     public vrframework.bean.panel.VRPanel pnlEndereco;
     public javax.swing.JScrollPane scrollImportação;
     public vrframework.bean.panel.VRPanel tabImportacao;

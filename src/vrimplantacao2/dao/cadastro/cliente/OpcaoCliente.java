@@ -78,7 +78,10 @@ public enum OpcaoCliente {
     DATA_ADMISSAO,
     NUMERO,
     MUNICIPIO,
-    UF;
+    UF,
+    NOME_PAI,
+    NOME_MAE,
+    NOME_CONJUGE;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;
