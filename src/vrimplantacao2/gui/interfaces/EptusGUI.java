@@ -19,6 +19,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
+import vrimplantacao2.dao.interfaces.EptusDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.STI3DAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -26,10 +27,10 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class STI3GUI extends VRInternalFrame implements ConexaoEvent {
+public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "STI3";
-    private static STI3GUI instance;
+    private static final String SISTEMA = "Eptus";
+    private static EptusGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -63,9 +64,9 @@ public class STI3GUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private STI3DAO dao = new STI3DAO();
+    private EptusDAO dao = new EptusDAO();
 
-    private STI3GUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private EptusGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -145,7 +146,7 @@ public class STI3GUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new STI3GUI(i_mdiFrame);
+                instance = new EptusGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -229,8 +230,8 @@ public class STI3GUI extends VRInternalFrame implements ConexaoEvent {
                                 && (!txtDataFimVenda.getText().trim().isEmpty())) {
 
                             DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-                            dao.setDataInicioVenda(new java.sql.Date(fmt.parse(txtDataIniVenda.getText()).getTime()));
-                            dao.setDataTerminoVenda(new java.sql.Date(fmt.parse(txtDataFimVenda.getText()).getTime()));
+                            //dao.setDataInicioVenda(new java.sql.Date(fmt.parse(txtDataIniVenda.getText()).getTime()));
+                            //dao.setDataTerminoVenda(new java.sql.Date(fmt.parse(txtDataFimVenda.getText()).getTime()));
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     }
@@ -287,7 +288,7 @@ public class STI3GUI extends VRInternalFrame implements ConexaoEvent {
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkPrecoTerminal = new vrframework.bean.checkBox.VRCheckBox();
 
-        setTitle("Importação STI3");
+        setTitle("Importação Eptus");
         setToolTipText("");
 
         vRLabel1.setText("Loja (Cliente):");
