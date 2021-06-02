@@ -1,8 +1,11 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 
@@ -72,7 +75,10 @@ public enum OpcaoCliente {
     TELEFONE_EMPRESA,
     SALARIO,
     CARGO,
-    DATA_ADMISSAO;
+    DATA_ADMISSAO,
+    NUMERO,
+    MUNICIPIO,
+    UF;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;
@@ -97,5 +103,44 @@ public enum OpcaoCliente {
 
     public void setListaEspecial(List<ClienteIMP> listaEspecial) {
         this.listaEspecial = listaEspecial;
+    }
+    
+    public static Set<OpcaoCliente> getDados() {
+        return new HashSet<>(Arrays.asList(
+                DADOS,
+                RAZAO,
+                FANTASIA,
+                CNPJ,
+                INSCRICAO_ESTADUAL
+        ));
+    }
+    
+    public static Set<OpcaoCliente> getEndereco() {
+        return new HashSet<>(Arrays.asList(
+                ENDERECO,
+                NUMERO,
+                COMPLEMENTO,
+                BAIRRO,
+                MUNICIPIO,
+                UF,
+                CEP
+        ));
+    }
+    
+    public static Set<OpcaoCliente> getContato() {
+        return new HashSet<>(Arrays.asList(
+                TELEFONE,
+                CELULAR,
+                EMAIL,
+                CONTATOS
+        ));
+    }
+    
+    public static Set<OpcaoCliente> getPadrao() {
+        Set<OpcaoCliente> result = new HashSet<>();
+        result.addAll(getPadrao());
+        result.addAll(getEndereco());
+        result.addAll(getContato());
+        return result;
     }
 }
