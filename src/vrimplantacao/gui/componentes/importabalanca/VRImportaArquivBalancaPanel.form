@@ -29,7 +29,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabsOpcoes" pref="578" max="32767" attributes="0"/>
+              <Component id="tabsOpcoes" pref="404" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -38,7 +38,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabsOpcoes" pref="187" max="32767" attributes="0"/>
+              <Component id="tabsOpcoes" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -166,7 +166,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
@@ -176,6 +176,7 @@
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="rdbCodigoInterno" min="-2" max="-2" attributes="0"/>
@@ -184,13 +185,8 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="chkIgnorarUltimoDigito" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="rdbToledo" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="rdbFilizolaRdc360" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="rdbToledo" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -211,12 +207,12 @@
                           <Component id="chkIgnorarUltimoDigito" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="rdbFilizolaRdc360" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="rdbToledo" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="rdbToledoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="rdbToledo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btnImportarNutricional" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="txtNutricional" alignment="1" min="-2" max="-2" attributes="0"/>

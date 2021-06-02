@@ -52,7 +52,8 @@ public enum OpcaoFornecedor {
     BLOQUEADO, 
     EMITE_NFE, 
     PERMITE_NF_SEM_PEDIDO,
-    TIPO_INDICADOR_IE;
+    TIPO_INDICADOR_IE,
+    PRODUTO_FORNECEDOR;
     
     private List<FornecedorIMP> listaEspecial;
 
@@ -110,6 +111,7 @@ public enum OpcaoFornecedor {
         result.addAll(getEndereco());
         result.addAll(getContato());
         result.addAll(getDadosComplementares());
+        result.add(PRODUTO_FORNECEDOR);
         
         return result;
     }
