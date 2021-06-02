@@ -129,7 +129,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     }
 
     /**
-     * Creates new form ChecksFornecedorPanelGUI
+     * Creates new form ChecksClientePanelGUI
      */
     public ChecksClientePanelGUI() {
         super();
@@ -672,7 +672,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
         addTab("Importação de Cliente", scrollImportação);
 
-        getAccessibleContext().setAccessibleName("Importação de Fornecedores");
+        getAccessibleContext().setAccessibleName("Importação de Clientes");
     }// </editor-fold>//GEN-END:initComponents
 
     private void chkMunicipioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMunicipioActionPerformed

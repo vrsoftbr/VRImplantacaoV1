@@ -141,9 +141,10 @@ public enum OpcaoCliente {
     
     public static Set<OpcaoCliente> getPadrao() {
         Set<OpcaoCliente> result = new HashSet<>();
-        result.addAll(getPadrao());
+        result.addAll(getDados());
         result.addAll(getEndereco());
         result.addAll(getContato());
+        
         return result;
     }
 }
