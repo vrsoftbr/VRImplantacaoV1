@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -89,6 +90,34 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL
         ));        
+    }
+    
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.RAZAO,
+                OpcaoCliente.CNPJ,
+                OpcaoCliente.INSCRICAO_ESTADUAL,
+                OpcaoCliente.ENDERECO,
+                OpcaoCliente.NUMERO,
+                OpcaoCliente.COMPLEMENTO,
+                OpcaoCliente.BAIRRO,
+                OpcaoCliente.MUNICIPIO,
+                OpcaoCliente.UF,
+                OpcaoCliente.CEP,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CELULAR,
+                OpcaoCliente.EMAIL,
+                OpcaoCliente.CONTATOS,
+                OpcaoCliente.DATA_CADASTRO,
+                OpcaoCliente.SITUACAO_CADASTRO,
+                OpcaoCliente.BLOQUEADO,
+                OpcaoCliente.PERMITE_CREDITOROTATIVO,
+                OpcaoCliente.PERMITE_CHEQUE,
+                OpcaoCliente.VALOR_LIMITE,
+                OpcaoCliente.OBSERVACOES
+        ));
     }
 
     public List<Estabelecimento> getLojaCliente() throws SQLException {

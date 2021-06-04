@@ -7,10 +7,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 
-/**
- *
- * @author Leandro
- */
 public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
     public Importador importador;

@@ -311,8 +311,17 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.ENDERECO)) {
                     sql.put("endereco", vo.getEndereco());
                 }
+                if (opt.contains(OpcaoCliente.NUMERO)) {
+                    sql.put("numero", vo.getNumero());
+                }
                 if (opt.contains(OpcaoCliente.BAIRRO)) {
                     sql.put("bairro", vo.getBairro());
+                }
+                if (opt.contains(OpcaoCliente.MUNICIPIO)) {
+                    sql.put("id_municipio", vo.getId_municipio());
+                }
+                if (opt.contains(OpcaoCliente.UF)) {
+                    sql.put("id_estado", vo.getId_estado());
                 }
                 if (opt.contains(OpcaoCliente.PERMITE_CHEQUE)) {
                     sql.put("permitecheque", vo.isPermiteCheque());
@@ -388,6 +397,15 @@ public class ClientePreferencialDAO {
                 }
                 if (opt.contains(OpcaoCliente.DATA_ADMISSAO)) {
                     sql.put("dataadmissao", vo.getDataAdmissao());
+                }
+                if (opt.contains(OpcaoCliente.NOME_PAI)) {
+                    sql.put("nomepai", vo.getNomePai());
+                }
+                if (opt.contains(OpcaoCliente.NOME_MAE)) {
+                    sql.put("nomemae", vo.getNomeMae());
+                }
+                if (opt.contains(OpcaoCliente.NOME_CONJUGE)) {
+                    sql.put("nomeconjuge", vo.getNomeConjuge());
                 }
                 sql.setWhere("id = " + vo.getId());
                 if (!sql.isEmpty()) {

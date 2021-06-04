@@ -518,6 +518,14 @@ public abstract class InterfaceDAO {
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return OpcaoFornecedor.getPadrao();
     }
+
+    /**
+     * Retorna uma lista com todos os campos que este importa para os clientes.
+     * @return Lista com os parâmetros.
+     */
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return OpcaoCliente.getPadrao();
+    }
     
     /**
      * Retorna uma lista com as notas fiscais a serem importadas.

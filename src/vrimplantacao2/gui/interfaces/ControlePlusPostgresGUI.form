@@ -5,7 +5,7 @@
     <Property name="iconifiable" type="boolean" value="true"/>
     <Property name="maximizable" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="true"/>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o VR para VR"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Controle Plus (Postgres)"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
@@ -58,7 +58,7 @@
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="351" max="32767" attributes="0"/>
+              <Component id="tabs" pref="370" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -131,7 +131,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="tabFornecedor" alignment="0" pref="290" max="32767" attributes="0"/>
+                      <Component id="tabFornecedor" alignment="0" pref="309" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
@@ -140,7 +140,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabClientes">
+            <Component class="vrimplantacao2.gui.component.checks.ChecksClientePanelGUI" name="tabClientes">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Clientes">
@@ -148,61 +148,7 @@
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
-
-              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
-              <SubComponents>
-                <Container class="vrframework.bean.panel.VRPanel" name="tabClienteDados">
-                  <Properties>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder/>
-                      </Border>
-                    </Property>
-                  </Properties>
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Descri&#xe7;&#xe3;o">
-                        <Property name="tabTitle" type="java.lang.String" value="Descri&#xe7;&#xe3;o"/>
-                      </JTabbedPaneConstraints>
-                    </Constraint>
-                  </Constraints>
-
-                  <Layout>
-                    <DimensionLayout dim="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="448" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                    <DimensionLayout dim="1">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="232" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                  </Layout>
-                  <SubComponents>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClientePreferencial">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Cliente Preferencial"/>
-                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="true" type="code"/>
-                        </Property>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClientePreferencialActionPerformed"/>
-                      </Events>
-                    </Component>
-                  </SubComponents>
-                </Container>
-              </SubComponents>
-            </Container>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
@@ -245,7 +191,7 @@
                       <Component id="chkUnifProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="187" max="32767" attributes="0"/>
+                      <EmptySpace pref="206" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chkReiniciarIDClienteUnif" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtReiniciarIDClienteUnif" alignment="3" min="-2" max="-2" attributes="0"/>
