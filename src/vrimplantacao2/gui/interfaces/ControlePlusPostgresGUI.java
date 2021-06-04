@@ -248,7 +248,7 @@ public class ControlePlusPostgresGUI extends VRInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Importação VR para VR");
+        setTitle("Importação Controle Plus (Postgres)");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Loja:");
 
