@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.2" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="vRCheckBox1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="vRComboBox3" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Component id="vRAddButton3" min="-2" pref="33" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="vRComboBox2" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="vRComboBox1" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="vRAddButton2" min="-2" pref="33" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="vRAddButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRSaveButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRCancelButton1" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="vRAddButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRSaveButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRCancelButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="vRComboBox1" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                  <Component id="vRAddButton2" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+              <Component id="vRComboBox2" min="-2" pref="28" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                      <Component id="vRComboBox3" min="-2" pref="28" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="vRAddButton3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="vRCheckBox1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="vr.view.components.button.save.VRSaveButton" name="vRSaveButton1">
+    </Component>
+    <Component class="vr.view.components.button.cancel.VRCancelButton" name="vRCancelButton1">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="vRCancelButton1ActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="vr.view.components.button.add.VRAddButton" name="vRAddButton1">
+    </Component>
+    <Component class="vr.view.components.combobox.VRComboBox" name="vRComboBox1">
+    </Component>
+    <Component class="vr.view.components.label.VRLabel" name="vRLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Conex&#xe3;o"/>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.button.add.VRAddButton" name="vRAddButton2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value=""/>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.label.VRLabel" name="vRLabel2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Loja Origem"/>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.combobox.VRComboBox" name="vRComboBox2">
+    </Component>
+    <Component class="vr.view.components.label.VRLabel" name="vRLabel3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Loja Destino (VR)"/>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.combobox.VRComboBox" name="vRComboBox3">
+    </Component>
+    <Component class="vr.view.components.button.add.VRAddButton" name="vRAddButton3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value=""/>
+      </Properties>
+    </Component>
+    <Component class="vr.view.components.checkbox.VRCheckBox" name="vRCheckBox1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Conclu&#xed;da / Encerrada"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

@@ -595,6 +595,9 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMenu = new javax.swing.JMenuBar();
         mnuCadastro = new javax.swing.JMenu();
         mnuLoja = new javax.swing.JMenuItem();
+        mnuAjuda1 = new javax.swing.JMenu();
+        mnuCadastros = new javax.swing.JMenu();
+        mnuMapeamentoDeLojas = new javax.swing.JMenuItem();
         mnuInterface = new javax.swing.JMenu();
         mnuImpSistema = new javax.swing.JMenu();
         mnuDatabase = new javax.swing.JMenu();
@@ -1078,6 +1081,22 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCadastro.add(mnuLoja);
 
         mnuMenu.add(mnuCadastro);
+
+        mnuAjuda1.setText("v2.5");
+
+        mnuCadastros.setText("Cadastro");
+
+        mnuMapeamentoDeLojas.setText("Mapeamento de Loja");
+        mnuMapeamentoDeLojas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMapeamentoDeLojasActionPerformed(evt);
+            }
+        });
+        mnuCadastros.add(mnuMapeamentoDeLojas);
+
+        mnuAjuda1.add(mnuCadastros);
+
+        mnuMenu.add(mnuAjuda1);
 
         mnuInterface.setText("Interface");
 
@@ -5237,6 +5256,10 @@ public final class MenuGUI extends VRMdiFrame {
         ControlePlusPostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuControlePlusActionPerformed
 
+    private void mnuMapeamentoDeLojasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMapeamentoDeLojasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mnuMapeamentoDeLojasActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -5324,6 +5347,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAcom;
     private javax.swing.JMenuItem mnuAdmRioPreto;
     private javax.swing.JMenu mnuAjuda;
+    private javax.swing.JMenu mnuAjuda1;
     private javax.swing.JMenuItem mnuAjudaSobre;
     private javax.swing.JMenuItem mnuAlphaSys;
     private javax.swing.JMenuItem mnuAlterDataWShop;
@@ -5352,6 +5376,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuCache;
     private javax.swing.JMenuItem mnuCadastraFacil;
     private javax.swing.JMenu mnuCadastro;
+    private javax.swing.JMenu mnuCadastros;
     private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCerebro;
     private javax.swing.JMenuItem mnuCervantes;
@@ -5446,6 +5471,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLoja;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
+    private javax.swing.JMenuItem mnuMapeamentoDeLojas;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;
