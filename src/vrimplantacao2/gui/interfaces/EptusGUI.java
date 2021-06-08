@@ -21,7 +21,6 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.EptusDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.STI3DAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -96,10 +95,10 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "powerstock";
+        conexaoMySQL.database = "eptus";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "password";
+        conexaoMySQL.pass = "2E506Y73025m246u3J";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 

@@ -271,6 +271,7 @@ import vrimplantacao2.gui.interfaces.CorrecaoImpostosDSoftGUI;
 import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
+import vrimplantacao2.gui.interfaces.EptusGUI;
 import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
@@ -734,6 +735,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSiit = new javax.swing.JMenuItem();
         mnuSTI = new javax.swing.JMenuItem();
         mnuSTI3 = new javax.swing.JMenuItem();
+        mnuEptus = new javax.swing.JMenuItem();
         mnuOracle = new javax.swing.JMenu();
         mnuApollo = new javax.swing.JMenuItem();
         jMenuItemArius = new javax.swing.JMenuItem();
@@ -2126,6 +2128,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuMySQL2.add(mnuSTI3);
+
+        mnuEptus.setText("Eptus");
+        mnuEptus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEptusActionPerformed(evt);
+            }
+        });
+        mnuMySQL2.add(mnuEptus);
 
         mnuDatabase.add(mnuMySQL2);
 
@@ -5237,6 +5247,10 @@ public final class MenuGUI extends VRMdiFrame {
         ControlePlusPostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuControlePlusActionPerformed
 
+    private void mnuEptusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEptusActionPerformed
+        EptusGUI.exibir(this);
+    }//GEN-LAST:event_mnuEptusActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -5378,6 +5392,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuEasySac;
     private javax.swing.JMenuItem mnuEditarConexoes;
     private javax.swing.JMenuItem mnuEmporio;
+    private javax.swing.JMenuItem mnuEptus;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenu mnuEspeciais;
     private javax.swing.JMenuItem mnuEtica;
