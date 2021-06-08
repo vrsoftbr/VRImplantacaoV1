@@ -13,7 +13,7 @@ public class TipoEstadoCivilTest {
     public void testGetByString() {
         System.out.print("TipoEstadoCivilTest.testGetByString()...");
         
-        assertEquals(TipoEstadoCivil.SOLTEIRO, TipoEstadoCivil.getByString(""));
+        assertEquals(TipoEstadoCivil.NAO_INFORMADO, TipoEstadoCivil.getByString(""));
         
         System.out.println("OK");
     }

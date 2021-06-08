@@ -10,6 +10,7 @@ import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import vrframework.classe.Conexao;
 import vrimplantacao.vo.vrimplantacao.CestVO;
@@ -79,6 +80,7 @@ public class CestDAOTest {
 
     }
     
+    @Ignore
     @Test
     public void testGetCestValido() throws Exception {
         CestDAO dao = new CestDAO();
