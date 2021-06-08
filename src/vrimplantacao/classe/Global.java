@@ -9,7 +9,7 @@ public class Global {
     /**
      * Data da liberação desta versão.
      */
-    public static final Date DATA_VERSAO = new GregorianCalendar(2021, 05, 08).getTime();
+    public static final Date DATA_VERSAO = new GregorianCalendar(2021, 05, 8).getTime();
     public static int idLoja = 0;
     public static String loja = "";
     public static int idEstado = 0;

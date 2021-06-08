@@ -194,8 +194,10 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
                                 && (!txtDataFimVenda.getText().trim().isEmpty())) {
 
                             DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
-                            //dao.setDataInicioVenda(new java.sql.Date(fmt.parse(txtDataIniVenda.getText()).getTime()));
-                            //dao.setDataTerminoVenda(new java.sql.Date(fmt.parse(txtDataFimVenda.getText()).getTime()));
+                            
+                            dao.setDataInicioVenda(new java.sql.Date(fmt.parse(txtDataIniVenda.getText()).getTime()));
+                            dao.setDataTerminoVenda(new java.sql.Date(fmt.parse(txtDataFimVenda.getText()).getTime()));
+                            
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     }
