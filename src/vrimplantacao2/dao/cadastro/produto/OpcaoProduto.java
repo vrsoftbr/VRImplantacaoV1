@@ -444,8 +444,12 @@ public enum OpcaoProduto {
         public String toString() {
             return "Importar - Copiar ICMS débito no crédito";
         }        
-    }, 
-    SOMENTE_ATIVO,
+    },
+    /**
+     * Elimina todos os produtos que não estão marcados como ativos no momento
+     * da importação.
+     */
+    IMPORTAR_SOMENTE_PRODUTOS_ATIVOS,
     /***
      * Força a atualização de custo mesmo que o usuário já os tenha alterado.
      */
