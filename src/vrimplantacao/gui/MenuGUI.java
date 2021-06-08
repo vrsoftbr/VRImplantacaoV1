@@ -10,7 +10,7 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
-import vr.implantacao.App;
+import vr.implantacao.main.App;
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import vrframework.bean.busca.VRBusca;
 import vrframework.bean.busca.VREventoBusca;

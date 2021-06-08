@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vr.core.collection.Properties;
 import vr.core.parametro.versao.Versao;
-import vr.implantacao.App;
+import vr.implantacao.main.App;
 import vrframework.bean.dialog.VRDialog;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Conexao;

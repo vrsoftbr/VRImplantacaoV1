@@ -1,4 +1,4 @@
-package vr.implantacao;
+package vr.implantacao.main;
 
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import java.awt.Font;
