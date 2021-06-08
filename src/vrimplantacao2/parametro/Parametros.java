@@ -31,7 +31,7 @@ import vrimplantacao2.vo.enums.TipoPagamento;
  * Classe responsável por manipular parâmetros armazenados no banco de dados.
  * @author Leandro Caires
  */
-public final class Parametros implements Iterable<Parametro>{
+public class Parametros implements Iterable<Parametro>{
     
     private static final Logger LOG = Logger.getLogger(Parametros.class.getName());
     
@@ -65,14 +65,25 @@ public final class Parametros implements Iterable<Parametro>{
     
     //<editor-fold defaultstate="collapsed" desc="SINGLETON">
     private static Parametros singleton;
-    public static Parametros get() {
-        if (singleton == null) {
+    private static Factory factory = new Factory();
+    public static void setFactory(Factory factory) {
+        Parametros.factory = factory;
+    }
+    
+    public static class Factory {
+        public Parametros newInstance() {
             try {
-                singleton = new Parametros();
+                return new Parametros();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
+        }
+    }
+    
+    public static Parametros get() {
+        if (singleton == null) {
+            singleton = factory.newInstance();
         }
         return singleton;
     }
