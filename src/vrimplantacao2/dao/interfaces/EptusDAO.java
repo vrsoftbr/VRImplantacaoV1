@@ -680,50 +680,33 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private void obterNext() {
             try {
+                
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                
                 if (next == null) {
                     if (rst.next()) {
+                        
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id");
+                        
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("documento")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setIdClientePreferencial(rst.getString("cod_cliente"));
+                        
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + 
+                                " " + rst.getString("hora");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + 
+                                " " + rst.getString("hora");
+                        
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setNumeroSerie(rst.getString("numeroserie"));
-                        next.setModeloImpressora(rst.getString("modelo"));
-                        
-                        if (rst.getString("nomecliente") != null
-                                && !rst.getString("nomecliente").trim().isEmpty()
-                                && rst.getString("nomecliente").trim().length() > 45) {
-
-                            next.setNomeCliente(rst.getString("nomecliente").substring(0, 45));
-                        } else {
-                            next.setNomeCliente(rst.getString("nomecliente"));
-                        }
-                        
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado")) + ","
-                                + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);
+                        next.setSubTotalImpressora(0d);
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -734,7 +717,23 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = 
+                    "select\n" +
+                    "	v.cod_idregistro id,\n" +
+                    "	v.dt_movto data,\n" +
+                    "	v.hr_movto hora,\n" +
+                    "	v.no_docto documento,\n" +
+                    "	v.no_doctoserie ecf,\n" +
+                    "	v.no_cooecf coo,\n" +
+                    "	s.descricao caixa,\n" +
+                    "	v.cod_cliente,\n" +
+                    "	v.razao_cliente\n" +
+                    "from\n" +
+                    "	venda_cab v\n" +
+                    "join 	serie_doc s on v.no_doctoserie = s.codigo\n" +
+                    "where \n" +
+                    "	v.codemp = 1 and \n" +
+                    "	v.dt_movto between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -773,26 +772,18 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setSequencia(rst.getInt("seq"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-
-                        String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
-                        }
-
-                        obterAliquota(next, trib);
+                        next.setIcmsAliquotaId(rst.getString("cod_tributacao"));
+                        
                     }
                 }
             } catch (Exception ex) {
@@ -801,110 +792,29 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        /**
-         * Método temporario, desenvolver um mapeamento eficiente da tributação.
-         *
-         * @param item
-         * @throws SQLException
-         */
-        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
-             TA	7.00	ALIQUOTA 07%
-             TB	12.00	ALIQUOTA 12%
-             TC	18.00	ALIQUOTA 18%
-             TD	25.00	ALIQUOTA 25%
-             TE	11.00	ALIQUOTA 11%
-             I	0.00	ISENTO
-             F	0.00	SUBST TRIBUTARIA
-             N	0.00	NAO INCIDENTE
-             */
-            int cst;
-            double aliq;
-            switch (icms) {
-                case "TA":
-                    cst = 0;
-                    aliq = 7;
-                    break;
-                case "TB":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "TC":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "TD":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "TE":
-                    cst = 0;
-                    aliq = 11;
-                    break;
-                case "TF":
-                    cst = 0;
-                    aliq = 11;
-                    break;
-                case "TG":
-                    cst = 0;
-                    aliq = 4.5;
-                    break;
-                case "TH":
-                    cst = 0;
-                    aliq = 8;
-                    break;
-                case "TI":
-                    cst = 0;
-                    aliq = 4;
-                    break;
-                case "TJ":
-                    cst = 0;
-                    aliq = 9.14;
-                    break;
-                case "TL":
-                    cst = 0;
-                    aliq = 13.3;
-                    break;
-                case "TM":
-                    cst = 0;
-                    aliq = 4.14;
-                    break;
-                case "TN":
-                    cst = 0;
-                    aliq = 4.7;
-                    break;
-                case "TO":
-                    cst = 0;
-                    aliq = 11.2;
-                    break;
-                case "TP":
-                    cst = 0;
-                    aliq = 8.40;
-                    break;
-                case "TQ":
-                    cst = 0;
-                    aliq = 8.83;
-                    break;
-                case "F":
-                    cst = 60;
-                    aliq = 0;
-                    break;
-                case "N":
-                    cst = 41;
-                    aliq = 0;
-                    break;
-                default:
-                    cst = 40;
-                    aliq = 0;
-                    break;
-            }
-            item.setIcmsCst(cst);
-            item.setIcmsAliq(aliq);
-        }
-
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "";
+                    = 
+                    "select \n" +
+                    "	vi.record_no id,\n" +
+                    "	vi.cod_idregistro id_venda,\n" +
+                    "	vi.cod_produto id_produto,\n" +
+                    "	pd.Descricao,\n" +
+                    "	pd.Unidade,\n" +
+                    "	vi.no_item seq,\n" +
+                    "	vi.cod_barras ean,\n" +
+                    "	vi.quantidade,\n" +
+                    "	vi.vlr_venda,\n" +
+                    "	(vi.quantidade * vi.vlr_venda) total,\n" +
+                    "	vi.cod_tributacao\n" +
+                    "from \n" +
+                    "	venda_pro vi \n" +
+                    "join prodserv_dados pd on vi.cod_produto = pd.codigo and \n" +
+                    "	pd.codemp = vi.codemp\n" +
+                    "where \n" +
+                    "	vi.codemp = 1 and \n" +
+                    "	vi.dt_movto between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + 
+                                                                  VendaIterator.FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
