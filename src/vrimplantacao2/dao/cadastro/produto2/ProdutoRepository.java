@@ -37,6 +37,7 @@ import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.PisCofinsVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -84,6 +85,7 @@ public class ProdutoRepository {
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
 
         LOG.finest("Abrindo a transação");
         provider.begin();
@@ -93,6 +95,8 @@ public class ProdutoRepository {
              */
             System.gc();
             List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos)
+                organizados = filtrarProdutosInativos(organizados);
             produtos.clear();
             System.gc();
 
@@ -257,6 +261,7 @@ public class ProdutoRepository {
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
 
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
@@ -280,6 +285,8 @@ public class ProdutoRepository {
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
             List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos)
+                organizados = filtrarProdutosInativos(organizados);
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
@@ -507,11 +514,14 @@ public class ProdutoRepository {
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
 
         provider.begin();
         try {
             System.gc();
             List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos)
+                organizados = filtrarProdutosInativos(organizados);
             produtos.clear();
             System.gc();
 
@@ -559,6 +569,7 @@ public class ProdutoRepository {
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         boolean manterSomenteOsProdutosForcarNovo = Parametros.OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo();
         boolean incluirProdutosNovos = Parametros.OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes(); 
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
         
         verificarAliquotasMapeadas(produtos);
         verificarAliquotasNaoMapeadas(produtos);
@@ -585,6 +596,8 @@ public class ProdutoRepository {
             
             setNotify("Removendo da listagem produtos já importados e vinculados...", 0);
             produtos = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos)
+                produtos = filtrarProdutosInativos(produtos);
             produtos = filtrarProdutosEEansJaMapeados(produtos);
             if (manterSomenteOsProdutosForcarNovo) {
                 produtos = filtrarSomenteForcarNovo(produtos);
@@ -606,6 +619,16 @@ public class ProdutoRepository {
             provider.rollback();
             throw e;
         }
+    }
+    
+    List<ProdutoIMP> filtrarProdutosInativos(List<ProdutoIMP> produtos) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp: produtos) {
+            if (SituacaoCadastro.ATIVO.equals(imp.getSituacaoCadastro())) {
+                result.add(imp);
+            }
+        }
+        return result;
     }
     
     List<ProdutoIMP> filtrarSomenteForcarNovo(List<ProdutoIMP> produtos) throws Exception {
