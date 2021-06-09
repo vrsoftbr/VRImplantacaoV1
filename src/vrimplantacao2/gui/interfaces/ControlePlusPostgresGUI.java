@@ -50,7 +50,7 @@ public class ControlePlusPostgresGUI extends VRInternalFrame {
     }
 
     /**
-     * Creates new form RPInfoGUI
+     * Creates new form ControlePlusPostgresGUI
      *
      * @param frame
      * @throws java.lang.Exception
