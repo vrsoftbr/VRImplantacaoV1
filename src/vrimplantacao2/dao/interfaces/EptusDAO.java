@@ -146,15 +146,14 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoCliente.PERMITE_CREDITOROTATIVO,
                 OpcaoCliente.PERMITE_CHEQUE,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.OBSERVACOES
+                OpcaoCliente.OBSERVACOES,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
-        System.out.println("Loja: " + getLojaOrigem());
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(

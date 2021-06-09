@@ -1,11 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -17,8 +13,6 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.EptusDAO;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -71,6 +65,8 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         
         tabFornecedores.setOpcoesDisponiveis(dao);
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabCliente.setOpcoesDisponiveis(dao);
+        
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
@@ -182,10 +178,6 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
                         
                         tabCliente.setImportador(importador);
                         tabCliente.executarImportacao();
-                        
-                        if (chkRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
 
                         if ((chkVenda.isSelected())
                                 && (txtDataInicioVenda.getDate() != null)
@@ -221,8 +213,6 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
-        vRButton1 = new vrframework.bean.button.VRButton();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
@@ -237,16 +227,12 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
         tabClientes = new vrframework.bean.panel.VRPanel();
         tabCliente = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
-        tabRotativo = new javax.swing.JPanel();
-        chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabVendas = new vrframework.bean.panel.VRPanel();
         vRLabel2 = new vrframework.bean.label.VRLabel();
         vRLabel3 = new vrframework.bean.label.VRLabel();
         chkVenda = new vrframework.bean.checkBox.VRCheckBox();
         txtDataFimVenda = new org.jdesktop.swingx.JXDatePicker();
         txtDataInicioVenda = new org.jdesktop.swingx.JXDatePicker();
-
-        vRButton1.setText("vRButton1");
 
         setTitle("Importação Eptus");
         setToolTipText("");
@@ -338,32 +324,6 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
-
-        chkRotativo.setText("Cŕedito Rotativo");
-        chkRotativo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkRotativoActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout tabRotativoLayout = new javax.swing.GroupLayout(tabRotativo);
-        tabRotativo.setLayout(tabRotativoLayout);
-        tabRotativoLayout.setHorizontalGroup(
-            tabRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabRotativoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(466, Short.MAX_VALUE))
-        );
-        tabRotativoLayout.setVerticalGroup(
-            tabRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabRotativoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(309, Short.MAX_VALUE))
-        );
-
-        tabImportacao.addTab("Rotativo", tabRotativo);
 
         vRLabel2.setText("Data Início");
 
@@ -484,10 +444,6 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         }
     }//GEN-LAST:event_chkVendaActionPerformed
 
-    private void chkRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRotativoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkRotativoActionPerformed
-
     private void txtDataFimVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDataFimVendaActionPerformed
         if (txtDataFimVenda.getDate() == null) {
             txtDataFimVenda.setDate(new Date());
@@ -502,13 +458,11 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
     private javax.swing.JLabel jLabel1;
-    private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabCliente;
     private vrframework.bean.panel.VRPanel tabClientes;
@@ -516,12 +470,10 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private javax.swing.JTabbedPane tabImportacao;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private javax.swing.JPanel tabRotativo;
     private vrframework.bean.panel.VRPanel tabVendas;
     private javax.swing.JTabbedPane tabs;
     private org.jdesktop.swingx.JXDatePicker txtDataFimVenda;
     private org.jdesktop.swingx.JXDatePicker txtDataInicioVenda;
-    private vrframework.bean.button.VRButton vRButton1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;

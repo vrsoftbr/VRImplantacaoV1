@@ -126,6 +126,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         
         if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
             chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
+            tabCreditoRotativo.add(pnlCreditoRotativo);
         } else {
             pnlCreditoRotativo.setVisible(false);
             this.remove(tabCreditoRotativo);
@@ -133,6 +134,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         
         if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
             chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
+            tabCheque.add(pnlCheque);
         } else {
             pnlCheque.setVisible(false);
             this.remove(tabCheque);
