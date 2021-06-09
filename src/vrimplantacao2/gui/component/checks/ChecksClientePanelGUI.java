@@ -259,7 +259,14 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                 importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
             }
         }
-
+        
+        if (chkCreditoRotativo.isSelected()) {
+            importador.importarCreditoRotativo();
+        }
+        
+        if (chkCheque.isSelected()) {
+            importador.importarCheque();
+        }
     }
 
     public void executarImportacao() throws Exception {
