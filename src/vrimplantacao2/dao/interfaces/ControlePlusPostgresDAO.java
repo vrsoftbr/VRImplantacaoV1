@@ -116,8 +116,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoCliente.PERMITE_CREDITOROTATIVO,
                 OpcaoCliente.PERMITE_CHEQUE,
                 OpcaoCliente.VALOR_LIMITE,
-                OpcaoCliente.OBSERVACOES,
-                OpcaoCliente.RECEBER_CREDITOROTATIVO
+                OpcaoCliente.OBSERVACOES
         ));
     }
 
