@@ -5,7 +5,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -30,7 +29,6 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
     public String lojaMesmoID;
-    public int vPlanoContas;
     
     @Override
     public String getSistema() {
@@ -503,26 +501,6 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    public List<ItemComboVO> getPlanoContas() throws Exception {
-        List<ItemComboVO> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	nr_titulo_tipo,\n" +
-                    "	ds_titulo_tipo\n" +
-                    "from \n" +
-                    "	cadastro.tb_titulo_tipo\n" +
-                    "order by\n" +
-                    "	1")) {
-                while(rs.next()) {
-                    result.add(new ItemComboVO(rs.getInt("nr_titulo_tipo"), rs.getString("ds_titulo_tipo")));
-                }
-            }
-        }        
-        return result;
-    }
-    
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
@@ -550,8 +528,8 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     "join\n" +
                     "	cadastro.tb_base ba on ba.cd_base = r.cd_base_cliente\n" +
                     "where \n" +
-                    "	dt_ultima_baixa is null and\n" +
-                    "	rt.nr_titulo_tipo = " + vPlanoContas + "\n" +
+                    "	dt_ultima_baixa is null\n" +
+                    //"	and rt.nr_titulo_tipo = " + vPlanoContas + "\n" +
                     "order by\n" +
                     "	dt_emissao")) {
                 while (rs.next()) {

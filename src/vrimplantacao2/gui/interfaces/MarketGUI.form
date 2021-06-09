@@ -610,10 +610,8 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="cmbPlanoContas" alignment="0" min="-2" pref="226" max="-2" attributes="0"/>
-                              <Component id="lblPlanoContas" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="237" max="32767" attributes="0"/>
+                          <EmptySpace pref="373" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -624,11 +622,7 @@
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="lblPlanoContas" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="cmbPlanoContas" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="116" max="32767" attributes="0"/>
+                          <EmptySpace pref="164" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -642,13 +636,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbPlanoContas">
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="lblPlanoContas">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Plano de Contas"/>
                   </Properties>
                 </Component>
               </SubComponents>
