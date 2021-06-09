@@ -81,7 +81,9 @@ public enum OpcaoCliente {
     UF,
     NOME_PAI,
     NOME_MAE,
-    NOME_CONJUGE;
+    NOME_CONJUGE,
+    RECEBER_CREDITOROTATIVO,
+    RECEBER_CHEQUE;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;
