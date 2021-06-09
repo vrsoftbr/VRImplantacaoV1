@@ -4,6 +4,11 @@
   <NonVisualComponents>
     <Component class="org.jdesktop.swingx.JXDatePicker" name="jXDatePicker1">
     </Component>
+    <Component class="vrframework.bean.button.VRButton" name="vRButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="vRButton1"/>
+      </Properties>
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Eptus"/>
@@ -298,18 +303,18 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="txtDataIniVenda" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
-                                      <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDataInicioVenda" alignment="0" min="-2" pref="123" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtDataFimVenda" min="-2" pref="100" max="-2" attributes="0"/>
+                                      <Component id="txtDataFimVenda" min="-2" pref="123" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <Component id="chkVenda" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="370" max="32767" attributes="0"/>
+                          <EmptySpace pref="330" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -325,10 +330,10 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtDataIniVenda" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDataInicioVenda" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDataFimVenda" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="261" max="32767" attributes="0"/>
+                          <EmptySpace pref="258" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -339,14 +344,10 @@
                     <Property name="text" type="java.lang.String" value="Data In&#xed;cio"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDataIniVenda">
-                </Component>
                 <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Data Fim"/>
                   </Properties>
-                </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDataFimVenda">
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVenda">
                   <Properties>
@@ -354,6 +355,16 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkVendaActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDataFimVenda">
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtDataFimVendaActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDataInicioVenda">
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtDataInicioVendaActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

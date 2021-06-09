@@ -8,9 +8,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -279,8 +281,29 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
+        Map<String, ProdutoIMP> eans = new HashMap<>();
         
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	Cod_Produto,\n" +
+                    "	Cod_Barras,\n" +
+                    "	Embalagem_Venda \n" +
+                    "from \n" +
+                    "	prodserv_codbar\n" +
+                    "where \n" +
+                    "	CodEmp = 1")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportId(rs.getString("cod_produto"));
+                    imp.setEan(rs.getString("cod_barras"));
+                    imp.setQtdEmbalagem(rs.getInt("Embalagem_Venda"));
+                    
+                    eans.put(imp.getImportId(), imp);
+                }
+            }
+            
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	p.record_no,\n" +
@@ -289,7 +312,6 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.dt_cadastro,\n" +
                     "	p.Sit_Desativado situacaocadastro,\n" +
                     "	p.desc_reduzida,\n" +
-                    "	pa.cod_barras ean,\n" +
                     "	p.envia_balanca balanca,\n" +
                     "	p.dias_validade validade,\n" +
                     "	pc.qtd_atual estoque,\n" +
@@ -301,7 +323,6 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pc.custo_varejo custocomimposto,\n" +
                     "	pc.mlucro_varejo margem,\n" +
                     "	pc.gondola_venda precovenda,\n" +
-                    "	pa.embalagem_venda qtdembalagem,\n" +
                     "	p.embalagem_compra qtdembalagemcompra,\n" +
                     "	pc.gondola_atacado precoatacado,\n" +
                     "	p.embalagem_venda qtdembalagemvenda,\n" +
@@ -331,9 +352,6 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	concat('C', tc.duff_cod_trib, tc.duff_aliq_icms, tc.duff_red_baseicm) id_icms_credito\n" +
                     "from\n" +
                     "	prodserv_dados p\n" +
-                    "join prodserv_codbar pa on\n" +
-                    "	p.codigo = pa.cod_produto\n" +
-                    "	and p.codemp = pa.codemp\n" +
                     "join prodserv_valor pc on\n" +
                     "	p.codigo = pc.cod_produto\n" +
                     "	and p.codemp = pc.codemp\n" +
@@ -355,7 +373,15 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("dt_cadastro"));
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 0 ? 1 : 0);
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setEan(rs.getString("ean"));
+                    
+                    ProdutoIMP ean = eans.get(imp.getImportId());
+                    
+                    if (ean != null) {
+                        imp.setEan(ean.getEan());
+                    } else {
+                        imp.setEan(imp.getImportId());
+                    }
+                    
                     imp.seteBalanca(rs.getInt("balanca") == 1);
                     imp.setValidade(rs.getInt("validade"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
@@ -730,10 +756,11 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	v.razao_cliente\n" +
                     "from\n" +
                     "	venda_cab v\n" +
-                    "join 	serie_doc s on v.no_doctoserie = s.codigo\n" +
+                    "join serie_doc s on v.no_doctoserie = s.codigo\n" +
                     "where \n" +
                     "	v.codemp = 1 and \n" +
-                    "	v.dt_movto between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'";
+                    "	v.dt_movto between '" + FORMAT.format(dataInicio) + "' and '" 
+                                              + FORMAT.format(dataTermino) + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -773,7 +800,14 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.next()) {
                         next = new VendaItemIMP();
 
-                        next.setId(rst.getString("id"));
+                        next.setId(rst.getString("data") + 
+                                rst.getString("doc") + 
+                                rst.getString("loja") + 
+                                rst.getString("id_venda") + 
+                                rst.getString("id_produto") + 
+                                rst.getString("cod_rastreador") + 
+                                rst.getString("id"));
+                        
                         next.setVenda(rst.getString("id_venda"));
                         next.setProduto(rst.getString("id_produto"));
                         next.setSequencia(rst.getInt("seq"));
@@ -799,6 +833,10 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vi.record_no id,\n" +
                     "	vi.cod_idregistro id_venda,\n" +
                     "	vi.cod_produto id_produto,\n" +
+                    "   vi.dt_movto data,\n" +
+                    "   vi.no_docto doc,\n" +
+                    "   vi.codemp loja,\n" +
+                    "   vi.cod_rastreador,\n" +
                     "	pd.Descricao,\n" +
                     "	pd.Unidade,\n" +
                     "	vi.no_item seq,\n" +

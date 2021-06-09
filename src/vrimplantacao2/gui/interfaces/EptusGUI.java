@@ -4,6 +4,7 @@ import java.awt.Frame;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -108,9 +109,6 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
 
         centralizarForm();
         this.setMaximum(false);
-
-        txtDataIniVenda.setEnabled(false);
-        txtDataFimVenda.setEnabled(false);
     }
 
     public void carregarLojaVR() throws Exception {
@@ -190,17 +188,11 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
                         }
 
                         if ((chkVenda.isSelected())
-                                && (!txtDataIniVenda.getText().trim().isEmpty())
-                                && (!txtDataFimVenda.getText().trim().isEmpty())) {
-
-                            DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                                && (txtDataInicioVenda.getDate() != null)
+                                && (txtDataFimVenda.getDate() != null)) {
                             
-                            dao.setDataInicioVenda(
-                                    new java.sql.Date(
-                                            fmt.parse(txtDataIniVenda.getText()).getTime()));
-                            dao.setDataTerminoVenda(
-                                    new java.sql.Date(
-                                            fmt.parse(txtDataFimVenda.getText()).getTime()));
+                            dao.setDataInicioVenda(txtDataInicioVenda.getDate());
+                            dao.setDataTerminoVenda(txtDataFimVenda.getDate());
                             
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
@@ -230,6 +222,7 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private void initComponents() {
 
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
+        vRButton1 = new vrframework.bean.button.VRButton();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
@@ -248,10 +241,12 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabVendas = new vrframework.bean.panel.VRPanel();
         vRLabel2 = new vrframework.bean.label.VRLabel();
-        txtDataIniVenda = new vrframework.bean.textField.VRTextField();
         vRLabel3 = new vrframework.bean.label.VRLabel();
-        txtDataFimVenda = new vrframework.bean.textField.VRTextField();
         chkVenda = new vrframework.bean.checkBox.VRCheckBox();
+        txtDataFimVenda = new org.jdesktop.swingx.JXDatePicker();
+        txtDataInicioVenda = new org.jdesktop.swingx.JXDatePicker();
+
+        vRButton1.setText("vRButton1");
 
         setTitle("Importação Eptus");
         setToolTipText("");
@@ -381,6 +376,18 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
             }
         });
 
+        txtDataFimVenda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDataFimVendaActionPerformed(evt);
+            }
+        });
+
+        txtDataInicioVenda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDataInicioVendaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
         tabVendas.setLayout(tabVendasLayout);
         tabVendasLayout.setHorizontalGroup(
@@ -390,14 +397,14 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabVendasLayout.createSequentialGroup()
                         .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDataInicioVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(370, Short.MAX_VALUE))
+                .addContainerGap(330, Short.MAX_VALUE))
         );
         tabVendasLayout.setVerticalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -410,9 +417,9 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDataInicioVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addContainerGap(258, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Vendas", tabVendas);
@@ -469,10 +476,10 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private void chkVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendaActionPerformed
         // TODO add your handling code here:
         if (chkVenda.isSelected()) {
-            txtDataIniVenda.setEnabled(true);
+            txtDataInicioVenda.setEnabled(true);
             txtDataFimVenda.setEnabled(true);
         } else {
-            txtDataIniVenda.setEnabled(false);
+            txtDataInicioVenda.setEnabled(false);
             txtDataFimVenda.setEnabled(false);
         }
     }//GEN-LAST:event_chkVendaActionPerformed
@@ -480,6 +487,18 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private void chkRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRotativoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkRotativoActionPerformed
+
+    private void txtDataFimVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDataFimVendaActionPerformed
+        if (txtDataFimVenda.getDate() == null) {
+            txtDataFimVenda.setDate(new Date());
+        }
+    }//GEN-LAST:event_txtDataFimVendaActionPerformed
+
+    private void txtDataInicioVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDataInicioVendaActionPerformed
+        if (txtDataInicioVenda.getDate() == null) {
+            txtDataInicioVenda.setDate(new Date());
+        }
+    }//GEN-LAST:event_txtDataInicioVendaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -500,8 +519,9 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JPanel tabRotativo;
     private vrframework.bean.panel.VRPanel tabVendas;
     private javax.swing.JTabbedPane tabs;
-    private vrframework.bean.textField.VRTextField txtDataFimVenda;
-    private vrframework.bean.textField.VRTextField txtDataIniVenda;
+    private org.jdesktop.swingx.JXDatePicker txtDataFimVenda;
+    private org.jdesktop.swingx.JXDatePicker txtDataInicioVenda;
+    private vrframework.bean.button.VRButton vRButton1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;
