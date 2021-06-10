@@ -3,7 +3,6 @@ package vrimplantacao2.gui.component.checks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.JTabbedPane;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
