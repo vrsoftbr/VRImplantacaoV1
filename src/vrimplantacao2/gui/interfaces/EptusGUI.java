@@ -223,9 +223,7 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
-        tabFornecedor = new vrframework.bean.panel.VRPanel();
         tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
-        tabClientes = new vrframework.bean.panel.VRPanel();
         tabCliente = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         tabVendas = new vrframework.bean.panel.VRPanel();
         vRLabel2 = new vrframework.bean.label.VRLabel();
@@ -282,48 +280,8 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         tabs.addTab("Conexão", conexaoMySQL);
 
         tabImportacao.addTab("Produtos", tabProdutos);
-
-        javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
-        tabFornecedor.setLayout(tabFornecedorLayout);
-        tabFornecedorLayout.setHorizontalGroup(
-            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabFornecedorLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-                .addGap(11, 11, 11))
-        );
-        tabFornecedorLayout.setVerticalGroup(
-            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabFornecedorLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        tabImportacao.addTab("Fornecedores", tabFornecedor);
-
-        javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
-        tabClientes.setLayout(tabClientesLayout);
-        tabClientesLayout.setHorizontalGroup(
-            tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 588, Short.MAX_VALUE)
-            .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(tabClientesLayout.createSequentialGroup()
-                    .addGap(0, 0, 0)
-                    .addComponent(tabCliente, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
-                    .addGap(0, 0, 0)))
-        );
-        tabClientesLayout.setVerticalGroup(
-            tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 337, Short.MAX_VALUE)
-            .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(tabClientesLayout.createSequentialGroup()
-                    .addGap(7, 7, 7)
-                    .addComponent(tabCliente, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
-                    .addGap(8, 8, 8)))
-        );
-
-        tabImportacao.addTab("Clientes", tabClientes);
+        tabImportacao.addTab("Fornecedores", tabFornecedores);
+        tabImportacao.addTab("Clientes", tabCliente);
 
         vRLabel2.setText("Data Início");
 
@@ -465,8 +423,6 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabCliente;
-    private vrframework.bean.panel.VRPanel tabClientes;
-    private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private javax.swing.JTabbedPane tabImportacao;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
