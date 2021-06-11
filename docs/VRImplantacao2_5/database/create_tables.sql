@@ -23,12 +23,14 @@ ALTER TABLE implantacao2_5.sistemabancodados ADD nomeschema VARCHAR(60);
 ALTER TABLE implantacao2_5.sistemabancodados ADD usuario VARCHAR(30);
 ALTER TABLE implantacao2_5.sistemabancodados ADD senha VARCHAR(30);
 
-
-ALTER TABLE implantacao2_5.bancodados DROP nomeschema;
-ALTER TABLE implantacao2_5.bancodados DROP usuario;
-ALTER TABLE implantacao2_5.bancodados DROP senha;
-
-
-select * from implantacao2_5.sistema;
-select * from implantacao2_5.bancodados;
-select * from implantacao2_5.sistemabancodados;
+CREATE TABLE implantacao2_5.conexao(
+	id serial PRIMARY KEY NOT NULL,
+	host VARCHAR(20) NOT NULL,
+	porta INTEGER NOT NULL,
+	usuario VARCHAR(30) NOT NULL,
+	senha VARCHAR(30) NOT NULL,
+	descricao VARCHAR (60),
+	id_sistemabancodados INTEGER NOT NULL,
+	CONSTRAINT fk_id_sistemabancodados FOREIGN KEY (id_sistemabancodados)
+	REFERENCES implantacao2_5.sistemabancodados (id)
+);
