@@ -1,0 +1,13 @@
+﻿INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Access'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('ADS'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Cache'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Dbf'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Firebird'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('DB2'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Informix'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('MySQL'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Oracle'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('Paradox'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('PostgresSQL'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('SQLite'));
+INSERT INTO implantacao2_5.bancodados (nome) VALUES (upper('SQL Server'));
