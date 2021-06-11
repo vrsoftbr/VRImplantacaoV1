@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.openide.util.Exceptions;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -387,13 +386,11 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    
                     if(imp.getCodMercadologico3() == null || imp.getCodMercadologico3().isEmpty()) {
                         imp.setCodMercadologico3("1");
                     }
                     
                     imp.setCodMercadologico4(rs.getString("merc4"));
-                    
                     if(imp.getCodMercadologico4() == null || imp.getCodMercadologico4().isEmpty()) {
                         imp.setCodMercadologico4("1");
                     }
@@ -401,19 +398,14 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(Utils.arredondar(rs.getDouble("estoque"), 2));
                     imp.setEstoqueMinimo(Utils.arredondar(rs.getDouble("qtd_minima"), 2));
                     imp.setEstoqueMaximo(Utils.arredondar(rs.getDouble("qtd_maxima"), 2));
-                    
                     imp.setPesoBruto(rs.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rs.getDouble("peso_liquido"));
-                    
                     imp.setCustoSemImposto(Utils.arredondar(rs.getDouble("custosemimposto"), 2));
                     imp.setCustoComImposto(Utils.arredondar(rs.getDouble("custocomimposto"), 2));
-                    imp.setCustoMedioSemImposto(imp.getCustoMedioComImposto());
                     imp.setCustoAnteriorComImposto(Utils.arredondar(rs.getDouble("custo_anterior"), 2));
                     imp.setCustoAnteriorSemImposto(imp.getCustoAnteriorComImposto());
-                    
                     imp.setMargem(Utils.arredondar(rs.getDouble("margem"), 2));
                     imp.setPrecovenda(Utils.arredondar(rs.getDouble("precovenda"), 2));
-                    
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("natureza_receita"));
