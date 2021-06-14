@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
+import vr.implantacao.controller.atualizador.AtualizadorController;
 import vr.implantacao.controller.cadastro.ConfiguracaoBaseDadosController;
 import vr.implantacao.vo.cadastro.BancoDadosVO;
 import vr.implantacao.vo.cadastro.SistemaVO;
@@ -21,6 +22,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDados = null;
     private ConfiguracaoBaseDadosController controller = null;
+    private AtualizadorController atualizadorController = null;
     
     /**
      * Creates new form ConfiguracaoPrincipalGUI
@@ -29,7 +31,13 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         super(menuGUI);
         initComponents();
         
+        criarEstrutura();
         setConfiguracao();
+    }
+    
+    private void criarEstrutura() throws Exception {
+        atualizadorController = new AtualizadorController();
+        atualizadorController.criarEstrutura();
     }
     
     private void setConfiguracao() throws Exception {
@@ -42,7 +50,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         getSistema();
         configurarColuna();
     }
-    
+        
     private void configurarColuna() throws Exception {
         List<VRColumnTable> column = new ArrayList();
 
