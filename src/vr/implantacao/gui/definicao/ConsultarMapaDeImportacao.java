@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vr.implantacao.gui;
+package vr.implantacao.gui.definicao;
 
 import vr.view.components.panel.VRPanel;
 
