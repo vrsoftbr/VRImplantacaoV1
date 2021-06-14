@@ -20,4 +20,8 @@ public class ConfiguracaoBaseDadosController {
     public List<BancoDadosVO> getBancoDadosPorSistema(int idSistema) {
         return service.getBancoDadosPorSistema(idSistema);
     }
+    
+    public javax.swing.JPanel exibiPainelConexao(int idBancoDados) {
+        return service.exibiPainelConexao(idBancoDados);
+    }
 }
