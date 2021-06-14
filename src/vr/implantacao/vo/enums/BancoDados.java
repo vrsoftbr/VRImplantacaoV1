@@ -31,7 +31,7 @@ public enum BancoDados {
     }
     
     BancoDados(String nome) {
-        this.nome = nome;
+        setNome(nome);
     }
 
 }
