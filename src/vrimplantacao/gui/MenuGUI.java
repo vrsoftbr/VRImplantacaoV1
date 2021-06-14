@@ -10,6 +10,7 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import vr.implantacao.gui.cadastro.ConfiguracaoBaseDadosGUI;
 import vr.implantacao.main.App;
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import vrframework.bean.busca.VRBusca;
@@ -5257,7 +5258,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuControlePlusActionPerformed
 
     private void mnuMapeamentoDeLojasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMapeamentoDeLojasActionPerformed
-        // TODO add your handling code here:
+        ConfiguracaoBaseDadosGUI.exibir(this);
     }//GEN-LAST:event_mnuMapeamentoDeLojasActionPerformed
 
 

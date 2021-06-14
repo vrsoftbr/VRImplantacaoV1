@@ -1,4 +1,4 @@
-package vr.implantacao.gui;
+package vr.implantacao.gui.definicao;
 
 import vr.view.components.panel.VRPanel;
 

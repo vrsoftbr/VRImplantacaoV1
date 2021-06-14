@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="btnParametro" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="chkMatriz" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="lblLojaOrigem" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboLojaOrigem" alignment="0" min="-2" pref="305" max="-2" attributes="0"/>
+                      <Component id="lblLojaVR" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboLojaVR" alignment="0" min="-2" pref="305" max="-2" attributes="0"/>
+                      <Component id="chkEncerrada" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="chkMatriz" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblLojaOrigem" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="cboLojaOrigem" min="-2" pref="24" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="lblLojaVR" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="cboLojaVR" min="-2" pref="24" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="chkEncerrada" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnSalvar" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnParametro" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="15" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMatriz">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Loja Matriz"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.label.VRLabel" name="lblLojaOrigem">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Loja Origem"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.comboBox.VRComboBox" name="cboLojaOrigem">
+    </Component>
+    <Component class="vrframework.bean.label.VRLabel" name="lblLojaVR">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Loja VR"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.comboBox.VRComboBox" name="cboLojaVR">
+    </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEncerrada">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Conclu&#xed;da / Encerrada"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.button.VRButton" name="btnSalvar">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/vrframework/img/salvar.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Salvar"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.button.VRButton" name="btnParametro">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/vrframework/img/parametrizar.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Par&#xe2;metro Loja"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
