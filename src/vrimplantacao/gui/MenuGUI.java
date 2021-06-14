@@ -689,12 +689,12 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutocom = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
-        chkLogicBox = new javax.swing.JMenuItem();
+        mnuGCom = new javax.swing.JMenuItem();
         chkGigatron = new javax.swing.JMenuItem();
+        chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
-        mnuGCom = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1777,13 +1777,13 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuFutura);
 
-        chkLogicBox.setText("LogicBox");
-        chkLogicBox.addActionListener(new java.awt.event.ActionListener() {
+        mnuGCom.setText("GCom");
+        mnuGCom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkLogicBoxActionPerformed(evt);
+                mnuGComActionPerformed(evt);
             }
         });
-        mnuFirebird3.add(chkLogicBox);
+        mnuFirebird3.add(mnuGCom);
 
         chkGigatron.setText("Gigatron");
         chkGigatron.addActionListener(new java.awt.event.ActionListener() {
@@ -1792,6 +1792,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkGigatron);
+
+        chkLogicBox.setText("LogicBox");
+        chkLogicBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkLogicBoxActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(chkLogicBox);
 
         mnuMercaLite.setText("MercaLite");
         mnuMercaLite.addActionListener(new java.awt.event.ActionListener() {
@@ -1816,14 +1824,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
-
-        mnuGCom.setText("GCom");
-        mnuGCom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuGComActionPerformed(evt);
-            }
-        });
-        mnuFirebird3.add(mnuGCom);
 
         mnuDatabase.add(mnuFirebird3);
 
