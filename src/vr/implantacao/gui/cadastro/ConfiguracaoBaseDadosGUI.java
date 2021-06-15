@@ -95,16 +95,16 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
     
-    private void exibiPainelConexao(int idBancoDados) {
+    private void exibiPainelConexao() {
         tabConexao.removeAll();
         
-        JPanel painelDeConexaoDinamico = controller.exibiPainelConexao(idBancoDados);
+        JPanel painelDeConexaoDinamico = controller.exibiPainelConexao(cboSistema.getId(), cboBD.getId());
         
         if (painelDeConexaoDinamico == null) {
             try {
                 Util.exibirMensagem("Nenhum painel configurado para o banco de dados " + 
-                                                EBancoDados.getById(idBancoDados) + "!",
-                        "Configuração de Base de Dados");
+                                                EBancoDados.getById(cboBD.getId()) + "!",
+                        getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -221,13 +221,15 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(vRButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(vRButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -253,7 +255,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_cboSistemaActionPerformed
 
     private void cboBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboBDActionPerformed
-        exibiPainelConexao(cboBD.getId());
+        exibiPainelConexao();
     }//GEN-LAST:event_cboBDActionPerformed
 
 

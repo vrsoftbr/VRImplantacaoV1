@@ -40,6 +40,18 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
         initComponents();
     }
     
+    public ConexaoPostgreSQLPanel(String schema, 
+            int porta, 
+            String usuario, 
+            String senha) {
+        
+        initComponents();
+        txtDatabase.setArquivo(schema);
+        txtPorta.setText(String.valueOf(porta));
+        txtUsuario.setText(usuario);
+        txtSenha.setText(senha);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
