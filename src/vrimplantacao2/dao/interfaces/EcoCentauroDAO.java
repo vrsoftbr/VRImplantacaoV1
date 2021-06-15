@@ -19,7 +19,7 @@ public class EcoCentauroDAO extends InterfaceDAO {
         return "Eco Centauro";
     }
 
-    public List<Estabelecimento> getLojas() throws Exception {
+    public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
