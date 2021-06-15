@@ -2,6 +2,8 @@ package vr.implantacao.dao.atualizador;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import vr.implantacao.vo.enums.BancoDados;
 import vr.implantacao.vo.enums.Sistema;
 import vrframework.classe.Conexao;
@@ -13,6 +15,44 @@ import vrframework.classe.Conexao;
 
 public class AtualizadorDAO {
 
+    private List<String> verificarBancoDados() throws Exception {
+        List<String> result = null;
+        for (BancoDados bancoDados : BancoDados.values()) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select nome \n"
+                        + "from implantacao2_5.bancodados \n"
+                        + "where nome = '" + bancoDados + "'"
+                )) {
+                    if (!rs.next()) {
+                        result = new ArrayList<>();
+                        result.add(rs.getString("nome"));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    private List<String> verificarSistema() throws Exception {
+        List<String> result = null;
+        for (Sistema sistema : Sistema.values()) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select nome \n"
+                        + "from implantacao2_5.sistema \n"
+                        + "where nome = '" + sistema + "'"
+                )) {
+                    if (!rs.next()) {
+                        result = new ArrayList<>();
+                        result.add(rs.getString("nome"));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
     public void criarSchema() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("CREATE SCHEMA IF NOT EXISTS implantacao2_5");
@@ -74,34 +114,24 @@ public class AtualizadorDAO {
         }
     }
 
-    public void inserirTabelaBancoDados() throws Exception {        
-        for (BancoDados bancoDados : BancoDados.values()) {            
+    public void inserirTabelaBancoDados() throws Exception {
+        List<String> bancoDados = new ArrayList<>();
+        bancoDados = verificarBancoDados();
+
+        for (String bancoDado : bancoDados) {
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select nome \n"
-                        + "from implantacao2_5.bancodados \n"
-                        + "where nome = '" + bancoDados + "'"
-                )) {
-                    if (!rs.next()) {
-                        stm.execute("INSERT INTO implantacao2_5.bancodados (nome) VALUES ('" + bancoDados + "');");
-                    }
-                }
+                stm.execute("INSERT INTO implantacao2_5.bancodados (nome) VALUES ('" + bancoDado + "');");
             }
         }
     }
 
     public void inserirTabelaSistema() throws Exception {
-        for (Sistema sistema : Sistema.values()) {
+        List<String> sistemas = new ArrayList<>();
+        sistemas = verificarSistema();
+
+        for (String sistema : sistemas) {
             try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select nome \n"
-                        + "from implantacao2_5.sistema \n"
-                        + "where nome = '" + sistema + "'"
-                )) {
-                    if (!rs.next()) {
-                        stm.execute("INSERT INTO implantacao2_5.sistema (nome) VALUES ('" + sistema + "')");
-                    }
-                }
+                stm.execute("INSERT INTO implantacao2_5.sistema (nome) VALUES ('" + sistema + "')");
             }
         }
     }
@@ -283,6 +313,6 @@ public class AtualizadorDAO {
         criarTabelas();
         inserirTabelaBancoDados();
         inserirTabelaSistema();
-        inserirTabelaSistemaBancoDados();
+        //inserirTabelaSistemaBancoDados();
     }
 }
