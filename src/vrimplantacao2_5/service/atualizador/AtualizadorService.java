@@ -74,5 +74,6 @@ public class AtualizadorService {
         this.atualizadorDAO.criarTabelas();
         this.inserirTabelaBancoDados();
         this.inserirTabelaSistema();
+        this.atualizadorDAO.inserirTabelaSistemaBancoDados();
     }
 }
