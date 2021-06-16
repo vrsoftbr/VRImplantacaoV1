@@ -1,20 +1,32 @@
-package vrimplantacao2_5.gui.cadastro.configuracaobd;
+package vrimplantacao2_5.gui.cadastro.mapaloja;
 
-import vr.view.components.panel.VRPanel;
+import vrframework.bean.dialog.VRDialog;
+import vrframework.classe.Util;
 
 /**
  *
  * @author guilhermegomes
  */
-public class MapeamentoLojaGUI extends VRPanel {
+public class MapaLojaGUI extends VRDialog {
 
+    private static MapaLojaGUI mapaLojaGUI = null;
+    
     /**
-     * Creates new form MapeamentoLojaGUI
+     * Creates new form MapaLojaGUI
      */
-    public MapeamentoLojaGUI() {
+    public MapaLojaGUI() {
         initComponents();
+        
+        setConfiguracao();
     }
     
+    private void setConfiguracao() {
+        centralizarForm();
+        setTitle("Mapeamento de Loja");
+        
+        
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -25,27 +37,29 @@ public class MapeamentoLojaGUI extends VRPanel {
         lblLojaVR = new vrframework.bean.label.VRLabel();
         cboLojaVR = new vrframework.bean.comboBox.VRComboBox();
         chkEncerrada = new vrframework.bean.checkBox.VRCheckBox();
-        btnSalvar = new vrframework.bean.button.VRButton();
         btnParametro = new vrframework.bean.button.VRButton();
+        btnSalvar = new vrframework.bean.button.VRButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkMatriz, "Loja Matriz");
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkMatriz, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.chkMatriz.text")); // NOI18N
         chkMatriz.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblLojaOrigem, "Loja Origem");
+        org.openide.awt.Mnemonics.setLocalizedText(lblLojaOrigem, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.lblLojaOrigem.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(lblLojaVR, "Loja VR");
+        org.openide.awt.Mnemonics.setLocalizedText(lblLojaVR, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.lblLojaVR.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkEncerrada, "Concluída / Encerrada");
+        org.openide.awt.Mnemonics.setLocalizedText(chkEncerrada, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.chkEncerrada.text")); // NOI18N
         chkEncerrada.setEnabled(false);
 
-        btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/salvar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnSalvar, "Salvar");
-
         btnParametro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/parametrizar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnParametro, "Parâmetro Loja");
+        org.openide.awt.Mnemonics.setLocalizedText(btnParametro, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.btnParametro.text")); // NOI18N
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/salvar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnSalvar, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.btnSalvar.text")); // NOI18N
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -83,10 +97,54 @@ public class MapeamentoLojaGUI extends VRPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnParametro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(MapaLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(MapaLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(MapaLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(MapaLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                MapaLojaGUI dialog = new MapaLojaGUI();
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnParametro;
@@ -98,4 +156,16 @@ public class MapeamentoLojaGUI extends VRPanel {
     private vrframework.bean.label.VRLabel lblLojaOrigem;
     private vrframework.bean.label.VRLabel lblLojaVR;
     // End of variables declaration//GEN-END:variables
+    
+    public static void exibir() {
+        try {
+            if (mapaLojaGUI == null || !mapaLojaGUI.isActive()) {
+                mapaLojaGUI = new MapaLojaGUI();
+            }
+
+            mapaLojaGUI.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Mapeamento de Loja");
+        }
+    }
 }

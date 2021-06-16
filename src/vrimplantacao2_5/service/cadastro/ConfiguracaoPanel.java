@@ -1,4 +1,4 @@
-package vrimplantacao2_5.gui.componente;
+package vrimplantacao2_5.service.cadastro;
 
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 

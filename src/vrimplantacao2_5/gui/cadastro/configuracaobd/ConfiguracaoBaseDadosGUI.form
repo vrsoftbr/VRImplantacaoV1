@@ -158,6 +158,9 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Mapear Loja"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapearActionPerformed"/>
+          </Events>
         </Component>
         <Component class="vrframework.bean.tableEx.VRTableEx" name="tblLoja">
         </Component>

@@ -6,7 +6,7 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
+import vrimplantacao2_5.service.cadastro.ConfiguracaoPanel;
 
 /**
  *

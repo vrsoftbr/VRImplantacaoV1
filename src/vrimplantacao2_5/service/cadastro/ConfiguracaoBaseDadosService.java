@@ -10,7 +10,6 @@ import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrframework.classe.Util;
 import vrimplantacao2_5.dao.conexao.ConexaoSistemaDAO;
-import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
 
 /**
