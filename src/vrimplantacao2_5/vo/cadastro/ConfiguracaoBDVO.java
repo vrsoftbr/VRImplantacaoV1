@@ -9,10 +9,12 @@ public class ConfiguracaoBDVO {
     private int id;
     private String host;
     private int porta;
+    private String schema;
     private String usuario;
     private String senha;
     private String descricao;
-    private int idSistemaBancoDados;
+    private int idSistema;
+    private int idBancoDados;
 
     public int getId() {
         return id;
@@ -36,6 +38,14 @@ public class ConfiguracaoBDVO {
 
     public void setPorta(int porta) {
         this.porta = porta;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 
     public String getUsuario() {
@@ -62,11 +72,20 @@ public class ConfiguracaoBDVO {
         this.descricao = descricao;
     }
 
-    public int getIdSistemaBancoDados() {
-        return idSistemaBancoDados;
+    public int getIdSistema() {
+        return idSistema;
     }
 
-    public void setIdSistemaBancoDados(int idSistemaBancoDados) {
-        this.idSistemaBancoDados = idSistemaBancoDados;
+    public void setIdSistema(int idSistema) {
+        this.idSistema = idSistema;
     }
+
+    public int getIdBancoDados() {
+        return idBancoDados;
+    }
+
+    public void setIdBancoDados(int idBancoDados) {
+        this.idBancoDados = idBancoDados;
+    }
+    
 }

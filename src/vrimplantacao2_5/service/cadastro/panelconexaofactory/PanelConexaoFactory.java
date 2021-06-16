@@ -3,6 +3,7 @@ package vrimplantacao2_5.service.cadastro.panelconexaofactory;
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
 import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;
@@ -17,7 +18,7 @@ import vrimplantacao2_5.gui.componente.conexao.sqlserver.ConexaoSqlServerPanel;
  */
 public abstract class PanelConexaoFactory {
     
-    public static JPanel getPanelConexao(int idSistema, int idBancoDados) {
+    public static ConfiguracaoPanel getPanelConexao(int idSistema, int idBancoDados) {
         
         BancoDadosVO bdVO = null;
         
@@ -27,7 +28,7 @@ public abstract class PanelConexaoFactory {
             Exceptions.printStackTrace(ex);
         }
         
-        JPanel panelConexao = null;
+        ConfiguracaoPanel panelConexao = null;
         EBancoDados eBD = EBancoDados.getById(idBancoDados);
         
         switch(eBD) {

@@ -1083,11 +1083,11 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuMenu.add(mnuCadastro);
 
-        mnuAjuda1.setText("v2.5");
+        mnuAjuda1.setText("Importação 2.5");
 
-        mnuCadastros.setText("Cadastro");
+        mnuCadastros.setText("Configuração");
 
-        mnuMapeamentoDeLojas.setText("Mapeamento de Loja");
+        mnuMapeamentoDeLojas.setText("Configuração de Base de Dados");
         mnuMapeamentoDeLojas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuMapeamentoDeLojasActionPerformed(evt);

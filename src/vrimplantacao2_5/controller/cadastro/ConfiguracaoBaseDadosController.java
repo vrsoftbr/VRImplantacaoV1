@@ -1,9 +1,11 @@
 package vrimplantacao2_5.controller.cadastro;
 
 import java.util.List;
+import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
 import vrimplantacao2_5.service.cadastro.ConfiguracaoBaseDadosService;
 import vrimplantacao2_5.service.cadastro.panelobserver.PanelObserver;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
 /**
@@ -22,7 +24,11 @@ public class ConfiguracaoBaseDadosController {
         return service.getBancoDadosPorSistema(idSistema);
     }
     
-    public javax.swing.JPanel exibiPainelConexao(int idSistema, int idBancoDados) {
+    public ConfiguracaoPanel exibiPainelConexao(int idSistema, int idBancoDados) {
         return service.exibiPainelConexao(idSistema, idBancoDados);
+    }
+    
+    public void salvar(ConfiguracaoBDVO conexaoVO) {
+        service.salvar(conexaoVO);
     }
 }
