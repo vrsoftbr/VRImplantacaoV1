@@ -27,31 +27,19 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
     public void setSistema(String sistema) {
         this.sistema = sistema;
-    }    
+    }
 
     public String getSistema() {
         return sistema;
     }
-    
+
     /**
      * Creates new form ConexaoMySQLPanel
      */
     public ConexaoFirebirdPanel() {
         initComponents();
     }
-    
-    public ConexaoFirebirdPanel(String schema, 
-            int porta, 
-            String usuario, 
-            String senha) {
-        
-        initComponents();
-        txtDatabase.setArquivo(schema);
-        txtPorta.setText(String.valueOf(porta));
-        txtUsuario.setText(usuario);
-        txtSenha.setText(senha);
-    }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -221,7 +209,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_btnConectarActionPerformed
 
     public void validarDadosAcesso() throws Exception {
-        
+
         if (tabsCon.getSelectedIndex() == 0) {
             if (txtHost.getText().isEmpty()) {
                 throw new VRException("Favor informar host do banco de dados Firebird!");
@@ -235,19 +223,26 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
             if (txtUsuario.getText().isEmpty()) {
                 throw new VRException("Favor informar o usuário do banco de dados Firebird!");
             }
-            conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            
+            this.host = txtHost.getText();
+            this.port = txtPorta.getText();
+            this.database = txtDatabase.getArquivo();
+            this.user = txtUsuario.getText();
+            this.pass = txtSenha.getText();
+            
+            conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
         atualizarParametros();
-        
+
         if (onConectar != null) {
             onConectar.executar();
         }
     }
-    
+
     public void carregarParametros() {
         Parametros params = Parametros.get();
         txtHost.setText(params.getWithNull(host, sistema, "FIREBIRD", "HOST"));
@@ -257,14 +252,14 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
         txtSenha.setText(params.getWithNull(pass, sistema, "FIREBIRD", "SENHA"));
         txtStrConexao.setText(params.getWithNull(stringConexao, sistema, "FIREBIRD", "STR_CONEXAO"));
     }
-    
+
     public String pass = "masterkey";
     public String user = "sysdba";
     public String port = "3050";
     public String database = "database";
     public String host = "localhost";
     public String stringConexao = "jdbc:firebirdsql://host:port//opt/firebird/db.fdb";
-    
+
     public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), sistema, "FIREBIRD", "HOST");

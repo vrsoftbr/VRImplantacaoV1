@@ -1,22 +1,21 @@
-package vrimplantacao2.gui.component.conexao.sqlserver;
+package vrimplantacao2_5.gui.componente.conexao.firebird;
 
-import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.parametro.Parametros;
 
 /**
  *
  * @author Leandro
  */
-public class ConexaoSqlServerPanel extends javax.swing.JPanel {
+public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
     private String sistema;
-    private ConexaoSqlServer conexao = new ConexaoSqlServer();
+    private ConexaoFirebird conexao = new ConexaoFirebird();
     private ConexaoEvent onConectar;
-    
 
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
@@ -28,19 +27,31 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
 
     public void setSistema(String sistema) {
         this.sistema = sistema;
-    }    
+    }
 
     public String getSistema() {
         return sistema;
     }
-    
+
     /**
      * Creates new form ConexaoMySQLPanel
      */
-    public ConexaoSqlServerPanel() {
+    public ConexaoFirebirdPanel() {
         initComponents();
     }
-    
+
+    public ConexaoFirebirdPanel(String schema,
+            int porta,
+            String usuario,
+            String senha) {
+
+        initComponents();
+        txtDatabase.setArquivo(schema);
+        txtPorta.setText(String.valueOf(porta));
+        txtUsuario.setText(usuario);
+        txtSenha.setText(senha);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -67,7 +78,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         vRLabel26 = new vrframework.bean.label.VRLabel();
         txtStrConexao = new javax.swing.JTextField();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Conexão SQL Server"));
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Conexão Firebird"));
 
         txtUsuario.setCaixaAlta(false);
 
@@ -95,11 +106,6 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Porta");
 
         txtPorta.setCaixaAlta(false);
-        txtPorta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPortaActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout pnlConexaoPadraoLayout = new javax.swing.GroupLayout(pnlConexaoPadrao);
         pnlConexaoPadrao.setLayout(pnlConexaoPadraoLayout);
@@ -123,7 +129,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         pnlConexaoPadraoLayout.setVerticalGroup(
             pnlConexaoPadraoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlConexaoPadraoLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
                 .addGroup(pnlConexaoPadraoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -138,7 +144,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel26, "String de Conexão");
 
-        txtStrConexao.setText("jdbc:sqlserver://[host][\\instance][:port];trustServerCertificate=true");
+        txtStrConexao.setText("jdbc:firebirdsql://host:port//opt/firebird/db.fdb");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -205,7 +211,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
                 conexao.close();
             }
 
-            validarDadosAcessoSqlServer();
+            validarDadosAcesso();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
@@ -214,59 +220,67 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnConectarActionPerformed
 
-    private void txtPortaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPortaActionPerformed
-
-    public void validarDadosAcessoSqlServer() throws Exception {
-        if (txtHost.getText().isEmpty()) {
-            throw new VRException("Favor informar host do banco de dados SQL Server!");
-        }
-        if (txtPorta.getText().isEmpty()) {
-            throw new VRException("Favor informar a porta do banco de dados SQL Server!");
-        }
-        if (txtDatabase.getArquivo().isEmpty()) {
-            throw new VRException("Favor informar nome do banco de dados SQL Server!");
-        }
-        if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados SQL Server!");
-        }
+    public void validarDadosAcesso() throws Exception {
 
         if (tabsCon.getSelectedIndex() == 0) {
-            conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            if (txtHost.getText().isEmpty()) {
+                throw new VRException("Favor informar host do banco de dados Firebird!");
+            }
+            if (txtPorta.getText().isEmpty()) {
+                throw new VRException("Favor informar a porta do banco de dados Firebird!");
+            }
+            if (txtDatabase.getArquivo().isEmpty()) {
+                throw new VRException("Favor informar nome do banco de dados Firebird!");
+            }
+            if (txtUsuario.getText().isEmpty()) {
+                throw new VRException("Favor informar o usuário do banco de dados Firebird!");
+            }
+            
+            this.host = txtHost.getText();
+            this.port = txtPorta.getText();
+            this.database = txtDatabase.getArquivo();
+            this.user = txtUsuario.getText();
+            this.pass = txtSenha.getText();
+            
+            conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
         atualizarParametros();
-        
+
         if (onConectar != null) {
             onConectar.executar();
         }
     }
-    
+
     public void carregarParametros() {
         Parametros params = Parametros.get();
-        txtHost.setText(params.getWithNull(host, sistema, "SQLSERVER", "HOST"));
-        txtDatabase.setArquivo(params.getWithNull(database, sistema, "SQLSERVER", "DATABASE"));
-        txtPorta.setText(params.getWithNull(port, sistema, "SQLSERVER", "PORTA"));
-        txtUsuario.setText(params.getWithNull(user, sistema, "SQLSERVER", "USUARIO"));
-        txtSenha.setText(params.getWithNull(pass, sistema, "SQLSERVER", "SENHA"));
+        txtHost.setText(params.getWithNull(host, sistema, "FIREBIRD", "HOST"));
+        txtDatabase.setArquivo(params.getWithNull(database, sistema, "FIREBIRD", "DATABASE"));
+        txtPorta.setText(params.getWithNull(port, sistema, "FIREBIRD", "PORTA"));
+        txtUsuario.setText(params.getWithNull(user, sistema, "FIREBIRD", "USUARIO"));
+        txtSenha.setText(params.getWithNull(pass, sistema, "FIREBIRD", "SENHA"));
+        txtStrConexao.setText(params.getWithNull(stringConexao, sistema, "FIREBIRD", "STR_CONEXAO"));
     }
-    public String pass = "sa";
-    public String user = "sa";
-    public String port = "1433";
+
+    public String pass = "masterkey";
+    public String user = "sysdba";
+    public String port = "3050";
     public String database = "database";
     public String host = "localhost";
-    
-    public void atualizarParametros() {
+    public String stringConexao = "jdbc:firebirdsql://host:port//opt/firebird/db.fdb";
+
+    public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
-        params.put(txtHost.getText(), sistema, "SQLSERVER", "HOST");
-        params.put(txtDatabase.getArquivo(), sistema, "SQLSERVER", "DATABASE");
-        params.put(txtPorta.getText(), sistema, "SQLSERVER", "PORTA");
-        params.put(txtUsuario.getText(), sistema, "SQLSERVER", "USUARIO");
-        params.put(txtSenha.getText(), sistema, "SQLSERVER", "SENHA");
+        params.put(txtHost.getText(), sistema, "FIREBIRD", "HOST");
+        params.put(txtDatabase.getArquivo(), sistema, "FIREBIRD", "DATABASE");
+        params.put(txtPorta.getText(), sistema, "FIREBIRD", "PORTA");
+        params.put(txtUsuario.getText(), sistema, "FIREBIRD", "USUARIO");
+        params.put(txtSenha.getText(), sistema, "FIREBIRD", "SENHA");
+        params.put(txtStrConexao.getText(), sistema, "FIREBIRD", "STR_CONEXAO");
+        params.salvar();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
