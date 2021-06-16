@@ -16,6 +16,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
     private String sistema;
     private ConexaoSqlServer conexao = new ConexaoSqlServer();
     private ConexaoEvent onConectar;
+    
 
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
@@ -38,6 +39,18 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
      */
     public ConexaoSqlServerPanel() {
         initComponents();
+    }
+    
+    public ConexaoSqlServerPanel(String schema, 
+            int porta, 
+            String usuario, 
+            String senha) {
+        
+        initComponents();
+        txtDatabase.setArquivo(schema);
+        txtPorta.setText(String.valueOf(porta));
+        txtUsuario.setText(usuario);
+        txtSenha.setText(senha);
     }
     
     /**
@@ -94,6 +107,11 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Porta");
 
         txtPorta.setCaixaAlta(false);
+        txtPorta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPortaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlConexaoPadraoLayout = new javax.swing.GroupLayout(pnlConexaoPadrao);
         pnlConexaoPadrao.setLayout(pnlConexaoPadraoLayout);
@@ -199,7 +217,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
                 conexao.close();
             }
 
-            validarDadosAcessoMySQL();
+            validarDadosAcessoSqlServer();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
@@ -208,7 +226,11 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnConectarActionPerformed
 
-    public void validarDadosAcessoMySQL() throws Exception {
+    private void txtPortaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPortaActionPerformed
+
+    public void validarDadosAcessoSqlServer() throws Exception {
         if (txtHost.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados SQL Server!");
         }

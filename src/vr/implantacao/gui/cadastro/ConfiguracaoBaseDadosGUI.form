@@ -22,115 +22,62 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="pnlLoja" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtUsuario" min="-2" pref="123" max="-2" attributes="0"/>
-                                  <Component id="lblUsuario" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="lblSenha" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="vRPasswordField1" min="-2" pref="147" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="btnTestar" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="btnSalvar" pref="135" max="32767" attributes="0"/>
-                                  </Group>
-                              </Group>
+                  <Component id="pnlLoja" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="cboSistema" alignment="0" min="-2" pref="279" max="-2" attributes="0"/>
+                              <Component id="lblSistema" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="cboSistema" alignment="0" min="-2" pref="279" max="-2" attributes="0"/>
-                                  <Component id="lblSistema" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lblBD" min="-2" max="-2" attributes="0"/>
-                                  <Component id="cboBD" max="32767" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <Component id="txtNomeConexao" alignment="0" max="32767" attributes="0"/>
-                          <Component id="lblNomeCon" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lblHost" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtHost" min="-2" pref="209" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lblSchema" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtSchema" min="-2" pref="185" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="lblPorta" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Component id="txtPorta" max="32767" attributes="0"/>
-                              </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblBD" min="-2" max="-2" attributes="0"/>
+                              <Component id="cboBD" min="-2" pref="278" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="33" max="32767" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblNomeCon" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtNomeConexao" alignment="0" min="-2" pref="526" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRButton1" pref="0" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
+                  <Component id="btnSalvar" alignment="0" max="32767" attributes="0"/>
+                  <Component id="tabConexao" alignment="0" max="32767" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="lblNomeCon" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="txtNomeConexao" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="txtNomeConexao" max="32767" attributes="0"/>
+                  <Component id="vRButton1" pref="0" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblBD" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblSistema" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="cboBD" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cboSistema" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblHost" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblSchema" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblPorta" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtHost" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtSchema" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtPorta" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblSenha" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnTestar" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnSalvar" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="vRPasswordField1" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="tabConexao" pref="181" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnlLoja" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -159,58 +106,9 @@
       </Properties>
     </Component>
     <Component class="vrframework.bean.comboBox.VRComboBox" name="cboBD">
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="lblHost">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Host"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtHost">
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtSchema">
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="lblSchema">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Schema"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtPorta">
       <Events>
-        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtPortaKeyPressed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboBDActionPerformed"/>
       </Events>
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="lblPorta">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Porta"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="lblUsuario">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Usu&#xe1;rio"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="lblSenha">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Senha"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.button.VRButton" name="btnSalvar">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/vrframework/img/salvar.png"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Salvar"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.button.VRButton" name="btnTestar">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/vrframework/img/conect.png"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="Testar Conex&#xe3;o"/>
-      </Properties>
     </Component>
     <Container class="vrframework.bean.panel.VRPanel" name="pnlLoja">
       <Properties>
@@ -224,14 +122,14 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="tblLoja" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Component id="btnMapear" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="tblLoja" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -243,7 +141,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMapear" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tblLoja" pref="161" max="32767" attributes="0"/>
+                  <Component id="tblLoja" pref="129" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -252,6 +150,9 @@
       <SubComponents>
         <Component class="vrframework.bean.button.VRButton" name="btnMapear">
           <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/vrframework/img/configurar.png"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Mapear Loja"/>
           </Properties>
         </Component>
@@ -259,7 +160,34 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="vrframework.bean.passwordField.VRPasswordField" name="vRPasswordField1">
+    <Component class="vrframework.bean.button.VRButton" name="btnSalvar">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/vrframework/img/salvar.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Salvar"/>
+      </Properties>
+    </Component>
+    <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabConexao">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Painel de Conex&#xe3;o"/>
+          </Border>
+        </Property>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
+    </Container>
+    <Component class="vrframework.bean.button.VRButton" name="vRButton1">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/vrframework/img/ignorar.png"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Dica!"/>
+        <Property name="borderPainted" type="boolean" value="false"/>
+        <Property name="contentAreaFilled" type="boolean" value="false"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
