@@ -63,10 +63,15 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean gerarEanAtacado = false;
     private boolean soAtivos = false;
     private Date dtOfertas;
-    private boolean ignorarEnviaBalanca = false;
+    private boolean utilizarPropesvarNaBalanca = false;
     private boolean usarOfertasDoEncarte = false;
+    private boolean removerDigitoDaBalanca = false;
     private Set<String> finalizadorasRotativo;
     private Set<String> finalizadorasCheque;
+
+    public void setRemoverDigitoDaBalanca(boolean removerDigitoDaBalanca) {
+        this.removerDigitoDaBalanca = removerDigitoDaBalanca;
+    }
     
     public void setFinalizadorasRotativo(Set<String> finalizadorasRotativo) {
         this.finalizadorasRotativo = finalizadorasRotativo;
@@ -258,8 +263,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         this.dtOfertas = dtOfertas;
     }
 
-    public void setIgnorarEnviaBalanca(boolean ignorarEnviaBalanca) {
-        this.ignorarEnviaBalanca = ignorarEnviaBalanca;
+    public void setUtilizarPropesvarNaBalanca(boolean utilizarPropesvarNaBalanca) {
+        this.utilizarPropesvarNaBalanca = utilizarPropesvarNaBalanca;
     }
 
     public void setUsarOfertasDoEncarte(boolean usarOfertasDoEncarte) {
@@ -447,45 +452,60 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setImportSistema(getSistema());
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportId(rst.getString("id"));
-                            imp.setEan(ean.ean);
-                            imp.setQtdEmbalagem(ean.qtdEmbalagem);
                             imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                             imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                             imp.setDescricaoGondola(imp.getDescricaoCompleta());
                             imp.setCodMercadologico1(rst.getString("merc1"));
                             imp.setCodMercadologico2(rst.getString("merc2"));
                             imp.setCodMercadologico3(rst.getString("merc3"));
-                            ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));
-                            if (ignorarEnviaBalanca) {                                
-                                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                                if ("KG".equals(imp.getTipoEmbalagem())) {
+                                                        
+                            int plu;
+                            if (removerDigitoDaBalanca) {
+                                plu = ProdutoBalancaDAO.TipoConversao.REMOVER_DIGITO.convert(ean.ean);
+                            } else {
+                                plu = ProdutoBalancaDAO.TipoConversao.SIMPLES.convert(ean.ean);
+                            }
+                            final boolean isBalancaNoSysPdv = rst.getBoolean("e_balanca");
+                            
+                            if (utilizarPropesvarNaBalanca) {                                
+                                if ("KG".equals(rst.getString("tipoembalagem"))) {
                                     imp.seteBalanca(true);
+                                    imp.setQtdEmbalagem(1);
+                                    imp.setEan(String.valueOf(plu));
                                 } else {
-                                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                                    imp.seteBalanca(isBalancaNoSysPdv);
+                                    imp.setQtdEmbalagem(ean.qtdEmbalagem);
+                                    if (plu > 0 && plu <= 999999) {
+                                        imp.setEan(String.valueOf(plu));
+                                    } else {
+                                        imp.setEan(ean.ean);
+                                    }
                                 }
+                                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                                 imp.setValidade(Utils.stringToInt(rst.getString("validade")));
                             } else {
+                                ProdutoBalancaVO bal = balanca.get(plu);
                                 if (bal != null) {
                                     imp.seteBalanca(true);
-                                    if (null != bal.getPesavel()) {
-                                        switch (bal.getPesavel()) {
-                                            case "P":
-                                                imp.setTipoEmbalagem("KG");
-                                                break;
-                                            case "U":
-                                                imp.setTipoEmbalagem("UN");
-                                                break;
-                                        }
-                                    }
+                                    imp.setEan(String.valueOf(bal.getCodigo()));
+                                    imp.setQtdEmbalagem(1);
+                                    imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                                     imp.setValidade(bal.getValidade());
+                                } else if (isBalancaNoSysPdv) {
+                                    imp.seteBalanca(true);
+                                    imp.setEan(String.valueOf(plu));
+                                    imp.setQtdEmbalagem(1);
+                                    imp.setTipoEmbalagem(rst.getString("prounid"));
+                                    imp.setValidade(Utils.stringToInt(rst.getString("validade")));
                                 } else {
                                     if (balanca.isEmpty()) {
-                                        imp.seteBalanca(rst.getBoolean("e_balanca"));
-                                        imp.setTipoEmbalagem(rst.getString("prounid"));
+                                        imp.seteBalanca(isBalancaNoSysPdv);
                                     } else {
                                         imp.seteBalanca(false);
-                                        imp.setTipoEmbalagem(rst.getString("prounid"));
                                     }
+                                    imp.setEan(ean.ean);
+                                    imp.setQtdEmbalagem(ean.qtdEmbalagem);
+                                    imp.setTipoEmbalagem(rst.getString("prounid"));
                                     imp.setValidade(Utils.stringToInt(rst.getString("validade")));
                                 }
                             }
