@@ -4,8 +4,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import vr.implantacao.vo.enums.BancoDados;
-import vr.implantacao.vo.enums.Sistema;
+import vr.implantacao.vo.enums.EBancoDados;
+import vr.implantacao.vo.enums.ESistema;
 import vrframework.classe.Conexao;
 
 /**
@@ -17,7 +17,7 @@ public class AtualizadorDAO {
 
     private List<String> verificarBancoDados() throws Exception {
         List<String> result = null;
-        for (BancoDados bancoDados : BancoDados.values()) {
+        for (EBancoDados bancoDados : EBancoDados.values()) {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rs = stm.executeQuery(
                         "select nome \n"
@@ -36,7 +36,7 @@ public class AtualizadorDAO {
     
     private List<String> verificarSistema() throws Exception {
         List<String> result = null;
-        for (Sistema sistema : Sistema.values()) {
+        for (ESistema sistema : ESistema.values()) {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rs = stm.executeQuery(
                         "select nome \n"

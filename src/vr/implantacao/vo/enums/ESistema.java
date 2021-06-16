@@ -9,7 +9,7 @@ package vr.implantacao.vo.enums;
  *
  * @author Desenvolvimento
  */
-public enum Sistema {
+public enum ESistema {
 
     ACCESYS("ACCESYS"),
     ACOM("ACOM"),
@@ -218,7 +218,7 @@ public enum Sistema {
         this.nome = nome;
     }
 
-    Sistema(String nome) {
+    ESistema(String nome) {
         setNome(nome);
     }
 
