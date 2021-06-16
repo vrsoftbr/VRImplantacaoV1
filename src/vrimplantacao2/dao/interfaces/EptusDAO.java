@@ -586,7 +586,7 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.fone2,\n" +
                     "	c.email_1,\n" +
                     "	c.email_2,\n" +
-                    "	c.limite_credito\n" +
+                    "	c.lc_limite limite\n" +
                     "from\n" +
                     "	clientes c\n" +
                     "where \n" +
@@ -610,7 +610,7 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("dt_cadastro"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setTelefone(rs.getString("fone"));
-                    imp.setValorLimite(rs.getDouble("limite_credito"));
+                    imp.setValorLimite(rs.getDouble("limite"));
                     
                     result.add(imp);
                 }
@@ -637,12 +637,12 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	dt_vencto,\n" +
                     "	vlr_tot_venda,\n" +
                     "	valor_bruto,\n" +
-                    "	valor_pagto,\n" +
+                    "	coalesce(valor_pagto, 0) valor_pagto,\n" +
                     "	historico\n" +
                     "from \n" +
                     "	ctas_receber\n" +
                     "where \n" +
-                    "	valor_pagto < valor_bruto and\n" +
+                    "	coalesce(Valor_Pagto, 0) < Valor_Bruto and\n" +
                     "	codemp = 1")) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
