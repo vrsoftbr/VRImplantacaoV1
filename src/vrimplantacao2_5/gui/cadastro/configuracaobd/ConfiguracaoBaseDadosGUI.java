@@ -6,7 +6,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
-import vr.view.dialogs.MessageDialog;
 import vrimplantacao2_5.controller.cadastro.ConfiguracaoBaseDadosController;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
@@ -17,7 +16,8 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
+import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
+import vrimplantacao2_5.service.cadastro.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 
 /**
@@ -33,6 +33,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     /**
      * Creates new form ConfiguracaoPrincipalGUI
+     * @param menuGUI
+     * @throws java.lang.Exception
      */
     public ConfiguracaoBaseDadosGUI(VRMdiFrame menuGUI) throws Exception {
         super(menuGUI);
@@ -211,6 +213,11 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         btnMapear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/configurar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnMapear, "Mapear Loja");
+        btnMapear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapearActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlLojaLayout = new javax.swing.GroupLayout(pnlLoja);
         pnlLoja.setLayout(pnlLojaLayout);
@@ -332,6 +339,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnDicaActionPerformed
 
+    private void btnMapearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapearActionPerformed
+        MapaLojaGUI.exibir();
+    }//GEN-LAST:event_btnMapearActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnDica;
@@ -358,7 +369,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
             configuracaoBaseDados.setVisible(true);
         } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Mapeamento de Loja");
+            Util.exibirMensagemErro(ex, "Configuração de Base de Dados");
         } finally {
             menuGUI.setDefaultCursor();
         }

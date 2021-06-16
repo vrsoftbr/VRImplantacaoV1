@@ -1,4 +1,4 @@
-package vrimplantacao2_5.gui.cadastro.configuracaobd;
+package vrimplantacao2_5.gui.cadastro.mapaloja;
 
 import java.util.ArrayList;
 import java.util.List;

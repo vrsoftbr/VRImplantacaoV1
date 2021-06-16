@@ -1,9 +1,8 @@
 package vrimplantacao2_5.controller.cadastro;
 
 import java.util.List;
-import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
+import vrimplantacao2_5.service.cadastro.ConfiguracaoPanel;
 import vrimplantacao2_5.service.cadastro.ConfiguracaoBaseDadosService;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObserver;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
