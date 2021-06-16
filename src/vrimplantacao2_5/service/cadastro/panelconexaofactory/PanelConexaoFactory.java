@@ -25,6 +25,10 @@ public abstract class PanelConexaoFactory {
 
         try {
             bdVO = new BancoDadosDAO().getInformacaoBancoDados(idSistema, idBancoDados);
+            
+            if(bdVO == null) {
+                bdVO = new BancoDadosVO();                
+            }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -32,43 +36,34 @@ public abstract class PanelConexaoFactory {
         ConfiguracaoPanel panelConexao = null;
         EBancoDados eBD = EBancoDados.getById(idBancoDados);
 
-        if (bdVO == null) {
-            try {
-                Util.exibirMensagem("Tabela implantacao2_5.sistemabancodados não encontrada!", 
-                        "Configuração de Base de Dados");
-            } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        } else {
-            switch (eBD) {
-                case FIREBIRD:
-                    panelConexao = new ConexaoFirebirdPanel(bdVO.getSchema(), bdVO.getPorta(),
-                            bdVO.getUsuario(), bdVO.getSenha());
-                    break;
+        switch (eBD) {
+            case FIREBIRD:
+                panelConexao = new ConexaoFirebirdPanel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;
 
-                case MYSQL:
-                    panelConexao = new ConexaoMySQLPanel(bdVO.getSchema(), bdVO.getPorta(),
-                            bdVO.getUsuario(), bdVO.getSenha());
-                    break;
+            case MYSQL:
+                panelConexao = new ConexaoMySQLPanel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;
 
-                case ORACLE:
-                    panelConexao = new ConexaoOraclePanel(bdVO.getSchema(), bdVO.getPorta(),
-                            bdVO.getUsuario(), bdVO.getSenha());
-                    break;
+            case ORACLE:
+                panelConexao = new ConexaoOraclePanel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;
 
-                case POSTGRESQL:
-                    panelConexao = new ConexaoPostgreSQLPanel(bdVO.getSchema(), bdVO.getPorta(),
-                            bdVO.getUsuario(), bdVO.getSenha());
-                    break;
+            case POSTGRESQL:
+                panelConexao = new ConexaoPostgreSQLPanel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;
 
-                case SQLSERVER:
-                    panelConexao = new ConexaoSqlServerPanel(bdVO.getSchema(), bdVO.getPorta(),
-                            bdVO.getUsuario(), bdVO.getSenha());
-                    break;
+            case SQLSERVER:
+                panelConexao = new ConexaoSqlServerPanel(bdVO.getSchema(), bdVO.getPorta(),
+                        bdVO.getUsuario(), bdVO.getSenha());
+                break;
 
-                default:
-                    return null;
-            }
+            default:
+                return null;
         }
 
         return panelConexao;

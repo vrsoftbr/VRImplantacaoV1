@@ -7,11 +7,11 @@ package vrimplantacao2_5.vo.cadastro;
 public class BancoDadosVO {
     
     private int id;
-    private String nome;
-    private String schema;
-    private String usuario;
-    private String senha;
-    private int porta;
+    private String nome = "";
+    private String schema = "";
+    private String usuario = "";
+    private String senha = "";
+    private int porta = 0;
 
     public int getId() {
         return id;
