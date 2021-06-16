@@ -25,11 +25,11 @@ public abstract class PanelConexaoFactory {
 
         try {
             bdVO = new BancoDadosDAO().getInformacaoBancoDados(idSistema, idBancoDados);
-            
-            if(bdVO == null) {
-                bdVO = new BancoDadosVO();                
-            }
         } catch (Exception ex) {
+            if (bdVO == null) {
+                bdVO = new BancoDadosVO();
+            }
+
             Exceptions.printStackTrace(ex);
         }
 
