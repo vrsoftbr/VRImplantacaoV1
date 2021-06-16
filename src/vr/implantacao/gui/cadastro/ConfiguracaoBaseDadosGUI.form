@@ -41,7 +41,7 @@
                               <Component id="txtNomeConexao" alignment="0" min="-2" pref="526" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="vRButton1" pref="0" max="32767" attributes="0"/>
+                          <Component id="btnDica" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="btnSalvar" alignment="0" max="32767" attributes="0"/>
@@ -59,7 +59,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="txtNomeConexao" max="32767" attributes="0"/>
-                  <Component id="vRButton1" pref="0" max="32767" attributes="0"/>
+                  <Component id="btnDica" pref="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -179,7 +179,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
     </Container>
-    <Component class="vrframework.bean.button.VRButton" name="vRButton1">
+    <Component class="vrframework.bean.button.VRButton" name="btnDica">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/vrframework/img/ignorar.png"/>

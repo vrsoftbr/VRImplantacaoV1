@@ -1,7 +1,11 @@
 package vrimplantacao2.gui.component.conexao.postgresql;
 
+import java.util.ArrayList;
+import java.util.List;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
+import vr.implantacao.service.cadastro.panelobserver.PanelObservable;
+import vr.implantacao.service.cadastro.panelobserver.PanelObserver;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoPostgres;
@@ -11,11 +15,12 @@ import vrimplantacao2.parametro.Parametros;
  *
  * @author Leandro
  */
-public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
+public class ConexaoPostgreSQLPanel extends javax.swing.JPanel implements PanelObservable {
 
     private String sistema;
     private ConexaoPostgres conexao = new ConexaoPostgres();
     private ConexaoEvent onConectar;
+    private List<PanelObserver> observadores = new ArrayList<>();
 
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
@@ -31,6 +36,10 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
 
     public String getSistema() {
         return sistema;
+    }
+    
+    public int getStatusConexao() {
+        return conexao != null ? 1 : 0;
     }
     
     /**
@@ -238,8 +247,11 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
+            
+            this.notificarObservador();
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
+            this.notificarObservador();
         }
         
         atualizarParametros();
@@ -291,4 +303,22 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel7;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void registrarObservador(PanelObserver observer) {
+        observadores.add(observer);
+    }
+
+    @Override
+    public void removerObservador(PanelObserver observer) {
+        observadores.add(observer);   
+    }
+
+    @Override
+    public void notificarObservador() {
+        
+        for (PanelObserver ob : observadores) {
+            ob.habilitarBotao(getStatusConexao());
+        }
+    }
 }

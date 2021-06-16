@@ -1,7 +1,11 @@
 package vrimplantacao2.gui.component.conexao.firebird;
 
+import java.util.ArrayList;
+import java.util.List;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
+import vr.implantacao.service.cadastro.panelobserver.PanelObservable;
+import vr.implantacao.service.cadastro.panelobserver.PanelObserver;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoFirebird;
@@ -11,11 +15,12 @@ import vrimplantacao2.parametro.Parametros;
  *
  * @author Leandro
  */
-public class ConexaoFirebirdPanel extends javax.swing.JPanel {
+public class ConexaoFirebirdPanel extends javax.swing.JPanel implements PanelObservable {
 
     private String sistema;
     private ConexaoFirebird conexao = new ConexaoFirebird();
     private ConexaoEvent onConectar;
+    private List<PanelObserver> observadores = new ArrayList();
 
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
@@ -27,31 +32,35 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
     public void setSistema(String sistema) {
         this.sistema = sistema;
-    }    
+    }
 
     public String getSistema() {
         return sistema;
     }
-    
+
+    public Integer getStatusConexao() {
+        return conexao != null ? 1 : 0;
+    }
+
     /**
      * Creates new form ConexaoMySQLPanel
      */
     public ConexaoFirebirdPanel() {
         initComponents();
     }
-    
-    public ConexaoFirebirdPanel(String schema, 
-            int porta, 
-            String usuario, 
+
+    public ConexaoFirebirdPanel(String schema,
+            int porta,
+            String usuario,
             String senha) {
-        
+
         initComponents();
         txtDatabase.setArquivo(schema);
         txtPorta.setText(String.valueOf(porta));
         txtUsuario.setText(usuario);
         txtSenha.setText(senha);
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -221,7 +230,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_btnConectarActionPerformed
 
     public void validarDadosAcesso() throws Exception {
-        
+
         if (tabsCon.getSelectedIndex() == 0) {
             if (txtHost.getText().isEmpty()) {
                 throw new VRException("Favor informar host do banco de dados Firebird!");
@@ -235,19 +244,28 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
             if (txtUsuario.getText().isEmpty()) {
                 throw new VRException("Favor informar o usuário do banco de dados Firebird!");
             }
-            conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            
+            this.host = txtHost.getText();
+            this.port = txtPorta.getText();
+            this.database = txtDatabase.getArquivo();
+            this.user = txtUsuario.getText();
+            this.pass = txtSenha.getText();
+            
+            conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
+            this.notificarObservador();
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
+            this.notificarObservador();
         }
 
         atualizarParametros();
-        
+
         if (onConectar != null) {
             onConectar.executar();
         }
     }
-    
+
     public void carregarParametros() {
         Parametros params = Parametros.get();
         txtHost.setText(params.getWithNull(host, sistema, "FIREBIRD", "HOST"));
@@ -257,14 +275,14 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
         txtSenha.setText(params.getWithNull(pass, sistema, "FIREBIRD", "SENHA"));
         txtStrConexao.setText(params.getWithNull(stringConexao, sistema, "FIREBIRD", "STR_CONEXAO"));
     }
-    
+
     public String pass = "masterkey";
     public String user = "sysdba";
     public String port = "3050";
     public String database = "database";
     public String host = "localhost";
     public String stringConexao = "jdbc:firebirdsql://host:port//opt/firebird/db.fdb";
-    
+
     public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), sistema, "FIREBIRD", "HOST");
@@ -294,4 +312,22 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel7;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void registrarObservador(PanelObserver observer) {
+        observadores.add(observer);
+    }
+
+    @Override
+    public void removerObservador(PanelObserver observer) {
+        observadores.remove(observer);
+    }
+
+    @Override
+    public void notificarObservador() {
+        
+        for (PanelObserver ob : observadores) {
+            ob.habilitarBotao(getStatusConexao());
+        }
+    }
 }

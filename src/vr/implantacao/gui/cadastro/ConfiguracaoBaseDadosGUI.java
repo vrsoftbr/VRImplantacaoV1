@@ -7,7 +7,9 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
 import vr.implantacao.controller.cadastro.ConfiguracaoBaseDadosController;
+import vr.implantacao.service.cadastro.panelobserver.PanelObserver;
 import vr.implantacao.vo.cadastro.BancoDadosVO;
+import vr.implantacao.vo.cadastro.ConexaoVO;
 import vr.implantacao.vo.cadastro.SistemaVO;
 import vr.implantacao.vo.enums.EBancoDados;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -15,15 +17,20 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel;
+import vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel;
 
 /**
  *
  * @author guilhermegomes
  */
-public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
+public class ConfiguracaoBaseDadosGUI extends VRInternalFrame implements PanelObserver {
 
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDados = null;
     private ConfiguracaoBaseDadosController controller = null;
+    private JPanel painelDeConexaoDinamico;
+    private ConexaoVO conexaoVO = null;
     
     /**
      * Creates new form ConfiguracaoPrincipalGUI
@@ -44,6 +51,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         
         getSistema();
         configurarColuna();
+        conexaoVO = new ConexaoVO();
     }
     
     private void configurarColuna() throws Exception {
@@ -76,10 +84,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
     
-    private void getBancoDadosPorSistema(int idSistema) {
+    private void getBancoDadosPorSistema() {
         cboBD.setModel(new DefaultComboBoxModel());
         
-        List<BancoDadosVO> bancosPorSistema = controller.getBancoDadosPorSistema(idSistema);
+        List<BancoDadosVO> bancosPorSistema = controller.getBancoDadosPorSistema(cboSistema.getId());
         
         if (bancosPorSistema == null) {
             return;
@@ -93,24 +101,79 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             
             cboBD.addItem(it);
         }
+        
+        desabilitarBotao();
     }
     
     private void exibiPainelConexao() {
         tabConexao.removeAll();
+        desabilitarBotao();
         
-        JPanel painelDeConexaoDinamico = controller.exibiPainelConexao(cboSistema.getId(), cboBD.getId());
+        painelDeConexaoDinamico = controller.exibiPainelConexao(
+                                                this,
+                                                cboSistema.getId(), 
+                                                cboBD.getId());
         
         if (painelDeConexaoDinamico == null) {
             try {
                 Util.exibirMensagem("Nenhum painel configurado para o banco de dados " + 
                                                 EBancoDados.getById(cboBD.getId()) + "!",
-                        getTitle());
+                                                getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
         } else {
             tabConexao.add(painelDeConexaoDinamico);
+            
         }
+        
+        habilitarBotaoSalvar();
+    }
+    
+    private void habilitarBotaoSalvar() {
+        if(painelDeConexaoDinamico instanceof ConexaoFirebirdPanel) {
+            
+            final ConexaoFirebirdPanel panelFirebird = (ConexaoFirebirdPanel) painelDeConexaoDinamico;
+            
+            panelFirebird.setOnConectar(new ConexaoEvent() {
+                @Override
+                public void executar() throws Exception {
+                    btnSalvar.setEnabled(true);
+                    
+                    conexaoVO.setHost(panelFirebird.host);
+                    conexaoVO.setUsuario(panelFirebird.user);
+                    conexaoVO.setSenha(panelFirebird.pass);
+                    conexaoVO.setPorta(Integer.valueOf(panelFirebird.port));
+                }
+            });
+        }
+        
+        if(painelDeConexaoDinamico instanceof ConexaoPostgreSQLPanel) {
+            
+            final ConexaoPostgreSQLPanel panelPostgres = (ConexaoPostgreSQLPanel) painelDeConexaoDinamico;
+            
+            panelPostgres.setOnConectar(new ConexaoEvent() {
+                @Override
+                public void executar() throws Exception {
+                    btnSalvar.setEnabled(true);
+                    
+                    conexaoVO.setHost(panelPostgres.host);
+                    conexaoVO.setUsuario(panelPostgres.user);
+                    conexaoVO.setSenha(panelPostgres.pass);
+                    conexaoVO.setPorta(Integer.valueOf(panelPostgres.port));
+                }
+            });
+        }
+    }
+    
+    private void desabilitarBotao() {
+        btnSalvar.setEnabled(false);
+        btnMapear.setEnabled(false);
+    }
+    
+    @Override
+    public void salvar() {
+        conexaoVO.setDescricao(txtNomeConexao.getText());
     }
     
     /**
@@ -133,7 +196,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         tblLoja = new vrframework.bean.tableEx.VRTableEx();
         btnSalvar = new vrframework.bean.button.VRButton();
         tabConexao = new vrframework.bean.tabbedPane.VRTabbedPane();
-        vRButton1 = new vrframework.bean.button.VRButton();
+        btnDica = new vrframework.bean.button.VRButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(lblNomeCon, "Nome da Conexão");
 
@@ -186,10 +249,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         tabConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Painel de Conexão"));
 
-        vRButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/ignorar.png"))); // NOI18N
-        vRButton1.setToolTipText("Dica!");
-        vRButton1.setBorderPainted(false);
-        vRButton1.setContentAreaFilled(false);
+        btnDica.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/ignorar.png"))); // NOI18N
+        btnDica.setToolTipText("Dica!");
+        btnDica.setBorderPainted(false);
+        btnDica.setContentAreaFilled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -213,7 +276,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                                 .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 526, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(vRButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                            .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                     .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -226,7 +289,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtNomeConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -248,7 +311,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cboSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboSistemaActionPerformed
-        getBancoDadosPorSistema(cboSistema.getId());
+        getBancoDadosPorSistema();
     }//GEN-LAST:event_cboSistemaActionPerformed
 
     private void cboBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboBDActionPerformed
@@ -257,6 +320,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrframework.bean.button.VRButton btnDica;
     private vrframework.bean.button.VRButton btnMapear;
     private vrframework.bean.button.VRButton btnSalvar;
     private vrframework.bean.comboBox.VRComboBox cboBD;
@@ -268,7 +332,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabConexao;
     private vrframework.bean.tableEx.VRTableEx tblLoja;
     private vrframework.bean.textField.VRTextField txtNomeConexao;
-    private vrframework.bean.button.VRButton vRButton1;
     // End of variables declaration//GEN-END:variables
     
     public static void exibir(VRMdiFrame menuGUI) {
@@ -284,6 +347,13 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             Util.exibirMensagemErro(ex, "Mapeamento de Loja");
         } finally {
             menuGUI.setDefaultCursor();
+        }
+    }
+
+    @Override
+    public void habilitarBotao(int situacaoConexao) {
+        if (situacaoConexao == 1) {
+            //btnSalvar.setEnabled(true);
         }
     }
 }

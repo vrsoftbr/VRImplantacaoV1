@@ -4,7 +4,8 @@ import java.util.List;
 import org.openide.util.Exceptions;
 import vr.implantacao.dao.bancodados.BancoDadosDAO;
 import vr.implantacao.dao.sistema.SistemaDAO;
-import vr.implantacao.service.panelconexaofactory.PanelConexaoFactory;
+import vr.implantacao.service.cadastro.panelconexaofactory.PanelConexaoFactory;
+import vr.implantacao.service.cadastro.panelobserver.PanelObserver;
 import vr.implantacao.vo.cadastro.BancoDadosVO;
 import vr.implantacao.vo.cadastro.SistemaVO;
 import vrframework.classe.Util;
@@ -65,7 +66,7 @@ public class ConfiguracaoBaseDadosService {
         return bdPorSistema;
     }
     
-    public javax.swing.JPanel exibiPainelConexao(int idSistema, int idBancoDados) {
-        return PanelConexaoFactory.getPanelConexao(idSistema, idBancoDados);
+    public javax.swing.JPanel exibiPainelConexao(PanelObserver conexaoBD, int idSistema, int idBancoDados) {
+        return PanelConexaoFactory.getPanelConexao(conexaoBD, idSistema, idBancoDados);
     }
 }

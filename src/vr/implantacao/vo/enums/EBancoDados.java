@@ -20,7 +20,6 @@ public enum EBancoDados {
     SQLITE(12),
     SQLSERVER(13);
     
-    
     public static EBancoDados getById(int id) {
         for (EBancoDados bd: values()) {
             if (bd.getId() == id) {

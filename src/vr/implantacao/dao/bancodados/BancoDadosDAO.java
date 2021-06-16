@@ -19,6 +19,7 @@ public class BancoDadosDAO {
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
+                    "   sb.id,\n" +        
                     "	s.id id_sistema,\n" +
                     "	s.nome sistema,\n" +
                     "	b.id id_banco,\n" +

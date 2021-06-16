@@ -1,10 +1,12 @@
-package vr.implantacao.service.panelconexaofactory;
+package vr.implantacao.service.cadastro.panelconexaofactory;
 
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
 import vr.implantacao.dao.bancodados.BancoDadosDAO;
+import vr.implantacao.service.cadastro.panelobserver.PanelObserver;
 import vr.implantacao.vo.cadastro.BancoDadosVO;
 import vr.implantacao.vo.enums.EBancoDados;
+import vrframework.bean.internalFrame.VRInternalFrame;
 import vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel;
 import vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel;
 import vrimplantacao2.gui.component.conexao.oracle.ConexaoOraclePanel;
@@ -17,7 +19,7 @@ import vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel;
  */
 public abstract class PanelConexaoFactory {
     
-    public static JPanel getPanelConexao(int idSistema, int idBancoDados) {
+    public static JPanel getPanelConexao(PanelObserver conexaoBD, int idSistema, int idBancoDados) {
         
         BancoDadosVO bdVO = null;
         
@@ -34,6 +36,8 @@ public abstract class PanelConexaoFactory {
             case FIREBIRD: 
                 panelConexao = new ConexaoFirebirdPanel(bdVO.getSchema(), bdVO.getPorta(), 
                                                         bdVO.getUsuario(), bdVO.getSenha());
+                
+                ((ConexaoFirebirdPanel) panelConexao).registrarObservador(conexaoBD);
             break;
             
             case MYSQL: 
@@ -49,6 +53,8 @@ public abstract class PanelConexaoFactory {
             case POSTGRESQL: 
                 panelConexao = new ConexaoPostgreSQLPanel(bdVO.getSchema(), bdVO.getPorta(), 
                                                           bdVO.getUsuario(), bdVO.getSenha());
+                
+                ((ConexaoPostgreSQLPanel) panelConexao).registrarObservador(conexaoBD);
             break;
             
             case SQLSERVER: 
