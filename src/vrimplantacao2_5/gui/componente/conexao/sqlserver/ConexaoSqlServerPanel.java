@@ -1,4 +1,4 @@
-package vrimplantacao2.gui.component.conexao.sqlserver;
+package vrimplantacao2_5.gui.componente.conexao.sqlserver;
 
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
@@ -39,6 +39,18 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
      */
     public ConexaoSqlServerPanel() {
         initComponents();
+    }
+    
+    public ConexaoSqlServerPanel(String schema, 
+            int porta, 
+            String usuario, 
+            String senha) {
+        
+        initComponents();
+        txtDatabase.setArquivo(schema);
+        txtPorta.setText(String.valueOf(porta));
+        txtUsuario.setText(usuario);
+        txtSenha.setText(senha);
     }
     
     /**

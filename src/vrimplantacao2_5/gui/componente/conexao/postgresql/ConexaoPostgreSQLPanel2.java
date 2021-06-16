@@ -1,22 +1,21 @@
-package vrimplantacao2.gui.component.conexao.sqlserver;
+package vrimplantacao2_5.gui.componente.conexao.postgresql;
 
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.classe.ConexaoPostgres2;
 import vrimplantacao2.parametro.Parametros;
 
 /**
  *
  * @author Leandro
  */
-public class ConexaoSqlServerPanel extends javax.swing.JPanel {
+public class ConexaoPostgreSQLPanel2 extends javax.swing.JPanel {
 
     private String sistema;
-    private ConexaoSqlServer conexao = new ConexaoSqlServer();
+    private ConexaoPostgres2 conexao = new ConexaoPostgres2();
     private ConexaoEvent onConectar;
-    
 
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
@@ -37,7 +36,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
     /**
      * Creates new form ConexaoMySQLPanel
      */
-    public ConexaoSqlServerPanel() {
+    public ConexaoPostgreSQLPanel2() {
         initComponents();
     }
     
@@ -67,7 +66,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         vRLabel26 = new vrframework.bean.label.VRLabel();
         txtStrConexao = new javax.swing.JTextField();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Conexão SQL Server"));
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Conexão PostgreSQL"));
 
         txtUsuario.setCaixaAlta(false);
 
@@ -95,11 +94,6 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Porta");
 
         txtPorta.setCaixaAlta(false);
-        txtPorta.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPortaActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout pnlConexaoPadraoLayout = new javax.swing.GroupLayout(pnlConexaoPadrao);
         pnlConexaoPadrao.setLayout(pnlConexaoPadraoLayout);
@@ -123,7 +117,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         pnlConexaoPadraoLayout.setVerticalGroup(
             pnlConexaoPadraoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlConexaoPadraoLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
                 .addGroup(pnlConexaoPadraoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -138,7 +132,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel26, "String de Conexão");
 
-        txtStrConexao.setText("jdbc:sqlserver://[host][\\instance][:port];trustServerCertificate=true");
+        txtStrConexao.setText("jdbc:oracle:thin:@10.0.2.250:1521/orcl");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -194,8 +188,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
                     .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConectar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnConectar)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -205,7 +198,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
                 conexao.close();
             }
 
-            validarDadosAcessoSqlServer();
+            validarDadosAcesso();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
@@ -214,22 +207,18 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnConectarActionPerformed
 
-    private void txtPortaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPortaActionPerformed
-
-    public void validarDadosAcessoSqlServer() throws Exception {
+    public void validarDadosAcesso() throws Exception {
         if (txtHost.getText().isEmpty()) {
-            throw new VRException("Favor informar host do banco de dados SQL Server!");
+            throw new VRException("Favor informar host do banco de dados PostgreSQL!");
         }
         if (txtPorta.getText().isEmpty()) {
-            throw new VRException("Favor informar a porta do banco de dados SQL Server!");
+            throw new VRException("Favor informar a porta do banco de dados PostgreSQL!");
         }
         if (txtDatabase.getArquivo().isEmpty()) {
-            throw new VRException("Favor informar nome do banco de dados SQL Server!");
+            throw new VRException("Favor informar nome do banco de dados PostgreSQL!");
         }
         if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados SQL Server!");
+            throw new VRException("Favor informar o usuário do banco de dados PostgreSQL!");
         }
 
         if (tabsCon.getSelectedIndex() == 0) {
@@ -238,9 +227,9 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
-
-        atualizarParametros();
         
+        atualizarParametros();
+
         if (onConectar != null) {
             onConectar.executar();
         }
@@ -248,25 +237,26 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
     
     public void carregarParametros() {
         Parametros params = Parametros.get();
-        txtHost.setText(params.getWithNull(host, sistema, "SQLSERVER", "HOST"));
-        txtDatabase.setArquivo(params.getWithNull(database, sistema, "SQLSERVER", "DATABASE"));
-        txtPorta.setText(params.getWithNull(port, sistema, "SQLSERVER", "PORTA"));
-        txtUsuario.setText(params.getWithNull(user, sistema, "SQLSERVER", "USUARIO"));
-        txtSenha.setText(params.getWithNull(pass, sistema, "SQLSERVER", "SENHA"));
+        txtHost.setText(params.getWithNull(host, sistema, "POSTGRES", "HOST"));
+        txtDatabase.setArquivo(params.getWithNull(database, sistema, "POSTGRES", "DATABASE"));
+        txtPorta.setText(params.getWithNull(port, sistema, "POSTGRES", "PORTA"));
+        txtUsuario.setText(params.getWithNull(user, sistema, "POSTGRES", "USUARIO"));
+        txtSenha.setText(params.getWithNull(pass, sistema, "POSTGRES", "SENHA"));
     }
-    public String pass = "sa";
-    public String user = "sa";
-    public String port = "1433";
+    
+    public String pass = "postgres";
+    public String user = "postgres";
+    public String port = "5432";
     public String database = "database";
     public String host = "localhost";
     
     public void atualizarParametros() {
         Parametros params = Parametros.get();
-        params.put(txtHost.getText(), sistema, "SQLSERVER", "HOST");
-        params.put(txtDatabase.getArquivo(), sistema, "SQLSERVER", "DATABASE");
-        params.put(txtPorta.getText(), sistema, "SQLSERVER", "PORTA");
-        params.put(txtUsuario.getText(), sistema, "SQLSERVER", "USUARIO");
-        params.put(txtSenha.getText(), sistema, "SQLSERVER", "SENHA");
+        params.put(txtHost.getText(), sistema, "POSTGRES", "HOST");
+        params.put(txtDatabase.getArquivo(), sistema, "POSTGRES", "DATABASE");
+        params.put(txtPorta.getText(), sistema, "POSTGRES", "PORTA");
+        params.put(txtUsuario.getText(), sistema, "POSTGRES", "USUARIO");
+        params.put(txtSenha.getText(), sistema, "POSTGRES", "SENHA");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
