@@ -2,8 +2,6 @@ package vr.implantacao.dao.atualizador;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import vr.implantacao.vo.enums.EBancoDados;
 import vr.implantacao.vo.enums.ESistema;
 import vrframework.classe.Conexao;
@@ -15,42 +13,28 @@ import vrframework.classe.Conexao;
 
 public class AtualizadorDAO {
 
-    private List<String> verificarBancoDados() throws Exception {
-        List<String> result = null;
-        for (EBancoDados bancoDados : EBancoDados.values()) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select nome \n"
-                        + "from implantacao2_5.bancodados \n"
-                        + "where nome = '" + bancoDados + "'"
-                )) {
-                    if (!rs.next()) {
-                        result = new ArrayList<>();
-                        result.add(rs.getString("nome"));
-                    }
-                }
+    public boolean verificarBancoDados(EBancoDados eBancoDados) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select nome \n"
+                    + "from implantacao2_5.bancodados \n"
+                    + "where nome = '" + eBancoDados + "'"
+            )) {
+                return rs.next();
             }
         }
-        return result;
     }
     
-    private List<String> verificarSistema() throws Exception {
-        List<String> result = null;
-        for (ESistema sistema : ESistema.values()) {
-            try (Statement stm = Conexao.createStatement()) {
-                try (ResultSet rs = stm.executeQuery(
-                        "select nome \n"
-                        + "from implantacao2_5.sistema \n"
-                        + "where nome = '" + sistema + "'"
-                )) {
-                    if (!rs.next()) {
-                        result = new ArrayList<>();
-                        result.add(rs.getString("nome"));
-                    }
-                }
+    public boolean verificarSistema(ESistema eSistema) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select nome \n"
+                    + "from implantacao2_5.sistema \n"
+                    + "where nome = '" + eSistema + "'"
+            )) {
+                return rs.next();
             }
         }
-        return result;
     }
     
     public void criarSchema() throws Exception {
@@ -114,25 +98,15 @@ public class AtualizadorDAO {
         }
     }
 
-    public void inserirTabelaBancoDados() throws Exception {
-        List<String> bancoDados = new ArrayList<>();
-        bancoDados = verificarBancoDados();
-
-        for (String bancoDado : bancoDados) {
-            try (Statement stm = Conexao.createStatement()) {
-                stm.execute("INSERT INTO implantacao2_5.bancodados (nome) VALUES ('" + bancoDado + "');");
-            }
+    public void inserirTabelaBancoDados(EBancoDados eBancoDados) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("INSERT INTO implantacao2_5.bancodados (nome) VALUES ('" + eBancoDados + "');");
         }
     }
 
-    public void inserirTabelaSistema() throws Exception {
-        List<String> sistemas = new ArrayList<>();
-        sistemas = verificarSistema();
-
-        for (String sistema : sistemas) {
-            try (Statement stm = Conexao.createStatement()) {
-                stm.execute("INSERT INTO implantacao2_5.sistema (nome) VALUES ('" + sistema + "')");
-            }
+    public void inserirTabelaSistema(ESistema eSistema) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("INSERT INTO implantacao2_5.sistema (nome) VALUES ('" + eSistema + "')");
         }
     }
 
@@ -306,13 +280,5 @@ public class AtualizadorDAO {
                     + "	 WHERE nome LIKE '%SQL SERVER%'), 'sa', 'Pol!gon5oft', 'PADARIA');   	     "
             );
         }
-    }
-
-    public void criarEstrutura() throws Exception {
-        criarSchema();
-        criarTabelas();
-        inserirTabelaBancoDados();
-        inserirTabelaSistema();
-        //inserirTabelaSistemaBancoDados();
     }
 }
