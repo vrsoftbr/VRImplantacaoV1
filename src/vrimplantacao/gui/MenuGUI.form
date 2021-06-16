@@ -24,17 +24,17 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="mnuAjuda1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="v2.5"/>
+            <Property name="text" type="java.lang.String" value="Importa&#xe7;&#xe3;o 2.5"/>
           </Properties>
           <SubComponents>
             <Menu class="javax.swing.JMenu" name="mnuCadastros">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Cadastro"/>
+                <Property name="text" type="java.lang.String" value="Configura&#xe7;&#xe3;o"/>
               </Properties>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="mnuMapeamentoDeLojas">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Mapeamento de Loja"/>
+                    <Property name="text" type="java.lang.String" value="Configura&#xe7;&#xe3;o de Base de Dados"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMapeamentoDeLojasActionPerformed"/>

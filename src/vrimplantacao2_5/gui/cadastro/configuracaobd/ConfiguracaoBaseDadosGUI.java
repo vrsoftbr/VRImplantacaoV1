@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import vrimplantacao2_5.controller.atualizador.AtualizadorController;
 import org.openide.util.Exceptions;
+import vr.view.dialogs.MessageDialog;
 import vrimplantacao2_5.controller.cadastro.ConfiguracaoBaseDadosController;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
@@ -17,9 +18,8 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
-import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;
-import vrimplantacao2_5.gui.componente.conexao.postgresql.ConexaoPostgreSQLPanel;
 
 /**
  *
@@ -30,7 +30,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDados = null;
     private ConfiguracaoBaseDadosController controller = null;
     private AtualizadorController atualizadorController = null;
-    private JPanel painelDeConexaoDinamico;
+    private ConfiguracaoPanel painelDeConexaoDinamico;
     private ConfiguracaoBDVO conexaoVO = null;
     
     /**
@@ -116,60 +116,36 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         tabConexao.removeAll();
         desabilitarBotao();
         
-        painelDeConexaoDinamico = controller.exibiPainelConexao(
-                                                cboSistema.getId(), 
-                                                cboBD.getId());
+        painelDeConexaoDinamico = controller.exibiPainelConexao(cboSistema.getId(), cboBD.getId());
         
         if (painelDeConexaoDinamico == null) {
             try {
                 Util.exibirMensagem("Nenhum painel configurado para o banco de dados " + 
-                                                EBancoDados.getById(cboBD.getId()) + "!",
-                                                getTitle());
+                                                EBancoDados.getById(cboBD.getId()) + "!", getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
         } else {
-            tabConexao.add(painelDeConexaoDinamico);
-            
+            tabConexao.add((JPanel) painelDeConexaoDinamico);
         }
         
         habilitarBotaoSalvar();
     }
     
     private void habilitarBotaoSalvar() {
-        if(painelDeConexaoDinamico instanceof ConexaoFirebirdPanel) {
-            
-            final ConexaoFirebirdPanel panelFirebird = (ConexaoFirebirdPanel) painelDeConexaoDinamico;
-            
-            panelFirebird.setOnConectar(new ConexaoEvent() {
-                @Override
-                public void executar() throws Exception {
-                    btnSalvar.setEnabled(true);
-                    
-                    conexaoVO.setHost(panelFirebird.host);
-                    conexaoVO.setUsuario(panelFirebird.user);
-                    conexaoVO.setSenha(panelFirebird.pass);
-                    conexaoVO.setPorta(Integer.valueOf(panelFirebird.port));
-                }
-            });
-        }
         
-        if(painelDeConexaoDinamico instanceof ConexaoPostgreSQLPanel) {
-            
-            final ConexaoPostgreSQLPanel panelPostgres = (ConexaoPostgreSQLPanel) painelDeConexaoDinamico;
-            
-            panelPostgres.setOnConectar(new ConexaoEvent() {
-                @Override
-                public void executar() throws Exception {
-                    btnSalvar.setEnabled(true);
-                    
-                    conexaoVO.setHost(panelPostgres.host);
-                    conexaoVO.setUsuario(panelPostgres.user);
-                    conexaoVO.setSenha(panelPostgres.pass);
-                    conexaoVO.setPorta(Integer.valueOf(panelPostgres.port));
-                }
-            });
-        }
+        painelDeConexaoDinamico.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                btnSalvar.setEnabled(true);
+
+                conexaoVO.setHost(painelDeConexaoDinamico.getHost());
+                conexaoVO.setUsuario(painelDeConexaoDinamico.getUsuario());
+                conexaoVO.setSenha(painelDeConexaoDinamico.getSenha());
+                conexaoVO.setPorta(Integer.valueOf(painelDeConexaoDinamico.getPorta()));
+                conexaoVO.setSchema(painelDeConexaoDinamico.getSchema());
+            }
+        });
     }
     
     private void desabilitarBotao() {
@@ -180,6 +156,21 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     @Override
     public void salvar() {
         conexaoVO.setDescricao(txtNomeConexao.getText());
+        conexaoVO.setIdBancoDados(cboBD.getId());
+        conexaoVO.setIdSistema(cboSistema.getId());
+        
+        controller.salvar(conexaoVO);
+        
+        if(conexaoVO.getId() != 0) {
+            
+            btnMapear.setEnabled(true);
+            
+            try {
+                Util.exibirMensagem("Conexão salva com sucesso!", getTitle());
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
     
     /**
@@ -205,6 +196,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         btnDica = new vrframework.bean.button.VRButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(lblNomeCon, "Nome da Conexão");
+
+        txtNomeConexao.setObrigatorio(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(lblSistema, "Sistema");
 
@@ -252,6 +245,11 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/salvar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnSalvar, "Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         tabConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Painel de Conexão"));
 
@@ -259,6 +257,11 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         btnDica.setToolTipText("Dica!");
         btnDica.setBorderPainted(false);
         btnDica.setContentAreaFilled(false);
+        btnDica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDicaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -323,6 +326,19 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private void cboBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboBDActionPerformed
         exibiPainelConexao();
     }//GEN-LAST:event_cboBDActionPerformed
+
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        salvar();
+    }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnDicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDicaActionPerformed
+        try {
+            Util.exibirMensagem("Informe uma descrição da conexão!\n"
+                    + "Exemplo: CONEXÃO DA LOJA MATRIZ - SERVIDOR 0.0.0.0", getTitle());
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_btnDicaActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

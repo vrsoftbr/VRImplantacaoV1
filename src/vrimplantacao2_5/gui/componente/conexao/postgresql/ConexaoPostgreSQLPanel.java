@@ -6,17 +6,19 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.gui.componente.ConfiguracaoPanel;
 
 /**
  *
  * @author Leandro
  */
-public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
+public class ConexaoPostgreSQLPanel extends javax.swing.JPanel implements ConfiguracaoPanel {
 
     private String sistema;
     private ConexaoPostgres conexao = new ConexaoPostgres();
     private ConexaoEvent onConectar;
 
+    @Override
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
     }
@@ -291,4 +293,29 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel7;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public String getHost() {
+        return this.host;
+    }
+
+    @Override
+    public String getPorta() {
+        return this.port;
+    }
+
+    @Override
+    public String getSchema() {
+        return this.database;
+    }
+
+    @Override
+    public String getUsuario() {
+        return this.user;
+    }
+
+    @Override
+    public String getSenha() {
+        return this.pass;
+    }
 }
