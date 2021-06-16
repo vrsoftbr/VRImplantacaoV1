@@ -40,11 +40,11 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         super(menuGUI);
         initComponents();
         
-        criarEstrutura();
+        criarEstrutura2_5();
         setConfiguracao();
     }
     
-    private void criarEstrutura() throws Exception {
+    private void criarEstrutura2_5() throws Exception {
         atualizadorController = new AtualizadorController();
         atualizadorController.criarEstrutura2_5();
     }
