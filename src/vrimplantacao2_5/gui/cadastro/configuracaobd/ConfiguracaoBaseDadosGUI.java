@@ -30,6 +30,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private ConfiguracaoBaseDadosController controller = null;
     private ConfiguracaoPanel painelDeConexaoDinamico;
     private ConfiguracaoBDVO conexaoVO = null;
+    public VRMdiFrame parentFrame = null;
     
     /**
      * Creates new form ConfiguracaoPrincipalGUI
@@ -40,6 +41,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         super(menuGUI);
         initComponents();
         
+        this.parentFrame = menuGUI;
         setConfiguracao();
     }
     
@@ -127,7 +129,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }
     
     private void habilitarBotaoSalvar() {
-        
         painelDeConexaoDinamico.setOnConectar(new ConexaoEvent() {
             @Override
             public void executar() throws Exception {
@@ -149,6 +150,16 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     @Override
     public void salvar() {
+        if(txtNomeConexao.getText().isEmpty()) {
+            try {
+                Util.exibirMensagem("Campo Nome da Conexão obrigatório!", getTitle());
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            
+            return;
+        }
+        
         conexaoVO.setDescricao(txtNomeConexao.getText());
         conexaoVO.setIdBancoDados(cboBD.getId());
         conexaoVO.setIdSistema(cboSistema.getId());
@@ -340,7 +351,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnDicaActionPerformed
 
     private void btnMapearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapearActionPerformed
-        MapaLojaGUI.exibir();
+        MapaLojaGUI.exibir(this);
     }//GEN-LAST:event_btnMapearActionPerformed
 
 
