@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
 import vrimplantacao2_5.controller.cadastro.ConfiguracaoBaseDadosController;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObserver;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
@@ -17,15 +16,15 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao2.gui.component.conexao.ConexaoEvent;
-import vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel;
-import vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel;
+import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
+import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;
+import vrimplantacao2_5.gui.componente.conexao.postgresql.ConexaoPostgreSQLPanel;
 
 /**
  *
  * @author guilhermegomes
  */
-public class ConfiguracaoBaseDadosGUI extends VRInternalFrame implements PanelObserver {
+public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDados = null;
     private ConfiguracaoBaseDadosController controller = null;
@@ -110,7 +109,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame implements PanelOb
         desabilitarBotao();
         
         painelDeConexaoDinamico = controller.exibiPainelConexao(
-                                                this,
                                                 cboSistema.getId(), 
                                                 cboBD.getId());
         
@@ -347,13 +345,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame implements PanelOb
             Util.exibirMensagemErro(ex, "Mapeamento de Loja");
         } finally {
             menuGUI.setDefaultCursor();
-        }
-    }
-
-    @Override
-    public void habilitarBotao(int situacaoConexao) {
-        if (situacaoConexao == 1) {
-            //btnSalvar.setEnabled(true);
         }
     }
 }

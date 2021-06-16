@@ -3,7 +3,6 @@ package vrimplantacao2_5.service.cadastro.panelconexaofactory;
 import javax.swing.JPanel;
 import org.openide.util.Exceptions;
 import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObserver;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;
@@ -18,7 +17,7 @@ import vrimplantacao2_5.gui.componente.conexao.sqlserver.ConexaoSqlServerPanel;
  */
 public abstract class PanelConexaoFactory {
     
-    public static JPanel getPanelConexao(PanelObserver conexaoBD, int idSistema, int idBancoDados) {
+    public static JPanel getPanelConexao(int idSistema, int idBancoDados) {
         
         BancoDadosVO bdVO = null;
         
@@ -35,8 +34,6 @@ public abstract class PanelConexaoFactory {
             case FIREBIRD: 
                 panelConexao = new ConexaoFirebirdPanel(bdVO.getSchema(), bdVO.getPorta(), 
                                                         bdVO.getUsuario(), bdVO.getSenha());
-                
-                ((ConexaoFirebirdPanel) panelConexao).registrarObservador(conexaoBD);
             break;
             
             case MYSQL: 
@@ -52,8 +49,6 @@ public abstract class PanelConexaoFactory {
             case POSTGRESQL: 
                 panelConexao = new ConexaoPostgreSQLPanel(bdVO.getSchema(), bdVO.getPorta(), 
                                                           bdVO.getUsuario(), bdVO.getSenha());
-                
-                ((ConexaoPostgreSQLPanel) panelConexao).registrarObservador(conexaoBD);
             break;
             
             case SQLSERVER: 

@@ -22,7 +22,7 @@ public class ConfiguracaoBaseDadosController {
         return service.getBancoDadosPorSistema(idSistema);
     }
     
-    public javax.swing.JPanel exibiPainelConexao(PanelObserver conexaoBD, int idSistema, int idBancoDados) {
-        return service.exibiPainelConexao(conexaoBD, idSistema, idBancoDados);
+    public javax.swing.JPanel exibiPainelConexao(int idSistema, int idBancoDados) {
+        return service.exibiPainelConexao(idSistema, idBancoDados);
     }
 }

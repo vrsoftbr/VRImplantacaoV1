@@ -1,11 +1,7 @@
 package vrimplantacao2_5.gui.componente.conexao.firebird;
 
-import java.util.ArrayList;
-import java.util.List;
-import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObservable;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObserver;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoFirebird;
@@ -15,12 +11,11 @@ import vrimplantacao2.parametro.Parametros;
  *
  * @author Leandro
  */
-public class ConexaoFirebirdPanel extends javax.swing.JPanel implements PanelObservable {
+public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
     private String sistema;
     private ConexaoFirebird conexao = new ConexaoFirebird();
     private ConexaoEvent onConectar;
-    private List<PanelObserver> observadores = new ArrayList();
 
     public void setOnConectar(ConexaoEvent onConectar) {
         this.onConectar = onConectar;
@@ -36,10 +31,6 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel implements PanelObs
 
     public String getSistema() {
         return sistema;
-    }
-
-    public Integer getStatusConexao() {
-        return conexao != null ? 1 : 0;
     }
 
     /**
@@ -253,10 +244,8 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel implements PanelObs
             
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
-            this.notificarObservador();
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
-            this.notificarObservador();
         }
 
         atualizarParametros();
@@ -312,22 +301,4 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel implements PanelObs
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel7;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void registrarObservador(PanelObserver observer) {
-        observadores.add(observer);
-    }
-
-    @Override
-    public void removerObservador(PanelObserver observer) {
-        observadores.remove(observer);
-    }
-
-    @Override
-    public void notificarObservador() {
-        
-        for (PanelObserver ob : observadores) {
-            ob.habilitarBotao(getStatusConexao());
-        }
-    }
 }

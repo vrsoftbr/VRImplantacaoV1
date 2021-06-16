@@ -1,11 +1,7 @@
 package vrimplantacao2.gui.component.conexao.firebird;
 
-import java.util.ArrayList;
-import java.util.List;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObservable;
-import vrimplantacao2_5.service.cadastro.panelobserver.PanelObserver;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoFirebird;
