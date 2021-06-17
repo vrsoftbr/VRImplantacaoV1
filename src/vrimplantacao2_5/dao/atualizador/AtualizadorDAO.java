@@ -214,7 +214,19 @@ public class AtualizadorDAO {
                     + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
                     + "	 WHERE nome = 'AVISTARE'),\n"
                     + "	 (SELECT id FROM implantacao2_5.bancodados\n"
-                    + "	 WHERE nome = 'SQLSERVER'));"
+                    + "	 WHERE nome = 'SQLSERVER')); \n"
+                    + "\n"
+                    + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
+                    + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
+                    + "	 WHERE nome = 'BASE'),\n"
+                    + "	 (SELECT id FROM implantacao2_5.bancodados\n"
+                    + "	 WHERE nome = 'ACCESS'));	 	\n"
+                    + "\n"
+                    + "INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)\n"
+                    + "VALUES ((SELECT id FROM implantacao2_5.sistema\n"
+                    + "	 WHERE nome = 'BRAJANGESTORES'),\n"
+                    + "	 (SELECT id FROM implantacao2_5.bancodados\n"
+                    + "	 WHERE nome = 'POSTGRESQL'));"
             );
         }
     }
