@@ -6,10 +6,24 @@ package vrimplantacao2.vo.cadastro;
  */
 public class ProdutoBalancaVO {
     
-    private int codigo = 0;
-    private String descricao = "SEM DESCRICAO";
-    private String pesavel = "P";
-    private int validade = 0;
+    private int codigo;
+    private String descricao;
+    private String pesavel;
+    private int validade;
+
+    public ProdutoBalancaVO() {
+        this.validade = 0;
+        this.pesavel = "P";
+        this.descricao = "SEM DESCRICAO";
+        this.codigo = 0;
+    }
+
+    public ProdutoBalancaVO(int codigo, String descricao, String pesavel, int validade) {
+        this.codigo = codigo;
+        this.descricao = descricao;
+        this.pesavel = pesavel;
+        this.validade = validade;
+    }
 
     public int getCodigo() {
         return codigo;

@@ -58,6 +58,7 @@ import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
 import vrimplantacao2.dao.cadastro.financeiro.diversos.TipoPagamentoDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.parametro.Parametros;
 import static vrimplantacao2.parametro.Parametros.OpcoesExperimentaisDeProduto;
 import vrimplantacao2.utils.logging.LoggingConfig;
@@ -116,10 +117,12 @@ public class ParametroGUI extends VRInternalFrame {
         rdgLogType = new ButtonGroup();
         rdgTipoConexaoODBC = new ButtonGroup();
         rdgTipoConexaoSqlServer = new ButtonGroup();
+        rdgTipoConvercaoBalanca = new ButtonGroup();
         tabs = new VRTabbedPane();
         tabValorPadrão = new VRPanel();
         scroll = new JScrollPane();
-        vRPanel2 = new VRPanel();
+        vRTabbedPane1 = new vr.view.components.tabbedpane.VRTabbedPane();
+        tabPg1 = new VRPanel();
         pnlDiversos = new VRPanel();
         vRLabel4 = new VRLabel();
         cmbTipoPagamento = new JComboBox();
@@ -127,8 +130,6 @@ public class ParametroGUI extends VRInternalFrame {
         vRLabel5 = new VRLabel();
         chkIgnorarClienteImpVenda = new VRCheckBox();
         chkForcarCadastroProdutoVenda = new VRCheckBox();
-        chkImportarIcmsIsentoMigracaoProduto = new VRCheckBox();
-        chkNaoImportarPautaSeAlgumNcmNaoExistir = new VRCheckBox();
         pnlLocalizacao = new VRPanel();
         vRLabel1 = new VRLabel();
         vRLabel2 = new VRLabel();
@@ -153,6 +154,14 @@ public class ParametroGUI extends VRInternalFrame {
         vRLabel8 = new VRLabel();
         optSqlServerMicrosoft = new JRadioButton();
         optSqlServerJTDS = new JRadioButton();
+        tabPg2 = new vr.view.components.panel.VRPanel();
+        vRPanel2 = new VRPanel();
+        chkImportarIcmsIsentoMigracaoProduto = new VRCheckBox();
+        chkNaoImportarPautaSeAlgumNcmNaoExistir = new VRCheckBox();
+        pnlBalancaConv = new VRPanel();
+        optBalancaConvSimples = new JRadioButton();
+        optBalancaConvRemoveDig = new JRadioButton();
+        vRLabel10 = new VRLabel();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -232,10 +241,6 @@ public class ParametroGUI extends VRInternalFrame {
 
         chkForcarCadastroProdutoVenda.setText("Forçar cadastro de produto que não existe na importação de venda");
 
-        chkImportarIcmsIsentoMigracaoProduto.setText("Importar Icms ISENTO quando não encontrar a tributação de Icms na migração do produto");
-
-        chkNaoImportarPautaSeAlgumNcmNaoExistir.setText("Não importar PAUTA se algum NCM não existir no VR no momento da importação");
-
         GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
         pnlDiversos.setLayout(pnlDiversosLayout);
         pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -254,8 +259,6 @@ public class ParametroGUI extends VRInternalFrame {
                             .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlDiversosLayout.createSequentialGroup()
                         .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -276,10 +279,6 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkForcarCadastroProdutoVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -453,7 +452,6 @@ public class ParametroGUI extends VRInternalFrame {
         vRLabel8.setText("Tipo de Conexão");
 
         rdgTipoConexaoSqlServer.add(optSqlServerMicrosoft);
-        optSqlServerMicrosoft.setSelected(true);
         optSqlServerMicrosoft.setText("Microsoft");
         optSqlServerMicrosoft.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -492,24 +490,24 @@ public class ParametroGUI extends VRInternalFrame {
                 .addContainerGap(11, Short.MAX_VALUE))
         );
 
-        GroupLayout vRPanel2Layout = new GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        GroupLayout tabPg1Layout = new GroupLayout(tabPg1);
+        tabPg1.setLayout(tabPg1Layout);
+        tabPg1Layout.setHorizontalGroup(tabPg1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(tabPg1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(tabPg1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(pnlLocalizacao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(vRPanel2Layout.createSequentialGroup()
+                    .addGroup(tabPg1Layout.createSequentialGroup()
                         .addComponent(pnlDriverSQLServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vRPanel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        vRPanel2Layout.setVerticalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(GroupLayout.Alignment.TRAILING, vRPanel2Layout.createSequentialGroup()
+        tabPg1Layout.setVerticalGroup(tabPg1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(GroupLayout.Alignment.TRAILING, tabPg1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlLocalizacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -519,13 +517,104 @@ public class ParametroGUI extends VRInternalFrame {
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addGroup(tabPg1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(pnlDriverSQLServer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10))
+        );
+
+        vRTabbedPane1.addTab("Pág. 1", tabPg1);
+
+        vRPanel2.setBorder(BorderFactory.createTitledBorder("Produtos"));
+
+        chkImportarIcmsIsentoMigracaoProduto.setText("Importar Icms ISENTO quando não encontrar a tributação de Icms na migração do produto");
+
+        chkNaoImportarPautaSeAlgumNcmNaoExistir.setText("Não importar PAUTA se algum NCM não existir no VR no momento da importação");
+
+        pnlBalancaConv.setBorder(BorderFactory.createTitledBorder("Tipo conversão de balança"));
+
+        rdgTipoConvercaoBalanca.add(optBalancaConvSimples);
+        optBalancaConvSimples.setSelected(true);
+        optBalancaConvSimples.setText("Simples");
+        optBalancaConvSimples.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optBalancaConvSimplesActionPerformed(evt);
+            }
+        });
+
+        rdgTipoConvercaoBalanca.add(optBalancaConvRemoveDig);
+        optBalancaConvRemoveDig.setText("Remove Dígito Verificador");
+        optBalancaConvRemoveDig.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optBalancaConvRemoveDigActionPerformed(evt);
+            }
+        });
+
+        vRLabel10.setText("<html>\n<i>\nEste parâmetro controla a conversão do código plu dos produtos de balança que são importados para a tabela\nimplantacao,produtobalanca.\n</i>\n</html>");
+
+        GroupLayout pnlBalancaConvLayout = new GroupLayout(pnlBalancaConv);
+        pnlBalancaConv.setLayout(pnlBalancaConvLayout);
+        pnlBalancaConvLayout.setHorizontalGroup(pnlBalancaConvLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlBalancaConvLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlBalancaConvLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(vRLabel10, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(pnlBalancaConvLayout.createSequentialGroup()
+                        .addComponent(optBalancaConvSimples)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(optBalancaConvRemoveDig)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pnlBalancaConvLayout.setVerticalGroup(pnlBalancaConvLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(GroupLayout.Alignment.TRAILING, pnlBalancaConvLayout.createSequentialGroup()
+                .addComponent(vRLabel10, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlBalancaConvLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(optBalancaConvSimples)
+                    .addComponent(optBalancaConvRemoveDig))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        scroll.setViewportView(vRPanel2);
+        GroupLayout vRPanel2Layout = new GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlBalancaConv, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.DEFAULT_SIZE, 658, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel2Layout.setVerticalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addComponent(chkImportarIcmsIsentoMigracaoProduto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNaoImportarPautaSeAlgumNcmNaoExistir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
+                .addComponent(pnlBalancaConv, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        GroupLayout tabPg2Layout = new GroupLayout(tabPg2);
+        tabPg2.setLayout(tabPg2Layout);
+        tabPg2Layout.setHorizontalGroup(tabPg2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(tabPg2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        tabPg2Layout.setVerticalGroup(tabPg2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(tabPg2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel2, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(476, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane1.addTab("Pág. 2", tabPg2);
+
+        scroll.setViewportView(vRTabbedPane1);
 
         tabValorPadrão.add(scroll, BorderLayout.CENTER);
 
@@ -676,7 +765,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlTipoLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlNivelLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(137, Short.MAX_VALUE))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
 
         btnLogExcluir.setText("Excluir");
@@ -702,7 +791,7 @@ public class ParametroGUI extends VRInternalFrame {
         tabLoggingLayout.setHorizontalGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
@@ -795,7 +884,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(185, Short.MAX_VALUE))
+                .addContainerGap(190, Short.MAX_VALUE))
         );
         tabEngineMigracaoLayout.setVerticalGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(tabEngineMigracaoLayout.createSequentialGroup()
@@ -803,7 +892,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(tabEngineMigracaoLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(pnlProdutoUnificacao, GroupLayout.PREFERRED_SIZE, 114, GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlMercadologicoImportacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(352, Short.MAX_VALUE))
+                .addContainerGap(337, Short.MAX_VALUE))
         );
 
         tabs.addTab("Engine de Migração", tabEngineMigracao);
@@ -828,7 +917,7 @@ public class ParametroGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(tabs, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabs, GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
                     .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnGravar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -842,7 +931,7 @@ public class ParametroGUI extends VRInternalFrame {
         layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabs, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tabs, GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -923,6 +1012,14 @@ public class ParametroGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_optSqlServerJTDSoptFonteDadosActionPerformed
 
+    private void optBalancaConvSimplesActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optBalancaConvSimplesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_optBalancaConvSimplesActionPerformed
+
+    private void optBalancaConvRemoveDigActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optBalancaConvRemoveDigActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_optBalancaConvRemoveDigActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private VRButton btnCancelar;
     private VRButton btnGravar;
@@ -946,10 +1043,13 @@ public class ParametroGUI extends VRInternalFrame {
     private VRComboBox cmbUfPadrao;
     private JLabel jLabel1;
     private JScrollPane jScrollPane1;
+    private JRadioButton optBalancaConvRemoveDig;
+    private JRadioButton optBalancaConvSimples;
     private JRadioButton optDriver;
     private JRadioButton optFonteDados;
     private JRadioButton optSqlServerJTDS;
     private JRadioButton optSqlServerMicrosoft;
+    private VRPanel pnlBalancaConv;
     private VRPanel pnlDiversos;
     private VRPanel pnlDriverODBC;
     private VRPanel pnlDriverSQLServer;
@@ -974,9 +1074,12 @@ public class ParametroGUI extends VRInternalFrame {
     private ButtonGroup rdgLogType;
     private ButtonGroup rdgTipoConexaoODBC;
     private ButtonGroup rdgTipoConexaoSqlServer;
+    private ButtonGroup rdgTipoConvercaoBalanca;
     private JScrollPane scroll;
     private vr.view.components.panel.VRPanel tabEngineMigracao;
     private VRPanel tabLogging;
+    private VRPanel tabPg1;
+    private vr.view.components.panel.VRPanel tabPg2;
     private VRPanel tabValorPadrão;
     private VRTable tableLogging;
     private VRTabbedPane tabs;
@@ -986,6 +1089,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRTextField txtNomeDriverODBC;
     private VRTextField txtVendaProdutoPadrao;
     private VRLabel vRLabel1;
+    private VRLabel vRLabel10;
     private VRLabel vRLabel2;
     private VRLabel vRLabel3;
     private VRLabel vRLabel4;
@@ -998,6 +1102,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRPanel vRPanel3;
     private VRPanel vRPanel4;
     private VRPanel vRPanel5;
+    private vr.view.components.tabbedpane.VRTabbedPane vRTabbedPane1;
     // End of variables declaration//GEN-END:variables
 
     private void carregarMunicipiosEstados() throws Exception {
@@ -1072,6 +1177,14 @@ public class ParametroGUI extends VRInternalFrame {
                 optSqlServerJTDS.setSelected(true);
                 break;
         }
+        switch (ProdutoBalancaDAO.TipoConversao.get(parametros.get("BALANCA","STRATEGY"))) {
+            case REMOVER_DIGITO:
+                optBalancaConvRemoveDig.setSelected(true);
+                break;
+            default:
+                optBalancaConvSimples.setSelected(true);
+                break;
+        }
         chkProdutoIncluirNovos.setSelected(OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes());
         
         LOG.fine("Parametros carregados na tela");
@@ -1110,6 +1223,12 @@ public class ParametroGUI extends VRInternalFrame {
                 parametros.put(ConexaoSqlServer.Driver.JTDS.getDriver(),"SQLServer","Driver");
             } else if (optSqlServerMicrosoft.isSelected()) {
                 parametros.put(ConexaoSqlServer.Driver.MICROSOFT.getDriver(),"SQLServer","Driver");
+            }
+            
+            if (optBalancaConvRemoveDig.isSelected()) {
+                parametros.put(ProdutoBalancaDAO.TipoConversao.REMOVER_DIGITO.getKey(), "BALANCA", "STRATEGY");
+            } else if (optBalancaConvSimples.isSelected()) {
+                parametros.put(ProdutoBalancaDAO.TipoConversao.SIMPLES.getKey(), "BALANCA", "STRATEGY");
             }
             
             parametros.salvar();
