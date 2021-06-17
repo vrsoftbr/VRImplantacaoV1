@@ -52,11 +52,11 @@ VALUES ((SELECT id FROM implantacao2_5.sistema
 	 (SELECT id FROM implantacao2_5.bancodados
 	 WHERE nome = 'FIREBIRD'));
 
-INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
 VALUES ((SELECT id FROM implantacao2_5.sistema
 	 WHERE nome = 'ATHOS'),
 	 (SELECT id FROM implantacao2_5.bancodados
-	 WHERE nome = 'POSTGRESQL'));
+	 WHERE nome = 'POSTGRESQL'), 'athos', 'j2mhw82dyu1kn5g4', null);   	 
 
 INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
 VALUES ((SELECT id FROM implantacao2_5.sistema
@@ -106,16 +106,149 @@ VALUES ((SELECT id FROM implantacao2_5.sistema
 	 (SELECT id FROM implantacao2_5.bancodados
 	 WHERE nome = 'POSTGRESQL'));	 	
 
-
-
-
-
-	 
+/**** C */
 INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CADASTRAFACIL'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD'));	 	
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CEFAS'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'ORACLE'));	 	
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CEREBRO'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD'));	 	
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CERVANTES'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'POSTGRESQL'));	 	
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CFSOFTSIAECF'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD'));	 	
+	 
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
 VALUES ((SELECT id FROM implantacao2_5.sistema
 	 WHERE nome = 'CGA'),
 	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD'), 'SYSDBA', 'masterkey', null);
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CISS'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'DB2'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CLICK'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'MYSQL'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CONTROLWARE'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'POSTGRESQL'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CONTROLX'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'SQLSERVER'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CPGESTOR'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'ORACLE'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CPLUS'),
+	 (SELECT id FROM implantacao2_5.bancodados
 	 WHERE nome = 'FIREBIRD'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CRONOS20'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'POSTGRESQL'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'CUPERMAX'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'ORACLE'));
+
+/***** D */
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DATASYNC'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'SQLSERVER')); 
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DELFI'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD')); 
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DESTRO'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD')); 
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DEVMASTER'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'POSTGRESQL'), 'devmaster', 'devmaster', null); 
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DIRECTOR'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'SQL SERVER'), 'sa', '#1qwer0987', null);   	   
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DJSYSTEM'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'DBF'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DLINK'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'MYSQL'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DSOFT'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'FIREBIRD'));
+
+INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
+VALUES ((SELECT id FROM implantacao2_5.sistema
+	 WHERE nome = 'DTCOM'),
+	 (SELECT id FROM implantacao2_5.bancodados
+	 WHERE nome = 'DBF'));
+
+
+
+
 
 INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados)
 VALUES ((SELECT id FROM implantacao2_5.sistema
@@ -244,18 +377,6 @@ VALUES ((SELECT id FROM implantacao2_5.sistema
 
 INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
 VALUES ((SELECT id FROM implantacao2_5.sistema
-	 WHERE nome = 'DEVMASTER'),
-	 (SELECT id FROM implantacao2_5.bancodados
-	 WHERE nome = 'POSTGRESQL'), 'devmaster', 'devmaster', null); 
-
-INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
-VALUES ((SELECT id FROM implantacao2_5.sistema
-	 WHERE nome = 'BRAJAN'),
-	 (SELECT id FROM implantacao2_5.bancodados
-	 WHERE nome = 'POSTGRESQL'), 'postgres', 'orple', null); 
-
-INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
-VALUES ((SELECT id FROM implantacao2_5.sistema
 	 WHERE nome = 'NCA'),
 	 (SELECT id FROM implantacao2_5.bancodados
 	 WHERE nome = 'POSTGRESQL'), 'postgres', 'post', null);  
@@ -267,11 +388,6 @@ VALUES ((SELECT id FROM implantacao2_5.sistema
 	 WHERE nome = 'POSTGRESQL'), 'postgres', 'postgres', null);   
 
 
-INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
-VALUES ((SELECT id FROM implantacao2_5.sistema
-	 WHERE nome = 'ATHOS'),
-	 (SELECT id FROM implantacao2_5.bancodados
-	 WHERE nome = 'POSTGRESQL'), 'athos', 'j2mhw82dyu1kn5g4', null);   	 
 
 
 INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
@@ -280,11 +396,6 @@ VALUES ((SELECT id FROM implantacao2_5.sistema
 	 (SELECT id FROM implantacao2_5.bancodados
 	 WHERE nome = 'POSTGRESQL'), 'postgres', 'rmpostgres', 'rmbancodados');   	  
 
-INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
-VALUES ((SELECT id FROM implantacao2_5.sistema
-	 WHERE nome = 'DIRECTOR'),
-	 (SELECT id FROM implantacao2_5.bancodados
-	 WHERE nome = 'SQL SERVER'), 'sa', '#1qwer0987', null);   	   
 
 INSERT INTO implantacao2_5.sistemabancodados (id_sistema, id_bancodados, usuario, senha, nomeschema)
 VALUES ((SELECT id FROM implantacao2_5.sistema
