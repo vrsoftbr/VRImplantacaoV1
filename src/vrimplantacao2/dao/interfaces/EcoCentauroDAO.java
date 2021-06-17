@@ -123,7 +123,7 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
                 }
             }
         }
@@ -137,10 +137,38 @@ public class EcoCentauroDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "    f.codigo AS id,\n"
+                    + "    f.nome AS razao,\n"
+                    + "    f.fantasia AS fantasia,\n"
+                    + "    f.cpfcnpj AS cnpj,\n"
+                    + "    f.rgie AS inscricaoestadual,\n"
+                    + "    f.endereco,\n"
+                    + "    f.numeroendereco AS numero,\n"
+                    + "    f.complemento,\n"
+                    + "    f.bairro,\n"
+                    + "    cid.nome AS municipio,\n"
+                    + "    cid.estado AS uf,\n"
+                    + "    f.cep,\n"
+                    + "    f.fone AS telefone,\n"
+                    + "    f.fax,\n"
+                    + "    f.homepage AS email2,\n"
+                    + "    f.email,\n"
+                    + "    f.fonecomervend,\n"
+                    + "    f.foneresidvend,\n"
+                    + "    f.fonetelevendas,\n"
+                    + "    f.celularvend,\n"
+                    + "    f.emailvend,\n"
+                    + "    f.datacadastro,\n"
+                    + "    f.observacao,\n"
+                    + "    f.contribuinte,\n"
+                    + "    CASE f.ativo WHEN 'S' THEN 1 ELSE 0 END ativo\n"
+                    + "FROM tpagfornecedor f\n"
+                    + "LEFT JOIN tgercidade cid ON cid.codigo = f.cidade\n"
+                    + "ORDER BY 1"
             )) {
                 while (rst.next()) {
-
+                    FornecedorIMP imp = new FornecedorIMP();
                 }
             }
         }
@@ -153,10 +181,17 @@ public class EcoCentauroDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT\n"
+                    + "    fornecedor AS idfornecedor,\n"
+                    + "    produto AS idproduto,\n"
+                    + "    ultcompraqtde AS qtdembalagem,\n"
+                    + "    ultcompradata AS dataalteracao,\n"
+                    + "    codnofornecedor AS codigoexterno\n"
+                    + "FROM testfornecproduto\n"
+                    + "ORDER BY 1, 2"
             )) {
                 while (rst.next()) {
-
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                 }
             }
         }
