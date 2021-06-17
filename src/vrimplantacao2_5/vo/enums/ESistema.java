@@ -67,7 +67,7 @@ public enum ESistema {
     FENIX(54, "FENIX"),
     FLASH(55, "FLASH"),
     FLATAN(56, "FLATAN"),
-    FORTDAO(57, "FORTDAO"),
+    FORT(57, "FORT"),
     FUTURA(58, "FUTURA"),
     G10(59, "G10"),
     G3(60, "G3"),
