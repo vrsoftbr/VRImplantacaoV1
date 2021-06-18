@@ -46,6 +46,9 @@
   </Layout>
   <SubComponents>
     <Component class="vrframework.bean.tableEx.VRTableEx" name="tblConsultaConexao">
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblConsultaConexaoMouseClicked"/>
+      </Events>
     </Component>
     <Component class="vrframework.bean.button.VRButton" name="btnInserirConexao">
       <Properties>

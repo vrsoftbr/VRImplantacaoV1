@@ -3,6 +3,7 @@ package vrimplantacao2_5.gui.cadastro.configuracao;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingConstants;
+import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
@@ -17,7 +18,9 @@ import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     private static ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBaseDadosGUI = null;
-    private ConsultaConfiguracaoBancoDadosController controller = null;
+    private ConfiguracaoBaseDadosGUI configuracaoBancoDados = null;
+    public ConsultaConfiguracaoBancoDadosController controller = null;
+    private ConfiguracaoBancoVO configuracaoVO; 
 
     /**
      * Creates new form ConsultaConfiguracaoBaseDadosGUI
@@ -35,9 +38,9 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
         centralizarForm();
         setTitle("Consulta Configuração Base de Dados");
         
-        controller = new ConsultaConfiguracaoBancoDadosController();
+        controller = new ConsultaConfiguracaoBancoDadosController(this);
         configurarColuna();
-        consultar();
+        controller.consultar();
     }
     
     private void configurarColuna() throws Exception {
@@ -54,12 +57,10 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     @Override
     public void consultar() throws Exception {
-        List<ConfiguracaoBancoVO> conexoes = controller.consultar();
-        
-        Object[][] dados = new Object[conexoes.size()][5];
+        Object[][] dados = new Object[controller.getConexao().size()][5];
         
         int i = 0;
-        for (ConfiguracaoBancoVO cx : conexoes) {
+        for (ConfiguracaoBancoVO cx : controller.getConexao()) {
             dados[i][0] = cx.getDescricao();
             dados[i][1] = cx.getSistema().getNome();
             dados[i][2] = cx.getBancoDados().getNome();
@@ -73,12 +74,31 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
         tblConsultaConexao.setModel(dados);
     }
 
+    @Override
+    public void editar() {
+        configuracaoVO = new ConfiguracaoBancoVO();
+        
+        if(tblConsultaConexao.getLinhaSelecionada() == -1) {
+            return;
+        }
+        
+        configuracaoVO = controller.getConexao().get(tblConsultaConexao.getLinhaSelecionada());
+        
+        exibirConfiguracao(mdiFrame);
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         tblConsultaConexao = new vrframework.bean.tableEx.VRTableEx();
         btnInserirConexao = new vrframework.bean.button.VRButton();
+
+        tblConsultaConexao.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblConsultaConexaoMouseClicked(evt);
+            }
+        });
 
         btnInserirConexao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao, "Cadastrar Conexão");
@@ -118,6 +138,17 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
         ConfiguracaoBaseDadosGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirConexaoActionPerformed
 
+    private void tblConsultaConexaoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaConexaoMouseClicked
+        if (evt.getClickCount() > 1) {
+            try {
+                editar();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }//GEN-LAST:event_tblConsultaConexaoMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnInserirConexao;
@@ -135,6 +166,23 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
             consultaConfiguracaoBaseDadosGUI.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Consulta Configuração de Base de Dados");
+        } finally {
+            menuGUI.setDefaultCursor();
+        }
+    }
+    
+    private void exibirConfiguracao(VRMdiFrame menuGUI) {
+        try {
+            menuGUI.setWaitCursor();     
+            
+            if (configuracaoBancoDados == null || configuracaoBancoDados.isClosed()) {
+                configuracaoBancoDados = new ConfiguracaoBaseDadosGUI(menuGUI);
+            }
+            
+            configuracaoBancoDados.editar(this.configuracaoVO, this);
+            configuracaoBancoDados.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Configuração de Base de Dados");
         } finally {
             menuGUI.setDefaultCursor();
         }

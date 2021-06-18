@@ -80,12 +80,11 @@ public class ConfiguracaoBaseDadosService {
         try {
             Conexao.begin();
             
-            if (existeConexao(conexaoVO)) {
-                Util.exibirMensagem("Já existe uma conexão cadastrada!", getTitle());
-                return;
-            }
-            
             if(conexaoVO.getId() == 0) {
+                if (existeConexao(conexaoVO)) {
+                    Util.exibirMensagem("Já existe uma conexão cadastrada!", getTitle());
+                    return;
+                }
                 conexaoDAO.inserir(conexaoVO);
             } else {
                 conexaoDAO.alterar(conexaoVO);
