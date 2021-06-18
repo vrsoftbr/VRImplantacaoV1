@@ -301,6 +301,7 @@ import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -5258,7 +5259,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuControlePlusActionPerformed
 
     private void mnuMapeamentoDeLojasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMapeamentoDeLojasActionPerformed
-        ConfiguracaoBaseDadosGUI.exibir(this);
+        ConsultaConfiguracaoBaseDadosGUI.exibir(this);
     }//GEN-LAST:event_mnuMapeamentoDeLojasActionPerformed
 
 

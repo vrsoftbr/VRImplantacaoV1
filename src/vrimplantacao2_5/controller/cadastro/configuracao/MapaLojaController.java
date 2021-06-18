@@ -1,9 +1,9 @@
-package vrimplantacao2_5.controller.mapaloja;
+package vrimplantacao2_5.controller.cadastro.configuracao;
 
 import java.util.List;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
-import vrimplantacao2_5.service.mapaloja.MapaLojaService;
+import vrimplantacao2_5.service.cadastro.configuracao.MapaLojaService;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 
@@ -38,5 +38,9 @@ public class MapaLojaController {
     
     public List<ConfiguracaoBancoLojaVO> getLojaMapeada() {
         return lojasMapeadas;
+    }
+    
+    public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO, String title) {
+        mapaLojaService.excluirLojaMapeada(configuracaoBancoLojaVO, title);
     }
 }

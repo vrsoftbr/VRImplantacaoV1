@@ -1,4 +1,4 @@
-package vrimplantacao2_5.controller.cadastro;
+package vrimplantacao2_5.controller.cadastro.configuracao;
 
 import java.util.List;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;

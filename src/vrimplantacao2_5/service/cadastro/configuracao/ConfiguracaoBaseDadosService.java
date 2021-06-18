@@ -44,7 +44,7 @@ public class ConfiguracaoBaseDadosService {
             
         } catch (Exception e) {
             try {
-                Util.exibirMensagem(e.getMessage(), "Configuração de Base de Dados");
+                Util.exibirMensagem(e.getMessage(), getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -62,7 +62,7 @@ public class ConfiguracaoBaseDadosService {
             
         } catch (Exception e) {
             try {
-                Util.exibirMensagem(e.getMessage(), "Configuração de Base de Dados");
+                Util.exibirMensagem(e.getMessage(), getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -76,9 +76,14 @@ public class ConfiguracaoBaseDadosService {
     }
     
     public void salvar(ConfiguracaoBancoVO conexaoVO) {
-
+        
         try {
             Conexao.begin();
+            
+            if (existeConexao(conexaoVO)) {
+                Util.exibirMensagem("Já existe uma conexão cadastrada!", getTitle());
+                return;
+            }
             
             if(conexaoVO.getId() == 0) {
                 conexaoDAO.inserir(conexaoVO);
@@ -96,5 +101,21 @@ public class ConfiguracaoBaseDadosService {
                 Exceptions.printStackTrace(ex1);
             }
         }
+    }
+    
+    public boolean existeConexao(ConfiguracaoBancoVO configuracaoVO) {
+        boolean retorno = false;
+        
+        try {
+            retorno = conexaoDAO.existeConexao(configuracaoVO);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
+        return retorno;
+    }
+    
+    private String getTitle() {
+        return "Configuração de Base de Dados";
     }
 }

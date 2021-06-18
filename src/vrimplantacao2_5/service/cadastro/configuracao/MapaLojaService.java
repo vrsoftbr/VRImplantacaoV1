@@ -1,4 +1,4 @@
-package vrimplantacao2_5.service.mapaloja;
+package vrimplantacao2_5.service.cadastro.configuracao;
 
 import java.util.List;
 import org.openide.util.Exceptions;
@@ -47,11 +47,16 @@ public class MapaLojaService {
             if (configuracaoBancoVO.getConfiguracaoBancoLoja().getId() == 0 &&
                     !existeLojaMapeada(configuracaoBancoVO)) {
                 
+                String eMatriz = verificaLojaMatriz(configuracaoBancoVO);
+                
                 /**
-                 * Verifica se é a primeira loja mapeada
+                 * Verifica se já não existe loja informada como matriz 
+                 * (loja principal para o cadastro de produto)
                  */
-                if (verificaLojaMatriz(configuracaoBancoVO)) {
-                    configuracaoBancoVO.getConfiguracaoBancoLoja().setLojaMatriz(true);
+                if (configuracaoBancoVO.getConfiguracaoBancoLoja().isLojaMatriz() && !eMatriz.isEmpty()) {
+                    Util.exibirMensagem("Loja Origem " + eMatriz + " "
+                            + "já selecionada como principal!", "Mapa de Loja");
+                    return;
                 }
 
                 configuracaoBancoVO.getConfiguracaoBancoLoja().setDataCadastro(Utils.getDataAtual());
@@ -67,8 +72,8 @@ public class MapaLojaService {
         }
     }
 
-    private boolean verificaLojaMatriz(ConfiguracaoBancoVO configuracaoBancoVO) {
-        boolean eMatriz = true;
+    private String verificaLojaMatriz(ConfiguracaoBancoVO configuracaoBancoVO) {
+        String eMatriz = "";
 
         try {
             eMatriz = configuracaoDAO.verificaLojaMatriz(configuracaoBancoVO);
@@ -122,19 +127,32 @@ public class MapaLojaService {
 
         return lojas;
     }
-
-    enum ETipoLoja {
-        LOJAORIGEM("LOJA DE ORIGEM"),
-        LOJADESTINO("LOJA DESTINO DO VR");
-
-        private final String tipoLoja;
-
-        private ETipoLoja(String tipoLoja) {
-            this.tipoLoja = tipoLoja;
+    
+    public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO, String title) {
+        try {
+            if (configuracaoBancoLojaVO.getSituacaoMigracao() != ESituacaoMigracao.CONFIGURANDO) {
+                Util.exibirMensagem("Processo de migração iniciado, não é possível excluir a loja mapeada!", title);
+            }
+            
+            configuracaoDAO.excluirLojaMapeada(configuracaoBancoLojaVO);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Exceptions.printStackTrace(ex);
         }
+    }
+}
 
-        public String getTipoLoja() {
-            return tipoLoja;
-        }
+enum ETipoLoja {
+    LOJAORIGEM("LOJA DE ORIGEM"),
+    LOJADESTINO("LOJA DESTINO DO VR");
+
+    private final String tipoLoja;
+
+    private ETipoLoja(String tipoLoja) {
+        this.tipoLoja = tipoLoja;
+    }
+
+    public String getTipoLoja() {
+        return tipoLoja;
     }
 }

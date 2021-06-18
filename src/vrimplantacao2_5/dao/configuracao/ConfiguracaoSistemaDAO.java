@@ -7,7 +7,9 @@ import java.util.List;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
+import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 
 /**
@@ -28,8 +30,8 @@ public class ConfiguracaoSistemaDAO {
         sql.put("senha", conexaoVO.getSenha());
         sql.put("descricao", conexaoVO.getDescricao());
         sql.put("nomeschema", conexaoVO.getSchema());
-        sql.put("id_sistema", conexaoVO.getIdSistema());
-        sql.put("id_bancodados", conexaoVO.getIdBancoDados());
+        sql.put("id_sistema", conexaoVO.getSistema().getId());
+        sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
 
         sql.getReturning().add("id");
 
@@ -56,8 +58,8 @@ public class ConfiguracaoSistemaDAO {
         sql.put("senha", conexaoVO.getSenha());
         sql.put("descricao", conexaoVO.getDescricao());
         sql.put("nomeschema", conexaoVO.getSchema());
-        sql.put("id_sistema", conexaoVO.getIdSistema());
-        sql.put("id_bancodados", conexaoVO.getIdBancoDados());
+        sql.put("id_sistema", conexaoVO.getSistema().getId());
+        sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
 
         sql.setWhere("id = " + conexaoVO.getId());
 
@@ -94,18 +96,19 @@ public class ConfiguracaoSistemaDAO {
         }
     }
     
-    public boolean verificaLojaMatriz(ConfiguracaoBancoVO configuracaoBancoVO) throws Exception {
-        boolean retorno = true;
+    public String verificaLojaMatriz(ConfiguracaoBancoVO configuracaoBancoVO) throws Exception {
+        String retorno = "";
         
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select "
-                     + "id "
+                     + "id_lojaorigem "
                  + "from "
                     + "implantacao2_5.conexaoloja "
-                 + "where id_conexao = " + configuracaoBancoVO.getId())) {
+                 + "where id_conexao = " + configuracaoBancoVO.getId()
+                 + " and lojamatriz is true")) {
                 if (rs.next()) {
-                    retorno = false;
+                    retorno = rs.getString("id_lojaorigem");
                 }
             }
         }
@@ -113,7 +116,8 @@ public class ConfiguracaoSistemaDAO {
         return retorno;
     }
     
-    public boolean existeLojaMapeada(String tipoLoja, ConfiguracaoBancoVO configuracaoBancoVO) throws Exception {
+    public boolean existeLojaMapeada(String tipoLoja, 
+                                    ConfiguracaoBancoVO configuracaoBancoVO) throws Exception {
         boolean retorno = false;
         String sql = "", filtro = "";
         
@@ -126,7 +130,7 @@ public class ConfiguracaoSistemaDAO {
         }
         
         sql = "select "
-                 + "id "
+                + "id "
             + "from "
                 + "implantacao2_5.conexaoloja "
             + "where id_conexao = " + configuracaoBancoVO.getId() + filtro;
@@ -179,5 +183,84 @@ public class ConfiguracaoSistemaDAO {
         }
         
         return result;
+    }
+    
+    public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
+        try(Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from implantacao2_5.conexaoloja where id = " + 
+                                                        configuracaoBancoLojaVO.getId());
+        }
+    }
+    
+    public List consultar() throws Exception {
+        List<ConfiguracaoBancoVO> result = new ArrayList<>();
+        
+        try(Statement stm = Conexao.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	c.id,\n" +
+                    "	c.descricao,\n" +
+                    "	s.id id_sistema,\n" +
+                    "	s.nome sistema,\n" +
+                    "	b.id id_bancodados,\n" +
+                    "	b.nome bancodados,\n" +
+                    "	c.host,\n" +
+                    "	c.porta,\n" +
+                    "	c.usuario,\n" +
+                    "	c.nomeschema\n" +
+                    "from \n" +
+                    "	implantacao2_5.conexao c\n" +
+                    "join implantacao2_5.sistema s\n" +
+                    "		on c.id_sistema = s.id\n" +
+                    "join implantacao2_5.bancodados b\n" +
+                    "		on c.id_bancodados = b.id\n" +
+                    "order by c.descricao")) {
+                while(rs.next()) {
+                    ConfiguracaoBancoVO configuracaoVO = new ConfiguracaoBancoVO();
+                    SistemaVO sistemaVO = new SistemaVO();
+                    BancoDadosVO bancoDadosVO = new BancoDadosVO();
+                    
+                    configuracaoVO.setId(rs.getInt("id"));
+                    configuracaoVO.setDescricao(rs.getString("descricao"));
+                    sistemaVO.setId(rs.getInt("id_sistema"));
+                    sistemaVO.setNome(rs.getString("sistema"));
+                    configuracaoVO.setSistema(sistemaVO);
+                    bancoDadosVO.setId(rs.getInt("id_bancodados"));
+                    bancoDadosVO.setNome(rs.getString("bancodados"));
+                    configuracaoVO.setBancoDados(bancoDadosVO);
+                    configuracaoVO.setHost(rs.getString("host"));
+                    configuracaoVO.setPorta(rs.getInt("porta"));
+                    configuracaoVO.setUsuario(rs.getString("usuario"));
+                    configuracaoVO.setSchema(rs.getString("nomeschema"));
+                    
+                    result.add(configuracaoVO);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    public boolean existeConexao(ConfiguracaoBancoVO configuracaoVO) throws Exception {
+        boolean retorno = false;
+        
+        try(Statement stm = Conexao.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	id\n" +
+                    "from \n" +
+                    "	implantacao2_5.conexao\n" +
+                    "where \n" +
+                    "	id_sistema = " + configuracaoVO.getSistema().getId() + " and \n" +
+                    "	id_bancodados = " + configuracaoVO.getBancoDados().getId() + " and \n" +
+                    "	nomeschema = '" + configuracaoVO.getSchema() + "' and\n" +
+                    "   host = '" + configuracaoVO.getHost() + "'")) {
+                if (rs.next()) {
+                    retorno = true;
+                }
+            }
+         }
+        
+        return retorno;
     }
 }
