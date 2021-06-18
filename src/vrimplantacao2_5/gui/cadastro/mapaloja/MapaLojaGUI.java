@@ -1,13 +1,17 @@
 package vrimplantacao2_5.gui.cadastro.mapaloja;
 
 import javax.swing.DefaultComboBoxModel;
+import org.openide.util.Exceptions;
 import vrframework.bean.dialog.VRDialog;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2_5.gui.cadastro.configuracaobd.ConfiguracaoBaseDadosGUI;
+import vrimplantacao2_5.controller.mapaloja.MapaLojaController;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.mapaloja.MapaLojaService;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 
 /**
  *
@@ -15,13 +19,16 @@ import vrimplantacao2_5.service.mapaloja.MapaLojaService;
  */
 public class MapaLojaGUI extends VRDialog {
 
-    private static MapaLojaGUI mapaLojaGUI = null;
     private MapaLojaService mapaLojaService = null;
     public LojaConsultaGUI lojaConsultaGUI = null;
-    public static ConfiguracaoBaseDadosGUI cfgBaseDadosGUI = null;
+    public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
+    private ConfiguracaoBancoVO configuracaoBancoVO = null;
+    private ConfiguracaoBancoLojaVO configuracaoBancoLojaVO = null;
+    private MapaLojaController mapaLojaController = null;
     
     /**
      * Creates new form MapaLojaGUI
+     * @param mapaController
      */
     public MapaLojaGUI() {
         initComponents();
@@ -33,18 +40,58 @@ public class MapaLojaGUI extends VRDialog {
         centralizarForm();
         setResizable(false);
         setModal(true);
-        setTitle("Mapeamento de Loja");
+        setTitle("Mapa de Loja");
         
         mapaLojaService = new MapaLojaService();
+        configuracaoBancoLojaVO = new ConfiguracaoBancoLojaVO();
+        
         carregarLojaVR();
+        carregarLojaOrigem();
     }
     
-    public void carregarLojaVR() {
+    private void carregarLojaOrigem() {
+        cboLojaOrigem.setModel(new DefaultComboBoxModel());
+        
+        cboLojaOrigem.addItem(new ItemComboVO("1", "SYSPDV - LOJA 01"));
+        cboLojaOrigem.addItem(new ItemComboVO("2", "SYSPDV - LOJA 02"));
+    }
+    
+    private void carregarLojaVR() {
         cboLojaVR.setModel(new DefaultComboBoxModel());
         
         for (LojaVO oLoja : mapaLojaService.getLojaVR()) {
             cboLojaVR.addItem(new ItemComboVO(oLoja.id, oLoja.descricao));
         }
+    }
+    
+    public void setConfiguracaoConexao(ConfiguracaoBancoVO configuracaoBancoVO) {
+        this.configuracaoBancoVO = configuracaoBancoVO;
+    }
+    
+    public void setMapaLojaController(MapaLojaController mapaLojaController) {
+        this.mapaLojaController = mapaLojaController;
+    }
+    
+    @Override
+    public void salvar() {
+         configuracaoBancoLojaVO.setIdLojaOrigem(((ItemComboVO) cboLojaOrigem.getSelectedItem()).idString);
+         configuracaoBancoLojaVO.setIdLojaVR(cboLojaVR.getId());        
+         configuracaoBancoVO.setConfiguracaoBancoLoja(configuracaoBancoLojaVO);
+         
+         mapaLojaController.salvar(configuracaoBancoVO);
+         
+         if (configuracaoBancoLojaVO.getId() != 0) {
+             try {
+                mapaLojaController.consultaLojaMapeada(configuracaoBancoVO.getId());
+                
+                Util.exibirMensagem("Loja Mapeada com sucesso!", getTitle());
+
+                this.setVisible(false);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Exceptions.printStackTrace(ex);
+            }
+         }
     }
 
     @SuppressWarnings("unchecked")
@@ -55,11 +102,11 @@ public class MapaLojaGUI extends VRDialog {
         lblLojaOrigem = new vrframework.bean.label.VRLabel();
         cboLojaOrigem = new vrframework.bean.comboBox.VRComboBox();
         lblLojaVR = new vrframework.bean.label.VRLabel();
-        cboLojaVR = new vrframework.bean.comboBox.VRComboBox();
         chkEncerrada = new vrframework.bean.checkBox.VRCheckBox();
         btnParametro = new vrframework.bean.button.VRButton();
         btnSalvar = new vrframework.bean.button.VRButton();
         btnInserirLoja = new vrframework.bean.button.VRButton();
+        cboLojaVR = new vrframework.bean.comboBox.VRComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -78,6 +125,11 @@ public class MapaLojaGUI extends VRDialog {
 
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/salvar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnSalvar, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.btnSalvar.text")); // NOI18N
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         btnInserirLoja.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vr/view/img/add-black-18x18.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnInserirLoja, org.openide.util.NbBundle.getMessage(MapaLojaGUI.class, "MapaLojaGUI.btnInserirLoja.text")); // NOI18N
@@ -93,45 +145,47 @@ public class MapaLojaGUI extends VRDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(0, 84, Short.MAX_VALUE)
-                        .addComponent(btnParametro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkMatriz, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkEncerrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(cboLojaOrigem, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
-                                    .addComponent(cboLojaVR, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(chkMatriz, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnInserirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(chkEncerrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 66, Short.MAX_VALUE)
+                                .addComponent(btnParametro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(cboLojaOrigem, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cboLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnInserirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkMatriz, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkMatriz, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEncerrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cboLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cboLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
                 .addComponent(lblLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cboLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInserirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkEncerrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnInserirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnParametro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -144,6 +198,10 @@ public class MapaLojaGUI extends VRDialog {
     private void btnInserirLojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirLojaActionPerformed
         exibirCadastroLoja();
     }//GEN-LAST:event_btnInserirLojaActionPerformed
+
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        salvar();
+    }//GEN-LAST:event_btnSalvarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -200,24 +258,11 @@ public class MapaLojaGUI extends VRDialog {
     private vrframework.bean.label.VRLabel lblLojaVR;
     // End of variables declaration//GEN-END:variables
     
-    public static void exibir(ConfiguracaoBaseDadosGUI cfgBaseDadosGUI) {
-        try {
-            if (mapaLojaGUI == null || !mapaLojaGUI.isActive()) {
-                mapaLojaGUI = new MapaLojaGUI();
-            }
-            
-            MapaLojaGUI.cfgBaseDadosGUI = cfgBaseDadosGUI;
-            mapaLojaGUI.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Mapeamento de Loja");
-        }
-    }
-    
     private void exibirCadastroLoja() {
         try {
             this.setWaitCursor();
             if (lojaConsultaGUI == null || lojaConsultaGUI.isClosed()) {
-                lojaConsultaGUI = new LojaConsultaGUI(cfgBaseDadosGUI.parentFrame);
+                lojaConsultaGUI = new LojaConsultaGUI(configuracaoBaseDadosGUI.parentFrame);
             }
 
             lojaConsultaGUI.setVisible(true);

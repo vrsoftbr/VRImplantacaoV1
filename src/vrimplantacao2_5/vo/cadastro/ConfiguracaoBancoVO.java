@@ -4,7 +4,7 @@ package vrimplantacao2_5.vo.cadastro;
  *
  * @author guilhermegomes
  */
-public class ConfiguracaoBDVO {
+public class ConfiguracaoBancoVO {
     
     private int id;
     private String host;
@@ -15,6 +15,7 @@ public class ConfiguracaoBDVO {
     private String descricao;
     private int idSistema;
     private int idBancoDados;
+    private ConfiguracaoBancoLojaVO configuracaoBancoLoja;
 
     public int getId() {
         return id;
@@ -86,6 +87,14 @@ public class ConfiguracaoBDVO {
 
     public void setIdBancoDados(int idBancoDados) {
         this.idBancoDados = idBancoDados;
+    }
+
+    public ConfiguracaoBancoLojaVO getConfiguracaoBancoLoja() {
+        return configuracaoBancoLoja;
+    }
+
+    public void setConfiguracaoBancoLoja(ConfiguracaoBancoLojaVO configuracaoBancoLoja) {
+        this.configuracaoBancoLoja = configuracaoBancoLoja;
     }
     
 }
