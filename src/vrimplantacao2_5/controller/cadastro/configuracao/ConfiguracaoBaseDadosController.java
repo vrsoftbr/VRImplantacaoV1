@@ -1,10 +1,11 @@
-package vrimplantacao2_5.controller.cadastro;
+package vrimplantacao2_5.controller.cadastro.configuracao;
 
 import java.util.List;
-import vrimplantacao2_5.service.cadastro.ConfiguracaoPanel;
-import vrimplantacao2_5.service.cadastro.ConfiguracaoBaseDadosService;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
+import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
+import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoBaseDadosService;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
 /**
@@ -14,6 +15,13 @@ import vrimplantacao2_5.vo.cadastro.SistemaVO;
 public class ConfiguracaoBaseDadosController {
     
     ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService();
+    ConfiguracaoBaseDadosGUI configuracaoGUI = null;
+
+    public ConfiguracaoBaseDadosController() {}
+    
+    public ConfiguracaoBaseDadosController(ConfiguracaoBaseDadosGUI configuracaoGUI) {
+        this.configuracaoGUI = configuracaoGUI;
+    }
     
     public List<SistemaVO> getSistema() {
         return service.getSistema();
@@ -27,7 +35,7 @@ public class ConfiguracaoBaseDadosController {
         return service.exibiPainelConexao(idSistema, idBancoDados);
     }
     
-    public void salvar(ConfiguracaoBDVO conexaoVO) {
+    public void salvar(ConfiguracaoBancoVO conexaoVO) {
         service.salvar(conexaoVO);
     }
 }

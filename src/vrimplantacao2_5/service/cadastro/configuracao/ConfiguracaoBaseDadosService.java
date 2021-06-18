@@ -1,16 +1,15 @@
-package vrimplantacao2_5.service.cadastro;
+package vrimplantacao2_5.service.cadastro.configuracao;
 
 import java.util.List;
 import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.dao.sistema.SistemaDAO;
-import vrimplantacao2_5.service.cadastro.panelconexaofactory.PanelConexaoFactory;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrframework.classe.Util;
-import vrimplantacao2_5.dao.conexao.ConexaoSistemaDAO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBDVO;
+import vrimplantacao2_5.dao.configuracao.ConfiguracaoSistemaDAO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 
 /**
  *
@@ -20,17 +19,17 @@ public class ConfiguracaoBaseDadosService {
     
     private final SistemaDAO sistemaDAO;
     private final BancoDadosDAO bdDAO;
-    private final ConexaoSistemaDAO conexaoDAO;
+    private final ConfiguracaoSistemaDAO conexaoDAO;
 
     public ConfiguracaoBaseDadosService() {
         sistemaDAO = new SistemaDAO();
         bdDAO = new BancoDadosDAO();
-        conexaoDAO = new ConexaoSistemaDAO();
+        conexaoDAO = new ConfiguracaoSistemaDAO();
     }
 
     public ConfiguracaoBaseDadosService(SistemaDAO sistemaDAO,
                                         BancoDadosDAO bdDAO,
-                                        ConexaoSistemaDAO conexaoDAO) {
+                                        ConfiguracaoSistemaDAO conexaoDAO) {
         this.sistemaDAO = sistemaDAO;
         this.bdDAO = bdDAO;
         this.conexaoDAO = conexaoDAO;
@@ -45,7 +44,7 @@ public class ConfiguracaoBaseDadosService {
             
         } catch (Exception e) {
             try {
-                Util.exibirMensagem(e.getMessage(), "Configuração de Base de Dados");
+                Util.exibirMensagem(e.getMessage(), getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -63,7 +62,7 @@ public class ConfiguracaoBaseDadosService {
             
         } catch (Exception e) {
             try {
-                Util.exibirMensagem(e.getMessage(), "Configuração de Base de Dados");
+                Util.exibirMensagem(e.getMessage(), getTitle());
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -76,10 +75,15 @@ public class ConfiguracaoBaseDadosService {
         return PanelConexaoFactory.getPanelConexao(idSistema, idBancoDados);
     }
     
-    public void salvar(ConfiguracaoBDVO conexaoVO) {
-
+    public void salvar(ConfiguracaoBancoVO conexaoVO) {
+        
         try {
             Conexao.begin();
+            
+            if (existeConexao(conexaoVO)) {
+                Util.exibirMensagem("Já existe uma conexão cadastrada!", getTitle());
+                return;
+            }
             
             if(conexaoVO.getId() == 0) {
                 conexaoDAO.inserir(conexaoVO);
@@ -97,5 +101,21 @@ public class ConfiguracaoBaseDadosService {
                 Exceptions.printStackTrace(ex1);
             }
         }
+    }
+    
+    public boolean existeConexao(ConfiguracaoBancoVO configuracaoVO) {
+        boolean retorno = false;
+        
+        try {
+            retorno = conexaoDAO.existeConexao(configuracaoVO);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
+        return retorno;
+    }
+    
+    private String getTitle() {
+        return "Configuração de Base de Dados";
     }
 }

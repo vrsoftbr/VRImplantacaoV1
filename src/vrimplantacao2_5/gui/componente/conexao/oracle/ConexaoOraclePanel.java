@@ -6,7 +6,7 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.service.cadastro.ConfiguracaoPanel;
+import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 
 /**
  *
