@@ -108,7 +108,7 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     + "    p.estdisponivel AS estoque,\n"
                     + "    p.grupo AS mercaologico1,\n"
                     + "    p.subgrupo AS mercadologico2,\n"
-                    + "    1 AS mercadologico3,\n"
+                    + "    '1' AS mercadologico3,\n"
                     + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
                     + "    gi.csf AS csticms,\n"
                     + "    p.aliqcompra_icms AS aliquota_credito,\n"
