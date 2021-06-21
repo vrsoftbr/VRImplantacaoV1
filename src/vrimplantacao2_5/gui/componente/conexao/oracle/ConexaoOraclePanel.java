@@ -215,7 +215,7 @@ public class ConexaoOraclePanel extends javax.swing.JPanel implements Configurac
                 conexao.close();
             }
 
-            validarDadosAcessoMySQL();
+            validarDadosAcessoOracle();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
@@ -224,7 +224,7 @@ public class ConexaoOraclePanel extends javax.swing.JPanel implements Configurac
         }
     }//GEN-LAST:event_btnConectarActionPerformed
 
-    public void validarDadosAcessoMySQL() throws Exception {
+    public void validarDadosAcessoOracle() throws Exception {
         if (txtHost.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados MySQL!");
         }
@@ -238,6 +238,12 @@ public class ConexaoOraclePanel extends javax.swing.JPanel implements Configurac
             throw new VRException("Favor informar o usuário do banco de dados MySQL!");
         }
 
+        this.port = txtPorta.getText();
+        this.database = txtDatabase.getText();
+        this.host = txtHost.getText();
+        this.user = txtUsuario.getText();
+        this.pass = txtSenha.getText();
+        
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
