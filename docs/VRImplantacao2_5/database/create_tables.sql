@@ -1,16 +1,16 @@
-﻿CREATE SCHEMA implantacao2_5;
+﻿CREATE SCHEMA IF NOT EXISTS implantacao2_5;
 
-CREATE TABLE implantacao2_5.sistema(
+CREATE TABLE IF NOT EXISTS implantacao2_5.sistema(
 	id serial PRIMARY KEY NOT NULL,
 	nome VARCHAR(60) NOT NULL
 );
 
-CREATE TABLE implantacao2_5.bancodados(
+CREATE TABLE IF NOT EXISTS implantacao2_5.bancodados(
 	id serial PRIMARY KEY NOT NULL,
 	nome VARCHAR(60) NOT NULL
 );
 
-CREATE TABLE implantacao2_5.sistemabancodados(
+CREATE TABLE IF NOT EXISTS implantacao2_5.sistemabancodados(
 	id serial PRIMARY KEY NOT NULL,
 	id_sistema INTEGER NOT NULL,
 	id_bancodados INTEGER NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE implantacao2_5.sistemabancodados(
 		UNIQUE (id_sistema, id_bancodados)
 );
 
-CREATE TABLE implantacao2_5.conexao(
+CREATE TABLE IF NOT EXISTS implantacao2_5.conexao(
 	id serial PRIMARY KEY NOT NULL,
 	host VARCHAR(20) NOT NULL,
 	porta INTEGER NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE implantacao2_5.conexao(
 		REFERENCES implantacao2_5.sistemabancodados (id)
 );
 
-CREATE TABLE implantacao2_5.conexaoloja(
+CREATE TABLE IF NOT EXISTS implantacao2_5.conexaoloja(
 	id serial PRIMARY KEY NOT NULL,
 	id_conexao INTEGER NOT NULL,
 	id_lojaorigem VARCHAR NOT NULL,
@@ -45,8 +45,20 @@ CREATE TABLE implantacao2_5.conexaoloja(
 	datacadastro TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW(),
 	id_situacaomigracao INTEGER NOT NULL,
 	lojamatriz BOOLEAN,
-	CONSTRAINT fk_if_conexao FOREIGN KEY (id_conexao)
+	CONSTRAINT fk_id_conexao FOREIGN KEY (id_conexao)
 		REFERENCES implantacao2_5.conexao(id)
+);
+
+CREATE TABLE IF NOT EXISTS implantacao2_5.sistemabancodadosscripts(
+	id serial PRIMARY KEY NOT NULL,
+	id_sistema INTEGER NOT NULL,
+	id_bancodados INTEGER NOT NULL,
+	script_getlojas TEXT,
+	CONSTRAINT fk_id_sistema FOREIGN KEY (id_sistema)
+		REFERENCES implantacao2_5.sistema (id),
+	CONSTRAINT fk_id_bancodados FOREIGN KEY (id_bancodados)
+		REFERENCES implantacao2_5.bancodados (id),
+	CONSTRAINT un_sistema_bancodados_scripts UNIQUE (id_sistema, id_bancodados)
 );
 
 /*ALTER TABLE implantacao2_5.sistemabancodados ADD CONSTRAINT un_sistema_bancodados UNIQUE (id_sistema, id_bancodados);
