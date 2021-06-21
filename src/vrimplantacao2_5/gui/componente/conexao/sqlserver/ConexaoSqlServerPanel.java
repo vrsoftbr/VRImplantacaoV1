@@ -245,6 +245,12 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel implements Configu
         if (txtUsuario.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados SQL Server!");
         }
+        
+        this.port = txtPorta.getText();
+        this.database = txtDatabase.getArquivo();
+        this.host = txtHost.getText();
+        this.user = txtUsuario.getText();
+        this.pass = txtSenha.getText();
 
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 

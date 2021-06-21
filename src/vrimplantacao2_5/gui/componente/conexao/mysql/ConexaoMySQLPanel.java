@@ -238,6 +238,12 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel implements Configuraca
             throw new VRException("Favor informar o usuário do banco de dados MySQL!");
         }
 
+        this.port = txtPorta.getText();
+        this.database = txtDatabase.getText();
+        this.host = txtHost.getText();
+        this.user = txtUsuario.getText();
+        this.pass = txtSenha.getText();
+        
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());

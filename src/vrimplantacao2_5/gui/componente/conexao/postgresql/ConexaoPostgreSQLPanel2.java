@@ -221,6 +221,12 @@ public class ConexaoPostgreSQLPanel2 extends javax.swing.JPanel {
             throw new VRException("Favor informar o usuário do banco de dados PostgreSQL!");
         }
 
+        this.port = txtPorta.getText();
+        this.database = txtDatabase.getArquivo();
+        this.host = txtHost.getText();
+        this.user = txtUsuario.getText();
+        this.pass = txtSenha.getText();
+        
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());

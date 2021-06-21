@@ -244,6 +244,12 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel implements Config
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
         
+        this.port = txtPorta.getText();
+        this.database = txtDatabase.getArquivo();
+        this.host = txtHost.getText();
+        this.user = txtUsuario.getText();
+        this.pass = txtSenha.getText();
+        
         atualizarParametros();
 
         if (onConectar != null) {
