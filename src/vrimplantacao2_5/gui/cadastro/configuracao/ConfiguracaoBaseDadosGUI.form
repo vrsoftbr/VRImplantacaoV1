@@ -61,7 +61,7 @@
                   <Component id="txtNomeConexao" max="32767" attributes="0"/>
                   <Component id="btnDica" pref="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblBD" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblSistema" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -71,9 +71,9 @@
                   <Component id="cboBD" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cboSistema" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabConexao" pref="181" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="tabConexao" min="-2" pref="146" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnlLoja" max="32767" attributes="0"/>
@@ -149,7 +149,7 @@
                       <Component id="btnExcluirLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tblLoja" pref="129" max="32767" attributes="0"/>
+                  <Component id="tblLoja" pref="140" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -195,13 +195,9 @@
       </Events>
     </Component>
     <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabConexao">
-      <Properties>
-        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Painel de Conex&#xe3;o"/>
-          </Border>
-        </Property>
-      </Properties>
+      <AccessibilityProperties>
+        <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Painel de Conex&#xe3;o"/>
+      </AccessibilityProperties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
     </Container>
