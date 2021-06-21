@@ -12,7 +12,6 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
@@ -62,7 +61,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     private void setConfiguracao() throws Exception {
         centralizarForm();
-        this.setMaximum(false);
         setTitle("Configuração de Base de Dados");
         
         controller = new ConfiguracaoBaseDadosController();
@@ -339,7 +337,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
+                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -350,8 +348,6 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 btnSalvarActionPerformed(evt);
             }
         });
-
-        tabConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Painel de Conexão"));
 
         btnDica.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/ignorar.png"))); // NOI18N
         btnDica.setToolTipText("Dica!");
@@ -408,13 +404,15 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     .addComponent(cboBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tabConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
                 .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        tabConexao.getAccessibleContext().setAccessibleName("Painel de Conexão");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
