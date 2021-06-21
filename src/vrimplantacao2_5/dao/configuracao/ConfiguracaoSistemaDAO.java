@@ -207,7 +207,8 @@ public class ConfiguracaoSistemaDAO {
                     "	c.host,\n" +
                     "	c.porta,\n" +
                     "	c.usuario,\n" +
-                    "	c.nomeschema\n" +
+                    "	c.nomeschema,\n" +
+                    "   c.senha\n" +        
                     "from \n" +
                     "	implantacao2_5.conexao c\n" +
                     "join implantacao2_5.sistema s\n" +
@@ -232,6 +233,7 @@ public class ConfiguracaoSistemaDAO {
                     configuracaoVO.setPorta(rs.getInt("porta"));
                     configuracaoVO.setUsuario(rs.getString("usuario"));
                     configuracaoVO.setSchema(rs.getString("nomeschema"));
+                    configuracaoVO.setSenha(rs.getString("senha"));
                     
                     result.add(configuracaoVO);
                 }

@@ -318,4 +318,13 @@ public class ConexaoOraclePanel extends javax.swing.JPanel implements Configurac
     public String getSenha() {
         return this.pass;
     }
+    
+    @Override
+    public void setDadoConexao(String host, String schema, int porta, String usuario, String senha) {
+        txtHost.setText(host);
+        txtDatabase.setText(schema);
+        txtPorta.setText(String.valueOf(porta));
+        txtUsuario.setText(usuario);
+        txtSenha.setText(senha);
+    }
 }

@@ -326,4 +326,13 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel implements Configu
     public String getSenha() {
         return this.pass;
     }
+    
+    @Override
+    public void setDadoConexao(String host, String schema, int porta, String usuario, String senha) {
+        txtHost.setText(host);
+        txtDatabase.setArquivo(schema);
+        txtPorta.setText(String.valueOf(porta));
+        txtUsuario.setText(usuario);
+        txtSenha.setText(senha);
+    }
 }
