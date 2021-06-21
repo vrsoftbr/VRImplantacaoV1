@@ -10,7 +10,7 @@ public class ScriptsSistemasController {
 
     private ScriptsSistemasService scriptSistemasService;
     
-    public String getLojas(int id_sistema, int id_bancodados) throws Exception {
-        return scriptSistemasService.getLojas(id_sistema, id_bancodados);
+    public String getLojas(int idSistema, int idBancodados) throws Exception {
+        return scriptSistemasService.getLojas(idSistema, idBancodados);
     }
 }
