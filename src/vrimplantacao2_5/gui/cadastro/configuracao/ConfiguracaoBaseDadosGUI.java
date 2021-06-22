@@ -221,6 +221,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         
         if (lojas.size() > 0) {
            btnExcluirLoja.setEnabled(true);
+           btnProximo.setEnabled(true);
         }
     }
     
