@@ -12,7 +12,7 @@ import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
@@ -22,6 +22,7 @@ import vrimplantacao2_5.controller.cadastro.configuracao.ConfiguracaoBaseDadosCo
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
+import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
 
 /**
  *
@@ -29,14 +30,17 @@ import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
  */
 public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
+    public VRMdiFrame parentFrame = null;
+    private ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private static MapaLojaGUI mapaLojaGUI = null;
-    private ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
+    
     private ConfiguracaoBaseDadosController controller = null;
     private MapaLojaController mapaController = null;
+    
     private ConfiguracaoPanel painelDeConexaoDinamico;
-    private ConfiguracaoBancoVO configuracaoBancoVO = null;
-    public VRMdiFrame parentFrame = null;
+    private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
+    
     
     /**
      * Creates new form ConfiguracaoPrincipalGUI
@@ -56,7 +60,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         setTitle("Configuração de Base de Dados");
         
         controller = new ConfiguracaoBaseDadosController();
-        configuracaoBancoVO = new ConfiguracaoBancoVO();
+        configuracaoBancoVO = new ConfiguracaoBaseDadosVO();
         mapaController = new MapaLojaController(this);
         
         getSistema();
@@ -236,7 +240,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
     
-    public void editar(ConfiguracaoBancoVO configuracaoBancoVO,
+    public void editar(ConfiguracaoBaseDadosVO configuracaoBancoVO,
                       ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI) throws Exception {
         this.configuracaoBancoVO = configuracaoBancoVO;
         this.consultaConfiguracaoBancoDadosGUI = consultaConfiguracaoBancoDadosGUI;
@@ -247,6 +251,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         
         exibiPainelConexao();
         mapaController.consultaLojaMapeada(configuracaoBancoVO.getId());
+        
+        if (mapaController.getLojaMapeada().size() > 0) {
+            btnProximo.setEnabled(true);
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -266,6 +274,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         btnSalvar = new vrframework.bean.button.VRButton();
         tabConexao = new vrframework.bean.tabbedPane.VRTabbedPane();
         btnDica = new vrframework.bean.button.VRButton();
+        btnProximo = new vrframework.bean.button.VRButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(lblNomeCon, "Nome da Conexão");
 
@@ -329,7 +338,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                     .addComponent(btnMapear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExcluirLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(tblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -348,6 +357,15 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         btnDica.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDicaActionPerformed(evt);
+            }
+        });
+
+        btnProximo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/proximo.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnProximo, "Pŕoximo");
+        btnProximo.setEnabled(false);
+        btnProximo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProximoActionPerformed(evt);
             }
         });
 
@@ -375,7 +393,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                     .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -400,7 +421,9 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 .addGap(6, 6, 6)
                 .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -442,11 +465,16 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         excluir();
     }//GEN-LAST:event_btnExcluirLojaActionPerformed
 
+    private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
+        SelecaoLojaGUI.exibirMigracaoLoja();
+    }//GEN-LAST:event_btnProximoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnDica;
     private vrframework.bean.button.VRButton btnExcluirLoja;
     private vrframework.bean.button.VRButton btnMapear;
+    private vrframework.bean.button.VRButton btnProximo;
     private vrframework.bean.button.VRButton btnSalvar;
     private vrframework.bean.comboBox.VRComboBox cboBD;
     private vrframework.bean.comboBox.VRComboBox cboSistema;

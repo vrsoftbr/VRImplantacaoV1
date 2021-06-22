@@ -5,7 +5,7 @@ import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoBaseDadosService;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
 /**
@@ -35,7 +35,7 @@ public class ConfiguracaoBaseDadosController {
         return service.exibiPainelConexao(idSistema, idBancoDados);
     }
     
-    public void salvar(ConfiguracaoBancoVO conexaoVO) {
+    public void salvar(ConfiguracaoBaseDadosVO conexaoVO) {
         service.salvar(conexaoVO);
     }
 }

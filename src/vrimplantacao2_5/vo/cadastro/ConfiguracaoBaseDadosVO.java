@@ -4,7 +4,7 @@ package vrimplantacao2_5.vo.cadastro;
  *
  * @author guilhermegomes
  */
-public class ConfiguracaoBancoVO {
+public class ConfiguracaoBaseDadosVO {
     
     private int id;
     private String descricao;

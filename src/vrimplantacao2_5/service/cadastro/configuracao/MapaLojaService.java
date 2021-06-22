@@ -6,9 +6,9 @@ import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2_5.dao.configuracao.ConfiguracaoSistemaDAO;
+import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 
 /**
@@ -18,14 +18,14 @@ import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 public class MapaLojaService {
 
     private final LojaDAO lojaDAO;
-    private final ConfiguracaoSistemaDAO configuracaoDAO;
+    private final ConfiguracaoBaseDadosDAO configuracaoDAO;
 
     public MapaLojaService() {
         this.lojaDAO = new LojaDAO();
-        this.configuracaoDAO = new ConfiguracaoSistemaDAO();
+        this.configuracaoDAO = new ConfiguracaoBaseDadosDAO();
     }
 
-    public MapaLojaService(LojaDAO lojaDAO, ConfiguracaoSistemaDAO cfgDAO) {
+    public MapaLojaService(LojaDAO lojaDAO, ConfiguracaoBaseDadosDAO cfgDAO) {
         this.lojaDAO = lojaDAO;
         this.configuracaoDAO = cfgDAO;
     }
@@ -42,7 +42,7 @@ public class MapaLojaService {
         return lojas;
     }
 
-    public void salvar(ConfiguracaoBancoVO configuracaoBancoVO) {
+    public void salvar(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
         try {
             if (configuracaoBancoVO.getConfiguracaoBancoLoja().getId() == 0 &&
                     !existeLojaMapeada(configuracaoBancoVO)) {
@@ -72,7 +72,7 @@ public class MapaLojaService {
         }
     }
 
-    private String verificaLojaMatriz(ConfiguracaoBancoVO configuracaoBancoVO) {
+    private String verificaLojaMatriz(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
         String eMatriz = "";
 
         try {
@@ -84,7 +84,7 @@ public class MapaLojaService {
         return eMatriz;
     }
 
-    private boolean existeLojaMapeada(ConfiguracaoBancoVO configuracaoBancoVO) {
+    private boolean existeLojaMapeada(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
         boolean lojaMapeada = false;
         try {
             /**
@@ -132,6 +132,7 @@ public class MapaLojaService {
         try {
             if (configuracaoBancoLojaVO.getSituacaoMigracao() != ESituacaoMigracao.CONFIGURANDO) {
                 Util.exibirMensagem("Processo de migração iniciado, não é possível excluir a loja mapeada!", title);
+                return;
             }
             
             configuracaoDAO.excluirLojaMapeada(configuracaoBancoLojaVO);

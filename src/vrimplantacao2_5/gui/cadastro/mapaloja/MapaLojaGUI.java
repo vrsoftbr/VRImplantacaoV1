@@ -11,7 +11,7 @@ import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.cadastro.configuracao.MapaLojaService;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
 /**
  *
@@ -22,7 +22,7 @@ public class MapaLojaGUI extends VRDialog {
     private MapaLojaService mapaLojaService = null;
     public LojaConsultaGUI lojaConsultaGUI = null;
     public ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
-    private ConfiguracaoBancoVO configuracaoBancoVO = null;
+    private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
     private ConfiguracaoBancoLojaVO configuracaoBancoLojaVO = null;
     private MapaLojaController mapaLojaController = null;
     
@@ -63,7 +63,7 @@ public class MapaLojaGUI extends VRDialog {
         }
     }
     
-    public void setConfiguracaoConexao(ConfiguracaoBancoVO configuracaoBancoVO) {
+    public void setConfiguracaoConexao(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
         this.configuracaoBancoVO = configuracaoBancoVO;
     }
     
