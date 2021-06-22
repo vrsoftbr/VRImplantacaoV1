@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
@@ -16,9 +16,9 @@ import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
  *
  * @author guilhermegomes
  */
-public class ConfiguracaoSistemaDAO {
+public class ConfiguracaoBaseDadosDAO {
 
-    public void inserir(ConfiguracaoBancoVO conexaoVO) throws Exception {
+    public void inserir(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
         sql.setTableName("conexao");
@@ -46,7 +46,7 @@ public class ConfiguracaoSistemaDAO {
         }
     }
 
-    public void alterar(ConfiguracaoBancoVO conexaoVO) throws Exception {
+    public void alterar(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
         sql.setTableName("conexao");
@@ -70,7 +70,7 @@ public class ConfiguracaoSistemaDAO {
         }
     }
 
-    public void inserirLoja(ConfiguracaoBancoVO conexaoVO) throws Exception {
+    public void inserirLoja(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
         sql.setSchema("implantacao2_5");
@@ -96,7 +96,7 @@ public class ConfiguracaoSistemaDAO {
         }
     }
     
-    public String verificaLojaMatriz(ConfiguracaoBancoVO configuracaoBancoVO) throws Exception {
+    public String verificaLojaMatriz(ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         String retorno = "";
         
         try(Statement stm = Conexao.createStatement()) {
@@ -117,7 +117,7 @@ public class ConfiguracaoSistemaDAO {
     }
     
     public boolean existeLojaMapeada(String tipoLoja, 
-                                    ConfiguracaoBancoVO configuracaoBancoVO) throws Exception {
+                                    ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         boolean retorno = false;
         String sql = "", filtro = "";
         
@@ -193,7 +193,7 @@ public class ConfiguracaoSistemaDAO {
     }
     
     public List consultar() throws Exception {
-        List<ConfiguracaoBancoVO> result = new ArrayList<>();
+        List<ConfiguracaoBaseDadosVO> result = new ArrayList<>();
         
         try(Statement stm = Conexao.createStatement()) {
             try(ResultSet rs = stm.executeQuery(
@@ -217,7 +217,7 @@ public class ConfiguracaoSistemaDAO {
                     "		on c.id_bancodados = b.id\n" +
                     "order by c.descricao")) {
                 while(rs.next()) {
-                    ConfiguracaoBancoVO configuracaoVO = new ConfiguracaoBancoVO();
+                    ConfiguracaoBaseDadosVO configuracaoVO = new ConfiguracaoBaseDadosVO();
                     SistemaVO sistemaVO = new SistemaVO();
                     BancoDadosVO bancoDadosVO = new BancoDadosVO();
                     
@@ -243,7 +243,7 @@ public class ConfiguracaoSistemaDAO {
         return result;
     }
     
-    public boolean existeConexao(ConfiguracaoBancoVO configuracaoVO) throws Exception {
+    public boolean existeConexao(ConfiguracaoBaseDadosVO configuracaoVO) throws Exception {
         boolean retorno = false;
         
         try(Statement stm = Conexao.createStatement()) {

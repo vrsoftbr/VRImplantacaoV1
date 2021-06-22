@@ -5,7 +5,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.cadastro.configuracao.MapaLojaService;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
 /**
  *
@@ -26,7 +26,7 @@ public class MapaLojaController {
         return mapaLojaService.getLojaVR();
     }
     
-    public void salvar(ConfiguracaoBancoVO configuracaoBancoVO) {
+    public void salvar(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
         mapaLojaService.salvar(configuracaoBancoVO);
     }
     

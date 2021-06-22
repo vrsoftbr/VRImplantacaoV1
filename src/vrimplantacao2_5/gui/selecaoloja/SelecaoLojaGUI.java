@@ -1,0 +1,224 @@
+package vrimplantacao2_5.gui.selecaoloja;
+
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import org.openide.util.Exceptions;
+import vrframework.bean.dialog.VRDialog;
+import vrframework.classe.Util;
+import vrframework.remote.ItemComboVO;
+import vrimplantacao2_5.controller.selecaoloja.SelecaoLojaController;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
+
+/**
+ *
+ * @author guilhermegomes
+ */
+public class SelecaoLojaGUI extends VRDialog {
+
+    private static SelecaoLojaGUI migracaoGUI = null;
+    private SelecaoLojaController controller = null;
+    
+    /**
+     * Creates new form MigracaoGUI
+     * @throws java.lang.Exception
+     */
+    public SelecaoLojaGUI() throws Exception {
+        initComponents();
+        
+        setConfiguracao();
+    }
+    
+    private void setConfiguracao() throws Exception {
+        centralizarForm();
+        setResizable(false);
+        setModal(true);
+        setTitle("Seleção de Loja");
+        
+        this.controller = new SelecaoLojaController();
+        getNomeConexao();
+    }
+    
+    private void getNomeConexao() throws Exception {
+        cboConexao.setModel(new DefaultComboBoxModel());
+        
+        List<ConfiguracaoBaseDadosVO> conexoes = controller.consultar();
+        
+        for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
+            cboConexao.addItem(new ItemComboVO(configuracaoVO.getId(), configuracaoVO.getDescricao()));
+        }
+    }
+    
+    private void getLojaMapeada() {
+        cboOrigem.setModel(new DefaultComboBoxModel());
+        
+        List<ConfiguracaoBancoLojaVO>  lojas = controller.getLojaMapeada(cboConexao.getId());
+        
+        for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
+            cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(), 
+                                              configuracaoLojaVO.getIdLojaOrigem() + " - " + 
+                                              (configuracaoLojaVO.isLojaMatriz() ? "MATRIZ" : "FILIAL")));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        lblNomeConexao = new vrframework.bean.label.VRLabel();
+        cboConexao = new vrframework.bean.comboBox.VRComboBox();
+        lblLojaOrigem = new vrframework.bean.label.VRLabel();
+        cboOrigem = new vrframework.bean.comboBox.VRComboBox();
+        lblLojaVR = new vrframework.bean.label.VRLabel();
+        txtLojaVR = new vrframework.bean.textField.VRTextField();
+        btnProximo = new vrframework.bean.button.VRButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        org.openide.awt.Mnemonics.setLocalizedText(lblNomeConexao, "Nome da Conexão");
+
+        cboConexao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboConexaoActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(lblLojaOrigem, "Loja Origem");
+
+        org.openide.awt.Mnemonics.setLocalizedText(lblLojaVR, "Loja VR");
+
+        txtLojaVR.setEnabled(false);
+
+        btnProximo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/proximo.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnProximo, "Pŕoximo");
+        btnProximo.setEnabled(false);
+        btnProximo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProximoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cboConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cboOrigem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 284, Short.MAX_VALUE))
+                    .addComponent(txtLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cboConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cboOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnProximoActionPerformed
+
+    private void cboConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboConexaoActionPerformed
+        getLojaMapeada();
+    }//GEN-LAST:event_cboConexaoActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(SelecaoLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(SelecaoLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(SelecaoLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(SelecaoLojaGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                SelecaoLojaGUI dialog = null;
+                try {
+                    dialog = new SelecaoLojaGUI();
+                } catch (Exception ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrframework.bean.button.VRButton btnProximo;
+    private vrframework.bean.comboBox.VRComboBox cboConexao;
+    private vrframework.bean.comboBox.VRComboBox cboOrigem;
+    private vrframework.bean.label.VRLabel lblLojaOrigem;
+    private vrframework.bean.label.VRLabel lblLojaVR;
+    private vrframework.bean.label.VRLabel lblNomeConexao;
+    private vrframework.bean.textField.VRTextField txtLojaVR;
+    // End of variables declaration//GEN-END:variables
+    
+    public static void exibirMigracaoLoja() {
+        try {
+            if (migracaoGUI == null || !migracaoGUI.isActive()) {
+                migracaoGUI = new SelecaoLojaGUI();
+            }
+
+            migracaoGUI.setVisible(true);
+            
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Seleção de Loja");
+        }
+    }
+}

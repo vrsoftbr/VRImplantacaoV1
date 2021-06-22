@@ -8,8 +8,8 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
-import vrimplantacao2_5.controller.cadastro.configuracao.ConsultaConfiguracaoBancoDadosController;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.controller.cadastro.configuracao.ConsultaConfiguracaoBaseDadosController;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
 /**
  *
@@ -19,8 +19,8 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     private static ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBaseDadosGUI = null;
     private ConfiguracaoBaseDadosGUI configuracaoBancoDados = null;
-    public ConsultaConfiguracaoBancoDadosController controller = null;
-    private ConfiguracaoBancoVO configuracaoVO; 
+    public ConsultaConfiguracaoBaseDadosController controller = null;
+    private ConfiguracaoBaseDadosVO configuracaoVO; 
 
     /**
      * Creates new form ConsultaConfiguracaoBaseDadosGUI
@@ -38,7 +38,7 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
         centralizarForm();
         setTitle("Consulta Configuração Base de Dados");
         
-        controller = new ConsultaConfiguracaoBancoDadosController(this);
+        controller = new ConsultaConfiguracaoBaseDadosController(this);
         configurarColuna();
         controller.consultar();
     }
@@ -60,7 +60,7 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
         Object[][] dados = new Object[controller.getConexao().size()][5];
         
         int i = 0;
-        for (ConfiguracaoBancoVO cx : controller.getConexao()) {
+        for (ConfiguracaoBaseDadosVO cx : controller.getConexao()) {
             dados[i][0] = cx.getDescricao();
             dados[i][1] = cx.getSistema().getNome();
             dados[i][2] = cx.getBancoDados().getNome();
@@ -76,7 +76,7 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
     @Override
     public void editar() {
-        configuracaoVO = new ConfiguracaoBancoVO();
+        configuracaoVO = new ConfiguracaoBaseDadosVO();
         
         if(tblConsultaConexao.getLinhaSelecionada() == -1) {
             return;

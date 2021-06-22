@@ -8,8 +8,8 @@ import vrimplantacao2_5.dao.sistema.SistemaDAO;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrframework.classe.Util;
-import vrimplantacao2_5.dao.configuracao.ConfiguracaoSistemaDAO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoVO;
+import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
 /**
  *
@@ -19,17 +19,17 @@ public class ConfiguracaoBaseDadosService {
     
     private final SistemaDAO sistemaDAO;
     private final BancoDadosDAO bdDAO;
-    private final ConfiguracaoSistemaDAO conexaoDAO;
+    private final ConfiguracaoBaseDadosDAO conexaoDAO;
 
     public ConfiguracaoBaseDadosService() {
         sistemaDAO = new SistemaDAO();
         bdDAO = new BancoDadosDAO();
-        conexaoDAO = new ConfiguracaoSistemaDAO();
+        conexaoDAO = new ConfiguracaoBaseDadosDAO();
     }
 
     public ConfiguracaoBaseDadosService(SistemaDAO sistemaDAO,
                                         BancoDadosDAO bdDAO,
-                                        ConfiguracaoSistemaDAO conexaoDAO) {
+                                        ConfiguracaoBaseDadosDAO conexaoDAO) {
         this.sistemaDAO = sistemaDAO;
         this.bdDAO = bdDAO;
         this.conexaoDAO = conexaoDAO;
@@ -75,7 +75,7 @@ public class ConfiguracaoBaseDadosService {
         return PanelConexaoFactory.getPanelConexao(idSistema, idBancoDados);
     }
     
-    public void salvar(ConfiguracaoBancoVO conexaoVO) {
+    public void salvar(ConfiguracaoBaseDadosVO conexaoVO) {
         
         try {
             Conexao.begin();
@@ -102,7 +102,7 @@ public class ConfiguracaoBaseDadosService {
         }
     }
     
-    public boolean existeConexao(ConfiguracaoBancoVO configuracaoVO) {
+    public boolean existeConexao(ConfiguracaoBaseDadosVO configuracaoVO) {
         boolean retorno = false;
         
         try {
