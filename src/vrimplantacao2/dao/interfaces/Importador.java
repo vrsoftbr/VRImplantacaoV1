@@ -601,14 +601,18 @@ public class Importador {
         
     }
     
+    public void unificarFornecedor(OpcaoFornecedor... opt) throws Exception {
+        
+    }
     /**
      * Unifica o cadastro dos fornecedores, apenas aqueles com CPF/CNPJ válidos,
      * e aqueles que não se enquadram nessa categoria são gravados apenas na
      * tabela implantacao.codant_fornecedor.
      *
+     * @param opt
      * @throws Exception
      */
-    public void unificarFornecedor() throws Exception {
+    public void unificarFornecedor(Set<OpcaoFornecedor> opt) throws Exception {
         ProgressBar.setStatus("Carregando fornecedores (Unificação)...");
         List<FornecedorIMP> fornecedores = getInterfaceDAO().getFornecedores();
         FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
@@ -616,6 +620,7 @@ public class Importador {
                 getLojaOrigem(),
                 getLojaVR()
         );
+        provider.setOpcoes(opt);
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.unificar(fornecedores);
     }
