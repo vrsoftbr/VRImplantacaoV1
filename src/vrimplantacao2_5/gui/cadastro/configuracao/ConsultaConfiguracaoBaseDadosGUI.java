@@ -135,6 +135,7 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnInserirConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexaoActionPerformed
+        ConfiguracaoBaseDadosGUI.consultaConfiguracaoBancoDadosGUI = this;
         ConfiguracaoBaseDadosGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirConexaoActionPerformed
 

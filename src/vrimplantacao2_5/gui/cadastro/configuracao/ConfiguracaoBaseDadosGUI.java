@@ -31,7 +31,7 @@ import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
 public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
     public VRMdiFrame parentFrame = null;
-    private ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
+    public static ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private static MapaLojaGUI mapaLojaGUI = null;
     
@@ -192,6 +192,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             try {
                 Util.exibirMensagem("Conexão salva com sucesso!", getTitle());
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Exceptions.printStackTrace(ex);
             }
         }

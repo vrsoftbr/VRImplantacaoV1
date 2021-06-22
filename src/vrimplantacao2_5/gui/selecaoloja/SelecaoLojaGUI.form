@@ -85,6 +85,9 @@
       </Properties>
     </Component>
     <Component class="vrframework.bean.comboBox.VRComboBox" name="cboOrigem">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboOrigemActionPerformed"/>
+      </Events>
     </Component>
     <Component class="vrframework.bean.label.VRLabel" name="lblLojaVR">
       <Properties>
