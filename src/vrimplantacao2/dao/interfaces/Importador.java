@@ -359,6 +359,10 @@ public class Importador {
         repository.salvar(produtos);
 
     }
+    
+    public void importarFornecedor(OpcaoFornecedor... opt) throws Exception {
+        this.importarFornecedor(new HashSet<>(Arrays.asList(opt)));
+    }
 
     /**
      * Executa a importação dos fornecedores.
@@ -366,7 +370,7 @@ public class Importador {
      * @param opt
      * @throws Exception
      */
-    public void importarFornecedor(OpcaoFornecedor... opt) throws Exception {
+    public void importarFornecedor(Set<OpcaoFornecedor> opt) throws Exception {
         ProgressBar.setStatus("Carregando fornecedores...");
         List<FornecedorIMP> fornecedores = getInterfaceDAO().getFornecedores();
         FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
@@ -374,6 +378,7 @@ public class Importador {
                 getLojaOrigem(),
                 getLojaVR()
         );
+        provider.setOpcoes(opt);
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.salvar(fornecedores);
     }
@@ -706,6 +711,7 @@ public class Importador {
                 getLojaOrigem(),
                 getLojaVR()
         );
+        provider.setOpcoes(new HashSet<>(Arrays.asList(opcoes)));
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.atualizar(fornecedores, opcoes);
     }
