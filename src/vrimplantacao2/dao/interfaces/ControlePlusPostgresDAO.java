@@ -88,7 +88,8 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
-                OpcaoFornecedor.INSCRICAO_MUNICIPAL
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));        
     }
     
