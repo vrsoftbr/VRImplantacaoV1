@@ -19,26 +19,28 @@ import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 public class ConfiguracaoBaseDadosDAO {
 
     public void inserir(ConfiguracaoBaseDadosVO conexaoVO) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {
-            SQLBuilder sql = new SQLBuilder();
+        SQLBuilder sql = new SQLBuilder();
 
-            sql.setTableName("conexao");
-            sql.setSchema("implantacao2_5");
+        sql.setTableName("conexao");
+        sql.setSchema("implantacao2_5");
 
-            sql.put("host", conexaoVO.getHost());
-            sql.put("porta", conexaoVO.getPorta());
-            sql.put("usuario", conexaoVO.getUsuario());
-            sql.put("senha", conexaoVO.getSenha());
-            sql.put("descricao", conexaoVO.getDescricao());
-            sql.put("nomeschema", conexaoVO.getSchema());
-            sql.put("id_sistema", conexaoVO.getSistema().getId());
-            sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
+        sql.put("host", conexaoVO.getHost());
+        sql.put("porta", conexaoVO.getPorta());
+        sql.put("usuario", conexaoVO.getUsuario());
+        sql.put("senha", conexaoVO.getSenha());
+        sql.put("descricao", conexaoVO.getDescricao());
+        sql.put("nomeschema", conexaoVO.getSchema());
+        sql.put("id_sistema", conexaoVO.getSistema().getId());
+        sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
 
-            sql.getReturning().add("id");
+        sql.getReturning().add("id");
 
-            try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                if (rst.next()) {
-                    conexaoVO.setId(rst.getInt("id"));
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
+                    if (rst.next()) {
+                        conexaoVO.setId(rst.getInt("id"));
+                    }
                 }
             }
         }

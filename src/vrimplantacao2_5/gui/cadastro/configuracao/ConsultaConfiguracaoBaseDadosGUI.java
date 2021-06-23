@@ -180,7 +180,8 @@ public class ConsultaConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 configuracaoBancoDados = new ConfiguracaoBaseDadosGUI(menuGUI);
             }
             
-            configuracaoBancoDados.editar(this.configuracaoVO, this);
+            ConfiguracaoBaseDadosGUI.consultaConfiguracaoBancoDadosGUI = this;
+            configuracaoBancoDados.editar(this.configuracaoVO);
             configuracaoBancoDados.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Configuração de Base de Dados");

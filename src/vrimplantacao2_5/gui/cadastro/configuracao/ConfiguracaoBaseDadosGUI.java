@@ -242,10 +242,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
     
-    public void editar(ConfiguracaoBaseDadosVO configuracaoBancoVO,
-                      ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI) throws Exception {
+    public void editar(ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         this.configuracaoBancoVO = configuracaoBancoVO;
-        this.consultaConfiguracaoBancoDadosGUI = consultaConfiguracaoBancoDadosGUI;
         
         txtNomeConexao.setText(configuracaoBancoVO.getDescricao());
         cboSistema.setDescricao(configuracaoBancoVO.getSistema().getNome());
