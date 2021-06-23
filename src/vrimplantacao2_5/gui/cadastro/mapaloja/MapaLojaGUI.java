@@ -1,6 +1,5 @@
 package vrimplantacao2_5.gui.cadastro.mapaloja;
 
-import java.sql.Connection;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.dialog.VRDialog;
@@ -15,7 +14,6 @@ import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.cadastro.configuracao.MapaLojaService;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
-import vrimplantacao2_5.vo.enums.EBancoDados;
 
 /**
  *
@@ -48,6 +46,7 @@ public class MapaLojaGUI extends VRDialog {
         
         mapaLojaService = new MapaLojaService();
         configuracaoBancoLojaVO = new ConfiguracaoBancoLojaVO();
+        migracaoSistemasController = new MigracaoSistemasController();
         
         carregarLojaVR();
         carregarLojaOrigem();
@@ -56,8 +55,8 @@ public class MapaLojaGUI extends VRDialog {
     private void carregarLojaOrigem() throws Exception {
         cboLojaOrigem.setModel(new DefaultComboBoxModel());
 
-        for (Estabelecimento loja : migracaoSistemasController.getLojasOrigem()) {
-            cboLojaOrigem.addItem(loja);
+        for (Estabelecimento loja : migracaoSistemasController.getLojasOrigem(74, 8)) {
+            cboLojaOrigem.addItem(new ItemComboVO(loja.cnpj, loja.razao));
         }
     }
     

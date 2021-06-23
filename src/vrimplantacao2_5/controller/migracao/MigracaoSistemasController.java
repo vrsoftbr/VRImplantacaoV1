@@ -17,7 +17,15 @@ public class MigracaoSistemasController {
     
     private MigracaoSistemasService migracaoSistemasService;
     
-    public List<Estabelecimento> getLojasOrigem() throws Exception {
-        return migracaoSistemasService.getLojasOrigem();
+    public MigracaoSistemasController() {
+        this.migracaoSistemasService = new MigracaoSistemasService();
+    }
+    
+    public MigracaoSistemasController(MigracaoSistemasService migracaoSistemasService) {
+        this.migracaoSistemasService = migracaoSistemasService;
+    }
+    
+    public List<Estabelecimento> getLojasOrigem(int idSistema, int idBancoDados) throws Exception {
+        return this.migracaoSistemasService.getLojasOrigem(idSistema, idBancoDados);
     }
 }

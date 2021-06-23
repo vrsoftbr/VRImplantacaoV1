@@ -16,7 +16,7 @@ import vrimplantacao2_5.vo.enums.EBancoDados;
  *
  * @author Desenvolvimento
  */
-public class ConexaoBancoDadosFactory {
+public abstract class ConexaoBancoDadosFactory {
     
     public static Connection getConexao(EBancoDados eBancoDados) throws Exception {
 
