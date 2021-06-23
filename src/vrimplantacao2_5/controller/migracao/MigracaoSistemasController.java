@@ -14,6 +14,25 @@ import vrimplantacao2_5.service.migracao.MigracaoSistemasService;
  * @author Desenvolvimento
  */
 public class MigracaoSistemasController {
+
+    private static int idSistema;
+    private static int idBancoDados;
+    
+    public static int getIdSistema() {
+        return idSistema;
+    }
+    
+    public static int getIdBancoDados() {
+        return idBancoDados;
+    }
+    
+    public void setIdSistema(int idSistema) {
+        this.idSistema = idSistema;
+    }
+    
+    public void setIdBancoDados(int idBancoDados) {
+        this.idBancoDados = idBancoDados;
+    }
     
     private MigracaoSistemasService migracaoSistemasService;
     

@@ -27,8 +27,7 @@ public class MapaLojaGUI extends VRDialog {
     private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
     private ConfiguracaoBancoLojaVO configuracaoBancoLojaVO = null;
     private MapaLojaController mapaLojaController = null;
-    private MigracaoSistemasController migracaoSistemasController = null;
-    
+    private MigracaoSistemasController migracaoSistemasController;
     /**
      * Creates new form MapaLojaGUI
      */
@@ -55,7 +54,7 @@ public class MapaLojaGUI extends VRDialog {
     private void carregarLojaOrigem() throws Exception {
         cboLojaOrigem.setModel(new DefaultComboBoxModel());
 
-        for (Estabelecimento loja : migracaoSistemasController.getLojasOrigem(74, 8)) {
+        for (Estabelecimento loja : migracaoSistemasController.getLojasOrigem(MigracaoSistemasController.getIdSistema(), MigracaoSistemasController.getIdBancoDados())) {
             cboLojaOrigem.addItem(new ItemComboVO(loja.cnpj, loja.razao));
         }
     }

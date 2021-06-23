@@ -1,5 +1,6 @@
 package vrimplantacao2_5.gui.cadastro.configuracao;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -20,10 +21,12 @@ import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.enums.ESituacaoMigracao;
 import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
 import vrimplantacao2_5.controller.cadastro.configuracao.ConfiguracaoBaseDadosController;
+import vrimplantacao2_5.controller.migracao.MigracaoSistemasController;
 import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
+import vrimplantacao2_5.service.migracao.ConexaoBancoDadosFactory;
 
 /**
  *
@@ -42,8 +45,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     private ConfiguracaoPanel painelDeConexaoDinamico;
     private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
-    
-    
+
+    private MigracaoSistemasController migracaoSistemasController = null;
     /**
      * Creates new form ConfiguracaoPrincipalGUI
      * @param menuGUI
@@ -56,6 +59,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         criarEstrutura2_5();
         this.parentFrame = menuGUI;
         setConfiguracao();
+        
+        migracaoSistemasController = new MigracaoSistemasController();
     }
     
     private void criarEstrutura2_5() throws Exception {
@@ -117,6 +122,14 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
         
         desabilitarBotao();
+    }
+    
+    private void selecionarBancoDados() throws Exception {        
+        migracaoSistemasController.setIdBancoDados(cboBD.getId());
+    }
+    
+    private void selecionarSistema() throws Exception {
+        migracaoSistemasController.setIdSistema(cboSistema.getId());
     }
     
     private void exibiPainelConexao() {
@@ -445,7 +458,13 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_cboSistemaActionPerformed
 
     private void cboBDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboBDActionPerformed
-        exibiPainelConexao();
+        
+        try {
+            exibiPainelConexao();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
     }//GEN-LAST:event_cboBDActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
@@ -466,7 +485,15 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnDicaActionPerformed
 
     private void btnMapearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapearActionPerformed
-        exibirMapaLoja();
+        
+        try {
+            selecionarBancoDados();
+            selecionarSistema();
+            exibirMapaLoja();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
     }//GEN-LAST:event_btnMapearActionPerformed
 
     private void btnExcluirLojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirLojaActionPerformed
