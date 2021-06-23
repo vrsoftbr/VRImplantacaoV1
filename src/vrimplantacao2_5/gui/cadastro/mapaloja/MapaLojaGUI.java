@@ -1,5 +1,6 @@
 package vrimplantacao2_5.gui.cadastro.mapaloja;
 
+import java.sql.Connection;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.dialog.VRDialog;
@@ -7,11 +8,14 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2_5.controller.cadastro.configuracao.MapaLojaController;
+import vrimplantacao2_5.controller.migracao.MigracaoSistemasController;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.service.cadastro.configuracao.MapaLojaService;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
+import vrimplantacao2_5.vo.enums.EBancoDados;
 
 /**
  *
@@ -25,17 +29,18 @@ public class MapaLojaGUI extends VRDialog {
     private ConfiguracaoBaseDadosVO configuracaoBancoVO = null;
     private ConfiguracaoBancoLojaVO configuracaoBancoLojaVO = null;
     private MapaLojaController mapaLojaController = null;
+    private MigracaoSistemasController migracaoSistemasController = null;
     
     /**
      * Creates new form MapaLojaGUI
      */
-    public MapaLojaGUI() {
+    public MapaLojaGUI() throws Exception {
         initComponents();
         
         setConfiguracao();
     }
     
-    private void setConfiguracao() {
+    private void setConfiguracao() throws Exception {
         centralizarForm();
         setResizable(false);
         setModal(true);
@@ -48,11 +53,12 @@ public class MapaLojaGUI extends VRDialog {
         carregarLojaOrigem();
     }
     
-    private void carregarLojaOrigem() {
+    private void carregarLojaOrigem() throws Exception {
         cboLojaOrigem.setModel(new DefaultComboBoxModel());
-        
-        cboLojaOrigem.addItem(new ItemComboVO("1", "SYSPDV - LOJA 01"));
-        cboLojaOrigem.addItem(new ItemComboVO("2", "SYSPDV - LOJA 02"));
+
+        for (Estabelecimento loja : migracaoSistemasController.getLojasOrigem()) {
+            cboLojaOrigem.addItem(loja);
+        }
     }
     
     private void carregarLojaVR() {
@@ -247,7 +253,12 @@ public class MapaLojaGUI extends VRDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                MapaLojaGUI dialog = new MapaLojaGUI();
+                MapaLojaGUI dialog = null;
+                try {
+                    dialog = new MapaLojaGUI();
+                } catch (Exception ex) {
+                    Exceptions.printStackTrace(ex);
+                }
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

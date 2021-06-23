@@ -21,7 +21,7 @@ public class ScriptsSistemasDAO {
                     + "and id_bancodados = " + idBancodados
             )) {
                 if (rs.next()) {
-                    sql = rs.getString("script_getlojas");
+                    sql = rs.getString("script_getlojas").replace("#", "'");
                 }
             }
         }
