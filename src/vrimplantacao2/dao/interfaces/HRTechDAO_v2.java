@@ -107,7 +107,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -119,8 +119,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "	m2.descmerc2,\n"
                     + "	m3.codmerc3,\n"
                     + "	m3.descmerc3,\n"
-                    + "	m4.codmerc4,\n"
-                    + "	m4.descmerc4\n"
+                    + "	coalesce(m4.codmerc4, 1) codmerc4,\n"
+                    + "	coalesce(m4.descmerc4, m3.descmerc3) descmerc4\n" 
                     + "from\n"
                     + "	(\n"
                     + "		select\n"
@@ -154,7 +154,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami = '' and gruc03subf = ''\n"
                     + "	) m3 on\n"
                     + "		m2.codmerc1 = m3.codmerc1 and m2.codmerc2 = m3.codmerc2\n"
-                    + "	join (\n"
+                    + "	left join (\n"
                     + "			select\n"
                     + "			gruc03seto codmerc1,\n"
                     + "			gruc03grup codmerc2,\n"
@@ -181,6 +181,56 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc3Descricao(rs.getString("descmerc3"));
                     imp.setMerc4ID(rs.getString("codmerc4"));
                     imp.setMerc4Descricao(rs.getString("descmerc4"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }*/
+    
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	m1.codmerc1,\n" +
+                    "	m1.descmerc1,\n" +
+                    "	m2.codmerc2,\n" +
+                    "	m2.descmerc2 \n" +
+                    "from\n" +
+                    "	(\n" +
+                    "		select\n" +
+                    "			gruc03seto codmerc1,\n" +
+                    "			gruc35desc descmerc1\n" +
+                    "		from\n" +
+                    "			fl100dpt s\n" +
+                    "		where\n" +
+                    "			gruc03seto != '' and gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n" +
+                    "	) m1\n" +
+                    "	join (\n" +
+                    "		select\n" +
+                    "			gruc03seto codmerc1,\n" +
+                    "			gruc03grup codmerc2,\n" +
+                    "			gruc35desc descmerc2\n" +
+                    "		from\n" +
+                    "			fl100dpt s\n" +
+                    "		where\n" +
+                    "			gruc03seto != '' and gruc03grup != '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n" +
+                    "	) m2 on\n" +
+                    "		m1.codmerc1 = m2.codmerc1\n" +
+                    "	order by 1,3")) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("codmerc1"));
+                    imp.setMerc1Descricao(rs.getString("descmerc1"));
+                    imp.setMerc2ID(rs.getString("codmerc2"));
+                    imp.setMerc2Descricao(rs.getString("descmerc2"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(rs.getString("descmerc2"));
 
                     result.add(imp);
                 }
@@ -656,8 +706,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setCodMercadologico4(rs.getString("merc4"));
+                    imp.setCodMercadologico3("1");
+                    //imp.setCodMercadologico4(rs.getString("merc4"));
                     //poimp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
