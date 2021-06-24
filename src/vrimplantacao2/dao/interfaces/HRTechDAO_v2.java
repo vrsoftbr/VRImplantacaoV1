@@ -268,6 +268,40 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+    
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	pf.CODIGOPLU idprodutopai,\n" +
+                    "	pf.ESTC35DESC descricaoprodutopai,\n" +
+                    "	pr.CODIGOPLU idprodutofilho,\n" +
+                    "	pr.ESTC35DESC descricaoprodutofilho,\n" +
+                    "	p.qtde qtdfilho\n" +
+                    "from \n" +
+                    "	FL310INS p\n" +
+                    "join fl300est pr on p.CODIGOPLU = pr.CODIGOPLU\n" +
+                    "join fl300est pf on p.CODIASSO = pf.CODIGOPLU\n" +
+                    "order by \n" +
+                    "	1, 4")) {
+                while(rs.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    
+                    imp.setId(rs.getString("idprodutopai"));
+                    imp.setDescricao(rs.getString("descricaoprodutopai"));
+                    imp.setProdutoAssociadoId(rs.getString("idprodutofilho"));
+                    imp.setDescricaoProdutoAssociado(rs.getString("descricaoprodutofilho"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
@@ -1408,14 +1442,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
-    @Override
-    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
-        return super.getAssociados(opt); //To change body of generated methods, choose Tools | Templates.
-    }
     
-    
-
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
