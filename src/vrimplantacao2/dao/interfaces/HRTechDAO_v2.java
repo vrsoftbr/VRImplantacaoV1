@@ -38,6 +38,7 @@ import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -1628,6 +1629,41 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(idCliente);
                     imp.setValor(rs.getDouble("total"));
                     result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	numerolanc id,\n" +
+                    "	codigoenti idcliente,\n" +
+                    "	notafiscal,\n" +
+                    "	parcela,\n" +
+                    "	datlancame,\n" +
+                    "	datemissao dtemissao,\n" +
+                    "	datentrada,\n" +
+                    "	datefetiva,\n" +
+                    "	vlrtotalnf,\n" +
+                    "	historico\n" +
+                    "from\n" +
+                    "	fl700fin\n" +
+                    "where\n" +
+                    "	tipo_pagto = 'chq'\n" +
+                    "	and codigoloja = '" + getLojaOrigem() + "'\n" +
+                    "	and tipolancam = 'r'\n" +
+                    "	and datpagto = '1900-01-01 00:00:00'")) {
+                while (rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id"));
                 }
             }
         }
