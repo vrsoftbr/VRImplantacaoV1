@@ -19,6 +19,7 @@ public class AliquotaVO {
     private double fcp;
     private boolean desonerado;
     private double porcentagemDesonerado;
+    private int idAliquotaPdv;
 
     public AliquotaVO() {
     }
@@ -102,6 +103,14 @@ public class AliquotaVO {
 
     public void setPorcentagemDesonerado(double porcentagemDesonerado) {
         this.porcentagemDesonerado = porcentagemDesonerado;
+    }
+
+    public int getIdAliquotaPdv() {
+        return idAliquotaPdv;
+    }
+
+    public void setIdAliquotaPdv(int idAliquotaPdv) {
+        this.idAliquotaPdv = idAliquotaPdv;
     }
 
     @Override

@@ -5,7 +5,7 @@
  */
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Date;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -489,13 +489,13 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     if ("0000-00-00".equals(rst.getString("recemiss"))) {
-                        dtEmissao = new Date(new java.util.Date().getTime());
+                        dtEmissao = (java.sql.Date) new Date(new java.util.Date().getTime());
                         imp.setDataEmissao(dtEmissao);
                     } else {
                         imp.setDataEmissao(rst.getDate("recemiss"));
                     }
                     if ("0000-00-00".equals(rst.getString("recvenci"))) {
-                        dtVencimento = new Date(new java.util.Date().getTime());
+                        dtVencimento = (java.sql.Date) new Date(new java.util.Date().getTime());
                         imp.setDataVencimento(dtVencimento);
                     } else {
                         imp.setDataVencimento(rst.getDate("recvenci"));
@@ -585,12 +585,12 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new TstiDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new TstiDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new TstiDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new TstiDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -655,6 +655,9 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "select\n"
                     + "	seq id,\n"
@@ -685,7 +688,8 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "	empresa = " + idLojaCliente + "\n"
                     + "	and exclui != 'S'\n"
-                    + "	and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
+                    //+ " and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "order by seq,data,horaini";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);

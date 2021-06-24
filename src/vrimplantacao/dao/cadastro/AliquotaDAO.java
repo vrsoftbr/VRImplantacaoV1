@@ -292,4 +292,13 @@ public class AliquotaDAO {
         
         return result;
     }
+    
+    public void vincularAliquota(AliquotaVO aliquota) throws Exception {
+        SQLBuilder sql = new SQLBuilder("public", "aliquota").where("id = " + aliquota.getId())
+                .put("id_aliquotapdv", aliquota.getIdAliquotaPdv());
+        
+        try(Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.update());
+        }
+    }
 }

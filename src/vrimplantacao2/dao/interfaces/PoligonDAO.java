@@ -34,10 +34,10 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Alan
  */
-public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */{
+public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */ {
 
     private static final Logger LOG = Logger.getLogger(PoligonDAO.class.getName());
-    
+
     public int v_tipoDocumento;
     public int v_tipoDocumentoCheque;
     public boolean v_usar_arquivoBalanca;
@@ -77,29 +77,28 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
     }
 
     /*@Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "CODFAMILIA, "
-                    + "descricao "
-                    + "from "
-                    + "FAMILIA"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("CODFAMILIA"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    vResult.add(imp);
-                }
-            }
-        }
-        return vResult;
-    }*/
-
+     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+     List<FamiliaProdutoIMP> vResult = new ArrayList<>();
+     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+     try (ResultSet rst = stm.executeQuery(
+     "select "
+     + "CODFAMILIA, "
+     + "descricao "
+     + "from "
+     + "FAMILIA"
+     )) {
+     while (rst.next()) {
+     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+     imp.setImportLoja(getLojaOrigem());
+     imp.setImportSistema(getSistema());
+     imp.setImportId(rst.getString("CODFAMILIA"));
+     imp.setDescricao(rst.getString("descricao"));
+     vResult.add(imp);
+     }
+     }
+     }
+     return vResult;
+     }*/
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();
@@ -181,17 +180,15 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    
-                    
-                    if ("S".equals(rst.getString("pesavel"))) {                        
-                        imp.setEan(rst.getString("cod_balanca"));                        
-                    } else {                    
+
+                    if ("S".equals(rst.getString("pesavel"))) {
+                        imp.setEan(rst.getString("cod_balanca"));
+                    } else {
                         imp.setEan(rst.getString("codigobarras"));
                     }
-                    
-                    
+
                     if ("S".equals(rst.getString("pesavel"))) {
-                        
+
                         String pesavel = Utils.acertarTexto(rst.getString("pesavel"));
                         if (produtosBalanca.isEmpty()) {
                             if (pesavel != null && "S".equals(pesavel.trim())) {
@@ -236,20 +233,18 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setSituacaoCadastro(rst.getInt("ativo") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
-                    
+
                     imp.setIcmsCst(rst.getInt("cst_saida"));
                     imp.setIcmsAliq(rst.getDouble("aliq_saida"));
                     imp.setIcmsReducao(rst.getDouble("red_saida"));
-                    
+
                     //imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estmin"));
                     imp.setEstoqueMaximo(rst.getDouble("estmax"));
-                    
+
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    
-                    
-                    
+
                     vResult.add(imp);
                 }
             }
@@ -305,7 +300,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
      }
      return result;
      }*/
-    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
@@ -555,37 +549,36 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
     }
 
     /*@Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
-        List<MapaTributoIMP> result = new ArrayList();
+     public List<MapaTributoIMP> getTributacao() throws Exception {
+     List<MapaTributoIMP> result = new ArrayList();
 
-        try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stmt.executeQuery(
-                    "select \n"
-                    + "	distinct\n"
-                    + "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\\\'))) id,\n"
-                    + "	coalesce(fcp.VALORTRIB, 0) fcp,\n"
-                    + "	icms.descricao\n"
-                    + "from \n"
-                    + "	aliquota_icms icms\n"
-                    + "	left join\n"
-                    + "		PRODUTOS p on icms.CODALIQ = p.CODALIQ\n"
-                    + "	left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n"
-                    + "where\n"
-                    + "	icms.descricao is not null\n"
-                    + "order by\n"
-                    + "	id, fcp"
-            )) {
-                while (rs.next()) {
-                    result.add(new MapaTributoIMP(
-                            formatTributacaoId(rs.getString("id"), rs.getDouble("fcp")),
-                            String.format("%s + FCP %.2f %%", rs.getString("descricao"), rs.getDouble("fcp"))
-                    ));
-                }
-            }
-        }
-        return result;
-    }*/
-
+     try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
+     try (ResultSet rs = stmt.executeQuery(
+     "select \n"
+     + "	distinct\n"
+     + "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\\\'))) id,\n"
+     + "	coalesce(fcp.VALORTRIB, 0) fcp,\n"
+     + "	icms.descricao\n"
+     + "from \n"
+     + "	aliquota_icms icms\n"
+     + "	left join\n"
+     + "		PRODUTOS p on icms.CODALIQ = p.CODALIQ\n"
+     + "	left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n"
+     + "where\n"
+     + "	icms.descricao is not null\n"
+     + "order by\n"
+     + "	id, fcp"
+     )) {
+     while (rs.next()) {
+     result.add(new MapaTributoIMP(
+     formatTributacaoId(rs.getString("id"), rs.getDouble("fcp")),
+     String.format("%s + FCP %.2f %%", rs.getString("descricao"), rs.getDouble("fcp"))
+     ));
+     }
+     }
+     }
+     return result;
+     }*/
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -620,9 +613,9 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
-                        next.setModeloImpressora(rst.getString("modelo"));
+                        //next.setModeloImpressora(rst.getString("modelo"));
 
                         if (rst.getString("nomecliente") != null
                                 && !rst.getString("nomecliente").trim().isEmpty()
@@ -632,16 +625,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                         } else {
                             next.setNomeCliente(rst.getString("nomecliente"));
                         }
-
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado")) + ","
-                                + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -653,59 +636,26 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "    cx.coo as numerocupom,\n"
-                    + "    cx.codcaixa as ecf,\n"
-                    + "    cx.data as data,\n"
-                    + "    coalesce(cx.cliente, '') as idclientepreferencial,\n"
-                    + "    min(cx.hora) as horainicio,\n"
-                    + "    max(cx.hora) as horatermino,\n"
-                    + "    min(case when cx.cancelado = 'N' then 0 else 1 end) as cancelado,\n"
-                    + "    sum(cx.totitem) as subtotalimpressora,\n"
-                    + "    cl.cnpj_cpf cpf,\n"
-                    + "    sum(isnull(cx.descitem,0)) desconto,\n"
-                    + "    sum(isnull(cx.acrescitem, 0)) acrescimo,\n"
-                    + "    pdv.NUM_SERIE numeroserie,\n"
-                    + "    pdv.IMP_MODELO modelo,\n"
-                    + "    pdv.IMP_MARCA marca,\n"
-                    + "    cl.razao nomecliente,\n"
-                    + "    cl.endereco,\n"
-                    + "    cl.numero,\n"
-                    + "    cl.complemento,\n"
-                    + "    cl.bairro,\n"
-                    + "    cl.cidade,\n"
-                    + "    cl.estado,\n"
-                    + "    cl.cep\n"
+                    + "	NoCupom as numerocupom,\n"
+                    + "	1 as ecf,\n"
+                    + "	v.Dt_cad as data,\n"
+                    + "	v.id_cli idclientepreferencial,\n"
+                    + " c.Nome nomecliente,\n"
+                    + "	CAST(CONVERT(NVARCHAR, v.Dt_cad, 8) as time) horainicio,\n"
+                    + "	CAST(CONVERT(NVARCHAR, v.Dt_cad, 8) as time) horatermino,\n"
+                    + "	case when Status = 'cancelado' then 1 else 0 end cancelado,\n"
+                    + "	subtotal subtotalimpressora,\n"
+                    + "	c.CNPJ cpf,\n"
+                    + "	desconto,\n"
+                    + "	SN numeroserie\n"
                     + "from\n"
-                    + "    caixageral as cx\n"
-                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
-                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
-                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
-                    + "    left join parampdv pdv on cx.codloja = pdv.CODLOJA and cx.codcaixa = pdv.CODCAIXA\n"
+                    + "	transacao v\n"
+                    + "	left join Cliente c on c.Id_cli = v.Id_cli \n"
                     + "where\n"
-                    + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
-                    + "    cx.codloja = " + idLojaCliente + " and\n"
-                    + "    cx.atualizado = 'S' and\n"
-                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')\n"
-                    + "group by\n"
-                    + "	   cx.coo,\n"
-                    + "    cx.codcaixa,\n"
-                    + "    cx.data,\n"
-                    + "    coalesce(cx.cliente, ''),\n"
-                    + "	   cl.cnpj_cpf,\n"
-                    + "    pdv.NUM_SERIE,\n"
-                    + "    pdv.IMP_MODELO,\n"
-                    + "    pdv.IMP_MARCA,\n"
-                    + "    cl.razao,\n"
-                    + "    cl.endereco,\n"
-                    + "    cl.numero,\n"
-                    + "    cl.complemento,\n"
-                    + "    cl.bairro,\n"
-                    + "    cl.cidade,\n"
-                    + "    cl.estado,\n"
-                    + "    cl.cep\n"
-                    + "order by\n"
-                    + "    data, numerocupom";
+                    + "	v.id_loja = " + idLojaCliente +  " \n"
+                    + "	and operacao = 'VEND'\n"
+                    + "	and CONVERT(NVARCHAR, v.Dt_cad, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "\n"
+                    + " order by 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -761,115 +711,12 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                         if (trib == null || "".equals(trib)) {
                             trib = rst.getString("codaliq_produto");
                         }
-
-                        obterAliquota(next, trib);
                     }
                 }
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
-        }
-
-        /**
-         * Método temporario, desenvolver um mapeamento eficiente da tributação.
-         *
-         * @param item
-         * @throws SQLException
-         */
-        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
-             TA	7.00	ALIQUOTA 07%
-             TB	12.00	ALIQUOTA 12%
-             TC	18.00	ALIQUOTA 18%
-             TD	25.00	ALIQUOTA 25%
-             TE	11.00	ALIQUOTA 11%
-             I	0.00	ISENTO
-             F	0.00	SUBST TRIBUTARIA
-             N	0.00	NAO INCIDENTE
-             */
-            int cst;
-            double aliq;
-            switch (icms) {
-                case "TA":
-                    cst = 0;
-                    aliq = 7;
-                    break;
-                case "TB":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "TC":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "TD":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "TE":
-                    cst = 0;
-                    aliq = 11;
-                    break;
-                case "TF":
-                    cst = 0;
-                    aliq = 11;
-                    break;
-                case "TG":
-                    cst = 0;
-                    aliq = 4.5;
-                    break;
-                case "TH":
-                    cst = 0;
-                    aliq = 8;
-                    break;
-                case "TI":
-                    cst = 0;
-                    aliq = 4;
-                    break;
-                case "TJ":
-                    cst = 0;
-                    aliq = 9.14;
-                    break;
-                case "TL":
-                    cst = 0;
-                    aliq = 13.3;
-                    break;
-                case "TM":
-                    cst = 0;
-                    aliq = 4.14;
-                    break;
-                case "TN":
-                    cst = 0;
-                    aliq = 4.7;
-                    break;
-                case "TO":
-                    cst = 0;
-                    aliq = 11.2;
-                    break;
-                case "TP":
-                    cst = 0;
-                    aliq = 8.40;
-                    break;
-                case "TQ":
-                    cst = 0;
-                    aliq = 8.83;
-                    break;
-                case "F":
-                    cst = 60;
-                    aliq = 0;
-                    break;
-                case "N":
-                    cst = 41;
-                    aliq = 0;
-                    break;
-                default:
-                    cst = 40;
-                    aliq = 0;
-                    break;
-            }
-            item.setIcmsCst(cst);
-            item.setIcmsAliq(aliq);
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {

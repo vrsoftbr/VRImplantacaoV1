@@ -294,6 +294,7 @@ public class IncluirAliquotaGUI extends VRDialog {
 
         private final IncluirAliquotaGUI view;
         private final AliquotaVO aliquota;
+        private AliquotaPdvVO aliquotaPdv;
 
         private Controller(IncluirAliquotaGUI view, AliquotaVO vo) {            
             this.view = view;
@@ -308,10 +309,28 @@ public class IncluirAliquotaGUI extends VRDialog {
             try {
                 loadModel();
                 AliquotaDAO dao = new AliquotaDAO();
+                
                 aliquota.setId(dao.insert(this.aliquota));
-                if (view.chkGerarPDV.isSelected() && Alerts.confirmar("Confirma a criação da aliquota pdv?")) {
+                if (view.chkGerarPDV.isSelected() && 
+                        Alerts.confirmar("Confirma a criação da aliquota pdv?")) {
+                    
                     AliquotaPdvDAO pdvDao = new AliquotaPdvDAO();
-                    pdvDao.incluir(AliquotaPdvVO.of(aliquota));
+                    
+                    aliquotaPdv = AliquotaPdvVO.of(aliquota);
+                    
+                    int idAliquotaPdv = pdvDao.getAliquotaCadastrada(aliquotaPdv);
+                    
+                    if (idAliquotaPdv > 0) {
+                        aliquota.setIdAliquotaPdv(idAliquotaPdv);
+                        
+                        dao.vincularAliquota(aliquota);
+                    } else {
+                        pdvDao.incluir(aliquotaPdv);
+                        
+                        aliquota.setIdAliquotaPdv(aliquotaPdv.getId());
+                        
+                        dao.vincularAliquota(aliquota);
+                    }
                 }
                 dispose();
             } catch (Exception ex) {
