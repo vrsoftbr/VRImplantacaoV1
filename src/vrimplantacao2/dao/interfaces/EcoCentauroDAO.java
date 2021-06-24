@@ -231,12 +231,12 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    icm.vendareducao1 AS reducao_saida\n"
                     + "FROM TESTPRODUTOGERAL pg\n"
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
-                    + "    AND p.empresa = "+getLojaOrigem()+"\n"
+                    + "    AND p.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND p.ativo = 'S'\n"        
                     + "LEFT JOIN TESTCEST ce ON ce.idcest = pg.idcest\n"
                     + "LEFT JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
-                    + "    AND icm.empresa = "+getLojaOrigem()+"\n"
-                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
-                    + "WHERE p.ativo = 'S'\n"
+                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"                    
                     + "ORDER BY 2"
             )) {
                 while (rst.next()) {
