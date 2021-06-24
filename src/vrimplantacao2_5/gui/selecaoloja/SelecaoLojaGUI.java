@@ -18,6 +18,7 @@ public class SelecaoLojaGUI extends VRDialog {
 
     private static SelecaoLojaGUI migracaoGUI = null;
     private SelecaoLojaController controller = null;
+    private List<ConfiguracaoBancoLojaVO> lojas = null;
     
     /**
      * Creates new form MigracaoGUI
@@ -52,12 +53,22 @@ public class SelecaoLojaGUI extends VRDialog {
     private void getLojaMapeada() {
         cboOrigem.setModel(new DefaultComboBoxModel());
         
-        List<ConfiguracaoBancoLojaVO>  lojas = controller.getLojaMapeada(cboConexao.getId());
+        lojas = controller.getLojaMapeada(cboConexao.getId());
         
         for (ConfiguracaoBancoLojaVO configuracaoLojaVO : lojas) {
             cboOrigem.addItem(new ItemComboVO(configuracaoLojaVO.getIdLojaOrigem(), 
                                               configuracaoLojaVO.getIdLojaOrigem() + " - " + 
                                               (configuracaoLojaVO.isLojaMatriz() ? "MATRIZ" : "FILIAL")));
+        }
+    }
+    
+    private void getLojaVR() {
+        ConfiguracaoBancoLojaVO configuracaoVO = lojas.get(cboOrigem.getSelectedIndex());
+        
+        txtLojaVR.setText(configuracaoVO.getIdLojaVR() + " - " + configuracaoVO.getDescricaoVR());
+        
+        if (configuracaoVO != null) {
+            btnProximo.setEnabled(true);
         }
     }
 
@@ -84,6 +95,12 @@ public class SelecaoLojaGUI extends VRDialog {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(lblLojaOrigem, "Loja Origem");
+
+        cboOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboOrigemActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(lblLojaVR, "Loja VR");
 
@@ -149,6 +166,10 @@ public class SelecaoLojaGUI extends VRDialog {
     private void cboConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboConexaoActionPerformed
         getLojaMapeada();
     }//GEN-LAST:event_cboConexaoActionPerformed
+
+    private void cboOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboOrigemActionPerformed
+        getLojaVR();
+    }//GEN-LAST:event_cboOrigemActionPerformed
 
     /**
      * @param args the command line arguments

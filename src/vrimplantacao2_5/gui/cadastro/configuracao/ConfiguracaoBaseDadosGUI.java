@@ -26,7 +26,6 @@ import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.gui.cadastro.mapaloja.MapaLojaGUI;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2_5.gui.selecaoloja.SelecaoLojaGUI;
-import vrimplantacao2_5.service.migracao.ConexaoBancoDadosFactory;
 
 /**
  *
@@ -35,7 +34,7 @@ import vrimplantacao2_5.service.migracao.ConexaoBancoDadosFactory;
 public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
     public VRMdiFrame parentFrame = null;
-    private ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
+    public static ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private static MapaLojaGUI mapaLojaGUI = null;
     
@@ -213,6 +212,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             try {
                 Util.exibirMensagem("Conexão salva com sucesso!", getTitle());
             } catch (Exception ex) {
+                ex.printStackTrace();
                 Exceptions.printStackTrace(ex);
             }
         }
@@ -241,6 +241,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         
         if (lojas.size() > 0) {
            btnExcluirLoja.setEnabled(true);
+           btnProximo.setEnabled(true);
         }
     }
     
@@ -261,10 +262,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
     }
     
-    public void editar(ConfiguracaoBaseDadosVO configuracaoBancoVO,
-                      ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI) throws Exception {
+    public void editar(ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         this.configuracaoBancoVO = configuracaoBancoVO;
-        this.consultaConfiguracaoBancoDadosGUI = consultaConfiguracaoBancoDadosGUI;
         
         txtNomeConexao.setText(configuracaoBancoVO.getDescricao());
         cboSistema.setDescricao(configuracaoBancoVO.getSistema().getNome());
