@@ -28,6 +28,7 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -42,6 +43,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.DivisaoIMP;
@@ -1637,6 +1639,44 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	numerolanc id,\n" +
+                    "	codigoenti idcliente,\n" +
+                    "	notafiscal,\n" +
+                    "	parcela,\n" +
+                    "	datlancame,\n" +
+                    "	datemissao dtemissao,\n" +
+                    "	datentrada,\n" +
+                    "	datefetiva,\n" +
+                    "	vlrtotalnf,\n" +
+                    "	historico\n" +
+                    "from\n" +
+                    "	fl700fin\n" +
+                    "where\n" +
+                    "	tipo_pagto in ('VLE', 'BOL', 'A', '   ', 'DH') \n" +
+                    "	and codigoloja = '" + getLojaOrigem() + "'\n" +
+                    "	and tipolancam = 'R'\n" +
+                    "	and datpagto = '1900-01-01 00:00:00'")) {
+                while(rs.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
         
@@ -1656,9 +1696,9 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "	fl700fin\n" +
                     "where\n" +
-                    "	tipo_pagto = 'chq'\n" +
+                    "	tipo_pagto = 'CHQ'\n" +
                     "	and codigoloja = '" + getLojaOrigem() + "'\n" +
-                    "	and tipolancam = 'r'\n" +
+                    "	and tipolancam = 'R'\n" +
                     "	and datpagto = '1900-01-01 00:00:00'")) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
