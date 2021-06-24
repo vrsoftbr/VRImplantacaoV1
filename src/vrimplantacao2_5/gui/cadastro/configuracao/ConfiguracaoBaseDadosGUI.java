@@ -227,6 +227,10 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     
     @Override
     public void excluir() {
+        if (tblLoja.getSelectedRow() == -1) {
+            return;
+        }
+        
         mapaController.excluirLojaMapeada(mapaController.
                                             getLojaMapeada().
                                                 get(tblLoja.
