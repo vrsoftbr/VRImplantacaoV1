@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -65,13 +66,13 @@ public class ImportadorMercadologicoNormalTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 List<MercadologicoNivelIMP> argumentAt = 
-                        (List<MercadologicoNivelIMP>) invocation.getArgumentAt(0, List.class);
+                        (List<MercadologicoNivelIMP>) invocation.getArgument(0, List.class);
                 for (MercadologicoNivelIMP imp: argumentAt) {
                     resultados.add(imp);
                 }
                 return null;
             }
-        }).when(repository).salvar(anyList(), anySet());
+        }).when(repository).salvar(new ArrayList<MercadologicoNivelIMP>(), new HashSet<OpcaoProduto>());
         
         List<MercadologicoIMP> imp = new ArrayList<>();
         imp.add(get("t1","t2","t3","t4","t5", "extra"));

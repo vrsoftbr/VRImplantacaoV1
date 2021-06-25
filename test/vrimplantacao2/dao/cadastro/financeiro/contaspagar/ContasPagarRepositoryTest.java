@@ -155,7 +155,7 @@ public class ContasPagarRepositoryTest {
             int ids = 1;
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVO.class);
+                PagarOutrasDespesasVO gravar = invocation.getArgument(0, PagarOutrasDespesasVO.class);
                 gravar.setId(ids);
                 ids++;
                 return null;
@@ -215,7 +215,7 @@ public class ContasPagarRepositoryTest {
             int ids = 1;
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVO.class);
+                PagarOutrasDespesasVO gravar = invocation.getArgument(0, PagarOutrasDespesasVO.class);
                 gravar.setId(ids);
                 db.add(gravar);
                 ids++;
@@ -228,7 +228,7 @@ public class ContasPagarRepositoryTest {
             int ids = 1;
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVencimentoVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVencimentoVO.class);
+                PagarOutrasDespesasVencimentoVO gravar = invocation.getArgument(0, PagarOutrasDespesasVencimentoVO.class);
                 gravar.setId(ids);
                 ids++;
                 dbVenc.add(gravar);
@@ -304,7 +304,7 @@ public class ContasPagarRepositoryTest {
             int ids = 1;
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVO.class);
+                PagarOutrasDespesasVO gravar = invocation.getArgument(0, PagarOutrasDespesasVO.class);
                 gravar.setId(ids);
                 db.add(gravar);
                 ids++;
@@ -317,7 +317,7 @@ public class ContasPagarRepositoryTest {
             int ids = 1;
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVencimentoVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVencimentoVO.class);
+                PagarOutrasDespesasVencimentoVO gravar = invocation.getArgument(0, PagarOutrasDespesasVencimentoVO.class);
                 gravar.setId(ids);
                 ids++;
                 dbVenc.add(gravar);

@@ -60,7 +60,7 @@ public class ProdutoRepositoryTest {
         when(provider.tributo().getIcms(eq(0), eq(7d), anyDouble())).thenReturn(new Icms(0, "07%", 0, 7, 0));
         when(provider.tributo().getIcms(eq(10), anyDouble(), anyDouble())).thenReturn(new Icms(2, "SUBSTITUIDO", 0, 0, 0));
         when(provider.tributo().getIcms(10, 0, 0)).thenReturn(new Icms(18, "SUBSTITUICAO", 10, 0, 0));
-        when(provider.getFamiliaProduto(argThat(not(equalTo("MOCA 123"))))).thenReturn(null);
+        //when(provider.getFamiliaProduto(argThat(not(equalTo("MOCA 123"))))).thenReturn(null);
         when(provider.getFamiliaProduto("MOCA 123")).thenReturn(new FamiliaProdutoVO(123, "FAMILIA MOCA"));
         when(provider.getLojaVR()).thenReturn(2);
         when(provider.getLoja()).thenReturn("LOJA 02");

@@ -76,7 +76,7 @@ public class ReceberCaixaRepositoryTest {
                 int ids = 0;
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    RecebimentoCaixaVO recebimento = invocation.getArgumentAt(0, RecebimentoCaixaVO.class);
+                    RecebimentoCaixaVO recebimento = invocation.getArgument(0, RecebimentoCaixaVO.class);
                     ids++;
                     recebimento.setId(ids);
                     novos.add(recebimento);
@@ -91,7 +91,7 @@ public class ReceberCaixaRepositoryTest {
             new Answer<Void> () {
                 @Override
                 public Void answer(InvocationOnMock invocation) throws Throwable {
-                    RecebimentoCaixaVO recebimento = invocation.getArgumentAt(0, RecebimentoCaixaVO.class);
+                    RecebimentoCaixaVO recebimento = invocation.getArgument(0, RecebimentoCaixaVO.class);
                     atualizados.add(recebimento);
                     return null;
                 }

@@ -88,7 +88,7 @@ public class PautaFiscalRepositoryTest {
                 int ids = 0;
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    PautaFiscalVO pauta = invocation.getArgumentAt(0, PautaFiscalVO.class);
+                    PautaFiscalVO pauta = invocation.getArgument(0, PautaFiscalVO.class);
                     pauta.setId(++ids);
                     gravados.add(pauta);
                     return null;
@@ -101,7 +101,7 @@ public class PautaFiscalRepositoryTest {
             new Answer() {
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    PautaFiscalVO pauta = invocation.getArgumentAt(0, PautaFiscalVO.class);
+                    PautaFiscalVO pauta = invocation.getArgument(0, PautaFiscalVO.class);
                     atualizar.add(pauta);
                     return null;
                 }
@@ -114,7 +114,7 @@ public class PautaFiscalRepositoryTest {
                 int ids = 0;
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    PautaFiscalAnteriorVO pauta = invocation.getArgumentAt(0, PautaFiscalAnteriorVO.class);
+                    PautaFiscalAnteriorVO pauta = invocation.getArgument(0, PautaFiscalAnteriorVO.class);
                     gravadosAnterior.add(pauta);
                     return null;
                 }
@@ -127,7 +127,7 @@ public class PautaFiscalRepositoryTest {
                 int ids = 0;
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    PautaFiscalAnteriorVO pauta = invocation.getArgumentAt(0, PautaFiscalAnteriorVO.class);
+                    PautaFiscalAnteriorVO pauta = invocation.getArgument(0, PautaFiscalAnteriorVO.class);
                     atualizarAnterior.add(pauta);
                     return null;
                 }
