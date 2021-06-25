@@ -92,7 +92,9 @@ public class ConfiguracaoBaseDadosServiceTest {
     }
 
     @Test
-    public void testSalvar() throws Exception {
+    public void testSalvarInserir() throws Exception {
+        MockedStatic conexaoMock = Mockito.mockStatic(Conexao.class);
+        
         SistemaDAO sistemaDAO = mock(SistemaDAO.class);
         BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
         ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
@@ -107,5 +109,7 @@ public class ConfiguracaoBaseDadosServiceTest {
         when(service.existeConexao(conexaoVO)).thenReturn(Boolean.FALSE);
 
         Mockito.verify(cfgDAO, Mockito.times(1)).inserir(conexaoVO);
+        
+        conexaoMock.close();
     }
 }
