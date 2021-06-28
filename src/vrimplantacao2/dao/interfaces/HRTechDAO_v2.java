@@ -1705,6 +1705,10 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     ChequeIMP imp = new ChequeIMP();
                     
                     imp.setId(rs.getString("id"));
+                    imp.setNumeroCheque(rs.getString("notafiscal"));
+                    imp.setValor(rs.getDouble("vlrtotalnf"));
+                    
+                    result.add(imp);
                 }
             }
         }
