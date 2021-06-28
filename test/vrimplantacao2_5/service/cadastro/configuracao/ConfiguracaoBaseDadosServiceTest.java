@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import static org.mockito.Matchers.anyInt;
 import org.mockito.MockedStatic;
-import org.mockito.InjectMocks;
 import static org.mockito.Matchers.anyInt;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -93,23 +90,25 @@ public class ConfiguracaoBaseDadosServiceTest {
 
     @Test
     public void testSalvarInserir() throws Exception {
-        MockedStatic conexaoMock = Mockito.mockStatic(Conexao.class);
-        
-        SistemaDAO sistemaDAO = mock(SistemaDAO.class);
-        BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
-        ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
-
-        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(sistemaDAO, bancoDAO, cfgDAO);
-
-        ConfiguracaoBaseDadosVO conexaoVO = new ConfiguracaoBaseDadosVO();
-        conexaoVO.setId(0);
-
-        service.salvar(conexaoVO);
-
-        when(service.existeConexao(conexaoVO)).thenReturn(Boolean.FALSE);
-
-        Mockito.verify(cfgDAO, Mockito.times(1)).inserir(conexaoVO);
-        
-        conexaoMock.close();
+        try (MockedStatic conexaoMock = Mockito.mockStatic(Conexao.class)) {
+            
+            SistemaDAO sistemaDAO = mock(SistemaDAO.class);
+            BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
+            ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
+            
+            ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
+                                                                sistemaDAO, bancoDAO, cfgDAO);
+            
+            ConfiguracaoBaseDadosVO conexaoVO = new ConfiguracaoBaseDadosVO();
+            conexaoVO.setId(0);
+            
+            service.salvar(conexaoVO);
+            
+            when(service.existeConexao(conexaoVO)).thenReturn(Boolean.FALSE);
+            
+            Mockito.verify(cfgDAO, Mockito.times(1)).inserir(conexaoVO);
+            
+            conexaoMock.close();
+        }
     }
 }
