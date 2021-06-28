@@ -5,6 +5,7 @@ import java.util.Set;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.parametro.Parametros;
 
 public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
@@ -638,5 +639,13 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel tabImportacao;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
+
+    public void gravarParametros(Parametros params, String... keys) {
+        
+    }
+
+    public void carregarParametros(Parametros params, String... keys) {
+        
+    }
 
 }

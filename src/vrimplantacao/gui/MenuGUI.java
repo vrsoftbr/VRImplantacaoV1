@@ -283,6 +283,7 @@ import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
+import vrimplantacao2.gui.interfaces.NeoGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
@@ -695,6 +696,7 @@ public final class MenuGUI extends VRMdiFrame {
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+        mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
@@ -1818,6 +1820,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuMercaLite);
+
+        mnuNeo.setText("Neo");
+        mnuNeo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuNeoActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuNeo);
 
         mnuPlenus.setText("Plenus");
         mnuPlenus.addActionListener(new java.awt.event.ActionListener() {
@@ -5266,6 +5276,9 @@ public final class MenuGUI extends VRMdiFrame {
         EcoCentauroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNeoActionPerformed
+        NeoGUI.exibir(this);
+    }//GEN-LAST:event_mnuNeoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -5491,6 +5504,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuNATISistemas;
     private javax.swing.JMenuItem mnuNCA;
     private javax.swing.JMenuItem mnuNFe;
+    private javax.swing.JMenuItem mnuNeo;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOracle;
     private javax.swing.JMenu mnuOrion;

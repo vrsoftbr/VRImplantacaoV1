@@ -2,6 +2,7 @@ package vrimplantacao2.dao.interfaces;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -559,38 +560,26 @@ public abstract class InterfaceDAO {
      */
     public final class ProdutoParaFamiliaHelper {
         
-        private String id = "";
-        private String[] descricao = new String[]{};
-        private boolean unico = true;
-        private String descricaoCasoVazio = "";
         private final List<FamiliaProdutoIMP> result;
 
         public ProdutoParaFamiliaHelper(List<FamiliaProdutoIMP> result) {
             this.result = result;
         }
         
+        private final Map<String, FamiliaProdutoIMP> tp = new HashMap<>();
         public void gerarFamilia(String pId, String pDescricao) {
-            if (!id.equals(pId)) {
-                if (!unico) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(id);
-                    imp.setDescricao("");
-                    for (String s: descricao) {
-                        imp.setDescricao(imp.getDescricao() + " " + s);
-                    }
-                    if (descricao.length == 0) {
-                        imp.setDescricao(descricaoCasoVazio);
-                    }
-                    result.add(imp);
-                }
-                id = pId;
-                descricaoCasoVazio = pDescricao;
-                descricao = descricaoCasoVazio.split(" ");
-                unico = true;
+            if (!tp.containsKey(pId)) {
+                FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportId(pId);
+                imp.setDescricao(pDescricao);
+                tp.put(pId, imp);
+                result.add(imp);
             } else {
-                unico = false;
+                FamiliaProdutoIMP imp = tp.get(pId);
+                
+                String[] descricao = imp.getDescricao().split(" ");
                 String[] descricaoOther = pDescricao.split(" ");
                 int length;
                 if (descricao.length < descricaoOther.length) {
@@ -607,6 +596,7 @@ public abstract class InterfaceDAO {
                         break;
                     }
                 }
+                imp.setDescricao(String.join(" ", descricao));                
             }
         }        
     }
