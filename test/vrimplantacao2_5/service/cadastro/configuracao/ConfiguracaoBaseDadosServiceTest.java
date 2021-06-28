@@ -3,13 +3,13 @@ package vrimplantacao2_5.service.cadastro.configuracao;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import org.junit.Test;
-import org.mockito.MockedStatic;
 import static org.mockito.Matchers.anyInt;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import vrframework.classe.Conexao;
+import vrframework.classe.VRException;
 import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
 import vrimplantacao2_5.dao.sistema.SistemaDAO;
@@ -29,8 +29,13 @@ public class ConfiguracaoBaseDadosServiceTest {
         BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
         ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
 
-        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(sistemaDAO, bancoDAO, cfgDAO);
+        ConfiguracaoBaseDadosServiceProvider provider
+                = mock(ConfiguracaoBaseDadosServiceProvider.class);
 
+        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
+                sistemaDAO, bancoDAO,
+                cfgDAO, provider);
+        
         List<SistemaVO> sistemas = new ArrayList<>();
         SistemaVO vo = new SistemaVO();
         vo.setId(1);
@@ -54,7 +59,12 @@ public class ConfiguracaoBaseDadosServiceTest {
         BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
         ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
 
-        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(sistemaDAO, bancoDAO, cfgDAO);
+        ConfiguracaoBaseDadosServiceProvider provider
+                = mock(ConfiguracaoBaseDadosServiceProvider.class);
+
+        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
+                sistemaDAO, bancoDAO,
+                cfgDAO, provider);
 
         List<BancoDadosVO> bancosPorSistema = new ArrayList<>();
         BancoDadosVO vo = new BancoDadosVO();
@@ -79,36 +89,67 @@ public class ConfiguracaoBaseDadosServiceTest {
         BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
         ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
 
-        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(sistemaDAO, bancoDAO, cfgDAO);
+        ConfiguracaoBaseDadosServiceProvider provider
+                = mock(ConfiguracaoBaseDadosServiceProvider.class);
+
+        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
+                sistemaDAO, bancoDAO,
+                cfgDAO, provider);
 
         ConfiguracaoBaseDadosVO configuracaoVO = new ConfiguracaoBaseDadosVO();
+        configuracaoVO.setId(0);
+        configuracaoVO.setSchema("/home/cliente/rs/strieder/banco.fdb");
+        configuracaoVO.setUsuario("SYSDBA");
+        configuracaoVO.setHost("localhost");
+        configuracaoVO.setSenha("masterkey");
+        
+        when(cfgDAO.existeConexao(configuracaoVO)).thenReturn(true);
 
-        when(cfgDAO.existeConexao(configuracaoVO)).thenReturn(false);
-
-        assertEquals(false, service.existeConexao(configuracaoVO));
+        VRException assertThrows = assertThrows(VRException.class, () -> service.existeConexao(configuracaoVO));
+        assertEquals("Já existe uma conexão cadastrada!", assertThrows.getMessage());
     }
 
     @Test
     public void testSalvarInserir() throws Exception {
-        try (MockedStatic conexaoMock = Mockito.mockStatic(Conexao.class)) {
-            
-            SistemaDAO sistemaDAO = mock(SistemaDAO.class);
-            BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
-            ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
-            
-            ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
-                                                                sistemaDAO, bancoDAO, cfgDAO);
-            
-            ConfiguracaoBaseDadosVO conexaoVO = new ConfiguracaoBaseDadosVO();
-            conexaoVO.setId(0);
-            
-            service.salvar(conexaoVO);
-            
-            when(service.existeConexao(conexaoVO)).thenReturn(Boolean.FALSE);
-            
-            Mockito.verify(cfgDAO, Mockito.times(1)).inserir(conexaoVO);
-            
-            conexaoMock.close();
-        }
+        SistemaDAO sistemaDAO = mock(SistemaDAO.class);
+        BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
+        ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
+        ConfiguracaoBaseDadosServiceProvider provider
+                = mock(ConfiguracaoBaseDadosServiceProvider.class);
+
+        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
+                sistemaDAO, bancoDAO,
+                cfgDAO, provider);
+
+        ConfiguracaoBaseDadosVO conexaoVO = new ConfiguracaoBaseDadosVO();
+        conexaoVO.setId(0);
+
+        service.salvar(conexaoVO);
+
+        when(cfgDAO.existeConexao(conexaoVO)).thenReturn(true);
+
+        Mockito.verify(cfgDAO, Mockito.times(1)).inserir(conexaoVO);
+    }
+    
+    @Test
+    public void testSalvarAlterar() throws Exception {
+        SistemaDAO sistemaDAO = mock(SistemaDAO.class);
+        BancoDadosDAO bancoDAO = mock(BancoDadosDAO.class);
+        ConfiguracaoBaseDadosDAO cfgDAO = mock(ConfiguracaoBaseDadosDAO.class);
+        ConfiguracaoBaseDadosServiceProvider provider
+                = mock(ConfiguracaoBaseDadosServiceProvider.class);
+
+        ConfiguracaoBaseDadosService service = new ConfiguracaoBaseDadosService(
+                sistemaDAO, bancoDAO,
+                cfgDAO, provider);
+
+        ConfiguracaoBaseDadosVO conexaoVO = new ConfiguracaoBaseDadosVO();
+        conexaoVO.setId(2);
+
+        service.salvar(conexaoVO);
+
+        when(cfgDAO.existeConexao(conexaoVO)).thenReturn(true);
+
+        Mockito.verify(cfgDAO, Mockito.times(1)).alterar(conexaoVO);
     }
 }

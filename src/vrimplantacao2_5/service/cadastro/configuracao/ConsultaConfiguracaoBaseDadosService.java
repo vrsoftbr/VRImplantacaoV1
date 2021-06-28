@@ -1,7 +1,7 @@
 package vrimplantacao2_5.service.cadastro.configuracao;
 
 import java.util.List;
-import org.openide.util.Exceptions;
+import vrframework.classe.Util;
 import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
@@ -27,7 +27,7 @@ public class ConsultaConfiguracaoBaseDadosService {
         try {
             result = configuracaoDAO.consultar();
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, "Consulta Configuração Base de Dados");
         }
         
         return result;
