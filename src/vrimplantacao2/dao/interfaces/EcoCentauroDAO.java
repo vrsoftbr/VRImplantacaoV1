@@ -240,6 +240,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"                    
                     + "ORDER BY 2"
             )) {
+                int cont = 0;
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -280,6 +281,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIcmsConsumidorId(idIcmsDebito);
                     
                     result.add(imp);
+                    
+                    System.out.println(cont++);
                 }
             }
         }
