@@ -1008,7 +1008,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.PAUTA_FISCAL,
-                OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.ASSOCIADO
         ));
     }
 
