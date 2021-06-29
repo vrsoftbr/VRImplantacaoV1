@@ -6,6 +6,7 @@ import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.parametro.Parametros;
 
 public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
@@ -101,6 +102,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             chkDataNascimento.setVisible(opt.contains(OpcaoCliente.DATA_NASCIMENTO));
             chkObservacao.setVisible(opt.contains(OpcaoCliente.OBSERVACOES));
             chkObservacao2.setVisible(opt.contains(OpcaoCliente.OBSERVACOES2));
+            chkSexo.setVisible(opt.contains(OpcaoCliente.SEXO));
+            chkEstadoCivil.setVisible(opt.contains(OpcaoCliente.ESTADO_CIVIL));
 
             tabImportacao.add(pnlDadosComplementares);
 
@@ -255,6 +258,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             if (chkSalario.isSelected()) {
                 opcao.add(OpcaoCliente.SALARIO);
             }
+            if (chkSexo.isSelected()) {
+                opcao.add(OpcaoCliente.SEXO);
+            }
+            if (chkEstadoCivil.isSelected()) {
+                opcao.add(OpcaoCliente.ESTADO_CIVIL);
+            }
 
             if (!opcao.isEmpty()) {
                 importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
@@ -324,6 +333,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkNomeConjuge = new vrframework.bean.checkBox.VRCheckBox();
         chkDataNascimento = new vrframework.bean.checkBox.VRCheckBox();
         chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
+        chkSexo = new vrframework.bean.checkBox.VRCheckBox();
+        chkEstadoCivil = new vrframework.bean.checkBox.VRCheckBox();
         pnlDadosEmpresa = new vrframework.bean.panel.VRPanel();
         jLabel10 = new javax.swing.JLabel();
         chkEmpresa = new vrframework.bean.checkBox.VRCheckBox();
@@ -378,7 +389,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(808, Short.MAX_VALUE))
+                .addContainerGap(351, Short.MAX_VALUE))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -567,6 +578,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkDataCadastro, "Data Cadastro");
         chkDataCadastro.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkSexo, "Sexo");
+        chkSexo.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkEstadoCivil, "Estado Cívil");
+        chkEstadoCivil.setEnabled(true);
+
         javax.swing.GroupLayout pnlDadosComplementaresLayout = new javax.swing.GroupLayout(pnlDadosComplementares);
         pnlDadosComplementares.setLayout(pnlDadosComplementaresLayout);
         pnlDadosComplementaresLayout.setHorizontalGroup(
@@ -601,8 +618,13 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(538, Short.MAX_VALUE))
+                        .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSexo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlDadosComplementaresLayout.setVerticalGroup(
             pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -624,7 +646,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkNomeConjuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkSexo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -727,7 +752,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlCreditoRotativoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(487, Short.MAX_VALUE))
+                .addContainerGap(579, Short.MAX_VALUE))
         );
         pnlCreditoRotativoLayout.setVerticalGroup(
             pnlCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -772,7 +797,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlChequeLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(529, Short.MAX_VALUE))
+                .addContainerGap(626, Short.MAX_VALUE))
         );
         pnlChequeLayout.setVerticalGroup(
             pnlChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -826,6 +851,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkEmail;
     public vrframework.bean.checkBox.VRCheckBox chkEmpresa;
     public vrframework.bean.checkBox.VRCheckBox chkEndereco;
+    public vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
     public vrframework.bean.checkBox.VRCheckBox chkIE;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipio;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
@@ -839,6 +865,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPermiteCheque;
     public vrframework.bean.checkBox.VRCheckBox chkPermiteCreditoRotativo;
     public vrframework.bean.checkBox.VRCheckBox chkSalario;
+    public vrframework.bean.checkBox.VRCheckBox chkSexo;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkTelefone;
     public vrframework.bean.checkBox.VRCheckBox chkUf;
@@ -864,5 +891,13 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel tabImportacao;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
+
+    public void gravarParametros(Parametros params, String... keys) {
+        
+    }
+
+    public void carregarParametros(Parametros params, String... keys) {
+        
+    }
 
 }

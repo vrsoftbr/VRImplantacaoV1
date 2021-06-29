@@ -32,6 +32,7 @@ public class FornecedorRepositoryProvider {
     private FornecedorPrazoDAO fornecedorPrazoDAO;
     private FornecedorPagamentoDAO fornecedorPagamenDAO;
     private FornecedorPrazoPedidoDAO fornecedorPrazoPedido;
+    private Set<OpcaoFornecedor> opcoes;
 
     public FornecedorRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
         this.sistema = sistema;
@@ -46,6 +47,14 @@ public class FornecedorRepositoryProvider {
         this.fornecedorPrazoDAO = new FornecedorPrazoDAO();
         this.fornecedorPagamenDAO = new FornecedorPagamentoDAO();
         this.fornecedorPrazoPedido = new FornecedorPrazoPedidoDAO();
+    }
+
+    public void setOpcoes(Set<OpcaoFornecedor> opcoes) {
+        this.opcoes = opcoes;
+    }
+
+    public Set<OpcaoFornecedor> getOpcoes() {
+        return opcoes;
     }
 
     public String getSistema() {

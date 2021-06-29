@@ -25,6 +25,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 /**
  *
@@ -76,7 +77,8 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.DATA_CADASTRO
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.RECEITA
         ));
     }
     
@@ -88,7 +90,8 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
-                OpcaoFornecedor.INSCRICAO_MUNICIPAL
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));        
     }
     
@@ -506,6 +509,45 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                     imp.setAtivo(rst.getInt("ativo") == 1);
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	r.id_receita as id,\n"
+                    + "	r.descr_receita as descricao,\n"
+                    + "	r.pr_codint as id_produto,\n"
+                    + "	r.pr_codint_item as item,\n"
+                    + "	r.pr_qtde_utilizada,\n"
+                    + "	1000 as qtdeemb,\n"
+                    + "	r.pr_qtde_utilizada::numeric * 1000 as qtdutilizada,\n"
+                    + "	p.uni_venda as tipoembalagem\n"
+                    + "from implantacao.receitas_ondas r\n"
+                    + "join implantacao.produtos_ondas p on r.pr_codint_item = p.pr_codint\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id_produto"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setRendimento(1);
+                    imp.setQtdembalagemreceita((int) rst.getDouble("qtdutilizada"));
+                    imp.setQtdembalagemproduto(rst.getInt("qtdeemb"));
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("item"));
                     result.add(imp);
                 }
             }

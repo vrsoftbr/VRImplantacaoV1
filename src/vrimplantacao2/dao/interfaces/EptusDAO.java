@@ -30,6 +30,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -425,6 +426,43 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	Cod_Fornecedor,\n" +
+                    "	Cod_Produto,\n" +
+                    "	ec.num_fabricante\n" +
+                    "from \n" +
+                    "	fornecedor_prod fo\n" +
+                    "join epcompraitens ec on fo.Cod_Produto = ec.codigo \n" +
+                    "where \n" +
+                    "	Last_movto = (select \n" +
+                    "                   max(Last_Movto) \n" +
+                    "                from \n" +
+                    "                   fornecedor_prod \n" +
+                    "                where Cod_Fornecedor = fo.Cod_Fornecedor and\n" +
+                    "                   Cod_Produto = fo.Cod_Produto)")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("Cod_Produto"));
+                    imp.setIdFornecedor(rs.getString("Cod_Fornecedor"));
+                    imp.setCodigoExterno(rs.getString("num_fabricante"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 
