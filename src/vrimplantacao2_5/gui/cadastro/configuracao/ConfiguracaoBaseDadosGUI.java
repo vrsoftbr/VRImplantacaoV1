@@ -130,7 +130,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         }
 
         if (configuracaoBancoVO.getId() > 0) {
-            painelDeConexaoDinamico.setDadoConexao(configuracaoBancoVO.getHost(),
+            painelDeConexaoDinamico.setDadosConexao(configuracaoBancoVO.getHost(),
                     configuracaoBancoVO.getSchema(),
                     configuracaoBancoVO.getPorta(),
                     configuracaoBancoVO.getUsuario(),
