@@ -595,7 +595,7 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     NutricionalIMP imp = new NutricionalIMP();
-                    imp.setId(rst.getString("pr_codint"));
+                    imp.setId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descricao"));
                     imp.setPorcao(rst.getString("pr_porcao"));
                     imp.setCaloria((int) rst.getDouble("pr_caloria"));
