@@ -1647,27 +1647,32 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "	numerolanc id,\n" +
-                    "	codigoenti idcliente,\n" +
+                    "	codigoenti idfornecedor,\n" +
                     "	notafiscal,\n" +
                     "	parcela,\n" +
                     "	datlancame,\n" +
                     "	datemissao dtemissao,\n" +
+                    "   datvencime vencimento,\n" +        
                     "	datentrada,\n" +
                     "	datefetiva,\n" +
-                    "	vlrtotalnf,\n" +
+                    "	vlrtotalnf valor,\n" +
                     "	historico\n" +
                     "from\n" +
                     "	fl700fin\n" +
                     "where\n" +
                     "	tipo_pagto in ('VLE', 'BOL', 'A', '   ', 'DH') \n" +
                     "	and codigoloja = '" + getLojaOrigem() + "'\n" +
-                    "	and tipolancam = 'R'\n" +
+                    "	and tipolancam in ('A', 'R') and tipocadast = 'F'\n" +        
                     "	and datpagto = '1900-01-01 00:00:00'")) {
                 while(rs.next()) {
                     ContaReceberIMP imp = new ContaReceberIMP();
                     
                     imp.setId(rs.getString("id"));
-                    
+                    imp.setDataEmissao(rs.getDate("dtemissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("historico"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
                     
                     result.add(imp);
                 }
