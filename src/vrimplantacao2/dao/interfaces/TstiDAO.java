@@ -610,7 +610,7 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -623,11 +623,9 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado(rst.getBoolean("cancelado"));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
 
                         if (rst.getString("nomecliente") != null
                                 && !rst.getString("nomecliente").trim().isEmpty()
@@ -641,7 +639,7 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                + Utils.acertarTexto(rst.getString("comple")) + ","
                                 + Utils.acertarTexto(rst.getString("bairro")) + ","
                                 + Utils.acertarTexto(rst.getString("cidade")) + "-"
                                 + Utils.acertarTexto(rst.getString("estado"));
@@ -660,7 +658,7 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "select\n"
-                    + "	seq id,\n"
+                    + "	concat(seq,cupom,data) id,\n"
                     + "	cupom numerocupom,\n"
                     + "	codcli idcliente,\n"
                     + "	case micro\n"
@@ -686,10 +684,9 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "	tslv010 v\n"
                     + "where\n"
-                    + "	empresa = " + idLojaCliente + "\n"
+                    + "	empresa = substring('" + idLojaCliente + "',1,1)\n"
                     + "	and exclui != 'S'\n"
                     + "	and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
-                    //+ " and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "order by seq,data,horaini";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -777,7 +774,7 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tslv011 i\n"
                     + "	join tslv010 v on v.seq = i.cupom\n"
                     + "where\n"
-                    + "	empresa = " + idLojaCliente + "\n"
+                    + "	empresa = substring('" + idLojaCliente + "',1,1)\n"
                     + "	and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "order by i.cupom,i.seq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
