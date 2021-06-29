@@ -109,7 +109,7 @@ public class CreditoRotativoRepositoryTest {
             new Answer() {
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    CreditoRotativoVO value = invocation.getArgumentAt(0, CreditoRotativoVO.class);
+                    CreditoRotativoVO value = invocation.getArgument(0, CreditoRotativoVO.class);
                     value.setId(236);
                     rotGravados.add(value);
                     return null;
@@ -121,7 +121,7 @@ public class CreditoRotativoRepositoryTest {
             new Answer() {
                 @Override
                 public Object answer(InvocationOnMock invocation) throws Throwable {
-                    CreditoRotativoAnteriorVO value = invocation.getArgumentAt(0, CreditoRotativoAnteriorVO.class);
+                    CreditoRotativoAnteriorVO value = invocation.getArgument(0, CreditoRotativoAnteriorVO.class);
                     rotAnterioresGravados.add(value);
                     return null;
                 }
@@ -132,7 +132,7 @@ public class CreditoRotativoRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        CreditoRotativoItemVO value = invocation.getArgumentAt(0, CreditoRotativoItemVO.class);
+                        CreditoRotativoItemVO value = invocation.getArgument(0, CreditoRotativoItemVO.class);
                         value.setId(569);
                         rotItemGravados.add(value);
                         return null;
@@ -144,7 +144,7 @@ public class CreditoRotativoRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        CreditoRotativoItemAnteriorVO value = invocation.getArgumentAt(0, CreditoRotativoItemAnteriorVO.class);
+                        CreditoRotativoItemAnteriorVO value = invocation.getArgument(0, CreditoRotativoItemAnteriorVO.class);
                         rotItemAnterioresGravados.add(value);
                         return null;
                     }                    
@@ -324,7 +324,7 @@ public class CreditoRotativoRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        CreditoRotativoItemVO value = invocation.getArgumentAt(0, CreditoRotativoItemVO.class);
+                        CreditoRotativoItemVO value = invocation.getArgument(0, CreditoRotativoItemVO.class);
                         itensGravados.add(value);
                         return null;
                     }

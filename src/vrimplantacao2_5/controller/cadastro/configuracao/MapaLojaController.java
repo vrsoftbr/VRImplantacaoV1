@@ -26,7 +26,7 @@ public class MapaLojaController {
         return mapaLojaService.getLojaVR();
     }
     
-    public void salvar(ConfiguracaoBaseDadosVO configuracaoBancoVO) {
+    public void salvar(ConfiguracaoBaseDadosVO configuracaoBancoVO) throws Exception {
         mapaLojaService.salvar(configuracaoBancoVO);
     }
     
@@ -40,7 +40,7 @@ public class MapaLojaController {
         return lojasMapeadas;
     }
     
-    public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO, String title) {
-        mapaLojaService.excluirLojaMapeada(configuracaoBancoLojaVO, title);
+    public void excluirLojaMapeada(ConfiguracaoBancoLojaVO configuracaoBancoLojaVO) throws Exception {
+        mapaLojaService.excluirLojaMapeada(configuracaoBancoLojaVO);
     }
 }

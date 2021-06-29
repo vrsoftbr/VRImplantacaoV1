@@ -186,7 +186,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             try {
                 Util.exibirMensagem("Campo Nome da Conexão obrigatório!", getTitle());
             } catch (Exception ex) {
-                Exceptions.printStackTrace(ex);
+                Util.exibirMensagemErro(ex, getTitle());
             }
 
             return;
@@ -255,8 +255,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
 
             mapaController.excluirLojaMapeada(mapaController.
                     getLojaMapeada().
-                    get(tblLoja.
-                            getLinhaSelecionada()), getTitle());
+                        get(tblLoja.
+                            getLinhaSelecionada()));
 
             mapaController.consultaLojaMapeada(configuracaoBancoVO.getId());
             consultaConfiguracaoLoja();

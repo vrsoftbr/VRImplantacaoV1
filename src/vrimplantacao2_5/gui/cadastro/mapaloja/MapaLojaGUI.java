@@ -76,7 +76,7 @@ public class MapaLojaGUI extends VRDialog {
     }
     
     @Override
-    public void salvar() {
+    public void salvar() throws Exception {
          configuracaoBancoLojaVO.setIdLojaOrigem(((ItemComboVO) cboLojaOrigem.getSelectedItem()).idString);
          configuracaoBancoLojaVO.setIdLojaVR(cboLojaVR.getId());
          configuracaoBancoLojaVO.setLojaMatriz(chkMatriz.isSelected());
@@ -208,7 +208,11 @@ public class MapaLojaGUI extends VRDialog {
     }//GEN-LAST:event_btnInserirLojaActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        salvar();
+        try {
+            salvar();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void btnDicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDicaActionPerformed

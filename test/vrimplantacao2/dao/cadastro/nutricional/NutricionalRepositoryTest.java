@@ -77,7 +77,7 @@ public class NutricionalRepositoryTest {
                     int id = 0;
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        NutricionalFilizolaVO a = invocation.getArgumentAt(0, NutricionalFilizolaVO.class);
+                        NutricionalFilizolaVO a = invocation.getArgument(0, NutricionalFilizolaVO.class);
                         a.setId(++id);
                         gravados.add(a);
                         return null;
@@ -89,7 +89,7 @@ public class NutricionalRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        NutricionalAnteriorVO a = invocation.getArgumentAt(0, NutricionalAnteriorVO.class);
+                        NutricionalAnteriorVO a = invocation.getArgument(0, NutricionalAnteriorVO.class);
                         anteriores.add(a);
                         return null;
                     }
@@ -101,8 +101,8 @@ public class NutricionalRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        Integer idNutricional = invocation.getArgumentAt(0, Integer.class);
-                        Integer idProduto = invocation.getArgumentAt(1, Integer.class);
+                        Integer idNutricional = invocation.getArgument(0, Integer.class);
+                        Integer idProduto = invocation.getArgument(1, Integer.class);
                         
                         itens.put(null, idNutricional, idProduto);
                         return null;
@@ -147,7 +147,7 @@ public class NutricionalRepositoryTest {
                     int id = 0;
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        NutricionalToledoVO a = invocation.getArgumentAt(0, NutricionalToledoVO.class);
+                        NutricionalToledoVO a = invocation.getArgument(0, NutricionalToledoVO.class);
                         a.setId(++id);
                         gravados.add(a);
                         return null;
@@ -159,7 +159,7 @@ public class NutricionalRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        NutricionalAnteriorVO a = invocation.getArgumentAt(0, NutricionalAnteriorVO.class);
+                        NutricionalAnteriorVO a = invocation.getArgument(0, NutricionalAnteriorVO.class);
                         anteriores.add(a);
                         return null;
                     }
@@ -171,8 +171,8 @@ public class NutricionalRepositoryTest {
                 new Answer() {
                     @Override
                     public Object answer(InvocationOnMock invocation) throws Throwable {
-                        Integer idNutricional = invocation.getArgumentAt(0, Integer.class);
-                        Integer idProduto = invocation.getArgumentAt(1, Integer.class);
+                        Integer idNutricional = invocation.getArgument(0, Integer.class);
+                        Integer idProduto = invocation.getArgument(1, Integer.class);
                         
                         itens.put(null, idNutricional, idProduto);
                         return null;

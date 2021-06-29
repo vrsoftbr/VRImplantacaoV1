@@ -120,7 +120,7 @@ public class ConfiguracaoBaseDadosDAO {
         boolean retorno = false;
         String sql = "", filtro = "";
 
-        if (tipoLoja.equals("LOJAORIGEM")) {
+        if (tipoLoja.equals("LOJA_ORIGEM")) {
             filtro = " and id_lojaorigem = '"
                     + configuracaoBancoVO.getConfiguracaoBancoLoja().getIdLojaOrigem() + "'";
         } else {
@@ -247,7 +247,7 @@ public class ConfiguracaoBaseDadosDAO {
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                      "select \n"
                     + "	id\n"
                     + "from \n"
                     + "	implantacao2_5.conexao\n"
@@ -255,7 +255,7 @@ public class ConfiguracaoBaseDadosDAO {
                     + "	id_sistema = " + configuracaoVO.getSistema().getId() + " and \n"
                     + "	id_bancodados = " + configuracaoVO.getBancoDados().getId() + " and \n"
                     + "	nomeschema = '" + configuracaoVO.getSchema() + "' and\n"
-                    + "   host = '" + configuracaoVO.getHost() + "'")) {
+                    + " host = '" + configuracaoVO.getHost() + "'")) {
                 if (rs.next()) {
                     retorno = true;
                 }
