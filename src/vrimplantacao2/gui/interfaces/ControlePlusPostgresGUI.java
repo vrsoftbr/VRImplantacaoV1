@@ -86,6 +86,9 @@ public class ControlePlusPostgresGUI extends VRInternalFrame {
         tabClientes.setOpcoesDisponiveis(dao);
 
         carregarParametros();
+        
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
+        vRImportaArquivBalancaPanel1.setLoja(vLojaCliente);
 
         centralizarForm();
         this.setMaximum(false);
@@ -239,6 +242,7 @@ public class ControlePlusPostgresGUI extends VRInternalFrame {
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
         txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel2 = new javax.swing.JLabel();
@@ -326,6 +330,7 @@ public class ControlePlusPostgresGUI extends VRInternalFrame {
         );
 
         tabs.addTab("Unificação", vRPanel2);
+        tabs.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, "Migrar");
@@ -445,6 +450,7 @@ public class ControlePlusPostgresGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTextField txtCompl;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
