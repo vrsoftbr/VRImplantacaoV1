@@ -17,12 +17,12 @@ public class AtualizadorController {
         this.atualizadorService.criarSchema();
     }
 
-    public List<EBancoDados> verificarBancoDados() throws Exception {
-        return this.atualizadorService.verificarBancoDados();
+    public List<EBancoDados> getBancoDados() throws Exception {
+        return this.atualizadorService.getBancoDados();
     }
     
-    public List<ESistema> verificarSistema() throws Exception {
-        return this.atualizadorService.verificarSistema();
+    public List<ESistema> getSistema() throws Exception {
+        return this.atualizadorService.getSistema();
     }
     
     public void criarTabelas() throws Exception {

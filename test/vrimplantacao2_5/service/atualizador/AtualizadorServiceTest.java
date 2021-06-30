@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2_5.service.atualizador;
 
 import java.util.ArrayList;
@@ -13,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
+import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
  *
@@ -23,17 +19,54 @@ public class AtualizadorServiceTest {
     @Test
     public void testVerificarBancoDados() throws Exception {
         AtualizadorDAO atulizadorDAO = mock(AtualizadorDAO.class);        
+
+        when(atulizadorDAO.verificarBancoDados(EBancoDados.FIREBIRD)).thenReturn(true);
+        
+        assertEquals(true, atulizadorDAO.verificarBancoDados(EBancoDados.FIREBIRD));
+    }
+    
+    @Test
+    public void testGetBancoDados() throws Exception {
+        AtualizadorDAO atulizadorDAO = mock(AtualizadorDAO.class);  
         AtualizadorService atualizadorService = new AtualizadorService(atulizadorDAO);
         
-        List<EBancoDados> bancoDados = new ArrayList<>();
-        
+        List<EBancoDados> result = new ArrayList<>();
         for (EBancoDados eBancoDados : EBancoDados.values()) {
-            if (!atulizadorDAO.verificarBancoDados(eBancoDados)) {
-                bancoDados.add(eBancoDados);
-                when(!atulizadorDAO.verificarBancoDados(eBancoDados)).thenReturn(false);
+            if (!atualizadorService.verificarBancoDados(eBancoDados)) {
+                result.add(eBancoDados);
+                when(!atualizadorService.verificarBancoDados(eBancoDados)).thenReturn(false);
+            } else {
+                when(atualizadorService.verificarBancoDados(eBancoDados)).thenReturn(true);
             }
         }
         
-        assertEquals(bancoDados.size(), atualizadorService.verificarBancoDados().size());        
+        assertEquals(result.size(), atualizadorService.getBancoDados().size());
+    }
+    
+    @Test
+    public void testVerificarSistema() throws Exception {
+        AtualizadorDAO atualizadorDAO = mock(AtualizadorDAO.class);
+        
+        when(atualizadorDAO.verificarSistema(ESistema.GETWAY)).thenReturn(true);
+        
+        assertEquals(true, atualizadorDAO.verificarSistema(ESistema.GETWAY));
+    }
+    
+    @Test
+    public void testGetSistema() throws Exception {
+        AtualizadorDAO atualizadorDAO = mock(AtualizadorDAO.class);
+        AtualizadorService atualizadorService = new AtualizadorService(atualizadorDAO);
+        
+        List<ESistema> result = new ArrayList<>();
+        for (ESistema eSistema : ESistema.values()) {
+            if (atualizadorService.verificarSistema(eSistema)) {                
+                result.add(eSistema);
+                when(!atualizadorService.verificarSistema(eSistema)).thenReturn(false);
+            } else {
+                when(atualizadorService.verificarSistema(eSistema)).thenReturn(true);
+            }
+        }
+        
+        assertEquals(result.size(), atualizadorService.getSistema().size());
     }
 }

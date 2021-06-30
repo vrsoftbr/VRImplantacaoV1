@@ -23,20 +23,28 @@ public class AtualizadorService {
         this.atualizadorDAO = atualizadorDAO;
     }
 
-    public List<EBancoDados> verificarBancoDados() throws Exception {
+    public boolean verificarBancoDados(EBancoDados eBancoDados) throws Exception {
+        return this.atualizadorDAO.verificarBancoDados(eBancoDados);
+    }
+
+    public List<EBancoDados> getBancoDados() throws Exception {
         List<EBancoDados> result = new ArrayList<>();
         for (EBancoDados eBancoDados : EBancoDados.values()) {
-            if (!this.atualizadorDAO.verificarBancoDados(eBancoDados)) {
+            if (!verificarBancoDados(eBancoDados)) {
                 result.add(eBancoDados);
             }
         }
         return result;
     }
     
-    public List<ESistema> verificarSistema() throws Exception {
+    public boolean verificarSistema(ESistema eSistema) throws Exception {
+        return this.atualizadorDAO.verificarSistema(eSistema);
+    }
+    
+    public List<ESistema> getSistema() throws Exception {
         List<ESistema> result = new ArrayList<>();
         for (ESistema eSistema : ESistema.values()) {
-            if (!this.atualizadorDAO.verificarSistema(eSistema)) {
+            if (!verificarSistema(eSistema)) {
                 result.add(eSistema);
             }
         }
@@ -52,14 +60,14 @@ public class AtualizadorService {
     }
     
     public void inserirTabelaBancoDados() throws Exception {
-        List<EBancoDados> eBancoDados = verificarBancoDados();
+        List<EBancoDados> eBancoDados = getBancoDados();
         for (EBancoDados eBancoDado : eBancoDados) {
             this.atualizadorDAO.inserirTabelaBancoDados(eBancoDado);
         }        
     }
     
     public void inserirTabelaSistema() throws Exception {
-        List<ESistema> eSistemas = verificarSistema();
+        List<ESistema> eSistemas = getSistema();
         for (ESistema eSistema : eSistemas) {
             this.atualizadorDAO.inserirTabelaSistema(eSistema);
         }        
