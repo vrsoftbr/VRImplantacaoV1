@@ -17,6 +17,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.CodigoAnteriorVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaItemVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
+import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.utils.arquivo.delimited.ArquivoTXT;
@@ -26,7 +27,28 @@ import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 public class NutricionalFilizolaDAO {
     
     private static final Logger LOG = Logger.getLogger(NutricionalFilizolaDAO.class.getName());
+    Utils util = new Utils();
 
+    public List<NutricionalFilizolaVO> getNutricionalFilizola(String arquivo) throws Exception {
+        List<NutricionalFilizolaVO> result = new ArrayList<>();
+        List<String> vFilizola = util.lerArquivoBalanca(arquivo);
+        
+        for (int i = 0; i < vFilizola.size(); i++) {
+            if (!vFilizola.get(i).trim().isEmpty()) {
+                
+                NutricionalFilizolaVO vo = new NutricionalFilizolaVO();
+                vo.setId(Utils.stringToInt(vFilizola.get(i).substring(0, 6)));
+                vo.setDescricao(vFilizola.get(i).substring(7, 29).trim());
+                vo.setPorcao(vFilizola.get(i).substring(40, 75).trim());
+                vo.setCaloria(Utils.stringToInt(vFilizola.get(i).substring(75, 80)));
+                vo.setPercentualcaloria(Utils.stringToInt(vFilizola.get(i).substring(80, 84)));
+                result.add(vo);
+            }
+        }
+        
+        return result;
+    }
+    
     public static void importarArquivoRdc360(String sistema, String loja, String arquivo) throws Exception {
         ArquivoTXT arq = new ArquivoTXT(arquivo);
         
