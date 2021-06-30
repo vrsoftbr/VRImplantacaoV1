@@ -29,16 +29,16 @@ public class AtualizadorController {
         this.atualizadorService.criarTabelas();
     }
     
-    public void inserirTabelaBancoDados() throws Exception {
-        this.atualizadorService.inserirTabelaBancoDados();
+    public void salvarBancoDados() throws Exception {
+        this.atualizadorService.salvarBancoDados();
     }
     
-    public void inserirTabelaSistema() throws Exception {
-        this.atualizadorService.inserirTabelaSistema();
+    public void salvarSistema() throws Exception {
+        this.atualizadorService.salvarSistema();
     }
     
-    public void inserirTabelaSistemaBancoDados() throws Exception {
-        this.atualizadorService.inserirTabelaSistemaBancoDados();
+    public void salvarSistemaBancoDados() throws Exception {
+        this.atualizadorService.salvarSistemaBancoDados();
     }
     
     public void criarEstrutura2_5() throws Exception {

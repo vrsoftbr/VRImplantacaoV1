@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import vrimplantacao2_5.dao.atualizador.AtualizadorDAO;
@@ -69,4 +70,25 @@ public class AtualizadorServiceTest {
         
         assertEquals(result.size(), atualizadorService.getSistema().size());
     }
+    
+    @Test
+    public void testSalvarBancoDados() throws Exception {
+        AtualizadorDAO atualizadorDAO = mock(AtualizadorDAO.class);
+        AtualizadorService atualizadorService = new AtualizadorService(atualizadorDAO);
+        
+        atualizadorService.salvarBancoDados();
+        
+        Mockito.verify(atualizadorDAO, Mockito.times(1)).salvarBancoDados(EBancoDados.FIREBIRD);
+    }
+    
+    @Test
+    public void testSalvarSistema() throws Exception {
+        AtualizadorDAO atualizadorDAO = mock(AtualizadorDAO.class);
+        AtualizadorService atualizadorService = new AtualizadorService(atualizadorDAO);
+        
+        atualizadorService.salvarSistema();
+        
+        Mockito.verify(atualizadorDAO, Mockito.times(1)).salvarSistema(ESistema.GETWAY);
+    }
+    
 }

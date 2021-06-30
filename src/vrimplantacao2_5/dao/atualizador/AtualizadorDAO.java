@@ -104,19 +104,19 @@ public class AtualizadorDAO {
         }
     }
 
-    public void inserirTabelaBancoDados(EBancoDados eBancoDados) throws Exception {
+    public void salvarBancoDados(EBancoDados eBancoDados) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("INSERT INTO implantacao2_5.bancodados (nome) VALUES ('" + eBancoDados + "');");
         }
     }
 
-    public void inserirTabelaSistema(ESistema eSistema) throws Exception {
+    public void salvarSistema(ESistema eSistema) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("INSERT INTO implantacao2_5.sistema (nome) VALUES ('" + eSistema + "')");
         }
     }
 
-    public void inserirTabelaSistemaBancoDados() throws Exception {
+    public void salvarSistemaBancoDados() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                     "DELETE FROM implantacao2_5.sistemabancodados; \n"

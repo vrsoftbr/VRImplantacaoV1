@@ -59,29 +59,29 @@ public class AtualizadorService {
         this.atualizadorDAO.criarTabelas();
     }
     
-    public void inserirTabelaBancoDados() throws Exception {
+    public void salvarBancoDados() throws Exception {
         List<EBancoDados> eBancoDados = getBancoDados();
         for (EBancoDados eBancoDado : eBancoDados) {
-            this.atualizadorDAO.inserirTabelaBancoDados(eBancoDado);
+            this.atualizadorDAO.salvarBancoDados(eBancoDado);
         }        
     }
     
-    public void inserirTabelaSistema() throws Exception {
+    public void salvarSistema() throws Exception {
         List<ESistema> eSistemas = getSistema();
         for (ESistema eSistema : eSistemas) {
-            this.atualizadorDAO.inserirTabelaSistema(eSistema);
+            this.atualizadorDAO.salvarSistema(eSistema);
         }        
     }
     
-    public void inserirTabelaSistemaBancoDados() throws Exception {
-        this.atualizadorDAO.inserirTabelaSistemaBancoDados();
+    public void salvarSistemaBancoDados() throws Exception {
+        this.atualizadorDAO.salvarSistemaBancoDados();
     }
     
     public void criarEstrutura2_5() throws Exception {
         this.atualizadorDAO.criarSchema();
         this.atualizadorDAO.criarTabelas();
-        this.inserirTabelaBancoDados();
-        this.inserirTabelaSistema();
-        this.atualizadorDAO.inserirTabelaSistemaBancoDados();
+        this.salvarBancoDados();
+        this.salvarSistema();
+        this.atualizadorDAO.salvarSistemaBancoDados();
     }
 }
