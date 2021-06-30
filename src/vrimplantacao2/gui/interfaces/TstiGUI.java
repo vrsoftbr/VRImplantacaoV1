@@ -33,7 +33,6 @@ public class TstiGUI extends VRInternalFrame {
     private static final String SISTEMA = "Tsti";
     private static final String SERVIDOR_SQL = "MySql";
     private static TstiGUI instance;
-    private TstiDAO dao = new TstiDAO();
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
@@ -331,8 +330,8 @@ public class TstiGUI extends VRInternalFrame {
                         }
                         
                         if (chkPdvVendas.isSelected()) {
-                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            tstiDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                            tstiDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         

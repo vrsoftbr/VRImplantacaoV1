@@ -596,7 +596,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("referencia") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -613,9 +613,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
-                        //next.setModeloImpressora(rst.getString("modelo"));
 
                         if (rst.getString("nomecliente") != null
                                 && !rst.getString("nomecliente").trim().isEmpty()
@@ -637,6 +635,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
             this.sql
                     = "select\n"
                     + "	NoCupom as numerocupom,\n"
+                    + " v.referencia,"
                     + "	1 as ecf,\n"
                     + "	v.Dt_cad as data,\n"
                     + "	v.id_cli idclientepreferencial,\n"
@@ -652,9 +651,9 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	transacao v\n"
                     + "	left join Cliente c on c.Id_cli = v.Id_cli \n"
                     + "where\n"
-                    + "	v.id_loja = " + idLojaCliente +  " \n"
+                    + "	v.id_loja = " + idLojaCliente + " \n"
                     + "	and operacao = 'VEND'\n"
-                    + "	and CONVERT(NVARCHAR, v.Dt_cad, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "\n"
+                    + "	and CONVERT(NVARCHAR, v.Dt_cad, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
                     + " order by 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -693,24 +692,17 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("referencia") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
-                        next.setId(rst.getString("id"));
+                        next.setId(rst.getString("id_item"));
                         next.setVenda(id);
                         next.setProduto(rst.getString("produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-
-                        String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
-                        }
                     }
                 }
             } catch (Exception ex) {
@@ -722,37 +714,27 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "    cx.id,\n"
-                    + "    cx.coo as numerocupom,\n"
-                    + "    cx.codcaixa as ecf,\n"
-                    + "    cx.data as data,\n"
-                    + "    cx.codprod as produto,\n"
-                    + "    pr.DESC_PDV as descricao,    \n"
-                    + "    isnull(cx.qtd, 0) as quantidade,\n"
-                    + "    isnull(cx.totitem, 0) as total,\n"
-                    + "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n"
-                    + "    isnull(cx.descitem, 0) as desconto,\n"
-                    + "    isnull(cx.acrescitem, 0) as acrescimo,\n"
-                    + "    case\n"
-                    + "     when LEN(cx.barra) > 14 \n"
-                    + "     then SUBSTRING(cx.BARRA, 4, LEN(cx.barra))\n"
-                    + "    else cx.BARRA end as codigobarras,\n"
-                    + "    pr.unidade,\n"
-                    + "    cx.codaliq codaliq_venda,\n"
-                    + "    pr.codaliq codaliq_produto,\n"
-                    + "    ic.DESCRICAO trib_desc\n"
-                    + "from\n"
-                    + "    caixageral as cx\n"
-                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
-                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
-                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
-                    + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
+                    + "	CONCAT(v.Referencia ,1,CONVERT(NVARCHAR, v.Dt_cad, 23)) id_venda,\n"
+                    + "	CONCAT(i.Referencia,'-',NumItem,'-',i.Id_prd,i.NoCupom) id_item,\n"
+                    + " i.referencia,\n"
+                    + " i.data,\n"
+                    + " 1 as ecf,\n"
+                    + "	i.Id_prd produto,\n"
+                    + "	p.descricao,\n"
+                    + "	Qtde quantidade,\n"
+                    + "	Vl_Tbl total,\n"
+                    + "	case when i.Status = 'cancelado' then 1 else 0 end cancelado,\n"
+                    + "	p.Cartela codigobarras,\n"
+                    + "	u.Unidade unidade\n"
+                    + "from EstMovto i\n"
+                    + "left join Transacao v on v.Referencia = i.Referencia \n"
+                    + "left join Produto p on p.Id_prd = i.Id_prd\n"
+                    + "left join unidade u on u.Id_unidade = p.Id_Unidade\n"
                     + "where\n"
-                    + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
-                    + "    cx.codloja = " + idLojaCliente + " and\n"
-                    + "    cx.atualizado = 'S' and\n"
-                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
+                    + "	i.id_loja = " + idLojaCliente + " \n"
+                    + "	and v.operacao = 'VEND'\n"
+                    + "	and CONVERT(NVARCHAR, v.Dt_cad, 23) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "\n"
+                    + "order by 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

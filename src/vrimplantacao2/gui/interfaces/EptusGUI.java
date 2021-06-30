@@ -231,6 +231,8 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
         chkVenda = new vrframework.bean.checkBox.VRCheckBox();
         txtDataFimVenda = new org.jdesktop.swingx.JXDatePicker();
         txtDataInicioVenda = new org.jdesktop.swingx.JXDatePicker();
+        tabBalanca = new vrframework.bean.panel.VRPanel();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setTitle("Importação Eptus");
         setToolTipText("");
@@ -344,6 +346,25 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabs.addTab("Importação", tabImportacao);
 
+        javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
+        tabBalanca.setLayout(tabBalancaLayout);
+        tabBalancaLayout.setHorizontalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabBalancaLayout.setVerticalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(243, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Balança", tabBalanca);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -422,6 +443,7 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrframework.bean.panel.VRPanel tabBalanca;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabCliente;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private javax.swing.JTabbedPane tabImportacao;
@@ -430,6 +452,7 @@ public class EptusGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabs;
     private org.jdesktop.swingx.JXDatePicker txtDataFimVenda;
     private org.jdesktop.swingx.JXDatePicker txtDataInicioVenda;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;
