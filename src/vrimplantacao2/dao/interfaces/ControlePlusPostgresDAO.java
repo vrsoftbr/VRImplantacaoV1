@@ -369,6 +369,33 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	pr_codint as idproduto, \n"
+                        + "	qtde as estoque\n"
+                        + "from implantacao.produtosestoque_ondas"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEstoque(Double.parseDouble(rst.getString("estoque").trim().replace(",", ".")));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
+    }
+    
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
