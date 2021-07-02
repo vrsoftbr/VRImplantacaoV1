@@ -334,7 +334,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel implements Configu
     }
     
     @Override
-    public void setDadoConexao(String host, String schema, int porta, String usuario, String senha) {
+    public void setDadosConexao(String host, String schema, int porta, String usuario, String senha) {
         txtHost.setText(host);
         txtDatabase.setArquivo(schema);
         txtPorta.setText(String.valueOf(porta));

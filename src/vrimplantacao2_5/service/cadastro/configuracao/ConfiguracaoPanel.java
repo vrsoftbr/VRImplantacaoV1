@@ -9,7 +9,7 @@ import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 public interface ConfiguracaoPanel {
 
     void setOnConectar(ConexaoEvent evento);
-    void setDadoConexao(String host, String schema, int porta, String usuario, String senha);
+    void setDadosConexao(String host, String schema, int porta, String usuario, String senha);
     String getHost();
     String getPorta();
     String getSchema();

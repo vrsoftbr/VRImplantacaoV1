@@ -326,7 +326,7 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel implements Config
     }
     
     @Override
-    public void setDadoConexao(String host, String schema, int porta, String usuario, String senha) {
+    public void setDadosConexao(String host, String schema, int porta, String usuario, String senha) {
         txtHost.setText(host);
         txtDatabase.setArquivo(schema);
         txtPorta.setText(String.valueOf(porta));

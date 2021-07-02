@@ -326,7 +326,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel implements Configuraca
     }
     
     @Override
-    public void setDadoConexao(String host, String schema, int porta, String usuario, String senha) {
+    public void setDadosConexao(String host, String schema, int porta, String usuario, String senha) {
         txtHost.setText(host);
         txtDatabase.setText(schema);
         txtPorta.setText(String.valueOf(porta));

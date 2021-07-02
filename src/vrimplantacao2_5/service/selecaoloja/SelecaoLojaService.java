@@ -13,7 +13,7 @@ import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
  */
 public class SelecaoLojaService {
     
-    private ConfiguracaoBaseDadosDAO configuracaoDAO;
+    private final ConfiguracaoBaseDadosDAO configuracaoDAO;
 
     public SelecaoLojaService(ConfiguracaoBaseDadosDAO configuracaoDAO) {
         this.configuracaoDAO = configuracaoDAO;
@@ -29,8 +29,7 @@ public class SelecaoLojaService {
         try {
             result = configuracaoDAO.consultar();
         } catch (Exception e) {
-            e.printStackTrace();
-            Exceptions.printStackTrace(e);
+            Util.exibirMensagemErro(e, "Mapa de Loja");
         }
         
         return result;
