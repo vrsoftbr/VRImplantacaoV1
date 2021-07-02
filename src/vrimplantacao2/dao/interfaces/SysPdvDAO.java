@@ -126,7 +126,8 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.CEST,
                 OpcaoProduto.ATACADO,
-                OpcaoProduto.OFERTA
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.FORCAR_ATUALIZACAO
         ));
     }
     
