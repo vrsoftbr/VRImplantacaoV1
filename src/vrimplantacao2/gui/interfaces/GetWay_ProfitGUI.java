@@ -17,6 +17,7 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -139,7 +140,19 @@ public class GetWay_ProfitGUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
+        vRImportaArquivBalancaPanel1.setProvider(new VRImportaArquivBalancaPanel.Provider() {
+            @Override
+            public String getSistema() {
+                dao.setComplemento(txtLojaMesmoID.getText());
+                return dao.getSistema();
+            }
 
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+        });
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         txtDataFimOferta.setFormats(new SimpleDateFormat("dd/MM/yyyy"));

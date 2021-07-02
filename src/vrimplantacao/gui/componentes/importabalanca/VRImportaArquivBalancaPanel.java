@@ -19,16 +19,22 @@ import vrimplantacao2.dao.cadastro.nutricional.NutricionalToledoDAO;
  */
 public class VRImportaArquivBalancaPanel extends VRPanel {
 
-    private String sistema;
-    private String loja;
+    private Provider provider = new DefaultProvider();
+
+    public void setProvider(Provider provider) {
+        this.provider = provider;
+    }
 
     public String getSistema() {
-        return sistema;
+        return provider.getSistema();
     }
 
     public void setSistema(String sistema) {
-        this.sistema = sistema;
-        if (this.sistema != null && this.loja != null) {
+        if (this.provider instanceof DefaultProvider) {
+            DefaultProvider prov = (DefaultProvider) this.provider;
+            prov.setSistema(sistema);
+        }
+        if (this.provider.getSistema() != null && this.provider.getLoja() != null) {
             tabsOpcoes.remove(tabNutricional);
             tabsOpcoes.addTab("Nutricionais", tabNutricional);
         } else {
@@ -37,12 +43,15 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     }
 
     public String getLoja() {
-        return loja;
+        return provider.getLoja();
     }
 
     public void setLoja(String loja) {
-        this.loja = loja;
-        if (this.sistema != null && this.loja != null) {
+        if (this.provider instanceof DefaultProvider) {
+            DefaultProvider prov = (DefaultProvider) this.provider;
+            prov.setLoja(loja);
+        }
+        if (this.provider.getSistema() != null && this.provider.getLoja() != null) {
             tabsOpcoes.remove(tabNutricional);
             tabsOpcoes.addTab("Nutricionais", tabNutricional);
         } else {
@@ -306,11 +315,11 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                     ProgressBar.setCancel(false);
                     
                     if (!txtNutricional.getArquivo().isEmpty()) {
-                        NutricionalToledoDAO.sistema = sistema;
-                        NutricionalToledoDAO.loja = loja;
+                        NutricionalToledoDAO.sistema = provider.getSistema();
+                        NutricionalToledoDAO.loja = provider.getLoja();
                         
                         if (rdbFilizolaRdc360.isSelected()) {
-                            NutricionalFilizolaDAO.importarArquivoRdc360(sistema, loja, txtNutricional.getArquivo());
+                            NutricionalFilizolaDAO.importarArquivoRdc360(provider.getSistema(), provider.getLoja(), txtNutricional.getArquivo());
                         }
                         if(rdbToledo.isSelected()) {
                             NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo());
@@ -434,4 +443,35 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 
         thread.start();
     }
+    
+    public static interface Provider {
+        public String getSistema();
+        public String getLoja();
+    }
+    
+    private static class DefaultProvider implements Provider {
+        
+        private String sistema;
+        private String loja;
+
+        public void setSistema(String sistema) {
+            this.sistema = sistema;
+        }
+
+        public void setLoja(String loja) {
+            this.loja = loja;
+        }
+        
+        @Override
+        public String getSistema() {
+            return sistema;
+        }
+
+        @Override
+        public String getLoja() {
+            return loja;
+        }
+        
+    }
+    
 }

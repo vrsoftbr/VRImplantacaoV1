@@ -11,6 +11,7 @@ import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.FamiliaProdutoDAO;
 import vrimplantacao2.dao.cadastro.MercadologicoDAO;
@@ -48,6 +49,16 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         centralizarForm();
         this.setMaximum(false);
         tabProdImportacao.setOpcoesDisponiveis(dao);
+        tabArquivoBalanca.setProvider(new VRImportaArquivBalancaPanel.Provider() {
+            @Override
+            public String getSistema() {
+                return txtSistema.getText();
+            }
+            @Override
+            public String getLoja() {
+                return txtCodLojaOrigem.getText();
+            }
+        });
     }
 
     private static PlanilhaV2GUI instance;
