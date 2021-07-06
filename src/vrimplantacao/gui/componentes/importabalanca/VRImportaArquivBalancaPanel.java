@@ -81,6 +81,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
         rdbGroup1 = new javax.swing.ButtonGroup();
         rdbNutriconal = new javax.swing.ButtonGroup();
+        rdbCodigo = new javax.swing.ButtonGroup();
         tabsOpcoes = new javax.swing.JTabbedPane();
         tabPesaveis = new javax.swing.JPanel();
         rdbCadTxt = new vrframework.bean.radioButton.VRRadioButton();
@@ -98,6 +99,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         vRLabel1 = new vrframework.bean.label.VRLabel();
         rdbCodigoInterno = new vrframework.bean.radioButton.VRRadioButton();
         rdbCodigoBarras = new vrframework.bean.radioButton.VRRadioButton();
+        tdbIdNoVr = new vrframework.bean.radioButton.VRRadioButton();
         chkIgnorarUltimoDigito = new vrframework.bean.checkBox.VRCheckBox();
 
         setBorder(null);
@@ -186,6 +188,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
 
         vRLabel1.setText("Importar Nutricional por:");
 
+        rdbCodigo.add(rdbCodigoInterno);
+        rdbCodigoInterno.setSelected(true);
         rdbCodigoInterno.setText("Código Interno");
         rdbCodigoInterno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -193,10 +197,19 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
             }
         });
 
+        rdbCodigo.add(rdbCodigoBarras);
         rdbCodigoBarras.setText("Codigo de Barras");
         rdbCodigoBarras.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rdbCodigoBarrasActionPerformed(evt);
+            }
+        });
+
+        rdbCodigo.add(tdbIdNoVr);
+        tdbIdNoVr.setText("ID no VR");
+        tdbIdNoVr.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tdbIdNoVrActionPerformed(evt);
             }
         });
 
@@ -210,21 +223,25 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addContainerGap()
                 .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
-                        .addComponent(txtNutricional, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtNutricional, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnImportarNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
                         .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rdbToledoProduto)
+                            .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(tabNutricionalLayout.createSequentialGroup()
                                 .addComponent(rdbCodigoInterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(rdbCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(rdbFilizolaRdc360)
-                            .addComponent(rdbToledo))
+                                .addComponent(tdbIdNoVr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(tabNutricionalLayout.createSequentialGroup()
+                                .addComponent(rdbFilizolaRdc360)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(rdbToledoProduto)
+                                    .addComponent(rdbToledo))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -237,14 +254,16 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rdbCodigoInterno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(rdbCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tdbIdNoVr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rdbFilizolaRdc360)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rdbToledo)
+                .addComponent(chkIgnorarUltimoDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rdbFilizolaRdc360)
+                    .addComponent(rdbToledo))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rdbToledoProduto)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(10, 10, 10)
                 .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnImportarNutricional, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNutricional, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -260,17 +279,11 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabsOpcoes, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(tabsOpcoes)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabsOpcoes)
-                .addContainerGap())
+            .addComponent(tabsOpcoes)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -367,12 +380,17 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         }
     }//GEN-LAST:event_rdbCodigoBarrasActionPerformed
 
+    private void tdbIdNoVrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tdbIdNoVrActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tdbIdNoVrActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnImportarBalanca;
     private vrframework.bean.button.VRButton btnImportarNutricional;
     private vrframework.bean.checkBox.VRCheckBox chkIgnorarUltimoDigito;
     private vrframework.bean.radioButton.VRRadioButton rdbCadTxt;
+    private javax.swing.ButtonGroup rdbCodigo;
     private vrframework.bean.radioButton.VRRadioButton rdbCodigoBarras;
     private vrframework.bean.radioButton.VRRadioButton rdbCodigoInterno;
     private javax.swing.JRadioButton rdbFilizolaRdc360;
@@ -386,6 +404,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     private javax.swing.JPanel tabNutricional;
     private javax.swing.JPanel tabPesaveis;
     private javax.swing.JTabbedPane tabsOpcoes;
+    private vrframework.bean.radioButton.VRRadioButton tdbIdNoVr;
     private vrframework.bean.fileChooser.VRFileChooser txtArquivoBalanca;
     private vrframework.bean.fileChooser.VRFileChooser txtNutricional;
     private vrframework.bean.label.VRLabel vRLabel1;

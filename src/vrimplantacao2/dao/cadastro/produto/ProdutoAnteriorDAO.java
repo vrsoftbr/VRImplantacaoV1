@@ -317,7 +317,7 @@ public class ProdutoAnteriorDAO {
                     "		ce.importloja = cp.imploja and\n" +
                     "		ce.importid = cp.impid\n" +
                     "where\n" +
-                    "	ce.ean = '" + ean + "' and\n" +
+                    "	ce.ean like '" + ean + "' and\n" +
                     "	ce.importsistema = '" + sistema + "' and\n" +
                     "	ce.importloja = '" + loja + "'\n" +
                     "limit 1\n"

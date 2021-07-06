@@ -31,40 +31,13 @@ public class NutricionalToledoDAO {
 
         for (int i = 0; i < vToledo.size(); i++) {
             NutricionalToledoIMP toledo = new NutricionalToledoIMP();
-            StringLine ln = new StringLine(vToledo.get(i));
-            if (!vToledo.get(i).trim().isEmpty()) {
-                /*ln.jump(4);
-                switch (ln.sbi(1)) {
-                    case 1: toledo.setPesavel("U"); break;
-                    case 5: toledo.setPesavel("U"); break;
-                    default: toledo.setPesavel("P"); break;
-                }
-                toledo.setCodigo(ln.sbi(6));
-                ln.jump(6);
-                toledo.setValidade(ln.sbi(3));
-                toledo.setDescricao(ln.sb(25));
-                ln.sb(25);*/
-                if ("0".equals(vToledo.get(i).substring(2, 3))) {
-                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
-                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
-                    toledo.setPesavel("P");
-                    toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
-                    toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
-                    //toledo.setCodigo(toledo.getNutricional());
-                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
-                } else {
-                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(2, 9)));
-                    //toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(4, 9)));
-                    toledo.setPesavel("U");
-                    toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
-                    toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
-                    //toledo.setCodigo(toledo.getNutricional());
-                    toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
-                }
+            final String linha = vToledo.get(i).trim();
+            if (!linha.isEmpty()) {                
+                toledo.setPesavel("0".equals(linha.substring(2, 3)) ? "P" : "U");
+                toledo.setDescricao(util.acertarTexto(linha.substring(18, 67).replace("'", "").trim()));
+                toledo.setValidade(Integer.parseInt(linha.substring(15, 18)));
+                toledo.setNutricional(Integer.parseInt(linha.substring(78, 84)));
+                toledo.setCodigo(Integer.parseInt(linha.substring(3, 9)));
             }
             result.add(toledo);
         }
@@ -85,7 +58,7 @@ public class NutricionalToledoDAO {
                     if (opcaoCodigo == 1) {
                         vo.setId(Utils.stringToInt(vToledo.get(i).substring(1, 7)));
                     } else {
-                        vo.setId(Utils.stringToInt(vToledo.get(i).substring(2, 7)));
+                        vo.setId(Utils.stringToInt(vToledo.get(i).substring(1, 6)));
                     }
                     
                     System.out.println("ID NUTRI: " + vo.getId());
@@ -189,7 +162,7 @@ public class NutricionalToledoDAO {
         createTable();
 
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from implantacao.codant_nutricionaltoledo");
+            stm.execute("delete from implantacao.codant_nutricionaltoledo where sistema = '" + sistema + "' and loja = '" + loja + "'");
         }
 
         for (NutricionalToledoIMP vo : nutricional) {            
@@ -203,12 +176,8 @@ public class NutricionalToledoDAO {
                 sql.put("descricao", vo.getDescricao());
                 sql.put("validade", vo.getValidade());
                 if (vo.getNutricional() != 0) {
-                    System.out.println("Aqui");
                     sql.put("nutricional", vo.getNutricional());
-                } /*else {
-                    System.out.println("Aqui 2");
-                    sql.put("nutricional", vo.getCodigo());
-                }*/
+                }
 
                 stm.execute(sql.getInsert());
             }
@@ -216,83 +185,90 @@ public class NutricionalToledoDAO {
     }
 
     private void salvarNutricionalToledo(List<NutricionalToledoVO> toledo) throws Exception {
-        ProgressBar.setMaximum(toledo.size());
-        ProgressBar.setStatus("Importando Info. Nutricional Toledo...");
+        try {
+            Conexao.begin();
+        
+            ProgressBar.setMaximum(toledo.size());
+            ProgressBar.setStatus("Importando Info. Nutricional Toledo...");
 
-        for (NutricionalToledoVO vo : toledo) {
-            
             final MultiMap<Integer, NutricionalToledoVO> nutricionais = getNutricionalProduto(sistema, loja);
-            
-            NutricionalToledoVO prod = nutricionais.get(vo.getId());
-            
-            if (prod == null) {
-                continue;
-            }
-            
-            try (Statement stm = Conexao.createStatement()) {
-                SQLBuilder sql = new SQLBuilder();
-                sql.setTableName("nutricionaltoledo");
-                sql.put("id", vo.getId());
-                sql.put("descricao", prod.getDescricao());
-                sql.put("id_situacaocadastro", vo.getId_situacaocadastro());
-                sql.put("caloria", vo.getCaloria());
-                sql.put("carboidrato", vo.getCarboidrato());
-                sql.put("carboidratoinferior", vo.isCarboidratoinferior());
-                sql.put("proteina", vo.getProteina());
-                sql.put("proteinainferior", vo.isProteinainferior());
-                sql.put("gordura", vo.getGordura());
-                sql.put("gordurasaturada", vo.getGordurasaturada());
-                sql.put("gorduratrans", vo.getGorduratrans());
-                sql.put("colesterolinferior", vo.isColesterolinferior());
-                sql.put("fibra", vo.getFibra());
-                sql.put("fibrainferior", vo.isFibrainferior());
-                sql.put("calcio", vo.getCalcio());
-                sql.put("ferro", vo.getFerro());
-                sql.put("sodio", vo.getSodio());
-                sql.put("percentualcaloria", vo.getPercentualcaloria());
-                sql.put("percentualcarboidrato", vo.getPercentualcarboidrato());
-                sql.put("percentualproteina", vo.getPercentualproteina());
-                sql.put("percentualgordura", vo.getPercentualgordura());
-                sql.put("percentualgordurasaturada", vo.getPercentualgordurasaturada());
-                sql.put("percentualfibra", vo.getPercentualfibra());
-                sql.put("percentualcalcio", vo.getPercentualcalcio());
-                sql.put("percentualferro", vo.getPercentualferro());
-                sql.put("percentualsodio", vo.getPercentualsodio());
-                sql.put("quantidade", vo.getQuantidade());
-                sql.put("id_tipounidadeporcao", vo.getId_tipounidadeporcao());
-                sql.put("medidainteira", vo.getMedidainteira());
-                sql.put("id_tipomedidadecimal", vo.getId_tipomedidadecimal());
-                sql.put("id_tipomedida", vo.getId_tipomedida());
+            for (NutricionalToledoVO vo : toledo) {
 
-                stm.execute(sql.getInsert());
-            }
-            
-            int idProduto = -1;
-            
-            if (this.opcaoCodigo == 2) {
-                idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
-            } else {
-                
-                if (ignorarUltimoDigito) {
-                    idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(sistema, loja, String.valueOf(vo.getId()));
-                } else {
-                    idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(vo.getId()));
+                NutricionalToledoVO prod = nutricionais.get(vo.getId());
+
+                if (prod == null) {
+                    continue;
                 }
-            }
-            
-            if (idProduto == -1) {
-                System.out.println("Produto Balança Não Encontrado: " + vo.getIdProduto() + "\n"
-                        + "Desc: " + vo.getDescricao());
-            } else {
+
                 try (Statement stm = Conexao.createStatement()) {
                     SQLBuilder sql = new SQLBuilder();
-                    sql.setTableName("nutricionaltoledoitem");
-                    sql.put("id_nutricionaltoledo", vo.getId());
-                    sql.put("id_produto", idProduto);
+                    sql.setTableName("nutricionaltoledo");
+                    sql.put("id", vo.getId());
+                    sql.put("descricao", prod.getDescricao());
+                    sql.put("id_situacaocadastro", vo.getId_situacaocadastro());
+                    sql.put("caloria", vo.getCaloria());
+                    sql.put("carboidrato", vo.getCarboidrato());
+                    sql.put("carboidratoinferior", vo.isCarboidratoinferior());
+                    sql.put("proteina", vo.getProteina());
+                    sql.put("proteinainferior", vo.isProteinainferior());
+                    sql.put("gordura", vo.getGordura());
+                    sql.put("gordurasaturada", vo.getGordurasaturada());
+                    sql.put("gorduratrans", vo.getGorduratrans());
+                    sql.put("colesterolinferior", vo.isColesterolinferior());
+                    sql.put("fibra", vo.getFibra());
+                    sql.put("fibrainferior", vo.isFibrainferior());
+                    sql.put("calcio", vo.getCalcio());
+                    sql.put("ferro", vo.getFerro());
+                    sql.put("sodio", vo.getSodio());
+                    sql.put("percentualcaloria", vo.getPercentualcaloria());
+                    sql.put("percentualcarboidrato", vo.getPercentualcarboidrato());
+                    sql.put("percentualproteina", vo.getPercentualproteina());
+                    sql.put("percentualgordura", vo.getPercentualgordura());
+                    sql.put("percentualgordurasaturada", vo.getPercentualgordurasaturada());
+                    sql.put("percentualfibra", vo.getPercentualfibra());
+                    sql.put("percentualcalcio", vo.getPercentualcalcio());
+                    sql.put("percentualferro", vo.getPercentualferro());
+                    sql.put("percentualsodio", vo.getPercentualsodio());
+                    sql.put("quantidade", vo.getQuantidade());
+                    sql.put("id_tipounidadeporcao", vo.getId_tipounidadeporcao());
+                    sql.put("medidainteira", vo.getMedidainteira());
+                    sql.put("id_tipomedidadecimal", vo.getId_tipomedidadecimal());
+                    sql.put("id_tipomedida", vo.getId_tipomedida());
 
                     stm.execute(sql.getInsert());
                 }
+
+                int idProduto = -1;
+
+                if (this.opcaoCodigo == 2) {
+                    idProduto = new ProdutoAnteriorDAO().getCodigoAtualEANant(sistema, loja, String.valueOf(vo.getId()));
+                } else {
+
+                    if (ignorarUltimoDigito) {
+                        idProduto = new ProdutoAnteriorDAO().getProdutoAnteriorSemUltimoDigito2(sistema, loja, String.valueOf(vo.getId()));
+                    } else {
+                        idProduto = new ProdutoAnteriorDAO().getCodigoAnterior2(sistema, loja, String.valueOf(vo.getId()));
+                    }
+                }
+
+                if (idProduto == -1) {
+                    System.out.println("Produto Balança Não Encontrado: " + vo.getIdProduto() + "\n"
+                            + "Desc: " + vo.getDescricao());
+                } else {
+                    try (Statement stm = Conexao.createStatement()) {
+                        SQLBuilder sql = new SQLBuilder();
+                        sql.setTableName("nutricionaltoledoitem");
+                        sql.put("id_nutricionaltoledo", vo.getId());
+                        sql.put("id_produto", idProduto);
+
+                        stm.execute(sql.getInsert());
+                    }
+                }
             }
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
         }
     }
     

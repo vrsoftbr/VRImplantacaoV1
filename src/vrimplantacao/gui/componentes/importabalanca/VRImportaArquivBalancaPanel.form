@@ -6,6 +6,8 @@
     </Component>
     <Component class="javax.swing.ButtonGroup" name="rdbNutriconal">
     </Component>
+    <Component class="javax.swing.ButtonGroup" name="rdbCodigo">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -27,20 +29,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabsOpcoes" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-          </Group>
+          <Component id="tabsOpcoes" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabsOpcoes" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-          </Group>
+          <Component id="tabsOpcoes" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -166,27 +160,33 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="txtNutricional" max="32767" attributes="0"/>
+                              <Component id="txtNutricional" pref="310" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnImportarNutricional" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkIgnorarUltimoDigito" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="rdbCodigoInterno" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="rdbCodigoBarras" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkIgnorarUltimoDigito" min="-2" max="-2" attributes="0"/>
+                                      <Component id="tdbIdNoVr" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="rdbFilizolaRdc360" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="rdbToledo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
+                                          <Component id="rdbToledo" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -204,15 +204,18 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="rdbCodigoInterno" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="rdbCodigoBarras" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkIgnorarUltimoDigito" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="tdbIdNoVr" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="rdbToledo" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkIgnorarUltimoDigito" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="rdbFilizolaRdc360" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="rdbToledo" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btnImportarNutricional" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="txtNutricional" alignment="1" min="-2" max="-2" attributes="0"/>
@@ -268,6 +271,10 @@
             </Component>
             <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbCodigoInterno">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="rdbCodigo"/>
+                </Property>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="C&#xf3;digo Interno"/>
               </Properties>
               <Events>
@@ -276,10 +283,24 @@
             </Component>
             <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbCodigoBarras">
               <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="rdbCodigo"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Codigo de Barras"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbCodigoBarrasActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="vrframework.bean.radioButton.VRRadioButton" name="tdbIdNoVr">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="rdbCodigo"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="ID no VR"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tdbIdNoVrActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIgnorarUltimoDigito">
