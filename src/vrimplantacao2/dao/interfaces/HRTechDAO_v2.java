@@ -77,7 +77,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     public void setComplemento(String complemento) {
         this.complemento = complemento;
     }    
-
+    
     @Override
     public String getSistema() {
         if (complemento == null || complemento.trim().equals("")) {
@@ -718,7 +718,10 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
                     
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
+                    String ean = rs.getString("ean");
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(ean, -2));
+                    
                     if (bal != null) {
                         imp.setEan(String.valueOf(bal.getCodigo()));
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
@@ -726,13 +729,12 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca(true);
                         imp.setValidade(bal.getValidade());
                     } else {
-                        imp.setEan(rs.getString("ean"));
+                        imp.setEan(ean);
                         imp.setTipoEmbalagem(rs.getString("embalagem"));
                         imp.setQtdEmbalagem(1);
                         imp.seteBalanca("S".equals(rs.getString("pesavel")));
                         imp.setValidade(rs.getInt("validade"));                        
                     }
-                    
                     
                     imp.setIdFamiliaProduto(familia.get(imp.getImportId()));                    
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
