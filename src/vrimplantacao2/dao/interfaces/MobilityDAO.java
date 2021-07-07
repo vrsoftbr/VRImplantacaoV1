@@ -71,7 +71,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.MARGEM
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
                 }
         ));
     }
