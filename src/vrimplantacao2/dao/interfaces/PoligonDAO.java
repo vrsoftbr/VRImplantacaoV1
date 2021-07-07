@@ -577,7 +577,8 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	v.id_loja = " + idLojaCliente + " \n"
                     + "	and operacao = 'VEND'\n"
                     + "	and CONVERT(NVARCHAR, v.data, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                    + " and v.Referencia not in ('V-0000226200','V-0000336107') order by 1";
+                  //+ " and v.Referencia not in ('V-0000226200','V-0000336107')\n"
+                    + "order by 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -626,7 +627,7 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                                     + rst.getString("Id_turno")
                                     + rst.getString("SN")
                                     + rst.getString("Referencia");
-                        System.out.println(id);
+
                         next.setId(id);
                         next.setVenda(idvenda);
                         next.setProduto(rst.getString("produto"));
@@ -676,7 +677,8 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	i.id_loja = " + idLojaCliente + " \n"
                     + "	and v.operacao = 'VEND'\n"
                     + "	and CONVERT(NVARCHAR, v.data, 23) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + " and v.Referencia not in ('V-0000226200','V-0000336107') order by 1,2";
+                  //+ " and v.Referencia not in ('V-0000226200','V-0000336107')\n"
+                    + " order by 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
