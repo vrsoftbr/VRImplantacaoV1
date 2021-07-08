@@ -4,9 +4,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import vrframework.classe.Util;
+import vrimplantacao2_5.gui.componente.conexao.DriverConexao;
 
-public class ConexaoOracle {
+public class ConexaoOracle implements DriverConexao {
 
     private static int contBegin = 0;
     private static Connection con;
@@ -20,7 +23,8 @@ public class ConexaoOracle {
     private static boolean usandoString = false;
     
     
-    public static void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
+    @Override
+    public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         abrirConexao(i_ip, "", i_porta, i_database, i_usuario, i_senha);
     }
     
@@ -69,7 +73,8 @@ public class ConexaoOracle {
         }
     }
     
-    public static void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
+    @Override
+    public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
         Class.forName("oracle.jdbc.driver.OracleDriver");
 
         usuario = i_usuario;
@@ -117,12 +122,14 @@ public class ConexaoOracle {
         }
     }
 
-    public static void close() throws Exception {
+    @Override
+    public void close() throws Exception {
         try {
             con.close();
             con = null;
 
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
+            Util.exibirMensagemErro(ex, "Close");
         }
     }
 
@@ -135,8 +142,10 @@ public class ConexaoOracle {
             stm.execute("SELECT 1 FROM DUAL");
             stm.close();
 
-        } catch (Exception ex) {
-            close();
+        } catch (SQLException ex) {
+            con.close();
+            con = null;
+            
             abrirConexao();
         }
     }

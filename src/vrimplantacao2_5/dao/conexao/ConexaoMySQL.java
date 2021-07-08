@@ -5,8 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import vrimplantacao2_5.gui.componente.conexao.DriverConexao;
 
-public class ConexaoMySQL {
+public class ConexaoMySQL implements DriverConexao {
 
     private int contBegin = 0;
     private static Connection con;
@@ -19,6 +20,7 @@ public class ConexaoMySQL {
     private String strCon = "";
     private boolean usandoString = false;
 
+    @Override
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         abrirConexao(i_ip, "", i_porta, i_database, i_usuario, i_senha);
     }

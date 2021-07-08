@@ -129,6 +129,12 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         }
     }
 
+    public void fecharConexao() throws Exception {
+        if(conexao != null) {
+            conexao.close();
+        }
+    }
+    
     private void validaInformacao(EBancoDados eBD) throws VRException {
         if (cfgVO.getHost().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + eBD + "!");

@@ -231,12 +231,14 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    //idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    //idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj; 
+                    idLojaVR = pnlConn.getLojaVR();                                        
+                    idLojaCliente = pnlConn.getLojaOrigem(); 
+                    
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
-                    //dao.setComplementoSistema(txtComplNomeSistema.getText());
+                    
+                    dao.setComplementoSistema(pnlConn.getComplemento());
                     dao.setFinalizadorasRotativo(rotativoSelecionado);
                     dao.setFinalizadorasCheque(chequeSelecionado);
                     dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
@@ -300,6 +302,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                         }
                     }
 
+                    pnlConn.fecharConexao();
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -316,10 +319,10 @@ public class SysPdv2_5GUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        vRPanel3 = new vrframework.bean.panel.VRPanel();
+        pnlMigrar = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        pnlImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametrosGerais = new vrframework.bean.panel.VRPanel();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
         chkOfertasEncarte = new vrframework.bean.checkBox.VRCheckBox();
@@ -334,7 +337,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFCnpj = new vrframework.bean.checkBox.VRCheckBox();
-        vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabClientes = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -352,13 +355,13 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
+        pnlUnificacao = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel4 = new vrframework.bean.panel.VRPanel();
+        pnlBalanca = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
@@ -380,18 +383,18 @@ public class SysPdv2_5GUI extends VRInternalFrame {
             }
         });
 
-        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
-        vRPanel3.setLayout(vRPanel3Layout);
-        vRPanel3Layout.setHorizontalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlMigrarLayout = new javax.swing.GroupLayout(pnlMigrar);
+        pnlMigrar.setLayout(pnlMigrarLayout);
+        pnlMigrarLayout.setHorizontalGroup(
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlMigrarLayout.createSequentialGroup()
                 .addContainerGap(463, Short.MAX_VALUE)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
+        pnlMigrarLayout.setVerticalGroup(
+            pnlMigrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlMigrarLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -470,8 +473,8 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
-        vRTabbedPane2.addTab("Parâmetros", tabParametrosGerais);
-        vRTabbedPane2.addTab("Produtos", tabProdutos);
+        pnlImportacao.addTab("Parâmetros", tabParametrosGerais);
+        pnlImportacao.addTab("Produtos", tabProdutos);
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -537,7 +540,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addContainerGap(73, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
+        pnlImportacao.addTab("Fornecedores", tabImpFornecedor);
 
         tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -578,7 +581,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addGap(0, 79, Short.MAX_VALUE))
         );
 
-        vRTabbedPane1.addTab("Clientes", tabClienteDados);
+        tabClientes.addTab("Clientes", tabClienteDados);
 
         chkCreditoRotativo.setText("Crédito Rotativo");
         chkCreditoRotativo.setEnabled(true);
@@ -624,7 +627,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
-        vRTabbedPane1.addTab("Crédito Rotativo", tabCreditoRotativo);
+        tabClientes.addTab("Crédito Rotativo", tabCreditoRotativo);
 
         chkCheque.setText("Cheques");
         chkCheque.setEnabled(true);
@@ -670,9 +673,9 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
-        vRTabbedPane1.addTab("Cheque", tabCheque);
+        tabClientes.addTab("Cheque", tabCheque);
 
-        vRTabbedPane2.addTab("Clientes", vRTabbedPane1);
+        pnlImportacao.addTab("Clientes", tabClientes);
 
         pnlDadosDataVenda.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
 
@@ -748,9 +751,9 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addContainerGap(98, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Venda", tabVenda);
+        pnlImportacao.addTab("Venda", tabVenda);
 
-        tabs.addTab("Importação", vRTabbedPane2);
+        tabs.addTab("Importação", pnlImportacao);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
@@ -762,13 +765,13 @@ public class SysPdv2_5GUI extends VRInternalFrame {
 
         chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
 
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlUnificacaoLayout = new javax.swing.GroupLayout(pnlUnificacao);
+        pnlUnificacao.setLayout(pnlUnificacaoLayout);
+        pnlUnificacaoLayout.setHorizontalGroup(
+            pnlUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -776,9 +779,9 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(281, Short.MAX_VALUE))
         );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        pnlUnificacaoLayout.setVerticalGroup(
+            pnlUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -792,32 +795,32 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addContainerGap(37, Short.MAX_VALUE))
         );
 
-        tabs.addTab("Unificação", vRPanel2);
+        tabs.addTab("Unificação", pnlUnificacao);
 
         vRImportaArquivBalancaPanel1.setSistema("SysPdv");
 
-        javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
-        vRPanel4.setLayout(vRPanel4Layout);
-        vRPanel4Layout.setHorizontalGroup(
-            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 572, Short.MAX_VALUE)
-            .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(vRPanel4Layout.createSequentialGroup()
-                    .addGap(27, 27, 27)
-                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGap(28, 28, 28)))
-        );
-        vRPanel4Layout.setVerticalGroup(
-            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 187, Short.MAX_VALUE)
-            .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(vRPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlBalancaLayout = new javax.swing.GroupLayout(pnlBalanca);
+        pnlBalanca.setLayout(pnlBalancaLayout);
+        pnlBalancaLayout.setHorizontalGroup(
+            pnlBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 553, Short.MAX_VALUE)
+            .addGroup(pnlBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlBalancaLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        pnlBalancaLayout.setVerticalGroup(
+            pnlBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 187, Short.MAX_VALUE)
+            .addGroup(pnlBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlBalancaLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
 
-        tabs.addTab("Balança", vRPanel4);
+        tabs.addTab("Balança", pnlBalanca);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -826,7 +829,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlMigrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -839,7 +842,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
                 .addGap(1, 1, 1)
-                .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -933,13 +936,18 @@ public class SysPdv2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private vrframework.bean.panel.VRPanel pnlBalanca;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlDadosDataVenda;
+    private vrframework.bean.tabbedPane.VRTabbedPane pnlImportacao;
+    private vrframework.bean.panel.VRPanel pnlMigrar;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
+    private vrframework.bean.panel.VRPanel pnlUnificacao;
     private javax.swing.JScrollPane scrollCheque;
     private javax.swing.JScrollPane scrollRotativo;
     private vrframework.bean.panel.VRPanel tabCheque;
     private vrframework.bean.panel.VRPanel tabClienteDados;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabClientes;
     private vrframework.bean.panel.VRPanel tabCreditoRotativo;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabParametrosGerais;
@@ -951,12 +959,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
     private org.jdesktop.swingx.JXDatePicker txtDtTerminoOferta;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel8;
-    private vrframework.bean.panel.VRPanel vRPanel2;
-    private vrframework.bean.panel.VRPanel vRPanel3;
-    private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel5;
-    private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
-    private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     // End of variables declaration//GEN-END:variables
 
 }

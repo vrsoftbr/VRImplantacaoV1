@@ -10,7 +10,6 @@ import javax.swing.DefaultDesktopManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
-import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vr.implantacao.main.App;
 import vr.view.helpers.ConexaoPropertiesEditorGUI;
 import vrframework.bean.busca.VRBusca;
@@ -302,6 +301,7 @@ import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
+import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -3551,7 +3551,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemGetWayActionPerformed
 
     private void jMenuItemSysPDVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVActionPerformed
-        SysPdvGUI.exibir(this);
+        SysPdv2_5GUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSysPDVActionPerformed
 
     private void jMenuItemIdealActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemIdealActionPerformed

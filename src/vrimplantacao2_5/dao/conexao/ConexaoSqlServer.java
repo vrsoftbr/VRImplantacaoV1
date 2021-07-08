@@ -7,8 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.gui.componente.conexao.DriverConexao;
 
-public class ConexaoSqlServer {
+public class ConexaoSqlServer implements DriverConexao {
 
     private int contBegin = 0;
     private static Connection con;
@@ -29,10 +30,12 @@ public class ConexaoSqlServer {
         }
     }
     
+    @Override
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         abrirConexao(i_ip, "", i_porta, i_database, i_usuario, i_senha);
     }
 
+    @Override
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
         Class.forName(Driver.get().getDriver());
         
@@ -108,12 +111,13 @@ public class ConexaoSqlServer {
         }
     }
 
+    @Override
     public void close() throws Exception {
         try {
             con.close();
             con = null;
 
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
         }
     }
 

@@ -29,7 +29,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
+                  <Component id="pnlMigrar" alignment="0" max="32767" attributes="0"/>
                   <Component id="tabs" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Component id="pnlConn" alignment="0" max="32767" attributes="0"/>
               </Group>
@@ -45,14 +45,14 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="tabs" pref="213" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-              <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
+              <Component id="pnlMigrar" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel3">
+    <Container class="vrframework.bean.panel.VRPanel" name="pnlMigrar">
 
       <Layout>
         <DimensionLayout dim="0">
@@ -95,7 +95,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="vRTabbedPane2">
+        <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="pnlImportacao">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Importa&#xe7;&#xe3;o">
@@ -347,7 +347,7 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="vRTabbedPane1">
+            <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabClientes">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Clientes">
@@ -684,7 +684,7 @@
             </Container>
           </SubComponents>
         </Container>
-        <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
+        <Container class="vrframework.bean.panel.VRPanel" name="pnlUnificacao">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Unifica&#xe7;&#xe3;o">
@@ -755,7 +755,7 @@
             </Component>
           </SubComponents>
         </Container>
-        <Container class="vrframework.bean.panel.VRPanel" name="vRPanel4">
+        <Container class="vrframework.bean.panel.VRPanel" name="pnlBalanca">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Balan&#xe7;a">
@@ -767,12 +767,12 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="572" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="553" max="32767" attributes="0"/>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                          <Component id="vRImportaArquivBalancaPanel1" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRImportaArquivBalancaPanel1" pref="541" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -783,8 +783,8 @@
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="vRImportaArquivBalancaPanel1" pref="175" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
