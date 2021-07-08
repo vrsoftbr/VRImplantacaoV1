@@ -1,6 +1,5 @@
 package vrimplantacao2_5.gui.cadastro.configuracao;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -37,6 +36,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     public static ConsultaConfiguracaoBaseDadosGUI consultaConfiguracaoBancoDadosGUI = null;
     private static ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private static MapaLojaGUI mapaLojaGUI = null;
+    private SelecaoLojaGUI migracaoGUI = null;
 
     private ConfiguracaoBaseDadosController controller = null;
     private AtualizadorController atualizadorController = null;
@@ -201,6 +201,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         configuracaoBancoVO.setDescricao(txtNomeConexao.getText());
         configuracaoBancoVO.setBancoDados(bancoDadosVO);
         configuracaoBancoVO.setSistema(sistemaVO);
+        configuracaoBancoVO.setComplemento(txtComplemento.getText());
 
         controller.salvar(configuracaoBancoVO);
 
@@ -212,8 +213,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             try {
                 Util.exibirMensagem("Conexão salva com sucesso!", getTitle());
             } catch (Exception ex) {
-                ex.printStackTrace();
-                Exceptions.printStackTrace(ex);
+                Util.exibirMensagemErro(ex, getTitle());
             }
         }
     }
@@ -300,6 +300,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         tabConexao = new vrframework.bean.tabbedPane.VRTabbedPane();
         btnDica = new vrframework.bean.button.VRButton();
         btnProximo = new vrframework.bean.button.VRButton();
+        lblComplemento = new vrframework.bean.label.VRLabel();
+        txtComplemento = new vrframework.bean.textField.VRTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(lblNomeCon, "Nome da Conexão");
 
@@ -394,6 +396,8 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(lblComplemento, "Complemento");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -401,37 +405,48 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(cboBD, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 526, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                    .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblBD, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(cboBD, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(txtNomeConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                            .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(tabConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btnProximo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(319, 319, 319)
+                        .addComponent(lblComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(67, 67, 67))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNomeCon, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtNomeConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtNomeConexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnDica, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -475,16 +490,16 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
         try {
             salvar();
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, getTitle());
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     private void btnDicaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDicaActionPerformed
         try {
-            Util.exibirMensagem("Informe uma descrição da conexão!\n"
+            Util.exibirMensagem("Informe uma descrição para a conexão\n para uma melhor identificação!\n"
                     + "Exemplo: CONEXÃO DA LOJA MATRIZ - SERVIDOR 0.0.0.0", getTitle());
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, getTitle());
         }
     }//GEN-LAST:event_btnDicaActionPerformed
 
@@ -495,7 +510,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             selecionarSistema();
             exibirMapaLoja();
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            Util.exibirMensagemErro(ex, getTitle());
         }
         
     }//GEN-LAST:event_btnMapearActionPerformed
@@ -505,7 +520,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnExcluirLojaActionPerformed
 
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
-        SelecaoLojaGUI.exibirMigracaoLoja();
+        exibirSelecaoLoja();
     }//GEN-LAST:event_btnProximoActionPerformed
 
 
@@ -518,11 +533,13 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cboBD;
     private vrframework.bean.comboBox.VRComboBox cboSistema;
     private vrframework.bean.label.VRLabel lblBD;
+    private vrframework.bean.label.VRLabel lblComplemento;
     private vrframework.bean.label.VRLabel lblNomeCon;
     private vrframework.bean.label.VRLabel lblSistema;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.tabbedPane.VRTabbedPane tabConexao;
     private vrframework.bean.tableEx.VRTableEx tblLoja;
+    private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.textField.VRTextField txtNomeConexao;
     // End of variables declaration//GEN-END:variables
 
@@ -532,10 +549,11 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 mapaLojaGUI = new MapaLojaGUI();
             }
 
-            mapaLojaGUI.configuracaoBaseDadosGUI = this;
-
             mapaLojaGUI.setMapaLojaController(mapaController);
+            mapaLojaGUI.configuracaoBaseDadosGUI = this;
             mapaLojaGUI.setConfiguracaoConexao(configuracaoBancoVO);
+            
+            mapaLojaGUI.setConfiguracao();
             mapaLojaGUI.setVisible(true);
 
         } catch (Exception ex) {
@@ -556,6 +574,20 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
             Util.exibirMensagemErro(ex, "Consulta Configuração de Base de Dados");
         } finally {
             menuGUI.setDefaultCursor();
+        }
+    }
+    
+    public void exibirSelecaoLoja() {
+        try {
+            if (migracaoGUI == null || !migracaoGUI.isActive()) {
+                migracaoGUI = new SelecaoLojaGUI();
+            }
+
+            migracaoGUI.parentFrame = this.parentFrame;
+            migracaoGUI.setVisible(true);
+            
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Seleção de Loja");
         }
     }
 }

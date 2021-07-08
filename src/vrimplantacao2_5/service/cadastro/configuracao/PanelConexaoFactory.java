@@ -1,6 +1,5 @@
 package vrimplantacao2_5.service.cadastro.configuracao;
 
-import org.openide.util.Exceptions;
 import vrframework.classe.Util;
 import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;

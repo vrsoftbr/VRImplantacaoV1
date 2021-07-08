@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
@@ -16,51 +14,79 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrframework.remote.ItemComboVO;
-import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SysPdvDAO;
 import vrimplantacao2.dao.interfaces.SysPdvDAO.FinalizadoraRecord;
-import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.vo.enums.ESistema;
 
-public class SysPdvGUI extends VRInternalFrame {
-    
-    private static final Logger LOG = Logger.getLogger(SysPdvGUI.class.getName());
-    
-    public static final String SISTEMA = "SysPDV";
-    private static final String SERVIDOR_SQL = "Firebird";
-    private static SysPdvGUI instance;
-    
-    private String vLojaCliente = "-1";
-    private int vLojaVR = -1;
-    
+public class SysPdv2_5GUI extends VRInternalFrame {
+
+    private static SysPdv2_5GUI instance;
     private SysPdvDAO dao = new SysPdvDAO();
-    
+
     private Set<String> rotativoSelecionado = new HashSet<>();
     private Set<String> chequeSelecionado = new HashSet<>();
     
-    private SysPdvGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private static final String SISTEMA = ESistema.SYSPDV.getNome();
+
+    public SysPdv2_5GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
-        initComponents();     
-        
+        initComponents();
+
+        pnlConn.setOnConectar(new ConexaoEvent() {
+
+            @Override
+            public void executar() throws Exception {
+
+                dao.setTipoConexao(pnlConn.cfgVO.getBancoDados().getNome().equals("FIREBIRD")
+                        ? SysPdvDAO.TipoConexao.FIREBIRD : SysPdvDAO.TipoConexao.SQL_SERVER);
+                gravarParametros();
+                //carregarFinalizadora();
+                tabProdutos.btnMapaTribut.setEnabled(true);
+            }
+        });
+
         tabProdutos.setOpcoesDisponiveis(dao);
-        
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                dao.setComplementoSistema(pnlConn.getComplemento());
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(pnlConn.getLojaOrigem());
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+
         txtDtTerminoOferta.setFormats("dd/MM/yyyy");
-        
+
         this.title = "Importação " + SISTEMA;
-        
-        carregarParametros();        
+
+        carregarParametros();
         centralizarForm();
         this.setMaximum(false);
     }
-    
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
 
@@ -70,42 +96,40 @@ public class SysPdvGUI extends VRInternalFrame {
         chkGerarEANAtacado.setSelected(params.getBool(false, SISTEMA, "GERAR_EAN_PARA_ATACADO"));
         chkIgnorarEnviaBalanca.setSelected(params.getBool(false, SISTEMA, "IGNORA_ENVIAR_BALANCA"));
         chkOfertasEncarte.setSelected(params.getBool(false, SISTEMA, "OFERTAS_ENCARTE"));
-        
-        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
-        vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
-        
+
         String strRotativoSelecionado = params.getWithNull("", SISTEMA, "ROTATIVO_SELECT");
         this.rotativoSelecionado.clear();
-        for (String id: strRotativoSelecionado.split("\\|")) {
+        for (String id : strRotativoSelecionado.split("\\|")) {
             if (!"".equals(id)) {
                 this.rotativoSelecionado.add(id);
             }
         }
         String strChequeSelecionado = params.getWithNull("", SISTEMA, "CHEQUE_SELECT");
         this.chequeSelecionado.clear();
-        for (String id: strChequeSelecionado.split("\\|")) {
+        for (String id : strChequeSelecionado.split("\\|")) {
             if (!"".equals(id)) {
                 this.chequeSelecionado.add(id);
             }
         }
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         tabProdutos.gravarParametros(params, SISTEMA);
-        params.put(txtDtTerminoOferta.getDate(), SISTEMA, "DATA_TERMINO_OFERTA");        
+        params.put(txtDtTerminoOferta.getDate(), SISTEMA, "DATA_TERMINO_OFERTA");
         params.put(chkSoAtivos.isSelected(), SISTEMA, "SO_ATIVOS");
         params.put(chkGerarEANAtacado.isSelected(), SISTEMA, "GERAR_EAN_PARA_ATACADO");
         params.put(chkIgnorarEnviaBalanca.isSelected(), SISTEMA, "IGNORA_ENVIAR_BALANCA");
         params.put(chkOfertasEncarte.isSelected(), SISTEMA, "OFERTAS_ENCARTE");
-        
+
         {
             StringBuilder builder = new StringBuilder();
             for (Iterator<String> iterator = this.rotativoSelecionado.iterator(); iterator.hasNext();) {
                 builder.append(iterator.next());
-                if (iterator.hasNext())
+                if (iterator.hasNext()) {
                     builder.append("|");
+                }
             }
             params.put(builder.toString(), SISTEMA, "ROTATIVO_SELECT");
         }
@@ -113,23 +137,25 @@ public class SysPdvGUI extends VRInternalFrame {
             StringBuilder builder = new StringBuilder();
             for (Iterator<String> iterator = this.chequeSelecionado.iterator(); iterator.hasNext();) {
                 builder.append(iterator.next());
-                if (iterator.hasNext())
+                if (iterator.hasNext()) {
                     builder.append("|");
+                }
             }
             params.put(builder.toString(), SISTEMA, "CHEQUE_SELECT");
         }
-        
+
         params.salvar();
     }
-    
+
     private FinalizadoraTableModel rotativoModel = new FinalizadoraTableModel(new ArrayList<FinalizadoraRecord>());
     private FinalizadoraTableModel chequeModel = new FinalizadoraTableModel(new ArrayList<FinalizadoraRecord>());
+
     private void carregarFinalizadora() throws Exception {
         this.rotativoModel = new FinalizadoraTableModel(this.dao.getFinalizadora());
-        for (FinalizadoraRecord f: this.rotativoModel.getItens()) {
+        for (FinalizadoraRecord f : this.rotativoModel.getItens()) {
             f.selected = rotativoSelecionado.contains(f.id);
         }
-        this.rotativoModel.addTableModelListener(new TableModelListener(){
+        this.rotativoModel.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
                 FinalizadoraRecord item = rotativoModel.getItens().get(e.getLastRow());
@@ -142,10 +168,10 @@ public class SysPdvGUI extends VRInternalFrame {
         });
         tblRotativo.setModel(this.rotativoModel);
         this.chequeModel = new FinalizadoraTableModel(this.dao.getFinalizadora());
-        for (FinalizadoraRecord f: this.chequeModel.getItens()) {
+        for (FinalizadoraRecord f : this.chequeModel.getItens()) {
             f.selected = chequeSelecionado.contains(f.id);
         }
-        this.chequeModel.addTableModelListener(new TableModelListener(){
+        this.chequeModel.addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
                 FinalizadoraRecord item = chequeModel.getItens().get(e.getLastRow());
@@ -158,32 +184,32 @@ public class SysPdvGUI extends VRInternalFrame {
         });
         tblCheque.setModel(this.chequeModel);
     }
-    
+
     private List<String> getFinalizadorasRotativo() {
         List<String> result = new ArrayList<>();
-        for (FinalizadoraRecord f: this.rotativoModel.getItens()) {
+        for (FinalizadoraRecord f : this.rotativoModel.getItens()) {
             if (f.selected) {
                 result.add(f.id);
             }
         }
         return result;
     }
-    
+
     private List<String> getFinalizadorasCheque() {
         List<String> result = new ArrayList<>();
-        for (FinalizadoraRecord f: this.chequeModel.getItens()) {
+        for (FinalizadoraRecord f : this.chequeModel.getItens()) {
             if (f.selected) {
                 result.add(f.id);
             }
         }
         return result;
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new SysPdvGUI(i_mdiFrame);
+                instance = new SysPdv2_5GUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -198,15 +224,15 @@ public class SysPdvGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
+
                     //idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     //idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj; 
-                    
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -214,25 +240,25 @@ public class SysPdvGUI extends VRInternalFrame {
                     dao.setFinalizadorasRotativo(rotativoSelecionado);
                     dao.setFinalizadorasCheque(chequeSelecionado);
                     dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
-                    
-                    if (tabs.getSelectedIndex() == 0) {                        
+
+                    if (tabs.getSelectedIndex() == 0) {
                         dao.setSoAtivos(chkSoAtivos.isSelected());
                         dao.setDtOfertas(txtDtTerminoOferta.getDate());
                         dao.setIgnorarEnviaBalanca(chkIgnorarEnviaBalanca.isSelected());
                         dao.setUsarOfertasDoEncarte(chkOfertasEncarte.isSelected());
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
-                        
+
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
-                        }                        
+                        }
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                        }              
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
+                        }
                         if (chkFCnpj.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CNPJ_CPF);
                         }
@@ -265,15 +291,15 @@ public class SysPdvGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -335,7 +361,7 @@ public class SysPdvGUI extends VRInternalFrame {
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         try {
-            configuracaoBaseDados1 = new vrimplantacao2_5.gui.componente.conexao.configuracao.ConfiguracaoBaseDados();
+            pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
             e1.printStackTrace();
         }
@@ -424,7 +450,7 @@ public class SysPdvGUI extends VRInternalFrame {
                     .addComponent(chkIgnorarEnviaBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkGerarEANAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout tabParametrosGeraisLayout = new javax.swing.GroupLayout(tabParametrosGerais);
@@ -508,7 +534,7 @@ public class SysPdvGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(97, Short.MAX_VALUE))
+                .addContainerGap(73, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
@@ -549,7 +575,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 103, Short.MAX_VALUE))
+                .addGap(0, 79, Short.MAX_VALUE))
         );
 
         vRTabbedPane1.addTab("Clientes", tabClienteDados);
@@ -593,7 +619,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addGroup(tabCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabCreditoRotativoLayout.createSequentialGroup()
                         .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 127, Short.MAX_VALUE))
+                        .addGap(0, 103, Short.MAX_VALUE))
                     .addComponent(scrollRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -640,7 +666,7 @@ public class SysPdvGUI extends VRInternalFrame {
                     .addComponent(scrollCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(tabChequeLayout.createSequentialGroup()
                         .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 127, Short.MAX_VALUE)))
+                        .addGap(0, 103, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -719,7 +745,7 @@ public class SysPdvGUI extends VRInternalFrame {
             .addGroup(tabVendaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(122, Short.MAX_VALUE))
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Venda", tabVenda);
@@ -763,7 +789,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(61, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -783,7 +809,7 @@ public class SysPdvGUI extends VRInternalFrame {
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 211, Short.MAX_VALUE)
+            .addGap(0, 187, Short.MAX_VALUE)
             .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(vRPanel4Layout.createSequentialGroup()
                     .addContainerGap()
@@ -802,16 +828,16 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(configuracaoBaseDados1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pnlConn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(configuracaoBaseDados1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlConn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
                 .addGap(1, 1, 1)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -825,10 +851,10 @@ public class SysPdvGUI extends VRInternalFrame {
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
-                        
+
             gravarParametros();
             importarTabelas();
-            
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
 
@@ -884,7 +910,7 @@ public class SysPdvGUI extends VRInternalFrame {
     private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
 
     }//GEN-LAST:event_chkPdvVendasActionPerformed
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
@@ -905,9 +931,9 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
-    private vrimplantacao2_5.gui.componente.conexao.configuracao.ConfiguracaoBaseDados configuracaoBaseDados1;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrframework.bean.panel.VRPanel pnlDadosDataVenda;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private javax.swing.JScrollPane scrollCheque;
@@ -932,10 +958,8 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     // End of variables declaration//GEN-END:variables
-    
+
 }
-
-
 
 class FinalizadoraTableModel extends AbstractTableModel {
 
@@ -948,7 +972,7 @@ class FinalizadoraTableModel extends AbstractTableModel {
     public FinalizadoraTableModel(List<FinalizadoraRecord> itens) {
         this.itens = itens;
     }
-    
+
     @Override
     public int getRowCount() {
         return this.itens.size();
@@ -963,10 +987,14 @@ class FinalizadoraTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         FinalizadoraRecord f = this.itens.get(rowIndex);
         switch (columnIndex) {
-            case 0: return f.selected;
-            case 1: return f.id;
-            case 2: return f.descricao;
-            default: return null;
+            case 0:
+                return f.selected;
+            case 1:
+                return f.id;
+            case 2:
+                return f.descricao;
+            default:
+                return null;
         }
     }
 
@@ -987,19 +1015,25 @@ class FinalizadoraTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
-            case 0: return Boolean.class;
-            default: return super.getColumnClass(columnIndex);
+            case 0:
+                return Boolean.class;
+            default:
+                return super.getColumnClass(columnIndex);
         }
     }
 
     @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
-            case 0: return "-";
-            case 1: return "Código";
-            case 2: return "Descrição";
-            default: return null;
+            case 0:
+                return "-";
+            case 1:
+                return "Código";
+            case 2:
+                return "Descrição";
+            default:
+                return null;
         }
     }
-    
+
 }

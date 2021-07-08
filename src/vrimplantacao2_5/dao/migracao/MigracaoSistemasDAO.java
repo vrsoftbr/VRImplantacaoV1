@@ -15,6 +15,7 @@ public class MigracaoSistemasDAO {
 
     public List<Estabelecimento> getLojasOrigem(Connection conexao, String sql) throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
+        
         try (Statement stm = conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(sql)) {
                 while (rs.next()) {
@@ -22,6 +23,7 @@ public class MigracaoSistemasDAO {
                 }
             }
         }
+        
         return result;
     }
 }
