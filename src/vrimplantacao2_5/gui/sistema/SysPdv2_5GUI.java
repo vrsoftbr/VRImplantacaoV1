@@ -84,6 +84,8 @@ public class SysPdv2_5GUI extends VRInternalFrame {
 
         carregarParametros();
         centralizarForm();
+        pnlConn.getNomeConexao();
+        
         this.setMaximum(false);
     }
 
@@ -96,7 +98,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         chkGerarEANAtacado.setSelected(params.getBool(false, SISTEMA, "GERAR_EAN_PARA_ATACADO"));
         chkIgnorarEnviaBalanca.setSelected(params.getBool(false, SISTEMA, "IGNORA_ENVIAR_BALANCA"));
         chkOfertasEncarte.setSelected(params.getBool(false, SISTEMA, "OFERTAS_ENCARTE"));
-
+        
         String strRotativoSelecionado = params.getWithNull("", SISTEMA, "ROTATIVO_SELECT");
         this.rotativoSelecionado.clear();
         for (String id : strRotativoSelecionado.split("\\|")) {
@@ -117,12 +119,15 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         Parametros params = Parametros.get();
 
         tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(pnlConn.cfgVO.getBancoDados().getNome(), SISTEMA, "CONEXAO");
         params.put(txtDtTerminoOferta.getDate(), SISTEMA, "DATA_TERMINO_OFERTA");
         params.put(chkSoAtivos.isSelected(), SISTEMA, "SO_ATIVOS");
         params.put(chkGerarEANAtacado.isSelected(), SISTEMA, "GERAR_EAN_PARA_ATACADO");
         params.put(chkIgnorarEnviaBalanca.isSelected(), SISTEMA, "IGNORA_ENVIAR_BALANCA");
         params.put(chkOfertasEncarte.isSelected(), SISTEMA, "OFERTAS_ENCARTE");
 
+        pnlConn.atualizarParametros();
+        
         {
             StringBuilder builder = new StringBuilder();
             for (Iterator<String> iterator = this.rotativoSelecionado.iterator(); iterator.hasNext();) {

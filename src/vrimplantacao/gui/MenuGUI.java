@@ -252,7 +252,6 @@ import vrimplantacao2.gui.interfaces.TopSystemGUI3;
 import vrimplantacao2.gui.interfaces.TpaRootacGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
-import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.VCashGUI;
 import vrimplantacao2.gui.interfaces.VRToVRGUI;
@@ -302,6 +301,7 @@ import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
+import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -4659,7 +4659,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAcertarIdsProdutosActionPerformed
 
     private void mnuUniplusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUniplusActionPerformed
-        UniplusGUI.exibir(this);
+        Uniplus2_5GUI.exibir(this);
     }//GEN-LAST:event_mnuUniplusActionPerformed
 
     private void mnuUpFortiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUpFortiActionPerformed

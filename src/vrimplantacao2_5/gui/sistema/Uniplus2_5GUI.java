@@ -41,7 +41,11 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
         params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
         params.put(uniplusDAO.getTabelaPreco().ordinal(), SISTEMA, "TABELA_PRECO");
+        params.put(chkDUN14Atacado.isSelected(), SISTEMA, "GERAR_DUN14_ATACADO");
+        params.put(chkNewEan.isSelected(), SISTEMA, "PREFIXO_MAIS_CODIGO");
 
+        pnlConn.atualizarParametros();
+        
         params.salvar();
     }
     
@@ -64,6 +68,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
             }
         });
         
+        pnlConn.getNomeConexao();
         centralizarForm();
         this.setMaximum(false);  
     }
@@ -546,6 +551,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
+            gravarParametros();
             importarTabelas();
 
         } catch (Exception ex) {

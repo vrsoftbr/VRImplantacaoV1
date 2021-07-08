@@ -23,7 +23,7 @@ import vrimplantacao2_5.vo.enums.EBancoDados;
  */
 public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
-    private SelecaoLojaController controller = null;
+    private SelecaoLojaController controller = new SelecaoLojaController();;
     private List<ConfiguracaoBancoLojaVO> lojas = null;
     private List<ConfiguracaoBaseDadosVO> conexoes = null;
     private ConexaoEvent onConectar;
@@ -44,7 +44,6 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     }
 
     private void setConfiguracao() throws Exception {
-        this.controller = new SelecaoLojaController();
         getNomeConexao();
     }
 
@@ -57,7 +56,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         return onConectar;
     }
 
-    private void getNomeConexao() throws Exception {
+    public void getNomeConexao() throws Exception {
         cboConexao.setModel(new DefaultComboBoxModel());
 
         conexoes = controller.consultar();
@@ -74,6 +73,8 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
         if (conexoes.size() > 0) {
             habilitarBotaoConectar();
         }
+        
+        preencheCampoLojaVR();
     }
 
     private void getLojaMapeada() {
@@ -111,11 +112,8 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
         validaInformacao(eBD);
         
-        conexao.abrirConexao(cfgVO.getHost(),
-                cfgVO.getPorta(),
-                cfgVO.getSchema(),
-                cfgVO.getUsuario(),
-                cfgVO.getSenha());
+        conexao.abrirConexao(cfgVO.getHost(), cfgVO.getPorta(), cfgVO.getSchema(), 
+                                                cfgVO.getUsuario(), cfgVO.getSenha());
 
         btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
         lblDados.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/disponivel_12.png")));
@@ -153,13 +151,15 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
 
-        params.put(cfgVO.getHost(), cfgVO.getSistema().getNome(), "FIREBIRD", "HOST");
-        params.put(cfgVO.getSchema(), cfgVO.getSistema().getNome(), "FIREBIRD", "DATABASE");
-        params.put(cfgVO.getPorta(), cfgVO.getSistema().getNome(), "FIREBIRD", "PORTA");
-        params.put(cfgVO.getUsuario(), cfgVO.getSistema().getNome(), "FIREBIRD", "USUARIO");
-        params.put(cfgVO.getSenha(), cfgVO.getSistema().getNome(), "FIREBIRD", "SENHA");
-        params.put(cfgVO.getSistema().getNome(), cfgVO.getSistema().getNome(), "FIREBIRD", "SISTEMA");
-        params.put(cfgVO.getBancoDados().getNome(), cfgVO.getSistema().getNome(), "FIREBIRD", "ENGINE");
+        final String SISTEMA = cfgVO.getSistema().getNome();
+        
+        params.put(cfgVO.getHost(), SISTEMA, "FIREBIRD", "HOST");
+        params.put(cfgVO.getSchema(), SISTEMA, "FIREBIRD", "DATABASE");
+        params.put(cfgVO.getPorta(), SISTEMA, "FIREBIRD", "PORTA");
+        params.put(cfgVO.getUsuario(), SISTEMA, "FIREBIRD", "USUARIO");
+        params.put(cfgVO.getSenha(), SISTEMA, "FIREBIRD", "SENHA");
+        params.put(cfgVO.getSistema().getNome(), SISTEMA, "FIREBIRD", "SISTEMA");
+        params.put(cfgVO.getBancoDados().getNome(), SISTEMA, "FIREBIRD", "ENGINE");
         params.salvar();
     }
 

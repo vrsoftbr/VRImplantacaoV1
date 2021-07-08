@@ -41,6 +41,7 @@ public class ConexaoFirebird implements DriverConexao {
         }
     }
     
+    @Override
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
         Class.forName("org.firebirdsql.jdbc.FBDriver");
 
