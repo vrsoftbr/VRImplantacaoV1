@@ -610,7 +610,8 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        //String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        String id = rst.getString("id_venda");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -658,7 +659,8 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "select\n"
-                    + "	concat(seq,cupom,data) id,\n"
+                  //+ "	concat(seq,cupom,data) id,\n"
+                    + "	v.seq id_venda,\n"
                     + "	cupom numerocupom,\n"
                     + "	codcli idcliente,\n"
                     + "	case micro\n"
@@ -725,11 +727,11 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("id_venda");
-                        String idItem = rst.getString("id_item");
+                        //String id = rst.getString("id_venda");
+                        //String idItem = rst.getString("id_item");
 
-                        next.setVenda(id);
-                        next.setId(idItem);
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
                         next.setProduto(rst.getString("produto"));
                         //next.setSequencia(rst.getInt("nroitem"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
