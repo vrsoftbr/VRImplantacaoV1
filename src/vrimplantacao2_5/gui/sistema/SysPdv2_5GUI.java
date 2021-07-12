@@ -47,7 +47,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                 dao.setTipoConexao(pnlConn.cfgVO.getBancoDados().getNome().equals("FIREBIRD")
                         ? SysPdvDAO.TipoConexao.FIREBIRD : SysPdvDAO.TipoConexao.SQL_SERVER);
                 gravarParametros();
-                //carregarFinalizadora();
+                carregarFinalizadora();
                 tabProdutos.btnMapaTribut.setEnabled(true);
             }
         });
@@ -713,11 +713,6 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         );
 
         chkPdvVendas.setEnabled(true);
-        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkPdvVendasActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout pnlDadosDataVendaLayout = new javax.swing.GroupLayout(pnlDadosDataVenda);
         pnlDadosDataVenda.setLayout(pnlDadosDataVendaLayout);
@@ -915,10 +910,6 @@ public class SysPdv2_5GUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
-    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
-
-    }//GEN-LAST:event_chkPdvVendasActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
@@ -966,7 +957,6 @@ public class SysPdv2_5GUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.panel.VRPanel vRPanel5;
     // End of variables declaration//GEN-END:variables
-
 }
 
 class FinalizadoraTableModel extends AbstractTableModel {

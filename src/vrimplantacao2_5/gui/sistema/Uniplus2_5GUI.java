@@ -635,5 +635,4 @@ public class Uniplus2_5GUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel9;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
-
 }
