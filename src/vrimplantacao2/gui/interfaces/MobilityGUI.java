@@ -218,9 +218,11 @@ public class MobilityGUI extends VRInternalFrame {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
                                     OpcaoCliente.CNPJ,
+                                    OpcaoCliente.INSCRICAO_ESTADUAL,
                                     OpcaoCliente.DADOS,
                                     OpcaoCliente.CONTATOS,
                                     OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.RECEBER_CREDITOROTATIVO,
                                     OpcaoCliente.SITUACAO_CADASTRO,
                                     OpcaoCliente.EMAIL);
                         }
