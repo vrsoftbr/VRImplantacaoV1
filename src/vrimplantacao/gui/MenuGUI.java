@@ -271,6 +271,7 @@ import vrimplantacao2.gui.interfaces.CorrecaoImpostosDSoftGUI;
 import vrimplantacao2.gui.interfaces.CorrecaoImpostosSuperContole_SuperServerGUI;
 import vrimplantacao2.gui.interfaces.DSoftGUI;
 import vrimplantacao2.gui.interfaces.EasySacGUI;
+import vrimplantacao2.gui.interfaces.EcoCentauroGUI;
 import vrimplantacao2.gui.interfaces.EptusGUI;
 import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.GComGUI;
@@ -689,6 +690,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFirebird3 = new javax.swing.JMenu();
         mnuAutocom = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
         mnuGCom = new javax.swing.JMenuItem();
         chkGigatron = new javax.swing.JMenuItem();
@@ -1770,6 +1772,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(mnuDSoft);
+
+        jMenuItem1.setText("Eco Centauro");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(jMenuItem1);
 
         mnuFutura.setText("Futura");
         mnuFutura.addActionListener(new java.awt.event.ActionListener() {
@@ -5261,9 +5271,16 @@ public final class MenuGUI extends VRMdiFrame {
         EptusGUI.exibir(this);
     }//GEN-LAST:event_mnuEptusActionPerformed
 
+
     private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNeoActionPerformed
         NeoGUI.exibir(this);
     }//GEN-LAST:event_mnuNeoActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        EcoCentauroGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
 
 
 
@@ -5272,6 +5289,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
