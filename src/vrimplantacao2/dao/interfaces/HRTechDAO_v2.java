@@ -1662,7 +1662,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "	fl700fin\n" +
                     "where\n" +
-                    "	tipo_pagto in ('VLE', 'BOL', 'A', '   ', 'DH') \n" +
+                    "	tipo_pagto in ('CHQ', 'VLE', 'BOL', 'A', '   ', 'DH') \n" +
                     "	and codigoloja = '" + getLojaOrigem() + "'\n" +
                     "	and tipolancam in ('A', 'R') and tipocadast = 'F'\n" +        
                     "	and datpagto = '1900-01-01 00:00:00'")) {
