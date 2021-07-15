@@ -27,7 +27,6 @@ public class PhoenixGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
         txtProdutoFile.setArquivo(params.get(SISTEMA, "PLANILHA_PRODUTO"));
-        txtProdutoLojaFile.setArquivo(params.get(SISTEMA, "PLANILHA_PRODUTO_LOJA"));
         txtFornecedorFile.setArquivo(params.get(SISTEMA, "PLANILHA_FORNECEDOR"));
         txtFornecedorMercFile.setArquivo(params.get(SISTEMA, "PLANILHA_PRODUTO_FORNECEDOR"));
         txtClienteFile.setArquivo(params.get(SISTEMA, "PLANILHA_CLIENTE"));
@@ -45,7 +44,6 @@ public class PhoenixGUI extends VRInternalFrame {
         params.put(txtSistema.getText(), SISTEMA, "SISTEMA");
         params.put(txtCodLojaOrigem.getText(), SISTEMA, "LOJA_CLIENTE");
         params.put(txtProdutoFile.getArquivo(), SISTEMA, "PLANILHA_PRODUTO");
-        params.put(txtProdutoLojaFile.getArquivo(), SISTEMA, "PLANILHA_PRODUTO_LOJA");
         params.put(txtFamiliaFile.getArquivo(), SISTEMA, "PLANILHA_FAMILIA");
         params.put(txtFornecedorFile.getArquivo(), SISTEMA, "PLANILHA_FORNECEDOR");
         params.put(txtFornecedorMercFile.getArquivo(), SISTEMA, "PLANILHA_PRODUTO_FORNECEDOR");
@@ -138,7 +136,6 @@ public class PhoenixGUI extends VRInternalFrame {
                     if (tabsProduto.getSelectedIndex() == 0) {
                         dao.setArquivoFamilia(txtFamiliaFile.getArquivo());
                         dao.setArquivo(txtProdutoFile.getArquivo());
-                        dao.setArquivoLoja(txtProdutoLojaFile.getArquivo());
 
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
@@ -219,8 +216,6 @@ public class PhoenixGUI extends VRInternalFrame {
         txtFamiliaFile = new vrframework.bean.fileChooser.VRFileChooser();
         lblProdutoFile = new vrframework.bean.label.VRLabel();
         txtProdutoFile = new vrframework.bean.fileChooser.VRFileChooser();
-        lblProdutoLojaFile = new vrframework.bean.label.VRLabel();
-        txtProdutoLojaFile = new vrframework.bean.fileChooser.VRFileChooser();
         tabArquivosForn = new vrframework.bean.panel.VRPanel();
         lblFileFornecedor = new vrframework.bean.label.VRLabel();
         txtFornecedorFile = new vrframework.bean.fileChooser.VRFileChooser();
@@ -446,8 +441,6 @@ public class PhoenixGUI extends VRInternalFrame {
 
         lblProdutoFile.setText("Planilha Produto Principal (Merc.DB)");
 
-        lblProdutoLojaFile.setText("Planilha Produto Loja (MercAnexo.DB)");
-
         javax.swing.GroupLayout tabArquivosLayout = new javax.swing.GroupLayout(tabArquivos);
         tabArquivos.setLayout(tabArquivosLayout);
         tabArquivosLayout.setHorizontalGroup(
@@ -457,13 +450,11 @@ public class PhoenixGUI extends VRInternalFrame {
                 .addGroup(tabArquivosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtFamiliaFile, javax.swing.GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
                     .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtProdutoLojaFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(tabArquivosLayout.createSequentialGroup()
                         .addGroup(tabArquivosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblProdutoFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblFileFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblProdutoLojaFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(lblFileFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 494, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabArquivosLayout.setVerticalGroup(
@@ -477,11 +468,7 @@ public class PhoenixGUI extends VRInternalFrame {
                 .addComponent(lblProdutoFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtProdutoFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblProdutoLojaFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtProdutoLojaFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap(84, Short.MAX_VALUE))
         );
 
         tabPrincipal.addTab("Arquivo Produto", tabArquivos);
@@ -628,7 +615,6 @@ public class PhoenixGUI extends VRInternalFrame {
     private javax.swing.JLabel lblLoja;
     private vrframework.bean.label.VRLabel lblOrigem;
     private vrframework.bean.label.VRLabel lblProdutoFile;
-    private vrframework.bean.label.VRLabel lblProdutoLojaFile;
     private vrframework.bean.label.VRLabel lblSistema;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlBotao;
@@ -650,7 +636,6 @@ public class PhoenixGUI extends VRInternalFrame {
     private vrframework.bean.fileChooser.VRFileChooser txtFornecedorFile;
     private vrframework.bean.fileChooser.VRFileChooser txtFornecedorMercFile;
     private vrframework.bean.fileChooser.VRFileChooser txtProdutoFile;
-    private vrframework.bean.fileChooser.VRFileChooser txtProdutoLojaFile;
     private javax.swing.JTextField txtSistema;
     private vrframework.bean.label.VRLabel vRLabel16;
     private vrframework.bean.panel.VRPanel vRPanel1;
