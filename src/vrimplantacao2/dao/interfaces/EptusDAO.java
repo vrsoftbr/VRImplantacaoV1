@@ -775,7 +775,7 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     = 
                     "select\n" +
                     "	v.cod_idregistro id,\n" +
-                    "	v.dt_movto data,\n" +
+                    "	max(v.dt_movto) data,\n" +
                     "	v.hr_movto hora,\n" +
                     "	v.no_docto documento,\n" +
                     "	v.no_doctoserie ecf,\n" +
@@ -789,7 +789,16 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where \n" +
                     "	v.codemp = 1 and \n" +
                     "	v.dt_movto between '" + FORMAT.format(dataInicio) + "' and '" 
-                                              + FORMAT.format(dataTermino) + "'";
+                                              + FORMAT.format(dataTermino) + "'\n" +
+                    "group by \n" +
+                    "	v.cod_idregistro,\n" +
+                    "	v.hr_movto,\n" +
+                    "	v.no_docto,\n" +
+                    "	v.no_doctoserie,\n" +
+                    "	v.no_cooecf,\n" +
+                    "	s.descricao,\n" +
+                    "	v.cod_cliente,\n" +
+                    "	v.razao_cliente";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
