@@ -76,29 +76,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         return result;
     }
 
-    /*@Override
-     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-     List<FamiliaProdutoIMP> vResult = new ArrayList<>();
-     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select "
-     + "CODFAMILIA, "
-     + "descricao "
-     + "from "
-     + "FAMILIA"
-     )) {
-     while (rst.next()) {
-     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-     imp.setImportLoja(getLojaOrigem());
-     imp.setImportSistema(getSistema());
-     imp.setImportId(rst.getString("CODFAMILIA"));
-     imp.setDescricao(rst.getString("descricao"));
-     vResult.add(imp);
-     }
-     }
-     }
-     return vResult;
-     }*/
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();
@@ -577,7 +554,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	v.id_loja = " + idLojaCliente + " \n"
                     + "	and operacao = 'VEND'\n"
                     + "	and CONVERT(NVARCHAR, v.data, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                  //+ " and v.Referencia not in ('V-0000226200','V-0000336107')\n"
                     + "order by 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -677,7 +653,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	i.id_loja = " + idLojaCliente + " \n"
                     + "	and v.operacao = 'VEND'\n"
                     + "	and CONVERT(NVARCHAR, v.data, 23) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                  //+ " and v.Referencia not in ('V-0000226200','V-0000336107')\n"
                     + " order by 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
