@@ -203,6 +203,7 @@ public class PhoenixDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         if (opcao == OpcaoProduto.VR_ATACADO) {
+            
             List<ProdutoIMP> result = new ArrayList<>();
 
             Arquivo produtos = ArquivoFactory.getArquivo(this.arquivoProduto, getOpcoes());
