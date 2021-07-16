@@ -318,6 +318,10 @@ public class Importador {
 
     }
     
+    public void importarAtacado() throws Exception {
+        
+    }
+    
     public void importarProdutosBalanca(OpcaoProduto... opcoes) throws Exception {
 
         ProgressBar.setStatus("Carregando produtos de Balança...");

@@ -15,12 +15,10 @@ import org.openide.util.Exceptions;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.arquivo.Arquivo;
 import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -39,7 +37,6 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class PhoenixDAO extends InterfaceDAO {
 
     private String arquivoProduto;
-    private String arquivoProdutoLoja;
     private String arquivoFamilia;
     private String arquivoFornecedor;
     private String arquivoProdutoFornecedor;
@@ -95,7 +92,8 @@ public class PhoenixDAO extends InterfaceDAO {
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
                     OpcaoProduto.PAUTA_FISCAL,
-                    OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.VR_ATACADO
                 }
         ));
     }
@@ -110,14 +108,6 @@ public class PhoenixDAO extends InterfaceDAO {
 
     public void setArquivo(String arquivo) {
         this.arquivoProduto = arquivo;
-    }
-
-    public String getArquivoLoja() {
-        return arquivoProdutoLoja;
-    }
-
-    public void setArquivoLoja(String arquivo) {
-        this.arquivoProdutoLoja = arquivo;
     }
 
     public String getArquivoFamilia() {
@@ -203,7 +193,7 @@ public class PhoenixDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         if (opcao == OpcaoProduto.VR_ATACADO) {
-            
+
             List<ProdutoIMP> result = new ArrayList<>();
 
             Arquivo produtos = ArquivoFactory.getArquivo(this.arquivoProduto, getOpcoes());
@@ -231,10 +221,9 @@ public class PhoenixDAO extends InterfaceDAO {
                 cont1++;
                 if (cont2 == 1000) {
                     cont2 = 0;
-                    ProgressBar.setStatus("Carregando produtos..." + cont1);
+                    ProgressBar.setStatus("Carregando produtos de atacado..." + cont1);
                 }
             }
-
             return result;
         }
         return null;
@@ -288,6 +277,7 @@ public class PhoenixDAO extends InterfaceDAO {
                 produto.setMargemMaxima(linha.getDouble("margemmaxima"));
                 produto.setMargemMinima(linha.getDouble("margemminima"));
                 produto.setEstoque(linha.getDouble("Quantidade"));
+                
                 produto.setEstoqueMinimo(linha.getDouble("QuantidadeMinima"));
                 produto.setEstoqueMaximo(linha.getDouble("QuantidadeMaxima"));
                 produto.setCustoComImposto(linha.getDouble("Custo"));

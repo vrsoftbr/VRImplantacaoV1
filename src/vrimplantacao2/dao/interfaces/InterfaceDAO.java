@@ -466,6 +466,8 @@ public abstract class InterfaceDAO {
     public List<AcumuladorIMP> getAcumuladores() throws Exception {
         return new ArrayList<>();
     }
+    
+    
 
     /**
      * Permite o retorno listas especificadas de acumuladorLayout.
