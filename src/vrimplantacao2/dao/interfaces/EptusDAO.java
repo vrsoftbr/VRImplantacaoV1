@@ -743,7 +743,7 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.next()) {
                         
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("id") + rst.getString("documento");
                         
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
@@ -837,7 +837,7 @@ public class EptusDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rst.getString("cod_rastreador") + 
                                 rst.getString("id"));
                         
-                        next.setVenda(rst.getString("id_venda"));
+                        next.setVenda(rst.getString("id_venda") + rst.getString("doc"));
                         next.setProduto(rst.getString("id_produto"));
                         next.setSequencia(rst.getInt("seq"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
