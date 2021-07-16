@@ -24,8 +24,6 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
-import vrimplantacao2.vo.enums.TipoIndicadorIE;
-import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -203,44 +201,54 @@ public class PhoenixDAO extends InterfaceDAO {
     }
 
     @Override
-    public List<ProdutoIMP> getProdutos() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        Map<String, ProdutoIMP> precos = new HashMap<>();
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
+        if (opcao == OpcaoProduto.VR_ATACADO) {
+            List<ProdutoIMP> result = new ArrayList<>();
 
-        Arquivo produtosLoja = ArquivoFactory.getArquivo(this.arquivoProdutoLoja, getOpcoes());
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivoProduto, getOpcoes());
+            Arquivo produtos = ArquivoFactory.getArquivo(this.arquivoProduto, getOpcoes());
+            int cont1 = 0;
+            int cont2 = 0;
 
-        ProgressBar.setStatus("Carregando preços...");
+            ProgressBar.setStatus("Carregando produtos atacado...");
 
-        int cont1 = 0;
-        int cont2 = 0;
+            for (LinhaArquivo linha : produtos) {
+                String id = linha.getString("Codigo");
 
-        for (LinhaArquivo linha : produtosLoja) {
+                if (id != null && !"".equals(id.trim())) {
 
-            String idProduto = linha.getString("EkCodigoMercadoria");
+                    ProdutoIMP produto = new ProdutoIMP();
 
-            if (idProduto != null && !"".equals(idProduto.trim())) {
+                    produto.setImportSistema(getSistema());
+                    produto.setImportLoja(getLojaOrigem());
+                    produto.setImportId(id);
+                    produto.setPrecovenda(linha.getDouble("PrecoAtacado"));
 
-                ProdutoIMP produtoPreco = new ProdutoIMP();
+                    result.add(produto);
+                }
 
-                produtoPreco.setImportId(idProduto);
-                produtoPreco.setPrecovenda(linha.getDouble("PrecoVarejo"));
-                produtoPreco.setCustoComImposto(linha.getDouble("CustoReal"));
-                produtoPreco.setCustoSemImposto(produtoPreco.getCustoComImposto());
-                produtoPreco.setEstoque(linha.getDouble("Quantidade"));
-
-                precos.put(idProduto, produtoPreco);
                 cont2++;
                 cont1++;
                 if (cont2 == 1000) {
                     cont2 = 0;
-                    ProgressBar.setStatus("Carregando preços..." + cont1);
+                    ProgressBar.setStatus("Carregando produtos..." + cont1);
                 }
             }
+
+            return result;
         }
+        return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivoProduto, getOpcoes());
+
+        int cont1 = 0;
+        int cont2 = 0;
 
         ProgressBar.setStatus("Carregando produtos...");
-        Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
 
         for (LinhaArquivo linha : produtos) {
 
@@ -272,30 +280,18 @@ public class PhoenixDAO extends InterfaceDAO {
                 produto.setDescricaoCompleta(linha.getString("Descricao"));
                 produto.setDescricaoReduzida(produto.getDescricaoCompleta());
                 produto.setDescricaoGondola(produto.getDescricaoCompleta());
-
-                /*produto.setCodMercadologico1(linha.getString("cod_mercadologico1"));
-                produto.setCodMercadologico2(linha.getString("cod_mercadologico2"));
-                produto.setCodMercadologico3(linha.getString("cod_mercadologico3"));
-                produto.setCodMercadologico4(linha.getString("cod_mercadologico4"));
-                produto.setCodMercadologico5(linha.getString("cod_mercadologico5"));*/
                 produto.setIdFamiliaProduto(linha.getString("EkCodigoFamilia"));
-
                 produto.setDataCadastro(getData(linha.getString("DataCadastro")));
                 produto.setValidade(linha.getInt("ValidadeDias"));
-
                 produto.setMargem(linha.getDouble("margem"));
                 produto.setMargemMaxima(linha.getDouble("margemmaxima"));
                 produto.setMargemMinima(linha.getDouble("margemminima"));
-
-                ProdutoIMP produtoLoja = precos.get(id);
-
-                if (produtoLoja != null) {
-                    produto.setEstoque(produtoLoja.getEstoque());
-                    produto.setCustoComImposto(produtoLoja.getCustoComImposto());
-                    produto.setCustoSemImposto(produtoLoja.getCustoSemImposto());
-                    produto.setPrecovenda(produtoLoja.getPrecovenda());
-                }
-
+                produto.setEstoque(linha.getDouble("Quantidade"));
+                produto.setEstoqueMinimo(linha.getDouble("QuantidadeMinima"));
+                produto.setEstoqueMaximo(linha.getDouble("QuantidadeMaxima"));
+                produto.setCustoComImposto(linha.getDouble("Custo"));
+                produto.setCustoSemImposto(linha.getDouble("CustoReal"));
+                produto.setPrecovenda(linha.getDouble("PrecoVarejo"));
                 produto.setNcm(linha.getString("CodigoNCM"));
                 produto.setCest(linha.getString("CEST"));
 
@@ -388,23 +384,18 @@ public class PhoenixDAO extends InterfaceDAO {
                 produto.setIcmsAliqConsumidor(aliquota);
                 produto.setIcmsCstConsumidor(cst);
                 produto.setIcmsReducaoConsumidor(reducao);
-
                 produto.setIcmsAliqSaida(aliquota);
                 produto.setIcmsCstSaida(cst);
                 produto.setIcmsReducaoSaida(reducao);
-
                 produto.setIcmsAliqSaidaForaEstado(aliquota);
                 produto.setIcmsCstSaidaForaEstado(cst);
                 produto.setIcmsReducaoSaidaForaEstado(reducao);
-
                 produto.setIcmsAliqSaidaForaEstadoNF(aliquota);
                 produto.setIcmsCstSaidaForaEstadoNF(cst);
                 produto.setIcmsReducaoSaidaForaEstadoNF(reducao);
-
                 produto.setIcmsAliqEntrada(aliquota);
                 produto.setIcmsCstEntrada(cst);
                 produto.setIcmsReducaoEntrada(reducao);
-
                 produto.setIcmsAliqEntradaForaEstado(aliquota);
                 produto.setIcmsCstEntradaForaEstado(cst);
                 produto.setIcmsReducaoEntradaForaEstado(reducao);

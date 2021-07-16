@@ -419,7 +419,7 @@ public class ProdutoRepository {
                         }
 
                         if (optSimples.contains(OpcaoProduto.VR_ATACADO)) {
-                            if (id > 0) {
+                            if (id > 0 && atacadoProdutoComplemento.getPrecoVenda() > 0) {
                                 provider.vrAtacado().salvar(atacadoProdutoComplemento, optSimples);
                             }
                         }
