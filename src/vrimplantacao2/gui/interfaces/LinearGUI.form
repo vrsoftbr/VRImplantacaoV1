@@ -38,9 +38,9 @@
                   <Component id="tabs" pref="563" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
-                      <Component id="txtComplemento" min="-2" pref="93" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtComplemento" min="-2" pref="86" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
@@ -61,8 +61,8 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtComplemento" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="tabOperacoes" pref="258" max="32767" attributes="0"/>
@@ -78,8 +78,6 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Loja (Cliente):"/>
       </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtComplemento">
     </Component>
     <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
       <Properties>
@@ -573,6 +571,8 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Compl."/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtComplemento">
     </Component>
   </SubComponents>
 </Form>

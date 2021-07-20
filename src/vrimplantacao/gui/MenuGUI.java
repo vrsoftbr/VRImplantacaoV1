@@ -287,7 +287,7 @@ import vrimplantacao2.gui.interfaces.NeoGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
-import vrimplantacao2.gui.interfaces.ResultMais_V2GUI;
+import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
@@ -5235,7 +5235,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuRMSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRMSistemasActionPerformed
         // TODO add your handling code here:
-        ResultMais_V2GUI.exibir(this);
+        ResultMaisGUI.exibir(this);
     }//GEN-LAST:event_mnuRMSistemasActionPerformed
 
     private void mnuPlenusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlenusActionPerformed
@@ -5271,15 +5271,14 @@ public final class MenuGUI extends VRMdiFrame {
         EptusGUI.exibir(this);
     }//GEN-LAST:event_mnuEptusActionPerformed
 
+    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {                                       
+        NeoGUI.exibir(this);
+    }                                      
+
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
         EcoCentauroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNeoActionPerformed
-        NeoGUI.exibir(this);
-    }//GEN-LAST:event_mnuNeoActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;

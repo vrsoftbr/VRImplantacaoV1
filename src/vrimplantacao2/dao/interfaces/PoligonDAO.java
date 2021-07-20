@@ -252,54 +252,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         return vResult;
     }
 
-    /*@Override
-     public List<ProdutoIMP> getEANs() throws Exception {
-     List<ProdutoIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-     try (ResultSet rs = stm.executeQuery(
-     "select\n"
-     + "	codprod id_produto,\n"
-     + "	barra ean,\n"
-     + "	1 qtdembalagem,\n"
-     + "	preco_unit preco\n"
-     + "from\n"
-     + "	produtos prod\n"
-     + "union\n"
-     + "select\n"
-     + "	codprod id_produto, \n"
-     + "	rtrim(barra_emb) ean, \n"
-     + "	qtd qtdembalagem,\n"
-     + "	preco_unit preco\n"
-     + "from \n"
-     + "	embalagens \n"
-     + "where\n"
-     + "	barra_emb is not null \n"
-     + "union\n"
-     + "select\n"
-     + "	codprod id_produto,\n"
-     + "	barra ean,\n"
-     + "	1 qtdembalagem,\n"
-     + "	0 preco\n"
-     + "from \n"
-     + "	alternativo\n"
-     + "where\n"
-     + "	barra is not null"
-     )) {
-     while (rs.next()) {
-     ProdutoIMP imp = new ProdutoIMP();
-
-     imp.setImportLoja(getLojaOrigem());
-     imp.setImportSistema(getSistema());
-     imp.setImportId(rs.getString("id_produto"));
-     imp.setEan(rs.getString("ean"));
-     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-
-     result.add(imp);
-     }
-     }
-     }
-     return result;
-     }*/
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
@@ -349,7 +301,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
 
                     imp.setTel_principal(Utils.stringLong(rst.getString("tel_principal")));
                     imp.addTelefone("FAX", rst.getString("FAX"));
-                    // imp.addEmail("email", rst.getString("email"), TipoContato.NFE);
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
 
@@ -548,37 +499,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
 
-    /*@Override
-     public List<MapaTributoIMP> getTributacao() throws Exception {
-     List<MapaTributoIMP> result = new ArrayList();
-
-     try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
-     try (ResultSet rs = stmt.executeQuery(
-     "select \n"
-     + "	distinct\n"
-     + "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\\\'))) id,\n"
-     + "	coalesce(fcp.VALORTRIB, 0) fcp,\n"
-     + "	icms.descricao\n"
-     + "from \n"
-     + "	aliquota_icms icms\n"
-     + "	left join\n"
-     + "		PRODUTOS p on icms.CODALIQ = p.CODALIQ\n"
-     + "	left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n"
-     + "where\n"
-     + "	icms.descricao is not null\n"
-     + "order by\n"
-     + "	id, fcp"
-     )) {
-     while (rs.next()) {
-     result.add(new MapaTributoIMP(
-     formatTributacaoId(rs.getString("id"), rs.getDouble("fcp")),
-     String.format("%s + FCP %.2f %%", rs.getString("descricao"), rs.getDouble("fcp"))
-     ));
-     }
-     }
-     }
-     return result;
-     }*/
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -596,7 +516,8 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("referencia") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("Id_loja") + rst.getString("data") 
+                                  + rst.getString("Id_turno") + rst.getString("SN") + rst.getString("Referencia");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -613,7 +534,6 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setNumeroSerie(rst.getString("numeroserie"));
 
                         if (rst.getString("nomecliente") != null
                                 && !rst.getString("nomecliente").trim().isEmpty()
@@ -634,10 +554,14 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "	NoCupom as numerocupom,\n"
-                    + " v.referencia,"
+                    + " v.Id_loja,\n"
+                    + " v.Data,\n"
+                    + " v.Id_turno,\n"
+                    + " v.SN,\n"
+                    + " v.Referencia,"
+                    + "	CASE when v.NoCupom is null then SUBSTRING(v.Referencia,3,10) else NoCupom end numerocupom,\n"
+                    + " CONCAT(v.Id_loja, CONVERT(NVARCHAR, v.data, 23), v.Id_turno, v.SN, v.Referencia) id_venda,\n"
                     + "	1 as ecf,\n"
-                    + "	v.Dt_cad as data,\n"
                     + "	v.id_cli idclientepreferencial,\n"
                     + " c.Nome nomecliente,\n"
                     + "	CAST(CONVERT(NVARCHAR, v.Dt_cad, 8) as time) horainicio,\n"
@@ -645,16 +569,16 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                     + "	case when Status = 'cancelado' then 1 else 0 end cancelado,\n"
                     + "	subtotal subtotalimpressora,\n"
                     + "	c.CNPJ cpf,\n"
-                    + "	desconto,\n"
-                    + "	SN numeroserie\n"
+                    + "	desconto\n"
                     + "from\n"
                     + "	transacao v\n"
                     + "	left join Cliente c on c.Id_cli = v.Id_cli \n"
                     + "where\n"
                     + "	v.id_loja = " + idLojaCliente + " \n"
                     + "	and operacao = 'VEND'\n"
-                    + "	and CONVERT(NVARCHAR, v.Dt_cad, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
-                    + " order by 1";
+                    + "	and CONVERT(NVARCHAR, v.data, 23) BETWEEN '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
+                  //+ " and v.Referencia not in ('V-0000226200','V-0000336107')\n"
+                    + "order by 1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -692,10 +616,20 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("referencia") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("Id_loja")
+                                    + rst.getString("data")
+                                    + rst.getString("Id_turno")
+                                    + rst.getString("SN")
+                                    + rst.getString("Referencia")
+                                    + rst.getString("NumItem");
+                        String idvenda = rst.getString("Id_loja")
+                                    + rst.getString("data") 
+                                    + rst.getString("Id_turno")
+                                    + rst.getString("SN")
+                                    + rst.getString("Referencia");
 
-                        next.setId(rst.getString("id_item"));
-                        next.setVenda(id);
+                        next.setId(id);
+                        next.setVenda(idvenda);
                         next.setProduto(rst.getString("produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
@@ -714,27 +648,37 @@ public class PoligonDAO extends InterfaceDAO /*implements MapaTributoProvider */
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "	CONCAT(v.Referencia ,1,CONVERT(NVARCHAR, v.Dt_cad, 23)) id_venda,\n"
-                    + "	CONCAT(i.Referencia,'-',NumItem,'-',i.Id_prd,i.NoCupom) id_item,\n"
-                    + " i.referencia,\n"
+                    + " CONCAT(v.Id_loja, v.data, v.Id_turno, v.SN, v.Referencia) id_venda,\n"
+                    + "	CONCAT(i.Id_loja, i.Data, i.Id_turno, i.SN, i.Referencia, i.NumItem) id_item,\n"
+                    + " i.Id_loja,\n"
                     + " i.data,\n"
+                    + " i.Id_turno,\n"
+                    + " i.SN,\n"
+                    + " i.referencia,\n"
+                    + " i.NumItem,\n"
                     + " 1 as ecf,\n"
-                    + "	i.Id_prd produto,\n"
+                    + "	p.codigo produto,\n"
                     + "	p.descricao,\n"
-                    + "	Qtde quantidade,\n"
-                    + "	Vl_Tbl total,\n"
+                    + "	Qtde * -1 quantidade,\n"
+                    + "	(Qtde * Vl_Unit)* -1 total,\n"
                     + "	case when i.Status = 'cancelado' then 1 else 0 end cancelado,\n"
-                    + "	p.Cartela codigobarras,\n"
+                    + "	SUBSTRING(p.Cartela,0,14) codigobarras,\n"
                     + "	u.Unidade unidade\n"
                     + "from EstMovto i\n"
-                    + "left join Transacao v on v.Referencia = i.Referencia \n"
+                    + "left join Transacao v on\n"
+                    + "		v.Id_loja = i.Id_loja and\n"
+                    + "		v.[Data] = i.[Data] and\n"
+                    + "		v.Id_turno = i.Id_turno and\n"
+                    + "		v.SN = i.SN and\n"
+                    + "		v.Referencia = i.Referencia\n"
                     + "left join Produto p on p.Id_prd = i.Id_prd\n"
                     + "left join unidade u on u.Id_unidade = p.Id_Unidade\n"
                     + "where\n"
                     + "	i.id_loja = " + idLojaCliente + " \n"
                     + "	and v.operacao = 'VEND'\n"
-                    + "	and CONVERT(NVARCHAR, v.Dt_cad, 23) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "\n"
-                    + "order by 1,2";
+                    + "	and CONVERT(NVARCHAR, v.data, 23) BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                  //+ " and v.Referencia not in ('V-0000226200','V-0000336107')\n"
+                    + " order by 1,2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

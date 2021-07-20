@@ -610,7 +610,8 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        //String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        String id = rst.getString("id_venda");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -658,7 +659,8 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
                     = "select\n"
-                    + "	concat(seq,cupom,data) id,\n"
+                  //+ "	concat(seq,cupom,data) id,\n"
+                    + "	v.seq id_venda,\n"
                     + "	cupom numerocupom,\n"
                     + "	codcli idcliente,\n"
                     + "	case micro\n"
@@ -685,7 +687,7 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	tslv010 v\n"
                     + "where\n"
                     + "	empresa = substring('" + idLojaCliente + "',1,1)\n"
-                    + "	and exclui != 'S'\n"
+                    + "	and exclui != 'S' and v.cupom != '000001'\n"
                     + "	and data between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
                     + "order by seq,data,horaini";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -725,18 +727,18 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("id_venda");
-                        String idItem = rst.getString("id_item");
+                        //String id = rst.getString("id_venda");
+                        //String idItem = rst.getString("id_item");
 
-                        next.setVenda(id);
-                        next.setId(idItem);
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setId(rst.getString("id_item"));
                         next.setProduto(rst.getString("produto"));
-                        next.setSequencia(rst.getInt("nroitem"));
+                        //next.setSequencia(rst.getInt("nroitem"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
@@ -775,6 +777,7 @@ public class TstiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	join tslv010 v on v.seq = i.cupom\n"
                     + "where\n"
                     + "	empresa = substring('" + idLojaCliente + "',1,1)\n"
+                    + " and v.cupom != '000001'\n"
                     + "	and data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "order by i.cupom,i.seq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
@@ -16,6 +17,8 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -134,7 +137,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         return result;
     }
-    
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -213,7 +216,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    pg.datacadastro AS datacadastro,\n"
                     + "    pg.classificacaofiscal AS ncm,\n"
                     + "    p.custofabrica AS custosemimposto,\n"
-                    + "    p.custofinal AS custosemimposto,\n"
+                    + "    p.custofinal AS custocomimposto,\n"
                     + "    p.margemlucro AS margem,\n"
                     + "    p.prpraticado AS precovenda,\n"
                     + "    p.estoqueminimo AS estoqueminimo,\n"
@@ -252,7 +255,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
@@ -450,6 +453,113 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	c.codigo id,\n"
+                    + "	c.nome,\n"
+                    + "	FANTASIA,\n"
+                    + "	CPFCNPJ,\n"
+                    + "	RGIE,\n"
+                    + "	INSCRICAOMUNICIPAL im,\n"
+                    + "	PESSOA tipopessoa,\n"
+                    + "	ENDERECO,\n"
+                    + "	NUMEROENDERECO numero,\n"
+                    + "	BAIRRO,\n"
+                    + "	COMPLEMENTO,\n"
+                    + "	m.nome CIDADE,\n"
+                    + " m.ESTADO uf,"
+                    + "	CEP,\n"
+                    + "	datacadastro data_cadastro,\n"
+                    + "	CASE WHEN bloqueado = 'S' THEN 1 ELSE 0 END BLOQUEADO,\n"
+                    + "	LIMITE,\n"
+                    + "	FONE telefone,\n"
+                    + "	FAX,\n"
+                    + "	FONECELULAR celular,\n"
+                    + "	EMAIL,\n"
+                    + "	OBS \n"
+                    + "FROM\n"
+                    + "	TRECCLIENTEGERAL c\n"
+                    + "LEFT JOIN TGERCIDADE m ON m.CODIGO = c.CIDADE \n"
+                    + "ORDER BY 1"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj(rs.getString("CPFCNPJ"));
+                    imp.setInscricaoestadual(rs.getString("RGIE"));
+                    imp.setInscricaoMunicipal(rs.getString("im"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setFax(rs.getString("fax"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setObservacao(rs.getString("obs"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + "	cr.EMPRESA||cr.CLIENTE||cr.MESANO id,\n"
+                    + "	cr.EMPRESA||cr.CLIENTE||cr.MESANO numerocupom,\n"
+                    + "	CREDIARIO valor\n"
+                    + "	cr.CLIENTE codcli,\n"
+                    + " cpfcnpj cnpjcliente,\n"
+                    + "	1 AS ecf,\n"
+                    + "	CAST(cr.DATAHORAALTERACAO AS date) emissao,\n"
+                    + "	CAST(cr.DATAHORAALTERACAO AS date) vencimento,\n"
+                    + "FROM\n"
+                    + "	TRECDEBITOMENSAL cr\n"
+                    + " LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
+                    + "WHERE\n"
+                    + "	EMPRESA = " + getLojaOrigem() + ""
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCupom(Utils.formataNumero(rs.getString("numerocupom")));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setIdCliente(rs.getString("codcli"));
+                    imp.setCnpjCliente(Utils.formataNumero(rs.getString("cnpjcliente")));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    
                     result.add(imp);
                 }
             }

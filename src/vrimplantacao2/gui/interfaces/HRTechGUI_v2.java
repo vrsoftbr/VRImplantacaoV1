@@ -395,7 +395,7 @@ public class HRTechGUI_v2 extends VRInternalFrame {
             pnlAdicionaisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlAdicionaisLayout.createSequentialGroup()
                 .addGap(6, 6, 6)
-                .addComponent(pnlBal, javax.swing.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
+                .addComponent(pnlBal, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(pnlAdicionaisLayout.createSequentialGroup()
                 .addContainerGap()
@@ -412,7 +412,7 @@ public class HRTechGUI_v2 extends VRInternalFrame {
                     .addComponent(lblLoja1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtCodConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlBal, javax.swing.GroupLayout.PREFERRED_SIZE, 158, Short.MAX_VALUE))
+                .addComponent(pnlBal, javax.swing.GroupLayout.PREFERRED_SIZE, 168, Short.MAX_VALUE))
         );
 
         tabsImportacao.addTab("Parâmetros", pnlAdicionais);
