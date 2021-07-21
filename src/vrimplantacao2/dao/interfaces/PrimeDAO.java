@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -71,6 +72,30 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "    empr_codigo as id,\n"
+                    + "    empr_nomereduzido as nome,\n"
+                    + "    empr_cnpjcpf as cnpj\n"
+                    + "from empresas order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(
+                            new Estabelecimento(
+                                    rst.getString("id"),
+                                    rst.getString("nome") + "-" + rst.getString("cnpj")
+                            )
+                    );
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -109,7 +134,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pe.cade_ctnota as custo\n"
                     + "from cadprod p\n"
                     + "left join cadprodemp pe on pe.cade_codigo = p.cadp_codigo\n"
-                    + "	and pe.cade_codempresa = '001'\n"
+                    + "	and pe.cade_codempresa = '" + getLojaOrigem() + "'\n"
                     + "left join classtrib cle on cle.clat_codsimb = pe.cade_codclassificacaoe\n"
                     + "	and cle.clat_uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "	and cle.clat_es = 'E'\n"
