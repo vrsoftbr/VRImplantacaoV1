@@ -105,7 +105,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pe.cade_estmax as estoquemaximo,\n"
                     + "    pe.cade_qemb as qtdembalagem, \n"
                     + "    pe.cade_margemcontribmin as margem,\n"
-                    + "    pe.cade_prvenda as precpvenda,\n"
+                    + "    pe.cade_prvenda as precovenda,\n"
                     + "    pe.cade_ctnota as custo\n"
                     + "from cadprod p\n"
                     + "left join cadprodemp pe on pe.cade_codigo = p.cadp_codigo\n"
@@ -119,11 +119,41 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by 1"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.seteBalanca(!"N".equals(rst.getString("balanca")));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cstpissaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
+                    
+                    imp.setIcmsDebitoId(rst.getString("cade_codclassificacaos"));
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    
+                    imp.setIcmsCreditoId(rst.getString("cade_codclassificacaoe"));
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
+                    
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
