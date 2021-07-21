@@ -308,9 +308,11 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                     if (!txtNutricional.getArquivo().isEmpty()) {
                         NutricionalToledoDAO.sistema = sistema;
                         NutricionalToledoDAO.loja = loja;
+                        NutricionalFilizolaDAO nutricionalFilizolaDAO = new NutricionalFilizolaDAO();
                         
                         if (rdbFilizolaRdc360.isSelected()) {
-                            NutricionalFilizolaDAO.importarArquivoRdc360(sistema, loja, txtNutricional.getArquivo());
+                            //NutricionalFilizolaDAO.importarArquivoRdc360(sistema, loja, txtNutricional.getArquivo());
+                            nutricionalFilizolaDAO.importarNutricionalFilizola(txtNutricional.getArquivo(), sistema, loja);
                         }
                         if(rdbToledo.isSelected()) {
                             NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo());
