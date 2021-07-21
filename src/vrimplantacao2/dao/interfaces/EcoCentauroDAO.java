@@ -12,7 +12,11 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
@@ -25,7 +29,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Desenvolvimento
  */
-public class EcoCentauroDAO extends InterfaceDAO {
+public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -71,7 +75,8 @@ public class EcoCentauroDAO extends InterfaceDAO {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.DATA_CADASTRO
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.MAPA_TRIBUTACAO
         ));
     }
 
@@ -86,6 +91,53 @@ public class EcoCentauroDAO extends InterfaceDAO {
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + "    icm.vendacsf1 AS cst_saida,\n"
+                    + "    icm.vendaicms1 AS aliquota_saida,\n"
+                    + "    icm.vendareducao1 AS reducao_saida\n"
+                    + "FROM TESTPRODUTOGERAL pg\n"
+                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+            )) {
+                while (rs.next()) {
+                    String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id
+                    )
+                    );
+                }
+            }
+
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + "    icm.compracsf AS cst_entrada,\n"
+                    + "    icm.compraicms AS aliquota_entrada,\n"
+                    + "    icm.comprareducao AS reducao_entrada\n"
+                    + "FROM TESTPRODUTOGERAL pg\n"
+                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+            )) {
+                while (rs.next()) {
+                    String id = rs.getString("cst_entrada") + "-" + rs.getString("aliquota_entrada") + "-" + rs.getString("reducao_entrada");
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id
+                    )
+                    );
+                }
+            }
+        }
+        return result;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -174,19 +226,14 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     + "    p.estdisponivel AS estoque,\n"
                     + "    p.grupo AS mercaologico1,\n"
                     + "    p.subgrupo AS mercadologico2,\n"
-                    + "    '1' AS mercadologico3,\n"
-                    + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
-                    + "    gi.csf AS csticms,\n"
-                    + "    p.aliqcompra_icms AS aliquota_credito,\n"
-                    + "    p.aliqcompra_reducao AS reducao_credito,\n"
-                    + "    p.aliqvenda_icms1 AS aliquota_debito,\n"
-                    + "    p.aliqvenda_reducao AS reducao_debito\n"
+                    + "    1 AS mercadologico3,\n"
+                    + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro\n"
                     + "FROM TESTPRODUTOGERAL pg\n"
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
-                    + "    AND p.empresa = '" + getLojaOrigem() + "'\n"
-                    + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
-                    + "WHERE p.ativo = 'S' AND p.estdisponivel > 0\n"
-                    + "ORDER BY 1"
+                    + "    AND p.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND p.ativo = 'S'\n"        
+                    + "    AND coalesce(p.estdisponivel, 0) > 0 \n"
+                    + "ORDER BY 2"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -214,12 +261,81 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
+
                     result.add(imp);
                 }
             }
         }
-
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.CEST) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT\n"
+                        + "    pg.codigo AS idproduto,\n"
+                        + "    ce.cest\n"
+                        + "FROM TESTPRODUTOGERAL pg\n"
+                        + "JOIN TESTCEST ce ON ce.idcest = pg.idcest"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setCest(rst.getString("cest"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        
+        if (opt == OpcaoProduto.ICMS) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT\n"
+                        + "    pg.codigo AS idproduto,\n"
+                        + "    icm.compracsf AS cst_entrada,\n"
+                        + "    icm.compraicms AS aliquota_entrada,\n"
+                        + "    icm.comprareducao AS reducao_entrada,\n"
+                        + "    icm.vendacsf1 AS cst_saida,\n"
+                        + "    icm.vendaicms1 AS aliquota_saida,\n"
+                        + "    icm.vendareducao1 AS reducao_saida\n"
+                        + "FROM TESTPRODUTOGERAL pg\n"
+                        + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                        + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                        + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+
+                        String idIcmsDebito, idIcmsCredito;
+
+                        idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliquota_saida") + "-" + rst.getString("reducao_saida");
+                        idIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
+
+                        imp.setIcmsDebitoId(idIcmsDebito);
+                        imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
+                        imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
+                        imp.setIcmsCreditoId(idIcmsCredito);
+                        imp.setIcmsCreditoForaEstadoId(idIcmsCredito);
+                        imp.setIcmsConsumidorId(idIcmsDebito);
+
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -279,6 +395,36 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
+                    
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.COMERCIAL);
+                    }
+
+                    if ((rst.getString("fonecomervend") != null)
+                            && (!rst.getString("fonecomervend").trim().isEmpty())) {
+                        imp.addTelefone("COMERCIAL", rst.getString("fonecomervend"));
+                    }
+
+                    if ((rst.getString("foneresidvend") != null)
+                            && (!rst.getString("foneresidvend").trim().isEmpty())) {
+                        imp.addTelefone("VENDAS", rst.getString("foneresidvend"));
+                    }
+
+                    if ((rst.getString("fonetelevendas") != null)
+                            && (!rst.getString("fonetelevendas").trim().isEmpty())) {
+                        imp.addTelefone("TELEVENDAS", rst.getString("fonetelevendas"));
+                    }
+
+                    if ((rst.getString("celularvend") != null)
+                            && (!rst.getString("celularvend").trim().isEmpty())) {
+                        imp.addCelular("CELULAR VENDAS", rst.getString("celularvend"));
+                    }
+
+                    if ((rst.getString("emailvend") != null)
+                            && (!rst.getString("emailvend").trim().isEmpty())) {
+                        imp.addEmail("EMAIL VENDAS", rst.getString("emailvend").toLowerCase(), TipoContato.COMERCIAL);
+                    }
                 }
             }
         }

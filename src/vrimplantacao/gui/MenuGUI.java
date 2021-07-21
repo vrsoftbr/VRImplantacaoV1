@@ -5271,18 +5271,14 @@ public final class MenuGUI extends VRMdiFrame {
         EptusGUI.exibir(this);
     }//GEN-LAST:event_mnuEptusActionPerformed
 
-
-    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNeoActionPerformed
+    private void mnuNeoActionPerformed(java.awt.event.ActionEvent evt) {                                       
         NeoGUI.exibir(this);
-    }//GEN-LAST:event_mnuNeoActionPerformed
+    }                                      
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
         EcoCentauroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
