@@ -44,7 +44,7 @@ public class PhoenixDAO extends InterfaceDAO {
     private String arquivoRotativo;
 
     private Map<String, String> opcoes = new LinkedHashMap<>();
-    private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
+    private SimpleDateFormat formatData = new SimpleDateFormat("dd/MM/yyyy");
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
@@ -565,6 +565,7 @@ public class PhoenixDAO extends InterfaceDAO {
             imp.setEcf(linha.getString("ECF"));
             imp.setIdCliente(linha.getString("CPFCGC"));
             imp.setValor(linha.getDouble("Valor"));
+            imp.setObservacao(linha.getString("Historico"));
 
             result.add(imp);
         }
