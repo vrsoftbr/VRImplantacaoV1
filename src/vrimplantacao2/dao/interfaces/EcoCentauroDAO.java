@@ -89,7 +89,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
 
