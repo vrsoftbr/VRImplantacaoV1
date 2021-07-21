@@ -14,6 +14,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -183,7 +185,7 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
                     + "    AND p.empresa = '" + getLojaOrigem() + "'\n"
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
-                    + "WHERE p.ativo = 'S'\n"
+                    + "WHERE p.ativo = 'S' AND p.estdisponivel > 0\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -315,6 +317,61 @@ public class EcoCentauroDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	p.IDSEQUENCIA ID,\n"
+                    + "	p.FORNECEDOR,\n"
+                    + "	p.DOCUMENTO,\n"
+                    + "	p.PARCELA,\n"
+                    + "	p.VALOR,\n"
+                    + "	cp.EMISSAO,\n"
+                    + "	cp.DATADIGITACAO ENTRADA,\n"
+                    + "	p.VENCIMENTO,\n"
+                    + "	cp.COMPLEMENTO OBS\n"
+                    + "FROM\n"
+                    + "	TPAGPARCELA p\n"
+                    + "LEFT JOIN TPAGDOCUMENTO cp ON cp.EMPRESA = p.EMPRESA\n"
+                    + "	AND cp.FORNECEDOR = p.FORNECEDOR AND cp.TIPO = p.TIPO \n"
+                    + "	AND cp.documento = p.DOCUMENTO\n"
+                    + "WHERE\n"
+                    + "	cp.EMPRESA = '" + getLojaOrigem() + "'\n"
+                    + "	AND p.DATABAIXA IS NULL\n"
+                    + "	AND IDRENEGOCIACAO IS NULL\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rst.getString("ID"));
+                    imp.setIdFornecedor(rst.getString("FORNECEDOR"));
+
+                    String doc = Utils.formataNumero(rst.getString("DOCUMENTO"));
+
+                    imp.setNumeroDocumento(doc);
+
+                    if (doc != null && !"".equals(doc)) {
+                        if (doc.length() > 6) {
+                            imp.setNumeroDocumento(doc.substring(0, 6));
+                        }
+                    }
+
+                    imp.setValor(rst.getDouble("VALOR"));
+                    imp.setDataEmissao(rst.getDate("EMISSAO"));
+                    imp.setDataEntrada(rst.getDate("ENTRADA"));
+                    imp.setObservacao(rst.getString("OBS"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("VENCIMENTO"), imp.getValor());
+                    parc.setNumeroParcela(rst.getInt("PARCELA"));
+
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -391,17 +448,17 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     "SELECT\n"
                     + "	cr.EMPRESA||cr.CLIENTE||cr.MESANO id,\n"
                     + "	cr.EMPRESA||cr.CLIENTE||cr.MESANO numerocupom,\n"
-                    + "	CREDIARIO valor\n"
+                    + "	CREDIARIO valor,\n"
                     + "	cr.CLIENTE codcli,\n"
                     + " cpfcnpj cnpjcliente,\n"
                     + "	1 AS ecf,\n"
                     + "	CAST(cr.DATAHORAALTERACAO AS date) emissao,\n"
-                    + "	CAST(cr.DATAHORAALTERACAO AS date) vencimento,\n"
+                    + "	CAST(cr.DATAHORAALTERACAO AS date) vencimento\n"
                     + "FROM\n"
                     + "	TRECDEBITOMENSAL cr\n"
                     + " LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
                     + "WHERE\n"
-                    + "	EMPRESA = " + getLojaOrigem() + ""
+                    + "	EMPRESA = '" + getLojaOrigem() + "'"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -413,7 +470,7 @@ public class EcoCentauroDAO extends InterfaceDAO {
                     imp.setEcf(rs.getString("ecf"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
-                    
+
                     result.add(imp);
                 }
             }
