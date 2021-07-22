@@ -7,8 +7,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -230,7 +233,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    1 AS mercadologico3,\n"
                     + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro\n"
                     + "FROM TESTPRODUTOGERAL pg\n"
-                    + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
+                    + "JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
                     + "    AND p.empresa = " + getLojaOrigem() + "\n"
                     + "    AND p.ativo = 'S'\n"        
                     + "    AND coalesce(p.estdisponivel, 0) > 0 \n"
@@ -338,6 +341,125 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         return null;
     }
+    
+    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, id_tipoembalagem from produto \n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
+                    vo.setIdproduto(rst.getInt("id"));
+                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
+                    vo.setCodigoBarras(gerarEan13(Long.parseLong(rst.getString("id")), true));
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void importarDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+        ProgressBar.setStatus("Carregar Produtos...");
+        try {
+            result = getDigitoVerificador();
+
+            if (!result.isEmpty()) {
+                gravarCodigoBarrasDigitoVerificador(result);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
+
+        Conexao.begin();
+        Statement stm, stm2 = null;
+        ResultSet rst = null;
+
+        stm = Conexao.createStatement();
+        stm2 = Conexao.createStatement();
+
+        String sql = "";
+        ProgressBar.setStatus("Gravando Código de Barras...");
+        ProgressBar.setMaximum(vo.size());
+
+        try {
+
+            for (ProdutoAutomacaoVO i_vo : vo) {
+
+                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
+                rst = stm.executeQuery(sql);
+
+                if (!rst.next()) {
+                    sql = "insert into produtoautomacao ("
+                            + "id_produto, "
+                            + "codigobarras, "
+                            + "id_tipoembalagem, "
+                            + "qtdembalagem) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ", "
+                            + i_vo.getIdTipoEmbalagem() + ", 1);";
+                    stm2.execute(sql);
+                } else {
+                    sql = "insert into implantacao.produtonaogerado ("
+                            + "id_produto, "
+                            + "codigobarras) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ");";
+                    stm2.execute(sql);
+                }
+                ProgressBar.next();
+            }
+
+            stm.close();
+            stm2.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
+    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
+        String codigo = String.format("%012d", i_codigo);
+
+        int somaPar = 0;
+        int somaImpar = 0;
+
+        for (int i = 0; i < 12; i += 2) {
+            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
+            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
+        }
+
+        int soma = somaImpar + (3 * somaPar);
+        int digito = 0;
+        boolean verifica = false;
+        int calculo = 0;
+
+        do {
+            calculo = soma % 10;
+
+            if (calculo != 0) {
+                digito += 1;
+                soma += 1;
+            }
+        } while (calculo != 0);
+
+        if (i_digito) {
+            return Long.parseLong(codigo + digito);
+        } else {
+            return Long.parseLong(codigo);
+        }
+    }  
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {

@@ -564,11 +564,15 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setCnpj(rs.getString("cpf"));
                     }
-
-                    imp.setInscricaoestadual(rs.getString("rg"));
-                    if (imp.getInscricaoestadual() == null && "".equals(imp.getInscricaoestadual())) {
-                        imp.setInscricaoestadual(rs.getString("insc_estadual"));
+                    
+                    String ie = rs.getString("insc_estadual");
+                    
+                    if (ie != null && !"".equals(ie)) {
+                        imp.setInscricaoestadual(ie);
+                    } else {
+                        imp.setInscricaoestadual(rs.getString("rg"));
                     }
+                    
                     imp.setTelefone(rs.getString("ddd") + rs.getString("telefone"));
                     imp.setCelular(rs.getString("ddd") + rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
