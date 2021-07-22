@@ -287,6 +287,7 @@ import vrimplantacao2.gui.interfaces.NeoGUI;
 import vrimplantacao2.gui.interfaces.PlenoKWGUI;
 import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
+import vrimplantacao2.gui.interfaces.PrimeGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
@@ -798,9 +799,10 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPostgres2 = new javax.swing.JMenu();
         mnuAthos = new javax.swing.JMenuItem();
         mnuCervantes = new javax.swing.JMenuItem();
+        mnuControlePlus = new javax.swing.JMenuItem();
+        mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
-        mnuControlePlus = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         mnuSQLServer = new javax.swing.JMenu();
@@ -2603,6 +2605,22 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuPostgres2.add(mnuCervantes);
 
+        mnuControlePlus.setText("Controle Plus");
+        mnuControlePlus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuControlePlusActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuControlePlus);
+
+        mnuPrime.setText("Prime");
+        mnuPrime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPrimeActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuPrime);
+
         mnuRMSistemas.setText("ResultMais");
         mnuRMSistemas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2618,14 +2636,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuViggo);
-
-        mnuControlePlus.setText("Controle Plus");
-        mnuControlePlus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuControlePlusActionPerformed(evt);
-            }
-        });
-        mnuPostgres2.add(mnuControlePlus);
 
         mnuDatabase.add(mnuPostgres2);
 
@@ -5280,6 +5290,11 @@ public final class MenuGUI extends VRMdiFrame {
         EcoCentauroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void mnuPrimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPrimeActionPerformed
+        // TODO add your handling code here:
+        PrimeGUI.exibir(this);
+    }//GEN-LAST:event_mnuPrimeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5522,6 +5537,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPoligon;
     private javax.swing.JMenu mnuPostgres;
     private javax.swing.JMenu mnuPostgres2;
+    private javax.swing.JMenuItem mnuPrime;
     private javax.swing.JMenuItem mnuProton;
     private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;
