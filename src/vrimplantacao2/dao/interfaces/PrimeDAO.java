@@ -73,7 +73,30 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "    clat_simbicms as id,\n"
+                    + "    'S-'||clat_simbicms as id,\n"
+                    + "    clat_descricao as descricao,\n"
+                    + "    clat_cst as cst,\n"
+                    + "    clat_icms as icms,\n"
+                    + "    clat_redbcicms as reducao\n"
+                    + "from classtrib\n"
+                    + "where clat_uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "and clat_es = 'S'\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(
+                            rst.getString("id"),
+                            rst.getString("descricao"),
+                            rst.getInt("cst"),
+                            rst.getDouble("icms"),
+                            rst.getDouble("reducao")
+                    ));
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "    'E-'||clat_simbicms as id,\n"
                     + "    clat_descricao as descricao,\n"
                     + "    clat_cst as cst,\n"
                     + "    clat_icms as icms,\n"
@@ -94,28 +117,6 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
 
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "    clat_simbicms as id,\n"
-                    + "    clat_descricao as descricao,\n"
-                    + "    clat_cst as cst,\n"
-                    + "    clat_icms as icms,\n"
-                    + "    clat_redbcicms as reducao\n"
-                    + "from classtrib\n"
-                    + "where clat_uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
-                    + "and clat_es = 'S'\n"
-                    + "order by 1"
-            )) {
-                while (rst.next()) {
-                    result.add(new MapaTributoIMP(
-                            rst.getString("id"),
-                            rst.getString("descricao"),
-                            rst.getInt("cst"),
-                            rst.getDouble("icms"),
-                            rst.getDouble("reducao")
-                    ));
-                }
-            }
         }
         return result;
     }
@@ -166,11 +167,11 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.cadp_cest as cest,\n"
                     + "    p.cadp_cstpise as cstpisentrada,\n"
                     + "    p.cadp_cstpiss as cstpissaida,\n"
-                    + "    pe.cade_codclassificacaoe,\n"
+                    + "    'E-'||pe.cade_codclassificacaoe as icmsentrada,\n"
                     + "    cle.clat_cst as csticmsentrada,\n"
                     + "    cle.clat_icms as aliqicmsentrada,\n"
                     + "    cle.clat_redbcicms as redicmsentrada,\n"
-                    + "    pe.cade_codclassificacaos,\n"
+                    + "    'S-'||pe.cade_codclassificacaos as icmssaida,\n"
                     + "    cls.clat_cst as csticmsentrada,\n"
                     + "    cls.clat_icms as aliqicmsentrada,\n"
                     + "    cls.clat_redbcicms as redicmsentrada,\n"
@@ -215,11 +216,11 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rst.getString("cstpissaida"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
                     
-                    imp.setIcmsDebitoId(rst.getString("cade_codclassificacaos"));
+                    imp.setIcmsDebitoId(rst.getString("icmssaida"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
                     
-                    imp.setIcmsCreditoId(rst.getString("cade_codclassificacaoe"));
+                    imp.setIcmsCreditoId(rst.getString("icmsentrada"));
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
                     
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
