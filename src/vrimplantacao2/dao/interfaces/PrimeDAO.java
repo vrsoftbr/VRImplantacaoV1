@@ -223,6 +223,8 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
                     
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    
+                    result.add(imp);
                 }
             }
         }

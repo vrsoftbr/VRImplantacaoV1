@@ -1612,6 +1612,7 @@ public class ProdutoRepository {
             destino.setCodigoSped(imp.getImportId());
         }
         destino.setSituacaoCadastro(imp.getSituacaoCadastro());
+        destino.setDataCadastro(imp.getDataCadastro());
         return destino;
     }
 

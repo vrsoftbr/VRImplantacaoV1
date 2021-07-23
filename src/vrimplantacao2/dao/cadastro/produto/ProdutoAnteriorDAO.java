@@ -130,6 +130,7 @@ public class ProdutoAnteriorDAO {
                     + "                      icmscreditoforaestadoid character varying,\n"
                     + "                      icmsconsumidorid character varying,\n"
                     + "                      dataalteracao timestamp, \n"        
+                    + "                      datacadastro timestamp, \n"        
                     + "                      primary key (impsistema, imploja, impid),\n"
                     + "                      unique (impsistema, imploja, codigosped)\n"
                     + "                );\n"
@@ -731,6 +732,7 @@ public class ProdutoAnteriorDAO {
             sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
             
             sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
+            sql.put("datacadastro", anterior.getDataCadastro());
 
             try {
                 stm.execute(sql.getInsert());
