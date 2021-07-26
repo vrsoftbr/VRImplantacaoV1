@@ -70,6 +70,7 @@ public class Uniplus2_5GUI extends VRInternalFrame {
         
         pnlConn.setSistema(ESistema.UNIPLUS);
         pnlConn.getNomeConexao();
+        
         centralizarForm();
         this.setMaximum(false);  
     }
