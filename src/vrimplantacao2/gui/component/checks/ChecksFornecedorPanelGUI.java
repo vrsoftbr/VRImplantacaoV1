@@ -2,6 +2,7 @@ package vrimplantacao2.gui.component.checks;
 
 import java.util.HashSet;
 import java.util.Set;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -98,6 +99,13 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             pnlProdutoFornecedor.setVisible(false);
         }
         
+        if (opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR)) {
+            chkPagarFornecedor.setVisible(opt.contains(OpcaoFornecedor.PAGAR_FORNECEDOR));
+        } else {
+            pnlContasPagar.setVisible(false);
+        }
+        
+        
         tabImportacao.revalidate();
     }
 
@@ -187,6 +195,14 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         if (chkProdutoFornecedor.isSelected()) {
             importador.importarProdutoFornecedor();
         }
+        
+        if (chkPagarFornecedor.isSelected()) {
+            if (chkImportarSomenteAtivos.isSelected()) {
+                importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);
+            } else {
+                importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+            }            
+        }
     }
     
     public void executarImportacao() throws Exception {
@@ -242,6 +258,10 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
         pnlProdutoFornecedor = new vrframework.bean.panel.VRPanel();
         jLabel9 = new javax.swing.JLabel();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        pnlContasPagar = new vrframework.bean.panel.VRPanel();
+        jLabel12 = new javax.swing.JLabel();
+        chkPagarFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        ImportarSemFornecedor = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -267,7 +287,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlParametrosLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(chkImportarSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(465, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlParametrosLayout.setVerticalGroup(
             pnlParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -323,7 +343,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkIM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(95, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -406,7 +426,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlEnderecoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(chkCep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlEnderecoLayout.setVerticalGroup(
             pnlEnderecoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -467,7 +487,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addComponent(jLabel7)))
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlDadosComplementaresLayout.setVerticalGroup(
             pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -509,7 +529,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlContatoLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addComponent(jLabel8)))
-                .addContainerGap(434, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlContatoLayout.setVerticalGroup(
             pnlContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -538,12 +558,12 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
             .addGroup(pnlProdutoFornecedorLayout.createSequentialGroup()
                 .addGroup(pnlProdutoFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlProdutoFornecedorLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlProdutoFornecedorLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(jLabel9)))
-                .addContainerGap(480, Short.MAX_VALUE))
+                        .addComponent(jLabel9))
+                    .addGroup(pnlProdutoFornecedorLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(549, Short.MAX_VALUE))
         );
         pnlProdutoFornecedorLayout.setVerticalGroup(
             pnlProdutoFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -555,19 +575,69 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        pnlContasPagar.setBorder(null);
+
+        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel12, "CONTAS À PAGAR");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPagarFornecedor, "Pagar Fornecedor");
+        chkPagarFornecedor.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(ImportarSemFornecedor, "Importar Sem Fornecedor");
+        ImportarSemFornecedor.setEnabled(true);
+
+        javax.swing.GroupLayout pnlContasPagarLayout = new javax.swing.GroupLayout(pnlContasPagar);
+        pnlContasPagar.setLayout(pnlContasPagarLayout);
+        pnlContasPagarLayout.setHorizontalGroup(
+            pnlContasPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContasPagarLayout.createSequentialGroup()
+                .addGroup(pnlContasPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlContasPagarLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel12))
+                    .addGroup(pnlContasPagarLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkPagarFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(ImportarSemFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(418, Short.MAX_VALUE))
+        );
+        pnlContasPagarLayout.setVerticalGroup(
+            pnlContasPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlContasPagarLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlContasPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkPagarFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ImportarSemFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(17, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout tabImportacaoLayout = new javax.swing.GroupLayout(tabImportacao);
         tabImportacao.setLayout(tabImportacaoLayout);
         tabImportacaoLayout.setHorizontalGroup(
             tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabImportacaoLayout.createSequentialGroup()
-                .addGroup(tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pnlContato, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlDadosComplementares, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlEndereco, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlDados, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlParametros, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnlProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, 0))
+                .addGroup(tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabImportacaoLayout.createSequentialGroup()
+                        .addComponent(pnlContato, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(5, 5, 5))
+                    .addGroup(tabImportacaoLayout.createSequentialGroup()
+                        .addComponent(pnlDadosComplementares, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(50, 50, 50))
+                    .addGroup(tabImportacaoLayout.createSequentialGroup()
+                        .addComponent(pnlEndereco, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(48, 48, 48))
+                    .addGroup(tabImportacaoLayout.createSequentialGroup()
+                        .addComponent(pnlDados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(36, 36, 36))
+                    .addGroup(tabImportacaoLayout.createSequentialGroup()
+                        .addComponent(pnlParametros, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(7, 7, 7))
+                    .addComponent(pnlProdutoFornecedor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlContasPagar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         tabImportacaoLayout.setVerticalGroup(
             tabImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -581,8 +651,11 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(pnlDadosComplementares, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(pnlContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(pnlProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         scrollImportação.setViewportView(tabImportacao);
@@ -598,6 +671,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public vrframework.bean.checkBox.VRCheckBox ImportarSemFornecedor;
     public javax.swing.ButtonGroup btgPautaFiscal;
     public vrframework.bean.checkBox.VRCheckBox chkBairro;
     public vrframework.bean.checkBox.VRCheckBox chkCep;
@@ -616,6 +690,7 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
     public vrframework.bean.checkBox.VRCheckBox chkNumero;
     public vrframework.bean.checkBox.VRCheckBox chkObservacao;
+    public vrframework.bean.checkBox.VRCheckBox chkPagarFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkPrazoFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     public vrframework.bean.checkBox.VRCheckBox chkRazao;
@@ -624,11 +699,13 @@ public class ChecksFornecedorPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
     public javax.swing.JLabel jLabel10;
+    public javax.swing.JLabel jLabel12;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
+    public vrframework.bean.panel.VRPanel pnlContasPagar;
     public vrframework.bean.panel.VRPanel pnlContato;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDadosComplementares;
