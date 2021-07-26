@@ -84,6 +84,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
 
         carregarParametros();
         centralizarForm();
+        pnlConn.setSistema(ESistema.SYSPDV);
         pnlConn.getNomeConexao();
         
         this.setMaximum(false);

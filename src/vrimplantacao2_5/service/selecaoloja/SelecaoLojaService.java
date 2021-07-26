@@ -37,6 +37,18 @@ public class SelecaoLojaService {
         return result;
     }
     
+    public List<ConfiguracaoBaseDadosVO> consultar(int idSistema) {
+        List<ConfiguracaoBaseDadosVO> result = null;
+        
+        try {
+            result = configuracaoDAO.consultar(idSistema);
+        } catch (Exception e) {
+            Util.exibirMensagemErro(e, "Mapa de Loja");
+        }
+        
+        return result;
+    }
+    
     public List<ConfiguracaoBancoLojaVO> getLojaMapeada(int idConexao) {
         List<ConfiguracaoBancoLojaVO> lojas = null;
 

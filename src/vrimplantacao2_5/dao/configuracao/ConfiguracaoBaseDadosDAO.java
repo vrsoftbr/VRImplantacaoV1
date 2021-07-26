@@ -192,8 +192,12 @@ public class ConfiguracaoBaseDadosDAO {
                     + configuracaoBancoLojaVO.getId());
         }
     }
-
+    
     public List consultar() throws Exception {
+        return consultar(0);
+    } 
+
+    public List consultar(int idSistema) throws Exception {
         List<ConfiguracaoBaseDadosVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {
@@ -217,7 +221,8 @@ public class ConfiguracaoBaseDadosDAO {
                     + "		on c.id_sistema = s.id\n"
                     + "join implantacao2_5.bancodados b\n"
                     + "		on c.id_bancodados = b.id\n"
-                    + "order by c.descricao")) {
+                    + (idSistema != 0 ? " where s.id = " + idSistema : "")        
+                    + " order by c.descricao")) {
                 while (rs.next()) {
                     ConfiguracaoBaseDadosVO configuracaoVO = new ConfiguracaoBaseDadosVO();
                     SistemaVO sistemaVO = new SistemaVO();

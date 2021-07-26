@@ -16,6 +16,7 @@ import vrimplantacao2_5.service.cadastro.configuracao.ConfiguracaoPanel;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
+import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
  *
@@ -31,6 +32,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
     public ConfiguracaoBaseDadosVO cfgVO = null;
     private ConfiguracaoBancoLojaVO configuracaoLojaVO = null;
+    private ESistema sistema;
 
     /**
      * Creates new form ConfiguracaoBaseDados
@@ -46,6 +48,10 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     private void setConfiguracao() throws Exception {
         getNomeConexao();
     }
+    
+    public void setSistema(ESistema sistema) {
+        this.sistema = sistema;
+    }
 
     @Override
     public void setOnConectar(ConexaoEvent onConectar) {
@@ -59,7 +65,7 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
     public void getNomeConexao() throws Exception {
         cboConexao.setModel(new DefaultComboBoxModel());
 
-        conexoes = controller.consultar();
+        conexoes = controller.consultar(sistema.getId());
         
         for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
             String complemento = (configuracaoVO.getComplemento() != null && 
