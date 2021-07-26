@@ -74,6 +74,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuOryonActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuStock">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Stock"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuStockActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuW2A">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="W2A Brasil"/>

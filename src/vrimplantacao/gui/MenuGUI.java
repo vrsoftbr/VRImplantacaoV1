@@ -291,6 +291,7 @@ import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
+import vrimplantacao2.gui.interfaces.StockGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
@@ -607,6 +608,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuBase = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         mnuOryon = new javax.swing.JMenuItem();
+        mnuStock = new javax.swing.JMenuItem();
         mnuW2A = new javax.swing.JMenuItem();
         mnuADS = new javax.swing.JMenu();
         mnuInfoMacStore = new javax.swing.JMenuItem();
@@ -1126,6 +1128,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuAccess.add(mnuOryon);
+
+        mnuStock.setText("Stock");
+        mnuStock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuStockActionPerformed(evt);
+            }
+        });
+        mnuAccess.add(mnuStock);
 
         mnuW2A.setText("W2A Brasil");
         mnuW2A.addActionListener(new java.awt.event.ActionListener() {
@@ -5294,6 +5304,10 @@ public final class MenuGUI extends VRMdiFrame {
         PhoenixGUI.exibir(this);
     }//GEN-LAST:event_mnuPhoenixActionPerformed
 
+    private void mnuStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuStockActionPerformed
+        StockGUI.exibir(this);
+    }//GEN-LAST:event_mnuStockActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5579,6 +5593,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenuItem mnuSolutionSupera;
     private javax.swing.JMenuItem mnuSri;
+    private javax.swing.JMenuItem mnuStock;
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperLoja10;
     private javax.swing.JMenuItem mnuSyncTech;

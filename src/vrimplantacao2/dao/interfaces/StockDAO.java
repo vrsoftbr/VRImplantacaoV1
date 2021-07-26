@@ -236,23 +236,31 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	proabrproduto as reduzida,\n"
                     + "	prodesunidade as unidade,\n"
                     + "	provalprecovenda as precovenda,\n"
-                    + "	proprecoatacado as precoatacado,\n"
                     + "	provalcusto as precocusto,\n"
+                    + "	prolucro as margem,\n"
                     + "	proqntminima as estoque_min,\n"
                     + "	proqntestoque as estoque,\n"
-                    + "	prolucro as margem,\n"
+                    + "	proCodDepartamento as merc1,\n"
+                    + "	proCodDepartamento as merc2,\n"
+                    + "	proCodDepartamento as merc3,\n"
                     + "	propeso as pesobruto,\n"
                     + "	prodataalterado as data_alteracao,\n"
                     + "	proncm as ncm,\n"
-                    + "proflagbalanca as e_balanca,"
+                    + " procest as cest,\n"
+                    + "	proflagbalanca as e_balanca,\n"
                     + "	trivalortributacao as aliquota_saida,\n"
                     + "	tricstcsosnsaida as cst_saida,\n"
-                    + "	0 as reducao,\n"
+                    + "	0 as red_saida,\n"
                     + "	trivalortributacao as aliquota_entrada,\n"
-                    + "	tricstcsosnentrada as cst_entrada\n"
+                    + "	tricstcsosnentrada as cst_entrada,\n"
+                    + " 0 as red_entrada\n"
                     + "FROM\n"
-                    + "	tbprodutos p\n"
-                    + "	LEFT JOIN tbtributacoes t on p.procodtributo = t.triid\n"
+                    + "	  tbprodutos p,\n"
+                    + "   tbGrupos m,\n"
+                    + "   tbtributacoes t\n"
+                    + "WHERE\n"
+                    + "   p.procodtributo = t.triid\n"
+                    + "   and m.depid = p.proCodDepartamento \n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -270,9 +278,14 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoSemImposto(rst.getDouble("precocusto"));
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setEstoqueMinimo(rst.getDouble("estoque_min"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setDataAlteracao(rst.getDate("data_alteracao"));
 
@@ -284,16 +297,7 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(imp.getCodMercadologico1());
                     imp.setCodMercadologico3(imp.getCodMercadologico1());
 
-                    //imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-
-                    imp.seteBalanca(rst.getBoolean("balanca"));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
-
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
 
                     imp.setPiscofinsCstCredito(rst.getString("pis_e"));
                     imp.setPiscofinsCstDebito(rst.getString("pis_s"));
@@ -462,7 +466,7 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rs.getDate("data_nasc"));
                     imp.setCnpj(rs.getString("cpfcnpj"));
                     imp.setInscricaoestadual(rs.getString("rg_ie"));
-                    
+
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
@@ -470,7 +474,7 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rs.getString("cidade"));
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    
+
                     imp.setTelefone(rs.getString("telefone"));
                     imp.setEmail(rs.getString("email"));
                     imp.setFax(rs.getString("fax"));
@@ -479,16 +483,16 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaTelefone(rs.getString("fone_empresa"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    
+
                     imp.setValorLimite(rs.getDouble("limite"));
                     imp.setDiaVencimento(rs.getInt("dia_vencimento"));
-                    
+
                     imp.setNomeMae(rs.getString("nomemae"));
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeConjuge(rs.getString("nome_conju"));
                     imp.setCpfConjuge(rs.getString("cpf_conju"));
                     imp.setDataNascimentoConjuge(rs.getDate("nasc_conju"));
-                    
+
                     result.add(imp);
                 }
             }
