@@ -7,14 +7,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -23,11 +29,58 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Desenvolvimento
  */
-public class EcoCentauroDAO extends InterfaceDAO {
+public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
         return "Eco Centauro";
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + "    icm.vendacsf1 AS cst_saida,\n"
+                    + "    icm.vendaicms1 AS aliquota_saida,\n"
+                    + "    icm.vendareducao1 AS reducao_saida\n"
+                    + "FROM TESTPRODUTOGERAL pg\n"
+                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+            )) {
+                while (rs.next()) {
+                    String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id
+                    )
+                    );
+                }
+            }
+
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT DISTINCT\n"
+                    + "    icm.compracsf AS cst_entrada,\n"
+                    + "    icm.compraicms AS aliquota_entrada,\n"
+                    + "    icm.comprareducao AS reducao_entrada\n"
+                    + "FROM TESTPRODUTOGERAL pg\n"
+                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
+                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
+                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+            )) {
+                while (rs.next()) {
+                    String id = rs.getString("cst_entrada") + "-" + rs.getString("aliquota_entrada") + "-" + rs.getString("reducao_entrada");
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id
+                    )
+                    );
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -420,4 +473,123 @@ public class EcoCentauroDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, id_tipoembalagem from produto \n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
+                    vo.setIdproduto(rst.getInt("id"));
+                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
+                    vo.setCodigoBarras(gerarEan13(Long.parseLong(rst.getString("id")), true));
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void importarDigitoVerificador() throws Exception {
+        List<ProdutoAutomacaoVO> result = new ArrayList<>();
+        ProgressBar.setStatus("Carregar Produtos...");
+        try {
+            result = getDigitoVerificador();
+
+            if (!result.isEmpty()) {
+                gravarCodigoBarrasDigitoVerificador(result);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
+
+        Conexao.begin();
+        Statement stm, stm2 = null;
+        ResultSet rst = null;
+
+        stm = Conexao.createStatement();
+        stm2 = Conexao.createStatement();
+
+        String sql = "";
+        ProgressBar.setStatus("Gravando Código de Barras...");
+        ProgressBar.setMaximum(vo.size());
+
+        try {
+
+            for (ProdutoAutomacaoVO i_vo : vo) {
+
+                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
+                rst = stm.executeQuery(sql);
+
+                if (!rst.next()) {
+                    sql = "insert into produtoautomacao ("
+                            + "id_produto, "
+                            + "codigobarras, "
+                            + "id_tipoembalagem, "
+                            + "qtdembalagem) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ", "
+                            + i_vo.getIdTipoEmbalagem() + ", 1);";
+                    stm2.execute(sql);
+                } else {
+                    sql = "insert into implantacao.produtonaogerado ("
+                            + "id_produto, "
+                            + "codigobarras) "
+                            + "values ("
+                            + i_vo.getIdproduto() + ", "
+                            + i_vo.getCodigoBarras() + ");";
+                    stm2.execute(sql);
+                }
+                ProgressBar.next();
+            }
+
+            stm.close();
+            stm2.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
+    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
+        String codigo = String.format("%012d", i_codigo);
+
+        int somaPar = 0;
+        int somaImpar = 0;
+
+        for (int i = 0; i < 12; i += 2) {
+            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
+            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
+        }
+
+        int soma = somaImpar + (3 * somaPar);
+        int digito = 0;
+        boolean verifica = false;
+        int calculo = 0;
+
+        do {
+            calculo = soma % 10;
+
+            if (calculo != 0) {
+                digito += 1;
+                soma += 1;
+            }
+        } while (calculo != 0);
+
+        if (i_digito) {
+            return Long.parseLong(codigo + digito);
+        } else {
+            return Long.parseLong(codigo);
+        }
+    }  
 }
