@@ -62,7 +62,8 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
-                OpcaoProduto.MAPA_TRIBUTACAO
+                OpcaoProduto.MAPA_TRIBUTACAO,
+                OpcaoProduto.FORCAR_ATUALIZACAO
         ));
     }
     
@@ -179,8 +180,9 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pe.cade_estmax as estoquemaximo,\n"
                     + "    pe.cade_qemb as qtdembalagem, \n"
                     + "    pe.cade_margemcontribmin as margem,\n"
-                    + "    pe.cade_prvenda as precovenda,\n"
-                    + "    pe.cade_ctnota as custo\n"
+                    + "    pe.cade_prnormal as precovenda,\n"
+                    + "    pe.cade_ctnota as custo,\n"
+                    + "    pe.cade_estoque2 as estoque \n"        
                     + "from cadprod p\n"
                     + "left join cadprodemp pe on pe.cade_codigo = p.cadp_codigo\n"
                     + "	and pe.cade_codempresa = '" + getLojaOrigem() + "'\n"
@@ -207,6 +209,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
