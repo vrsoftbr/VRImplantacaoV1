@@ -208,6 +208,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    pg.codigo AS id,\n"
                     + "    pg.codigobarra AS ean,\n"
                     + "    pg.descricao AS descricaocompleta,\n"
+                    + "    pg.referencia,\n"
                     + "    pg.descricaoreduzida AS descricaoreduzida,\n"
                     + "    pg.descricaograde AS descricaogondola,\n"
                     + "    pg.embalagem AS tipoembalagem,\n"
@@ -265,6 +266,12 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
+
+                    if (rst.getString("referencia") != null && !rst.getString("referencia").trim().isEmpty()) {
+                        if (!rst.getString("descricaocompleta").contains(rst.getString("referencia").trim())) {
+                            imp.setDescricaoCompleta(rst.getString("descricao") + " " + rst.getString("referencia"));
+                        }
+                    }
                     result.add(imp);
                 }
             }

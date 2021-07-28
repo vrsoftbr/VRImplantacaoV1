@@ -19,7 +19,6 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -55,7 +54,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
-    
+
     @Override
     public String getSistema() {
         if ("".equals(complemento)) {
@@ -70,8 +69,11 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
@@ -97,37 +99,38 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.OFERTA
         ));
     }
 
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "select \n" +
-                    "	 p.CODITEM id_produto,\n" +
-                    "    p.ncm,\n" +
-                    "    aliq.mva,\n" +
-                    "    0 cst,\n" +
-                    "    ai.ALIQUOTA_INTERNA aliquota\n" +
-                    "from\n" +
-                    "	produto p\n" +
-                    "    join empresas emp on\n" +
-                    "		emp.CODIGO_N = 1\n" +
-                    "	join aliquotas_internas_produto aliq on\n" +
-                    "		aliq.id_produto = p.coditem and\n" +
-                    "        aliq.uf_dest = emp.ESTADO\n" +
-                    "	join aliquotas_internas ai on\n" +
-                    "		aliq.UF_DEST = ai.ESTADO\n" +
-                    "order by\n" +
-                    "   p.coditem"
+                    "select \n"
+                    + "	 p.CODITEM id_produto,\n"
+                    + "    p.ncm,\n"
+                    + "    aliq.mva,\n"
+                    + "    0 cst,\n"
+                    + "    ai.ALIQUOTA_INTERNA aliquota\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "    join empresas emp on\n"
+                    + "		emp.CODIGO_N = 1\n"
+                    + "	join aliquotas_internas_produto aliq on\n"
+                    + "		aliq.id_produto = p.coditem and\n"
+                    + "        aliq.uf_dest = emp.ESTADO\n"
+                    + "	join aliquotas_internas ai on\n"
+                    + "		aliq.UF_DEST = ai.ESTADO\n"
+                    + "order by\n"
+                    + "   p.coditem"
             )) {
                 while (rs.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
-                    
+
                     imp.setId(rs.getString("id_produto"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setIva(rs.getDouble("mva"));
@@ -136,12 +139,12 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setAliquotaCreditoForaEstado(rs.getInt("cst"), rs.getDouble("aliquota"), 0);
                     imp.setAliquotaDebito(rs.getInt("cst"), rs.getDouble("aliquota"), 0);
                     imp.setAliquotaDebitoForaEstado(rs.getInt("cst"), rs.getDouble("aliquota"), 0);
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -151,15 +154,15 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stmt = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "SELECT\n" +
-                    "	posicao id,\n" +
-                    "	descricao,\n" +
-                    "	coalesce(cstecf, 0) cst,\n" +
-                    "	COALESCE(aliquota, 0) aliquota\n" +
-                    "FROM\n" +
-                    "	aliquotas\n" +
-                    "ORDER BY\n" +
-                    "	id"
+                    "SELECT\n"
+                    + "	posicao id,\n"
+                    + "	descricao,\n"
+                    + "	coalesce(cstecf, 0) cst,\n"
+                    + "	COALESCE(aliquota, 0) aliquota\n"
+                    + "FROM\n"
+                    + "	aliquotas\n"
+                    + "ORDER BY\n"
+                    + "	id"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
@@ -175,17 +178,17 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
         return result;
     }
 
-    public List<Estabelecimento> getLojas() throws Exception {        
+    public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	codigo_n id,\n" +
-                    "   nome razao,\n" +
-                    "   cgc cnpj\n" +
-                    "from\n" +
-                    "	empresas"
+                    "select\n"
+                    + "	codigo_n id,\n"
+                    + "   nome razao,\n"
+                    + "   cgc cnpj\n"
+                    + "from\n"
+                    + "	empresas"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(
@@ -205,26 +208,26 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	m1.CODGRUPO as merc1,\n" +
-                    "	m1.NOMEGRUPO as desc_merc1, \n" +
-                    "	m2.ID_CATEGORIA as merc2,\n" +
-                    "	m2.DESCRICAO as desc_merc2, \n" +
-                    "	m3.CODIGO as merc3,\n" +
-                    "	m3.DESCRICAO as desc_merc3 \n" +
-                    "from\n" +
-                    "	produto p \n" +
-                    "	left join grupo m1 on m1.CODGRUPO = p.GRUPO \n" +
-                    "	left join categorias m2 on m2.ID_CATEGORIA = p.CATEGORIA \n" +
-                    "	left join familias m3 on m3.CODIGO = p.FAMILIA \n" +
-                    "order by\n" +
-                    "	m1.CODGRUPO,\n" +
-                    "	m2.ID_CATEGORIA,\n" +
-                    "	m3.CODIGO"
+                    "select \n"
+                    + "	m1.CODGRUPO as merc1,\n"
+                    + "	m1.NOMEGRUPO as desc_merc1, \n"
+                    + "	m2.ID_CATEGORIA as merc2,\n"
+                    + "	m2.DESCRICAO as desc_merc2, \n"
+                    + "	m3.CODIGO as merc3,\n"
+                    + "	m3.DESCRICAO as desc_merc3 \n"
+                    + "from\n"
+                    + "	produto p \n"
+                    + "	left join grupo m1 on m1.CODGRUPO = p.GRUPO \n"
+                    + "	left join categorias m2 on m2.ID_CATEGORIA = p.CATEGORIA \n"
+                    + "	left join familias m3 on m3.CODIGO = p.FAMILIA \n"
+                    + "order by\n"
+                    + "	m1.CODGRUPO,\n"
+                    + "	m2.ID_CATEGORIA,\n"
+                    + "	m3.CODIGO"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rst.getString("merc1"));
@@ -233,7 +236,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setMerc2Descricao(rst.getString("desc_merc2"));
                     imp.setMerc3ID(rst.getString("merc3"));
                     imp.setMerc3Descricao(rst.getString("desc_merc3"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -242,74 +245,98 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	codigo id_familia,\n"
+                    + "	descricao \n"
+                    + "from\n"
+                    + "	familias"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id_familia"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	p.CODITEM id, \n" +
-                    "	p.GRUPO, \n" +
-                    "	p.CATEGORIA, \n" +
-                    "	p.FAMILIA, \n" +
-                    "	p.DESCRICAO descricaocompleta, \n" +
-                    "	p.ABREVIA descricaoreduzida, \n" +
-                    "	p.CUSTO custo, \n" +
-                    "	p.UNITARIO preco, \n" +
-                    "	p.BALANCA e_balanca, \n" +
-                    "	p.ALIQUOTASAIDA as ICMS, \n" +
-                    "	p.UNIDADE, \n" +
-                    "	p.id_fabricante, \n" +
-                    "	ean.ean, \n" +
-                    "	p.NCM, \n" +
-                    "	p.CATEGORIA, \n" +
-                    "	p.ATIVO, \n" +
-                    "	p.PESO_LIQUIDO, \n" +
-                    "	p.PESO_BRUTO, \n" +
-                    "	(p.QTDEMBALAGEM / 1000) as qtdembalagem, \n" +
-                    "	p.PIS pis_entrada, \n" +
-                    "	p.PISVENDAS pis_saida, \n" +
-                    "	p.NAT_REC pis_nat_rec, \n" +
-                    "	p.MARKDOWN, \n" +
-                    "	p.CEST, \n" +
-                    "	p.familia id_familia,\n" +
-                    "	est.qtd estoque,\n" +
-                    "	est.qtd_maxima estoquemaximo,\n" +
-                    "	est.qtd_minima estoqueminino,\n" +
-                    "	est.etiqueta_impressa,\n" +
-                    "	est.markdownrevenda ,\n" +
-                    "	est.qtd_troca troca\n" +
-                    "from\n" +
-                    "	produto p\n" +
-                    "	left JOIN (\n" +
-                    "		SELECT\n" +
-                    "			coditem id_produto,\n" +
-                    "			codbarra ean\n" +
-                    "		FROM\n" +
-                    "			produto\n" +
-                    "		union\n" +
-                    "		SELECT \n" +
-                    "			id_produto, \n" +
-                    "			codigo ean\n" +
-                    "		FROM\n" +
-                    "			codigos\n" +
-                    "		ORDER BY\n" +
-                    "			id_produto\n" +
-                    "	) ean on\n" +
-                    "		p.coditem = ean.id_produto\n" +
-                    "	left join estoques est on\n" +
-                    "		est.id_produto = p.coditem and\n" +
-                    "		est.id_empresa = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "   p.coditem"
+                    "select \n"
+                    + "	p.CODITEM id, \n"
+                    + "	p.GRUPO, \n"
+                    + "	p.CATEGORIA, \n"
+                    + "	p.FAMILIA, \n"
+                    + "	p.DESCRICAO descricaocompleta, \n"
+                    + "	p.ABREVIA descricaoreduzida, \n"
+                    + "	p.CUSTO custo, \n"
+                    + "	p.UNITARIO preco, \n"
+                    + "	p.BALANCA e_balanca, \n"
+                    + "	p.ALIQUOTASAIDA as ICMS, \n"
+                    + "	p.UNIDADE, \n"
+                    + "	p.id_fabricante, \n"
+                    + "	ean.ean, \n"
+                    + "	p.NCM, \n"
+                    + "	p.CATEGORIA, \n"
+                    + "	p.ATIVO, \n"
+                    + "	p.PESO_LIQUIDO, \n"
+                    + "	p.PESO_BRUTO, \n"
+                    + "	(p.QTDEMBALAGEM / 1000) as qtdembalagem, \n"
+                    + "	p.PIS pis_entrada, \n"
+                    + "	p.PISVENDAS pis_saida, \n"
+                    + "	p.NAT_REC pis_nat_rec, \n"
+                    + "	p.MARKDOWN, \n"
+                    + "	p.CEST, \n"
+                    + "	p.familia id_familia,\n"
+                    + "	est.qtd estoque,\n"
+                    + "	est.qtd_maxima estoquemaximo,\n"
+                    + "	est.qtd_minima estoqueminino,\n"
+                    + "	est.etiqueta_impressa,\n"
+                    + "	est.markdownrevenda ,\n"
+                    + "	est.qtd_troca troca\n"
+                    + "from\n"
+                    + "	produto p\n"
+                    + "	left JOIN (\n"
+                    + "		SELECT\n"
+                    + "			coditem id_produto,\n"
+                    + "			codbarra ean\n"
+                    + "		FROM\n"
+                    + "			produto\n"
+                    + "		union\n"
+                    + "		SELECT \n"
+                    + "			id_produto, \n"
+                    + "			codigo ean\n"
+                    + "		FROM\n"
+                    + "			codigos\n"
+                    + "		ORDER BY\n"
+                    + "			id_produto\n"
+                    + "	) ean on\n"
+                    + "		p.coditem = ean.id_produto\n"
+                    + "	left join estoques est on\n"
+                    + "		est.id_produto = p.coditem and\n"
+                    + "		est.id_empresa = " + getLojaOrigem() + "\n"
+                    + "order by\n"
+                    + "   p.coditem"
             )) {
                 int cont = 0;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportId(rst.getString("id"));
-                    
+
                     ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean")));
                     if (bal != null) {
                         imp.setEan(bal.getCodigo() + "");
@@ -346,14 +373,14 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setIcmsDebitoId(rst.getString("ICMS"));
                     imp.setIcmsCreditoId(rst.getString("ICMS"));
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminino"));
                     imp.setTroca(rst.getDouble("troca"));
-                    
+
                     imp.setPautaFiscalId(rst.getString("id"));
-                    
+
                     result.add(imp);
 
                     cont++;
@@ -371,40 +398,40 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "    f.codigocli id,\n" +
-                    "    f.razao,\n" +
-                    "    f.nomecli fantasia,\n" +
-                    "    f.cpfcgc cnpj,\n" +
-                    "    f.IDENINSC ie,\n" +
-                    "    f.suframa,\n" +
-                    "    f.ativo,\n" +
-                    "    f.ENDERCLI endereco,\n" +
-                    "    f.NUMERO,\n" +
-                    "    f.COMPLEMENTO,\n" +
-                    "    f.BAIRROCLI bairro,\n" +
-                    "    f.CIDADECLI cidade,\n" +
-                    "    f.ESTADOCLI estado,\n" +
-                    "    f.CEPCLI cep,\n" +
-                    "    f.ENDERCOB endereco_cob,\n" +
-                    "    f.NUMEROCOB numero_cob,\n" +
-                    "    f.COMPLEMENTOCOB complemento_cob,\n" +
-                    "    f.BAIRROCOB bairro_cob,\n" +
-                    "    f.CIDADECOB cidade_cob,\n" +
-                    "    f.ESTADOCOB estado_cob,\n" +
-                    "    f.CEPCOB cep_cob,\n" +
-                    "    f.FONECLI telefone,\n" +
-                    "    f.CADASTRADO datacadastro,\n" +
-                    "    f.ALTERADO dataalteracao,\n" +
-                    "    f.OBSERVACAO,\n" +
-                    "    f.EMAIL,\n" +
-                    "    f.FAXCLI fax\n" +
-                    "from\n" +
-                    "	clientes f\n" +
-                    "where\n" +
-                    "	f.tipo = 'F'\n" +
-                    "order by\n" +
-                    "	id"
+                    "select \n"
+                    + "    f.codigocli id,\n"
+                    + "    f.razao,\n"
+                    + "    f.nomecli fantasia,\n"
+                    + "    f.cpfcgc cnpj,\n"
+                    + "    f.IDENINSC ie,\n"
+                    + "    f.suframa,\n"
+                    + "    f.ativo,\n"
+                    + "    f.ENDERCLI endereco,\n"
+                    + "    f.NUMERO,\n"
+                    + "    f.COMPLEMENTO,\n"
+                    + "    f.BAIRROCLI bairro,\n"
+                    + "    f.CIDADECLI cidade,\n"
+                    + "    f.ESTADOCLI estado,\n"
+                    + "    f.CEPCLI cep,\n"
+                    + "    f.ENDERCOB endereco_cob,\n"
+                    + "    f.NUMEROCOB numero_cob,\n"
+                    + "    f.COMPLEMENTOCOB complemento_cob,\n"
+                    + "    f.BAIRROCOB bairro_cob,\n"
+                    + "    f.CIDADECOB cidade_cob,\n"
+                    + "    f.ESTADOCOB estado_cob,\n"
+                    + "    f.CEPCOB cep_cob,\n"
+                    + "    f.FONECLI telefone,\n"
+                    + "    f.CADASTRADO datacadastro,\n"
+                    + "    f.ALTERADO dataalteracao,\n"
+                    + "    f.OBSERVACAO,\n"
+                    + "    f.EMAIL,\n"
+                    + "    f.FAXCLI fax\n"
+                    + "from\n"
+                    + "	clientes f\n"
+                    + "where\n"
+                    + "	f.tipo = 'F'\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -417,7 +444,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setIe_rg(rst.getString("ie"));
                     imp.setSuframa(rst.getString("suframa"));
                     imp.setAtivo("S".equals(rst.getString("ativo")));
-                    
+
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -425,7 +452,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("estado"));
                     imp.setCep(rst.getString("cep"));
-                    
+
                     imp.setCob_endereco(rst.getString("endereco_cob"));
                     imp.setCob_numero(rst.getString("numero_cob"));
                     imp.setCob_complemento(rst.getString("complemento_cob"));
@@ -433,11 +460,11 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCob_municipio(rst.getString("cidade_cob"));
                     imp.setCob_uf(rst.getString("estado_cob"));
                     imp.setCob_cep(rst.getString("cep_cob"));
-                    
+
                     imp.setTel_principal(rst.getString("telefone"));
                     imp.addTelefone("FAX", rst.getString("fax"));
                     imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
-                    
+
                     result.add(imp);
                 }
             }
@@ -451,21 +478,21 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	pf.id_produto,\n" +
-                    "	pf.id_fornecedor,\n" +
-                    "	n.codigo codigoexterno,\n" +
-                    "	pf.ULTIMACOMPRA dataalteracao,\n" +
-                    "	coalesce(n.fator, 1) fator\n" +
-                    "from\n" +
-                    "	produtos_fornecedores pf\n" +
-                    "	join codigos_fornecedores n on\n" +
-                    "		pf.id_fornecedor = n.id_fornecedor and\n" +
-                    "		pf.ID_PRODUTO = n.ID_PRODUTO"
+                    "select\n"
+                    + "	pf.id_produto,\n"
+                    + "	pf.id_fornecedor,\n"
+                    + "	n.codigo codigoexterno,\n"
+                    + "	pf.ULTIMACOMPRA dataalteracao,\n"
+                    + "	coalesce(n.fator, 1) fator\n"
+                    + "from\n"
+                    + "	produtos_fornecedores pf\n"
+                    + "	join codigos_fornecedores n on\n"
+                    + "		pf.id_fornecedor = n.id_fornecedor and\n"
+                    + "		pf.ID_PRODUTO = n.ID_PRODUTO"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdProduto(rst.getString("id_produto"));
@@ -473,7 +500,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setQtdEmbalagem(rst.getInt("fator"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -487,38 +514,38 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	CODIGOCLI, \n" +
-                    "	NOMECLI, \n" +
-                    "	BAIRROCLI, \n" +
-                    "	CIDADECLI, \n" +
-                    "	ESTADOCLI, \n" +
-                    "	CEPCLI, \n" +
-                    "	FONECLI, \n" +
-                    "	FAXCLI, \n" +
-                    "	CPFCGC, \n" +
-                    "	IDENINSC, \n" +
-                    "	EMAIL, \n" +
-                    "	ENDERCLI, \n" +
-                    "	BANCO, \n" +
-                    "	CONTA, \n" +
-                    "	AGENCIA, \n" +
-                    "	ATIVO, \n" +
-                    "	RAZAO, \n" +
-                    "	ID_CIDADE, \n" +
-                    "	NUMERO,\n" +
-                    "	NOMEPAI, \n" +
-                    "	NOMEMAE,\n" +
-                    "	OBSERVACAO, \n" +
-                    "	CARGO, \n" +
-                    "	RENDA_TITULAR, \n" +
-                    "	LIMITE_CREDITO \n" +
-                    "from\n" +
-                    "	clientes \n" +
-                    "where\n" +
-                    "	TIPO = 'C'\n" +
-                    "order by\n" +
-                    "	codigocli"
+                    "select \n"
+                    + "	CODIGOCLI, \n"
+                    + "	NOMECLI, \n"
+                    + "	BAIRROCLI, \n"
+                    + "	CIDADECLI, \n"
+                    + "	ESTADOCLI, \n"
+                    + "	CEPCLI, \n"
+                    + "	FONECLI, \n"
+                    + "	FAXCLI, \n"
+                    + "	CPFCGC, \n"
+                    + "	IDENINSC, \n"
+                    + "	EMAIL, \n"
+                    + "	ENDERCLI, \n"
+                    + "	BANCO, \n"
+                    + "	CONTA, \n"
+                    + "	AGENCIA, \n"
+                    + "	ATIVO, \n"
+                    + "	RAZAO, \n"
+                    + "	ID_CIDADE, \n"
+                    + "	NUMERO,\n"
+                    + "	NOMEPAI, \n"
+                    + "	NOMEMAE,\n"
+                    + "	OBSERVACAO, \n"
+                    + "	CARGO, \n"
+                    + "	RENDA_TITULAR, \n"
+                    + "	LIMITE_CREDITO \n"
+                    + "from\n"
+                    + "	clientes \n"
+                    + "where\n"
+                    + "	TIPO = 'C'\n"
+                    + "order by\n"
+                    + "	codigocli"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -555,34 +582,34 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "SELECT\n" +
-                    "	c.contador id,\n" +
-                    "	c.EMISSAO dataemissao,\n" +
-                    "	c.caixa ecf,\n" +
-                    "	c.cupom numerocupom,\n" +
-                    "	c.coo,\n" +
-                    "	c.VALOR_PARCELA valor,\n" +
-                    "	c.OBSERVACAO,\n" +
-                    "	c.HISTORICO,\n" +
-                    "	c.ID_PORTADOR,\n" +
-                    "	c.CODIGO_N id_cliente,\n" +
-                    "	c.VENCTO_PARCELA datavencimento,\n" +
-                    "	c.JUROS\n" +
-                    "FROM\n" +
-                    "	creceber c\n" +
-                    "WHERE\n" +
-                    "   c.EMPRESA = " + getLojaOrigem() + " and\n" +
-                    "	c.VLPAGTO < c.VALOR_PARCELA and\n" +
-                    "	c.BAIXADO != 'S' AND dc = 'D'\n" +
-                    "ORDER BY\n" +
-                    "	id"
+                    "SELECT\n"
+                    + "	c.contador id,\n"
+                    + "	c.EMISSAO dataemissao,\n"
+                    + "	c.caixa ecf,\n"
+                    + "	c.cupom numerocupom,\n"
+                    + "	c.coo,\n"
+                    + "	c.VALOR_PARCELA valor,\n"
+                    + "	c.OBSERVACAO,\n"
+                    + "	c.HISTORICO,\n"
+                    + "	c.ID_PORTADOR,\n"
+                    + "	c.CODIGO_N id_cliente,\n"
+                    + "	c.VENCTO_PARCELA datavencimento,\n"
+                    + "	c.JUROS\n"
+                    + "FROM\n"
+                    + "	creceber c\n"
+                    + "WHERE\n"
+                    + "   c.EMPRESA = " + getLojaOrigem() + " and\n"
+                    + "	c.VLPAGTO < c.VALOR_PARCELA and\n"
+                    + "	c.BAIXADO != 'S' AND dc = 'D'\n"
+                    + "ORDER BY\n"
+                    + "	id"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rs.getString("id"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
                     imp.setEcf(rs.getString("ecf"));
@@ -592,15 +619,68 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setIdCliente(rs.getString("id_cliente"));
                     imp.setDataVencimento(rs.getDate("datavencimento"));
                     imp.setJuros(rs.getDouble("JUROS"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	ID_CHEQUE ID,\n"
+                    + "	EMISSAO DT_EMISSAO,\n"
+                    + "	VENCTO DT_VENCI,\n"
+                    + "	CUPOM,\n"
+                    + "	NCHEQUE NUMCHEQUE,\n"
+                    + "	CH.BANCO,\n"
+                    + "	CH.AGENCIA,\n"
+                    + "	CH.CONTA,\n"
+                    + "	CH.CGCCPF CPF_CNPJ,\n"
+                    + "	C.NOMECLI NOME_CLI,\n"
+                    + "	C.IDENINSC RG_IE,\n"
+                    + " C.FONECLI FONE_CLI,\n"
+                    + "	VALOR,\n"
+                    + "	OBS \n"
+                    + "FROM\n"
+                    + "	CHEQUES CH \n"
+                    + "	LEFT JOIN CLIENTES C ON CH.ID_CLIENTE = C.CODIGOCLI \n"
+                    + "WHERE\n"
+                    + "	CH.ID_EMPRESA = " + getLojaOrigem() + "\n"
+                    + "	AND BAIXADO = 'N' AND DATABAIXA IS NULL\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+
+                    imp.setId(rst.getString("ID"));
+                    imp.setDate(rst.getDate("DT_EMISSAO"));
+                    imp.setDataDeposito(rst.getDate("DT_VENCI"));
+                    imp.setNumeroCupom(rst.getString("CUPOM"));
+                    imp.setNumeroCheque(rst.getString("NUMCHEQUE"));
+                    imp.setBanco(rst.getInt("BANCO"));
+                    imp.setAgencia(rst.getString("AGENCIA"));
+                    imp.setConta(rst.getString("CONTA"));
+                    imp.setTelefone(rst.getString("FONE_CLI"));
+                    imp.setCpf(rst.getString("CPF_CNPJ"));
+                    imp.setNome(rst.getString("NOME_CLI"));
+                    imp.setRg(rst.getString("RG_IE"));
+                    imp.setValor(rst.getDouble("VALOR"));
+                    imp.setObservacao(rst.getString("OBS"));
+
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
     @Override
     public List<OfertaIMP> getOfertas(java.util.Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
