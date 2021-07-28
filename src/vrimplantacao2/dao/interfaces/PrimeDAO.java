@@ -15,6 +15,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -83,7 +84,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -355,7 +356,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.pare_dtemissao as dataemissao,\n"
                     + "    p.pare_dtvcto as datavnecimento,\n"
                     + "    p.pare_parcela as numeroparcela,\n"
-                    + "    p.pare_dcto as numerodocumento,\n"        
+                    + "    p.pare_dcto as numerodocumento,\n"
                     + "    p.pare_valor as valor,\n"
                     + "    p.pare_desconto as desconto,\n"
                     + "    p.pare_juros as juros,\n"
@@ -386,10 +387,66 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEntrada(rst.getDate("datamovimento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setObservacao(rst.getString("observacao") + " " + rst.getString("complementoobs"));
-                    
+
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("datavnecimento"), imp.getValor());
                     parc.setNumeroParcela(rst.getInt("numeroparcela"));
-                    
+                    parc.setObservacao(imp.getObservacao());
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "    (r.pare_protocolo||'-'||r.pare_chave) as id,\n"
+                    + "    r.pare_dtmvto as datamovimento,\n"
+                    + "    r.pare_dtemissao as dataemissao,\n"
+                    + "    r.pare_dtvcto as datavnecimento,\n"
+                    + "    r.pare_parcela as numeroparcela,\n"
+                    + "    r.pare_dcto as numerodocumento,\n"
+                    + "    r.pare_valor as valorparcela,\n"
+                    + "    r.pare_desconto as desconto,\n"
+                    + "    r.pare_juros as juros,\n"
+                    + "    r.pare_abatimentos as abatimentos,\n"
+                    + "    r.pare_acrescimos as acrescimos,\n"
+                    + "    r.pare_multa as multa,\n"
+                    + "    r.pare_parcelas as totalparcelas,\n"
+                    + "    r.pare_codentidade as idcliente,\n"
+                    + "    f.enti_razaosocial as razao,\n"
+                    + "    f.enti_nome as fantasia,\n"
+                    + "    f.enti_cnpjcpf as cnpj,\n"
+                    + "    r.pare_obs as observacao,\n"
+                    + "    r.pare_complemento as complementoobs,\n"
+                    + "    r.pare_pdv as ecf\n"
+                    + "from pagrec r\n"
+                    + "join entidades f on f.enti_codigo = r.pare_codentidade\n"
+                    + "where r.pare_pr = 'R'\n"
+                    + "and r.pare_dtbaixa = '2021-07-28'\n"
+                    + "and r.pare_codentidade = 16193\n"
+                    + "order by 3"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpjCliente(rst.getString("cnpj"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setNumeroCupom(rst.getString("numerodocumento"));
+                    imp.setParcela(rst.getInt("numeroparcela"));
+                    imp.setValor(rst.getDouble("valorparcela"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavnecimento"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setMulta(rst.getDouble("multa"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setObservacao(rst.getString("observacao") + " " + rst.getString("complementoobs"));
                     result.add(imp);
                 }
             }
