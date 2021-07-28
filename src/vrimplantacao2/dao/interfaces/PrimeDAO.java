@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -64,6 +68,19 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.MAPA_TRIBUTACAO,
                 OpcaoProduto.FORCAR_ATUALIZACAO
+        ));
+    }
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
     
@@ -145,7 +162,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -179,10 +196,14 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    pe.cade_estmin as estoqueminimo,\n"
                     + "    pe.cade_estmax as estoquemaximo,\n"
                     + "    pe.cade_qemb as qtdembalagem, \n"
-                    + "    pe.cade_margemcontribmin as margem,\n"
-                    + "    pe.cade_prnormal as precovenda,\n"
+                    + "    pe.cade_margemcontrib as margem,\n"
+                    + "    case \n"
+                    + "        pe.cade_oferta \n"
+                    + "	       when 'S' \n"
+                    + "	       then cade_prnormal\n"
+                    + "    else cade_prvenda end precovenda,\n"
                     + "    pe.cade_ctnota as custo,\n"
-                    + "    pe.cade_estoque2 as estoque \n"        
+                    + "    pe.cade_estoque2 as estoque \n"
                     + "from cadprod p\n"
                     + "left join cadprodemp pe on pe.cade_codigo = p.cadp_codigo\n"
                     + "	and pe.cade_codempresa = '" + getLojaOrigem() + "'\n"
@@ -218,16 +239,16 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpissaida"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
-                    
+
                     imp.setIcmsDebitoId(rst.getString("icmssaida"));
                     imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
                     imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
-                    
+
                     imp.setIcmsCreditoId(rst.getString("icmsentrada"));
                     imp.setIcmsCreditoForaEstadoId(imp.getIcmsCreditoId());
-                    
+
                     imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
-                    
+
                     result.add(imp);
                 }
             }
@@ -258,6 +279,121 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	f.enti_codigo as id,\n"
+                    + "	f.enti_razaosocial as razao,\n"
+                    + "	f.enti_nome as fantasia,\n"
+                    + "	f.enti_cnpjcpf as cnpj,\n"
+                    + "	f.enti_inscricaoestadual as ie,\n"
+                    + "	f.enti_inscricaomunicipal as im,\n"
+                    + "	f.enti_fj as tipopessoa,\n"
+                    + "	f.enti_endereco as endereco,\n"
+                    + "	f.enti_numero as numero,\n"
+                    + "	f.enti_complemento as complemento,\n"
+                    + "	f.enti_bairro as bairro,\n"
+                    + "	f.enti_municipio as municipio,\n"
+                    + "	m.muni_ibge as municipioibge,\n"
+                    + "	m.muni_nome as descricaomunicipio,\n"
+                    + "	m.muni_uf as descricaouf,\n"
+                    + "	f.enti_uf as uf,\n"
+                    + "	f.enti_cep as cep,\n"
+                    + "	f.enti_fone as telefone,\n"
+                    + "	f.enti_email as email,\n"
+                    + "	f.enti_fax as fax,\n"
+                    + "	f.enti_celular as celular,\n"
+                    + "	f.enti_datacadastro as datacadastro\n"
+                    + "from entidades f \n"
+                    + "left join municipios m on m.muni_codigo = f.enti_codmunicipio\n"
+                    + "where enti_tipo like '%F%'\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setInsc_municipal(rst.getString("im"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "    (p.pare_protocolo||'-'||pare_chave) as id,\n"
+                    + "    p.pare_dtmvto as datamovimento,\n"
+                    + "    p.pare_dtemissao as dataemissao,\n"
+                    + "    p.pare_dtvcto as datavnecimento,\n"
+                    + "    p.pare_parcela as numeroparcela,\n"
+                    + "    p.pare_dcto as numerodocumento,\n"        
+                    + "    p.pare_valor as valor,\n"
+                    + "    p.pare_desconto as desconto,\n"
+                    + "    p.pare_juros as juros,\n"
+                    + "    p.pare_abatimentos as abatimentos,\n"
+                    + "    p.pare_acrescimos as acrescimos,\n"
+                    + "    p.pare_multa as multa,\n"
+                    + "    p.pare_parcelas as totalparcelas,\n"
+                    + "    p.pare_codentidade as idfornecedor,\n"
+                    + "    f.enti_razaosocial as razao,\n"
+                    + "    f.enti_nome as fantasia,\n"
+                    + "    f.enti_cnpjcpf as cnpj,\n"
+                    + "    p.pare_obs as observacao,\n"
+                    + "    p.pare_complemento as complementoobs\n"
+                    + "from pagrec p\n"
+                    + "join entidades f on f.enti_codigo = p.pare_codentidade\n"
+                    + "where p.pare_pr = 'P'\n"
+                    + "and p.pare_dtbaixa is null\n"
+                    + "and p.pare_codempresa = '" + getLojaOrigem() + "'\n"
+                    + "order by 3"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataEntrada(rst.getDate("datamovimento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setObservacao(rst.getString("observacao") + " " + rst.getString("complementoobs"));
+                    
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("datavnecimento"), imp.getValor());
+                    parc.setNumeroParcela(rst.getInt("numeroparcela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 }
