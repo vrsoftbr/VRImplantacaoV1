@@ -26,15 +26,7 @@ public class SelecaoLojaService {
     }
     
     public List<ConfiguracaoBaseDadosVO> consultar() {
-        List<ConfiguracaoBaseDadosVO> result = null;
-        
-        try {
-            result = configuracaoDAO.consultar();
-        } catch (Exception e) {
-            Util.exibirMensagemErro(e, "Mapa de Loja");
-        }
-        
-        return result;
+        return consultar(0);
     }
     
     public List<ConfiguracaoBaseDadosVO> consultar(int idSistema) {

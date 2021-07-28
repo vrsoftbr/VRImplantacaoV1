@@ -24,7 +24,7 @@ import vrimplantacao2_5.vo.enums.ESistema;
  */
 public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
-    private SelecaoLojaController controller = new SelecaoLojaController();;
+    private final SelecaoLojaController controller = new SelecaoLojaController();
     private List<ConfiguracaoBancoLojaVO> lojas = null;
     private List<ConfiguracaoBaseDadosVO> conexoes = null;
     private ConexaoEvent onConectar;
