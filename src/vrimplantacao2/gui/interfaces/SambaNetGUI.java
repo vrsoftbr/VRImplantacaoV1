@@ -305,6 +305,7 @@ public class SambaNetGUI extends VRInternalFrame {
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
                     ProgressBar.dispose();
+                    ex.printStackTrace();
                     Util.exibirMensagemErro(ex, getTitle());
                 }
             }
