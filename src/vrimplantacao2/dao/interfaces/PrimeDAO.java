@@ -13,6 +13,9 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -396,6 +399,114 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	c.enti_codigo as id,\n"
+                    + "	c.enti_razaosocial as razao,\n"
+                    + "	c.enti_nome as fantasia,\n"
+                    + "	c.enti_cnpjcpf as cnpj,\n"
+                    + "	c.enti_inscricaoestadual as ie,\n"
+                    + "	c.enti_inscricaomunicipal as im,\n"
+                    + "	c.enti_rg as rg,\n"
+                    + "	c.enti_orgexp as orgaoemissor,\n"
+                    + "	c.enti_fj as tipopessoa,\n"
+                    + "	c.enti_endereco as endereco,\n"
+                    + "	c.enti_numero as numero,\n"
+                    + "	c.enti_complemento as complemento,\n"
+                    + "	c.enti_bairro as bairro,\n"
+                    + "	c.enti_municipio as municipio,\n"
+                    + "	m.muni_ibge as municipioibge,\n"
+                    + "	m.muni_nome as descricaomunicipio,\n"
+                    + "	m.muni_uf as descricaouf,\n"
+                    + "	c.enti_uf as uf,\n"
+                    + "	c.enti_cep as cep,\n"
+                    + "	c.enti_fone as telefone,\n"
+                    + "	c.enti_email as email,\n"
+                    + "	c.enti_fax as fax,\n"
+                    + "	c.enti_celular as celular,\n"
+                    + "	c.enti_datacadastro as datacadastro,\n"
+                    + "	c.enti_sexo as sexo,\n"
+                    + "	c.enti_naturalidade as naturalidade,\n"
+                    + "	c.enti_nacionalidade as nacionalidade,\n"
+                    + "	c.enti_celular as celular,\n"
+                    + "	c.enti_estcivil as estadocivil,\n"
+                    + "	c.enti_limitecrediario as valorlimite,\n"
+                    + "	c.enti_datanasc as datanascimento,\n"
+                    + "	c.enti_codsituacao as situacaocliente,\n"
+                    + "	s.situ_codigo as codigosituacaocliente,\n"
+                    + "	s.situ_descricao as descricaosituacaocliente\n"
+                    + "from entidades c \n"
+                    + "left join municipios m on m.muni_codigo = c.enti_codmunicipio\n"
+                    + "left join situacoes s on s.situ_codigo = c.enti_codsituacao\n"
+                    + "where enti_tipo like '%U%'\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    
+                    if (rst.getString("rg") != null && !rst.getString("rg").trim().isEmpty()) {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    } else {
+                        imp.setInscricaoestadual(rst.getString("ie"));
+                    }
+                    
+                    imp.setInscricaoMunicipal(rst.getString("im"));
+                    imp.setOrgaoemissor(rst.getString("orgaoemissor"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getString("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    
+                    if (rst.getString("sexo") != null && !rst.getString("sexo").trim().isEmpty()) {
+                        imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    }
+
+                    if (rst.getString("estadocivil") != null && !rst.getString("estadocivil").trim().isEmpty()) {
+                        switch (rst.getString("estadocivil")) {
+                            case "S":
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            case "C":
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            default:
+                                imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                                break;
+                        }
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                    }
+                    
+                    imp.setBloqueado("Normal".equals(rst.getString("descricaosituacaocliente")) ? false : true);
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
