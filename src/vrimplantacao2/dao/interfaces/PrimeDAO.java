@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -71,7 +73,8 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.ICMS,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.MAPA_TRIBUTACAO,
-                OpcaoProduto.FORCAR_ATUALIZACAO
+                OpcaoProduto.FORCAR_ATUALIZACAO,
+                OpcaoProduto.OFERTA
         ));
     }
 
@@ -564,4 +567,38 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	cade_codigo as idproduto, \n"
+                    + "	cade_dtoferta as datainicio, \n"
+                    + "	cade_dtoferta as datafim, \n"
+                    + "	cade_prvenda as precooferta, \n"
+                    + "	cade_prnormal as preconormal \n"
+                    + "from cadprodemp \n"
+                    + "where cade_oferta = 'S' \n"
+                    + "and cade_dtoferta >= '2021-08-01' \n"
+                    + "and cade_codempresa = '" + getLojaOrigem() + "'"
+            )) {
+
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datafim"));
+                    imp.setPrecoNormal(rs.getDouble("preconormal"));
+                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+
+                    result.add(imp);
+
+                }
+            }
+        }
+        return result;
+    }
+    
 }
