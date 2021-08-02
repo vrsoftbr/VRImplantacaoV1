@@ -606,7 +606,7 @@ public class Importador {
     }
     
     public void unificarFornecedor(OpcaoFornecedor... opt) throws Exception {
-        
+        unificarFornecedor(new HashSet<>(Arrays.asList(opt)));
     }
     /**
      * Unifica o cadastro dos fornecedores, apenas aqueles com CPF/CNPJ válidos,

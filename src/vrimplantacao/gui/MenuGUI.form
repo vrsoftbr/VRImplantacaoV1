@@ -1613,6 +1613,22 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuCervantesActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuControlePlus">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Controle Plus"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuControlePlusActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuPrime">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Prime"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPrimeActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuRMSistemas">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="ResultMais"/>
@@ -1627,14 +1643,6 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuViggoActionPerformed"/>
-                          </Events>
-                        </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuControlePlus">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="Controle Plus"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuControlePlusActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

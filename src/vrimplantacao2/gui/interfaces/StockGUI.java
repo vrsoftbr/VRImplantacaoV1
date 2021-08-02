@@ -20,7 +20,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.StockDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -256,11 +255,11 @@ public class StockGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         
-                        if (chkPdvVendas.isSelected()) {
+                        /*if (chkPdvVendas.isSelected()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
+                        }*/
                         
                         if (chkConvEmpresa.isSelected()) {
                             importador.importarConvenioEmpresa();
@@ -272,10 +271,6 @@ public class StockGUI extends VRInternalFrame {
                         
                         if (chkConvRecebimento.isSelected()) {
                             importador.importarConvenioTransacao();
-                        }
-                        
-                        if (chkCodAntProduto.isSelected()) {
-                            dao.alterarCodAnt_produto();
                         }
                         
                     } else if (tabs.getSelectedIndex() == 1) {
