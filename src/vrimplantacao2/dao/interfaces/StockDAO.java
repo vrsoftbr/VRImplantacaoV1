@@ -271,8 +271,8 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rst.getDouble("precocusto"));
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoque_min"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(Utils.stringToDouble(rst.getString("estoque_min")));
+                    imp.setEstoque(Utils.stringToDouble(rst.getString("estoque")));
 
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
