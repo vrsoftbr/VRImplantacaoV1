@@ -236,7 +236,7 @@ public class SGMasterDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
-                    //imp.setIcmsConsumidorId(idIcms);
+                    imp.setIcmsConsumidorId(idIcms);
                     
                     result.add(imp);
                 }
