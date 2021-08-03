@@ -3,9 +3,13 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -20,6 +24,52 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
         return "SuperControle";
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.ICMS_SAIDA,
+                    OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+                    OpcaoProduto.ICMS_SAIDA_NF,
+                    OpcaoProduto.ICMS_ENTRADA,
+                    OpcaoProduto.ICMS_CONSUMIDOR,
+                    OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.EXCECAO,
+                    OpcaoProduto.MARGEM
+                }
+        ));
+    }
+    
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -115,7 +165,7 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     + "	p.\"Unitario\",\n"
                     + "	p.\"Volume\",\n"
                     + "	p.\"Peso\" as peso,\n"
-                    + "	p.\"FkDepartamento\" as ,mercadologico1,\n"
+                    + "	p.\"FkDepartamento\" as mercadologico1,\n"
                     + "	p.\"FkSecao\" as mercadologico2,\n"
                     + "	p.\"FkCategoria\" as mercadologico3,\n"
                     + " p.\"FkFamilia\" as idfamiliaproduto,\n"
@@ -150,7 +200,7 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro3") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpiscofinssaida"));
@@ -158,7 +208,23 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     imp.setIcmsCstSaida(rst.getInt("csticms"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliquotaicms"));
                     imp.setIcmsReducaoSaida(rst.getDouble("reducaoicms"));
-                    result.add(imp);
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("csticms"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquotaicms"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducaoicms"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("csticms"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("aliquotaicms"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducaoicms"));                    
+                    imp.setIcmsCstEntrada(rst.getInt("csticms"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("aliquotaicms"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("reducaoicms"));
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("csticms"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("aliquotaicms"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducaoicms"));
+                    imp.setIcmsCstConsumidor(rst.getInt("csticms"));
+                    imp.setIcmsAliqConsumidor(rst.getDouble("aliquotaicms"));
+                    imp.setIcmsReducaoConsumidor(rst.getDouble("reducaoicms"));
+                    
+                    result.add(imp);                    
                 }
             }
         }
