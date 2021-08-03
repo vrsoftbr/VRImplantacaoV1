@@ -218,6 +218,7 @@ public class AutoMacGUI extends VRInternalFrame {
 
                     connSQL.close();
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
                 }

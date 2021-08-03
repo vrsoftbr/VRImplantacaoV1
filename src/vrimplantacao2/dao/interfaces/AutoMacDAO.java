@@ -8,10 +8,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -74,6 +76,8 @@ public class AutoMacDAO
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                     OpcaoProduto.MERCADOLOGICO_PRODUTO,
                     OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                     OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
@@ -118,4 +122,94 @@ public class AutoMacDAO
         ));
     }
 
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	p.codigo,\n" +
+                    "	p.id,\n" +
+                    "	p.\"DATA\" cadastro,\n" +
+                    "	p.cod_barra ean,\n" +
+                    "	p.grupo,\n" +
+                    "	p.setor,\n" +
+                    "	p.balanca,\n" +
+                    "	p.validade,\n" +
+                    "	p.tipo_unid,\n" +
+                    "	p.nome descricaocompleta,\n" +
+                    "	p.unidade,\n" +
+                    "	p.unid_compra,\n" +
+                    "	p.custo,\n" +
+                    "	p.preco_compra,\n" +
+                    "	p.margem,\n" +
+                    "	p.margem2,\n" +
+                    "	p.preco_venda,\n" +
+                    "	p.preco_venda2,\n" +
+                    "	p.est_minimo estoqueminimo,\n" +
+                    "	p.pos_estoque estoque,\n" +
+                    "	p.txa_icms id_icmsdebito,\n" +
+                    "	p.sit_trib_icm,\n" +
+                    "	fi.cod_fis ncm,\n" +
+                    "	fi.cst_pis,\n" +
+                    "	fi.cest\n" +
+                    "from \n" +
+                    "	produtos p\n" +
+                    "left join clafsipi fi on p.clas_fis_ipi = fi.codigo")) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setDataCadastro(rs.getDate("cadastro"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.seteBalanca(rs.getString("balanca") != null && 
+                                        !rs.getString("balanca").isEmpty() &&
+                                            rs.getString("balanca").equals("T"));
+                    
+                    long ean = Utils.stringToLong(imp.getEan(), -2);
+                    
+                    if(imp.isBalanca() &&
+                                ean != 0 &&
+                                    ean <= 999999) {
+                        imp.setEan(imp.getImportId());
+                    }
+                    
+                    imp.setValidade(rs.getInt("validade"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setPrecovenda(rs.getDouble("preco_venda"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    
+                    String[] pis;
+                    
+                    if(rs.getString("cst_pis") != null && !rs.getString("cst_pis").trim().isEmpty()) {
+                       pis = rs.getString("cst_pis").split(" ");
+                       imp.setPiscofinsCstDebito(pis[0]);
+                    }
+                    
+                    imp.setIcmsDebitoId(rs.getString("id_icmsdebito"));
+                    imp.setIcmsConsumidorId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoId(imp.getIcmsDebitoId());
+                    imp.setIcmsDebitoForaEstadoNfId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    imp.setIcmsCreditoForaEstadoId(imp.getIcmsDebitoId());
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 }
