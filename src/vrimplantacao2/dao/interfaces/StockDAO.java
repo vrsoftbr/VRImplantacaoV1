@@ -104,7 +104,7 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select trivalortributacao from tbtributacoes"
+                    "select distinct trivalortributacao from tbtributacoes"
             )) {
                 while (rst.next()) {
                     int cst = 0;
@@ -186,7 +186,7 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	depdesdepartamento as desmerc3\n"
                     + "FROM\n"
                     + "	tbGrupos\n"
-                    + "ORDER 1,3,5"
+                    + "ORDER by 1,3,5"
             )) {
                 while (rst.next()) {
 
