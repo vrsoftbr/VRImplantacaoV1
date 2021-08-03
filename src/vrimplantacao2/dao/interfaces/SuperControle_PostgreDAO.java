@@ -55,10 +55,21 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     + "join dbo.\"Categoria\" m3 on m3.\"Secao_Id\" = m2.\"Id\"\n"
                     + "order by 1, 3, 5"
             )) {
-
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("merc1_descricao"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("merc2_descricao"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("merc3_descricao"));
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -73,10 +84,17 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     + "from dbo.\"Familia\"\n"
                     + "order by 1"
             )) {
-
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
