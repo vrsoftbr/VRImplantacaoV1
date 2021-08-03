@@ -104,65 +104,22 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct trivalortributacao from tbtributacoes"
-            )) {
-                while (rst.next()) {
-                    int cst = 0;
-                    double aliquota = rst.getDouble("aliquota");
-                    double reducao = 0;
-
-                    result.add(new MapaTributoIMP(
-                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
-                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
-                            cst,
-                            aliquota,
-                            reducao
-                    ));
-                }
-            }
-
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    tricstcsosnentrada as cst_credito,\n"
-                    + "    trivalortributacao as aliquota_credito,\n"
-                    + "    0 as reducao_credito\n"
-                    + "from\n"
+                    "SELECT\n"
+                    + "	triid as id,\n"
+                    + "	tridestributo as descricao,\n"
+                    + "	IMENDES as aliquota,\n"
+                    + "	tricstcsosnsaida as cst,\n"
+                    + "	0 as reducao\n"
+                    + "FROM\n"
                     + "	tbtributacoes"
             )) {
                 while (rst.next()) {
-                    int cst = rst.getInt("cst_credito");
-                    double aliquota = rst.getDouble("aliquota_credito");
-                    double reducao = rst.getDouble("reducao_credito");
-
                     result.add(new MapaTributoIMP(
-                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
-                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
-                            cst,
-                            aliquota,
-                            reducao
-                    ));
-                }
-            }
-
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    tricstcsosnsaida as cst_debito,\n"
-                    + "    trivalortributacao as aliquota_debito,\n"
-                    + "    0 as reducao_debito\n"
-                    + "from\n"
-                    + "	tbtributacoes"
-            )) {
-                while (rst.next()) {
-                    int cst = rst.getInt("cst_debito");
-                    double aliquota = rst.getDouble("aliquota_debito");
-                    double reducao = rst.getDouble("reducao_debito");
-
-                    result.add(new MapaTributoIMP(
-                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
-                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
-                            cst,
-                            aliquota,
-                            reducao
+                            rst.getString("id"),
+                            rst.getString("descricao"),
+                            rst.getInt("cst"),
+                            rst.getDouble("aliquota"),
+                            rst.getDouble("reducao")
                     ));
                 }
             }
@@ -235,25 +192,12 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 proncm as ncm,\n"
                     + "  procest as cest,\n"
                     + "	 proflagbalanca as e_balanca,\n"
-                    + "	 trivalortributacao as aliquota_saida,\n"
-                    + "	 tricstcsosnsaida as cst_saida,\n"
-                    + "	 0 as red_saida,\n"
-                    + "	 trivalortributacao as aliquota_entrada,\n"
-                    + "	 tricstcsosnentrada as cst_entrada,\n"
-                    + "  0 as red_entrada,\n"
-                    + "  pc.piscodcst as pc_entrada,\n"
-                    + "	 pc.piscodcst as pc_saida,\n"
+                    + "  proCodTributo as id_icms,\n"
+                    + "  proCST_ENTRADA as pc_entrada,\n"
+                    + "  proCST_SAIDA as pc_saida,\n"
                     + "	 procodnatreceita as nat_receita"
                     + "FROM\n"
-                    + "	 tbprodutos p,\n"
-                    + "  tbGrupos m,\n"
-                    + "  tbtributacoes t,\n"
-                    + "  tbPisCofins pc"
-                    + "WHERE\n"
-                    + "  p.procodtributo = t.triid\n"
-                    + "  and m.depid = p.proCodDepartamento\n"
-                    + "  and p.proCodPisCofins = pc.pisId"
-                    + "ORDER BY 1"
+                    + "	 tbprodutos p"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -289,17 +233,9 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(imp.getCodMercadologico1());
                     imp.setCodMercadologico3(imp.getCodMercadologico1());
 
-                    imp.setIcmsAliqSaida(rst.getDouble("aliquota_saida"));
-                    imp.setIcmsCstSaida(rst.getInt("cst_saida"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("red_saida"));
-                    
-                    imp.setIcmsAliqConsumidor(rst.getDouble("aliquota_saida"));
-                    imp.setIcmsCstConsumidor(rst.getInt("cst_saida"));
-                    imp.setIcmsReducaoConsumidor(rst.getDouble("red_saida"));
-                    
-                    imp.setIcmsAliqEntrada(rst.getDouble("aliquota_entrada"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_entrada"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("red_entrada"));
+                    //imp.setIcmsCreditoId(rst.getString("id_icms"));
+                    //imp.setIcmsDebitoId(rst.getString("id_icms"));
+                    //imp.setIcmsConsumidorId(rst.getString("id_icms"));
                     
                     imp.setPiscofinsCstCredito(rst.getString("pc_entrada"));
                     imp.setPiscofinsCstDebito(rst.getString("pc_saida"));
