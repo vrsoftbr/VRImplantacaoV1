@@ -105,21 +105,20 @@ public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "	triid as id,\n"
-                    + "	tridestributo as descricao,\n"
-                    + "	IMENDES as aliquota,\n"
-                    + "	tricstcsosnsaida as cst,\n"
-                    + "	0 as reducao\n"
+                    + "	triid,\n"
+                    + "	tridestributo,\n"
+                    + "	imendes,\n"
+                    + "	tricstcsosnsaida\n"
                     + "FROM\n"
                     + "	tbtributacoes"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
-                            rst.getString("id"),
-                            rst.getString("descricao"),
-                            rst.getInt("cst"),
-                            rst.getDouble("aliquota"),
-                            rst.getDouble("reducao")
+                            rst.getString("triid"),
+                            rst.getString("tridestributo"),
+                            rst.getInt("tricstcsosnsaida"),
+                            rst.getDouble("imendes"),
+                            0
                     ));
                 }
             }
