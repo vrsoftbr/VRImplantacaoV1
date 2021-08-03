@@ -89,6 +89,7 @@ import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
 import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
+import vrimplantacao2.gui.SuperControle_PostgresGUI;
 import vrimplantacao2.gui.component.CleanDataBase;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -809,6 +810,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
+        mnuSuperControle = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
         mnuSQLServer = new javax.swing.JMenu();
@@ -2666,6 +2668,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuViggo);
+
+        mnuSuperControle.setText("Super Controle");
+        mnuSuperControle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSuperControleActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuSuperControle);
 
         mnuDatabase.add(mnuPostgres2);
 
@@ -5337,6 +5347,11 @@ public final class MenuGUI extends VRMdiFrame {
         AutoMacGUI.exibir(this);
     }//GEN-LAST:event_mnuAutoMacActionPerformed
 
+    private void mnuSuperControleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSuperControleActionPerformed
+        // TODO add your handling code here:
+        SuperControle_PostgresGUI.exibir(this);
+    }//GEN-LAST:event_mnuSuperControleActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5626,6 +5641,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSri;
     private javax.swing.JMenuItem mnuStock;
     private javax.swing.JMenuItem mnuSuper;
+    private javax.swing.JMenuItem mnuSuperControle;
     private javax.swing.JMenuItem mnuSuperLoja10;
     private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSysAut;
