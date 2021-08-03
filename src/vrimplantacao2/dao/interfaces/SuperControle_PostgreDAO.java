@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -117,9 +118,9 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     + "	p.\"FkDepartamento\" as ,mercadologico1,\n"
                     + "	p.\"FkSecao\" as mercadologico2,\n"
                     + "	p.\"FkCategoria\" as mercadologico3,\n"
-                    + "	p.\"FkFamilia\",\n"
+                    + " p.\"FkFamilia\" as idfamiliaproduto,\n"
                     + "	p.\"DtCadastro\" as datacadastro,\n"
-                    + "	p.\"Ativo\",\n"
+                    + "	p.\"Ativo\" as situacaocadastro,\n"
                     + "	p.\"NCM\" as ncm,\n"
                     + "	p.\"Cest\" as cest,\n"
                     + "	p.\"TribPIS\" as cstpiscofinssaida,\n"
@@ -132,10 +133,36 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     + "from dbo.\"Produto\" p\n"
                     + "order by 2"
             )) {
-
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.seteBalanca(rst.getBoolean("balanca"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setIdFamiliaProduto(rst.getString("idfamiliaproduto"));
+                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro3") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cstpiscofinssaida"));
+                    imp.setPiscofinsCstCredito(rst.getString("cstpiscofinsentrada"));
+                    imp.setIcmsCstSaida(rst.getInt("csticms"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliquotaicms"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("reducaoicms"));
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -151,10 +178,18 @@ public class SuperControle_PostgreDAO extends InterfaceDAO {
                     + "from dbo.\"EanAfiliado\"\n"
                     + "order by 1, 2"
             )) {
-
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
