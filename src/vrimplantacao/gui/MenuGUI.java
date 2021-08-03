@@ -264,6 +264,7 @@ import vrimplantacao2.gui.interfaces.VisualMixGUI;
 import vrimplantacao2.gui.interfaces.W2AGUI;
 import vrimplantacao2.gui.interfaces.AlterData_WShopGUI;
 import vrimplantacao2.gui.interfaces.AthosGUI;
+import vrimplantacao2.gui.interfaces.AutoMacGUI;
 import vrimplantacao2.gui.interfaces.AutocomGUI;
 import vrimplantacao2.gui.interfaces.CervantesGUI;
 import vrimplantacao2.gui.interfaces.ControlePlusPostgresGUI;
@@ -703,6 +704,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
+        mnuAutoMac = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1858,6 +1860,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
+
+        mnuAutoMac.setText("AutoMac");
+        mnuAutoMac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoMacActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuAutoMac);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -5323,6 +5333,10 @@ public final class MenuGUI extends VRMdiFrame {
         PrimeGUI.exibir(this);
     }//GEN-LAST:event_mnuPrimeActionPerformed
 
+    private void mnuAutoMacActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoMacActionPerformed
+        AutoMacGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutoMacActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5422,6 +5436,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAtmaFirebird;
     private javax.swing.JMenuItem mnuAutoADM;
+    private javax.swing.JMenuItem mnuAutoMac;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenuItem mnuAutocom;

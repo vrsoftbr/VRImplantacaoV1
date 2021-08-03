@@ -26,7 +26,6 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
-import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;

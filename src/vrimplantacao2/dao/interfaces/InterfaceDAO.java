@@ -598,7 +598,7 @@ public abstract class InterfaceDAO {
                         break;
                     }
                 }
-//                imp.setDescricao(String.join(" ", descricao));                
+                imp.setDescricao(String.join(" ", descricao));                
             }
         }        
     }
