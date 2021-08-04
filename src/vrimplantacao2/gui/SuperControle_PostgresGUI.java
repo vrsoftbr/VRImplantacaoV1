@@ -15,7 +15,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.PrimeDAO;
-import vrimplantacao2.dao.interfaces.SuperControle_PostgreDAO;
+import vrimplantacao2.dao.interfaces.SuperControle_PostgresDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -33,7 +33,7 @@ public class SuperControle_PostgresGUI extends VRInternalFrame {
 
     private String vLojaCliente;
     private int vLojaVR;
-    private final SuperControle_PostgreDAO dao;
+    private final SuperControle_PostgresDAO dao;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -57,7 +57,7 @@ public class SuperControle_PostgresGUI extends VRInternalFrame {
      */
     public SuperControle_PostgresGUI(VRMdiFrame frame) throws Exception {
         super(frame);
-        this.dao = new SuperControle_PostgreDAO();
+        this.dao = new SuperControle_PostgresDAO();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addInternalFrameListener(new InternalFrameAdapter() {

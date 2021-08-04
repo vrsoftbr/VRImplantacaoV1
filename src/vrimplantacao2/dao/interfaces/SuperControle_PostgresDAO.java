@@ -17,7 +17,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class SuperControle_PostgreDAO extends InterfaceDAO {
+public class SuperControle_PostgresDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
