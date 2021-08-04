@@ -162,6 +162,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ppis, \n"
                     + "pcofins, \n"
                     + "picms, \n"
+                    + "tributo,\n"       
                     + "tipvenda \n"
                  + "from \n"
                     + "produtos \n"
@@ -169,9 +170,12 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "secoes on secoes.sec_sub = produtos.secao\n"
                  + "order by \n"
                     + "codigo")) {
+                
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
@@ -194,13 +198,14 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoLiquido(rs.getDouble("peso"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setNcm(rs.getString("ncm"));
-                    imp.setIcmsCstSaida(rs.getInt("cstvenda"));
-                    imp.setIcmsCstEntrada(rs.getInt("cstvenda"));
-                    imp.setIcmsAliqSaida(rs.getDouble("picms"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("picms"));
-                    imp.setIcmsCreditoForaEstadoId(rs.getString("picms"));
-                    imp.setIcmsAliq(rs.getDouble("picms"));
-                    imp.setSituacaoCadastro((rs.getDate("dat_can")) == null ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setIcmsDebitoId(rs.getString("tributo"));
+                    imp.setIcmsDebitoForaEstadoNfId(rs.getString("tributo"));
+                    imp.setIcmsDebitoForaEstadoId(rs.getString("tributo"));
+                    imp.setIcmsCreditoId(rs.getString("tributo"));
+                    imp.setIcmsCreditoForaEstadoId(rs.getString("tributo"));
+                    imp.setSituacaoCadastro((rs.getDate("dat_can")) == null ? 
+                                SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    
                     if (vBalanca) {
                         if ((rs.getString("ean1") != null)
                                 && ("F".equals(rs.getString("tipvenda").trim()))) {
@@ -209,23 +214,27 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                             String ean = rs.getString("ean1").trim().substring(6, 12);
                             imp.setEan(ean);
                             codigoProduto = Long.parseLong(imp.getEan().trim());
+                            
                             if (codigoProduto <= Integer.MAX_VALUE) {
                                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
                             } else {
                                 produtoBalanca = null;
                             }
+                            
                             if (produtoBalanca != null) {
                                 imp.seteBalanca(true);
-                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? 
+                                                    produtoBalanca.getValidade() : rs.getInt("validade"));
                             } else {
                                 imp.setValidade(0);
                                 imp.seteBalanca(false);
                             }
                         }
                     } else {
-                        imp.seteBalanca(true);
+                        imp.seteBalanca(false);
                         imp.setValidade(rs.getInt("validade"));
                     }
+                    
                     result.add(imp);
                 }
             }
