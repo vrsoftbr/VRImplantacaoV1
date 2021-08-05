@@ -12,6 +12,7 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.controller.PrimeController;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.PrimeDAO;
@@ -33,6 +34,7 @@ public class PrimeGUI extends VRInternalFrame {
     private String vLojaCliente;
     private int vLojaVR;
     private final PrimeDAO dao;
+    private PrimeController controller;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -57,6 +59,7 @@ public class PrimeGUI extends VRInternalFrame {
     public PrimeGUI(VRMdiFrame frame) throws Exception {
         super(frame);
         this.dao = new PrimeDAO();
+        this.controller = new PrimeController();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addInternalFrameListener(new InternalFrameAdapter() {
@@ -186,7 +189,7 @@ public class PrimeGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-
+                    
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -215,6 +218,10 @@ public class PrimeGUI extends VRInternalFrame {
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
                         }
+                    } else if (tabs.getSelectedIndex() == 3) {
+                        if (chkPagarFornecedorDuplicado.isSelected()) {
+                            controller.deletarPagarFornecedorDuplicado(SISTEMA, idLojaCliente, idLojaVR);
+                        }
                     }
 
                     ProgressBar.dispose();
@@ -238,6 +245,7 @@ public class PrimeGUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        vRPanelBeanInfo1 = new vr.view.components.panel.VRPanelBeanInfo();
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
         txtCompl = new javax.swing.JTextField();
         cmbLojaOrigem = new javax.swing.JComboBox();
@@ -254,6 +262,8 @@ public class PrimeGUI extends VRInternalFrame {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        jPanel1 = new javax.swing.JPanel();
+        chkPagarFornecedorDuplicado = new vr.view.components.checkbox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel2 = new javax.swing.JLabel();
@@ -324,6 +334,27 @@ public class PrimeGUI extends VRInternalFrame {
 
         tabs.addTab("Unificação", vRPanel2);
         tabs.addTab("Balança", vRImportaArquivBalancaPanel1);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPagarFornecedorDuplicado, "Deletar pagarfornecedor duplicado");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPagarFornecedorDuplicado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(364, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPagarFornecedorDuplicado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(314, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Especiais", jPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, "Migrar");
@@ -420,6 +451,7 @@ public class PrimeGUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vr.view.components.checkbox.VRCheckBox chkPagarFornecedorDuplicado;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
@@ -430,6 +462,7 @@ public class PrimeGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedor;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
@@ -440,5 +473,6 @@ public class PrimeGUI extends VRInternalFrame {
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
+    private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo1;
     // End of variables declaration//GEN-END:variables
 }

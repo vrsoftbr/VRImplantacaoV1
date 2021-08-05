@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -69,7 +72,28 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                 }
         ));
     }
-    
+
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
+        ));
+    }
+
+    @Override
+    public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoCliente.DADOS,
+                OpcaoCliente.RECEBER_CREDITOROTATIVO
+        ));
+    }
+
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -213,7 +237,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducaoicms"));
                     imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("csticms"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducaoicms"));                    
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducaoicms"));
                     imp.setIcmsCstEntrada(rst.getInt("csticms"));
                     imp.setIcmsAliqEntrada(rst.getDouble("aliquotaicms"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("reducaoicms"));
@@ -223,8 +247,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     imp.setIcmsCstConsumidor(rst.getInt("csticms"));
                     imp.setIcmsAliqConsumidor(rst.getDouble("aliquotaicms"));
                     imp.setIcmsReducaoConsumidor(rst.getDouble("reducaoicms"));
-                    
-                    result.add(imp);                    
+
+                    result.add(imp);
                 }
             }
         }
@@ -283,7 +307,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     + "	e.\"UF\" as uf,\n"
                     + "	trim(t.\"DDD\"||' '||t.\"Numero\") as telefone,\n"
                     + "	t.\"Contato\" as contato,\n"
-                    + "	em.email\n"
+                    + "	em.\"Endereco\" as email\n"
                     + "from dbo.\"Entidade\" f\n"
                     + "left join dbo.\"Endereco\" e on e.\"Entidade_Id\" = f.\"Id\"\n"
                     + "left join dbo.\"Fone\" t on t.\"Entidade_Id\" = f.\"Id\"\n"
@@ -291,10 +315,40 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     + "where f.\"TipoEntidade\" = 2\n"
                     + "order by 1"
             )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("telefone"));
 
+                    if (rst.getString("contato") != null && !rst.getString("contato").trim().isEmpty()) {
+                        imp.setObservacao("CONTATO - " + rst.getString("contato"));
+                    }
+
+                    if (rst.getString("email") != null && !rst.getString("email").trim().isEmpty()) {
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.COMERCIAL);
+                    }
+
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -323,7 +377,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     + "	e.\"UF\" as uf,\n"
                     + "	trim(t.\"DDD\"||' '||t.\"Numero\") as telefone,\n"
                     + "	t.\"Contato\" as contato,\n"
-                    + "	em.email		\n"
+                    + "	em.\"Endereco\" as email\n"
                     + "from dbo.\"Entidade\" c\n"
                     + "left join dbo.\"Endereco\" e on e.\"Entidade_Id\" = c.\"Id\"\n"
                     + "left join dbo.\"Fone\" t on t.\"Entidade_Id\" = c.\"Id\"\n"
@@ -331,9 +385,30 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     + "where c.\"TipoEntidade\" = 1\n"
                     + "order by 1"
             )) {
-
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setInscricaoMunicipal(rst.getString("isncricaomunicipal"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipioibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setEmail(rst.getString("email"));
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 }
