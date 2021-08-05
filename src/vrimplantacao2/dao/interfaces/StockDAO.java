@@ -8,8 +8,6 @@ import java.util.logging.Logger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -23,8 +21,9 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-/*
-@author Alan
+/**
+ * 
+ * @author Alan
  */
 public class StockDAO extends InterfaceDAO implements MapaTributoProvider {
 
