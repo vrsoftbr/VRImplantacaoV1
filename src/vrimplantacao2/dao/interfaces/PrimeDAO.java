@@ -8,12 +8,15 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorParcelaVO;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -26,6 +29,16 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    private int idLojaVR;
+
+    public int getIdLojaVR() {
+        return this.idLojaVR;
+    }
+
+    public void setIdLojaVR(int idLojaVR) {
+        this.idLojaVR = idLojaVR;
+    }
 
     @Override
     public String getSistema() {
@@ -458,13 +471,13 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj"));
-                    
+
                     if (rst.getString("rg") != null && !rst.getString("rg").trim().isEmpty()) {
                         imp.setInscricaoestadual(rst.getString("rg"));
                     } else {
                         imp.setInscricaoestadual(rst.getString("ie"));
                     }
-                    
+
                     imp.setInscricaoMunicipal(rst.getString("im"));
                     imp.setOrgaoemissor(rst.getString("orgaoemissor"));
                     imp.setEndereco(rst.getString("endereco"));
@@ -481,7 +494,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setValorLimite(rst.getDouble("valorlimite"));
-                    
+
                     if (rst.getString("sexo") != null && !rst.getString("sexo").trim().isEmpty()) {
                         imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     }
@@ -501,7 +514,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
                     }
-                    
+
                     imp.setBloqueado("Normal".equals(rst.getString("descricaosituacaocliente")) ? false : true);
                     imp.setPermiteCheque(true);
                     imp.setPermiteCreditoRotativo(true);
@@ -567,7 +580,7 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
@@ -600,5 +613,103 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
+    public void deletarPagarFornecedorDuplicado(String sistema, String idLojaOrigem, int idLojaVR) throws Exception {
+        Conexao.begin();
+        List<PagarFornecedorVO> pagarFornecedorVO = new ArrayList<>();
+        List<PagarFornecedorParcelaVO> pagarFornecedorParcelaVO = new ArrayList<>();
+        List<PagarFornecedorVO> idPagarnecedor = new ArrayList<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select count(*), id_loja, id_fornecedor, dataemissao, dataentrada, numerodocumento, valor\n"
+                    + " from pagarfornecedor\n"
+                    + " where id in (select codigoatual from implantacao.codant_contapagar "
+                    + "               where sistema = '" + sistema + "' "
+                    + "                 and agrupador = '" + idLojaOrigem + "')"
+                    + " and id_loja = " + idLojaVR + "\n"
+                    + " group by id_loja, id_fornecedor, dataemissao, dataentrada, numerodocumento, valor\n"
+                    + " having count(*) > 1"
+            )) {
+                while (rst.next()) {
+
+                    PagarFornecedorVO vo = new PagarFornecedorVO();
+                    vo.setId_loja(rst.getInt("id_loja"));
+                    vo.setId_fornecedor(rst.getInt("id_fornecedor"));
+                    vo.setDataemissao(rst.getDate("dataemissao"));
+                    vo.setDataentrada(rst.getDate("dataentrada"));
+                    vo.setNumerodocumento(rst.getInt("numerodocumento"));
+                    vo.setValor(rst.getDouble("valor"));
+                    pagarFornecedorVO.add(vo);
+
+                }
+
+                for (PagarFornecedorVO pagarFornecedor : pagarFornecedorVO) {
+                    try (ResultSet rst2 = stm.executeQuery(
+                            "select \n"
+                            + " count(*), \n"
+                            + " numeroparcela, \n"
+                            + " datavencimento, \n"
+                            + " valor\n"
+                            + "from pagarfornecedorparcela\n"
+                            + "where id_pagarfornecedor in (select id \n"
+                            + "				      from pagarfornecedor\n"
+                            + "				     where id_fornecedor = " + pagarFornecedor.getId_fornecedor() + "\n"
+                            + "				       and dataemissao = '" + pagarFornecedor.getDataemissao() + "'\n"
+                            + "				       and dataentrada = '" + pagarFornecedor.getDataentrada() + "'\n"
+                            + "				       and numerodocumento = " + pagarFornecedor.getNumerodocumento() + "\n"
+                            + "				       and valor = " + pagarFornecedor.getValor() + "\n"
+                            + "				       and id_loja = " + pagarFornecedor.getId_loja() + ")\n"
+                            + "and id_pagarfornecedor in (select codigoatual from implantacao.codant_contapagar where agrupador = '" + idLojaOrigem + "' "
+                            + "                                        and sistema = '" + sistema + "')\n"
+                            + "group by numeroparcela, datavencimento, valor\n"
+                            + "having count(*) > 1"
+                    )) {
+                        while (rst2.next()) {
+                            PagarFornecedorParcelaVO vo2 = new PagarFornecedorParcelaVO();
+                            vo2.setNumeroparcela(rst2.getInt("numeroparcela"));
+                            vo2.setDatavencimento(rst2.getDate("datavencimento"));
+                            vo2.setValor(rst2.getDouble("valor"));
+                            pagarFornecedorParcelaVO.add(vo2);
+                        }
+                    }
+                }
+
+                for (PagarFornecedorParcelaVO pagarFornecedorParcela : pagarFornecedorParcelaVO) {
+                    
+                    try (ResultSet rst3 = stm.executeQuery(
+                            "select id_pagarfornecedor "
+                            + " from pagarfornecedorparcela\n"
+                            + "where numeroparcela = " + pagarFornecedorParcela.getNumeroparcela() + "\n"
+                            + "  and datavencimento = '" + pagarFornecedorParcela.getDatavencimento() + "'\n"
+                            + "	  and valor = " + pagarFornecedorParcela.getValor() + "\n"
+                            + "   and id not in (select min(id) from pagarfornecedorparcela \n"
+                            + "	                  where numeroparcela = " + pagarFornecedorParcela.getNumeroparcela() + "\n"
+                            + "			    and datavencimento = '" + pagarFornecedorParcela.getDatavencimento() + "'\n"
+                            + "			    and valor = " + pagarFornecedorParcela.getValor() + ")\n"
+                            + "and datapagamento is null"                           
+                    )) {
+                        while (rst3.next()) {
+                            
+                            PagarFornecedorVO vo3 = new PagarFornecedorVO();
+                            vo3.setId(rst3.getInt("id_pagarfornecedor"));
+                            idPagarnecedor.add(vo3);
+                        }
+                    }
+                }
+                
+                for (PagarFornecedorVO id : idPagarnecedor) {
+                    stm.execute("delete from pagarfornecedorparcela where id_pagarfornecedor = " + id.getId());
+                    stm.execute("delete from pagarfornecedor where id = " + id.getId() + " and id_loja = " + idLojaVR);                    
+                }
+                
+            }
+
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
 }
