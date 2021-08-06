@@ -187,12 +187,12 @@ public class DTComPlanilhaDAO extends InterfaceDAO implements MapaTributoProvide
         ProgressBar.setStatus("Carregando produtos...");
 
         Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().
-                            carregarProdutosBalanca();
-        
+                carregarProdutosBalanca();
+
         for (LinhaArquivo linha : CEST) {
             cests.put(linha.getString("NCM"), linha.getString("CEST"));
         }
-        
+
         for (LinhaArquivo linha : produtos) {
 
             String id = linha.getString("codigo");
@@ -222,13 +222,13 @@ public class DTComPlanilhaDAO extends InterfaceDAO implements MapaTributoProvide
                 imp.setDataCadastro(getData("dat_cad"));
                 imp.setPesoLiquido(linha.getDouble("peso"));
                 imp.setPiscofinsCstDebito(linha.getString("cstpis"));
-                
+
                 imp.setNcm(linha.getString("ncm"));
-                
-                if(cests.containsKey(imp.getNcm())) {
+
+                if (cests.containsKey(imp.getNcm())) {
                     imp.setCest(cests.get(imp.getNcm()));
                 }
-                
+
                 imp.setIcmsConsumidorId(linha.getString("tributo"));
                 imp.setIcmsDebitoId(linha.getString("tributo"));
                 imp.setIcmsDebitoForaEstadoNfId(linha.getString("tributo"));
@@ -275,6 +275,47 @@ public class DTComPlanilhaDAO extends InterfaceDAO implements MapaTributoProvide
             if (cont2 == 1000) {
                 cont2 = 0;
                 ProgressBar.setStatus("Carregando produtos..." + cont1);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivoProduto, getOpcoes());
+
+        int cont1 = 0;
+        int cont2 = 0;
+
+        ProgressBar.setStatus("Carregando EANs...");
+
+        for (LinhaArquivo linha : produtos) {
+            String id = linha.getString("codigo");
+
+            if (id != null && !"".equals(id.trim())) {
+                ProdutoIMP imp = new ProdutoIMP();
+                
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportId(id);
+                imp.setQtdEmbalagem(linha.getInt("qtdcaixa"));
+
+                if ((linha.getString("ean2") != null)
+                        && (!"0000000000000".equals(linha.getString("ean2")))) {
+                    imp.setEan(linha.getString("ean2"));
+                }
+
+                result.add(imp);
+            }
+            
+            cont2++;
+            cont1++;
+            if (cont2 == 1000) {
+                cont2 = 0;
+                ProgressBar.setStatus("Carregando EANs..." + cont1);
             }
         }
 

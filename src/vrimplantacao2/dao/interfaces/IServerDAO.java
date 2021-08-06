@@ -3,6 +3,7 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -13,6 +14,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -22,11 +24,17 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String complemento;
+
     @Override
     public String getSistema() {
         return "IServer";
     }
 
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -135,7 +143,7 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	Quantidade_Embalagem_Prod qtdembalagem,\n"
                     + "	Ncm_Prod ncm,\n"
                     + "	Cest_Prod cest,\n"
-                  //+ "	Validade_Balanca_Prod validade,\n"
+                    //+ "	Validade_Balanca_Prod validade,\n"
                     + "	case when Servico_Prod = 'B' then 'S' else 'N' end balanca,\n"
                     + "	case when Pesavel_Prod = 'N' then 0 else 1 end pesavel,\n"
                     + "	case when Status_Prod = 'A' then 1 else 0 end situacaocadastro\n"
@@ -150,40 +158,40 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(Utils.acertarTexto(rst.getString("unidade")));
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoReduzida());
-                    
+
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    
+
                     imp.setIcmsCstSaida(rst.getInt("cstsaida"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliqsaida"));
                     imp.setIcmsReducaoSaida(Utils.stringToDouble(rst.getString("redsaida")));
                     imp.setIcmsCstConsumidor(rst.getInt("cstsaida"));
                     imp.setIcmsAliqConsumidor(rst.getDouble("aliqsaida"));
                     imp.setIcmsReducaoConsumidor(Utils.stringToDouble(rst.getString("redsaida")));
-                    
+
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
-                    
+
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setMargem(rst.getDouble("margem"));
-                    
+
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoquemin"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemax"));
-                    
+
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    
+
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.seteBalanca("S".equals(rst.getString("balanca")));
-                                     
+
                     Result.add(imp);
                 }
             }
@@ -393,62 +401,50 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
         return Result;
     }
 
-    /*
-     @Override
-     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-     List<CreditoRotativoIMP> vResult = new ArrayList<>();
-     java.sql.Date dtEmissao, dtVencimento;
-     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(
-     "select\n"
-     + "recseq, reccod, rectitulo, reccli,\n"
-     + "recemiss, recvenci, recobs, recvalor,\n"
-     + "recvalpag, recparc\n"
-     + "from tsl.tsm003\n"
-     + "where recbaixa <> 'S'\n"
-     + "and recvenci <> '000-00-00'\n"
-     + "order by recvenci desc"
-     )) {
-     while (rst.next()) {
-     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-     imp.setId(rst.getString("recseq") + "-"
-     + rst.getString("reccli") + "-"
-     + getLojaOrigem());
-     imp.setIdCliente(rst.getString("reccli"));
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	a.Cod_All_Lancamento id,\n"
+                    + "	a.Data_Emissao_Lancamento emissao,\n"
+                    + "	b.Coo_Cupom cupom,\n"
+                    + "	a.Ecf,\n"
+                    + "	a.Valor_Lancamento valor,\n"
+                    + "	a.Cliente_Lancamento idcliente,\n"
+                    + "	a.Data_Vencimento_Lancamento vencimento,\n"
+                    + "	c.Cpf_Cnpj cnpjcpf,\n"
+                    + "	a.Obs_Lancamento obs\n"
+                    + "from\n"
+                    + "	tbl_all_lancamento a\n"
+                    + "	left join tbl_all_head b on a.Id_Documento = b.id_Documento\n"
+                    + "	left join tbl_cliente c on a.Cliente_Lancamento = c.Cod_Cliente \n"
+                    + "where\n"
+                    + "	a.Loja_Lancamento = " + getLojaOrigem() + "\n"
+                    + "	and Cliente_Lancamento != 0\n"
+                    + "	and Situacao_Lancamento = 'A'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setCnpjCliente(rst.getString("cnpjcpf"));
+                    imp.setObservacao(rst.getString("obs"));
+                    
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
 
-     if ((rst.getString("rectitulo") != null)
-     && (!rst.getString("rectitulo").trim().isEmpty())) {
-     if (!Utils.encontrouLetraCampoNumerico(rst.getString("rectitulo"))) {
-     imp.setNumeroCupom(rst.getString("rectitulo").trim());
-     }
-     }
-
-     if ("0000-00-00".equals(rst.getString("recemiss"))) {
-     dtEmissao = new Date(new java.util.Date().getTime());
-     imp.setDataEmissao(dtEmissao);
-     } else {
-     imp.setDataEmissao(rst.getDate("recemiss"));
-     }
-     if ("0000-00-00".equals(rst.getString("recvenci"))) {
-     dtVencimento = new Date(new java.util.Date().getTime());
-     imp.setDataVencimento(dtVencimento);
-     } else {
-     imp.setDataVencimento(rst.getDate("recvenci"));
-     }
-
-     imp.setValor(rst.getDouble("recvalor"));
-     imp.setParcela(rst.getInt("recparc"));
-     imp.setObservacao(rst.getString("recobs") + " TITULO "
-     + rst.getString("rectitulo") + " RECCOD " + rst.getString("reccod"));
-     vResult.add(imp);
-     }
-     }
-     }
-     return vResult;
-     }
-
-   
-     @Override
+    /*@Override
      public List<ChequeIMP> getCheques() throws Exception {
      List<ChequeIMP> vResult = new ArrayList<>();
      try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {

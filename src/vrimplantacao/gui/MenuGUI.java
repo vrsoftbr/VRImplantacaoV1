@@ -283,6 +283,7 @@ import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.IServer_v2GUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
@@ -740,6 +741,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuG3 = new javax.swing.JMenuItem();
         mnuGestorPDV = new javax.swing.JMenuItem();
         mnuIServer = new javax.swing.JMenuItem();
+        mnuIServer_v2 = new javax.swing.JMenuItem();
         mnuLinear = new javax.swing.JMenuItem();
         mnuMobnePdv = new javax.swing.JMenuItem();
         mnuPlenoKW = new javax.swing.JMenuItem();
@@ -2120,6 +2122,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuMySQL2.add(mnuIServer);
+
+        mnuIServer_v2.setText("IServer_V2");
+        mnuIServer_v2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuIServer_v2ActionPerformed(evt);
+            }
+        });
+        mnuMySQL2.add(mnuIServer_v2);
 
         mnuLinear.setText("Linear");
         mnuLinear.addActionListener(new java.awt.event.ActionListener() {
@@ -5362,6 +5372,10 @@ public final class MenuGUI extends VRMdiFrame {
         SuperControle_PostgresGUI.exibir(this);
     }//GEN-LAST:event_mnuSuperControleActionPerformed
 
+    private void mnuIServer_v2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIServer_v2ActionPerformed
+        IServer_v2GUI.exibir(this);
+    }//GEN-LAST:event_mnuIServer_v2ActionPerformed
+
     private void mnuDTComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDTComActionPerformed
         DTComPlanilhaGUI.exibir(this);
     }//GEN-LAST:event_mnuDTComActionPerformed
@@ -5549,6 +5563,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuHostMundo;
     private javax.swing.JMenuItem mnuIQSistemas;
     private javax.swing.JMenuItem mnuIServer;
+    private javax.swing.JMenuItem mnuIServer_v2;
     private javax.swing.JMenuItem mnuIcommerce;
     private javax.swing.JMenuItem mnuIdealSoft;
     private javax.swing.JMenu mnuImpSistema;
