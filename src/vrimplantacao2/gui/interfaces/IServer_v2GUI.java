@@ -214,11 +214,11 @@ public class IServer_v2GUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarCreditoRotativo();
                         }
                         
-                        /*if (chkPdvVendas.isSelected()) {
-                            dao.setVendaDataIni(edtDtVendaIni.getDate());
-                            dao.setVendaDataFim(edtDtVendaFim.getDate());
+                        if (chkPdvVendas.isSelected()) {
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }*/
+                        }
                     } else if (tabOperacoes.getSelectedIndex() == 2) {
                         if (chkUnifProdutos.isSelected()) {
                             List<OpcaoProduto> opt = new ArrayList<>();
