@@ -108,7 +108,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                 red
         );
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -139,7 +139,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
         }
         return result;
     }
-    
+
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -238,7 +238,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     + "	p.\"FkDepartamento\" as mercadologico1,\n"
                     + "	p.\"FkSecao\" as mercadologico2,\n"
                     + "	p.\"FkCategoria\" as mercadologico3,\n"
-                    + " p.\"FkFamilia\" as idfamiliaproduto,\n"
+                    + "	p.\"FkFamilia\" as idfamiliaproduto,\n"
                     + "	p.\"DtCadastro\" as datacadastro,\n"
                     + "	p.\"Ativo\" as situacaocadastro,\n"
                     + "	p.\"NCM\" as ncm,\n"
@@ -249,8 +249,17 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     + "	p.\"AliqICMS\" as aliquotaicms,\n"
                     + "	p.\"ReducaoBC\" as reducaoicms,\n"
                     + "	p.\"Pauta\" as pauta,\n"
-                    + "	p.\"MVA\" as mva\n"
+                    + "	p.\"MVA\" as mva,\n"
+                    + "	pl.\"VlVenda\" as precovenda,\n"
+                    + "	pl.\"CustoCompra\" as custo,\n"
+                    + "	pl.\"MargemCadastrada\" as margem,\n"
+                    + "	pl.\"MargemMinima\" as margemminima,\n"
+                    + "	pl.\"EstoqueAtual\" as estoque,\n"
+                    + "	pl.\"EstoqueMinimo\" as estoqueminimo,\n"
+                    + "	pl.\"EstoqueMaximo\" as estoquemaximo\n"
                     + "from dbo.\"Produto\" p\n"
+                    + "left join dbo.\"ProdutoMultiLoja\" pl on pl.\"Produto_Id\" = p.\"Id\"\n"
+                    + "and pl.\"FkLoja\" = " + getLojaOrigem() + "\n"
                     + "order by 2"
             )) {
                 while (rst.next()) {
@@ -271,24 +280,32 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargemMinima(rst.getDouble("margemminima"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpiscofinssaida"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpiscofinsentrada"));
-                    
+
                     String idIcms = getAliquotaKey(
                             rst.getString("csticms"),
                             rst.getDouble("aliquotaicms"),
                             rst.getDouble("reducaoicms")
                     );
-                    
+
                     imp.setIcmsDebitoId(idIcms);
                     imp.setIcmsDebitoForaEstadoId(idIcms);
                     imp.setIcmsDebitoForaEstadoNfId(idIcms);
                     imp.setIcmsCreditoId(idIcms);
                     imp.setIcmsCreditoForaEstadoId(idIcms);
                     imp.setIcmsConsumidorId(idIcms);
-                    
+
                     result.add(imp);
                 }
             }
