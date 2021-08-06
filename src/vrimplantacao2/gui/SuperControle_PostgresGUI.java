@@ -85,6 +85,29 @@ public class SuperControle_PostgresGUI extends VRInternalFrame {
         tabFornecedor.setOpcoesDisponiveis(dao);
         tabClientes.setOpcoesDisponiveis(dao);
 
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+        
         carregarParametros();
         
         vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
@@ -240,8 +263,7 @@ public class SuperControle_PostgresGUI extends VRInternalFrame {
 
         setIconifiable(true);
         setMaximizable(true);
-        setResizable(true);
-        setTitle("Importação Prime");
+        setTitle("Importação Super Controle");
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Loja:");
 

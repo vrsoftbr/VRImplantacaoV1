@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,19 +9,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class SuperControle_PostgresDAO extends InterfaceDAO {
+public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -68,7 +73,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.EXCECAO,
-                    OpcaoProduto.MARGEM
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.MAPA_TRIBUTACAO
                 }
         ));
     }
@@ -94,6 +100,46 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
         ));
     }
 
+    private String getAliquotaKey(String cst, double aliq, double red) throws SQLException {
+        return String.format(
+                "%s-%.2f-%.2f",
+                cst,
+                aliq,
+                red
+        );
+    }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct\n"
+                    + "	p.\"TribICMS\" as csticms,\n"
+                    + "	p.\"AliqICMS\" as aliquotaicms,\n"
+                    + "	p.\"ReducaoBC\" as reducaoicms\n"
+                    + "from dbo.\"Produto\" p\n"
+                    + "order by 1, 2, 3"
+            )) {
+                while (rs.next()) {
+                    String id = getAliquotaKey(
+                            rs.getString("csticms"),
+                            rs.getDouble("aliquotaicms"),
+                            rs.getDouble("reducaoicms")
+                    );
+                    result.add(new MapaTributoIMP(
+                            id,
+                            id,
+                            Utils.stringToInt(rs.getString("csticms")),
+                            rs.getDouble("aliquotaicms"),
+                            rs.getDouble("reducaoicms")
+                    ));
+                }
+            }
+        }
+        return result;
+    }
+    
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -229,25 +275,20 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpiscofinssaida"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpiscofinsentrada"));
-                    imp.setIcmsCstSaida(rst.getInt("csticms"));
-                    imp.setIcmsAliqSaida(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("reducaoicms"));
-                    imp.setIcmsCstSaidaForaEstado(rst.getInt("csticms"));
-                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducaoicms"));
-                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("csticms"));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("reducaoicms"));
-                    imp.setIcmsCstEntrada(rst.getInt("csticms"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("reducaoicms"));
-                    imp.setIcmsCstEntradaForaEstado(rst.getInt("csticms"));
-                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("reducaoicms"));
-                    imp.setIcmsCstConsumidor(rst.getInt("csticms"));
-                    imp.setIcmsAliqConsumidor(rst.getDouble("aliquotaicms"));
-                    imp.setIcmsReducaoConsumidor(rst.getDouble("reducaoicms"));
-
+                    
+                    String idIcms = getAliquotaKey(
+                            rst.getString("csticms"),
+                            rst.getDouble("aliquotaicms"),
+                            rst.getDouble("reducaoicms")
+                    );
+                    
+                    imp.setIcmsDebitoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoId(idIcms);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcms);
+                    imp.setIcmsCreditoId(idIcms);
+                    imp.setIcmsCreditoForaEstadoId(idIcms);
+                    imp.setIcmsConsumidorId(idIcms);
+                    
                     result.add(imp);
                 }
             }
@@ -392,7 +433,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
-                    imp.setInscricaoMunicipal(rst.getString("isncricaomunicipal"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setAtivo(rst.getBoolean("ativo"));
@@ -405,6 +446,42 @@ public class SuperControle_PostgresDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	r.\"Id\" as id,\n"
+                    + "	r.\"DtDocumento\" as dataemissao,\n"
+                    + "	r.\"DtVencimentoOriginal\" as datavencimento,\n"
+                    + "	r.\"VlOriginal\" as valor,\n"
+                    + "	r.\"VlRecebido\" as valorrecebido,\n"
+                    + "	r.\"VlJuros\" as juros,\n"
+                    + "	r.\"VlDesconto\" as desconto,\n"
+                    + "	r.\"Observacao\" as observacao,\n"
+                    + "	r.\"FkEntidade\" as idcliente	\n"
+                    + "from dbo.\"ContaReceber\" r\n"
+                    + "where r.\"FkLoja\" = " + getLojaOrigem() + "\n"
+                    + "and r.\"VlRecebido\" < r.\"VlOriginal\""
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
                 }
             }
