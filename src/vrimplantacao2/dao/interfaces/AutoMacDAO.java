@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -406,5 +407,40 @@ public class AutoMacDAO
         
         return result;
     }
-    
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	seq,\n" +
+                    "	referente cupom, \n" +
+                    "	cliente,\n" +
+                    "	documento,\n" +
+                    "	dt_entrada,\n" +
+                    "	dt_venc,\n" +
+                    "	valor\n" +
+                    "FROM\n" +
+                    "	contarcb\n" +
+                    "ORDER BY \n" +
+                    "	dt_venc")) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("seq"));
+                    imp.setIdCliente(rs.getString("cliente"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setDataEmissao(rs.getDate("dt_entrada"));
+                    imp.setDataVencimento(rs.getDate("dt_venc"));
+                    imp.setValor(rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 }
