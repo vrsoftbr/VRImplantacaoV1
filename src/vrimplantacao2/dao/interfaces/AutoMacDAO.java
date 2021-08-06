@@ -12,7 +12,11 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -212,4 +216,195 @@ public class AutoMacDAO
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	f.codigo,\n" +
+                    "	f.razao_social,\n" +
+                    "	f.nome_fantasia,\n" +
+                    "	f.cnpjcpf,\n" +
+                    "	f.endereco,\n" +
+                    "	f.end_numero,\n" +
+                    "	f.complemento,\n" +
+                    "	f.bairro,\n" +
+                    "	f.cidade,\n" +
+                    "	c.NOME municipio,\n" +
+                    "	c.estado,\n" +
+                    "	f.cep,\n" +
+                    "	f.inscest ie,\n" +
+                    "	f.fone,\n" +
+                    "	f.celular,\n" +
+                    "	f.fax,\n" +
+                    "	f.nome_contato,\n" +
+                    "	f.fone_contato,\n" +
+                    "	f.email,\n" +
+                    "	f.obs\n" +
+                    "FROM 	\n" +
+                    "	FORNECED f\n" +
+                    "LEFT JOIN CIDADES c ON f.CIDADE = c.codigo ")) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setRazao(rs.getString("razao_social"));
+                    imp.setFantasia(rs.getString("nome_fantasia"));
+                    imp.setCnpj_cpf(rs.getString("cnpjcpf"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("end_numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTel_principal(rs.getString("fone"));
+                    
+                    String foneContato = rs.getString("fone_contato"),
+                            nomeContato = rs.getString("nome_contato");
+                    
+                    if (foneContato != null && !foneContato.trim().isEmpty()) {
+                        imp.addContato("1", 
+                                nomeContato, 
+                                foneContato, 
+                                null, 
+                                TipoContato.NFE, 
+                                null);
+                    }
+                    
+                    String celular = rs.getString("celular");
+                    
+                    if (celular != null && !celular.trim().isEmpty()) {
+                        imp.addContato("2", 
+                                "CEL. CONTATO", 
+                                null, 
+                                celular, 
+                                TipoContato.NFE, 
+                                null);
+                    }
+                    
+                    String email = rs.getString("email");
+                    
+                    if (email != null && !email.trim().isEmpty()) {
+                        imp.addContato("3", 
+                                "EMAIL", 
+                                null, 
+                                null, 
+                                TipoContato.NFE, 
+                                email);
+                    }
+                    
+                    imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	pf.codigo,\n" +
+                    "	pf.produto,\n" +
+                    "	pf.nome,\n" +
+                    "	pf.fornecedor,\n" +
+                    "	pf.codigo_barras\n" +
+                    "FROM \n" +
+                    "	produtos_fornecedor pf \n" +
+                    "ORDER BY \n" +
+                    "	pf.fornecedor, pf.produto")) {
+                while (rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdProduto(rs.getString("produto"));
+                    imp.setIdFornecedor(rs.getString("fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigo_barras"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	c.codigo, \n" +
+                    "	c.nome,\n" +
+                    "	c.apelido,\n" +
+                    "	c.rg,\n" +
+                    "	c.cnpjcpf,\n" +
+                    "	c.inscest ie,\n" +
+                    "	c.endereco,\n" +
+                    "	c.end_numero,\n" +
+                    "	c.bairro,\n" +
+                    "	ci.nome municipio,\n" +
+                    "	ci.estado,\n" +
+                    "	c.cidade,\n" +
+                    "	c.complemento,\n" +
+                    "	c.cep,\n" +
+                    "	c.estado_civil,\n" +
+                    "	c.dt_nasc,\n" +
+                    "	c.sexo,\n" +
+                    "	c.fone,\n" +
+                    "	c.fax,\n" +
+                    "	c.celular,\n" +
+                    "	c.email,\n" +
+                    "	c.dt_cadastro,\n" +
+                    "	c.limite_cred,\n" +
+                    "	c.obs,\n" +
+                    "	c.ativo,\n" +
+                    "	c.bloqueado\n" +
+                    "FROM \n" +
+                    "	clientes c\n" +
+                    "LEFT JOIN cidades ci ON c.cidade = ci.codigo")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("codigo"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setFantasia(rs.getString("apelido"));
+                    imp.setCnpj(rs.getString("cnjcpf"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("end_numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("fone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setDataCadastro(rs.getDate("dt_cadastro"));
+                    imp.setValorLimite(rs.getDouble("limite_cred"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
 }
