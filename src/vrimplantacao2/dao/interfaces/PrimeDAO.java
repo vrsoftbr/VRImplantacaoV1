@@ -699,8 +699,13 @@ public class PrimeDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
                 
                 for (PagarFornecedorVO id : idPagarnecedor) {
-                    stm.execute("delete from pagarfornecedorparcela where id_pagarfornecedor = " + id.getId());
-                    stm.execute("delete from pagarfornecedor where id = " + id.getId() + " and id_loja = " + idLojaVR);                    
+                    stm.execute("delete from pagarfornecedorparcela where id_pagarfornecedor = " + id.getId()
+                            + " and id_pagafornecedor in (select codigoatual from implantacao.codant_contapagar where sistema = '" + sistema + "'\n"
+                            + " and agrupador = '" + idLojaOrigem + "') and id_loja = " + idLojaVR);
+                    stm.execute("delete from pagarfornecedor where id = " + id.getId()
+                            + " and id_loja = " + idLojaVR + "\n"
+                            + " and id in (select codigoatual from implantacao.codant_contapagar where sistema = '" + sistema + "' "
+                            + " and agrupador = '" + idLojaOrigem + "')");                    
                 }
                 
             }
