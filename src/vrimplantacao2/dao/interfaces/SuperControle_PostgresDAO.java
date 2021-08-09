@@ -23,6 +23,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -402,6 +403,35 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                         imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.COMERCIAL);
                     }
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	\"FkProduto\" as idproduto,\n"
+                    + "	\"FkEntidade\" as idfornecedor,\n"
+                    + "	\"CodigoEntidade\" as codigoexterno,\n"
+                    + "	\"DtReferencia\"  as dataalteracao\n"
+                    + "from dbo.\"Referencia\"\n"
+                    + "order by 2, 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     result.add(imp);
                 }
             }
