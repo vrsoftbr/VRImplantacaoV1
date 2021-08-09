@@ -1088,14 +1088,6 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuIServerActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuIServer_v2">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="IServer_V2"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuIServer_v2ActionPerformed"/>
-                          </Events>
-                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuLinear">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Linear"/>
