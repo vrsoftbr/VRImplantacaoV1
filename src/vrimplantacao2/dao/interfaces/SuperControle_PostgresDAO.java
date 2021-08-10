@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -75,7 +77,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.EXCECAO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.MAPA_TRIBUTACAO
+                    OpcaoProduto.MAPA_TRIBUTACAO,
+                    OpcaoProduto.OFERTA
                 }
         ));
     }
@@ -89,7 +92,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
-                OpcaoFornecedor.PAGAR_FORNECEDOR
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
 
@@ -417,11 +420,13 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "	\"FkProduto\" as idproduto,\n"
-                    + "	\"FkEntidade\" as idfornecedor,\n"
-                    + "	\"CodigoEntidade\" as codigoexterno,\n"
-                    + "	\"DtReferencia\"  as dataalteracao\n"
-                    + "from dbo.\"Referencia\"\n"
+                    + "	p.\"Id\" as idproduto,\n"
+                    + "	pf.\"FkProduto\",\n"
+                    + "	pf.\"FkEntidade\" as idfornecedor,\n"
+                    + "	pf.\"CodigoEntidade\" as codigoexterno,\n"
+                    + "	pf.\"DtReferencia\"  as dataalteracao\n"
+                    + "from dbo.\"Referencia\" pf\n"
+                    + "join dbo.\"Produto\" p on p.\"EAN\" = pf.\"FkProduto\"\n"
                     + "order by 2, 1"
             )) {
                 while (rst.next()) {
@@ -530,6 +535,38 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	\"FkProduto\" as idproduto,\n"
+                    + "	\"VlVenda\" as preconormal,\n"
+                    + "	\"VlPromocao\" as precooferta,\n"
+                    + "	\"DtPromocaoDe\" as datainicio,\n"
+                    + "	\"DtPromocaoAte\" as datafim\n"
+                    + "from dbo.\"ProdutoMultiLoja\"\n"
+                    + "where \"VlPromocao\" > 0 \n"
+                    + "and \"DtPromocaoDe\" >= '2021-01-01'"
+            )) {
+
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datafim"));
+                    imp.setPrecoNormal(rs.getDouble("preconormal"));
+                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+
+                    result.add(imp);
+
                 }
             }
         }
