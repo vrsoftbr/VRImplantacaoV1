@@ -16,6 +16,7 @@ public class ConfiguracaoBaseDadosVO {
     private ConfiguracaoBancoLojaVO configuracaoBancoLoja;
     private BancoDadosVO bancoDados;
     private SistemaVO sistema;
+    private String complemento = "";
 
     public int getId() {
         return id;
@@ -96,4 +97,13 @@ public class ConfiguracaoBaseDadosVO {
     public void setSistema(SistemaVO sistema) {
         this.sistema = sistema;
     }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
+    
 }

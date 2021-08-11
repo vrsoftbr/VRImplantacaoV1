@@ -33,9 +33,28 @@ public class SelecaoLojaServiceTest {
         configuracaoVO.setDescricao("CONEXAO SYSPDV - 192.168.0.112");
         result.add(configuracaoVO);
         
-        when(configuracaoDAO.consultar()).thenReturn(result);
+        when(configuracaoDAO.consultar(0)).thenReturn(result);
         
         List<ConfiguracaoBaseDadosVO> conexoes = service.consultar();
+        
+        assertEquals(result.size(), conexoes.size());
+    }
+    
+    @Test
+    public void testConsultarByID() throws Exception {
+        ConfiguracaoBaseDadosDAO configuracaoDAO = Mockito.mock(ConfiguracaoBaseDadosDAO.class);
+        SelecaoLojaService service = new SelecaoLojaService(configuracaoDAO);
+        
+        List<ConfiguracaoBaseDadosVO> result = new ArrayList<>();
+        ConfiguracaoBaseDadosVO configuracaoVO = new ConfiguracaoBaseDadosVO();
+        
+        configuracaoVO.setId(1);
+        configuracaoVO.setDescricao("CONEXAO SYSPDV - 192.168.0.111");
+        result.add(configuracaoVO);
+        
+        when(configuracaoDAO.consultar(2)).thenReturn(result);
+        
+        List<ConfiguracaoBaseDadosVO> conexoes = service.consultar(2);
         
         assertEquals(result.size(), conexoes.size());
     }

@@ -13,9 +13,11 @@ import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
  */
 public class MapaLojaController {
     
-    private final MapaLojaService mapaLojaService;
+    private MapaLojaService mapaLojaService = null;
     private ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI = null;
     private List<ConfiguracaoBancoLojaVO> lojasMapeadas = null;
+    
+    public MapaLojaController() {}
 
     public MapaLojaController(ConfiguracaoBaseDadosGUI configuracaoBaseDadosGUI) {
         this.mapaLojaService = new MapaLojaService();

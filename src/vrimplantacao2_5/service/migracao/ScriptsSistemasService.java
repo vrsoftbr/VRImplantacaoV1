@@ -1,5 +1,6 @@
 package vrimplantacao2_5.service.migracao;
 
+import vrframework.classe.VRException;
 import vrimplantacao2_5.dao.migracao.ScriptsSistemasDAO;
 
 /**
@@ -19,7 +20,14 @@ public class ScriptsSistemasService {
     }
     
     public String getLojas(int idSistema, int idBancodados) throws Exception {
-        return scriptSistemasDAO.getLojas(idSistema, idBancodados);
+        String sql = scriptSistemasDAO.getLojas(idSistema, idBancodados);
+        
+        if (sql.isEmpty()) {
+            throw new VRException("Script de consulta loja origem não configurado!\n"
+                    + "Verifique com o administrador do sistema!");
+        }
+        
+        return sql;
     }
     
 }

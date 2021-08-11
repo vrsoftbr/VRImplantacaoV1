@@ -11,7 +11,7 @@ import vrframework.classe.Conexao;
 public class ScriptsSistemasDAO {
     
     public String getLojas(int idSistema, int idBancodados) throws Exception {
-        String sql = null;
+        String sql = "";
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"

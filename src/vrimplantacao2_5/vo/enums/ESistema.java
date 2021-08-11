@@ -5,6 +5,8 @@
  */
 package vrimplantacao2_5.vo.enums;
 
+import static vrimplantacao2_5.vo.enums.EBancoDados.values;
+
 /**
  *
  * @author Desenvolvimento
@@ -213,14 +215,14 @@ public enum ESistema {
     private String nome;
 
     public int getId() {
-        return this.id;
+        return id;
     }
 
     public String getNome() {
-        return this.nome;
+        return nome;
     }
 
-    public void setId(int nome) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -228,9 +230,18 @@ public enum ESistema {
         this.nome = nome;
     }
 
-    ESistema(int id, String nome) {
-        setId(id);
-        setNome(nome);
+    private ESistema(int id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
+    
+    public static ESistema getById(int id) {
+        for (ESistema st: values()) {
+            if (st.getId() == id) {
+                return st;
+            }
+        }
+        return null;
     }
 
 }

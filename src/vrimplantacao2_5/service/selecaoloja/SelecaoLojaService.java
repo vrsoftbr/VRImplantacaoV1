@@ -1,11 +1,13 @@
 package vrimplantacao2_5.service.selecaoloja;
 
 import java.util.List;
-import org.openide.util.Exceptions;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
 import vrimplantacao2_5.dao.configuracao.ConfiguracaoBaseDadosDAO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
+import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
  *
@@ -24,10 +26,14 @@ public class SelecaoLojaService {
     }
     
     public List<ConfiguracaoBaseDadosVO> consultar() {
+        return consultar(0);
+    }
+    
+    public List<ConfiguracaoBaseDadosVO> consultar(int idSistema) {
         List<ConfiguracaoBaseDadosVO> result = null;
         
         try {
-            result = configuracaoDAO.consultar();
+            result = configuracaoDAO.consultar(idSistema);
         } catch (Exception e) {
             Util.exibirMensagemErro(e, "Mapa de Loja");
         }
@@ -45,5 +51,9 @@ public class SelecaoLojaService {
         }
 
         return lojas;
+    }
+    
+    public VRInternalFrame construirInternalFrame(ESistema sistema, VRMdiFrame frame) throws Exception {
+        return InternalFrameFactory.getInternalFrame(sistema, frame);
     }
 }

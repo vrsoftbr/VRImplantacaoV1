@@ -85,12 +85,9 @@
       </Properties>
     </Component>
     <Component class="vrframework.bean.comboBox.VRComboBox" name="cboOrigem">
-<<<<<<< HEAD
-=======
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboOrigemActionPerformed"/>
       </Events>
->>>>>>> origin/VRIMP-33
     </Component>
     <Component class="vrframework.bean.label.VRLabel" name="lblLojaVR">
       <Properties>

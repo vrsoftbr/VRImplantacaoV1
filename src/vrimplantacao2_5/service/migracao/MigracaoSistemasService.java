@@ -31,7 +31,8 @@ public class MigracaoSistemasService {
 
     public List<Estabelecimento> getLojasOrigem(int idSistema, int idBancoDados) throws Exception {
         sql = scriptsSistemasService.getLojas(idSistema, idBancoDados);
-        conexaoBancoDados = ConexaoBancoDadosFactory.getConexao(EBancoDados.getById(idBancoDados));        
+        conexaoBancoDados = ConexaoBancoDadosFactory.getConexao(EBancoDados.getById(idBancoDados)); 
+        
         return migracaoSistemasDAO.getLojasOrigem(conexaoBancoDados, sql);        
     }
 }

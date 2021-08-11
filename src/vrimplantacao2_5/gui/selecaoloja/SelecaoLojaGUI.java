@@ -4,11 +4,15 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.dialog.VRDialog;
+import vrframework.bean.internalFrame.VRInternalFrame;
+import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
+import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao2_5.controller.selecaoloja.SelecaoLojaController;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBancoLojaVO;
 import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
+import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
  *
@@ -16,9 +20,10 @@ import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
  */
 public class SelecaoLojaGUI extends VRDialog {
 
-    private static SelecaoLojaGUI migracaoGUI = null;
+    public VRMdiFrame parentFrame;
     private SelecaoLojaController controller = null;
     private List<ConfiguracaoBancoLojaVO> lojas = null;
+    private List<ConfiguracaoBaseDadosVO> conexoes = null;
     
     /**
      * Creates new form MigracaoGUI
@@ -43,7 +48,7 @@ public class SelecaoLojaGUI extends VRDialog {
     private void getNomeConexao() throws Exception {
         cboConexao.setModel(new DefaultComboBoxModel());
         
-        List<ConfiguracaoBaseDadosVO> conexoes = controller.consultar();
+        conexoes = controller.consultar();
         
         for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
             cboConexao.addItem(new ItemComboVO(configuracaoVO.getId(), configuracaoVO.getDescricao()));
@@ -70,6 +75,20 @@ public class SelecaoLojaGUI extends VRDialog {
         if (configuracaoVO != null) {
             btnProximo.setEnabled(true);
         }
+    }
+    
+    private void construirInternalFrame() throws Exception {
+        ConfiguracaoBaseDadosVO configuracaoVO = conexoes.get(cboConexao.getSelectedIndex());
+        ESistema eSistema = ESistema.getById(configuracaoVO.getSistema().getId());
+        
+        VRInternalFrame internalFrame = controller.construirInternalFrame(eSistema, parentFrame);
+        
+        if (internalFrame == null) {
+            throw new VRException("Nenhuma tela encontrada para o sistema informado!");
+        }
+        
+        this.setVisible(false);
+        internalFrame.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -160,7 +179,11 @@ public class SelecaoLojaGUI extends VRDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnProximoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProximoActionPerformed
-        // TODO add your handling code here:
+        try {
+            construirInternalFrame();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Seleção de Loja");
+        }
     }//GEN-LAST:event_btnProximoActionPerformed
 
     private void cboConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboConexaoActionPerformed
@@ -229,17 +252,5 @@ public class SelecaoLojaGUI extends VRDialog {
     private vrframework.bean.label.VRLabel lblNomeConexao;
     private vrframework.bean.textField.VRTextField txtLojaVR;
     // End of variables declaration//GEN-END:variables
-    
-    public static void exibirMigracaoLoja() {
-        try {
-            if (migracaoGUI == null || !migracaoGUI.isActive()) {
-                migracaoGUI = new SelecaoLojaGUI();
-            }
 
-            migracaoGUI.setVisible(true);
-            
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Seleção de Loja");
-        }
-    }
 }

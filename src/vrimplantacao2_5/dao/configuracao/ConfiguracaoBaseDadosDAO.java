@@ -32,6 +32,7 @@ public class ConfiguracaoBaseDadosDAO {
         sql.put("nomeschema", conexaoVO.getSchema());
         sql.put("id_sistema", conexaoVO.getSistema().getId());
         sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
+        sql.put("complemento", conexaoVO.getComplemento());
 
         sql.getReturning().add("id");
 
@@ -60,6 +61,7 @@ public class ConfiguracaoBaseDadosDAO {
         sql.put("nomeschema", conexaoVO.getSchema());
         sql.put("id_sistema", conexaoVO.getSistema().getId());
         sql.put("id_bancodados", conexaoVO.getBancoDados().getId());
+        sql.put("complemento", conexaoVO.getComplemento());
 
         sql.setWhere("id = " + conexaoVO.getId());
 
@@ -190,8 +192,12 @@ public class ConfiguracaoBaseDadosDAO {
                     + configuracaoBancoLojaVO.getId());
         }
     }
-
+    
     public List consultar() throws Exception {
+        return consultar(0);
+    } 
+
+    public List consultar(int idSistema) throws Exception {
         List<ConfiguracaoBaseDadosVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {
@@ -207,14 +213,16 @@ public class ConfiguracaoBaseDadosDAO {
                     + "	c.porta,\n"
                     + "	c.usuario,\n"
                     + "	c.nomeschema,\n"
-                    + "   c.senha\n"
+                    + " c.senha,\n"
+                    + " c.complemento\n"        
                     + "from \n"
                     + "	implantacao2_5.conexao c\n"
                     + "join implantacao2_5.sistema s\n"
                     + "		on c.id_sistema = s.id\n"
                     + "join implantacao2_5.bancodados b\n"
                     + "		on c.id_bancodados = b.id\n"
-                    + "order by c.descricao")) {
+                    + (idSistema != 0 ? " where s.id = " + idSistema : "")        
+                    + " order by c.descricao")) {
                 while (rs.next()) {
                     ConfiguracaoBaseDadosVO configuracaoVO = new ConfiguracaoBaseDadosVO();
                     SistemaVO sistemaVO = new SistemaVO();
@@ -233,7 +241,8 @@ public class ConfiguracaoBaseDadosDAO {
                     configuracaoVO.setUsuario(rs.getString("usuario"));
                     configuracaoVO.setSchema(rs.getString("nomeschema"));
                     configuracaoVO.setSenha(rs.getString("senha"));
-
+                    configuracaoVO.setComplemento(rs.getString("complemento"));
+                        
                     result.add(configuracaoVO);
                 }
             }
