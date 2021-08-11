@@ -7,13 +7,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import vr.core.utils.StringUtils;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -322,40 +326,36 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tributo t on p.cd_tributo = t.cd_tributo\n"
                     + "left join produto_tributo pt on p.cd_produto = pt.cd_produto\n"
                     + "left join beneficio_fiscal bene on bene.cd_beneficio_fiscal = p.cd_beneficio_fiscal \n"        
-                    + "where char_length(p.codigo) = 6 \n"
-                    + "and p.codigo != '000000' \n"
-                    + "and p.codigo like '%0' \n"        
+                    + "where char_length(p.codigo) = 5 \n"
+                    + "and p.codigo != '00000' \n"    
                     + "order by\n"
                     + "	p.codigo"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codigo"));
-                                        
-                    String ean = rs.getString("codigo");                    
-                    
                     imp.setDescricaoCompleta(rs.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rs.getString("embalagem"));
                     
-                    if (ean!= null && !ean.trim().isEmpty()) {
-                        
-                        if (ean.trim().length() == 6 && !"000000".equals(ean.trim())) {
-                            
-                            if (ean.startsWith("00") && ean.endsWith("0")) {
-                                imp.setEan(ean.substring(2, ean.trim().length() - 1));
-                            } else if (ean.startsWith("0") && ean.endsWith("0")) {
-                                imp.setEan(ean.substring(1, ean.trim().length() - 1));
-                            } else if (ean.endsWith("0")) {
-                                imp.setEan(ean.substring(0, ean.trim().length() - 1));
-                            } 
-                        }
+                    int plu = StringUtils.toInt(rs.getString("codigo"), -2);
+                    ProdutoBalancaVO bal = produtosBalanca.get(plu);
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setEan(String.valueOf(plu));
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        if (!produtosBalanca.isEmpty())
+                            continue;
+                        imp.seteBalanca(rs.getBoolean("e_balanca"));                                        
+                        imp.setEan(rs.getString("codigo"));
+                        imp.setTipoEmbalagem(rs.getString("embalagem"));         
+                        imp.setValidade(0);               
                     }
-                    
-                    imp.seteBalanca(rs.getBoolean("e_balanca"));
                                         
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
@@ -469,17 +469,29 @@ public class ResultMaisDAO extends InterfaceDAO implements MapaTributoProvider {
                     "order by\n" +
                     "	p.codigo"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("codigo"));                    
-                    imp.setEan(rs.getString("codigo"));                    
+                    imp.setImportId(rs.getString("codigo"));
+                    
+                    int plu = StringUtils.toInt(rs.getString("codigo"), -2);
+                    ProdutoBalancaVO bal = produtosBalanca.get(plu);
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setEan(String.valueOf(plu));
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        imp.seteBalanca(rs.getBoolean("e_balanca"));                                        
+                        imp.setEan(rs.getString("codigo"));
+                        imp.setTipoEmbalagem(rs.getString("embalagem"));         
+                        imp.setValidade(0);               
+                    }
                     imp.setDescricaoCompleta(rs.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rs.getString("embalagem"));                    
-                    imp.seteBalanca(rs.getBoolean("e_balanca"));                                        
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));

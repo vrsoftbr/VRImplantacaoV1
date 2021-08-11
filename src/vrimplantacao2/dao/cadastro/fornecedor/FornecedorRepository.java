@@ -432,6 +432,22 @@ public class FornecedorRepository {
                     imp.getImportId()
             );
         }
+        
+        boolean importarSomenteOsAtivos = provider.getOpcoes().contains(OpcaoFornecedor.IMPORTAR_SOMENTE_ATIVOS);
+        if (importarSomenteOsAtivos) {
+            MultiMap<String, FornecedorIMP> ativos = new MultiMap<>();
+            for (FornecedorIMP imp: result.values()) {
+                if (imp.isAtivo()) {
+                    ativos.put(
+                        imp,
+                        imp.getImportSistema(),
+                        imp.getImportLoja(),
+                        imp.getImportId()
+                    );
+                }
+            }
+            result = ativos;
+        }
 
         return result;
     }

@@ -53,7 +53,11 @@ public enum OpcaoFornecedor {
     EMITE_NFE, 
     PERMITE_NF_SEM_PEDIDO,
     TIPO_INDICADOR_IE,
-    PRODUTO_FORNECEDOR;
+    PRODUTO_FORNECEDOR,
+    IMPORTAR_SOMENTE_ATIVOS,
+    PAGAR_FORNECEDOR;
+    //TODO: SUFRAMA
+    //TODO: DATACADASTRO
     
     private List<FornecedorIMP> listaEspecial;
 

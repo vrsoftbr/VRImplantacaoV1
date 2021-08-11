@@ -37,6 +37,7 @@ import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.PisCofinsVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -84,6 +85,7 @@ public class ProdutoRepository {
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
 
         LOG.finest("Abrindo a transação");
         provider.begin();
@@ -93,6 +95,9 @@ public class ProdutoRepository {
              */
             System.gc();
             List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos) {
+                organizados = filtrarProdutosInativos(organizados);
+            }
             produtos.clear();
             System.gc();
 
@@ -105,7 +110,7 @@ public class ProdutoRepository {
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
 
             setNotify("Gravando os produtos...", organizados.size());
-            for (ProdutoIMP imp: organizados) {
+            for (ProdutoIMP imp : organizados) {
                 StringBuilder rep = new StringBuilder();
                 try {
 
@@ -168,10 +173,8 @@ public class ProdutoRepository {
                                 continue;
                             }
                         } else {
-                            if (
-                                    provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA) ||
-                                    provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_NORMAIS)
-                            ) {
+                            if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)
+                                    || provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_NORMAIS)) {
                                 strID = resetarIds(strID, eBalanca);
                             } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
                                 strID = String.valueOf(ean);
@@ -200,8 +203,8 @@ public class ProdutoRepository {
                         provider.anterior().salvar(anterior);
                         provider.complemento().salvar(complemento, false);
                         provider.aliquota().salvar(aliquota);
-                        
-                        if(aliquota.getBeneficio() != 0) {
+
+                        if (aliquota.getBeneficio() != 0) {
                             provider.aliquota().salvarAliquotaBeneficio(aliquota);
                         }
                     } else if (anterior.getCodigoAtual() != null) {
@@ -257,6 +260,7 @@ public class ProdutoRepository {
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
 
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
@@ -275,16 +279,19 @@ public class ProdutoRepository {
         //</editor-fold>
 
         if (!optSimples.isEmpty()) {
-            
+
             provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
             List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos) {
+                organizados = filtrarProdutosInativos(organizados);
+            }
             MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
 
             java.sql.Date dataHoraImportacao = Utils.getDataAtual();
             String primeiraLojaMigrada = getPrimeiraLojaMigrada();
-            
+
             produtos.clear();
             System.gc();
 
@@ -295,22 +302,20 @@ public class ProdutoRepository {
 
                 LOG.info("Produtos a serem atualizados: " + organizados.size());
 
-                
                 /* Identificar qual foi a primeira loja que migrou */
-                
                 isDataAlteracaoCodAntProduto();
-                
+
                 StringBuilder strOpt = new StringBuilder();
                 for (Iterator<OpcaoProduto> iterator = optSimples.iterator(); iterator.hasNext();) {
                     OpcaoProduto next = iterator.next();
                     strOpt.append(next.toString()).append(iterator.hasNext() ? ", " : "");
                 }
-                
+
                 if (importarSomenteLoja) {
                     provider.setStatus("Filtrando produtos que foram inclusos por unificação ou mapeamento");
-                    List<ProdutoIMP> a =  new ArrayList<>();
-                    for (ProdutoIMP imp: organizados) {
-                        ProdutoAnteriorVO anterior = provider.anterior().getLojaImp(                                
+                    List<ProdutoIMP> a = new ArrayList<>();
+                    for (ProdutoIMP imp : organizados) {
+                        ProdutoAnteriorVO anterior = provider.anterior().getLojaImp(
                                 provider.getSistema(),
                                 provider.getLoja(),
                                 imp.getImportId()
@@ -333,7 +338,7 @@ public class ProdutoRepository {
                     provider.complemento().criarEstoqueTrocaAnteriorTemporario();
                 }
 
-                for (ProdutoIMP imp :organizados) {
+                for (ProdutoIMP imp : organizados) {
 
                     ProdutoAnteriorVO anterior = null;
 
@@ -344,7 +349,7 @@ public class ProdutoRepository {
                                 imp.getImportId()
                         );
                     } else {
-                        anterior = provider.anterior().getLojaImp(                                
+                        anterior = provider.anterior().getLojaImp(
                                 provider.getSistema(),
                                 provider.getLoja(),
                                 imp.getImportId()
@@ -412,7 +417,7 @@ public class ProdutoRepository {
                         }
 
                         if (optSimples.contains(OpcaoProduto.VR_ATACADO)) {
-                            if (id > 0) {
+                            if (id > 0 && atacadoProdutoComplemento.getPrecoVenda() > 0) {
                                 provider.vrAtacado().salvar(atacadoProdutoComplemento, optSimples);
                             }
                         }
@@ -420,19 +425,19 @@ public class ProdutoRepository {
                         provider.automacao().atualizar(automacao, optSimples);
 
                         if (aliquotas.containsKey(prod.getId(), aliquota.getEstado().getId())) {
-                            
+
                             if (optSimples.contains(OpcaoProduto.ICMS_LOJA)) {
-                                
-                                String loja_sistema = imp.getImportSistema()+' '+imp.getImportLoja();
+
+                                String loja_sistema = imp.getImportSistema() + ' ' + imp.getImportLoja();
                                 boolean isPrimeiraLojaMigrada = false;
                                 if (loja_sistema.equals(primeiraLojaMigrada)) {
                                     isPrimeiraLojaMigrada = true;
                                 }
-                                                                
+
                                 provider.aliquota().atualizarIcmsLoja(aliquota, optSimples, anterior, isPrimeiraLojaMigrada);
                                 provider.anterior().atualizarIcmsLoja(anterior, isPrimeiraLojaMigrada);
-                                
-                            } else {                            
+
+                            } else {
                                 provider.aliquota().atualizar(aliquota, optSimples);
                                 provider.anterior().atualizarIcms(anterior);
                             }
@@ -497,7 +502,7 @@ public class ProdutoRepository {
             }
         }
     }
-    
+
     /**
      * Unifica uma listagem de produtos no sistema.
      *
@@ -507,11 +512,15 @@ public class ProdutoRepository {
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
 
         provider.begin();
         try {
             System.gc();
             List<ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos) {
+                organizados = filtrarProdutosInativos(organizados);
+            }
             produtos.clear();
             System.gc();
 
@@ -546,23 +555,25 @@ public class ProdutoRepository {
         }
         return strID;
     }
-    
+
     private static class AliquotaICMS {
-        
+
     }
-    
+
     Map<String, Integer> codant;
     Map<Long, Integer> produtosPorEan;
     MultiMap<String, Integer> codigosAnterioresIdEan;
+
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         boolean manterSomenteOsProdutosForcarNovo = Parametros.OpcoesExperimentaisDeProduto.isUnificarSomenteProdutosComForcarNovo();
-        boolean incluirProdutosNovos = Parametros.OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes(); 
-        
+        boolean incluirProdutosNovos = Parametros.OpcoesExperimentaisDeProduto.isIncluirProdutosNaoExistentes();
+        boolean filtrarProdutosInativos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_SOMENTE_PRODUTOS_ATIVOS);
+
         verificarAliquotasMapeadas(produtos);
         verificarAliquotasNaoMapeadas(produtos);
-        
+
         setNotify("Carregando os dados necessários...", 3);
         this.codant = provider.anterior().getAnterioresIncluindoComCodigoAtualNull();
         notificar();
@@ -582,50 +593,68 @@ public class ProdutoRepository {
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
                 this.naoTransformarEANemUN = true;
             }
-            
+
             setNotify("Removendo da listagem produtos já importados e vinculados...", 0);
             produtos = new Organizador(this).organizarListagem(produtos);
+            if (filtrarProdutosInativos) {
+                produtos = filtrarProdutosInativos(produtos);
+            }
             produtos = filtrarProdutosEEansJaMapeados(produtos);
             if (manterSomenteOsProdutosForcarNovo) {
                 produtos = filtrarSomenteForcarNovo(produtos);
             }
             System.gc();
-            
+
             vincularProdutoComEanInvalido(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
-            
+
             incluirEansNovosDeProdutosJaImportados(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
-            
+
             vincularProdutosQueSoExistemNoVrPorEan(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
-            
+
             if (incluirProdutosNovos) {
                 incluirProdutosComEansNovos(produtos, unificarProdutoBalanca, idStack, dataHoraImportacao);
             }
-            
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
     }
-    
+
+    List<ProdutoIMP> filtrarProdutosInativos(List<ProdutoIMP> produtos) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        for (ProdutoIMP imp : produtos) {
+            if (SituacaoCadastro.ATIVO.equals(imp.getSituacaoCadastro())) {
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
     List<ProdutoIMP> filtrarSomenteForcarNovo(List<ProdutoIMP> produtos) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        for (ProdutoIMP imp: produtos) {
-            if (!isProdutoVinculadoNaCodAnt(imp))
+        for (ProdutoIMP imp : produtos) {
+            if (!isProdutoVinculadoNaCodAnt(imp)) {
                 continue;
-            if (isCodigoAnteriorComCodigoAtualPreenchido(imp))
+            }
+            if (isCodigoAnteriorComCodigoAtualPreenchido(imp)) {
                 continue;
-            if (!isForcarNovo(imp))
+            }
+            if (!isForcarNovo(imp)) {
                 continue;
+            }
             result.add(imp);
         }
         produtos.removeAll(result);
         return result;
     }
+
     boolean isCodigoAnteriorComCodigoAtualPreenchido(ProdutoIMP imp) {
         Integer codigoAtual = this.codant.get(imp.getImportId());
         return codigoAtual != null && codigoAtual != 0;
     }
+
     boolean isForcarNovo(ProdutoIMP imp) throws Exception {
         return provider.anterior().forcarNovo(imp.getImportId());
     }
@@ -640,7 +669,7 @@ public class ProdutoRepository {
     private void vincularProdutosQueSoExistemNoVrPorEan(List<ProdutoIMP> produtos, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
         List<ProdutoIMP> produtosNaoVinculadosComEansExistentes = filtrarProdutosNaoVinculadosComEansExistentes(produtos);
         setNotify("Vinculando os produtos com EANs que já existem no VR...", produtosNaoVinculadosComEansExistentes.size());
-        for (ProdutoIMP imp: produtosNaoVinculadosComEansExistentes) {
+        for (ProdutoIMP imp : produtosNaoVinculadosComEansExistentes) {
             processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
         }
         produtosNaoVinculadosComEansExistentes.clear();
@@ -650,7 +679,7 @@ public class ProdutoRepository {
     private void incluirEansNovosDeProdutosJaImportados(List<ProdutoIMP> produtos, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
         List<ProdutoIMP> produtosVinculadosComNovosEans = filtrarProdutosVinculadosComNovosEans(produtos);
         setNotify("Incluindo novos EANs de produtos já importados...", produtosVinculadosComNovosEans.size());
-        for (ProdutoIMP imp: produtosVinculadosComNovosEans) {
+        for (ProdutoIMP imp : produtosVinculadosComNovosEans) {
             processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
         }
         produtosVinculadosComNovosEans.clear();
@@ -660,7 +689,7 @@ public class ProdutoRepository {
     private void vincularProdutoComEanInvalido(List<ProdutoIMP> produtos, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
         List<ProdutoIMP> produtosComEanInvalido = filtrarProdutosComEanInvalido(produtos);
         setNotify("Registrando na codant ou forçando a gravação de EANs inválidos...", produtosComEanInvalido.size());
-        for (ProdutoIMP imp: produtosComEanInvalido) {
+        for (ProdutoIMP imp : produtosComEanInvalido) {
             processarProdutoIMPParaUnificacao(imp, unificarProdutoBalanca, idStack, dataHoraImportacao);
         }
         produtosComEanInvalido.clear();
@@ -669,11 +698,11 @@ public class ProdutoRepository {
 
     private void verificarAliquotasNaoMapeadas(List<ProdutoIMP> produtos) throws Exception, NullPointerException {
         Set<IcmsWraper> icmss = new HashSet<>();
-        for (ProdutoIMP imp: produtos) {
+        for (ProdutoIMP imp : produtos) {
             icmss.add(new IcmsWraper(imp.getIcmsCstSaida(), imp.getIcmsAliqSaida(), imp.getIcmsReducaoSaida()));
         }
         StringBuilder builder = new StringBuilder();
-        for (IcmsWraper icms: icmss) {
+        for (IcmsWraper icms : icmss) {
             Icms ret = Icms.getIcmsPorValor(icms.cst, icms.aliquota, icms.reducao);
             if (ret == null) {
                 builder.append(String.format("(cst:%d aliq: %.2f red: %.2f)", icms.cst, icms.aliquota, icms.reducao)).append("\n");
@@ -682,14 +711,15 @@ public class ProdutoRepository {
         if (!builder.toString().isEmpty()) {
             String msg = "Os seguintes ICMSs não foram encontrados:\n" + builder.toString();
             System.out.println(msg);
-            if (!Parametros.get().isImportarIcmsIsentoMigracaoProduto())
+            if (!Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
                 throw new NullPointerException(msg);
+            }
         }
     }
-    
+
     private void verificarAliquotasMapeadas(List<ProdutoIMP> produtos) throws Exception, NullPointerException {
         Set<String> icmsIds = new HashSet<>();
-        for (ProdutoIMP imp: produtos) {
+        for (ProdutoIMP imp : produtos) {
             icmsIds.add(imp.getIcmsDebitoId());
             icmsIds.add(imp.getIcmsDebitoForaEstadoId());
             icmsIds.add(imp.getIcmsDebitoForaEstadoNfId());
@@ -698,7 +728,7 @@ public class ProdutoRepository {
             icmsIds.add(imp.getIcmsCreditoForaEstadoId());
         }
         StringBuilder builder = new StringBuilder();
-        for (String icmsId: icmsIds) {
+        for (String icmsId : icmsIds) {
             if (icmsId != null && !"".equals(icmsId.trim())) {
                 Icms icms = this.provider.tributo().getAliquotaByMapaId(icmsId, true);
                 if (icms == null) {
@@ -709,16 +739,18 @@ public class ProdutoRepository {
         if (!builder.toString().isEmpty()) {
             String msg = "Os seguintes ids de alíquota não foram encontrados no mapeamento:\n" + builder.toString();
             System.out.println(msg);
-            if (!Parametros.get().isImportarIcmsIsentoMigracaoProduto())
+            if (!Parametros.get().isImportarIcmsIsentoMigracaoProduto()) {
                 throw new NullPointerException(msg);
+            }
         }
     }
+
     private static class IcmsWraper {
 
         private final int cst;
         private final double aliquota;
         private final double reducao;
-        
+
         public IcmsWraper(int cst, double aliquota, double reducao) {
             this.cst = cst;
             this.aliquota = aliquota;
@@ -754,70 +786,77 @@ public class ProdutoRepository {
             }
             return Double.doubleToLongBits(this.reducao) == Double.doubleToLongBits(other.reducao);
         }
-        
-        
+
     }
-    
+
     List<ProdutoIMP> filtrarProdutosEEansJaMapeados(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
-        for (ProdutoIMP imp: produtos) {
-            if (isEanEIdExistenteNaCodAnt(imp))
+        for (ProdutoIMP imp : produtos) {
+            if (isEanEIdExistenteNaCodAnt(imp)) {
                 continue;
+            }
             result.add(imp);
         }
         return result;
     }
+
     private boolean isEanEIdExistenteNaCodAnt(ProdutoIMP imp) {
         Integer codigoatual = this.codigosAnterioresIdEan.get(imp.getImportId(), imp.getEan());
         return codigoatual != null;
     }
-    
+
     List<ProdutoIMP> filtrarProdutosComEanInvalido(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
-        for (ProdutoIMP imp: produtos) {
+        for (ProdutoIMP imp : produtos) {
             long ean = Utils.stringToLong(imp.getEan(), -2);
-            if (ean > 999999)
+            if (ean > 999999) {
                 continue;
+            }
             result.add(imp);
         }
         produtos.removeAll(result);
         return result;
     }
-    
+
     List<ProdutoIMP> filtrarProdutosVinculadosComNovosEans(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
-        for (ProdutoIMP imp: produtos) {            
-            if (!isProdutoVinculadoNaCodAnt(imp))
+        for (ProdutoIMP imp : produtos) {
+            if (!isProdutoVinculadoNaCodAnt(imp)) {
                 continue;
-            if (isEanExistenteNoVR(imp))
+            }
+            if (isEanExistenteNoVR(imp)) {
                 continue;
+            }
             result.add(imp);
         }
         produtos.removeAll(result);
         return result;
     }
+
     private boolean isProdutoVinculadoNaCodAnt(ProdutoIMP imp) {
         return this.codant.containsKey(imp.getImportId());
     }
+
     private boolean isEanExistenteNoVR(ProdutoIMP imp) {
         return this.produtosPorEan.containsKey(Utils.stringToLong(imp.getEan()));
     }
-    
+
     List<ProdutoIMP> filtrarProdutosNaoVinculadosComEansExistentes(List<ProdutoIMP> produtos) {
         List<ProdutoIMP> result = new ArrayList<>();
-        for (ProdutoIMP imp: produtos) {
+        for (ProdutoIMP imp : produtos) {
             long ean = Utils.stringToLong(imp.getEan());
             boolean eanNaoExisteNoVR = !this.produtosPorEan.containsKey(ean);
-            
-            if (eanNaoExisteNoVR)
+
+            if (eanNaoExisteNoVR) {
                 continue;
-            
+            }
+
             result.add(imp);
         }
         produtos.removeAll(result);
         return result;
     }
-    
+
     private void processarProdutoIMPParaUnificacao(ProdutoIMP imp, boolean unificarProdutoBalanca, ProdutoIDStack idStack, java.sql.Date dataHoraImportacao) throws Exception {
         String obsImportacao = "";
         imp.setManterEAN(false);
@@ -846,12 +885,11 @@ public class ProdutoRepository {
         if (eanValido) {
             if (!eanExistente || forcarNovo) {
                 /**
-                 * Mesmo que um determinado EAN não esteja cadastrado no
-                 * sistema (pois o mesmo pode ter sido excluído por um
-                 * usuário), é prudente verificar o código anterior para
-                 * determinar se este produto foi importado
-                 * anteriormente e gravar o EAN no produto correto e
-                 * evitar duplicação.
+                 * Mesmo que um determinado EAN não esteja cadastrado no sistema
+                 * (pois o mesmo pode ter sido excluído por um usuário), é
+                 * prudente verificar o código anterior para determinar se este
+                 * produto foi importado anteriormente e gravar o EAN no produto
+                 * correto e evitar duplicação.
                  */
                 //Se o produto não foi importado, um novo produto é criado.
                 if (!provider.anterior().cadastrado(imp.getImportId())) {
@@ -859,18 +897,18 @@ public class ProdutoRepository {
                         strID = String.valueOf(ean);
                     }
                     strID = resetarIds(strID, eBalanca);
-                    
+
                     id = idStack.obterID(strID, eBalanca);
-                    
+
                     codigoAtual = converterIMP(imp, id, unidade, eBalanca);
-                    
+
                     ProdutoAliquotaVO aliquota = converterAliquota(imp);
                     aliquota.setProduto(codigoAtual);
-                    
+
                     ProdutoComplementoVO complemento = converterComplemento(imp);
                     complemento.setProduto(codigoAtual);
                     complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
-                    
+
                     provider.salvar(codigoAtual);
                     obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
                     //provider.anterior().salvar(anterior);
@@ -883,44 +921,44 @@ public class ProdutoRepository {
                             complemento.setEstoque(0);
                         }
                         provider.complemento().salvar(complemento, false);
-                        
+
                     }
                     provider.aliquota().salvar(aliquota);
                 } else {
-                    
+
                     codigoAtual = provider.anterior().get(
                             provider.getSistema(),
                             provider.getLoja(),
                             imp.getImportId()
                     ).getCodigoAtual();
-                    
+
                     if (codigoAtual == null) {
-                        
+
                         if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
                             strID = String.valueOf(ean);
-                        }                        
+                        }
                         strID = resetarIds(strID, eBalanca);
-                        
+
                         id = idStack.obterID(strID, eBalanca);
-                        
+
                         if (forcarNovo) {
                             ean = id;
                         }
-                        
+
                         codigoAtual = converterIMP(imp, id, unidade, eBalanca);
-                        
+
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(codigoAtual);
-                        
+
                         ProdutoComplementoVO complemento = converterComplemento(imp);
                         complemento.setProduto(codigoAtual);
                         complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
-                        
+
                         provider.salvar(codigoAtual);
-                        
-                        obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE " +
-                                ProdutoRepository.class.getName().toString();
-                        
+
+                        obsImportacao = "PRODUTO NOVO - INSERIDO PELO METODO unificar DA CLASSE "
+                                + ProdutoRepository.class.getName().toString();
+
                         //provider.anterior().salvar(anterior);
                         double estoque = complemento.getEstoque();
                         for (LojaVO loja : provider.getLojas()) {
@@ -931,10 +969,10 @@ public class ProdutoRepository {
                                 complemento.setEstoque(0);
                             }
                             provider.complemento().salvar(complemento, false);
-                            
+
                         }
                         provider.aliquota().salvar(aliquota);
-                        
+
                         if (forcarNovo) {
                             obsImportacao = "PRODUTO NOVO - INSERIDO PELO MAPEAMENTO (FORCAR NOVO)";
                             gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
@@ -953,7 +991,7 @@ public class ProdutoRepository {
                     ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                     automacao.setProduto(codigoAtual);
                     provider.automacao().salvar(automacao);
-                    
+
                     gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
                 }
             } else {
@@ -961,24 +999,24 @@ public class ProdutoRepository {
                 codigoAtual = new ProdutoVO();
                 codigoAtual.setId(id);
                 obsImportacao = "PRODUTO UNIFICADO - UNIFICADO PELO METODO unificar DA CLASSE " + ProdutoRepository.class.getName().toString();
-                
+
                 // gravar codigo atual se for null
                 gravarCodigoAtual(imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), codigoAtual, obsImportacao);
             }
         }
         /**
-         * Independentemente se o produto foi gravado ou não, o código
-         * anterior deve ser registrado.
+         * Independentemente se o produto foi gravado ou não, o código anterior
+         * deve ser registrado.
          */
         if (!provider.anterior().cadastrado(imp.getImportId())) {
             ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
             anterior.setCodigoAtual(codigoAtual);
             anterior.setDataHora(dataHoraImportacao);
-            
+
             if (anterior.getCodigoAtual() == null) {
                 obsImportacao = "PRODUTO NAO LOCALIZADO NA UNIFICACAO";
             }
-            
+
             anterior.setObsImportacao(obsImportacao);
             provider.anterior().salvar(anterior);
         }
@@ -990,6 +1028,7 @@ public class ProdutoRepository {
     }
 
     private int countSemAnterior = 0;
+
     public void gravarCodigoAtual(String impsistema, String imploja, String impid, ProdutoVO codigoAtual, String obsimportacao) throws Exception {
         try {
             Conexao.begin();
@@ -1201,12 +1240,11 @@ public class ProdutoRepository {
 
         int idBeneficio = provider.aliquota().getBeneficio(imp.getBeneficio());
         aliquota.setBeneficio(idBeneficio);
-        
+
         /*
         if (idBeneficio != 0) {
             provider.aliquota().salvarAliquotaBeneficio(aliquota);
         }*/
-
         return aliquota;
     }
 
@@ -1556,7 +1594,7 @@ public class ProdutoRepository {
         destino.setIcmsCstConsumidor(imp.getIcmsCstConsumidor());
         destino.setIcmsAliqConsumidor(imp.getIcmsAliqConsumidor());
         destino.setIcmsReducaoConsumidor(imp.getIcmsReducaoConsumidor());
-        
+
         destino.setIcmsCstEntrada(imp.getIcmsCstEntrada());
         destino.setIcmsAliqEntrada(imp.getIcmsAliqEntrada());
         destino.setIcmsReducaoEntrada(imp.getIcmsReducaoEntrada());
@@ -1589,6 +1627,7 @@ public class ProdutoRepository {
             destino.setCodigoSped(imp.getImportId());
         }
         destino.setSituacaoCadastro(imp.getSituacaoCadastro());
+        destino.setDataCadastro(imp.getDataCadastro());
         return destino;
     }
 
@@ -1843,16 +1882,16 @@ public class ProdutoRepository {
 
         return to;
     }
-    
+
     public String getPrimeiraLojaMigrada() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct (impsistema||' '||imploja) sistema_loja \n"
-                            + "from implantacao.codant_produto \n"
-                            + "where dataimportacao in (select min(dataimportacao)"
-                            + "                         from implantacao.codant_produto)"
+                    + "from implantacao.codant_produto \n"
+                    + "where dataimportacao in (select min(dataimportacao)"
+                    + "                         from implantacao.codant_produto)"
             )) {
-                if (rst.next())  {
+                if (rst.next()) {
                     return rst.getString("sistema_loja");
                 } else {
                     return "";
@@ -1860,7 +1899,7 @@ public class ProdutoRepository {
             }
         }
     }
-    
+
     public void isDataAlteracaoCodAntProduto() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -1875,9 +1914,9 @@ public class ProdutoRepository {
                     + "order by\n"
                     + "	1,2,3,4"
             )) {
-                if (!rst.next()) {                    
+                if (!rst.next()) {
                     String sql = "alter table implantacao.codant_produto add column dataalteracao timestamp";
-                    stm.execute(sql);                    
+                    stm.execute(sql);
                 }
             }
         }

@@ -151,6 +151,7 @@
                                           <Component id="chkForcarPrecoCusto" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkImportarSomenteProdutosAtivos" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="195" max="32767" attributes="0"/>
                               </Group>
@@ -185,7 +186,9 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkAtualizarSomenteIncluidosUnificacao" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="10" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkImportarSomenteProdutosAtivos" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -257,6 +260,12 @@
                     <Property name="text" type="java.lang.String" value="Atualizar somente produtos inclu&#xed;dos pela unifica&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarSomenteProdutosAtivos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Importar somente produtos ativos"/>
+                    <Property name="toolTipText" type="java.lang.String" value="N&#xe3;o importa os produtos marcados como inativos no sistema antigo."/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="pnlOptAssociado">
@@ -269,9 +278,7 @@
                           <Component id="jLabel2" min="-2" pref="132" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Component id="chkInverterAssociado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkAssociadoSomenteAtivos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="334" max="32767" attributes="0"/>
+                          <EmptySpace pref="479" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -282,7 +289,6 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkInverterAssociado" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel2" linkSize="1" alignment="0" min="-2" pref="23" max="-2" attributes="0"/>
-                              <Component id="chkAssociadoSomenteAtivos" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -305,12 +311,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkInverterAssociado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Inverter"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAssociadoSomenteAtivos">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Somente produtos ativos"/>
                     <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
                   </Properties>
                 </Component>

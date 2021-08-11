@@ -20,7 +20,7 @@ public class ConexaoDBF {
 
     public static void abrirConexao(String i_database) throws Exception {
         
-        if (!usarOdbc) {            
+        if (usarOdbc) {            
             Class.forName("com.hxtt.sql.dbf.DBFDriver");
         } else {
             Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
@@ -29,11 +29,12 @@ public class ConexaoDBF {
         dataBase = i_database;
 
         try {
-            if (!usarOdbc) {
+            if (usarOdbc) {
                 con = DriverManager.getConnection("jdbc:DBF:///" + i_database+"?loadIndices=false");
             } else {
-                //con = DriverManager.getConnection("jdbc:odbc:Driver={Microsoft dBASE Driver (*.dbf)};DefaultDir=" + i_database);
-                con = DriverManager.getConnection("jdbc:odbc:Driver={Driver do Microsoft dBase (*.dbf)};DefaultDir=" + i_database);
+                con = DriverManager.
+                        getConnection("jdbc:odbc:Driver={Driver do Microsoft dBase (*.dbf)};DefaultDir=" + 
+                                                                                                    i_database);
             }
 
         } catch (Exception ex) {

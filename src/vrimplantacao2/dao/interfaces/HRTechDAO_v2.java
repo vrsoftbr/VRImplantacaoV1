@@ -28,6 +28,7 @@ import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -38,9 +39,11 @@ import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.DivisaoIMP;
@@ -74,7 +77,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
     public void setComplemento(String complemento) {
         this.complemento = complemento;
     }    
-
+    
     @Override
     public String getSistema() {
         if (complemento == null || complemento.trim().equals("")) {
@@ -107,7 +110,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -119,8 +122,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "	m2.descmerc2,\n"
                     + "	m3.codmerc3,\n"
                     + "	m3.descmerc3,\n"
-                    + "	m4.codmerc4,\n"
-                    + "	m4.descmerc4\n"
+                    + "	coalesce(m4.codmerc4, 1) codmerc4,\n"
+                    + "	coalesce(m4.descmerc4, m3.descmerc3) descmerc4\n" 
                     + "from\n"
                     + "	(\n"
                     + "		select\n"
@@ -154,7 +157,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami = '' and gruc03subf = ''\n"
                     + "	) m3 on\n"
                     + "		m2.codmerc1 = m3.codmerc1 and m2.codmerc2 = m3.codmerc2\n"
-                    + "	join (\n"
+                    + "	left join (\n"
                     + "			select\n"
                     + "			gruc03seto codmerc1,\n"
                     + "			gruc03grup codmerc2,\n"
@@ -187,6 +190,56 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }*/
+    
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	m1.codmerc1,\n" +
+                    "	m1.descmerc1,\n" +
+                    "	m2.codmerc2,\n" +
+                    "	m2.descmerc2 \n" +
+                    "from\n" +
+                    "	(\n" +
+                    "		select\n" +
+                    "			gruc03seto codmerc1,\n" +
+                    "			gruc35desc descmerc1\n" +
+                    "		from\n" +
+                    "			fl100dpt s\n" +
+                    "		where\n" +
+                    "			gruc03seto != '' and gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n" +
+                    "	) m1\n" +
+                    "	join (\n" +
+                    "		select\n" +
+                    "			gruc03seto codmerc1,\n" +
+                    "			gruc03grup codmerc2,\n" +
+                    "			gruc35desc descmerc2\n" +
+                    "		from\n" +
+                    "			fl100dpt s\n" +
+                    "		where\n" +
+                    "			gruc03seto != '' and gruc03grup != '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n" +
+                    "	) m2 on\n" +
+                    "		m1.codmerc1 = m2.codmerc1\n" +
+                    "	order by 1,3")) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("codmerc1"));
+                    imp.setMerc1Descricao(rs.getString("descmerc1"));
+                    imp.setMerc2ID(rs.getString("codmerc2"));
+                    imp.setMerc2Descricao(rs.getString("descmerc2"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(rs.getString("descmerc2"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -213,6 +266,40 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 imp.setDescricao(rs.getString("descricao"));
                 
                 result.add(imp);
+            }
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	pf.CODIGOPLU idprodutopai,\n" +
+                    "	pf.ESTC35DESC descricaoprodutopai,\n" +
+                    "	pr.CODIGOPLU idprodutofilho,\n" +
+                    "	pr.ESTC35DESC descricaoprodutofilho,\n" +
+                    "	p.qtde qtdfilho\n" +
+                    "from \n" +
+                    "	FL310INS p\n" +
+                    "join fl300est pr on p.CODIGOPLU = pr.CODIGOPLU\n" +
+                    "join fl300est pf on p.CODIASSO = pf.CODIGOPLU\n" +
+                    "order by \n" +
+                    "	1, 4")) {
+                while(rs.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    
+                    imp.setId(rs.getString("idprodutopai"));
+                    imp.setDescricao(rs.getString("descricaoprodutopai"));
+                    imp.setProdutoAssociadoId(rs.getString("idprodutofilho"));
+                    imp.setDescricaoProdutoAssociado(rs.getString("descricaoprodutofilho"));
+                    
+                    result.add(imp);
+                }
             }
         }
         
@@ -631,7 +718,10 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
                     
-                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("ean"), -2));
+                    String ean = rs.getString("ean");
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(ean, -2));
+                    
                     if (bal != null) {
                         imp.setEan(String.valueOf(bal.getCodigo()));
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
@@ -639,13 +729,12 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca(true);
                         imp.setValidade(bal.getValidade());
                     } else {
-                        imp.setEan(rs.getString("ean"));
+                        imp.setEan(ean);
                         imp.setTipoEmbalagem(rs.getString("embalagem"));
                         imp.setQtdEmbalagem(1);
                         imp.seteBalanca("S".equals(rs.getString("pesavel")));
                         imp.setValidade(rs.getInt("validade"));                        
                     }
-                    
                     
                     imp.setIdFamiliaProduto(familia.get(imp.getImportId()));                    
                     imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
@@ -656,8 +745,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setCodMercadologico4(rs.getString("merc4"));
+                    imp.setCodMercadologico3("1");
+                    //imp.setCodMercadologico4(rs.getString("merc4"));
                     //poimp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
@@ -921,7 +1010,8 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.NUTRICIONAL,
                 OpcaoProduto.PAUTA_FISCAL,
-                OpcaoProduto.PAUTA_FISCAL_PRODUTO
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.ASSOCIADO
         ));
     }
 
@@ -1358,14 +1448,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
-    @Override
-    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
-        return super.getAssociados(opt); //To change body of generated methods, choose Tools | Templates.
-    }
     
-    
-
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -1550,6 +1633,88 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     }                  
                     imp.setIdCliente(idCliente);
                     imp.setValor(rs.getDouble("total"));
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	numerolanc id,\n" +
+                    "	codigoenti idfornecedor,\n" +
+                    "	notafiscal,\n" +
+                    "	parcela,\n" +
+                    "	datlancame,\n" +
+                    "	datemissao dtemissao,\n" +
+                    "   datvencime vencimento,\n" +        
+                    "	datentrada,\n" +
+                    "	datefetiva,\n" +
+                    "	vlrtotalnf valor,\n" +
+                    "	historico\n" +
+                    "from\n" +
+                    "	fl700fin\n" +
+                    "where\n" +
+                    "	tipo_pagto in ('CHQ', 'VLE', 'BOL', 'A', '   ', 'DH') \n" +
+                    "	and codigoloja = '" + getLojaOrigem() + "'\n" +
+                    "	and tipolancam in ('A', 'R') and tipocadast = 'F'\n" +        
+                    "	and datpagto = '1900-01-01 00:00:00'")) {
+                while(rs.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("dtemissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("historico"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	numerolanc id,\n" +
+                    "	codigoenti idcliente,\n" +
+                    "	notafiscal,\n" +
+                    "	parcela,\n" +
+                    "	datlancame,\n" +
+                    "	datemissao dtemissao,\n" +
+                    "	datentrada,\n" +
+                    "	datefetiva,\n" +
+                    "	vlrtotalnf,\n" +
+                    "	historico\n" +
+                    "from\n" +
+                    "	fl700fin\n" +
+                    "where\n" +
+                    "	tipo_pagto = 'CHQ'\n" +
+                    "	and codigoloja = '" + getLojaOrigem() + "'\n" +
+                    "	and tipolancam = 'R'\n" +
+                    "	and datpagto = '1900-01-01 00:00:00'")) {
+                while (rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCheque(rs.getString("notafiscal"));
+                    imp.setValor(rs.getDouble("vlrtotalnf"));
+                    
                     result.add(imp);
                 }
             }

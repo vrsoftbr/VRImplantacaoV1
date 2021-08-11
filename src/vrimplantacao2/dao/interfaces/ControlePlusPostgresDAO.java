@@ -15,16 +15,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 /**
  *
@@ -76,10 +80,12 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.ICMS,
-                OpcaoProduto.DATA_CADASTRO
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.RECEITA,
+                OpcaoProduto.NUTRICIONAL
         ));
     }
-    
+
     @Override
     public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
         return new HashSet<>(Arrays.asList(
@@ -88,10 +94,11 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 OpcaoFornecedor.NOME_FANTASIA,
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
-                OpcaoFornecedor.INSCRICAO_MUNICIPAL
-        ));        
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.PRODUTO_FORNECEDOR
+        ));
     }
-    
+
     @Override
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
@@ -366,6 +373,33 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "	pr_codint as idproduto, \n"
+                        + "	qtde as estoque\n"
+                        + "from implantacao.produtosestoque_ondas"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEstoque(Double.parseDouble(rst.getString("estoque").trim().replace(",", ".")));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
+    }
+    
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -510,6 +544,103 @@ public class ControlePlusPostgresDAO extends InterfaceDAO {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	r.id_receita as id,\n"
+                    + "	r.descr_receita as descricao,\n"
+                    + "	r.pr_codint as id_produto,\n"
+                    + "	r.pr_codint_item as item,\n"
+                    + "	r.pr_qtde_utilizada,\n"
+                    + "	1000 as qtdeemb,\n"
+                    + "	r.pr_qtde_utilizada::numeric * 1000 as qtdutilizada,\n"
+                    + "	p.uni_venda as tipoembalagem\n"
+                    + "from implantacao.receitas_ondas r\n"
+                    + "join implantacao.produtos_ondas p on r.pr_codint_item = p.pr_codint\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id_produto"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setRendimento(1);
+                    imp.setQtdembalagemreceita((int) rst.getDouble("qtdutilizada"));
+                    imp.setQtdembalagemproduto(rst.getInt("qtdeemb"));
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("item"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	pr_codint as id,\n"
+                    + " pr_nome as descricao, \n"        
+                    + "	pr_porcao,\n"
+                    + "	replace(pr_caloria, ',', '.') as pr_caloria,\n"
+                    + "	replace(pr_vd_caloria, ',', '.') as pr_vd_caloria,\n"
+                    + "	replace(pr_carboidrato, ',', '.') as pr_carboidrato,\n"
+                    + "	replace(pr_vd_carboidrato, ',', '.') as pr_vd_carboidrato,\n"
+                    + "	replace(pr_proteina, ',', '.') as pr_proteina,\n"
+                    + "	replace(pr_vd_proteina, ',', '.') as pr_vd_proteina,\n"
+                    + "	replace(pr_gordura, ',', '.') as pr_gordura,\n"
+                    + "	replace(pr_vd_gordura, ',', '.') as pr_vd_gordura,\n"
+                    + "	replace(pr_gordurasaturada, ',', '.') as pr_gordurasaturada,\n"
+                    + "	replace(pr_vd_gordurasaturada, ',', '.') as pr_vd_gordurasaturada,\n"
+                    + "	replace(pr_colesterol, ',', '.') as pr_colesterol,\n"
+                    + "	replace(pr_vd_colesterol, ',', '.') as pr_vd_colesterol,\n"
+                    + "	replace(pr_fibraalimentar, ',', '.') as pr_fibraalimentar,\n"
+                    + "	replace(pr_vd_fibraalimentar, ',', '.') as pr_vd_fibraalimentar,\n"
+                    + "	replace(pr_calcio, ',', '.') as pr_calcio,\n"
+                    + "	replace(pr_vd_calcio, ',', '.') as pr_vd_calcio,\n"
+                    + "	replace(pr_ferro, ',', '.') as pr_ferro,\n"
+                    + "	replace(pr_vd_ferro, ',', '.') as pr_vd_ferro,\n"
+                    + "	replace(pr_sodio, ',', '.') as pr_sodio,\n"
+                    + "	replace(pr_vd_sodio, ',', '.') as pr_vd_sodio\n"
+                    + "from implantacao.produtos_ondas \n"
+                    + "where pr_porcao != ''\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setPorcao(rst.getString("pr_porcao"));
+                    imp.setCaloria((int) rst.getDouble("pr_caloria"));
+                    imp.setCarboidrato(rst.getDouble("pr_carboidrato"));
+                    imp.setProteina(rst.getDouble("pr_proteina"));
+                    imp.setGordura(rst.getDouble("pr_gordura"));
+                    imp.setGorduraSaturada(rst.getDouble("pr_gordurasaturada"));
+                    imp.setFibra(rst.getDouble("pr_fibraalimentar"));
+                    imp.setCalcio(rst.getDouble("pr_calcio"));
+                    imp.setFerro(rst.getDouble("pr_ferro"));
+                    imp.setSodio(rst.getDouble("pr_sodio"));                    
+                    imp.addProduto(imp.getId());
+                    
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 }

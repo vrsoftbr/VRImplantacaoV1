@@ -33,7 +33,6 @@ public class TstiGUI extends VRInternalFrame {
     private static final String SISTEMA = "Tsti";
     private static final String SERVIDOR_SQL = "MySql";
     private static TstiGUI instance;
-    private TstiDAO dao = new TstiDAO();
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
@@ -331,8 +330,8 @@ public class TstiGUI extends VRInternalFrame {
                         }
                         
                         if (chkPdvVendas.isSelected()) {
-                            dao.setDataInicioVenda((java.sql.Date) edtDtVendaFim.getDate());
-                            dao.setDataTerminoVenda((java.sql.Date) edtDtVendaFim.getDate());
+                            tstiDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                            tstiDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         
@@ -1003,7 +1002,7 @@ public class TstiGUI extends VRInternalFrame {
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(130, Short.MAX_VALUE))
+                .addContainerGap(134, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Vendas", tabVendas);

@@ -130,6 +130,7 @@ public class ProdutoAnteriorDAO {
                     + "                      icmscreditoforaestadoid character varying,\n"
                     + "                      icmsconsumidorid character varying,\n"
                     + "                      dataalteracao timestamp, \n"        
+                    + "                      datacadastro timestamp, \n"        
                     + "                      primary key (impsistema, imploja, impid),\n"
                     + "                      unique (impsistema, imploja, codigosped)\n"
                     + "                );\n"
@@ -317,7 +318,7 @@ public class ProdutoAnteriorDAO {
                     "		ce.importloja = cp.imploja and\n" +
                     "		ce.importid = cp.impid\n" +
                     "where\n" +
-                    "	ce.ean = '" + ean + "' and\n" +
+                    "	ce.ean::bigint = " + ean + " and\n" +
                     "	ce.importsistema = '" + sistema + "' and\n" +
                     "	ce.importloja = '" + loja + "'\n" +
                     "limit 1\n"
@@ -333,6 +334,35 @@ public class ProdutoAnteriorDAO {
         return retorno;
     }
 
+    public int getCodigoAtualEANantCPGestor(String sistema, String loja, String ean) throws Exception {
+        int retorno = -1;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	cp.codigoatual\n" +
+                    "from\n" +
+                    "	implantacao.codant_ean ce\n" +
+                    "	join implantacao.codant_produto cp on\n" +
+                    "		ce.importsistema = cp.impsistema and\n" +
+                    "		ce.importloja = cp.imploja and\n" +
+                    "		ce.importid = cp.impid\n" +
+                    "where\n" +
+                    "	ce.ean::bigint = " + ean + " and\n" +
+                    "	ce.importsistema = '" + sistema + "' and\n" +
+                    "	ce.importloja = '" + loja + "'\n" +
+                    "limit 1\n"
+            )) {
+
+                if (rst.next()) {
+                    retorno = rst.getInt("codigoatual");
+                } else {
+                    retorno = -1;
+                }
+            }
+        }
+        return retorno;
+    }
+    
     public String getCodigoAnteriorCpGestor(String ean) throws Exception {
         String retorno = "-1";
         try (Statement stm = Conexao.createStatement()) {
@@ -702,6 +732,7 @@ public class ProdutoAnteriorDAO {
             sql.put("icmscreditoforaestadoid", anterior.getIcmsCreditoForaEstadoId());
             
             sql.put("icmsconsumidorid", anterior.getIcmsConsumidorId());
+            sql.put("datacadastro", anterior.getDataCadastro());
 
             try {
                 stm.execute(sql.getInsert());

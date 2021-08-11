@@ -558,10 +558,12 @@ public class ProdutoIMP {
         this.piscofinsNaturezaReceita = Utils.stringToInt(piscofinsNaturezaReceita);
     }
 
+    @Deprecated
     public void setIcmsCst(String icmsCst) {
         this.setIcmsCst(Utils.stringToInt(icmsCst));
     }
     
+    @Deprecated
     public void setIcmsCst(int icmsCst) {
         this.icmsCstEntrada = icmsCst;
         this.icmsCstEntradaForaEstado = icmsCst;
@@ -571,6 +573,7 @@ public class ProdutoIMP {
         this.icmsCstConsumidor = icmsCst;
     }
 
+    @Deprecated
     public void setIcmsAliq(double icmsAliq) {
         this.icmsAliqEntrada = icmsAliq;
         this.icmsAliqEntradaForaEstado = icmsAliq;
@@ -580,6 +583,7 @@ public class ProdutoIMP {
         this.icmsAliqConsumidor = icmsAliq;
     }
 
+    @Deprecated
     public void setIcmsReducao(double icmsReducao) {
         this.icmsReducaoEntrada = icmsReducao;
         this.icmsReducaoEntradaForaEstado = icmsReducao;

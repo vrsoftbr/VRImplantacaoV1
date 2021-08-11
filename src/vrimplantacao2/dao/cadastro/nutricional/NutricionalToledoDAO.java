@@ -50,8 +50,8 @@ public class NutricionalToledoDAO {
                     toledo.setPesavel("P");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
                     //toledo.setCodigo(toledo.getNutricional());
                     toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                 } else {
@@ -60,8 +60,8 @@ public class NutricionalToledoDAO {
                     toledo.setPesavel("U");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
-                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    //toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
                     //toledo.setCodigo(toledo.getNutricional());
                     toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                 }

@@ -6,6 +6,7 @@ import java.util.Set;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.parametro.Parametros;
 
 public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
@@ -19,6 +20,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public void setOpcoesDisponiveis(InterfaceDAO dao) {
         this.opt = dao.getOpcoesDisponiveisCliente();
         tabImportacao.removeAll();
+        tabCreditoRotativo.removeAll();
+        tabCheque.removeAll();
 
         if (opt.contains(OpcaoCliente.DADOS)
                 || opt.contains(OpcaoCliente.RAZAO)
@@ -99,6 +102,8 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             chkDataNascimento.setVisible(opt.contains(OpcaoCliente.DATA_NASCIMENTO));
             chkObservacao.setVisible(opt.contains(OpcaoCliente.OBSERVACOES));
             chkObservacao2.setVisible(opt.contains(OpcaoCliente.OBSERVACOES2));
+            chkSexo.setVisible(opt.contains(OpcaoCliente.SEXO));
+            chkEstadoCivil.setVisible(opt.contains(OpcaoCliente.ESTADO_CIVIL));
 
             tabImportacao.add(pnlDadosComplementares);
 
@@ -120,8 +125,26 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         } else {
             pnlDadosEmpresa.setVisible(false);
         }
+        
+        if (opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO)) {            
+            chkCreditoRotativo.setVisible(opt.contains(OpcaoCliente.RECEBER_CREDITOROTATIVO));
+            tabCreditoRotativo.add(pnlCreditoRotativo);
+        } else {
+            pnlCreditoRotativo.setVisible(false);
+            this.remove(tabCreditoRotativo);
+        }
+        
+        if (opt.contains(OpcaoCliente.RECEBER_CHEQUE)) {
+            chkCheque.setVisible(opt.contains(OpcaoCliente.RECEBER_CHEQUE));
+            tabCheque.add(pnlCheque);
+        } else {
+            pnlCheque.setVisible(false);
+            this.remove(tabCheque);
+        }
 
         tabImportacao.revalidate();
+        tabCreditoRotativo.revalidate();
+        tabCheque.revalidate();
     }
 
     public Set<OpcaoCliente> getOpcoesDisponiveis() {
@@ -132,7 +155,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
      * Creates new form ChecksClientePanelGUI
      */
     public ChecksClientePanelGUI() {
-        super();
+        super();        
         initComponents();
     }
 
@@ -235,12 +258,25 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
             if (chkSalario.isSelected()) {
                 opcao.add(OpcaoCliente.SALARIO);
             }
+            if (chkSexo.isSelected()) {
+                opcao.add(OpcaoCliente.SEXO);
+            }
+            if (chkEstadoCivil.isSelected()) {
+                opcao.add(OpcaoCliente.ESTADO_CIVIL);
+            }
 
             if (!opcao.isEmpty()) {
                 importador.atualizarClientePreferencial(opcao.toArray(new OpcaoCliente[]{}));
             }
         }
-
+        
+        if (chkCreditoRotativo.isSelected()) {
+            importador.importarCreditoRotativo();
+        }
+        
+        if (chkCheque.isSelected()) {
+            importador.importarCheque();
+        }
     }
 
     public void executarImportacao() throws Exception {
@@ -297,14 +333,26 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         chkNomeConjuge = new vrframework.bean.checkBox.VRCheckBox();
         chkDataNascimento = new vrframework.bean.checkBox.VRCheckBox();
         chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
+        chkSexo = new vrframework.bean.checkBox.VRCheckBox();
+        chkEstadoCivil = new vrframework.bean.checkBox.VRCheckBox();
         pnlDadosEmpresa = new vrframework.bean.panel.VRPanel();
         jLabel10 = new javax.swing.JLabel();
         chkEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkCargo = new vrframework.bean.checkBox.VRCheckBox();
         chkDataAdmissao = new vrframework.bean.checkBox.VRCheckBox();
         chkSalario = new vrframework.bean.checkBox.VRCheckBox();
+        tabCreditoRotativo = new javax.swing.JPanel();
+        pnlCreditoRotativo = new vrframework.bean.panel.VRPanel();
+        jLabel7 = new javax.swing.JLabel();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        tabCheque = new javax.swing.JPanel();
+        pnlCheque = new vrframework.bean.panel.VRPanel();
+        jLabel11 = new javax.swing.JLabel();
+        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
+
+        setName("tabMain"); // NOI18N
 
         scrollImportação.setBorder(null);
 
@@ -341,7 +389,7 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(chkCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkIE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(808, Short.MAX_VALUE))
+                .addContainerGap(351, Short.MAX_VALUE))
         );
         pnlDadosLayout.setVerticalGroup(
             pnlDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -530,6 +578,12 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkDataCadastro, "Data Cadastro");
         chkDataCadastro.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkSexo, "Sexo");
+        chkSexo.setEnabled(true);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkEstadoCivil, "Estado Cívil");
+        chkEstadoCivil.setEnabled(true);
+
         javax.swing.GroupLayout pnlDadosComplementaresLayout = new javax.swing.GroupLayout(pnlDadosComplementares);
         pnlDadosComplementares.setLayout(pnlDadosComplementaresLayout);
         pnlDadosComplementaresLayout.setHorizontalGroup(
@@ -564,8 +618,13 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(538, Short.MAX_VALUE))
+                        .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSexo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlDadosComplementaresLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlDadosComplementaresLayout.setVerticalGroup(
             pnlDadosComplementaresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -587,7 +646,10 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkNomeConjuge, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkDataNascimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkSexo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chkEstadoCivil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -672,6 +734,96 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
 
         addTab("Importação de Cliente", scrollImportação);
 
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel7, "CREDITO ROTATIVO");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, "Receber Crédito Rotativo");
+        chkCreditoRotativo.setEnabled(true);
+
+        javax.swing.GroupLayout pnlCreditoRotativoLayout = new javax.swing.GroupLayout(pnlCreditoRotativo);
+        pnlCreditoRotativo.setLayout(pnlCreditoRotativoLayout);
+        pnlCreditoRotativoLayout.setHorizontalGroup(
+            pnlCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCreditoRotativoLayout.createSequentialGroup()
+                .addGroup(pnlCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCreditoRotativoLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel7))
+                    .addGroup(pnlCreditoRotativoLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(579, Short.MAX_VALUE))
+        );
+        pnlCreditoRotativoLayout.setVerticalGroup(
+            pnlCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCreditoRotativoLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabCreditoRotativoLayout = new javax.swing.GroupLayout(tabCreditoRotativo);
+        tabCreditoRotativo.setLayout(tabCreditoRotativoLayout);
+        tabCreditoRotativoLayout.setHorizontalGroup(
+            tabCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlCreditoRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabCreditoRotativoLayout.setVerticalGroup(
+            tabCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabCreditoRotativoLayout.createSequentialGroup()
+                .addComponent(pnlCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 327, Short.MAX_VALUE))
+        );
+
+        addTab("Importação Crédito Rotativo", tabCreditoRotativo);
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, "CHEQUE");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCheque, "Receber Cheque");
+        chkCheque.setEnabled(true);
+
+        javax.swing.GroupLayout pnlChequeLayout = new javax.swing.GroupLayout(pnlCheque);
+        pnlCheque.setLayout(pnlChequeLayout);
+        pnlChequeLayout.setHorizontalGroup(
+            pnlChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlChequeLayout.createSequentialGroup()
+                .addGroup(pnlChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlChequeLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel11))
+                    .addGroup(pnlChequeLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(626, Short.MAX_VALUE))
+        );
+        pnlChequeLayout.setVerticalGroup(
+            pnlChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlChequeLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabChequeLayout = new javax.swing.GroupLayout(tabCheque);
+        tabCheque.setLayout(tabChequeLayout);
+        tabChequeLayout.setHorizontalGroup(
+            tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnlCheque, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        tabChequeLayout.setVerticalGroup(
+            tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabChequeLayout.createSequentialGroup()
+                .addComponent(pnlCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 327, Short.MAX_VALUE))
+        );
+
+        addTab("Receber Cheque", tabCheque);
+
         getAccessibleContext().setAccessibleName("Importação de Clientes");
     }// </editor-fold>//GEN-END:initComponents
 
@@ -687,16 +839,19 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkCargo;
     public vrframework.bean.checkBox.VRCheckBox chkCelular;
     public vrframework.bean.checkBox.VRCheckBox chkCep;
+    public vrframework.bean.checkBox.VRCheckBox chkCheque;
     public vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     public vrframework.bean.checkBox.VRCheckBox chkCnpj;
     public vrframework.bean.checkBox.VRCheckBox chkComplemento;
     public vrframework.bean.checkBox.VRCheckBox chkContatoAdicional;
+    public vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     public vrframework.bean.checkBox.VRCheckBox chkDataAdmissao;
     public vrframework.bean.checkBox.VRCheckBox chkDataCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkDataNascimento;
     public vrframework.bean.checkBox.VRCheckBox chkEmail;
     public vrframework.bean.checkBox.VRCheckBox chkEmpresa;
     public vrframework.bean.checkBox.VRCheckBox chkEndereco;
+    public vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
     public vrframework.bean.checkBox.VRCheckBox chkIE;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipio;
     public vrframework.bean.checkBox.VRCheckBox chkMunicipioIbge;
@@ -710,24 +865,39 @@ public class ChecksClientePanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPermiteCheque;
     public vrframework.bean.checkBox.VRCheckBox chkPermiteCreditoRotativo;
     public vrframework.bean.checkBox.VRCheckBox chkSalario;
+    public vrframework.bean.checkBox.VRCheckBox chkSexo;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
     public vrframework.bean.checkBox.VRCheckBox chkTelefone;
     public vrframework.bean.checkBox.VRCheckBox chkUf;
     public vrframework.bean.checkBox.VRCheckBox chkUfIbge;
     public vrframework.bean.checkBox.VRCheckBox chkValorLimite;
     public javax.swing.JLabel jLabel10;
+    public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
+    public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
+    public vrframework.bean.panel.VRPanel pnlCheque;
     public vrframework.bean.panel.VRPanel pnlContato;
+    public vrframework.bean.panel.VRPanel pnlCreditoRotativo;
     public vrframework.bean.panel.VRPanel pnlDados;
     public vrframework.bean.panel.VRPanel pnlDadosComplementares;
     public vrframework.bean.panel.VRPanel pnlDadosEmpresa;
     public vrframework.bean.panel.VRPanel pnlEndereco;
     public javax.swing.JScrollPane scrollImportação;
+    public javax.swing.JPanel tabCheque;
+    public javax.swing.JPanel tabCreditoRotativo;
     public vrframework.bean.panel.VRPanel tabImportacao;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
+
+    public void gravarParametros(Parametros params, String... keys) {
+        
+    }
+
+    public void carregarParametros(Parametros params, String... keys) {
+        
+    }
 
 }

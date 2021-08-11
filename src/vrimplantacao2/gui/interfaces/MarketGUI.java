@@ -67,11 +67,6 @@ public class MarketGUI extends VRInternalFrame {
             params.put(vr.id, NOME_SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
-        ItemComboVO tipoPlanoContas = (ItemComboVO) cmbPlanoContas.getSelectedItem();
-        if (tipoPlanoContas != null) {
-            params.put(tipoPlanoContas.id, "Market", "TIPO_PLANO_CONTAS");
-            vPlanoContas = tipoPlanoContas.id;
-        }
         params.salvar();
     }
     
@@ -133,7 +128,6 @@ public class MarketGUI extends VRInternalFrame {
         btnMapaTrib.setEnabled(true);
         carregarLojaVR();
         carregarLojaCliente();
-        carregaPlanoContas();
         gravarParametros();
     }
 
@@ -165,21 +159,6 @@ public class MarketGUI extends VRInternalFrame {
         cmbLojaOrigem.setSelectedIndex(index);
     }
     
-    public void carregaPlanoContas() throws Exception {
-        cmbPlanoContas.setModel(new DefaultComboBoxModel());
-        int cont = 0;
-        int index = 0;
-        
-        for (ItemComboVO vo : marketDAO.getPlanoContas()) {
-            cmbPlanoContas.addItem(vo);
-            if (vo.id == vPlanoContas) {
-                index = cont;
-            }
-            cont ++;
-        }
-        cmbPlanoContas.setSelectedIndex(index);
-    }
-    
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
@@ -193,7 +172,6 @@ public class MarketGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     marketDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
-                    marketDAO.vPlanoContas = ((ItemComboVO) cmbPlanoContas.getSelectedItem()).id;
                     
                     if((!"".equals(txtLojaMesmoID.getText())) && (!txtLojaMesmoID.getText().isEmpty())) {
                         marketDAO.lojaMesmoID = " - " + txtLojaMesmoID.getText();
@@ -405,8 +383,6 @@ public class MarketGUI extends VRInternalFrame {
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
-        cmbPlanoContas = new vrframework.bean.comboBox.VRComboBox();
-        lblPlanoContas = new vrframework.bean.label.VRLabel();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -434,20 +410,20 @@ public class MarketGUI extends VRInternalFrame {
 
         setTitle("Market");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -762,8 +738,6 @@ public class MarketGUI extends VRInternalFrame {
 
         chkCheque.setText("Cheque");
 
-        lblPlanoContas.setText("Plano de Contas");
-
         javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
         tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
         tablCreditoRotativoLayout.setHorizontalGroup(
@@ -772,10 +746,8 @@ public class MarketGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(237, Short.MAX_VALUE))
+                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(373, Short.MAX_VALUE))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -784,11 +756,7 @@ public class MarketGUI extends VRInternalFrame {
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(116, Short.MAX_VALUE))
+                .addContainerGap(164, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
@@ -1109,8 +1077,6 @@ public class MarketGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private vrframework.bean.comboBox.VRComboBox cmbPlanoContas;
-    private vrframework.bean.label.VRLabel lblPlanoContas;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private javax.swing.JPanel pnlImpProd;

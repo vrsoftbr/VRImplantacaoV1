@@ -58,7 +58,7 @@ public class KeyListTest {
         assertFalse(key2.equals(key3));
         assertFalse(key4.equals(key5));
         assertFalse(key4.equals(key6));
-        assertTrue(key7.equals(key8));
+        assertFalse(key7.equals(key8));
     }
     
 }

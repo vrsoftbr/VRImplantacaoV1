@@ -17,6 +17,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -71,7 +72,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.MARGEM
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA,
                 }
         ));
     }
@@ -473,7 +475,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "    pf.id,\n"
                     + "    f.i_numero id_fornecedor,\n"
-                    + "    p.id id_produto,\n"
+                    + "    p.codigo_interno id_produto,\n"
                     + "    case when s_sequencial = '' then p.codigo_interno\n"
                     + "    else s_sequencial end as codexterno,\n"
                     + "    i_embalagem embalagem,\n"
@@ -562,11 +564,15 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setCnpj(rs.getString("cpf"));
                     }
-
-                    imp.setInscricaoestadual(rs.getString("insc_estadual"));
-                    if (imp.getInscricaoestadual() == null && "".equals(imp.getInscricaoestadual())) {
+                    
+                    String ie = rs.getString("insc_estadual");
+                    
+                    if (ie != null && !"".equals(ie)) {
+                        imp.setInscricaoestadual(ie);
+                    } else {
                         imp.setInscricaoestadual(rs.getString("rg"));
                     }
+                    
                     imp.setTelefone(rs.getString("ddd") + rs.getString("telefone"));
                     imp.setCelular(rs.getString("ddd") + rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
@@ -578,6 +584,35 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            StringBuilder builder = new StringBuilder();
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rst.getString("CTRID"));
+                    imp.setNumeroCupom(rst.getString("ctrnum"));
+                    imp.setIdCliente(rst.getString("clicod"));
+                    imp.setEcf(rst.getString("cxanum"));
+                    imp.setDataEmissao(rst.getDate("ctrdatemi"));
+                    imp.setDataVencimento(rst.getDate("ctrdatvnc"));
+                    imp.setValor(rst.getDouble("ctrvlrdev"));
+                    imp.setObservacao(rst.getString("ctrobs"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 }

@@ -10,6 +10,20 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 public class ProdutoAnteriorVO {
 
     /**
+     * @return the dataCadastro
+     */
+    public Date getDataCadastro() {
+        return dataCadastro;
+    }
+
+    /**
+     * @param dataCadastro the dataCadastro to set
+     */
+    public void setDataCadastro(Date dataCadastro) {
+        this.dataCadastro = dataCadastro;
+    }
+
+    /**
      * @return the dataHoraAlteracao
      */
     public Date getDataHoraAlteracao() {
@@ -412,6 +426,7 @@ public class ProdutoAnteriorVO {
     private double icmsAliqEntradaForaEstado = -1;
     private double icmsReducaoEntradaForaEstado = -1;
     private Date dataHoraAlteracao;
+    private Date dataCadastro;
     
     
     private final MultiMap<String, ProdutoAnteriorEanVO> eans = new MultiMap<>(

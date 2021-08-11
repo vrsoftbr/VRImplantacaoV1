@@ -111,7 +111,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PESAVEL,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
-            OpcaoProduto.VALIDADE
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
         }));
     }
     
@@ -182,7 +183,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                             val(sheet, 0, i).matches("[0-9]+") &&
                             val(sheet, 1, i).matches("[0-9]+") &&
-                            !val(sheet, 5, i).equals("")
+                            !val(sheet, 4, i).equals("")
                     ) {
                         if (tributos.add(val(sheet, 10, i))) {
                             LOG.fine("Tributo '" + val(sheet, 10, i) + "' incluso!");
@@ -233,11 +234,11 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     linha++;
                     if (
                             val(sh, 1, i).matches("[0-9]+") &&
-                            !val(sh, 6, i).equals("") &&
-                            val(sh, 8, i).matches("[0-9]+") &&
-                            !val(sh, 10, i).equals("")
+                            !val(sh, 7, i).equals("") &&
+                            val(sh, 9, i).matches("[0-9]+") &&
+                            !val(sh, 11, i).equals("")
                     ) {
-                        result.put(val(sh, 1, i), Utils.stringToInt(val(sh, 8, i)));
+                        result.put(val(sh, 1, i), Utils.stringToInt(val(sh, 9, i)));
                     }
                     
                     ProgressBar.next();
@@ -378,14 +379,14 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(sheet.getCell(0, i).getContents());
                         imp.setEan(sheet.getCell(2, i).getContents());
-                        imp.setDescricaoCompleta(sheet.getCell(7, i).getContents());
-                        imp.setDescricaoReduzida(sheet.getCell(7, i).getContents());
-                        imp.setDescricaoGondola(sheet.getCell(7, i).getContents());
-                        imp.setQtdEmbalagemCotacao(Utils.stringToInt(sheet.getCell(10, i).getContents(), 1));
-                        imp.setEstoque(Utils.stringToDouble(sheet.getCell(13, i).getContents()));
-                        imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
-                        imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
-                        imp.setPrecovenda(Utils.stringToDouble(sheet.getCell(16, i).getContents()));
+                        imp.setDescricaoCompleta(sheet.getCell(6, i).getContents());
+                        imp.setDescricaoReduzida(sheet.getCell(6, i).getContents());
+                        imp.setDescricaoGondola(sheet.getCell(6, i).getContents());
+                        imp.setQtdEmbalagemCotacao(Utils.stringToInt(sheet.getCell(9, i).getContents(), 1));
+                        imp.setEstoque(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
+                        imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(15, i).getContents()));
+                        imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(15, i).getContents()));
+                        imp.setPrecovenda(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
                         imp.setCodMercadologico1(centroReceita);
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);
@@ -523,21 +524,25 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                             val(sh, 0, i).matches("[0-9]+") &&
                             val(sh, 1, i).matches("[0-9]+") &&
-                            !val(sh, 5, i).equals("")
+                            !val(sh, 4, i).equals("")
                     ) {
                         ProdutoIMP imp = produtos.get(val(sh, 0, i),val(sh, 1, i));
                     
                         if (!imp.isBalanca()) {
                             imp.setTipoEmbalagem(val(sh,6,i));
                         }
-                        imp.setDescricaoCompleta(val(sh,5,i));
+                        imp.setDescricaoCompleta(val(sh,4,i));
                         imp.setNcm(val(sh,7,i));
+                        imp.setIcmsConsumidorId(val(sh,10, i));
                         imp.setIcmsDebitoId(val(sh,10, i));
                         imp.setIcmsCreditoId(val(sh,10, i));
-                        imp.setPiscofinsCstCredito(val(sh,11,i));
-                        imp.setPiscofinsCstDebito(val(sh,12,i));
-                        imp.setPiscofinsNaturezaReceita(val(sh,16,i));
-                        imp.setCest(val(sh,17,i));
+                        imp.setIcmsDebitoForaEstadoId(val(sh,10, i));
+                        imp.setIcmsDebitoForaEstadoNfId(val(sh,10, i));
+                        imp.setIcmsCreditoForaEstadoId(val(sh,10, i));
+                        imp.setPiscofinsCstCredito(val(sh,15,i));
+                        imp.setPiscofinsCstDebito(val(sh,16,i));
+                        imp.setPiscofinsNaturezaReceita(val(sh,19,i));
+                        imp.setCest(val(sh,20,i));
                     }
                     
                     ProgressBar.next();
@@ -578,6 +583,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (imp != null) {
                         result.add(imp);
                     }
+                    
                     imp = new FornecedorIMP();
                     if (inativacao) {
                         imp.setAtivo(false);
@@ -665,6 +671,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             }
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println(linha);
             throw ex;
         }

@@ -41,7 +41,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  */
 public class InfoMacDAO extends InterfaceDAO {
 
-    private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(InfoMacDAO.class.getName());
 
     private List<PlanoConta> planosSelecionados;
     private boolean importarDeClientes = true;
