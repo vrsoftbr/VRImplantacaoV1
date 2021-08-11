@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.produto2;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -254,9 +255,26 @@ public class ProdutoRepositoryTest {
         imp.setIcmsCstEntrada(10);
         imp.setIcmsAliqEntrada(0);
         imp.setIcmsReducaoEntrada(0);
+        
+        imp.setIcmsCstEntradaForaEstado(10);
+        imp.setIcmsAliqEntradaForaEstado(0);
+        imp.setIcmsReducaoEntradaForaEstado(0);
+        
         imp.setIcmsCstSaida(20);
         imp.setIcmsAliqSaida(18);
         imp.setIcmsReducaoSaida(61.11);
+        
+        imp.setIcmsCstSaidaForaEstado(20);
+        imp.setIcmsAliqSaidaForaEstado(18);
+        imp.setIcmsReducaoSaidaForaEstado(61.11);
+        
+        imp.setIcmsCstSaidaForaEstadoNF(20);
+        imp.setIcmsAliqSaidaForaEstadoNF(18);
+        imp.setIcmsReducaoSaidaForaEstadoNF(61.11);
+        
+        imp.setIcmsCstConsumidor(20);
+        imp.setIcmsAliqConsumidor(18);
+        imp.setIcmsReducaoConsumidor(61.11);
         
         return imp;
     }
@@ -402,11 +420,11 @@ public class ProdutoRepositoryTest {
         assertEquals(61.11, actual.getAliquotaDebitoForaEstadoNf().getReduzido(), 0.01);
         assertEquals(18, actual.getAliquotaDebitoForaEstadoNf().getAliquota(), 0.01);
         
-        assertEquals(0, actual.getAliquotaConsumidor().getCst());
-        assertEquals(0, actual.getAliquotaConsumidor().getId());
-        assertEquals("07%", actual.getAliquotaConsumidor().getDescricao());
-        assertEquals(0, actual.getAliquotaConsumidor().getReduzido(), 0.01);
-        assertEquals(7, actual.getAliquotaConsumidor().getAliquota(), 0.01);    
+        assertEquals(20, actual.getAliquotaConsumidor().getCst());
+        assertEquals(4, actual.getAliquotaConsumidor().getId());
+        assertEquals("18% RED 61.11", actual.getAliquotaConsumidor().getDescricao());
+        assertEquals(61.11, actual.getAliquotaConsumidor().getReduzido(), 0.01);
+        assertEquals(18, actual.getAliquotaConsumidor().getAliquota(), 0.01);    
     }
     
     @Test
@@ -444,11 +462,11 @@ public class ProdutoRepositoryTest {
         assertEquals(61.11, actual.getAliquotaDebitoForaEstadoNf().getReduzido(), 0.01);
         assertEquals(18, actual.getAliquotaDebitoForaEstadoNf().getAliquota(), 0.01);
         
-        assertEquals(0, actual.getAliquotaConsumidor().getCst());
-        assertEquals(0, actual.getAliquotaConsumidor().getId());
-        assertEquals("07%", actual.getAliquotaConsumidor().getDescricao());
-        assertEquals(0, actual.getAliquotaConsumidor().getReduzido(), 0.01);
-        assertEquals(7, actual.getAliquotaConsumidor().getAliquota(), 0.01);    
+        assertEquals(20, actual.getAliquotaConsumidor().getCst());
+        assertEquals(4, actual.getAliquotaConsumidor().getId());
+        assertEquals("18% RED 61.11", actual.getAliquotaConsumidor().getDescricao());
+        assertEquals(61.11, actual.getAliquotaConsumidor().getReduzido(), 0.01);
+        assertEquals(18, actual.getAliquotaConsumidor().getAliquota(), 0.01);    
     }
     
     @Test
@@ -893,4 +911,67 @@ public class ProdutoRepositoryTest {
         assertEquals("789654",rep.resetarIds(ids[2], bal[2]));
         assertEquals("2",rep.resetarIds(ids[3], bal[3]));
     }
+    
+    @Test
+    public void filtrarSomenteAtivos() throws Exception {
+        ProdutoRepository rep = new ProdutoRepository(provider);
+        
+        List<ProdutoIMP> imps = new ArrayList<>();
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("1");
+            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+            imps.add(imp);
+        }
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("1");
+            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+            imps.add(imp);
+        }
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("3");
+            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+            imps.add(imp);
+        }
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("5");
+            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+            imps.add(imp);
+        }
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("2");
+            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+            imps.add(imp);
+        }
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("4");
+            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+            imps.add(imp);
+        }   
+        {
+            ProdutoIMP imp = new ProdutoIMP();
+            imp.setImportId("6");
+            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+            imps.add(imp);
+        }     
+        
+        imps = rep.filtrarProdutosInativos(imps);
+        
+        assertEquals(4, imps.size());
+        assertEquals("1", imps.get(0).getImportId());
+        assertEquals(SituacaoCadastro.ATIVO, imps.get(0).getSituacaoCadastro());
+        assertEquals("3", imps.get(1).getImportId());
+        assertEquals(SituacaoCadastro.ATIVO, imps.get(1).getSituacaoCadastro());
+        assertEquals("2", imps.get(2).getImportId());
+        assertEquals(SituacaoCadastro.ATIVO, imps.get(2).getSituacaoCadastro());
+        assertEquals("4", imps.get(3).getImportId());
+        assertEquals(SituacaoCadastro.ATIVO, imps.get(3).getSituacaoCadastro());
+        
+    }
+    
 }

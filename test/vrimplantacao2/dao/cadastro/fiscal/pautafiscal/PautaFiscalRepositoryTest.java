@@ -12,11 +12,13 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import static vrimplantacao2.dao.cadastro.fiscal.pautafiscal.PautaFiscalRepositoryClasses.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
@@ -142,6 +144,13 @@ public class PautaFiscalRepositoryTest {
         imps.add(getImp2());
         
         PautaFiscalRepository rep = new PautaFiscalRepository(provider);
+        
+        Parametros.setFactory(new Parametros.Factory() {
+            @Override
+            public Parametros newInstance() {
+                return mock(Parametros.class, withSettings().defaultAnswer(Answers.RETURNS_DEEP_STUBS));
+            }
+        });        
         
         rep.importar(imps, EnumSet.of(OpcaoFiscal.NOVOS));
         
