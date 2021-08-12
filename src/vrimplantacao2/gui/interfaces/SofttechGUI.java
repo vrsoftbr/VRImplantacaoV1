@@ -52,6 +52,10 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         super(i_mdiFrame);
         initComponents();
         
+        /**
+         * fantastsoftace
+         * FaN_951753_@aCCe# 
+         */
         conexao.host = ("localhost");
         conexao.database = ("fs-gerencial");
         conexao.user = ("fantastsoft");

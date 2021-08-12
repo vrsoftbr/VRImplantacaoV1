@@ -179,7 +179,7 @@ public class AutoMacDAO
                     if(imp.isBalanca() &&
                                 ean != 0 &&
                                     ean <= 999999) {
-                        imp.setEan(imp.getImportId());
+                        imp.setEan(String.valueOf(ean));
                     }
                     
                     imp.setValidade(rs.getInt("validade"));
@@ -386,7 +386,7 @@ public class AutoMacDAO
                     imp.setId(rs.getString("codigo"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("apelido"));
-                    imp.setCnpj(rs.getString("cnjcpf"));
+                    imp.setCnpj(rs.getString("cnpjcpf"));
                     imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("end_numero"));
