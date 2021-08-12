@@ -5,10 +5,12 @@
  */
 package vrimplantacao2_5.service.cadastro;
 
+import java.util.List;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.provider.ConexaoProvider;
+import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 
 /**
  *
@@ -49,6 +51,18 @@ public class BancoDadosService {
             Util.exibirMensagemErro(ex, getTitle());
             provider.rollback();
         }
+    }
+    
+    public List<BancoDadosVO> consultar() {
+        List<BancoDadosVO> result = null;
+        
+        try {
+            result = bancoDadosDAO.consultar();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Consulta Banco de Dados");
+        }
+        
+        return result;
     }
     
     private String getTitle() {

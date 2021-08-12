@@ -108,4 +108,26 @@ public class BancoDadosDAO {
             }
         }
     }
+
+    public List<BancoDadosVO> consultar() throws Exception {
+        List<BancoDadosVO> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id, "
+                    + "nome "
+                    + "from implantacao2_5.bancodados"
+                    + "order by 2"
+            )) {
+                while (rst.next()) {
+                    BancoDadosVO vo = new BancoDadosVO();
+                    vo.setId(rst.getInt("id"));
+                    vo.setNome(rst.getString("nome"));
+                    result.add(vo);
+                }
+            }
+            return result;
+        }
+    }
 }
