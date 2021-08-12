@@ -209,7 +209,8 @@ public enum ESistema {
     ZOOMBOX(194, "ZOOMBOX"),
     ZPF(195, "ZPF"),
     LINEAR(196, "LINEAR"),
-    ARIUS(197, "ARIUS");
+    ARIUS(197, "ARIUS"),
+    SUPERCONTROLE(198, "SUPERCONTROLE");
 
     private int id;
     private String nome;
