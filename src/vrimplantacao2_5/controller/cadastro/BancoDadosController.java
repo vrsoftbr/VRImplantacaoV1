@@ -1,4 +1,4 @@
-package vrimplantacao2_5.gui.cadastro;
+package vrimplantacao2_5.controller.cadastro;
 
 import vrimplantacao2_5.service.cadastro.BancoDadosService;
 
