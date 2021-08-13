@@ -9,7 +9,6 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrimplantacao2_5.controller.cadastro.BancoDadosController;
-import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 
 /**
@@ -138,8 +137,8 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
     }//GEN-LAST:event_tblConsultaBancoDadosMouseClicked
 
     private void btnInserirConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexaoActionPerformed
-        ConsultaBancoDadosGUI.consultaBancoDadosGUI = this;
-        ConfiguracaoBaseDadosGUI.exibir(mdiFrame);
+        CadastroBancoDadosGUI.consultaBancoDadosGUI = this;
+        CadastroBancoDadosGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirConexaoActionPerformed
 
 
