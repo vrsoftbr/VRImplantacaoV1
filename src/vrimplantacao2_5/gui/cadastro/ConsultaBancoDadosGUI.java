@@ -9,11 +9,8 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrimplantacao2_5.controller.cadastro.BancoDadosController;
-import vrimplantacao2_5.controller.cadastro.configuracao.ConsultaConfiguracaoBaseDadosController;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
-import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
 /**
  *
@@ -23,11 +20,7 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
     
     private static ConsultaBancoDadosGUI consultaBancoDadosGUI = null;
     public BancoDadosController controller = null;
-    
-    
-    private ConfiguracaoBaseDadosGUI configuracaoBancoDados = null;
-    
-    private ConfiguracaoBaseDadosVO configuracaoVO; 
+    private BancoDadosVO bancoDadosVO; 
 
     /**
      * Creates new form ConsultaConfiguracaoBaseDadosGUI
@@ -43,7 +36,7 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
     
     private void setConfiguracao() throws Exception {
         centralizarForm();
-        setTitle("Consulta Configuração Base de Dados");
+        setTitle("Consulta Banco de Dados");
         
         controller = new BancoDadosController(this);
         configurarColuna();
@@ -53,9 +46,9 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
     private void configurarColuna() throws Exception {
         List<VRColumnTable> column = new ArrayList();
 
-        column.add(new VRColumnTable("Nome", true, SwingConstants.LEFT, false, null));
+        column.add(new VRColumnTable("Nome", true, SwingConstants.LEFT, false, null));        
 
-        tblConsultaConexao.configurarColuna(column, this, "Consulta", "");
+        tblConsultaBancoDados.configurarColuna(column, this, "Consulta", "");
     }
     
     @Override
@@ -69,38 +62,38 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
             i++;
         }
 
-        tblConsultaConexao.setRowHeight(20);
-        tblConsultaConexao.setModel(dados);
+        tblConsultaBancoDados.setRowHeight(20);
+        tblConsultaBancoDados.setModel(dados);
     }
 
     @Override
     public void editar() {
-        configuracaoVO = new ConfiguracaoBaseDadosVO();
+        bancoDadosVO = new BancoDadosVO();
         
-        if(tblConsultaConexao.getLinhaSelecionada() == -1) {
+        if(tblConsultaBancoDados.getLinhaSelecionada() == -1) {
             return;
         }
         
-        configuracaoVO = controller.getConexao().get(tblConsultaConexao.getLinhaSelecionada());
+        bancoDadosVO = controller.getBancoDados().get(tblConsultaBancoDados.getLinhaSelecionada());
         
-        exibirConfiguracao(mdiFrame);
+        //exibirConfiguracao(mdiFrame);
     }
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tblConsultaConexao = new vrframework.bean.tableEx.VRTableEx();
+        tblConsultaBancoDados = new vrframework.bean.tableEx.VRTableEx();
         btnInserirConexao = new vrframework.bean.button.VRButton();
 
-        tblConsultaConexao.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblConsultaBancoDados.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblConsultaConexaoMouseClicked(evt);
+                tblConsultaBancoDadosMouseClicked(evt);
             }
         });
 
         btnInserirConexao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao, "Cadastrar Conexão");
+        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao, "Cadastrar Banco de Dados");
         btnInserirConexao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInserirConexaoActionPerformed(evt);
@@ -114,7 +107,7 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tblConsultaConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
+                    .addComponent(tblConsultaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -126,19 +119,14 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tblConsultaConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+                .addComponent(tblConsultaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnInserirConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexaoActionPerformed
-        ConfiguracaoBaseDadosGUI.consultaConfiguracaoBancoDadosGUI = this;
-        ConfiguracaoBaseDadosGUI.exibir(mdiFrame);
-    }//GEN-LAST:event_btnInserirConexaoActionPerformed
-
-    private void tblConsultaConexaoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaConexaoMouseClicked
+    private void tblConsultaBancoDadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaBancoDadosMouseClicked
         if (evt.getClickCount() > 1) {
             try {
                 editar();
@@ -147,45 +135,33 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
                 Exceptions.printStackTrace(ex);
             }
         }
-    }//GEN-LAST:event_tblConsultaConexaoMouseClicked
+    }//GEN-LAST:event_tblConsultaBancoDadosMouseClicked
+
+    private void btnInserirConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexaoActionPerformed
+        ConsultaBancoDadosGUI.consultaBancoDadosGUI = this;
+        ConfiguracaoBaseDadosGUI.exibir(mdiFrame);
+    }//GEN-LAST:event_btnInserirConexaoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnInserirConexao;
-    private vrframework.bean.tableEx.VRTableEx tblConsultaConexao;
+    private vrframework.bean.tableEx.VRTableEx tblConsultaBancoDados;
     // End of variables declaration//GEN-END:variables
 
     public static void exibir(VRMdiFrame menuGUI) {
         try {
             menuGUI.setWaitCursor();     
             
-            if (consultaConfiguracaoBaseDadosGUI == null || consultaConfiguracaoBaseDadosGUI.isClosed()) {
-                consultaConfiguracaoBaseDadosGUI = new ConsultaConfiguracaoBaseDadosGUI(menuGUI);
+            if (consultaBancoDadosGUI == null || consultaBancoDadosGUI.isClosed()) {
+                consultaBancoDadosGUI = new ConsultaBancoDadosGUI(menuGUI);
             }
 
-            consultaConfiguracaoBaseDadosGUI.setVisible(true);
+            consultaBancoDadosGUI.setVisible(true);
         } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Consulta Configuração de Base de Dados");
+            Util.exibirMensagemErro(ex, "Consulta Banco de Dados");
         } finally {
             menuGUI.setDefaultCursor();
         }
     }
     
-    private void exibirConfiguracao(VRMdiFrame menuGUI) {
-        try {
-            menuGUI.setWaitCursor();     
-            
-            if (configuracaoBancoDados == null || configuracaoBancoDados.isClosed()) {
-                configuracaoBancoDados = new ConfiguracaoBaseDadosGUI(menuGUI);
-            }
-            
-            ConfiguracaoBaseDadosGUI.consultaConfiguracaoBancoDadosGUI = this;
-            configuracaoBancoDados.editar(this.configuracaoVO);
-            configuracaoBancoDados.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Configuração de Base de Dados");
-        } finally {
-            menuGUI.setDefaultCursor();
-        }
-    }
 }

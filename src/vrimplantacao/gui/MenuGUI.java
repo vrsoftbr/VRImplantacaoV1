@@ -308,6 +308,7 @@ import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.gui.cadastro.ConsultaBancoDadosGUI;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
@@ -607,6 +608,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCadastro = new javax.swing.JMenu();
         mnuLoja = new javax.swing.JMenuItem();
         mnuAjuda1 = new javax.swing.JMenu();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
         mnuCadastros = new javax.swing.JMenu();
         mnuMapeamentoDeLojas = new javax.swing.JMenuItem();
         mnuInterface = new javax.swing.JMenu();
@@ -1103,6 +1106,18 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMenu.add(mnuCadastro);
 
         mnuAjuda1.setText("Importação 2.5");
+
+        jMenu1.setText("Cadastro");
+
+        jMenuItem7.setText("Banco de Dados");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem7);
+
+        mnuAjuda1.add(jMenu1);
 
         mnuCadastros.setText("Configuração");
 
@@ -5391,11 +5406,17 @@ public final class MenuGUI extends VRMdiFrame {
         DTComPlanilhaGUI.exibir(this);
     }//GEN-LAST:event_mnuDTComActionPerformed
 
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+        ConsultaBancoDadosGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
@@ -5414,6 +5435,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItemActive;
     private javax.swing.JMenuItem jMenuItemArius;

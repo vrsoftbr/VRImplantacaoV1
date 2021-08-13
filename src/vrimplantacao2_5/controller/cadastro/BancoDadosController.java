@@ -12,7 +12,7 @@ import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 public class BancoDadosController {
     
     private final BancoDadosService bancoDadosService = new BancoDadosService();
-    private ConsultaBancoDadosGUI consultaBancoDadosGUI;
+    private ConsultaBancoDadosGUI consultaBancoDadosGUI = null;
     private List<BancoDadosVO> bancoDados = null;
     
     public BancoDadosController() {
@@ -28,7 +28,7 @@ public class BancoDadosController {
     }
     
     public void consultar() throws Exception {
-        bancoDadosService.consultar();
+        this.bancoDados = bancoDadosService.consultar();
         consultaBancoDadosGUI.consultar();
     }
     

@@ -100,8 +100,8 @@ public class BancoDadosDAO {
     public boolean existeBancoDados(String nome) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select nome "
-                    + "from implantacao2_5.bancodados "
+                    "select nome\n"
+                    + "from implantacao2_5.bancodados\n"
                     + "where nome = '" + nome + "'"
             )) {
                 return rst.next();
@@ -114,10 +114,10 @@ public class BancoDadosDAO {
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "id, "
-                    + "nome "
-                    + "from implantacao2_5.bancodados"
+                    "select\n"
+                    + "id,\n"
+                    + "nome\n"
+                    + "from implantacao2_5.bancodados\n"
                     + "order by 2"
             )) {
                 while (rst.next()) {
