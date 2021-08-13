@@ -95,6 +95,10 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.ICMS,
+                OpcaoProduto.ICMS_ENTRADA,
+                OpcaoProduto.ICMS_CONSUMIDOR,
+                OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+                OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.PAUTA_FISCAL,
@@ -372,6 +376,11 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setPiscofinsNaturezaReceita(rst.getString("PIS_NAT_REC"));
                     imp.setIcmsDebitoId(rst.getString("ICMS"));
                     imp.setIcmsCreditoId(rst.getString("ICMS"));
+                    imp.setIcmsConsumidorId(rst.getString("ICMS"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("ICMS"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("ICMS"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("ICMS"));
+                    
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
 
                     imp.setEstoque(rst.getDouble("estoque"));
