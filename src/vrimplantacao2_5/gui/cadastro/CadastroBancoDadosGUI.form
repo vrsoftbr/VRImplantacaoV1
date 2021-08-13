@@ -104,7 +104,7 @@
                           <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="330" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="txtDescricao" max="32767" attributes="0"/>
+                      <Component id="txtNomeBancoDados" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -121,7 +121,7 @@
                               <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDescricao" min="-2" pref="20" max="-2" attributes="0"/>
+                          <Component id="txtNomeBancoDados" min="-2" pref="20" max="-2" attributes="0"/>
                       </Group>
                       <Component id="txtCodigo" min="-2" pref="20" max="-2" attributes="0"/>
                   </Group>
@@ -143,7 +143,7 @@
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtDescricao">
+        <Component class="vrframework.bean.textField.VRTextField" name="txtNomeBancoDados">
           <Properties>
             <Property name="columns" type="int" value="25"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
@@ -158,8 +158,8 @@
             <Property name="obrigatorio" type="boolean" value="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtCodigoActionPerformed"/>
             <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtCodigoFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtCodigoActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

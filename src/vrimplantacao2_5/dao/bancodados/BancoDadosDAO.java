@@ -84,16 +84,24 @@ public class BancoDadosDAO {
         return bdVO;
     }
 
-    public void salvar(String nome) throws Exception {
+    public void salvar(BancoDadosVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
         sql.setSchema("implantacao2_5");
         sql.setTableName("bancodados");
 
-        sql.put("nome", nome);
+        sql.put("nome", vo.getNome());
+        
+        sql.getReturning().add("id");
 
-        try (Statement stm = Conexao.createStatement()) {
-            stm.execute(sql.toString());
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
+                    if (rst.next()) {
+                        vo.setId(rst.getInt("id"));
+                    }
+                }                
+            }
         }
     }
 

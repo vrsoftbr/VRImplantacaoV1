@@ -23,8 +23,8 @@ public class BancoDadosController {
         this.consultaBancoDadosGUI = consultaBancoDadosGUI;
     }
     
-    public void salvar(String nome) throws Exception {
-        bancoDadosService.salvar(nome);
+    public void salvar(BancoDadosVO vo) throws Exception {
+        bancoDadosService.salvar(vo);
     }
     
     public void consultar() throws Exception {
