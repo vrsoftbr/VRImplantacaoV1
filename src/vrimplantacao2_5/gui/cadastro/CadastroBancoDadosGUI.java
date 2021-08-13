@@ -6,6 +6,7 @@ import vrframework.classe.Util;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.controller.cadastro.BancoDadosController;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
+import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
 
 public class CadastroBancoDadosGUI extends VRInternalFrame {
 
@@ -14,6 +15,7 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
     public static CadastroBancoDadosGUI cadastroBancoDadosGUI = null;
     public static ConsultaBancoDadosGUI consultaBancoDadosGUI = null;
     private BancoDadosController bancoDadosController = null;
+    private BancoDadosVO bancoDadosVO = null;
 
     public CadastroBancoDadosGUI(VRMdiFrame menuGUI) throws Exception {
         super(menuGUI);
@@ -63,6 +65,13 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
         }
     }
 
+    public void editar(BancoDadosVO bancoDadosVO) throws Exception {
+        this.bancoDadosVO = bancoDadosVO;
+        
+        txtCodigo.setText(String.valueOf(bancoDadosVO.getId()));
+        txtNomeBancoDados.setText(bancoDadosVO.getNome());
+    }
+    
     public static void exibir(VRMdiFrame menuGUI) {
         try {
             menuGUI.setWaitCursor();

@@ -9,6 +9,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrimplantacao2_5.controller.cadastro.BancoDadosController;
+import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 
 /**
@@ -19,7 +20,8 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
     
     private static ConsultaBancoDadosGUI consultaBancoDadosGUI = null;
     public BancoDadosController controller = null;
-    private BancoDadosVO bancoDadosVO; 
+    private BancoDadosVO bancoDadosVO;
+    private CadastroBancoDadosGUI cadastroBancoDados = null;
 
     /**
      * Creates new form ConsultaConfiguracaoBaseDadosGUI
@@ -75,7 +77,7 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
         
         bancoDadosVO = controller.getBancoDados().get(tblConsultaBancoDados.getLinhaSelecionada());
         
-        //exibirConfiguracao(mdiFrame);
+        exibirCadastroBancoDados(mdiFrame);
     }
     
     @SuppressWarnings("unchecked")
@@ -158,6 +160,24 @@ public class ConsultaBancoDadosGUI extends VRInternalFrame {
             consultaBancoDadosGUI.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Consulta Banco de Dados");
+        } finally {
+            menuGUI.setDefaultCursor();
+        }
+    }
+    
+    private void exibirCadastroBancoDados(VRMdiFrame menuGUI) {
+        try {
+            menuGUI.setWaitCursor();     
+            
+            if (cadastroBancoDados == null || cadastroBancoDados.isClosed()) {
+                cadastroBancoDados = new CadastroBancoDadosGUI(menuGUI);
+            }
+            
+            CadastroBancoDadosGUI.consultaBancoDadosGUI = this;
+            cadastroBancoDados.editar(this.bancoDadosVO);
+            cadastroBancoDados.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Configuração de Base de Dados");
         } finally {
             menuGUI.setDefaultCursor();
         }
