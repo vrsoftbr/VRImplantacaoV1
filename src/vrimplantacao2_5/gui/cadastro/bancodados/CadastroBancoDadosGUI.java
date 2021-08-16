@@ -59,7 +59,7 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
         if (vo.getId() != 0) {
             txtCodigo.setText(String.valueOf(vo.getId()));
 
-            consultaBancoDadosGUI.controller.consultar();
+            consultaBancoDadosGUI.controller.consultar("");
 
             try {
                 Util.exibirMensagem("Banco de Dados salvo com sucesso!", getTitle());

@@ -66,11 +66,11 @@ public class BancoDadosService {
         }
     }
     
-    public List<BancoDadosVO> consultar() {
+    public List<BancoDadosVO> consultar(String nome) {
         List<BancoDadosVO> result = null;
         
         try {
-            result = bancoDadosDAO.consultar();
+            result = bancoDadosDAO.consultar(nome);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Consulta Banco de Dados");
         }

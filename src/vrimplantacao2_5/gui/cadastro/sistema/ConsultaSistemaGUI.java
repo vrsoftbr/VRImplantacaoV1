@@ -43,7 +43,7 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
         
         controller = new SistemaController(this);
         configurarColuna();
-        controller.consultar(txtFiltro.getText().trim());
+        controller.consultar("");
     }
     
     private void configurarColuna() throws Exception {

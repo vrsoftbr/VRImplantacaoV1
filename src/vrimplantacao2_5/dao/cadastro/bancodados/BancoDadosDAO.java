@@ -134,7 +134,7 @@ public class BancoDadosDAO {
         }
     }
 
-    public List<BancoDadosVO> consultar() throws Exception {
+    public List<BancoDadosVO> consultar(String nome) throws Exception {
         List<BancoDadosVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {
@@ -143,6 +143,7 @@ public class BancoDadosDAO {
                     + "id,\n"
                     + "nome\n"
                     + "from implantacao2_5.bancodados\n"
+                    + "where nome like '%"+nome+"%' \n"        
                     + "order by 2"
             )) {
                 while (rst.next()) {
