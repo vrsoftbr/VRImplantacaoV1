@@ -1,30 +1,29 @@
-package vrimplantacao2_5.gui.cadastro;
+package vrimplantacao2_5.gui.cadastro.sistema;
 
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2_5.controller.cadastro.bancodados.BancoDadosController;
-import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
-import vrimplantacao2_5.vo.cadastro.ConfiguracaoBaseDadosVO;
+import vrimplantacao2_5.controller.cadastro.sistema.SistemaController;
+import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
-public class CadastroBancoDadosGUI extends VRInternalFrame {
+public class CadastroSistemaGUI extends VRInternalFrame {
 
     private LojaVO oLoja = null;
     public VRMdiFrame parentFrame = null;
-    public static CadastroBancoDadosGUI cadastroBancoDadosGUI = null;
-    public static ConsultaBancoDadosGUI consultaBancoDadosGUI = null;
-    private BancoDadosController bancoDadosController = null;
-    private BancoDadosVO bancoDadosVO = null;
+    public static CadastroSistemaGUI cadastroSistemaGUI = null;
+    public static ConsultaSistemaGUI consultaSistemaGUI = null;
+    private SistemaController sistemaController = null;
+    private SistemaVO sistemaVO = null;
 
-    public CadastroBancoDadosGUI(VRMdiFrame menuGUI) throws Exception {
+    public CadastroSistemaGUI(VRMdiFrame menuGUI) throws Exception {
         super(menuGUI);
         initComponents();
         
         centralizarForm();
         
         this.parentFrame = menuGUI;
-        bancoDadosController = new BancoDadosController();
+        sistemaController = new SistemaController();
         txtCodigo.setEditable(false);
         txtCodigo.setEnabled(false);
     }
@@ -32,12 +31,12 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
     @Override
     public void incluir() throws Exception {
         txtCodigo.setText("");
-        txtNomeBancoDados.setText("");
+        txtNomeSistema.setText("");
     }
 
     @Override
     public void salvar() throws Exception {
-        if (txtNomeBancoDados.getText().trim().isEmpty()) {
+        if (txtNomeSistema.getText().trim().isEmpty()) {
             try {
                 Util.exibirMensagem("Campo Nome obrigatório!", getTitle());
             } catch (Exception ex) {
@@ -47,47 +46,47 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
             return;
         }
 
-        BancoDadosVO vo = new BancoDadosVO();
-        vo.setNome(txtNomeBancoDados.getText().trim());
+        SistemaVO vo = new SistemaVO();
+        vo.setNome(txtNomeSistema.getText().trim());
 
         if (txtCodigo.getText().trim().isEmpty()) {
-            bancoDadosController.salvar(vo);
+            sistemaController.salvar(vo);
         } else {            
             vo.setId(Integer.parseInt(txtCodigo.getText()));            
-            bancoDadosController.alterar(vo);
+            sistemaController.alterar(vo);
         }
 
         if (vo.getId() != 0) {
             txtCodigo.setText(String.valueOf(vo.getId()));
 
-            consultaBancoDadosGUI.controller.consultar();
+            consultaSistemaGUI.controller.consultar();
 
             try {
-                Util.exibirMensagem("Banco de Dados salvo com sucesso!", getTitle());
+                Util.exibirMensagem("Sistema salvo com sucesso!", getTitle());
             } catch (Exception ex) {
                 Util.exibirMensagemErro(ex, getTitle());
             }
         }
     }
 
-    public void editar(BancoDadosVO bancoDadosVO) throws Exception {
-        this.bancoDadosVO = bancoDadosVO;
+    public void editar(SistemaVO sistemaVO) throws Exception {
+        this.sistemaVO = sistemaVO;
         
-        txtCodigo.setText(String.valueOf(bancoDadosVO.getId()));
-        txtNomeBancoDados.setText(bancoDadosVO.getNome());
+        txtCodigo.setText(String.valueOf(sistemaVO.getId()));
+        txtNomeSistema.setText(sistemaVO.getNome());
     }
     
     public static void exibir(VRMdiFrame menuGUI) {
         try {
             menuGUI.setWaitCursor();
 
-            if (cadastroBancoDadosGUI == null || cadastroBancoDadosGUI.isClosed()) {
-                cadastroBancoDadosGUI = new CadastroBancoDadosGUI(menuGUI);
+            if (cadastroSistemaGUI == null || cadastroSistemaGUI.isClosed()) {
+                cadastroSistemaGUI = new CadastroSistemaGUI(menuGUI);
             }
 
-            cadastroBancoDadosGUI.setVisible(true);
+            cadastroSistemaGUI.setVisible(true);
         } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Consulta Configuração de Base de Dados");
+            Util.exibirMensagemErro(ex, "Consulta Sistema");
         } finally {
             menuGUI.setDefaultCursor();
         }
@@ -103,13 +102,13 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRLabel2 = new vrframework.bean.label.VRLabel();
         vRLabel3 = new vrframework.bean.label.VRLabel();
-        txtNomeBancoDados = new vrframework.bean.textField.VRTextField();
+        txtNomeSistema = new vrframework.bean.textField.VRTextField();
         txtCodigo = new vrframework.bean.textField.VRTextField();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnSalvar = new vrframework.bean.button.VRButton();
 
-        setTitle("Cadastro Banco de Dados");
+        setTitle("Cadastro Sistema");
 
         vRToolBar1.setRollover(true);
 
@@ -143,9 +142,9 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel3, "Nome");
         vRLabel3.setName(""); // NOI18N
 
-        txtNomeBancoDados.setColumns(25);
-        txtNomeBancoDados.setName(""); // NOI18N
-        txtNomeBancoDados.setObrigatorio(true);
+        txtNomeSistema.setColumns(25);
+        txtNomeSistema.setName(""); // NOI18N
+        txtNomeSistema.setObrigatorio(true);
 
         txtCodigo.setColumns(6);
         txtCodigo.setMascara("Numero");
@@ -176,7 +175,7 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 330, Short.MAX_VALUE))
-                    .addComponent(txtNomeBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txtNomeSistema, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         vRPanel1Layout.setVerticalGroup(
@@ -189,7 +188,7 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
                             .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNomeBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtNomeSistema, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -324,7 +323,7 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnTbIncluir;
     private vrframework.bean.button.VRButton btnTbSalvar;
     private vrframework.bean.textField.VRTextField txtCodigo;
-    private vrframework.bean.textField.VRTextField txtNomeBancoDados;
+    private vrframework.bean.textField.VRTextField txtNomeSistema;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;
     private vrframework.bean.panel.VRPanel vRPanel1;

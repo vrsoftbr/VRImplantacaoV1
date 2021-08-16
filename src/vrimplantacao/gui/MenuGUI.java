@@ -308,7 +308,7 @@ import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2_5.gui.cadastro.ConsultaBancoDadosGUI;
+import vrimplantacao2_5.gui.cadastro.bancodados.ConsultaBancoDadosGUI;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;

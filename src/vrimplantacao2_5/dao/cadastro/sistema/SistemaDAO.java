@@ -58,7 +58,7 @@ public class SistemaDAO {
         }
     }
     
-    public void alterar(BancoDadosVO vo) throws Exception {
+    public void alterar(SistemaVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
         sql.setTableName("sistema");
@@ -87,8 +87,8 @@ public class SistemaDAO {
         }
     }    
     
-    public List<BancoDadosVO> consultar() throws Exception {
-        List<BancoDadosVO> result = new ArrayList<>();
+    public List<SistemaVO> consultar() throws Exception {
+        List<SistemaVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -99,7 +99,7 @@ public class SistemaDAO {
                     + "order by 2"
             )) {
                 while (rst.next()) {
-                    BancoDadosVO vo = new BancoDadosVO();
+                    SistemaVO vo = new SistemaVO();
                     vo.setId(rst.getInt("id"));
                     vo.setNome(rst.getString("nome"));
                     result.add(vo);

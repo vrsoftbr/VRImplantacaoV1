@@ -49,7 +49,7 @@ public class SistemaService {
         }
     }
     
-    public void alterar(BancoDadosVO vo) throws Exception {
+    public void alterar(SistemaVO vo) throws Exception {
         try {
             provider.begin();
             
@@ -62,19 +62,19 @@ public class SistemaService {
         }
     }
     
-    public List<BancoDadosVO> consultar() {
-        List<BancoDadosVO> result = null;
+    public List<SistemaVO> consultar() {
+        List<SistemaVO> result = null;
         
         try {
             result = sistemaDAO.consultar();
         } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Consulta Banco de Dados");
+            Util.exibirMensagemErro(ex, "Consulta Sistemas");
         }
         
         return result;
     }
     
     private String getTitle() {
-        return "Cadastro Banco de Dados";
+        return "Cadastro Sistema";
     }    
 }
