@@ -27,6 +27,10 @@ public class BancoDadosController {
         bancoDadosService.salvar(vo);
     }
     
+    public void alterar(BancoDadosVO vo) throws Exception {
+        bancoDadosService.alterar(vo);
+    }
+    
     public void consultar() throws Exception {
         this.bancoDados = bancoDadosService.consultar();
         consultaBancoDadosGUI.consultar();

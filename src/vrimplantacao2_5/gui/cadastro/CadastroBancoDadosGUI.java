@@ -50,7 +50,12 @@ public class CadastroBancoDadosGUI extends VRInternalFrame {
         BancoDadosVO vo = new BancoDadosVO();
         vo.setNome(txtNomeBancoDados.getText().trim());
 
-        bancoDadosController.salvar(vo);
+        if (txtCodigo.getText().trim().isEmpty()) {
+            bancoDadosController.salvar(vo);
+        } else {            
+            vo.setId(Integer.parseInt(txtCodigo.getText()));            
+            bancoDadosController.alterar(vo);
+        }
 
         if (vo.getId() != 0) {
             txtCodigo.setText(String.valueOf(vo.getId()));

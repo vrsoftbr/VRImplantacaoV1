@@ -46,11 +46,23 @@ public class BancoDadosService {
             existeBancoDados(vo.getNome().trim());
             bancoDadosDAO.salvar(vo);
             
-            provider.commit();
-            
+            provider.commit();            
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
             provider.rollback();
+        }
+    }
+    
+    public void alterar(BancoDadosVO vo) throws Exception {
+        try {
+            provider.begin();
+            
+            bancoDadosDAO.alterar(vo);
+            
+            provider.commit();
+        } catch(Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+            provider.rollback();            
         }
     }
     

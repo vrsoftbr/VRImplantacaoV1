@@ -105,6 +105,23 @@ public class BancoDadosDAO {
         }
     }
 
+    public void alterar(BancoDadosVO vo) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+
+        sql.setTableName("bancodados");
+        sql.setSchema("implantacao2_5");
+
+        sql.put("nome", vo.getNome());
+
+        sql.setWhere("id = " + vo.getId());
+
+        if (!sql.isEmpty()) {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(sql.getUpdate());
+            }
+        }        
+    }
+    
     public boolean existeBancoDados(String nome) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
