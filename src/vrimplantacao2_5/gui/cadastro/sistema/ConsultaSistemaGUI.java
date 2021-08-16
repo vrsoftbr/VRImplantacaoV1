@@ -93,7 +93,7 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
         });
 
         btnInserirConexao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao, "Cadastrar Banco de Dados");
+        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao, "Cadastrar Sistema");
         btnInserirConexao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInserirConexaoActionPerformed(evt);

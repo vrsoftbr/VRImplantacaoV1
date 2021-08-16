@@ -52,7 +52,9 @@ public class SistemaDAO {
         if (!sql.isEmpty()) {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                    vo.setId(rst.getInt("id"));
+                    if (rst.next()) {
+                        vo.setId(rst.getInt("id"));
+                    }
                 }
             }
         }
