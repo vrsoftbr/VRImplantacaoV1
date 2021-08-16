@@ -7,7 +7,6 @@ import java.util.List;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 
 /**
  *
