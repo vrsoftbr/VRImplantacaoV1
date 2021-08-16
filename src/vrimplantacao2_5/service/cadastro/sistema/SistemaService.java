@@ -62,11 +62,11 @@ public class SistemaService {
         }
     }
     
-    public List<SistemaVO> consultar() {
+    public List<SistemaVO> consultar(String nome) {
         List<SistemaVO> result = null;
         
         try {
-            result = sistemaDAO.consultar();
+            result = sistemaDAO.consultar(nome);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Consulta Sistemas");
         }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
+import vr.view.components.textfield.TextCase;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
@@ -38,9 +39,11 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
         centralizarForm();
         setTitle("Consulta Sistemas");
         
+        txtFiltro.setTextCase(TextCase.UPPERCASE);
+        
         controller = new SistemaController(this);
         configurarColuna();
-        controller.consultar();
+        controller.consultar(txtFiltro.getText().trim());
     }
     
     private void configurarColuna() throws Exception {
@@ -85,6 +88,8 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
 
         tblConsultaBancoDados = new vrframework.bean.tableEx.VRTableEx();
         btnInserirConexao = new vrframework.bean.button.VRButton();
+        txtFiltro = new vr.view.components.textfield.VRTextField();
+        btnInserirConexao1 = new vrframework.bean.button.VRButton();
 
         tblConsultaBancoDados.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -100,6 +105,14 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
             }
         });
 
+        btnInserirConexao1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/consultar_20.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao1, "Pesquisar");
+        btnInserirConexao1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInserirConexao1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -110,6 +123,10 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
                     .addComponent(tblConsultaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, 626, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnInserirConexao1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -117,7 +134,10 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnInserirConexao1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tblConsultaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addContainerGap())
@@ -142,10 +162,21 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
         CadastroSistemaGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirConexaoActionPerformed
 
+    private void btnInserirConexao1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexao1ActionPerformed
+        try {
+            // TODO add your handling code here:
+            controller.consultar(txtFiltro.getText().trim());
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_btnInserirConexao1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnInserirConexao;
+    private vrframework.bean.button.VRButton btnInserirConexao1;
     private vrframework.bean.tableEx.VRTableEx tblConsultaBancoDados;
+    private vr.view.components.textfield.VRTextField txtFiltro;
     // End of variables declaration//GEN-END:variables
 
     public static void exibir(VRMdiFrame menuGUI) {

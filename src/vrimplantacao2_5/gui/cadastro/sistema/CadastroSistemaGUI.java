@@ -59,7 +59,7 @@ public class CadastroSistemaGUI extends VRInternalFrame {
         if (vo.getId() != 0) {
             txtCodigo.setText(String.valueOf(vo.getId()));
 
-            consultaSistemaGUI.controller.consultar();
+            consultaSistemaGUI.controller.consultar("");
 
             try {
                 Util.exibirMensagem("Sistema salvo com sucesso!", getTitle());

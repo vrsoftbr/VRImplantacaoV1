@@ -32,8 +32,8 @@ public class SistemaController {
         sistemaService.alterar(vo);
     }
     
-    public void consultar() throws Exception {
-        this.sistema = sistemaService.consultar();
+    public void consultar(String nome) throws Exception {
+        this.sistema = sistemaService.consultar(nome);
         consultaSistemaGUI.consultar();
     }
 

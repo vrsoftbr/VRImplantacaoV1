@@ -89,7 +89,7 @@ public class SistemaDAO {
         }
     }    
     
-    public List<SistemaVO> consultar() throws Exception {
+    public List<SistemaVO> consultar(String nome) throws Exception {
         List<SistemaVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {
@@ -98,6 +98,7 @@ public class SistemaDAO {
                     + "id,\n"
                     + "nome\n"
                     + "from implantacao2_5.sistema\n"
+                    + "where nome like '%"+nome+"%' \n"
                     + "order by 2"
             )) {
                 while (rst.next()) {
