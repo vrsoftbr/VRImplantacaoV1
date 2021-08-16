@@ -8,7 +8,7 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
-import vrimplantacao2_5.controller.cadastro.BancoDadosController;
+import vrimplantacao2_5.controller.cadastro.bancodados.BancoDadosController;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 

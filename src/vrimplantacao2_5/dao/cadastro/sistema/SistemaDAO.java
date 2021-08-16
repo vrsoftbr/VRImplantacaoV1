@@ -1,4 +1,4 @@
-package vrimplantacao2_5.dao.sistema;
+package vrimplantacao2_5.dao.cadastro.sistema;
 
 import java.sql.ResultSet;
 import java.sql.Statement;

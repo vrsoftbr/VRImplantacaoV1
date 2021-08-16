@@ -1,4 +1,4 @@
-package vrimplantacao2_5.dao.bancodados;
+package vrimplantacao2_5.dao.cadastro.bancodados;
 
 import java.sql.ResultSet;
 import java.sql.Statement;

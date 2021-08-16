@@ -1,8 +1,8 @@
-package vrimplantacao2_5.controller.cadastro;
+package vrimplantacao2_5.controller.cadastro.bancodados;
 
 import java.util.List;
 import vrimplantacao2_5.gui.cadastro.ConsultaBancoDadosGUI;
-import vrimplantacao2_5.service.cadastro.BancoDadosService;
+import vrimplantacao2_5.service.cadastro.bancodados.BancoDadosService;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 
 /**

@@ -1,7 +1,7 @@
 package vrimplantacao2_5.service.cadastro.configuracao;
 
 import vrframework.classe.Util;
-import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.enums.EBancoDados;
 import vrimplantacao2_5.gui.componente.conexao.firebird.ConexaoFirebirdPanel;

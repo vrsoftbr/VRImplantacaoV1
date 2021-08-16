@@ -1,50 +1,46 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package vrimplantacao2_5.service.cadastro;
+package vrimplantacao2_5.service.cadastro.sistema;
 
 import java.util.List;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao2_5.dao.bancodados.BancoDadosDAO;
+import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.provider.ConexaoProvider;
 import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
+import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
 /**
  *
  * @author Desenvolvimento
  */
-public class BancoDadosService {
-    
+public class SistemaService {
+
     private final ConexaoProvider provider;
-    private final BancoDadosDAO bancoDadosDAO;
+    private final SistemaDAO sistemaDAO;
     
-    public BancoDadosService() {
-        this.bancoDadosDAO = new BancoDadosDAO();
+    public SistemaService() {
+        this.sistemaDAO = new SistemaDAO();
         this.provider = new ConexaoProvider();
     }
     
-    public BancoDadosService(BancoDadosDAO bancoDadosDAO, 
-                             ConexaoProvider conexaoProvider) {
-        this.bancoDadosDAO = bancoDadosDAO;
-        this.provider = conexaoProvider;
+    public SistemaService(SistemaDAO sistemaDAO, 
+                          ConexaoProvider provider) {
+        this.sistemaDAO = sistemaDAO;
+        this.provider = provider;
     }
     
     public void existeBancoDados(String nome) throws Exception {
-        if (bancoDadosDAO.existeBancoDados(nome)) {
-            throw new VRException("Banco de dados já cadastrado");
+        if (sistemaDAO.existeSistema(nome)) {
+            throw new VRException("Sistema já cadastrado");
         }
     }
     
-    public void salvar(BancoDadosVO vo) throws Exception {
+    public void salvar(SistemaVO vo) throws Exception {
         
         try {
             provider.begin();
             
             existeBancoDados(vo.getNome().trim());
-            bancoDadosDAO.salvar(vo);
+            sistemaDAO.salvar(vo);
             
             provider.commit();            
         } catch (Exception ex) {
@@ -57,7 +53,7 @@ public class BancoDadosService {
         try {
             provider.begin();
             
-            bancoDadosDAO.alterar(vo);
+            sistemaDAO.alterar(vo);
             
             provider.commit();
         } catch(Exception ex) {
@@ -70,7 +66,7 @@ public class BancoDadosService {
         List<BancoDadosVO> result = null;
         
         try {
-            result = bancoDadosDAO.consultar();
+            result = sistemaDAO.consultar();
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Consulta Banco de Dados");
         }
