@@ -54,16 +54,6 @@ public class CadastroSistemaBancoDadosGUI extends VRInternalFrame {
     
     @Override
     public void salvar() throws Exception {
-        if (txtSenha.getText().trim().isEmpty()) {
-            try {
-                Util.exibirMensagem("Campo Nome obrigatório!", getTitle());
-            } catch (Exception ex) {
-                Util.exibirMensagemErro(ex, getTitle());
-            }
-
-            return;
-        }
-
         SistemaBancoDadosVO vo = new SistemaBancoDadosVO();
         vo.setIdSistema(cboSistema.getId());
         vo.setIdBancoDados(cboBancoDados.getId());
@@ -75,6 +65,7 @@ public class CadastroSistemaBancoDadosGUI extends VRInternalFrame {
         if (idSistemaBancoDados <= 0) {
             sistemaBancoDadosController.salvar(vo);
         } else {
+            vo.setId(idSistemaBancoDados);
             sistemaBancoDadosController.alterar(vo);
         }
 

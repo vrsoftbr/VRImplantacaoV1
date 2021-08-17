@@ -90,6 +90,7 @@ public class SistemaBancoDadosDAO {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
+                    + " sb.id, \n"        
                     + "	b.id as id_bancodados,\n"
                     + "	b.nome as nome_bancodados,\n"
                     + "	s.id as id_sistema,\n"
@@ -106,6 +107,7 @@ public class SistemaBancoDadosDAO {
             )) {
                 while (rst.next()) {
                     SistemaBancoDadosVO sistemaBancoDadosVO = new SistemaBancoDadosVO();
+                    sistemaBancoDadosVO.setId(rst.getInt("id"));
                     sistemaBancoDadosVO.setIdSistema(rst.getInt("id_sistema"));
                     sistemaBancoDadosVO.setNomeSistema(rst.getString("nome_sistema"));
                     sistemaBancoDadosVO.setIdBancoDados(rst.getInt("id_bancodados"));
