@@ -3,7 +3,6 @@ package vrimplantacao2_5.controller.cadastro.sistema;
 import java.util.List;
 import vrimplantacao2_5.gui.cadastro.sistema.ConsultaSistemaGUI;
 import vrimplantacao2_5.service.cadastro.sistema.SistemaService;
-import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
 /**

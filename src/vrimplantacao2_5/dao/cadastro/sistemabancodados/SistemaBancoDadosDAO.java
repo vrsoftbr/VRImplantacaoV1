@@ -91,7 +91,7 @@ public class SistemaBancoDadosDAO {
                     sistemaBancoDadosVO.setUsuario(rst.getString("usuario"));
                     sistemaBancoDadosVO.setSenha(rst.getString("senha"));
                     sistemaBancoDadosVO.setPorta(rst.getInt("porta"));
-                    result.add(vo);
+                    result.add(sistemaBancoDadosVO);
                 }
             }
         }
