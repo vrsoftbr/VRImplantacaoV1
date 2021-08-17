@@ -14,6 +14,16 @@ import vrimplantacao2_5.vo.cadastro.SistemaBancoDadosVO;
  */
 public class SistemaBancoDadosDAO {
 
+    private String filtro = "\n";
+    
+    public String getFiltro() {
+        return this.filtro;
+    }
+    
+    public void setFiltro(String filtro) {
+        this.filtro = filtro;
+    }
+    
     public void salvar(SistemaBancoDadosVO vo) throws Exception {
 
         SQLBuilder sql = new SQLBuilder();
@@ -65,6 +75,18 @@ public class SistemaBancoDadosDAO {
     public List<SistemaBancoDadosVO> consultar(SistemaBancoDadosVO vo) throws Exception {
         List<SistemaBancoDadosVO> result = new ArrayList<>();
 
+        if (vo != null) {
+            if (vo.getNomeSistema() != null && !vo.getNomeSistema().trim().isEmpty() && vo.getIdBancoDados() > 0) {
+                setFiltro("where s.nome like '%" + vo.getNomeSistema() + "%' and b.id = " + vo.getIdBancoDados() + "\n");
+            } else if (vo.getNomeSistema() != null && !vo.getNomeSistema().trim().isEmpty() && vo.getIdBancoDados() <= 0) {
+                setFiltro("where s.nome like '%" + vo.getNomeSistema() + "%' \n");
+            } else if ((vo.getNomeSistema() == null || vo.getNomeSistema().trim().isEmpty()) && vo.getIdBancoDados() > 0) {
+                setFiltro("and b.id = " + vo.getIdBancoDados() + "\n");
+            } else {
+                setFiltro("\n");
+            }
+        }
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -79,6 +101,7 @@ public class SistemaBancoDadosDAO {
                     + "from implantacao2_5.sistemabancodados sb\n"
                     + "join implantacao2_5.sistema s on s.id = sb.id_sistema\n"
                     + "join implantacao2_5.bancodados b on b.id = sb.id_bancodados\n"
+                    + getFiltro()
                     + "order by b.nome, s.nome"
             )) {
                 while (rst.next()) {

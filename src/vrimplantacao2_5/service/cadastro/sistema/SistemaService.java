@@ -74,6 +74,24 @@ public class SistemaService {
         return result;
     }
     
+    public List getSistema() {
+        List<SistemaVO> sistemas = null;
+
+        try {
+
+            sistemas = sistemaDAO.getSistema();
+
+        } catch (Exception e) {
+            try {
+                Util.exibirMensagem(e.getMessage(), getTitle());
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, getTitle());
+            }
+        }
+
+        return sistemas;
+    }
+    
     private String getTitle() {
         return "Cadastro Sistema";
     }    

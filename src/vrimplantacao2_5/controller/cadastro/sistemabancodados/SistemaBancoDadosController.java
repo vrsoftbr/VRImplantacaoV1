@@ -2,7 +2,9 @@ package vrimplantacao2_5.controller.cadastro.sistemabancodados;
 
 import java.util.List;
 import vrimplantacao2_5.gui.cadastro.sistemabancodados.ConsultaSistemaBancoDadosGUI;
+import vrimplantacao2_5.service.cadastro.bancodados.BancoDadosService;
 import vrimplantacao2_5.service.cadastro.sistemabancodados.SistemaBancoDadosService;
+import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaBancoDadosVO;
 
 /**
@@ -12,11 +14,13 @@ import vrimplantacao2_5.vo.cadastro.SistemaBancoDadosVO;
 public class SistemaBancoDadosController {
 
     private final SistemaBancoDadosService sistemaBanbcoDadosService = new SistemaBancoDadosService();
+    private final BancoDadosService bancoDadosService = new BancoDadosService();
     private ConsultaSistemaBancoDadosGUI consultaSistemaBancoDadosGUI;
     private List<SistemaBancoDadosVO> sistemaBancoDadosVO = null;
+    private List<BancoDadosVO> bancoDadosVO = null;
     
     public SistemaBancoDadosController() {
-        
+
     }
     
     public SistemaBancoDadosController(ConsultaSistemaBancoDadosGUI consultaSistemaBancoDadosGUI) {
@@ -30,5 +34,9 @@ public class SistemaBancoDadosController {
     
     public List<SistemaBancoDadosVO> getSistemaBancoDados() {
         return this.sistemaBancoDadosVO;
-    }    
+    }
+    
+    public List<BancoDadosVO> getBancoDados() throws Exception {
+        return this.bancoDadosVO = bancoDadosService.getBancoDados();
+    }
 }

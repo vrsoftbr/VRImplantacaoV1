@@ -77,6 +77,22 @@ public class BancoDadosService {
         
         return result;
     }
+
+    public List getBancoDados() throws Exception {
+        List<BancoDadosVO> result = null;
+        
+        try {
+            result = bancoDadosDAO.getBancoDados();
+        } catch (Exception e) {
+            try {
+                Util.exibirMensagem(e.getMessage(), getTitle());
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, getTitle());
+            }
+        }
+        
+        return result;
+    }
     
     private String getTitle() {
         return "Cadastro Banco de Dados";
