@@ -94,7 +94,7 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
         
         sistemaBancoDadosVO = controller.getSistemaBancoDados().get(tblConsultaSistemaBancoDados.getLinhaSelecionada());
         
-        exibirCadastroSistema(mdiFrame);
+        exibirCadastroSistemaBancoDados(mdiFrame);
     }
     
     @SuppressWarnings("unchecked")
@@ -236,7 +236,7 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
         }
     }
     
-    private void exibirCadastroSistema(VRMdiFrame menuGUI) {
+    private void exibirCadastroSistemaBancoDados(VRMdiFrame menuGUI) {
         try {
             menuGUI.setWaitCursor();     
             
@@ -248,7 +248,7 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
             cadastroSistemaBancoDadosGUI.editar(this.sistemaBancoDadosVO);
             cadastroSistemaBancoDadosGUI.setVisible(true);
         } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Configuração de Base de Dados");
+            Util.exibirMensagemErro(ex, "Cadastro Sistemas x Banco de Dados");
         } finally {
             menuGUI.setDefaultCursor();
         }
