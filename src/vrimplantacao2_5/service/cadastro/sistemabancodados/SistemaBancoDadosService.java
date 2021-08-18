@@ -20,9 +20,9 @@ public class SistemaBancoDadosService {
         this.provider = new ConexaoProvider();
     }
     
-    public SistemaBancoDadosService(SistemaBancoDadosDAO sistemaBancoDadosDAO) {
+    public SistemaBancoDadosService(SistemaBancoDadosDAO sistemaBancoDadosDAO, ConexaoProvider provider) {
         this.sistemaBancoDadosDAO = sistemaBancoDadosDAO;
-        this.provider = new ConexaoProvider();
+        this.provider = provider;
     }
     
     public void inserir(SistemaBancoDadosVO vo) throws Exception {
