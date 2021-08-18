@@ -18,8 +18,12 @@ import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
  */
 public class BancoDadosService {
     
-    private final ConexaoProvider provider;
+    private ConexaoProvider provider;
     private final BancoDadosDAO bancoDadosDAO;
+    
+    public BancoDadosService(BancoDadosDAO bancoDadosDAO) {
+        this.bancoDadosDAO = new BancoDadosDAO();
+    }
     
     public BancoDadosService() {
         this.bancoDadosDAO = new BancoDadosDAO();
