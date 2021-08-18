@@ -23,8 +23,8 @@ public class SistemaController {
         this.consultaSistemaGUI = consultaSistemaGUI;
     }
     
-    public void salvar(SistemaVO vo) throws Exception {
-        sistemaService.salvar(vo);
+    public void inserir(SistemaVO vo) throws Exception {
+        sistemaService.inserir(vo);
     }
     
     public void alterar(SistemaVO vo) throws Exception {

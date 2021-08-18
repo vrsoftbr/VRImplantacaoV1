@@ -39,7 +39,7 @@ public class SistemaDAO {
         return result;
     }
 
-    public void salvar(SistemaVO vo) throws Exception {
+    public void inserir(SistemaVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("implantacao2_5");
         sql.setTableName("sistema");

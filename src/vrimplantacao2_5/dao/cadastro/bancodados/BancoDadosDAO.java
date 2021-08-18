@@ -84,7 +84,7 @@ public class BancoDadosDAO {
         return bdVO;
     }
 
-    public void salvar(BancoDadosVO vo) throws Exception {
+    public void inserir(BancoDadosVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();
 
         sql.setSchema("implantacao2_5");

@@ -23,8 +23,8 @@ public class BancoDadosController {
         this.consultaBancoDadosGUI = consultaBancoDadosGUI;
     }
     
-    public void salvar(BancoDadosVO vo) throws Exception {
-        bancoDadosService.salvar(vo);
+    public void inserir(BancoDadosVO vo) throws Exception {
+        bancoDadosService.inserir(vo);
     }
     
     public void alterar(BancoDadosVO vo) throws Exception {

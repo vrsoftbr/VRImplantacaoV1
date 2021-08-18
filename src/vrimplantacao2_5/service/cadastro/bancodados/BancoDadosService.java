@@ -38,13 +38,13 @@ public class BancoDadosService {
         }
     }
     
-    public void salvar(BancoDadosVO vo) throws Exception {
+    public void inserir(BancoDadosVO vo) throws Exception {
         
         try {
             provider.begin();
             
             existeBancoDados(vo.getNome().trim());
-            bancoDadosDAO.salvar(vo);
+            bancoDadosDAO.inserir(vo);
             
             provider.commit();            
         } catch (Exception ex) {

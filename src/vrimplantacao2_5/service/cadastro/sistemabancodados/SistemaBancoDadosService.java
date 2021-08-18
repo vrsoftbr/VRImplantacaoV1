@@ -25,12 +25,12 @@ public class SistemaBancoDadosService {
         this.provider = new ConexaoProvider();
     }
     
-    public void salvar(SistemaBancoDadosVO vo) throws Exception {
+    public void inserir(SistemaBancoDadosVO vo) throws Exception {
         
         try {
             provider.begin();
             
-            sistemaBancoDadosDAO.salvar(vo);
+            sistemaBancoDadosDAO.inserir(vo);
             
             provider.commit();
         } catch (Exception ex) {

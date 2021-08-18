@@ -48,8 +48,8 @@ public class SistemaBancoDadosController {
         return this.sistemaVO = sistemaService.getSistema();
     }
     
-    public void salvar(SistemaBancoDadosVO vo) throws Exception {
-        sistemaBanbcoDadosService.salvar(vo);
+    public void inserir(SistemaBancoDadosVO vo) throws Exception {
+        sistemaBanbcoDadosService.inserir(vo);
     }
     
     public void alterar(SistemaBancoDadosVO vo) throws Exception {

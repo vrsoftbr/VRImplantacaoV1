@@ -63,7 +63,7 @@ public class CadastroSistemaBancoDadosGUI extends VRInternalFrame {
         vo.setSenha(txtSenha.getText().trim());
         
         if (idSistemaBancoDados <= 0) {
-            sistemaBancoDadosController.salvar(vo);
+            sistemaBancoDadosController.inserir(vo);
         } else {
             vo.setId(idSistemaBancoDados);
             sistemaBancoDadosController.alterar(vo);

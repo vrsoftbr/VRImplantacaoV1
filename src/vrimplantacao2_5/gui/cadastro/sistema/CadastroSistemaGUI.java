@@ -50,7 +50,7 @@ public class CadastroSistemaGUI extends VRInternalFrame {
         vo.setNome(txtNomeSistema.getText().trim());
 
         if (txtCodigo.getText().trim().isEmpty()) {
-            sistemaController.salvar(vo);
+            sistemaController.inserir(vo);
         } else {            
             vo.setId(Integer.parseInt(txtCodigo.getText()));            
             sistemaController.alterar(vo);

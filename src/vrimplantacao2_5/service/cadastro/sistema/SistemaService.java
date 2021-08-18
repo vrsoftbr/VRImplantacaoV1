@@ -34,13 +34,13 @@ public class SistemaService {
         }
     }
     
-    public void salvar(SistemaVO vo) throws Exception {
+    public void inserir(SistemaVO vo) throws Exception {
         
         try {
             provider.begin();
             
             existeBancoDados(vo.getNome().trim());
-            sistemaDAO.salvar(vo);
+            sistemaDAO.inserir(vo);
             
             provider.commit();            
         } catch (Exception ex) {

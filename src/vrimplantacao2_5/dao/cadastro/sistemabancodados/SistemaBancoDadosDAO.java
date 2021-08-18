@@ -24,7 +24,7 @@ public class SistemaBancoDadosDAO {
         this.filtro = filtro;
     }
     
-    public void salvar(SistemaBancoDadosVO vo) throws Exception {
+    public void inserir(SistemaBancoDadosVO vo) throws Exception {
 
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("implantacao2_5");
