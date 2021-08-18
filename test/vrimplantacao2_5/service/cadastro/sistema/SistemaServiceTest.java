@@ -72,7 +72,7 @@ public class SistemaServiceTest {
     }
     
     @Test 
-    public void testGetBancoDados() throws Exception {
+    public void testGetSistema() throws Exception {
         SistemaDAO sistemaDAO = mock(SistemaDAO.class);
         ConexaoProvider provider = mock(ConexaoProvider.class);
         SistemaService sistemaService = new SistemaService(sistemaDAO, provider);
