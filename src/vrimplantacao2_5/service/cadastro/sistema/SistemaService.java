@@ -5,7 +5,6 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao2_5.dao.cadastro.sistema.SistemaDAO;
 import vrimplantacao2_5.provider.ConexaoProvider;
-import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 
 /**
@@ -28,7 +27,7 @@ public class SistemaService {
         this.provider = provider;
     }
     
-    public void existeBancoDados(String nome) throws Exception {
+    public void existeSistema(String nome) throws Exception {
         if (sistemaDAO.existeSistema(nome)) {
             throw new VRException("Sistema já cadastrado");
         }
@@ -39,7 +38,7 @@ public class SistemaService {
         try {
             provider.begin();
             
-            existeBancoDados(vo.getNome().trim());
+            existeSistema(vo.getNome().trim());
             sistemaDAO.inserir(vo);
             
             provider.commit();            
