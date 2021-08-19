@@ -5,12 +5,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.poi.hmef.attribute.MAPIAttribute;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoDAO;
 import vrimplantacao.utils.Utils;
@@ -22,7 +20,6 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -84,7 +81,7 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
     
-    public List<Estabelecimento> getLojaCliente() throws Exception {
+    public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -93,6 +90,22 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("cnpj"), rs.getString("razao")));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    public List<String> getNomeLojaCliente() throws Exception {
+        List<String> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getString("razao"));
                 }
             }
         }
@@ -116,6 +129,79 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                         rs.getDouble(""),
                         rs.getDouble("")
                 ));
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    ""
+            
+            )) {
+                while (rs.next()) {
+                FornecedorIMP imp = new FornecedorIMP();
+                
+                imp.setCnpj_cpf(rs.getString(""));
+                
+                result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<ProdutoFornecedorIMP> getProdutosFornecedor() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    ""
+            )) {
+                while (rs.next()) {
+                ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    ""
+            )) {
+                while (rs.next()) {
+                ClienteIMP imp = new ClienteIMP();
+                
+                result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    ""
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    result.add(imp);
                 }
             }
         }
