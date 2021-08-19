@@ -61,6 +61,18 @@ CREATE TABLE IF NOT EXISTS implantacao2_5.sistemabancodadosscripts(
 	CONSTRAINT un_sistema_bancodados_scripts UNIQUE (id_sistema, id_bancodados)
 );
 
+CREATE TABLE IF NOT EXISTS implantacao2_5.unidade(
+	id serial PRIMARY KEY NOT NULL,
+	nome VARCHAR(60),
+	id_municipio INTEGER NOT NULL,
+	id_estado INTEGER NOT NULL,
+	CONSTRAINT fk_id_municipio FOREIGN KEY (id_municipio)
+		REFERENCES municipio (id),
+	CONSTRAINT fk_id_estado FOREIGN KEY (id_estado)
+		REFERENCES estado (id),	
+)
+
+
 /*ALTER TABLE implantacao2_5.sistemabancodados ADD CONSTRAINT un_sistema_bancodados UNIQUE (id_sistema, id_bancodados);
 ALTER TABLE implantacao2_5.sistemabancodados ADD nomeschema VARCHAR(60);
 ALTER TABLE implantacao2_5.sistemabancodados ADD usuario VARCHAR(30);
