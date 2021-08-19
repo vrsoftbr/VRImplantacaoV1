@@ -16,7 +16,6 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SambaNetV2DAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -128,6 +127,9 @@ public class SambaNetV2GUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
+        
+        dao.utilizarTabelaParam = chkParamLoja.isSelected();
+        
         for (Estabelecimento loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
@@ -274,6 +276,7 @@ public class SambaNetV2GUI extends VRInternalFrame implements ConexaoEvent {
         chkClienteValorLimite = new vrframework.bean.checkBox.VRCheckBox();
         tabParametro = new javax.swing.JPanel();
         chkIcmsForaEstado = new javax.swing.JCheckBox();
+        chkParamLoja = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -350,21 +353,27 @@ public class SambaNetV2GUI extends VRInternalFrame implements ConexaoEvent {
 
         chkIcmsForaEstado.setText("ICMS Fora Estado");
 
+        chkParamLoja.setText("Utilizar tabela PARAM para lojas do cliente");
+
         javax.swing.GroupLayout tabParametroLayout = new javax.swing.GroupLayout(tabParametro);
         tabParametro.setLayout(tabParametroLayout);
         tabParametroLayout.setHorizontalGroup(
             tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabParametroLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkIcmsForaEstado)
-                .addContainerGap(399, Short.MAX_VALUE))
+                .addGroup(tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkIcmsForaEstado)
+                    .addComponent(chkParamLoja))
+                .addContainerGap(264, Short.MAX_VALUE))
         );
         tabParametroLayout.setVerticalGroup(
             tabParametroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabParametroLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkIcmsForaEstado)
-                .addContainerGap(209, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkParamLoja)
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Ajuste", tabParametro);
@@ -517,6 +526,7 @@ public class SambaNetV2GUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private javax.swing.JCheckBox chkIcmsForaEstado;
+    private javax.swing.JCheckBox chkParamLoja;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;

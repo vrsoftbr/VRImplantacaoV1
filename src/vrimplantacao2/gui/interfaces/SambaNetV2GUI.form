@@ -213,10 +213,13 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkIcmsForaEstado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="399" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkIcmsForaEstado" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkParamLoja" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="264" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -225,7 +228,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkIcmsForaEstado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="209" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkParamLoja" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="184" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -234,6 +239,11 @@
                 <Component class="javax.swing.JCheckBox" name="chkIcmsForaEstado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ICMS Fora Estado"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkParamLoja">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Utilizar tabela PARAM para lojas do cliente"/>
                   </Properties>
                 </Component>
               </SubComponents>

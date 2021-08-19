@@ -421,7 +421,8 @@ public class AutoMacDAO
                     "	documento,\n" +
                     "	dt_entrada,\n" +
                     "	dt_venc,\n" +
-                    "	valor\n" +
+                    "	valor,\n" +
+                    "   pendente\n" +        
                     "FROM\n" +
                     "	contarcb\n" +
                     "ORDER BY \n" +
@@ -434,7 +435,7 @@ public class AutoMacDAO
                     imp.setNumeroCupom(rs.getString("cupom"));
                     imp.setDataEmissao(rs.getDate("dt_entrada"));
                     imp.setDataVencimento(rs.getDate("dt_venc"));
-                    imp.setValor(rs.getDouble("valor"));
+                    imp.setValor(rs.getDouble("pendente"));
                     
                     result.add(imp);
                 }
