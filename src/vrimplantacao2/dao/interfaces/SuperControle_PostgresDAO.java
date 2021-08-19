@@ -174,11 +174,14 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     + "	m2.\"Id\" as merc2,\n"
                     + "	m2.\"Descricao\" as merc2_descricao,\n"
                     + "	m3.\"Id\" as merc3,\n"
-                    + "	m3.\"Descricao\" as merc3_descricao\n"
+                    + "	m3.\"Descricao\" as merc3_descricao,\n"
+                    + "	m4.\"Id\" as merc4,\n"
+                    + "	m4.\"Descricao\" as merc4_descricao\n"
                     + "from dbo.\"Departamento\" m1\n"
                     + "join dbo.\"Secao\" m2 on m2.\"Departamento_Id\" = m1.\"Id\"\n"
                     + "join dbo.\"Categoria\" m3 on m3.\"Secao_Id\" = m2.\"Id\"\n"
-                    + "order by 1, 3, 5"
+                    + "join dbo.\"SubCategoria\" m4 on m4.\"Categoria_Id\" = m3.\"Id\"\n"
+                    + "order by 1, 3, 5, 7"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -190,6 +193,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     imp.setMerc2Descricao(rst.getString("merc2_descricao"));
                     imp.setMerc3ID(rst.getString("merc3"));
                     imp.setMerc3Descricao(rst.getString("merc3_descricao"));
+                    imp.setMerc4ID(rst.getString("merc4"));
+                    imp.setMerc4Descricao(rst.getString("merc4_descricao"));
                     result.add(imp);
                 }
             }
@@ -242,6 +247,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     + "	p.\"FkDepartamento\" as mercadologico1,\n"
                     + "	p.\"FkSecao\" as mercadologico2,\n"
                     + "	p.\"FkCategoria\" as mercadologico3,\n"
+                    + "	p.\"FkSubCategoria\" as mercadologico4,\n"
                     + "	p.\"FkFamilia\" as idfamiliaproduto,\n"
                     + "	p.\"DtCadastro\" as datacadastro,\n"
                     + "	p.\"Ativo\" as situacaocadastro,\n"
@@ -282,6 +288,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("mercadologico3"));
+                    imp.setCodMercadologico4(rst.getString("mercadologico4"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
