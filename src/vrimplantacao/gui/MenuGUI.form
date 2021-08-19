@@ -2170,6 +2170,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPoligonActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSBOnline">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="SBOnline"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSBOnlineActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuSTSistemas_v2">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="ST Sistemas"/>

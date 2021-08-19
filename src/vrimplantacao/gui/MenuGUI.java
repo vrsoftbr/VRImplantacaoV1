@@ -293,6 +293,7 @@ import vrimplantacao2.gui.interfaces.PlenusGUI;
 import vrimplantacao2.gui.interfaces.PoligonGUI;
 import vrimplantacao2.gui.interfaces.PrimeGUI;
 import vrimplantacao2.gui.interfaces.ResultMaisGUI;
+import vrimplantacao2.gui.interfaces.SBOnlineGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
@@ -876,6 +877,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuSQLServer3 = new javax.swing.JMenu();
         mnuPoligon = new javax.swing.JMenuItem();
+        mnuSBOnline = new javax.swing.JMenuItem();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
         mnuSysAut = new javax.swing.JMenuItem();
         mnuTelecon = new javax.swing.JMenuItem();
@@ -3176,6 +3178,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSQLServer3.add(mnuPoligon);
 
+        mnuSBOnline.setText("SBOnline");
+        mnuSBOnline.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSBOnlineActionPerformed(evt);
+            }
+        });
+        mnuSQLServer3.add(mnuSBOnline);
+
         mnuSTSistemas_v2.setText("ST Sistemas");
         mnuSTSistemas_v2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -5366,6 +5376,10 @@ public final class MenuGUI extends VRMdiFrame {
         DTComPlanilhaGUI.exibir(this);
     }//GEN-LAST:event_mnuDTComActionPerformed
 
+    private void mnuSBOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSBOnlineActionPerformed
+        SBOnlineGUI.exibir(this);
+    }//GEN-LAST:event_mnuSBOnlineActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5622,6 +5636,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRensoftware;
     private javax.swing.JMenuItem mnuRepleis;
+    private javax.swing.JMenuItem mnuSBOnline;
     private javax.swing.JMenuItem mnuSDInformatica;
     private javax.swing.JMenu mnuSQLServer;
     private javax.swing.JMenu mnuSQLServer2;
