@@ -104,7 +104,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
         });
 
         btnInserirUnidade.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirUnidade, "Cadastrar Sistema");
+        org.openide.awt.Mnemonics.setLocalizedText(btnInserirUnidade, "Cadastrar Unidade");
         btnInserirUnidade.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInserirUnidadeActionPerformed(evt);
