@@ -312,6 +312,7 @@ import vrimplantacao2_5.gui.cadastro.bancodados.ConsultaBancoDadosGUI;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.cadastro.sistema.ConsultaSistemaGUI;
 import vrimplantacao2_5.gui.cadastro.sistemabancodados.ConsultaSistemaBancoDadosGUI;
+import vrimplantacao2_5.gui.cadastro.unidade.ConsultaUnidadeGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
 
@@ -614,6 +615,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem13 = new javax.swing.JMenuItem();
+        jMenuItem15 = new javax.swing.JMenuItem();
         mnuCadastros = new javax.swing.JMenu();
         mnuMapeamentoDeLojas = new javax.swing.JMenuItem();
         mnuInterface = new javax.swing.JMenu();
@@ -1136,6 +1138,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu1.add(jMenuItem13);
+
+        jMenuItem15.setText("Unidades");
+        jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem15ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem15);
 
         mnuAjuda1.add(jMenu1);
 
@@ -5441,6 +5451,11 @@ public final class MenuGUI extends VRMdiFrame {
         ConsultaSistemaBancoDadosGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
+    private void jMenuItem15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem15ActionPerformed
+        // TODO add your handling code here:
+        ConsultaUnidadeGUI.exibir(this);
+    }//GEN-LAST:event_jMenuItem15ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5453,6 +5468,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem14;
+    private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem23;
