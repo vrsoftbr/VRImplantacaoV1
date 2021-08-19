@@ -92,6 +92,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
+                OpcaoFornecedor.TELEFONE,
+                OpcaoFornecedor.CEP,
                 OpcaoFornecedor.PRODUTO_FORNECEDOR
         ));
     }
@@ -100,6 +102,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
     public Set<OpcaoCliente> getOpcoesDisponiveisCliente() {
         return new HashSet<>(Arrays.asList(
                 OpcaoCliente.DADOS,
+                OpcaoCliente.TELEFONE,
+                OpcaoCliente.CEP,
                 OpcaoCliente.RECEBER_CREDITOROTATIVO
         ));
     }
@@ -374,7 +378,8 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     + "	e.\"Municipio\" as municipio,\n"
                     + "	e.\"MunicipioCodigo\" as municipioibge,\n"
                     + "	e.\"UF\" as uf,\n"
-                    + "	trim(t.\"DDD\"||' '||t.\"Numero\") as telefone,\n"
+                    + " e.\"Cep\" as cep,\n"
+                    + "	trim(coalesce(t.\"DDD\", '')||' '||coalesce(t.\"Numero\", '')) as telefone,\n"
                     + "	t.\"Contato\" as contato,\n"
                     + "	em.\"Endereco\" as email\n"
                     + "from dbo.\"Entidade\" f\n"
@@ -403,6 +408,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setIbge_municipio(rst.getInt("municipioibge"));
                     imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
                     imp.setTel_principal(rst.getString("telefone"));
 
                     if (rst.getString("contato") != null && !rst.getString("contato").trim().isEmpty()) {
@@ -475,6 +481,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     + "	e.\"Municipio\" as municipio,\n"
                     + "	e.\"MunicipioCodigo\" as municipioibge,\n"
                     + "	e.\"UF\" as uf,\n"
+                    + " e.\"Cep\" as cep,\n"        
                     + "	trim(t.\"DDD\"||' '||t.\"Numero\") as telefone,\n"
                     + "	t.\"Contato\" as contato,\n"
                     + "	em.\"Endereco\" as email\n"
@@ -503,6 +510,7 @@ public class SuperControle_PostgresDAO extends InterfaceDAO implements MapaTribu
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setMunicipioIBGE(rst.getInt("municipioibge"));
                     imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
                     result.add(imp);
