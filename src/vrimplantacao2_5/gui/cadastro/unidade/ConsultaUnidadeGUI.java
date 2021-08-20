@@ -37,7 +37,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
     
     private void setConfiguracao() throws Exception {
         centralizarForm();
-        setTitle("Consulta Sistemas x Banco Dados");
+        setTitle("Consulta Unidades VR");
         
         txtFiltroUnidade.setTextCase(TextCase.UPPERCASE);
         
@@ -223,7 +223,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
             cadastroUnidadeGUI.editar(this.unidadeVO);
             cadastroUnidadeGUI.setVisible(true);
         } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Cadastro Sistemas x Banco de Dados");
+            Util.exibirMensagemErro(ex, "Cadastro Unidades VR");
         } finally {
             menuGUI.setDefaultCursor();
         }

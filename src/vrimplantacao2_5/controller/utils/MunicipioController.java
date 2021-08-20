@@ -13,8 +13,8 @@ public class MunicipioController {
     private MunicipioService municipioService = new MunicipioService();
     private List<MunicipioVO> municipioVO = null;
     
-    public void getMunicipios(int idEstado) throws Exception {
-        municipioVO = municipioService.getMunicipios(idEstado);
+    public List<MunicipioVO> getMunicipios(int idEstado) throws Exception {
+        return municipioVO = municipioService.getMunicipios(idEstado);
     }
     
     public List<MunicipioVO> getMunicipio() {

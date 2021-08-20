@@ -1139,7 +1139,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu1.add(jMenuItem13);
 
-        jMenuItem15.setText("Unidades");
+        jMenuItem15.setText("Unidades VR");
         jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem15ActionPerformed(evt);
