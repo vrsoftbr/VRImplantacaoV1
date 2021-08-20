@@ -19,6 +19,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -35,7 +36,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
     public String getSistema() {
         return "Eco Centauro";
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -135,7 +136,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                 OpcaoFornecedor.CNPJ_CPF,
                 OpcaoFornecedor.INSCRICAO_ESTADUAL,
                 OpcaoFornecedor.INSCRICAO_MUNICIPAL,
-                OpcaoFornecedor.PRODUTO_FORNECEDOR
+                OpcaoFornecedor.PRODUTO_FORNECEDOR,
+                OpcaoFornecedor.PAGAR_FORNECEDOR
         ));
     }
 
@@ -375,6 +377,50 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
     }
 
     @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + " cp.IDSEQUENCIA id,\n"
+                    + " cp.FORNECEDOR idfornecedor,\n"
+                    + " cpfcnpj cnpj,\n"
+                    + " cp.DOCUMENTO numerodocumento,\n"
+                    + " d.EMISSAO dataemissao,\n"
+                    + " d.DATADIGITACAO dataentrada,\n"
+                    + " cp.VALOR, \n"
+                    + " cp.VENCIMENTO datavencimento,\n"
+                    + " COALESCE (cp.OBS,'')||cp.DOCUMENTO||'-'||cp.PARCELA AS OBS \n"
+                    + "FROM \n"
+                    + "	TPAGPARCELA cp\n"
+                    + "	LEFT JOIN TPAGDOCUMENTO d ON d.DOCUMENTO = cp.DOCUMENTO \n"
+                    + "	LEFT JOIN TPAGFORNECEDOR f ON cp.FORNECEDOR = f.CODIGO \n"
+                    + "WHERE \n"
+                    + "	cp.EMPRESA = " + getLojaOrigem() + "\n"
+                    + "	AND cp.DATABAIXA IS NULL"
+            )) {
+                while (rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntrada(rs.getDate("dataentrada"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setVencimento(rs.getDate("datavencimento"));
+                    imp.setObservacao(rs.getString("obs"));
+                    
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -473,14 +519,14 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setEcf(rs.getString("ecf"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
         List<ProdutoAutomacaoVO> result = new ArrayList<>();
 
@@ -598,5 +644,5 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
         } else {
             return Long.parseLong(codigo);
         }
-    }  
+    }
 }
