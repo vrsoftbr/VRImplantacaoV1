@@ -8,11 +8,13 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;
+import vrimplantacao2_5.controller.utils.EstadoController;
+import vrimplantacao2_5.controller.utils.MunicipioController;
 import static vrimplantacao2_5.gui.cadastro.sistemabancodados.CadastroSistemaBancoDadosGUI.consultaSistemaBancoDadosGUI;
-import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaBancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.SistemaVO;
 import vrimplantacao2_5.vo.cadastro.UnidadeVO;
+import vrimplantacao2_5.vo.utils.EstadoVO;
 
 public class CadastroUnidadeGUI extends VRInternalFrame {
 
@@ -21,6 +23,8 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
     public static CadastroUnidadeGUI cadastroUnidadeGUI = null;
     public static ConsultaUnidadeGUI consultaUnidadeGUI = null;
     private UnidadeController unidadeController = null;
+    private EstadoController estadoController = null;
+    private MunicipioController municipioController = null;
     private UnidadeVO unidadeVO = null;
 
     public CadastroUnidadeGUI(VRMdiFrame menuGUI) throws Exception {
@@ -33,9 +37,10 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
         this.parentFrame = menuGUI;
         unidadeController = new UnidadeController();
         consultaUnidadeGUI = new ConsultaUnidadeGUI(menuGUI);
+        estadoController = new EstadoController();
+        municipioController = new MunicipioController();
         
-        getBancoDados();
-        getSistemas();
+        getEstados();
     }
     
     @Override
@@ -43,25 +48,11 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
     }
 
     private void setConfigurarCampos() {
-        txtPorta.setObrigatorio(false);
-        txtPorta.setCaixaAlta(false);
-        txtNomeSchema.setObrigatorio(false);
-        txtNomeSchema.setCaixaAlta(false);
-        txtUsuario.setObrigatorio(false);
-        txtUsuario.setCaixaAlta(false);
-        txtSenha.setObrigatorio(false);
-        txtSenha.setCaixaAlta(false);        
     }
     
     @Override
     public void salvar() throws Exception {
         SistemaBancoDadosVO vo = new SistemaBancoDadosVO();
-        vo.setIdSistema(cboSistema.getId());
-        vo.setIdBancoDados(cboBancoDados.getId());
-        vo.setPorta(Integer.parseInt(txtPorta.getText().trim()));
-        vo.setNomeSchema(txtNomeSchema.getText().trim());
-        vo.setUsuario(txtUsuario.getText().trim());
-        vo.setSenha(txtSenha.getText().trim());
         
         /*if (idSistemaBancoDados <= 0) {
             sistemaBancoDadosController.inserir(vo);
@@ -107,32 +98,18 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
             menuGUI.setDefaultCursor();
         }
     }
-    
-    private void getSistemas() throws Exception {
-        cboSistema.setModel(new DefaultComboBoxModel());
         
-        List<SistemaVO> sistemas = consultaSistemaBancoDadosGUI.controller.getSistemas();
+    private void getEstados() throws Exception {
+        cboUF.setModel(new DefaultComboBoxModel());
         
-        if (sistemas == null) {
+        List<EstadoVO> estados = estadoController.getEstados();
+        
+        if (estados == null) {
             return ;
         }
         
-        for (SistemaVO vo : sistemas) {
-            cboSistema.addItem(new ItemComboVO(vo.getId(), vo.getNome()));
-        }
-    }
-    
-    private void getBancoDados() throws Exception {
-        cboBancoDados.setModel(new DefaultComboBoxModel());
-
-        List<BancoDadosVO> bancoDados = consultaSistemaBancoDadosGUI.controller.getBancoDados();
-
-        if (bancoDados == null) {
-            return;
-        }
-
-        for (BancoDadosVO vo : bancoDados) {
-            cboBancoDados.addItem(new ItemComboVO(vo.getId(), vo.getNome()));
+        for (EstadoVO vo : estados) {
+            cboUF.addItem(new ItemComboVO(vo.getId(), vo.getDescricao()));
         }
     }
     
@@ -144,23 +121,17 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
         btnTbIncluir = new vrframework.bean.button.VRButton();
         btnTbSalvar = new vrframework.bean.button.VRButton();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
-        vRLabel3 = new vrframework.bean.label.VRLabel();
-        txtSenha = new vrframework.bean.textField.VRTextField();
-        txtPorta = new vrframework.bean.textField.VRTextField();
-        vRLabel4 = new vrframework.bean.label.VRLabel();
-        txtUsuario = new vrframework.bean.textField.VRTextField();
-        vRLabel5 = new vrframework.bean.label.VRLabel();
-        cboSistema = new vrframework.bean.comboBox.VRComboBox();
-        vRLabel2 = new vr.view.components.label.VRLabel();
-        cboBancoDados = new vrframework.bean.comboBox.VRComboBox();
-        vRLabel6 = new vr.view.components.label.VRLabel();
-        txtNomeSchema = new vrframework.bean.textField.VRTextField();
+        txtNomeUnidade = new vrframework.bean.textField.VRTextField();
         vRLabel7 = new vrframework.bean.label.VRLabel();
+        cboUF = new vr.view.components.combobox.VRComboBox();
+        cboMunicipio = new vr.view.components.combobox.VRComboBox();
+        vRLabel1 = new vr.view.components.label.VRLabel();
+        vRLabel2 = new vr.view.components.label.VRLabel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnSalvar = new vrframework.bean.button.VRButton();
 
-        setTitle("Cadastro Sistemas x Banco de Dados");
+        setTitle("Cadastro Unidade");
 
         vRToolBar1.setRollover(true);
 
@@ -188,37 +159,16 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
         });
         vRToolBar1.add(btnTbSalvar);
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel3, "Senha");
-        vRLabel3.setName(""); // NOI18N
+        txtNomeUnidade.setColumns(25);
+        txtNomeUnidade.setName(""); // NOI18N
+        txtNomeUnidade.setObrigatorio(false);
 
-        txtSenha.setColumns(25);
-        txtSenha.setName(""); // NOI18N
-        txtSenha.setObrigatorio(false);
-
-        txtPorta.setColumns(25);
-        txtPorta.setName(""); // NOI18N
-        txtPorta.setObrigatorio(false);
-
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel4, "Porta");
-        vRLabel4.setName(""); // NOI18N
-
-        txtUsuario.setColumns(25);
-        txtUsuario.setName(""); // NOI18N
-        txtUsuario.setObrigatorio(false);
-
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, "Usuário");
-        vRLabel5.setName(""); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel2, "Sistema");
-
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel6, "Banco de Dados");
-
-        txtNomeSchema.setColumns(25);
-        txtNomeSchema.setName(""); // NOI18N
-        txtNomeSchema.setObrigatorio(false);
-
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Schema");
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Unidade");
         vRLabel7.setName(""); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "Estado");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel2, "Município");
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
@@ -227,66 +177,32 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cboBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(vRPanel1Layout.createSequentialGroup()
-                                .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txtPorta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNomeSchema, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(txtNomeUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboUF, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboMunicipio, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cboSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cboBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNomeSchema, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNomeUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboUF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cboMunicipio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         btnSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/sair.png"))); // NOI18N
@@ -403,17 +319,11 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnSalvar;
     private vrframework.bean.button.VRButton btnTbIncluir;
     private vrframework.bean.button.VRButton btnTbSalvar;
-    private vrframework.bean.comboBox.VRComboBox cboBancoDados;
-    private vrframework.bean.comboBox.VRComboBox cboSistema;
-    private vrframework.bean.textField.VRTextField txtNomeSchema;
-    private vrframework.bean.textField.VRTextField txtPorta;
-    private vrframework.bean.textField.VRTextField txtSenha;
-    private vrframework.bean.textField.VRTextField txtUsuario;
+    private vr.view.components.combobox.VRComboBox cboMunicipio;
+    private vr.view.components.combobox.VRComboBox cboUF;
+    private vrframework.bean.textField.VRTextField txtNomeUnidade;
+    private vr.view.components.label.VRLabel vRLabel1;
     private vr.view.components.label.VRLabel vRLabel2;
-    private vrframework.bean.label.VRLabel vRLabel3;
-    private vrframework.bean.label.VRLabel vRLabel4;
-    private vrframework.bean.label.VRLabel vRLabel5;
-    private vr.view.components.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;

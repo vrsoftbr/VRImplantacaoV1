@@ -169,8 +169,8 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
     }//GEN-LAST:event_tblConsultaUnidadeMouseClicked
 
     private void btnInserirUnidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirUnidadeActionPerformed
-        /*CadastroUnidadeGUI.consultaUnidadeGUI = this;
-        CadastroUnidadeGUI.exibir(mdiFrame);*/
+        CadastroUnidadeGUI.consultaUnidadeGUI = this;
+        CadastroUnidadeGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirUnidadeActionPerformed
 
     private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed

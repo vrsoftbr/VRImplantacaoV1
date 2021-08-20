@@ -2,7 +2,7 @@
 
 <Form version="1.5" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JInternalFrameFormInfo">
   <Properties>
-    <Property name="title" type="java.lang.String" value="Cadastro Sistemas x Banco de Dados"/>
+    <Property name="title" type="java.lang.String" value="Cadastro Unidade"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -95,41 +95,18 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="cboSistema" alignment="0" min="-2" pref="250" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="cboBancoDados" alignment="0" min="-2" pref="250" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                              <Component id="txtPorta" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtNomeSchema" alignment="0" min="-2" pref="200" max="-2" attributes="0"/>
-                              <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtUsuario" alignment="0" min="-2" pref="200" max="-2" attributes="0"/>
-                              <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSenha" min="-2" pref="200" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
+                      <Component id="txtNomeUnidade" alignment="0" min="-2" pref="253" max="-2" attributes="0"/>
+                      <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboUF" min="-2" pref="150" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboMunicipio" min="-2" pref="290" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -139,108 +116,24 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="cboSistema" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="cboBancoDados" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtPorta" min="-2" pref="20" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtUsuario" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                              <Component id="txtSenha" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtNomeSchema" min="-2" pref="20" max="-2" attributes="0"/>
-                      </Group>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="txtNomeUnidade" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="cboUF" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="cboMunicipio" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="22" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Senha"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtSenha">
-          <Properties>
-            <Property name="columns" type="int" value="25"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-            <Property name="obrigatorio" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="false" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtPorta">
-          <Properties>
-            <Property name="columns" type="int" value="25"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-            <Property name="obrigatorio" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="false" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Porta"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
-          <Properties>
-            <Property name="columns" type="int" value="25"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-            <Property name="obrigatorio" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="false" type="code"/>
-            </Property>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Usu&#xe1;rio"/>
-            <Property name="name" type="java.lang.String" value="" noResource="true"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.comboBox.VRComboBox" name="cboSistema">
-        </Component>
-        <Component class="vr.view.components.label.VRLabel" name="vRLabel2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Sistema"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.comboBox.VRComboBox" name="cboBancoDados">
-        </Component>
-        <Component class="vr.view.components.label.VRLabel" name="vRLabel6">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Banco de Dados"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtNomeSchema">
+        <Component class="vrframework.bean.textField.VRTextField" name="txtNomeUnidade">
           <Properties>
             <Property name="columns" type="int" value="25"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
@@ -251,8 +144,22 @@
         </Component>
         <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Schema"/>
+            <Property name="text" type="java.lang.String" value="Unidade"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="vr.view.components.combobox.VRComboBox" name="cboUF">
+        </Component>
+        <Component class="vr.view.components.combobox.VRComboBox" name="cboMunicipio">
+        </Component>
+        <Component class="vr.view.components.label.VRLabel" name="vRLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Estado"/>
+          </Properties>
+        </Component>
+        <Component class="vr.view.components.label.VRLabel" name="vRLabel2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Munic&#xed;pio"/>
           </Properties>
         </Component>
       </SubComponents>
