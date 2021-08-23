@@ -190,7 +190,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkIcmsCredito.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA));
             chkIcmsCreditoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO));
             chkIcmsConsumidor.setVisible(opt.contains(OpcaoProduto.ICMS_CONSUMIDOR));
-            btnMapaTribut.setVisible(chkICMS.isVisible());
+            btnMapaTribut.setVisible(opt.contains(OpcaoProduto.MAPA_TRIBUTACAO));
             chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
             chkCodigoBeneficio.setVisible(opt.contains(OpcaoProduto.CODIGO_BENEFICIO));
