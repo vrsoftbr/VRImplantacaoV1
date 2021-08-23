@@ -89,7 +89,7 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
         tblConsultaBancoDados = new vrframework.bean.tableEx.VRTableEx();
         btnInserirConexao = new vrframework.bean.button.VRButton();
         txtFiltro = new vr.view.components.textfield.VRTextField();
-        btnInserirConexao1 = new vrframework.bean.button.VRButton();
+        btnPesquisarSistema = new vrframework.bean.button.VRButton();
         vRLabel1 = new vr.view.components.label.VRLabel();
 
         tblConsultaBancoDados.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -106,11 +106,11 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
             }
         });
 
-        btnInserirConexao1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/consultar_20.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao1, "Pesquisar");
-        btnInserirConexao1.addActionListener(new java.awt.event.ActionListener() {
+        btnPesquisarSistema.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/consultar_20.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnPesquisarSistema, "Pesquisar");
+        btnPesquisarSistema.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnInserirConexao1ActionPerformed(evt);
+                btnPesquisarSistemaActionPerformed(evt);
             }
         });
 
@@ -129,7 +129,7 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnInserirConexao1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnPesquisarSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -145,7 +145,7 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInserirConexao1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnPesquisarSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tblConsultaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
                 .addContainerGap())
@@ -170,19 +170,19 @@ public class ConsultaSistemaGUI extends VRInternalFrame {
         CadastroSistemaGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirConexaoActionPerformed
 
-    private void btnInserirConexao1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexao1ActionPerformed
+    private void btnPesquisarSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarSistemaActionPerformed
         try {
             // TODO add your handling code here:
             controller.consultar(txtFiltro.getText().trim());
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
-    }//GEN-LAST:event_btnInserirConexao1ActionPerformed
+    }//GEN-LAST:event_btnPesquisarSistemaActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnInserirConexao;
-    private vrframework.bean.button.VRButton btnInserirConexao1;
+    private vrframework.bean.button.VRButton btnPesquisarSistema;
     private vrframework.bean.tableEx.VRTableEx tblConsultaBancoDados;
     private vr.view.components.textfield.VRTextField txtFiltro;
     private vr.view.components.label.VRLabel vRLabel1;

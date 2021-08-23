@@ -185,8 +185,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_btnPesquisarActionPerformed
-
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnInserirUnidade;
     private vrframework.bean.button.VRButton btnPesquisar;

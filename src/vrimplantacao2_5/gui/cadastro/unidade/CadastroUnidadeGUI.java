@@ -38,7 +38,7 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
         consultaUnidadeGUI = new ConsultaUnidadeGUI(menuGUI);
         estadoController = new EstadoController();
         municipioController = new MunicipioController();
-
+        
         getEstados();        
     }
 
@@ -68,7 +68,7 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
         
         if (vo.getId() != 0) {
             txtCodigo.setText(String.valueOf(vo.getId()));
-            unidadeController.consultar(vo);
+            consultaUnidadeGUI.controller.consultar(null);
 
             try {
                 Util.exibirMensagem("Unidade VR salva com sucesso!", getTitle());

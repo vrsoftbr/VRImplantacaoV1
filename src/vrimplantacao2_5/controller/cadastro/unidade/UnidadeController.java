@@ -32,7 +32,7 @@ public class UnidadeController {
     }
     
     public void consultar(UnidadeVO vo) throws Exception {
-        unidadeVO = this.unidadeService.consultar(vo);
+        this.unidadeVO = unidadeService.consultar(vo);
         consultaUnidadeGUI.consultar();
     }
     
