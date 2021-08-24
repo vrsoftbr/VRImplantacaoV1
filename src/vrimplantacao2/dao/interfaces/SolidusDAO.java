@@ -241,7 +241,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.RECEITA_BALANCA,
             OpcaoProduto.RECEITA,
             OpcaoProduto.DIVISAO,
-            OpcaoProduto.DIVISAO_PRODUTO,}));
+            OpcaoProduto.DIVISAO_PRODUTO
+        }));
     }
 
     @Override
