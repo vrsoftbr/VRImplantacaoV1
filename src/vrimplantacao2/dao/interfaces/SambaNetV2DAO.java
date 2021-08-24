@@ -30,6 +30,7 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String complemento;
     public boolean utilizarTabelaParam = false;
+    public String rotativoPDV = "";
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
@@ -396,7 +397,13 @@ public class SambaNetV2DAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
                     imp.setId(rst.getString("ID"));
+                    
+                    if(!rotativoPDV.isEmpty()) {
+                        imp.setId(rotativoPDV + "-" + rst.getString("ID"));
+                    }
+
                     imp.setIdCliente(rst.getString("CODCLIE"));
                     imp.setDataEmissao(rst.getDate("DTEMISSAO"));
                     imp.setDataVencimento(rst.getDate("DTVENCTO"));
