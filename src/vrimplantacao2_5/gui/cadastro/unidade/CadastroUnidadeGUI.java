@@ -35,7 +35,6 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
 
         this.parentFrame = menuGUI;
         unidadeController = new UnidadeController();
-        consultaUnidadeGUI = new ConsultaUnidadeGUI(menuGUI);
         estadoController = new EstadoController();
         municipioController = new MunicipioController();
         
@@ -79,13 +78,12 @@ public class CadastroUnidadeGUI extends VRInternalFrame {
     }
 
     public void editar(UnidadeVO unidadeVO) throws Exception {
-
-        /*cboSistema.setId(sistemaBancoDadosVO.getIdSistema());
-        cboBancoDados.setId(sistemaBancoDadosVO.getIdBancoDados());
-        txtPorta.setText(String.valueOf(sistemaBancoDadosVO.getPorta()));
-        txtNomeSchema.setText(sistemaBancoDadosVO.getNomeSchema());
-        txtUsuario.setText(sistemaBancoDadosVO.getUsuario());
-        txtSenha.setText(sistemaBancoDadosVO.getSenha());*/
+        this.unidadeVO = unidadeVO;
+        
+        txtCodigo.setText(String.valueOf(unidadeVO.getId()));
+        txtNomeUnidade.setText(unidadeVO.getNome());
+        cboUF.setId(unidadeVO.getIdEstado());
+        cboMunicipio.setId(unidadeVO.getIdMunicipio());        
     }
 
     public static void exibir(VRMdiFrame menuGUI) {

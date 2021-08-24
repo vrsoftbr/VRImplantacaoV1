@@ -12,7 +12,7 @@ import vrimplantacao2_5.vo.cadastro.UnidadeVO;
 public class UnidadeController {
 
     private final UnidadeService unidadeService = new UnidadeService();
-    private ConsultaUnidadeGUI consultaUnidadeGUI;
+    private ConsultaUnidadeGUI consultaUnidadeGUI = null;
     private List<UnidadeVO> unidadeVO = null;
     
     public UnidadeController() {
