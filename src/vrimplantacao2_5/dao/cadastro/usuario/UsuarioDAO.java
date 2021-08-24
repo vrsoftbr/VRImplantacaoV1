@@ -115,4 +115,18 @@ public class UsuarioDAO {
             }
         }
     }
+    
+    public boolean existeUsuario(UsuarioVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id \n"
+                    + "from implantacao2_5.usuario \n"
+                    + "where login = '" + vo.getLogin()+ "' \n"
+                    + "and id_unidade = " + vo.getIdUnidade()
+            )) {
+                return rst.next();
+            }
+        }
+    }   
 }
