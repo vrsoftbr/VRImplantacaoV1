@@ -219,6 +219,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    pg.pesoliquido AS pesoliquido,\n"
                     + "    pg.datacadastro AS datacadastro,\n"
                     + "    pg.classificacaofiscal AS ncm,\n"
+                    + "    c.cest as cest,\n"
                     + "    p.custofabrica AS custosemimposto,\n"
                     + "    p.custofinal AS custocomimposto,\n"
                     + "    p.margemlucro AS margem,\n"
@@ -230,16 +231,23 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    p.subgrupo AS mercadologico2,\n"
                     + "    '1' AS mercadologico3,\n"
                     + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
-                    + "    gi.csf AS csticms,\n"
-                    + "    p.aliqcompra_icms AS aliquota_credito,\n"
-                    + "    p.aliqcompra_reducao AS reducao_credito,\n"
-                    + "    p.aliqvenda_icms1 AS aliquota_debito,\n"
-                    + "    p.aliqvenda_reducao AS reducao_debito\n"
+                    + "    icm_s.vendacsf1 AS cst_saida,\n"
+                    + "    icm_s.vendaicms1 AS aliquota_saida,\n"
+                    + "    icm_s.vendareducao1 AS reducao_saida,\n"
+                    + "    icm_e.compracsf AS cst_entrada,\n"
+                    + "    icm_e.compraicms AS aliquota_entrada,\n"
+                    + "    icm_e.comprareducao AS reducao_entrada\n"
                     + "FROM TESTPRODUTOGERAL pg\n"
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
                     + "    AND p.empresa = '" + getLojaOrigem() + "'\n"
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
-                   // + "WHERE p.ativo = 'S'\n"
+                    + "LEFT JOIN TESTICMS icm_s on icm_s.produto = pg.codigo\n"
+                    + "    AND icm_s.empresa = '" + getLojaOrigem() + "'\n"
+                    + "    AND icm_s.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "LEFT JOIN TESTICMS icm_e on icm_e.produto = pg.codigo\n"
+                    + "    AND icm_e.empresa = '" + getLojaOrigem() + "'\n"
+                    + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -268,6 +276,19 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+
+                    String idIcmsDebito, IdIcmsCredito;
+
+                    idIcmsDebito = rst.getString("cst_saida") + "-" + rst.getString("aliquota_saida") + "-" + rst.getString("reducao_saida");
+                    IdIcmsCredito = rst.getString("cst_entrada") + "-" + rst.getString("aliquota_entrada") + "-" + rst.getString("reducao_entrada");
+
+                    imp.setIcmsDebitoId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoId(idIcmsDebito);
+                    imp.setIcmsDebitoForaEstadoNfId(idIcmsDebito);
+                    imp.setIcmsCreditoId(IdIcmsCredito);
+                    imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
+                    imp.setIcmsConsumidorId(idIcmsDebito);
 
                     if (rst.getString("referencia") != null && !rst.getString("referencia").trim().isEmpty()) {
                         if (!rst.getString("descricaocompleta").contains(rst.getString("referencia").trim())) {
@@ -411,7 +432,6 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setValor(rs.getDouble("valor"));
                     imp.setVencimento(rs.getDate("datavencimento"));
                     imp.setObservacao(rs.getString("obs"));
-                    
 
                     result.add(imp);
                 }
