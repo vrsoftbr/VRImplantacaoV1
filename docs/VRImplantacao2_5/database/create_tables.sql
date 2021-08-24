@@ -72,6 +72,17 @@ CREATE TABLE IF NOT EXISTS implantacao2_5.unidade(
 		REFERENCES estado (id),	
 )
 
+ALTER TABLE implantacao2_5.unidade ADD CONSTRAINT un_unidade UNIQUE (nome, id_municipio, id_estado);
+
+CREATE TABLE IF NOT EXISTS implantacao2_5.usuario(
+	id serial PRIMARY KEY NOT NULL,
+	nome VARCHAR(30) NOT NULL,
+	login VARCHAR(30) NOT NULL,
+	senha VARCHAR(30) NOT NULL,
+	id_unidade INTEGER NOT NULL,
+	CONSTRAINT fk_id_unidade FOREIGN KEY (id_unidade)
+		REFERENCES implantacao2_5.unidade (id)
+)
 
 /*ALTER TABLE implantacao2_5.sistemabancodados ADD CONSTRAINT un_sistema_bancodados UNIQUE (id_sistema, id_bancodados);
 ALTER TABLE implantacao2_5.sistemabancodados ADD nomeschema VARCHAR(60);
