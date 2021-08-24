@@ -157,8 +157,10 @@
                                   <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="lblPDV" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtPDV" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="231" max="32767" attributes="0"/>
+                          <EmptySpace pref="252" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -173,7 +175,11 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="186" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lblPDV" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                          <Component id="txtPDV" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="135" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -197,6 +203,13 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteValorLimite">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Valor Limite"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JTextField" name="txtPDV">
+                </Component>
+                <Component class="javax.swing.JLabel" name="lblPDV">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="PDV"/>
                   </Properties>
                 </Component>
               </SubComponents>
