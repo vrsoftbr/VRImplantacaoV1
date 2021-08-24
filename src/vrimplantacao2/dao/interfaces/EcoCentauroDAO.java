@@ -239,7 +239,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TESTPRODUTO p ON p.produto = pg.codigo\n"
                     + "    AND p.empresa = '" + getLojaOrigem() + "'\n"
                     + "LEFT JOIN TESTGRUPOICMS gi ON gi.codigoid = pg.grupoicms\n"
-                    + "WHERE p.ativo = 'S'\n"
+                   // + "WHERE p.ativo = 'S'\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
