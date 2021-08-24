@@ -55,8 +55,11 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
                     result.add(new MapaTributoIMP(
                             id,
-                            id
-                    )
+                            id,
+                            rs.getInt("cst_saida"),
+                            rs.getDouble("aliquota_saida"),
+                            rs.getDouble("reducao_saida")
+                        )
                     );
                 }
             }
@@ -75,8 +78,11 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     String id = rs.getString("cst_entrada") + "-" + rs.getString("aliquota_entrada") + "-" + rs.getString("reducao_entrada");
                     result.add(new MapaTributoIMP(
                             id,
-                            id
-                    )
+                            id,
+                            rs.getInt("cst_entrada"),
+                            rs.getDouble("aliquota_entrada"),
+                            rs.getDouble("reducao_entrada")
+                        )
                     );
                 }
             }
