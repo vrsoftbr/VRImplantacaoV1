@@ -167,7 +167,7 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString(""));
@@ -287,10 +287,42 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	r.CODIGO,\n"
+                    + "	r.CLIENTE,\n"
+                    + "	case\n"
+                    + "	  when c.CPF is null then c.CGC\n"
+                    + "	  else c.CPF\n"
+                    + "	end cpf_cnpj,\n"
+                    + "	r.EMISSAO,\n"
+                    + "	r.JUROS,\n"
+                    + "	r.VALPAGO,\n"
+                    + "	r.NOTAPEDIDO,\n"
+                    + "	r.FATURA,\n"
+                    + "	r.OBS,\n"
+                    + "	r.VENCIMENTO,\n"
+                    + "	r.UltPag\n"
+                    + "from\n"
+                    + "	receber r\n"
+                    + "join Cliente c on\n"
+                    + "	r.CLIENTE = c.CODIGO\n"
+                    + "where\n"
+                    + "	r.BAIXA = 0\n"
+                    + "order by\n"
+                    + "	r.CODIGO"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rs.getString("codigo"));
+                    imp.setIdCliente(rs.getString("cliente"));
+                    imp.setCnpjCliente(rs.getString("cpf_cnpj"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    imp.setValor(rs.getDouble("fatura"));
+                    imp.setNumeroCupom(rs.getString("notapedido"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
 
                     result.add(imp);
                 }
