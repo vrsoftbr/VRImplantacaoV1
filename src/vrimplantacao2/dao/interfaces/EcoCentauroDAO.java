@@ -59,7 +59,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                             rs.getInt("cst_saida"),
                             rs.getDouble("aliquota_saida"),
                             rs.getDouble("reducao_saida")
-                        )
+                    )
                     );
                 }
             }
@@ -82,7 +82,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                             rs.getInt("cst_entrada"),
                             rs.getDouble("aliquota_entrada"),
                             rs.getDouble("reducao_entrada")
-                        )
+                    )
                     );
                 }
             }
@@ -521,19 +521,21 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	cr.EMPRESA||cr.CLIENTE||cr.MESANO id,\n"
-                    + "	cr.EMPRESA||cr.CLIENTE||cr.MESANO numerocupom,\n"
-                    + "	CREDIARIO valor,\n"
+                    + "	cr.IDTRECPARCELA id,\n"
+                    + "	cr.DOCUMENTO numerocupom,\n"
+                    + "	cr.valor,\n"
                     + "	cr.CLIENTE codcli,\n"
-                    + " cpfcnpj cnpjcliente,\n"
+                    + "	cpfcnpj cnpjcliente,\n"
                     + "	1 AS ecf,\n"
-                    + "	CAST(cr.DATAHORAALTERACAO AS date) emissao,\n"
-                    + "	CAST(cr.DATAHORAALTERACAO AS date)+10 vencimento\n"
+                    + "	t.EMISSAO emissao,\n"
+                    + "	cr.vencimento\n"
                     + "FROM\n"
-                    + "	TRECDEBITOMENSAL cr\n"
-                    + " LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
+                    + "	TRECPARCELA cr\n"
+                    + "LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
+                    + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO \n"
                     + "WHERE\n"
-                    + "	EMPRESA = " + getLojaOrigem() + ""
+                    + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
+                    + "	AND cr.databaixa IS NULL"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
