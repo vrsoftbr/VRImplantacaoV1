@@ -54,7 +54,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
         column.add(new VRColumnTable("Município", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Estado", true, SwingConstants.LEFT, false, null));
 
-        tblConsultaUnidade.configurarColuna(column, this, "Consulta", "");
+        tblConsulta.configurarColuna(column, this, "Consulta", "");
     }
     
     @Override
@@ -70,19 +70,19 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
             i++;
         }
 
-        tblConsultaUnidade.setRowHeight(20);
-        tblConsultaUnidade.setModel(dados);
+        tblConsulta.setRowHeight(20);
+        tblConsulta.setModel(dados);
     }
 
     @Override
     public void editar() {
         unidadeVO = new UnidadeVO();
         
-        if(tblConsultaUnidade.getLinhaSelecionada() == -1) {
+        if(tblConsulta.getLinhaSelecionada() == -1) {
             return;
         }
         
-        unidadeVO = controller.getUnidade().get(tblConsultaUnidade.getLinhaSelecionada());
+        unidadeVO = controller.getUnidade().get(tblConsulta.getLinhaSelecionada());
         
         exibirCadastroUnidade(mdiFrame);
     }
@@ -91,23 +91,23 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tblConsultaUnidade = new vrframework.bean.tableEx.VRTableEx();
-        btnInserirUnidade = new vrframework.bean.button.VRButton();
+        tblConsulta = new vrframework.bean.tableEx.VRTableEx();
+        btnInserir = new vrframework.bean.button.VRButton();
         txtFiltroUnidade = new vr.view.components.textfield.VRTextField();
         btnPesquisar = new vrframework.bean.button.VRButton();
         vRLabel1 = new vr.view.components.label.VRLabel();
 
-        tblConsultaUnidade.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblConsulta.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblConsultaUnidadeMouseClicked(evt);
+                tblConsultaMouseClicked(evt);
             }
         });
 
-        btnInserirUnidade.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirUnidade, "Cadastrar Unidade");
-        btnInserirUnidade.addActionListener(new java.awt.event.ActionListener() {
+        btnInserir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnInserir, "Cadastrar Unidade");
+        btnInserir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnInserirUnidadeActionPerformed(evt);
+                btnInserirActionPerformed(evt);
             }
         });
 
@@ -128,7 +128,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tblConsultaUnidade, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -136,7 +136,7 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnInserirUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -148,16 +148,16 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtFiltroUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInserirUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tblConsultaUnidade, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tblConsultaUnidadeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaUnidadeMouseClicked
+    private void tblConsultaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaMouseClicked
         if (evt.getClickCount() > 1) {
             try {
                 editar();
@@ -166,12 +166,12 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
                 Exceptions.printStackTrace(ex);
             }
         }
-    }//GEN-LAST:event_tblConsultaUnidadeMouseClicked
+    }//GEN-LAST:event_tblConsultaMouseClicked
 
-    private void btnInserirUnidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirUnidadeActionPerformed
+    private void btnInserirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirActionPerformed
         CadastroUnidadeGUI.consultaUnidadeGUI = this;
         CadastroUnidadeGUI.exibir(mdiFrame);
-    }//GEN-LAST:event_btnInserirUnidadeActionPerformed
+    }//GEN-LAST:event_btnInserirActionPerformed
 
     private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
         try {
@@ -187,9 +187,9 @@ public class ConsultaUnidadeGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnPesquisarActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private vrframework.bean.button.VRButton btnInserirUnidade;
+    private vrframework.bean.button.VRButton btnInserir;
     private vrframework.bean.button.VRButton btnPesquisar;
-    private vrframework.bean.tableEx.VRTableEx tblConsultaUnidade;
+    private vrframework.bean.tableEx.VRTableEx tblConsulta;
     private vr.view.components.textfield.VRTextField txtFiltroUnidade;
     private vr.view.components.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables

@@ -61,7 +61,7 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
         column.add(new VRColumnTable("Usuário", true, SwingConstants.LEFT, false, null));
         column.add(new VRColumnTable("Senha", true, SwingConstants.LEFT, false, null));
 
-        tblConsultaSistemaBancoDados.configurarColuna(column, this, "Consulta", "");
+        tblConsulta.configurarColuna(column, this, "Consulta", "");
     }
     
     @Override
@@ -80,19 +80,19 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
             i++;
         }
 
-        tblConsultaSistemaBancoDados.setRowHeight(20);
-        tblConsultaSistemaBancoDados.setModel(dados);
+        tblConsulta.setRowHeight(20);
+        tblConsulta.setModel(dados);
     }
 
     @Override
     public void editar() {
         sistemaBancoDadosVO = new SistemaBancoDadosVO();
         
-        if(tblConsultaSistemaBancoDados.getLinhaSelecionada() == -1) {
+        if(tblConsulta.getLinhaSelecionada() == -1) {
             return;
         }
         
-        sistemaBancoDadosVO = controller.getSistemaBancoDados().get(tblConsultaSistemaBancoDados.getLinhaSelecionada());
+        sistemaBancoDadosVO = controller.getSistemaBancoDados().get(tblConsulta.getLinhaSelecionada());
         
         exibirCadastroSistemaBancoDados(mdiFrame);
     }
@@ -101,33 +101,33 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tblConsultaSistemaBancoDados = new vrframework.bean.tableEx.VRTableEx();
-        btnInserirConexao = new vrframework.bean.button.VRButton();
+        tblConsulta = new vrframework.bean.tableEx.VRTableEx();
+        btnInserir = new vrframework.bean.button.VRButton();
         txtFiltroSistema = new vr.view.components.textfield.VRTextField();
-        btnInserirConexao1 = new vrframework.bean.button.VRButton();
+        btnPesquisar = new vrframework.bean.button.VRButton();
         cboFiltroBancoDados = new vrframework.bean.comboBox.VRComboBox();
         vRLabel1 = new vr.view.components.label.VRLabel();
         vRLabel2 = new vr.view.components.label.VRLabel();
 
-        tblConsultaSistemaBancoDados.addMouseListener(new java.awt.event.MouseAdapter() {
+        tblConsulta.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblConsultaSistemaBancoDadosMouseClicked(evt);
+                tblConsultaMouseClicked(evt);
             }
         });
 
-        btnInserirConexao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao, "Cadastrar Sistema");
-        btnInserirConexao.addActionListener(new java.awt.event.ActionListener() {
+        btnInserir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/adicionar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnInserir, "Cadastrar Sistema");
+        btnInserir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnInserirConexaoActionPerformed(evt);
+                btnInserirActionPerformed(evt);
             }
         });
 
-        btnInserirConexao1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/consultar_20.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnInserirConexao1, "Pesquisar");
-        btnInserirConexao1.addActionListener(new java.awt.event.ActionListener() {
+        btnPesquisar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/consultar_20.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnPesquisar, "Pesquisar");
+        btnPesquisar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnInserirConexao1ActionPerformed(evt);
+                btnPesquisarActionPerformed(evt);
             }
         });
 
@@ -142,7 +142,7 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tblConsultaSistemaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -153,9 +153,9 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(cboFiltroBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnInserirConexao1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -168,18 +168,18 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtFiltroSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInserirConexao1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cboFiltroBancoDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInserirConexao, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tblConsultaSistemaBancoDados, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+                .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tblConsultaSistemaBancoDadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaSistemaBancoDadosMouseClicked
+    private void tblConsultaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultaMouseClicked
         if (evt.getClickCount() > 1) {
             try {
                 editar();
@@ -188,14 +188,14 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
                 Exceptions.printStackTrace(ex);
             }
         }
-    }//GEN-LAST:event_tblConsultaSistemaBancoDadosMouseClicked
+    }//GEN-LAST:event_tblConsultaMouseClicked
 
-    private void btnInserirConexaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexaoActionPerformed
+    private void btnInserirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirActionPerformed
         CadastroSistemaBancoDadosGUI.consultaSistemaBancoDadosGUI = this;
         CadastroSistemaBancoDadosGUI.exibir(mdiFrame);
-    }//GEN-LAST:event_btnInserirConexaoActionPerformed
+    }//GEN-LAST:event_btnInserirActionPerformed
 
-    private void btnInserirConexao1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirConexao1ActionPerformed
+    private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
         try {
             
             sistemaBancoDadosVO = new SistemaBancoDadosVO();
@@ -207,14 +207,14 @@ public class ConsultaSistemaBancoDadosGUI extends VRInternalFrame {
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
-    }//GEN-LAST:event_btnInserirConexao1ActionPerformed
+    }//GEN-LAST:event_btnPesquisarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private vrframework.bean.button.VRButton btnInserirConexao;
-    private vrframework.bean.button.VRButton btnInserirConexao1;
+    private vrframework.bean.button.VRButton btnInserir;
+    private vrframework.bean.button.VRButton btnPesquisar;
     private vrframework.bean.comboBox.VRComboBox cboFiltroBancoDados;
-    private vrframework.bean.tableEx.VRTableEx tblConsultaSistemaBancoDados;
+    private vrframework.bean.tableEx.VRTableEx tblConsulta;
     private vr.view.components.textfield.VRTextField txtFiltroSistema;
     private vr.view.components.label.VRLabel vRLabel1;
     private vr.view.components.label.VRLabel vRLabel2;

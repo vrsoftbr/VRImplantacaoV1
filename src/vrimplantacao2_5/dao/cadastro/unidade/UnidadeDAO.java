@@ -14,9 +14,27 @@ import vrimplantacao2_5.vo.cadastro.UnidadeVO;
  */
 public class UnidadeDAO {
 
+    private String filtro = "\n";
+    
+    public String getFiltro() {
+        return this.filtro;                
+    }
+    
+    public void setFiltro(String filtro) {
+        this.filtro = filtro;
+    }
+    
     public List<UnidadeVO> consultar(UnidadeVO vo) throws Exception {
         List<UnidadeVO> result = new ArrayList<>();
 
+        if (vo != null) {
+            if (vo.getNome() != null && !vo.getNome().trim().isEmpty()) {
+                setFiltro("where u.nome like '%" + vo.getNome() + "%'");
+            } else {
+                setFiltro("\n");
+            }
+        }
+        
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -29,6 +47,7 @@ public class UnidadeDAO {
                     + "from implantacao2_5.unidade u\n"
                     + "join municipio m on m.id = u.id_municipio\n"
                     + "join estado e on e.id = u.id_estado\n"
+                    + getFiltro()
                     + "order by 2"
             )) {
                 while (rst.next()) {

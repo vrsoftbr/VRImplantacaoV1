@@ -22,7 +22,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tblConsultaUnidade" max="32767" attributes="0"/>
+                  <Component id="tblConsulta" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
@@ -31,7 +31,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnPesquisar" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnInserirUnidade" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnInserir" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -47,22 +47,22 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="txtFiltroUnidade" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnPesquisar" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnInserirUnidade" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
+                  <Component id="btnInserir" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-              <Component id="tblConsultaUnidade" pref="299" max="32767" attributes="0"/>
+              <Component id="tblConsulta" pref="299" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="vrframework.bean.tableEx.VRTableEx" name="tblConsultaUnidade">
+    <Component class="vrframework.bean.tableEx.VRTableEx" name="tblConsulta">
       <Events>
-        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblConsultaUnidadeMouseClicked"/>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblConsultaMouseClicked"/>
       </Events>
     </Component>
-    <Component class="vrframework.bean.button.VRButton" name="btnInserirUnidade">
+    <Component class="vrframework.bean.button.VRButton" name="btnInserir">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/vrframework/img/adicionar.png"/>
@@ -70,7 +70,7 @@
         <Property name="text" type="java.lang.String" value="Cadastrar Unidade"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInserirUnidadeActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInserirActionPerformed"/>
       </Events>
     </Component>
     <Component class="vr.view.components.textfield.VRTextField" name="txtFiltroUnidade">
