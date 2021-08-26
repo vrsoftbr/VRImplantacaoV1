@@ -1,22 +1,17 @@
 package vrimplantacao2.dao.interfaces;
 
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIProperty;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.ProdutoDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -409,14 +404,83 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	p.Codigo id,\n"
+                    + "	p.CodigoBar,\n"
+                    + "	p.Descricao descricaocompleta,\n"
+                    + "	p.Descricao descricaoreduzida,\n"
+                    + "	p.Descricao descricaogondola,\n"
+                    + "	p.Ativo id_situacaocadastro,\n"
+                    + "	p.UltAltera datacadastro,\n"
+                    + "	p.Grupo,\n"
+                    + "	p.SubGrupo,\n"
+                    + "	p.Marca,\n"
+                    + "	p.CodGeneroProduto,\n"
+                    + "	cl.Valor ncm,\n"
+                    + "	cest.CEST,\n"
+                    + "	p.MargemV margem,\n"
+                    + "	p.Balanca,\n"
+                    + "	p.DiasValidade validade,\n"
+                    + "	p.Unidade id_tipoembalagem,\n"
+                    + "	ct.SitTribPIS,\n"
+                    + "	ct.SitTribPISEnt,\n"
+                    + "	ct.NatRecPIS,\n"
+                    + "	p.PVista preco,\n"
+                    + "	p.Custo,\n"
+                    + "	p.EstoqueMin,\n"
+                    + "	p.Estoque,\n"
+                    + "	ctuf.CodUF,\n"
+                    + "	ctuf.SitTribICMS icms_cst,\n"
+                    + "	ctuf.AliqICMS icms_aliq,\n"
+                    + "	ctuf.Reducao icms_red\n"
+                    + "from\n"
+                    + "	Produto p \n"
+                    + "	left join ClassFiscal cl on p.CodClassFiscal = cl.Codigo\n"
+                    + "	left join TabelaCEST cest on p.CodCEST = cest.CodCEST\n"
+                    + "	left join CalcTributo ct on ct.CodClassFiscal = cl.Codigo and ct.FinalidadeConfig != 'N'\n"
+                    + "	left join CalcTributoUF ctuf on ct.CodCalcTributo = ctuf.CodCalcTributo and ctuf.CodUF = 35\n"
+                    + "order by\n"
+                    + "	id"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-
+                    
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("codigobar"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rs.getString("descricaogondola"));
+                    imp.setSituacaoCadastro(rs.getInt("id_situacao"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    
+                    imp.setCodMercadologico1(rs.getString("grupo"));
+                    imp.setCodMercadologico2(rs.getString("subgrupo"));
+                    imp.setCodMercadologico3(rs.getString("marca"));
+                    
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    
+                    imp.seteBalanca(rs.getBoolean("balanca"));
+                    imp.setValidade(rs.getInt("validade"));
+                    imp.setTipoEmbalagem(rs.getString("id_tipoembalagem"));
+                    
+                    imp.setPiscofinsCstDebito(rs.getString("sittribpis"));
+                    imp.setPiscofinsCstCredito(rs.getString("sittribpisent"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("natrecpis"));
+                    
+                    imp.setPrecovenda(rs.getDouble("preco"));
+                    imp.setCustoSemImposto(rs.getDouble("custo"));
+                    imp.setCustoComImposto(imp.getCustoSemImposto());
+                    
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
+                    
+                    imp.setIcmsCstSaida(rs.getInt("icms_cst"));
+                    imp.setIcmsAliqSaida(rs.getDouble("icms_aliq"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red"));
+                    
                     result.add(imp);
                 }
             }

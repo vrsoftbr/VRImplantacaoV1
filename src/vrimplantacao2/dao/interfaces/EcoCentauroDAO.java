@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -15,8 +16,10 @@ import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -237,6 +240,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    p.subgrupo AS mercadologico2,\n"
                     + "    '1' AS mercadologico3,\n"
                     + "    CASE p.ativo WHEN 'S' THEN 1 ELSE 0 END situacaocadastro,\n"
+                    + "    CASE p.SETOR WHEN '001' THEN 1 ELSE 0 END ebalanca,\n"
+                    + "    coalesce(pg.diasvalidade,0) as validade,\n"
                     + "    icm_s.vendacsf1 AS cst_saida,\n"
                     + "    icm_s.vendaicms1 AS aliquota_saida,\n"
                     + "    icm_s.vendareducao1 AS reducao_saida,\n"
@@ -256,12 +261,39 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "ORDER BY 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
+                    
+                    long longEAN = Utils.stringToLong(imp.getEan(), -2);
+                    String strEAN = String.valueOf(longEAN);
+
+                    if (strEAN.startsWith("999000") && strEAN.length() == 13) {
+                        final String eanBal = strEAN.substring(7,strEAN.length()-1);
+                        final int plu = Utils.stringToInt(eanBal, -1);
+                        ProdutoBalancaVO bal = produtosBalanca.get(plu);
+                        if (bal != null) {
+                            imp.setEan(String.valueOf(bal.getCodigo()));
+                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
+                            imp.setValidade(bal.getValidade());
+                        } else {
+                            imp.setEan(eanBal);
+                            imp.seteBalanca(rst.getBoolean("ebalanca"));
+                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                            imp.setValidade(rst.getInt("validade"));
+                        }
+                    } else {
+                        imp.seteBalanca(rst.getBoolean("ebalanca"));
+                        imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+                    
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
