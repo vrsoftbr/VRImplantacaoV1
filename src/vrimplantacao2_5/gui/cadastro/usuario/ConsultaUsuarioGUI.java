@@ -2,6 +2,7 @@ package vrimplantacao2_5.gui.cadastro.usuario;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
 import org.openide.util.Exceptions;
 import vr.view.components.textfield.TextCase;
@@ -9,7 +10,10 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
+import vrframework.remote.ItemComboVO;
+import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;
 import vrimplantacao2_5.controller.cadastro.usuario.UsuarioController;
+import vrimplantacao2_5.vo.cadastro.UnidadeVO;
 import vrimplantacao2_5.vo.cadastro.UsuarioVO;
 
 /**
@@ -22,6 +26,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
     public UsuarioController controller = null;
     private UsuarioVO usuarioVO;
     private CadastroUsuarioGUI cadastroUsuarioGUI = null;
+    private UnidadeController unidadeController = null;
 
     /**
      * Creates new form ConsultaConfiguracaoBaseDadosGUI
@@ -39,12 +44,15 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
         centralizarForm();
         setTitle("Consulta Usuários VRImplantacao");
         
-        txtFiltroUsuario.setTextCase(TextCase.UPPERCASE);
+        txtFiltroNome.setTextCase(TextCase.UPPERCASE);
         
         controller = new UsuarioController(this);
         configurarColuna();
         usuarioVO = new UsuarioVO();
         controller.consultar(usuarioVO);
+        unidadeController = new UnidadeController();
+        
+        getUnidades();
     }
     
     private void configurarColuna() throws Exception {
@@ -93,9 +101,11 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
 
         tblConsulta = new vrframework.bean.tableEx.VRTableEx();
         btnInserir = new vrframework.bean.button.VRButton();
-        txtFiltroUsuario = new vr.view.components.textfield.VRTextField();
+        txtFiltroNome = new vr.view.components.textfield.VRTextField();
         btnPesquisar = new vrframework.bean.button.VRButton();
         vRLabel1 = new vr.view.components.label.VRLabel();
+        vRLabel10 = new vrframework.bean.label.VRLabel();
+        cboFiltroUnidade = new vrframework.bean.comboBox.VRComboBox();
 
         tblConsulta.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -119,7 +129,16 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "Usuario");
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "Nome");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel10, "Unidade");
+        vRLabel10.setName(""); // NOI18N
+
+        cboFiltroUnidade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboFiltroUnidadeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -132,25 +151,35 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtFiltroUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 506, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtFiltroNome, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cboFiltroUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtFiltroNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cboFiltroUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtFiltroUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnInserir, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                .addComponent(tblConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -178,20 +207,27 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
             
             usuarioVO = new UsuarioVO();
             
-            usuarioVO.setNome(txtFiltroUsuario.getText().trim());
+            usuarioVO.setNome(txtFiltroNome.getText().trim());
+            usuarioVO.setIdUnidade(cboFiltroUnidade.getId());
             
             controller.consultar(usuarioVO);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_btnPesquisarActionPerformed
+
+    private void cboFiltroUnidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboFiltroUnidadeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboFiltroUnidadeActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnInserir;
     private vrframework.bean.button.VRButton btnPesquisar;
+    private vrframework.bean.comboBox.VRComboBox cboFiltroUnidade;
     private vrframework.bean.tableEx.VRTableEx tblConsulta;
-    private vr.view.components.textfield.VRTextField txtFiltroUsuario;
+    private vr.view.components.textfield.VRTextField txtFiltroNome;
     private vr.view.components.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel10;
     // End of variables declaration//GEN-END:variables
 
     public static void exibir(VRMdiFrame menuGUI) {
@@ -225,6 +261,21 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
             Util.exibirMensagemErro(ex, "Cadastro Unidades VR");
         } finally {
             menuGUI.setDefaultCursor();
+        }
+    }
+    
+    private void getUnidades() throws Exception {
+        cboFiltroUnidade.setModel(new DefaultComboBoxModel());
+
+        List<UnidadeVO> unidades = unidadeController.getUnidades();
+
+        if (unidades == null) {
+            return;
+        }
+
+        cboFiltroUnidade.addItem(new ItemComboVO(0, "SELECIONE A UNIDADE"));
+        for (UnidadeVO vo : unidades) {
+            cboFiltroUnidade.addItem(new ItemComboVO(vo.getId(), vo.getNome()));
         }
     }
     
