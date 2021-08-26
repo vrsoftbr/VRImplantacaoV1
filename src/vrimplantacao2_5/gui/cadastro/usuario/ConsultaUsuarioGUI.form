@@ -26,7 +26,7 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtFiltroUnidade" min="-2" pref="506" max="-2" attributes="0"/>
+                          <Component id="txtFiltroUsuario" min="-2" pref="506" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnPesquisar" min="-2" max="-2" attributes="0"/>
@@ -45,7 +45,7 @@
               <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="txtFiltroUnidade" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtFiltroUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnPesquisar" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnInserirUsuario" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
               </Group>
@@ -73,7 +73,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInserirUsuarioActionPerformed"/>
       </Events>
     </Component>
-    <Component class="vr.view.components.textfield.VRTextField" name="txtFiltroUnidade">
+    <Component class="vr.view.components.textfield.VRTextField" name="txtFiltroUsuario">
     </Component>
     <Component class="vrframework.bean.button.VRButton" name="btnPesquisar">
       <Properties>

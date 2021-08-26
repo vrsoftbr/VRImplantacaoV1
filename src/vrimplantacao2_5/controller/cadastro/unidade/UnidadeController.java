@@ -39,4 +39,8 @@ public class UnidadeController {
     public List<UnidadeVO> getUnidade() {
         return unidadeVO;
     }
+    
+    public List<UnidadeVO> getUnidades() throws Exception {
+        return this.unidadeVO = unidadeService.getUnidades();
+    }
 }

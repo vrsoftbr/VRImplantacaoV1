@@ -46,7 +46,7 @@ public class UnidadeDAO {
         return result;
     }
 
-    public List<UnidadeVO> getUnidade() throws Exception {
+    public List<UnidadeVO> getUnidades() throws Exception {
         List<UnidadeVO> result = new ArrayList<>();
 
         try (Statement stm = Conexao.createStatement()) {

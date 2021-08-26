@@ -84,11 +84,11 @@ public class UnidadeService {
         return result;
     }
     
-    public List<UnidadeVO> getUnidade() throws Exception {
+    public List<UnidadeVO> getUnidades() throws Exception {
         List<UnidadeVO> result = null;
         
         try {
-            result = unidadeDAO.getUnidade();
+            result = unidadeDAO.getUnidades();
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Consulta Unidades");
         }

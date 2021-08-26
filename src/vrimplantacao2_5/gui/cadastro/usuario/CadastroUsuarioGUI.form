@@ -95,31 +95,34 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtCodigo" alignment="0" min="-2" pref="65" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Component id="cboUnidade" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtCodigo" alignment="0" min="-2" pref="65" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="txtNomeUnidade" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtNome" min="-2" pref="296" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="cboUF" alignment="0" min="-2" pref="148" max="-2" attributes="0"/>
-                              <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtLogin" alignment="0" min="-2" pref="180" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="txtSenha" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                              <Component id="cboMunicipio" min="-2" pref="270" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="vRLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -134,7 +137,7 @@
                       <Group type="102" attributes="0">
                           <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtNomeUnidade" min="-2" pref="20" max="-2" attributes="0"/>
+                          <Component id="txtNome" min="-2" pref="20" max="-2" attributes="0"/>
                       </Group>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
@@ -145,22 +148,29 @@
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtLogin" min="-2" pref="20" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtSenha" min="-2" pref="20" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="cboUF" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cboMunicipio" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="vRLabel10" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="cboUnidade" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtNomeUnidade">
+        <Component class="vrframework.bean.textField.VRTextField" name="txtNome">
           <Properties>
             <Property name="columns" type="int" value="25"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
@@ -169,29 +179,9 @@
         </Component>
         <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Unidade"/>
+            <Property name="text" type="java.lang.String" value="Nome"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
           </Properties>
-        </Component>
-        <Component class="vr.view.components.label.VRLabel" name="vRLabel1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Estado"/>
-          </Properties>
-        </Component>
-        <Component class="vr.view.components.label.VRLabel" name="vRLabel2">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Munic&#xed;pio"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.comboBox.VRComboBox" name="cboUF">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboUFActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="vrframework.bean.comboBox.VRComboBox" name="cboMunicipio">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboMunicipioActionPerformed"/>
-          </Events>
         </Component>
         <Component class="vrframework.bean.textField.VRTextField" name="txtCodigo">
           <Properties>
@@ -208,6 +198,43 @@
         <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
           <Properties>
             <Property name="text" type="java.lang.String" value="C&#xf3;digo"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Login"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtLogin">
+          <Properties>
+            <Property name="columns" type="int" value="25"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtSenha">
+          <Properties>
+            <Property name="columns" type="int" value="25"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel9">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Senha"/>
+            <Property name="name" type="java.lang.String" value="" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.comboBox.VRComboBox" name="cboUnidade">
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboUnidadeActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel10">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Unidade"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
           </Properties>
         </Component>

@@ -23,6 +23,7 @@ public class UsuarioDAO {
                     + "	us.id,\n"
                     + "	us.nome,\n"
                     + "	us.login,\n"
+                    + " us.senha,\n"        
                     + " us.id_unidade, \n"        
                     + "	un.nome as unidade\n"
                     + "from implantacao2_5.usuario us\n"
@@ -90,7 +91,9 @@ public class UsuarioDAO {
         if (!sql.isEmpty()) {
             try (Statement stm = Conexao.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
-                    vo.setId(rst.getInt("id"));
+                    if (rst.next()) {
+                        vo.setId(rst.getInt("id"));
+                    }
                 }
             }
         }

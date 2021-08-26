@@ -31,8 +31,9 @@ public class UsuarioController {
         usuarioService.alterar(vo);
     }
     
-    public List<UsuarioVO> consultar(UsuarioVO vo) throws Exception {
-        return this.usuarioVO = usuarioService.consultar(vo);
+    public void consultar(UsuarioVO vo) throws Exception {
+        this.usuarioVO = usuarioService.consultar(vo);
+        consultaUsuarioGUI.consultar();
     }
     
     public List<UsuarioVO> getUsuarios() {

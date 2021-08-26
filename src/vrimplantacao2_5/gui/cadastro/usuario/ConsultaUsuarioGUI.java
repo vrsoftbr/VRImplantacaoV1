@@ -10,12 +10,11 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrimplantacao2_5.controller.cadastro.usuario.UsuarioController;
-import vrimplantacao2_5.vo.cadastro.UnidadeVO;
 import vrimplantacao2_5.vo.cadastro.UsuarioVO;
 
 /**
  *
- * @author guilhermegomes
+ * @author Desenvolvimento
  */
 public class ConsultaUsuarioGUI extends VRInternalFrame {
     
@@ -40,7 +39,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
         centralizarForm();
         setTitle("Consulta Usuários VRImplantacao");
         
-        txtFiltroUnidade.setTextCase(TextCase.UPPERCASE);
+        txtFiltroUsuario.setTextCase(TextCase.UPPERCASE);
         
         controller = new UsuarioController(this);
         configurarColuna();
@@ -94,7 +93,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
 
         tblConsultaUsuario = new vrframework.bean.tableEx.VRTableEx();
         btnInserirUsuario = new vrframework.bean.button.VRButton();
-        txtFiltroUnidade = new vr.view.components.textfield.VRTextField();
+        txtFiltroUsuario = new vr.view.components.textfield.VRTextField();
         btnPesquisar = new vrframework.bean.button.VRButton();
         vRLabel1 = new vr.view.components.label.VRLabel();
 
@@ -133,7 +132,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtFiltroUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, 506, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtFiltroUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 506, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -147,7 +146,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtFiltroUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFiltroUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPesquisar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnInserirUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -170,7 +169,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
     }//GEN-LAST:event_tblConsultaUsuarioMouseClicked
 
     private void btnInserirUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInserirUsuarioActionPerformed
-        CadastroUsuarioGUI.consultaUnidadeGUI = this;
+        CadastroUsuarioGUI.consultaUsuarioGUI = this;
         CadastroUsuarioGUI.exibir(mdiFrame);
     }//GEN-LAST:event_btnInserirUsuarioActionPerformed
 
@@ -179,7 +178,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
             
             usuarioVO = new UsuarioVO();
             
-            usuarioVO.setNome(txtFiltroUnidade.getText().trim());
+            usuarioVO.setNome(txtFiltroUsuario.getText().trim());
             
             controller.consultar(usuarioVO);
         } catch (Exception ex) {
@@ -191,7 +190,7 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnInserirUsuario;
     private vrframework.bean.button.VRButton btnPesquisar;
     private vrframework.bean.tableEx.VRTableEx tblConsultaUsuario;
-    private vr.view.components.textfield.VRTextField txtFiltroUnidade;
+    private vr.view.components.textfield.VRTextField txtFiltroUsuario;
     private vr.view.components.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
 
@@ -219,9 +218,9 @@ public class ConsultaUsuarioGUI extends VRInternalFrame {
                 cadastroUsuarioGUI = new CadastroUsuarioGUI(menuGUI);
             }
             
-            /*CadastroUsuarioGUI.consultaUnidadeGUI = this;
+            CadastroUsuarioGUI.consultaUsuarioGUI = this;
             cadastroUsuarioGUI.editar(this.usuarioVO);
-            cadastroUsuarioGUI.setVisible(true);*/
+            cadastroUsuarioGUI.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Cadastro Unidades VR");
         } finally {
