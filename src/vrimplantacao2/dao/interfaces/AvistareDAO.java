@@ -84,7 +84,9 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.VOLUME_QTD
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA
                 }
         ));
     }
@@ -303,34 +305,55 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdCodBarras2 as ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "union all\n"
-                    + "select \n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdCodBarras3 as ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
-                    + "union all\n"
-                    + "select \n"
-                    + "	p.ProdID as id,\n"
-                    + "	p.ProdEan14 as ean,\n"
-                    + "	un.UnSigla as unidade\n"
-                    + "from dbo.TB_PRODUTO p\n"
-                    + "left join dbo.TB_UNIDADE_MEDIDA un on un.UnID = p.ProdUnidadeMedidaID\n"
+                    "select * from (select\n" +
+                    "	p.prodid id,\n" +
+                    "	p.prodcodbarras1 ean,\n" +
+                    "	un.UnSigla as unidade\n" +
+                    "from\n" +
+                    "	tb_produto p\n" +
+                    "left join dbo.TB_UNIDADE_MEDIDA un on\n" +
+                    "	un.UnID = p.ProdUnidadeMedidaID\n" +
+                    "where\n" +
+                    "	ltrim(rtrim(coalesce(p.prodcodbarras1, ''))) != ''\n" +
+                    "union all \n" +
+                    "select\n" +
+                    "	p.ProdID as id,\n" +
+                    "	p.ProdCodBarras2 as ean,\n" +
+                    "	un.UnSigla as unidade\n" +
+                    "from\n" +
+                    "	dbo.TB_PRODUTO p\n" +
+                    "left join dbo.TB_UNIDADE_MEDIDA un on\n" +
+                    "	un.UnID = p.ProdUnidadeMedidaID\n" +
+                    "union all \n" +
+                    "select\n" +
+                    "	p.ProdID as id,\n" +
+                    "	p.ProdCodBarras3 as ean,\n" +
+                    "	un.UnSigla as unidade\n" +
+                    "from\n" +
+                    "	dbo.TB_PRODUTO p\n" +
+                    "left join dbo.TB_UNIDADE_MEDIDA un on\n" +
+                    "	un.UnID = p.ProdUnidadeMedidaID\n" +
+                    "union all \n" +
+                    "select\n" +
+                    "	p.ProdID as id,\n" +
+                    "	p.ProdEan14 as ean,\n" +
+                    "	un.UnSigla as unidade\n" +
+                    "from\n" +
+                    "	dbo.TB_PRODUTO p\n" +
+                    "left join dbo.TB_UNIDADE_MEDIDA un on\n" +
+                    "	un.UnID = p.ProdUnidadeMedidaID) ea \n" +
+                    "where \n" +
+                    "	ea.ean is not null"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+                    
                     result.add(imp);
                 }
             }
