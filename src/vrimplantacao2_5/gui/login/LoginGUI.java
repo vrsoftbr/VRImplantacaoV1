@@ -1,10 +1,8 @@
 package vrimplantacao2_5.gui.login;
 
-import vrimplantacao.gui.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import vr.core.collection.Properties;
 import vr.core.parametro.versao.Versao;
 import vr.implantacao.main.App;
@@ -23,32 +21,48 @@ import vrimplantacao.vo.loja.FornecedorVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.UsuarioVO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;
+import vrimplantacao2_5.vo.cadastro.UnidadeVO;
 
 public class LoginGUI extends VRDialog {
 
     private UsuarioVO oUsuario = null;
     private VRMdiFrame mdiFrame = null;
     private List<DadosConexaoPostgreSQL> vEmpresa = null;
+        
+    /* Classes da versão 2.5 */
+    UnidadeController unidadeController = new UnidadeController();
+    
 
     public LoginGUI() throws Exception {
         initComponents();
 
         centralizarForm();
 
-        cboLoja.setTabela("loja");
-        cboLoja.carregar();
-        cboLoja.setId(Global.idLoja);
-
-        carregarEmpresa();
+        getUnidades();
 
         lblVersao.setText("Versão do banco " + Versao.createFromConnectionInterface(Conexao.getConexao()).getVersao());
 
         this.setModal(true);
     }
 
+    private void getUnidades() throws Exception {
+        cboUnidade.setModel(new DefaultComboBoxModel());
+        
+        List<UnidadeVO> unidadesVO = unidadeController.getUnidades();
+        
+        if (unidadesVO == null) {
+            return;
+        }
+        
+        for (UnidadeVO vo : unidadesVO) {
+            cboUnidade.addItem(new ItemComboVO(vo.getId(), vo.getNome()));
+        }
+    }
+    
     public void autenticar() throws Exception {
-        if (cboLoja.getId() == -1) {
-            cboLoja.requestFocus();
+        if (cboUnidade.getId() == -1) {
+            cboUnidade.requestFocus();
             throw new VRException("Informe a loja!");
         }
 
@@ -60,10 +74,10 @@ public class LoginGUI extends VRDialog {
                 throw new VRException("Usuário e/ou senha inválido(s)");
             }
         } else {
-            oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboLoja.getId());
+            oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboUnidade.getId());
         }
 
-        LojaVO oLoja = new LojaDAO().carregar(cboLoja.getId());
+        LojaVO oLoja = new LojaDAO().carregar(cboUnidade.getId());
 
         FornecedorVO oFornecedor = new FornecedorDAO().carregar(oLoja.idFornecedor);
 
@@ -73,20 +87,20 @@ public class LoginGUI extends VRDialog {
         Global.fornecedor = oFornecedor.nomeFantasia;
         Global.idEstado = oFornecedor.idEstado;
         Global.idMunicipio = oFornecedor.idMunicipio;
-        Global.idLoja = cboLoja.getId();
+        Global.idLoja = cboUnidade.getId();
         Global.loja = oLoja.descricao;
 
-        MenuGUI form = new MenuGUI(this);
+        //MenuGUI form = new MenuGUI(this);
 
-        form.atualizarRodape();
+        /*form.atualizarRodape();
         form.setVisible(true);
-        form.checkParametros();
+        form.checkParametros();*/
 
         if (mdiFrame != null) {
             mdiFrame.dispose();
         }
 
-        mdiFrame = form;
+        //mdiFrame = form;
 
         Properties oProperties = App.properties();
 
@@ -97,8 +111,8 @@ public class LoginGUI extends VRDialog {
 
         this.dispose();
 
-        form.requestFocus();
-        form.verificarLite();
+        //form.requestFocus();
+        //form.verificarLite();
     }
 
     public void setUsuario(String i_usuario) throws Exception {
@@ -115,7 +129,7 @@ public class LoginGUI extends VRDialog {
         oProperties.carregar();
 
         vEmpresa = new ArrayList();
-        cboEmpresa.removeAllItems();
+        //cboEmpresa.removeAllItems();
 
         int i = 1;
 
@@ -135,21 +149,21 @@ public class LoginGUI extends VRDialog {
             oEmpresa.alias = oProperties.get("database" + empresa + ".alias") == null? ("EMPRESA " + String.valueOf(i)) : oProperties.get("database" + empresa + ".alias");
 
             vEmpresa.add(oEmpresa);
-            cboEmpresa.addItem(new ItemComboVO(i, oEmpresa.alias));
+            //cboEmpresa.addItem(new ItemComboVO(i, oEmpresa.alias));
 
             i++;
         }
 
         if (vEmpresa.size() <= 1) {
-            cboEmpresa.setVisible(false);
+            //cboEmpresa.setVisible(false);
             Parametros.get().setEmpresaAtiva(vEmpresa.get(0));
             return;
         }
 
         lblLoja.setText("Empresa / Loja");
-        cboEmpresa.setWide(true);
+        //cboEmpresa.setWide(true);
 
-        cboEmpresa.addActionListener(new ActionListener() {
+        /*cboEmpresa.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -159,15 +173,15 @@ public class LoginGUI extends VRDialog {
                     Util.exibirMensagemErro(ex, getTitle());
                 }
             }
-        });
+        });*/
     }
 
     private void conectarEmpresa() throws Exception {
-        if (cboEmpresa.getId() == -1) {
+        /*if (cboEmpresa.getId() == -1) {
             return;
-        }
+        }*/
 
-        DadosConexaoPostgreSQL oEmpresa = vEmpresa.get(cboEmpresa.getSelectedIndex());
+        /*DadosConexaoPostgreSQL oEmpresa = vEmpresa.get(cboEmpresa.getSelectedIndex());
 
         Conexao.abrirConexao(oEmpresa.ipBanco, oEmpresa.ipSecBanco, oEmpresa.portaBanco, oEmpresa.nomeBanco, oEmpresa.usuarioBanco, oEmpresa.senhaBanco);
 
@@ -176,7 +190,7 @@ public class LoginGUI extends VRDialog {
 
         Global.idUsuario = -1;
         
-        Parametros.get().setEmpresaAtiva(oEmpresa);
+        Parametros.get().setEmpresaAtiva(oEmpresa);*/
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -188,9 +202,8 @@ public class LoginGUI extends VRDialog {
         vRLabel2 = new vrframework.bean.label.VRLabel();
         lblLoja = new vrframework.bean.label.VRLabel();
         txtSenha = new vrframework.bean.passwordField.VRPasswordField();
-        cboLoja = new vrframework.bean.comboBox.VRComboBox();
         chkLembrar = new vrframework.bean.checkBox.VRCheckBox();
-        cboEmpresa = new vrframework.bean.comboBox.VRComboBox();
+        cboUnidade = new vrframework.bean.comboBox.VRComboBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnAutenticar = new vrframework.bean.button.VRButton();
         btnSair = new vrframework.bean.button.VRButton();
@@ -218,15 +231,9 @@ public class LoginGUI extends VRDialog {
 
         vRLabel2.setText("Senha");
 
-        lblLoja.setText("Loja");
+        lblLoja.setText("Unidade");
 
         txtSenha.setColumns(11);
-
-        cboLoja.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                cboLojaFocusLost(evt);
-            }
-        });
 
         chkLembrar.setText("Lembrar usuário");
         chkLembrar.setAlignmentY(0.0F);
@@ -236,7 +243,11 @@ public class LoginGUI extends VRDialog {
         chkLembrar.setMargin(new java.awt.Insets(2, 0, 2, 0));
         chkLembrar.setPreferredSize(new java.awt.Dimension(65, 14));
 
-        cboEmpresa.setFocusable(false);
+        cboUnidade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboUnidadeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
@@ -247,15 +258,12 @@ public class LoginGUI extends VRDialog {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(chkLembrar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblLoja, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtUsuario, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
                     .addComponent(vRLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtSenha, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addComponent(cboEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cboLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(31, 31, 31))
+                    .addComponent(txtSenha, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
+                    .addComponent(cboUnidade, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(34, 34, 34))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -271,9 +279,7 @@ public class LoginGUI extends VRDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cboLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cboEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(cboUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addComponent(chkLembrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(7, 7, 7))
@@ -324,7 +330,7 @@ public class LoginGUI extends VRDialog {
         getContentPane().add(vRPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 210, 370, 40));
 
         lblPrograma.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblPrograma.setText("VR Implantação");
+        lblPrograma.setText("VR Implantação 2.5");
         lblPrograma.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         getContentPane().add(lblPrograma, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 180, 30));
 
@@ -374,13 +380,14 @@ public class LoginGUI extends VRDialog {
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
     }//GEN-LAST:event_formKeyPressed
 
-    private void cboLojaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_cboLojaFocusLost
-    }//GEN-LAST:event_cboLojaFocusLost
+    private void cboUnidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboUnidadeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboUnidadeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnAutenticar;
     private vrframework.bean.button.VRButton btnSair;
-    private vrframework.bean.comboBox.VRComboBox cboEmpresa;
-    private vrframework.bean.comboBox.VRComboBox cboLoja;
+    private vrframework.bean.comboBox.VRComboBox cboUnidade;
     private vrframework.bean.checkBox.VRCheckBox chkLembrar;
     private vrframework.bean.label.VRLabel lblLoja;
     private vrframework.bean.label.VRLabel lblPrograma;

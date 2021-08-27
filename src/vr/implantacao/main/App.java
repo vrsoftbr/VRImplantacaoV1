@@ -15,8 +15,9 @@ import vrframework.classe.Conexao;
 import vr.view.dialogs.splashsscreen.SplashScreen;
 import vrframework.classe.Util;
 import vrimplantacao.classe.Global;
-import vrimplantacao.gui.LoginGUI;
+
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.gui.login.LoginGUI;
 
 /**
  * Classe principal da aplicação
