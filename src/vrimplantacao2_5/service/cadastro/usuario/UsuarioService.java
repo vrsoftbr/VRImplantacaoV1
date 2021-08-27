@@ -75,13 +75,18 @@ public class UsuarioService {
     }
     
     private String getTitle() {
-        return "Cadastro Unidade";
+        return "Cadastro Usuário";
     }        
 
-    public void autenticar(UsuarioVO vo) throws Exception {
-        if (!usuarioDAO.autenticar(vo)) {
-            throw new VRException("Usuario não existe.");
+    public List<UsuarioVO> autenticar(UsuarioVO vo) throws Exception {
+        List<UsuarioVO> result = null;
+        
+        result = usuarioDAO.autenticar(vo);
+
+        if (result == null || result.isEmpty()) {
+            throw new VRException("Usuário não existe.");
         }
-    }
-    
+        
+        return result;
+    }    
 }

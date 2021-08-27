@@ -36,8 +36,8 @@ public class UsuarioController {
         consultaUsuarioGUI.consultar();
     }
     
-    public void autenticar(UsuarioVO vo) throws Exception {
-        usuarioService.autenticar(vo);
+    public List<UsuarioVO> autenticar(UsuarioVO vo) throws Exception {
+        return usuarioService.autenticar(vo);
     }
     
     public List<UsuarioVO> getUsuarios() {

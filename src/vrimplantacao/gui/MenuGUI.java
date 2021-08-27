@@ -20,7 +20,6 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.Util;
 import vrframework.gui.SobreGUI;
 import vrframework.remote.Arquivo;
-import vrimplantacao.classe.Global;
 import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.gui.assistente.mapamercadologico.MapaMercadologicoGUI;
 import vrimplantacao.gui.assistente.parametro.ParametroGUI;
@@ -308,6 +307,7 @@ import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.gui.cadastro.bancodados.ConsultaBancoDadosGUI;
 import vrimplantacao2_5.gui.cadastro.configuracao.ConsultaConfiguracaoBaseDadosGUI;
 import vrimplantacao2_5.gui.cadastro.sistema.ConsultaSistemaGUI;
@@ -416,8 +416,8 @@ public final class MenuGUI extends VRMdiFrame {
     @Override
     public void atualizarRodape() throws Exception {
         
-        lblRazaoSocial.setText(Global.fornecedor);
-        lblLoja.setText(Global.loja);
+        lblUsuario.setText(Global.getNomeUsuario());
+        lblUnidade.setText(Global.getNomeUnidade());
         lblData.setText(new DataProcessamentoDAO().get());
         lblVersao.setText("VERSÃO " + Global.VERSAO);
     }
@@ -602,11 +602,11 @@ public final class MenuGUI extends VRMdiFrame {
         jSeparator3 = new javax.swing.JToolBar.Separator();
         vrDesktopPane = new vrframework.bean.desktopPane.VRDesktopPane();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
-        lblRazaoSocial = new vrframework.bean.label.VRLabel();
+        lblUsuario = new vrframework.bean.label.VRLabel();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         lblVersao = new vrframework.bean.label.VRLabel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
-        lblLoja = new vrframework.bean.label.VRLabel();
+        lblUnidade = new vrframework.bean.label.VRLabel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         lblData = new vrframework.bean.label.VRLabel();
         mnuMenu = new javax.swing.JMenuBar();
@@ -992,8 +992,8 @@ public final class MenuGUI extends VRMdiFrame {
 
         vRPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
-        lblRazaoSocial.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblRazaoSocial.setText("@@@@@@@@");
+        lblUsuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblUsuario.setText("@@@@@@@@");
 
         javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
         vRPanel5.setLayout(vRPanel5Layout);
@@ -1001,12 +1001,12 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblRazaoSocial, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
+                .addComponent(lblUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel5Layout.setVerticalGroup(
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1046,8 +1046,8 @@ public final class MenuGUI extends VRMdiFrame {
 
         vRPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
 
-        lblLoja.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLoja.setText("@@@");
+        lblUnidade.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblUnidade.setText("@@@");
 
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
@@ -1055,12 +1055,12 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
+                .addComponent(lblUnidade, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel3Layout.setVerticalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(lblUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3583,7 +3583,7 @@ public final class MenuGUI extends VRMdiFrame {
             this.setWaitCursor();
             SobreGUI form = new SobreGUI();
 
-            form.setSobre("VR Implantaçao", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
+            form.setSobre("VR Implantaçao 2.5", Global.VERSAO, new SimpleDateFormat("dd/MM/yyyy").format(Global.DATA_VERSAO));
             form.setVisible(true);
 
         } catch (Exception ex) {
@@ -5550,8 +5550,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private vrframework.bean.label.VRLabel lblData;
-    private vrframework.bean.label.VRLabel lblLoja;
-    private vrframework.bean.label.VRLabel lblRazaoSocial;
+    private vrframework.bean.label.VRLabel lblUnidade;
+    private vrframework.bean.label.VRLabel lblUsuario;
     private vrframework.bean.label.VRLabel lblVersao;
     private javax.swing.JMenuItem mmnuDGCom;
     private javax.swing.JMenuItem mmnuGestora;

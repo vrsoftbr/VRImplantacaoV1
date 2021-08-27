@@ -156,18 +156,32 @@ public class UsuarioDAO {
         }
     }
 
-    public boolean autenticar(UsuarioVO vo) throws Exception {
+    public List<UsuarioVO> autenticar(UsuarioVO vo) throws Exception {
+        List<UsuarioVO> result = new ArrayList<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "id \n"
-                    + "from implantacao2_5.usuario \n"
-                    + "where login = '" + vo.getLogin() + "' \n"
-                    + "and senha = '" + vo.getSenha() + "' \n"
-                    + "and id_unidade = " + vo.getIdUnidade()
+                    + "	us.id,\n"
+                    + "	us.nome,\n"
+                    + "	us.login,\n"
+                    + " us.id_unidade, \n"
+                    + "	un.nome as unidade\n"
+                    + "from implantacao2_5.usuario us\n"
+                    + "join implantacao2_5.unidade un on un.id = us.id_unidade\n"
+                    + "where us.login = '" + vo.getLogin() + "' \n"
+                    + "and us.senha = '" + vo.getSenha() + "' \n"
+                    + "and us.id_unidade = " + vo.getIdUnidade()
             )) {
-                return rst.next();
+                if (rst.next()) {
+                    UsuarioVO usuarioVO = new UsuarioVO();
+                    usuarioVO.setId(rst.getInt("id"));
+                    usuarioVO.setNome(rst.getString("nome"));
+                    usuarioVO.setIdUnidade(rst.getInt("id_unidade"));
+                    usuarioVO.setDescricaoUnidade(rst.getString("unidade"));
+                    result.add(usuarioVO);
+                }
             }
         }
+        return result;
     }
 }

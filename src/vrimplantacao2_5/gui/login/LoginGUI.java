@@ -15,6 +15,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.DadosConexaoPostgreSQL;
 import vrimplantacao.gui.MenuGUI;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.classe.Global;
 import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;
 import vrimplantacao2_5.controller.cadastro.usuario.UsuarioController;
 import vrimplantacao2_5.vo.cadastro.UnidadeVO;
@@ -68,10 +69,20 @@ public class LoginGUI extends VRDialog {
         vo.setSenha(txtSenha.getText());
         vo.setIdUnidade(cboUnidade.getId());
         
-        usuarioController.autenticar(vo);
+        List<UsuarioVO> usuarioVO = usuarioController.autenticar(vo);
+        
+        usuarioVO.stream().map((usuario) -> {
+            Global.setNomeUsuario(usuario.getNome());
+            return usuario;
+        }).map((usuario) -> {
+            Global.setIdUnidade(usuario.getIdUnidade());
+            return usuario;
+        }).forEachOrdered((usuario) -> {
+            Global.setNomeUnidade(usuario.getDescricaoUnidade());
+        });
 
         MenuGUI form = new MenuGUI(this);
-
+        
         form.atualizarRodape();
         form.setVisible(true);
         form.checkParametros();
