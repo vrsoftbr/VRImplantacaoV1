@@ -97,13 +97,11 @@ public class LoginGUI extends VRDialog {
 
         if (chkLembrar.isSelected()) {
             oProperties.set("system.usuario", txtUsuario.getText());
-
         }
 
         this.dispose();
 
         form.requestFocus();
-        //form.verificarLite();
     }
 
     public void setUsuario(String i_usuario) throws Exception {
@@ -113,75 +111,6 @@ public class LoginGUI extends VRDialog {
 
     public void setSenha(String i_senha) throws Exception {
         txtSenha.setText(i_senha);
-    }
-
-    private void carregarEmpresa() throws Exception {
-        Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
-        oProperties.carregar();
-
-        vEmpresa = new ArrayList();
-        //cboEmpresa.removeAllItems();
-
-        int i = 1;
-
-        while (true) {
-            String empresa = i == 1 ? "" : String.valueOf(i);
-
-            if (oProperties.get("database" + empresa + ".ip") == null) {
-                break;
-            }
-            DadosConexaoPostgreSQL oEmpresa = new DadosConexaoPostgreSQL();
-            oEmpresa.ipBanco = oProperties.get("database" + empresa + ".ip");
-            oEmpresa.ipSecBanco = oProperties.get("database" + empresa + ".ipsec");
-            oEmpresa.portaBanco = oProperties.getInt("database" + empresa + ".porta");
-            oEmpresa.nomeBanco = oProperties.get("database" + empresa + ".nome");
-            oEmpresa.usuarioBanco = oProperties.get("database" + empresa + ".usuario") == null  ? "postgres" : oProperties.get("database" + empresa + ".usuario");
-            oEmpresa.senhaBanco = oProperties.get("database" + empresa + ".senha") == null ? "postgres" : oProperties.get("database" + empresa + ".senha");
-            oEmpresa.alias = oProperties.get("database" + empresa + ".alias") == null? ("EMPRESA " + String.valueOf(i)) : oProperties.get("database" + empresa + ".alias");
-
-            vEmpresa.add(oEmpresa);
-            //cboEmpresa.addItem(new ItemComboVO(i, oEmpresa.alias));
-
-            i++;
-        }
-
-        if (vEmpresa.size() <= 1) {
-            //cboEmpresa.setVisible(false);
-            Parametros.get().setEmpresaAtiva(vEmpresa.get(0));
-            return;
-        }
-
-        lblLoja.setText("Empresa / Loja");
-        //cboEmpresa.setWide(true);
-
-        /*cboEmpresa.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    conectarEmpresa();
-                    lblVersao.setText("Versão do banco " + Versao.createFromConnectionInterface(Conexao.getConexao()).getVersao());
-                } catch (Exception ex) {
-                    Util.exibirMensagemErro(ex, getTitle());
-                }
-            }
-        });*/
-    }
-
-    private void conectarEmpresa() throws Exception {
-        /*if (cboEmpresa.getId() == -1) {
-            return;
-        }*/
-
-        /*DadosConexaoPostgreSQL oEmpresa = vEmpresa.get(cboEmpresa.getSelectedIndex());
-
-        Conexao.abrirConexao(oEmpresa.ipBanco, oEmpresa.ipSecBanco, oEmpresa.portaBanco, oEmpresa.nomeBanco, oEmpresa.usuarioBanco, oEmpresa.senhaBanco);
-
-        cboLoja.carregar();
-        cboLoja.setId(Global.idLoja);
-
-        Global.idUsuario = -1;
-        
-        Parametros.get().setEmpresaAtiva(oEmpresa);*/
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
