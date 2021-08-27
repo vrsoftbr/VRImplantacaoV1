@@ -7,18 +7,15 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import vrimplantacao2_5.dao.cadastro.bancodados.BancoDadosDAO;
 import vrimplantacao2_5.dao.cadastro.unidade.UnidadeDAO;
 import vrimplantacao2_5.provider.ConexaoProvider;
-import vrimplantacao2_5.service.cadastro.bancodados.BancoDadosService;
-import vrimplantacao2_5.vo.cadastro.BancoDadosVO;
 import vrimplantacao2_5.vo.cadastro.UnidadeVO;
 
 /**
  *
  * @author Desenvolvimento
  */
-public class UnidadeTest {
+public class UnidadeServiceTest {
 
     @Test
     public void testExisteUnidade() throws Exception {
