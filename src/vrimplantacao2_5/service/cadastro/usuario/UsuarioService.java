@@ -77,5 +77,11 @@ public class UsuarioService {
     private String getTitle() {
         return "Cadastro Unidade";
     }        
+
+    public void autenticar(UsuarioVO vo) throws Exception {
+        if (!usuarioDAO.autenticar(vo)) {
+            throw new VRException("Usuario não existe.");
+        }
+    }
     
 }

@@ -75,17 +75,17 @@ public class LoginGUI extends VRDialog {
         Global.idLoja = cboLoja.getId();
         Global.loja = oLoja.descricao;
 
-        MenuGUI form = new MenuGUI(this);
+        /*MenuGUI form = new MenuGUI(this);
 
         form.atualizarRodape();
         form.setVisible(true);
-        form.checkParametros();
+        form.checkParametros();*/
 
         if (mdiFrame != null) {
             mdiFrame.dispose();
         }
 
-        mdiFrame = form;
+        //mdiFrame = form;
 
         Properties oProperties = App.properties();
 
@@ -96,8 +96,8 @@ public class LoginGUI extends VRDialog {
 
         this.dispose();
 
-        form.requestFocus();
-        form.verificarLite();
+        //form.requestFocus();
+        //form.verificarLite();
     }
 
     public void setUsuario(String i_usuario) throws Exception {

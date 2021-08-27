@@ -13,16 +13,12 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.DadosConexaoPostgreSQL;
-import vrimplantacao.classe.Global;
-import vrimplantacao.dao.cadastro.FornecedorDAO;
-import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.dao.cadastro.UsuarioDAO;
-import vrimplantacao.vo.loja.FornecedorVO;
-import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao.vo.loja.UsuarioVO;
+import vrimplantacao.gui.MenuGUI;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.cadastro.unidade.UnidadeController;
+import vrimplantacao2_5.controller.cadastro.usuario.UsuarioController;
 import vrimplantacao2_5.vo.cadastro.UnidadeVO;
+import vrimplantacao2_5.vo.cadastro.UsuarioVO;
 
 public class LoginGUI extends VRDialog {
 
@@ -32,6 +28,7 @@ public class LoginGUI extends VRDialog {
         
     /* Classes da versão 2.5 */
     UnidadeController unidadeController = new UnidadeController();
+    UsuarioController usuarioController = new UsuarioController();
     
 
     public LoginGUI() throws Exception {
@@ -55,52 +52,35 @@ public class LoginGUI extends VRDialog {
             return;
         }
         
-        for (UnidadeVO vo : unidadesVO) {
+        unidadesVO.forEach((vo) -> {
             cboUnidade.addItem(new ItemComboVO(vo.getId(), vo.getNome()));
-        }
+        });
     }
     
     public void autenticar() throws Exception {
         if (cboUnidade.getId() == -1) {
             cboUnidade.requestFocus();
-            throw new VRException("Informe a loja!");
+            throw new VRException("Informe a Unidade!");
         }
 
-        if (Parametros.lite != null && !"".equals(Parametros.lite)) {
-            if (txtUsuario.getText().equals("LITE") && txtSenha.getText().equals("VRLITE")) {
-                oUsuario = new UsuarioVO();
-                oUsuario.setNome("VR LITE");
-            } else {
-                throw new VRException("Usuário e/ou senha inválido(s)");
-            }
-        } else {
-            oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboUnidade.getId());
-        }
+        UsuarioVO vo = new UsuarioVO();
+        vo.setLogin(txtUsuario.getText());
+        vo.setSenha(txtSenha.getText());
+        vo.setIdUnidade(cboUnidade.getId());
+        
+        usuarioController.autenticar(vo);
 
-        LojaVO oLoja = new LojaDAO().carregar(cboUnidade.getId());
+        MenuGUI form = new MenuGUI(this);
 
-        FornecedorVO oFornecedor = new FornecedorDAO().carregar(oLoja.idFornecedor);
-
-        Global.idUsuario = oUsuario.id;
-        Global.usuario = oUsuario.nome;
-        Global.idFornecedor = oLoja.idFornecedor;
-        Global.fornecedor = oFornecedor.nomeFantasia;
-        Global.idEstado = oFornecedor.idEstado;
-        Global.idMunicipio = oFornecedor.idMunicipio;
-        Global.idLoja = cboUnidade.getId();
-        Global.loja = oLoja.descricao;
-
-        //MenuGUI form = new MenuGUI(this);
-
-        /*form.atualizarRodape();
+        form.atualizarRodape();
         form.setVisible(true);
-        form.checkParametros();*/
+        form.checkParametros();
 
         if (mdiFrame != null) {
             mdiFrame.dispose();
         }
 
-        //mdiFrame = form;
+        mdiFrame = form;
 
         Properties oProperties = App.properties();
 
@@ -111,7 +91,7 @@ public class LoginGUI extends VRDialog {
 
         this.dispose();
 
-        //form.requestFocus();
+        form.requestFocus();
         //form.verificarLite();
     }
 
@@ -228,12 +208,14 @@ public class LoginGUI extends VRDialog {
         vRLabel1.setText("Usuário");
 
         txtUsuario.setColumns(12);
+        txtUsuario.setObrigatorio(true);
 
         vRLabel2.setText("Senha");
 
         lblLoja.setText("Unidade");
 
         txtSenha.setColumns(11);
+        txtSenha.setObrigatorio(true);
 
         chkLembrar.setText("Lembrar usuário");
         chkLembrar.setAlignmentY(0.0F);

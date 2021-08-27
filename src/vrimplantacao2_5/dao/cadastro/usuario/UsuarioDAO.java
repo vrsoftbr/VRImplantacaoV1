@@ -38,7 +38,7 @@ public class UsuarioDAO {
                 setFiltro("\n");
             }
         }
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
@@ -149,6 +149,21 @@ public class UsuarioDAO {
                     + "id \n"
                     + "from implantacao2_5.usuario \n"
                     + "where login = '" + vo.getLogin() + "' \n"
+                    + "and id_unidade = " + vo.getIdUnidade()
+            )) {
+                return rst.next();
+            }
+        }
+    }
+
+    public boolean autenticar(UsuarioVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id \n"
+                    + "from implantacao2_5.usuario \n"
+                    + "where login = '" + vo.getLogin() + "' \n"
+                    + "and senha = '" + vo.getSenha() + "' \n"
                     + "and id_unidade = " + vo.getIdUnidade()
             )) {
                 return rst.next();

@@ -316,6 +316,7 @@ import vrimplantacao2_5.gui.cadastro.unidade.ConsultaUnidadeGUI;
 import vrimplantacao2_5.gui.cadastro.usuario.ConsultaUsuarioGUI;
 import vrimplantacao2_5.gui.sistema.SysPdv2_5GUI;
 import vrimplantacao2_5.gui.sistema.Uniplus2_5GUI;
+import vrimplantacao2_5.gui.login.LoginGUI;
 
 public final class MenuGUI extends VRMdiFrame {
 

@@ -95,6 +95,7 @@
         <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
           <Properties>
             <Property name="columns" type="int" value="12"/>
+            <Property name="obrigatorio" type="boolean" value="true"/>
           </Properties>
         </Component>
         <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
@@ -110,6 +111,7 @@
         <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenha">
           <Properties>
             <Property name="columns" type="int" value="11"/>
+            <Property name="obrigatorio" type="boolean" value="true"/>
           </Properties>
         </Component>
         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkLembrar">
