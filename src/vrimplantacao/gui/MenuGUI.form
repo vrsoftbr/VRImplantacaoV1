@@ -27,7 +27,7 @@
             <Property name="text" type="java.lang.String" value="Importa&#xe7;&#xe3;o 2.5"/>
           </Properties>
           <SubComponents>
-            <Menu class="javax.swing.JMenu" name="jMenu1">
+            <Menu class="javax.swing.JMenu" name="mnuCadastro2_5">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cadastro"/>
               </Properties>

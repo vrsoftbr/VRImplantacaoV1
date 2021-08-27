@@ -411,6 +411,10 @@ public final class MenuGUI extends VRMdiFrame {
         atualizarRodape();
         configurarBusca();
         atualizarJanela();
+        
+        if (Global.getIdUnidade() != 1) {
+            mnuCadastro2_5.setVisible(false);
+        }
     }
 
     @Override
@@ -613,7 +617,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCadastro = new javax.swing.JMenu();
         mnuLoja = new javax.swing.JMenuItem();
         mnuAjuda1 = new javax.swing.JMenu();
-        jMenu1 = new javax.swing.JMenu();
+        mnuCadastro2_5 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem13 = new javax.swing.JMenuItem();
@@ -1116,7 +1120,7 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuAjuda1.setText("Importação 2.5");
 
-        jMenu1.setText("Cadastro");
+        mnuCadastro2_5.setText("Cadastro");
 
         jMenuItem7.setText("Banco de Dados");
         jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
@@ -1124,7 +1128,7 @@ public final class MenuGUI extends VRMdiFrame {
                 jMenuItem7ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem7);
+        mnuCadastro2_5.add(jMenuItem7);
 
         jMenuItem9.setText("Sistemas");
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
@@ -1132,7 +1136,7 @@ public final class MenuGUI extends VRMdiFrame {
                 jMenuItem9ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem9);
+        mnuCadastro2_5.add(jMenuItem9);
 
         jMenuItem13.setText("Sistema x Banco Dados");
         jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
@@ -1140,7 +1144,7 @@ public final class MenuGUI extends VRMdiFrame {
                 jMenuItem13ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem13);
+        mnuCadastro2_5.add(jMenuItem13);
 
         jMenuItem15.setText("Unidades VR");
         jMenuItem15.addActionListener(new java.awt.event.ActionListener() {
@@ -1148,7 +1152,7 @@ public final class MenuGUI extends VRMdiFrame {
                 jMenuItem15ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem15);
+        mnuCadastro2_5.add(jMenuItem15);
 
         jMenuItem16.setText("Usuários VRImplantacao");
         jMenuItem16.addActionListener(new java.awt.event.ActionListener() {
@@ -1156,9 +1160,9 @@ public final class MenuGUI extends VRMdiFrame {
                 jMenuItem16ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem16);
+        mnuCadastro2_5.add(jMenuItem16);
 
-        mnuAjuda1.add(jMenu1);
+        mnuAjuda1.add(mnuCadastro2_5);
 
         mnuCadastros.setText("Configuração");
 
@@ -5477,7 +5481,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem chkGigatron;
     private javax.swing.JMenuItem chkLogicBox;
     private javax.swing.JMenuItem chkSGMaster;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
@@ -5594,6 +5597,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuCache;
     private javax.swing.JMenuItem mnuCadastraFacil;
     private javax.swing.JMenu mnuCadastro;
+    private javax.swing.JMenu mnuCadastro2_5;
     private javax.swing.JMenu mnuCadastros;
     private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCerebro;
