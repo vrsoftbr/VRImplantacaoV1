@@ -248,7 +248,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
 
-                    int codigoProduto = Utils.stringToInt(rst.getString("id"), -2);
+                    int codigoProduto = Utils.stringToInt(rst.getString("ProdCodInterno"), -2);
                     ProdutoBalancaVO produtoBalanca = produtosBalanca.get(codigoProduto);                    
 
                     if (produtoBalanca != null) {
