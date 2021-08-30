@@ -694,7 +694,7 @@ public class NotaSaidaNfceDAO {
             )) {
                 if (!rst.next()) {
                     if (!incluirEcfInexistente) {
-                        throw new VRException("Tipo modelo não encontrado!");
+                        throw new VRException("TIPO MODELO ECF (" + ecf + ") NÃO ENCONTRADO. POR FAVOR VERIFICAR CADASTRO ECF!");
                     }
                     return 999;
                 }

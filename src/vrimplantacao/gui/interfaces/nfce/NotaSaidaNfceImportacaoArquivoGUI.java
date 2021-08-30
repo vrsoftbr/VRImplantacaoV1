@@ -78,7 +78,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                             oVenda = dao.importar(arq, chkVerificarCodigoAnterior.isSelected(), chkVerificarCodigoBarras.isSelected(), chkExibirDivergencias.isSelected());
                             lojas.add(oVenda.idLoja);
                         } catch (Exception ex) {
-                            vDivergenciaGeral.add(new DivergenciaVO("Não foi possível importar o arquivo " + arq + "! " + ex, TipoDivergencia.ERRO.getId()));
+                            vDivergenciaGeral.add(new DivergenciaVO("<html>" + ex + "<br> Não foi possível importar o arquivo " + arq + "!</html>", TipoDivergencia.ERRO.getId()));
                             continue;
                         }
                         NotaSaidaNfceDAO notaSaidaNfceDAO = new NotaSaidaNfceDAO();

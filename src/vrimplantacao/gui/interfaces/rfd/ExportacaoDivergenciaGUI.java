@@ -42,6 +42,7 @@ public class ExportacaoDivergenciaGUI extends VRInternalFrame {
             i++;
         }
 
+        tblConsulta.setRowHeight(60);
         tblConsulta.setModel(dados, colunas);
         tblConsulta.setDefaultRenderer(Object.class, new MyTableCellRenderer());
 
