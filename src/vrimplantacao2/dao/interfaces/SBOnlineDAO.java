@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIProperty;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -8,17 +7,19 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -77,6 +78,18 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
 
+    @Override
+    public Set<OpcaoFornecedor> getOpcoesDisponiveisFornecedor() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoFornecedor.DADOS,
+                OpcaoFornecedor.RAZAO_SOCIAL,
+                OpcaoFornecedor.NOME_FANTASIA,
+                OpcaoFornecedor.CNPJ_CPF,
+                OpcaoFornecedor.INSCRICAO_ESTADUAL,
+                OpcaoFornecedor.INSCRICAO_MUNICIPAL
+        ));
+    }
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -115,15 +128,27 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    ""
+                    "select\n"
+                    + "	 DISTINCT\n"
+                    + "	 SitTribICMS descricao,\n"
+                    + "	 SitTribICMS cst_saida,\n"
+                    + "	 AliqICMS aliquota_saida,\n"
+                    + "	 Reducao reducao_saida\n"
+                    + "from\n"
+                    + "	 CalcTributoUF icm \n"
+                    + "	 left join UF u on icm.CodUF = u.CodIBGE \n"
+                    + "where\n"
+                    + "	 u.Sigla = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+                    + "group BY SitTribICMS,AliqICMS,Reducao"
             )) {
                 while (rs.next()) {
+                    String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
                     result.add(new MapaTributoIMP(
-                            rs.getString(""),
-                            rs.getString(""),
-                            0,
-                            rs.getDouble(""),
-                            rs.getDouble("")
+                            id,
+                            id,
+                            rs.getInt("cst_saida"),
+                            rs.getDouble("aliquota_saida"),
+                            rs.getDouble("reducao_saida")
                     ));
                 }
             }
@@ -162,10 +187,12 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
 
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString(""));
+                    imp.setFantasia(rs.getString("fantasia"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -180,22 +207,6 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setAtivo(rs.getBoolean("id_situacaocadastro"));
 
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    public List<ProdutoFornecedorIMP> getProdutosFornecedor() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    ""
-            )) {
-                while (rs.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     result.add(imp);
                 }
             }
@@ -446,41 +457,41 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("codigobar"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                    imp.setSituacaoCadastro(rs.getInt("id_situacao"));
+                    imp.setSituacaoCadastro(rs.getInt("id_situacaocadastro"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    
+
                     imp.setCodMercadologico1(rs.getString("grupo"));
                     imp.setCodMercadologico2(rs.getString("subgrupo"));
                     imp.setCodMercadologico3(rs.getString("marca"));
-                    
+
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    
+
                     imp.seteBalanca(rs.getBoolean("balanca"));
                     imp.setValidade(rs.getInt("validade"));
                     imp.setTipoEmbalagem(rs.getString("id_tipoembalagem"));
-                    
+
                     imp.setPiscofinsCstDebito(rs.getString("sittribpis"));
                     imp.setPiscofinsCstCredito(rs.getString("sittribpisent"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("natrecpis"));
-                    
+
                     imp.setPrecovenda(rs.getDouble("preco"));
                     imp.setCustoSemImposto(rs.getDouble("custo"));
                     imp.setCustoComImposto(imp.getCustoSemImposto());
-                    
+
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
-                    
+
                     imp.setIcmsCstSaida(rs.getInt("icms_cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms_aliq"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_red"));
-                    
+
                     result.add(imp);
                 }
             }
