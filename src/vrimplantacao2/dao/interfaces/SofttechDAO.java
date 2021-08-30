@@ -494,6 +494,7 @@ public class SofttechDAO extends InterfaceDAO {
         opt.addAll(OpcaoProduto.getFamilia());
         opt.addAll(Arrays.asList(
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
