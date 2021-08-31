@@ -1,4 +1,4 @@
-package vrimplantacao2_5.gui.migracao;
+package vrimplantacao2_5.gui.migracao2_5;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.WindowConstants;
