@@ -91,6 +91,14 @@ public class SistemaService {
         return sistemas;
     }
     
+    public List<SistemaVO> getSistema(int idSistema) throws Exception {        
+        List<SistemaVO> result = null;
+        
+        result = sistemaDAO.getSistema(idSistema);
+        
+        return result;
+    }
+    
     private String getTitle() {
         return "Cadastro Sistema";
     }    

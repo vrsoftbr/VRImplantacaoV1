@@ -38,6 +38,27 @@ public class SistemaDAO {
 
         return result;
     }
+        
+    public List<SistemaVO> getSistema(int idSistema) throws Exception {
+        List<SistemaVO> result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id, \n"
+                    + "nome \n"
+                    + "from implantacao2_5.sistema \n"
+                    + "where id = " + idSistema
+            )) {
+                if (rst.next()) {
+                    SistemaVO vo = new SistemaVO();
+                    vo.setId(rst.getInt("id"));
+                    vo.setNome(rst.getString("nome"));
+                    result.add(vo);
+                }
+            }            
+        }
+        return result;
+    }
 
     public void inserir(SistemaVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();

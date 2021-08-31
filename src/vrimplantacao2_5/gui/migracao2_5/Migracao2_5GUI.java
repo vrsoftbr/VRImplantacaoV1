@@ -9,11 +9,10 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.controller.PrimeController;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.PrimeDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2_5.controller.migracao2_5.Migracao2_5Controller;
+import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
+import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
  *
@@ -21,14 +20,10 @@ import vrimplantacao2.parametro.Parametros;
  */
 public class Migracao2_5GUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "Prime";
-
+    private static String SISTEMA;
     private static Migracao2_5GUI instance;
-
-    private String vLojaCliente;
     private int vLojaVR;
-    private final PrimeDAO dao;
-    private PrimeController controller;
+    private Migracao2_5Controller controller = new Migracao2_5Controller();
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -52,15 +47,36 @@ public class Migracao2_5GUI extends VRInternalFrame {
      */
     public Migracao2_5GUI(VRMdiFrame frame) throws Exception {
         super(frame);
-        this.dao = new PrimeDAO();
-        this.controller = new PrimeController();
         initComponents();
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        
+        pnlConn.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                tabProdutos.btnMapaTribut.setEnabled(true);
+                gravarParametros();
+            }
+        });
 
+        pnlConn.setSistema(ESistema.VRMASTER);
+        pnlConn.getNomeConexao();
         centralizarForm();
         this.setMaximum(false);
     }
 
+    private void gravarParametros() throws Exception {
+        Parametros params = Parametros.get();
+        tabProdutos.gravarParametros(params, SISTEMA);
+        params.put(pnlConn.getHost(), SISTEMA, "HOST");
+        params.put(pnlConn.getSchema(), SISTEMA, "DATABASE");
+        params.put(pnlConn.getPorta(), SISTEMA, "PORTA");
+        params.put(pnlConn.getUsuario(), SISTEMA, "USUARIO");
+        params.put(pnlConn.getSenha(), SISTEMA, "SENHA");
+
+        pnlConn.atualizarParametros();
+        
+        params.salvar();
+    }
+    
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -87,11 +103,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    //idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    
-                    Importador importador = new Importador(dao);
-                    importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);
                     
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
