@@ -86,6 +86,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Integer versaoVenda = 2;
     
+    private boolean importarIcmsEntradaCad = false;
+    
     public Integer getVersaoVenda() {
         return this.versaoVenda;
     }
@@ -130,6 +132,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         this.vendaUtilizaDigito = vendaUtilizaDigito;
     }
 
+    public boolean isImportarIcmsEntradaCad() {
+        return this.importarIcmsEntradaCad;
+    }
+    
+    public void setImportarIcmsEntradaCad(boolean importarIcmsEntradaCad) {
+        this.importarIcmsEntradaCad = importarIcmsEntradaCad;
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         
@@ -189,6 +199,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
                 OpcaoProduto.FAMILIA,
                 OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
@@ -377,6 +388,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
+        String importacaoIcmsEntrada = isImportarIcmsEntradaCad() ? "prc.prlcodtriecad icmsentradaid,\n" : "prc.prlcodtrie icmsentradaid,\n";
+        
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n" +
@@ -415,6 +428,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlcodpiscofs piscofinssaida,\n" +
                     "	prc.prltabpiscof piscofinsnatrec,\n" +
                     "	prc.prlcodtris icmssaidaid,\n" +
+                        importacaoIcmsEntrada +
                     "	prc.prlcodtrie icmsentradaid,\n" +
                     "	prc.prlprvena precoatacado,\n" +
                     "	prc.prlmargata margematacado,\n" +
