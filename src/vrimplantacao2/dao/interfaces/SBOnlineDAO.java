@@ -95,26 +95,10 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select cnpj, razao from firma"
+                    "select seriacao, fantasia from firma"
             )) {
                 while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("cnpj"), rs.getString("razao")));
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public List<String> getNomeLojaCliente() throws Exception {
-        List<String> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select fantasia from firma"
-            )) {
-                while (rst.next()) {
-                    result.add(rst.getString("fantasia"));
+                    result.add(new Estabelecimento(rs.getString("seriacao"), rs.getString("fantasia")));
                 }
             }
         }
