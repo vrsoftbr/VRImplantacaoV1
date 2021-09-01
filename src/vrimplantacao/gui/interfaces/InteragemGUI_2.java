@@ -16,7 +16,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.interfaces.InteragemDAO;
+import vrimplantacao2.dao.interfaces.InterageDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -32,7 +32,7 @@ public class InteragemGUI_2 extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
-    private InteragemDAO dao = new InteragemDAO();
+    private InterageDAO dao = new InterageDAO();
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();

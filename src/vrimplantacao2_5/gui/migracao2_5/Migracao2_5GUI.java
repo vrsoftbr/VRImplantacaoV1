@@ -1,14 +1,9 @@
 package vrimplantacao2_5.gui.migracao2_5;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.WindowConstants;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrframework.remote.ItemComboVO;
-import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.migracao2_5.Migracao2_5Controller;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
@@ -24,13 +19,14 @@ public class Migracao2_5GUI extends VRInternalFrame {
     private static Migracao2_5GUI instance;
     private int vLojaVR;
     private Migracao2_5Controller controller = new Migracao2_5Controller();
+    private ESistema eSistema;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new Migracao2_5GUI(i_mdiFrame);
-            }
+                instance = new Migracao2_5GUI(i_mdiFrame, null);
+            }   
             instance.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
@@ -43,12 +39,23 @@ public class Migracao2_5GUI extends VRInternalFrame {
      * Creates new form ControlePlusPostgresGUI
      *
      * @param frame
+     * @param sistema
      * @throws java.lang.Exception
      */
-    public Migracao2_5GUI(VRMdiFrame frame) throws Exception {
+    public Migracao2_5GUI(VRMdiFrame frame, ESistema sistema) throws Exception {
         super(frame);
         initComponents();
         
+        SISTEMA = sistema.getNome();
+        this.title = "Importação " + SISTEMA;
+        
+        carregarParametros();
+        
+        this.eSistema = sistema;
+        eSistema.setDao(sistema.getDao());
+        
+        tabProdutos.setOpcoesDisponiveis(sistema.getDao());
+        tabProdutos.btnMapaTribut.setVisible(false);        
         pnlConn.setOnConectar(new ConexaoEvent() {
             @Override
             public void executar() throws Exception {
@@ -57,12 +64,18 @@ public class Migracao2_5GUI extends VRInternalFrame {
             }
         });
 
-        pnlConn.setSistema(ESistema.VRMASTER);
+        pnlConn.setSistema(sistema);
         pnlConn.getNomeConexao();
+        
         centralizarForm();
         this.setMaximum(false);
     }
 
+    private void carregarParametros() throws Exception {
+        Parametros params = Parametros.get();
+        tabProdutos.carregarParametros(params, SISTEMA);
+    }
+    
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
@@ -77,20 +90,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
         params.salvar();
     }
     
-    public void carregarLojaVR() throws Exception {
-        cmbLojaVR.setModel(new DefaultComboBoxModel());
-        int cont = 0;
-        int index = 0;
-        for (LojaVO oLoja : new LojaDAO().carregar()) {
-            cmbLojaVR.addItem(new ItemComboVO(oLoja.id, oLoja.descricao));
-            if (oLoja.id == vLojaVR) {
-                index = cont;
-            }
-            cont++;
-        }
-        cmbLojaVR.setSelectedIndex(index);
-    }
-
     private void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
@@ -102,8 +101,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -140,8 +137,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
-        jLabel2 = new javax.swing.JLabel();
-        cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         try {
             pnlConn = new vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel();
         } catch (java.lang.Exception e1) {
@@ -222,18 +217,12 @@ public class Migracao2_5GUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Loja:");
-
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap(495, Short.MAX_VALUE)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -241,11 +230,7 @@ public class Migracao2_5GUI extends VRInternalFrame {
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -292,8 +277,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
-    private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private javax.swing.JLabel jLabel2;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedor;

@@ -31,7 +31,7 @@ public abstract class InternalFrameFactory {
                 internalFrame = new Uniplus2_5GUI(frame);
                 break;    
             default:
-                internalFrame = new Migracao2_5GUI(frame);
+                internalFrame = new Migracao2_5GUI(frame, sistema);                
         }
 
         return internalFrame;

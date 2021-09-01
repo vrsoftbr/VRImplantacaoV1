@@ -182,6 +182,7 @@ public class SelecaoLojaGUI extends VRDialog {
         try {
             construirInternalFrame();
         } catch (Exception ex) {
+            ex.printStackTrace();
             Util.exibirMensagemErro(ex, "Seleção de Loja");
         }
     }//GEN-LAST:event_btnProximoActionPerformed
