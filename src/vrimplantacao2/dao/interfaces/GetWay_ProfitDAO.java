@@ -23,7 +23,6 @@ import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -77,7 +76,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public boolean v_usar_arquivoBalanca;
     public boolean v_usar_arquivoBalancaUnificacao;
     public boolean usarMargemBruta = false;
-    
+
     public boolean usarQtdEmbDoProduto = false;
     public boolean usaMargemLiquidaPraticada = false;
     public boolean usaMargemSobreVenda = false;
@@ -103,7 +102,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public void setComplemento(String complemento) {
         this.complemento = complemento == null ? "" : complemento.trim();
     }
-    
+
     @Override
     public String getSistema() {
         return "GetWay" + (!"".equals(complemento) ? " - " + complemento : "");
@@ -296,7 +295,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	pl.preco_unit precovenda,\n"
                     + " prod.preco_unit as precovenda_produto, \n"
                     + " prod.preco_cust as custo_produto, \n"
-                    + " prod.estoque as estoque_produto, \n"        
+                    + " prod.estoque as estoque_produto, \n"
                     + "	prod.margem_bruta margem_bruta,\n"
                     + "	prod.margem_param margem_param,\n"
                     + "	prod.lucroliq margemliquidapraticada,\n"
@@ -312,7 +311,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	prod.cst_pissaida piscofins_cst_debito,\n"
                     + "	prod.nat_rec piscofins_natureza_receita,\n"
                     + " ltrim(rtrim(prod.codaliq)) icms_debito_id,\n"
-                    + " fcp.VALORTRIB fcp,\n"                    
+                    + " fcp.VALORTRIB fcp,\n"
                     + "	prod.CODTRIB icms_cst_saida,\n"
                     + "	al.ALIQUOTA icms_aliquota_saida,\n"
                     + "	prod.PER_REDUC icms_reduzido_saida,\n"
@@ -333,9 +332,9 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "		al.CODALIQ = prod.codaliq_nf\n"
                     + "left join TROCACOMPRA trc on prod.CODPROD = trc.CODPROD\n"
                     + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
-                    + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"      
+                    + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"
                     + "and pl.codloja = " + getLojaOrigem() + "\n"
-                    + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S'\n" : "")        
+                    + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S'\n" : "")
                     + "order by\n"
                     + "	id"
             )) {
@@ -358,7 +357,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     if (copiarDescricaoCompletaParaGondola) {
                         imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     }
-                    
+
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
                     imp.setCodMercadologico3(rst.getString("cod_mercadologico3"));
@@ -397,7 +396,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_debito"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
-                    
+
                     String aliquotaDebitoId = formatTributacaoId(rst.getString("icms_debito_id"), rst.getDouble("fcp"));
                     imp.setIcmsDebitoId(aliquotaDebitoId);
                     imp.setIcmsDebitoForaEstadoId(aliquotaDebitoId);
@@ -421,7 +420,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                             imp.setIcmsAliqEntrada(0);
                             imp.setIcmsReducaoEntrada(0);
                         }
-                        
+
                         imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
                         imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntradaForaEstado());
                         imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntradaForaEstado());
@@ -511,7 +510,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         }
         return vResult;
     }
-    
+
     //<editor-fold defaultstate="collapsed" desc="Script Com o Custo da Nota de Entrada">
     /*@Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -806,7 +805,6 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         return vResult;
     }*/
     //</editor-fold>
-
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
@@ -908,7 +906,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	aliq_s_nf.VALORTRIB icms_debito_nf,\n"
                     + "	PER_REDUC icms_debito_red_nf,\n"
                     + "	CAST(PER_REDUC_ENT as numeric(15, 2)) icms_credito_red_nf,\n"
-                    + " aliq_s_nf.VALORTRIB icms_credito_nf,"        
+                    + " aliq_s_nf.VALORTRIB icms_credito_nf,"
                     + "	CODTRIB_ENT cst_credito_nf,\n"
                     //+ "	ULTICMSCRED icms_credito_nf,\n"
                     + " p.ALIQICMS_INTER aliq_interna,\n"
@@ -919,7 +917,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "left join ALIQUOTA_ICMS aliq_s_c on p.CODALIQ = aliq_s_c.CODALIQ\n"
                     + "where CODPROD = " + imp.getImportId())) {
                 if (rs.next()) {
-                    
+
                     //Aliquota Débito
                     imp.setIcmsAliqSaida(rs.getDouble("icms_debito_nf"));
                     imp.setIcmsCstSaida(rs.getInt("cst_debito_nf"));
@@ -929,7 +927,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setIcmsAliqEntrada(rs.getInt("icms_credito_nf"));
                     imp.setIcmsCstEntrada(rs.getInt("cst_credito_nf"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_credito_red_nf"));
-                    
+
                     imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito_nf"));
                     imp.setIcmsCstEntradaForaEstado(rs.getInt("cst_credito_nf"));
                     imp.setIcmsReducaoEntradaForaEstado(rs.getDouble("icms_credito_red_nf"));
@@ -1296,55 +1294,55 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "   f.codfornec,\n" +
-                    "	f.razao,\n" +
-                    "	coalesce(f.fantasia, f.RAZAO) fantasia,\n" +
-                    "	f.endereco,\n" +
-                    "	f.numero,\n" +
-                    "	f.bairro,\n" +
-                    "	f.complemento,\n" +
-                    "	f.cidade,\n" +
-                    "	f.estado,\n" +
-                    "	f.cep,\n" +
-                    "	f.telefone,\n" +
-                    "	f.fax,\n" +
-                    "	f.email,\n" +
-                    "	f.celular,\n" +
-                    "	f.fone1,\n" +
-                    "	f.contato,\n" +
-                    "	f.ie,\n" +
-                    "	f.cnpj_cpf,\n" +
-                    "	f.agencia,\n" +
-                    "	f.banco,\n" +
-                    "	f.conta,\n" +
-                    "	f.dtcad,\n" +
-                    "	f.valor_compra,\n" +
-                    "	f.ativo, \n" +
-                    "   f.obs, \n" +
-                    "   c.descricao as descricaopag, \n" +
-                    "   f.pentrega, \n" +
-                    "   f.pvisita,\n" +
-                    "   coalesce(\n" +
-                    "   	case \n" +
-                    "               when codtipofornec = 1 then 0 \n" +
-                    "               when codtipofornec = 2 then 1 \n" +
-                    "		    when codtipofornec = 3 then 2 \n" +
-                    "		    when codtipofornec = 4 then 3 \n" +
-                    "		    when codtipofornec = 5 then 5 \n" +
-                    "		    when codtipofornec = 6 then 6 \n" +
-                    "		    when codtipofornec = 7 then 7 \n" +
-                    "		    when codtipofornec = 8 then 8 \n" +
-                    "		end,\n" +
-                    "		2\n" +
-                    "	) as codtipofornec, \n" +
-                    "    simples \n" +
-                    "from \n" +
-                    "    fornecedores f \n" +
-                    "    left join condpagto c on\n" +
-                    "    	f.codcondpagto = c.codcondpagto \n" +
-                    "order by\n" +
-                    "	codfornec"
+                    "select \n"
+                    + "   f.codfornec,\n"
+                    + "	f.razao,\n"
+                    + "	coalesce(f.fantasia, f.RAZAO) fantasia,\n"
+                    + "	f.endereco,\n"
+                    + "	f.numero,\n"
+                    + "	f.bairro,\n"
+                    + "	f.complemento,\n"
+                    + "	f.cidade,\n"
+                    + "	f.estado,\n"
+                    + "	f.cep,\n"
+                    + "	f.telefone,\n"
+                    + "	f.fax,\n"
+                    + "	f.email,\n"
+                    + "	f.celular,\n"
+                    + "	f.fone1,\n"
+                    + "	f.contato,\n"
+                    + "	f.ie,\n"
+                    + "	f.cnpj_cpf,\n"
+                    + "	f.agencia,\n"
+                    + "	f.banco,\n"
+                    + "	f.conta,\n"
+                    + "	f.dtcad,\n"
+                    + "	f.valor_compra,\n"
+                    + "	f.ativo, \n"
+                    + "   f.obs, \n"
+                    + "   c.descricao as descricaopag, \n"
+                    + "   f.pentrega, \n"
+                    + "   f.pvisita,\n"
+                    + "   coalesce(\n"
+                    + "   	case \n"
+                    + "               when codtipofornec = 1 then 0 \n"
+                    + "               when codtipofornec = 2 then 1 \n"
+                    + "		    when codtipofornec = 3 then 2 \n"
+                    + "		    when codtipofornec = 4 then 3 \n"
+                    + "		    when codtipofornec = 5 then 5 \n"
+                    + "		    when codtipofornec = 6 then 6 \n"
+                    + "		    when codtipofornec = 7 then 7 \n"
+                    + "		    when codtipofornec = 8 then 8 \n"
+                    + "		end,\n"
+                    + "		2\n"
+                    + "	) as codtipofornec, \n"
+                    + "    simples \n"
+                    + "from \n"
+                    + "    fornecedores f \n"
+                    + "    left join condpagto c on\n"
+                    + "    	f.codcondpagto = c.codcondpagto \n"
+                    + "order by\n"
+                    + "	codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -1380,8 +1378,8 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                                 + " - Prazo visita: " + rst.getInt("PVISITA"));
                     }
                     imp.setObservacao(Utils.acertarTexto(rst.getString("OBS")) + " Cond. pag: "
-                     + Utils.acertarTexto(rst.getString("DESCRICAOPAG"))
-                     + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
+                            + Utils.acertarTexto(rst.getString("DESCRICAOPAG"))
+                            + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
 
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
@@ -1553,7 +1551,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                             }
                         }
                     }
-                    */
+                     */
                     vResult.add(imp);
                 }
             }
@@ -1793,7 +1791,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                   "SELECT "
+                    "SELECT "
                     + "CODRECEBER AS ID, "
                     + "CLIENTES.CNPJ_CPF, "
                     + "CODRECEBER, NUMTIT, "
@@ -1805,13 +1803,13 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "coalesce(VALOR,0) VALOR, "
                     + "coalesce(VALORJUROS,0) VALORJUROS, "
                     + "OBS "
-                 + "FROM "
+                    + "FROM "
                     + "RECEBER "
-                 + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
-                 + "where UPPER(SITUACAO) = 'AB' "
+                    + "INNER JOIN CLIENTES ON CLIENTES.CODCLIE = RECEBER.CODCLIE "
+                    + "where UPPER(SITUACAO) = 'AB' "
                     + "and RECEBER.CODTIPODOCUMENTO = " + v_tipoDocumento + " "
                     + "and RECEBER.CODLOJA = " + getLojaOrigem() + " "
-                 + "order by DTEMISSAO"
+                    + "order by DTEMISSAO"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -1828,7 +1826,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setNumeroCupom(rst.getString("NOTAECF"));
                     imp.setObservacao(rst.getString("OBS"));
                     imp.setJuros(rst.getDouble("VALORJUROS"));
-                    
+
                     vResult.add(imp);
                 }
             }
@@ -1873,7 +1871,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                 while (rst.next()) {
                     //int idBanco = new BancoDAO().getId(rst.getInt("CODBANCO"));
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     imp.setId(rst.getString("ID"));
                     imp.setDate(rst.getDate("DTEMISSAO"));
                     imp.setDataDeposito(rst.getDate("DTVENCTO"));
@@ -1933,7 +1931,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "CODPAGAR, "
                     + "CODFORNEC, "
                     + "coalesce(NOTA, '0') NOTA, "
-                    + "DESD PARCELA, "        
+                    + "DESD PARCELA, "
                     + "VALOR, "
                     + "DTVENCTO, "
                     + "DTEMISSAO, "
@@ -1952,17 +1950,17 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rst.getString("CODPAGAR"));
                     imp.setIdFornecedor(rst.getString("CODFORNEC"));
-                    
+
                     String doc = Utils.formataNumero(rst.getString("NOTA"));
-                    
+
                     imp.setNumeroDocumento(doc);
-                    
-                    if(doc != null && !"".equals(doc)) {
-                        if(doc.length() > 6) {
+
+                    if (doc != null && !"".equals(doc)) {
+                        if (doc.length() > 6) {
                             imp.setNumeroDocumento(doc.substring(0, 6));
                         }
                     }
-                    
+
                     imp.setValor(rst.getDouble("VALOR"));
                     imp.setDataEmissao(rst.getDate("DTEMISSAO"));
                     imp.setDataEntrada(rst.getDate("DTENTRADA"));
@@ -1971,7 +1969,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                             + (rst.getString("OBS2") == null ? "" : rst.getString("OBS2")));
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("DTVENCTO"), imp.getValor());
                     parc.setNumeroParcela(rst.getInt("PARCELA"));
-                    
+
                     vResult.add(imp);
                 }
             }
@@ -2192,11 +2190,11 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-    
+
     private String formatTributacaoId(String id, double fcp) {
         return String.format("%s-%.2f", id, fcp);
     }
-    
+
     //Utilizado este método com novo script para cliente que utiliza alíquota FCP
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
@@ -2204,25 +2202,31 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
 
         try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select \n" +
-                    "	distinct\n" +
-                    "	ltrim(rtrim(replace(icms.codaliq,'\\','\\\\\\'))) id,\n" +
-                    "	coalesce(fcp.VALORTRIB, 0) fcp,\n" +
-                    "	icms.descricao\n" +
-                    "from \n" +
-                    "	aliquota_icms icms\n" +
-                    "	left join\n" +
-                    "		PRODUTOS p on icms.CODALIQ = p.CODALIQ\n" +
-                    "	left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n" +
-                    "where\n" +
-                    "	icms.descricao is not null\n" +
-                    "order by\n" +
-                    "	id, fcp"
+                    "select \n"
+                    + "	distinct\n"
+                    + "	ltrim(rtrim(replace(icms.codaliq,'\\\\','\\\\\\\\\\\\'))) id,\n"
+                    + "	coalesce(fcp.VALORTRIB, 0) fcp,\n"
+                    + "	icms.descricao,\n"
+                    + "	coalesce(icms.VALORTRIB, 0) as valor,\n"
+                    + "	coalesce(icms.REDUCAO, 0) as reducao,\n"
+                    + "	coalesce(icms.aliquota, 0) as aliquota\n"
+                    + "from \n"
+                    + "	aliquota_icms icms\n"
+                    + "	left join\n"
+                    + "		PRODUTOS p on icms.CODALIQ = p.CODALIQ\n"
+                    + "	left join PROD_TRIBFCP fcp on p.codprod = fcp.CODPROD\n"
+                    + "where\n"
+                    + "	icms.descricao is not null\n"
+                    + "order by\n"
+                    + "	id, fcp"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
-                            formatTributacaoId(rs.getString("id"), rs.getDouble("fcp")), 
-                            String.format("%s + FCP %.2f %%", rs.getString("descricao"), rs.getDouble("fcp"))
+                            formatTributacaoId(rs.getString("id"), rs.getDouble("fcp")),
+                            String.format("%s + FCP %.2f %%", rs.getString("descricao"), rs.getDouble("fcp")),
+                            0,
+                            rs.getDouble("valor"),
+                            rs.getDouble("reducao")
                     ));
                 }
             }
@@ -2317,7 +2321,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modelo"));
-                        
+
                         if (rst.getString("nomecliente") != null
                                 && !rst.getString("nomecliente").trim().isEmpty()
                                 && rst.getString("nomecliente").trim().length() > 45) {
@@ -2326,7 +2330,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                         } else {
                             next.setNomeCliente(rst.getString("nomecliente"));
                         }
-                        
+
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
