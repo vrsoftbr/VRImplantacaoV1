@@ -31,7 +31,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-/*
+/**
+ *
  * @author Alan
  */
 public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -209,7 +210,8 @@ public class IServerDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	case when Status_Prod = 'A' then 1 else 0 end situacaocadastro\n"
                     + "from\n"
                     + "	tbl_produto p\n"
-                    + "join tbl_classe icm on icm.Cod_Classe = p.Classe_Prod"
+                    + "join tbl_classe icm on icm.Cod_Classe = p.Classe_Prod\n"
+                    + " where Status_Prod = 'A'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
