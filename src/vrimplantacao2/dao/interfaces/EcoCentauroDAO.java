@@ -1,7 +1,10 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,15 +39,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private boolean importarCodigoPrincipal;
-    
+
     public boolean isImportarCodigoPrincipal() {
         return this.importarCodigoPrincipal;
     }
-    
+
     public void setImportarCodigoPrincipal(boolean importarCodigoPrincipal) {
         this.importarCodigoPrincipal = importarCodigoPrincipal;
     }
-    
+
     @Override
     public String getSistema() {
         return "Eco Centauro";
@@ -270,7 +273,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
                     + "WHERE pg.descricao NOT LIKE '%BASE CORROMPIDA%'\n"
-                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"        
+                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -280,12 +283,12 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    
+
                     long longEAN = Utils.stringToLong(imp.getEan(), -2);
                     String strEAN = String.valueOf(longEAN);
 
                     if (strEAN.startsWith("999000") && strEAN.length() == 13) {
-                        final String eanBal = strEAN.substring(7,strEAN.length()-1);
+                        final String eanBal = strEAN.substring(7, strEAN.length() - 1);
                         final int plu = Utils.stringToInt(eanBal, -1);
                         ProdutoBalancaVO bal = produtosBalanca.get(plu);
                         if (bal != null) {
@@ -304,7 +307,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                         imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                         imp.setValidade(rst.getInt("validade"));
                     }
-                    
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
@@ -351,7 +354,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -521,34 +524,41 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "	c.codigo id,\n"
-                    + "	c.nome,\n"
-                    + "	FANTASIA,\n"
-                    + "	CPFCNPJ,\n"
-                    + "	RGIE,\n"
-                    + "	INSCRICAOMUNICIPAL im,\n"
-                    + "	PESSOA tipopessoa,\n"
-                    + "	ENDERECO,\n"
-                    + "	NUMEROENDERECO numero,\n"
-                    + "	BAIRRO,\n"
-                    + "	COMPLEMENTO,\n"
-                    + "	m.nome CIDADE,\n"
-                    + " m.ESTADO uf,"
-                    + "	CEP,\n"
-                    + "	datacadastro data_cadastro,\n"
-                    + "	CASE WHEN bloqueado = 'S' THEN 1 ELSE 0 END BLOQUEADO,\n"
-                    + "	LIMITE,\n"
-                    + "	FONE telefone,\n"
-                    + "	FAX,\n"
-                    + "	FONECELULAR celular,\n"
-                    + "	EMAIL,\n"
-                    + "	OBS \n"
+                    + "    c.codigo id,\n"
+                    + "    c.nome,\n"
+                    + "    C.FANTASIA,\n"
+                    + "    C.CPFCNPJ,\n"
+                    + "    C.RGIE,\n"
+                    + "    C.INSCRICAOMUNICIPAL im,\n"
+                    + "    C.PESSOA tipopessoa,\n"
+                    + "    C.ENDERECO,\n"
+                    + "    C.NUMEROENDERECO numero,\n"
+                    + "    C.BAIRRO,\n"
+                    + "    C.COMPLEMENTO,\n"
+                    + "    m.nome CIDADE,\n"
+                    + "    m.ESTADO uf,\n"
+                    + "    C.CEP,\n"
+                    + "    coalesce(SUBSTRING(P.datanasc from 9 FOR 2)||'/'||SUBSTRING(P.datanasc from 6 FOR 2)||'/'||SUBSTRING(P.datanasc from 1 FOR 4), '') datanascimento,\n"
+                    + "    C.datacadastro data_cadastro,\n"
+                    + "    CASE WHEN C.bloqueado = 'S' THEN 1 ELSE 0 END BLOQUEADO,\n"
+                    + "    p.localtrabalho empresa,\n"
+                    + "    C.LIMITE,\n"
+                    + "    p.nomepai,\n"
+                    + "    p.nomemae,\n"
+                    + "    C.FONE telefone,\n"
+                    + "    C.FAX,\n"
+                    + "    C.FONECELULAR celular,\n"
+                    + "    C.EMAIL,\n"
+                    + "    C.OBS\n"
                     + "FROM\n"
-                    + "	TRECCLIENTEGERAL c\n"
-                    + "LEFT JOIN TGERCIDADE m ON m.CODIGO = c.CIDADE \n"
+                    + "    TRECCLIENTEGERAL c\n"
+                    + "LEFT JOIN TGERCIDADE m ON m.CODIGO = c.CIDADE\n"
+                    + "left JOIN trecpfisica p ON  C.codigo = P.codigo\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
@@ -571,6 +581,11 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCep(rs.getString("cep"));
 
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    
+                    if (rs.getString("datanascimento") != null && !rs.getString("datanascimento").trim().isEmpty()) {
+                        imp.setDataNascimento(new java.sql.Date(fmt.parse(rs.getString("datanascimento")).getTime()));
+                    }
+                    
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setValorLimite(rs.getDouble("limite"));
 
@@ -579,6 +594,11 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
                     imp.setObservacao(rs.getString("obs"));
+                    
+                    imp.setBloqueado(rs.getInt("BLOQUEADO") == 1);
+                    imp.setNomePai(rs.getString("nomepai"));
+                    imp.setNomeMae(rs.getString("nomemae"));
+                    imp.setEmpresa(rs.getString("empresa"));
 
                     result.add(imp);
                 }
