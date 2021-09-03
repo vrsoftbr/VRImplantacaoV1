@@ -35,6 +35,16 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private boolean importarCodigoPrincipal;
+    
+    public boolean isImportarCodigoPrincipal() {
+        return this.importarCodigoPrincipal;
+    }
+    
+    public void setImportarCodigoPrincipal(boolean importarCodigoPrincipal) {
+        this.importarCodigoPrincipal = importarCodigoPrincipal;
+    }
+    
     @Override
     public String getSistema() {
         return "Eco Centauro";
@@ -215,8 +225,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "    pg.codigo AS id,\n"
+                    "SELECT \n"
+                    + "    pg.produtoprincipal AS id,\n"
                     + "    pg.codigobarra AS ean,\n"
                     + "    pg.descricao AS descricaocompleta,\n"
                     + "    pg.referencia,\n"
@@ -259,6 +269,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "    AND icm_e.empresa = '" + getLojaOrigem() + "'\n"
                     + "    AND icm_e.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "LEFT JOIN TESTCEST c on c.idcest = pg.idcest\n"
+                    + "WHERE pg.descricao NOT LIKE '%BASE CORROMPIDA%'\n"
+                    + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"        
                     + "ORDER BY 1"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
@@ -279,7 +291,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                         if (bal != null) {
                             imp.setEan(String.valueOf(bal.getCodigo()));
                             imp.seteBalanca(true);
-                            imp.setTipoEmbalagem(bal.getPesavel().equals("U") ? "UN" : "KG");
+                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                             imp.setValidade(bal.getValidade());
                         } else {
                             imp.setEan(eanBal);
@@ -292,7 +304,6 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                         imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                         imp.setValidade(rst.getInt("validade"));
                     }
-                    
                     
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -338,6 +349,35 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
             }
         }
 
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "    produtoprincipal AS idproduto,\n"
+                    + "    codigobarra AS ean,\n"
+                    + "    embalagem AS tipoembalagem,\n"
+                    + "    qtdeembalagem AS qtdembalagem\n"
+                    + "FROM TESTPRODUTOGERAL\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("idproduto"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
