@@ -20,7 +20,7 @@ public class Migracao2_5GUI extends VRInternalFrame {
     private static Migracao2_5GUI instance;
     private Migracao2_5Controller controller = new Migracao2_5Controller();
     private ESistema eSistema;
-    private ChecksOptionsHipcomPanelGUI chkPptHippicom = new ChecksOptionsHipcomPanelGUI();
+    private ChecksOptionsHipcomPanelGUI pnlChkPptHippicom = new ChecksOptionsHipcomPanelGUI();
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -67,6 +67,8 @@ public class Migracao2_5GUI extends VRInternalFrame {
 
         pnlConn.setSistema(sistema);
         pnlConn.getNomeConexao();
+        
+        tabs.add("Paramêtros", pnlChkPptHippicom);
         
         centralizarForm();
         this.setMaximum(false);
@@ -223,16 +225,12 @@ public class Migracao2_5GUI extends VRInternalFrame {
         vRPanel3Layout.setHorizontalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
-                .addContainerGap(495, Short.MAX_VALUE)
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel3Layout.setVerticalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(btnMigrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
