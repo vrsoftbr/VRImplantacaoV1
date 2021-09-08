@@ -36,8 +36,8 @@
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-          <JTabbedPaneConstraints tabName="Par&#xe2;metros Hipcom">
-            <Property name="tabTitle" type="java.lang.String" value="Par&#xe2;metros Hipcom"/>
+          <JTabbedPaneConstraints tabName="Par&#xe2;metros VR">
+            <Property name="tabTitle" type="java.lang.String" value="Par&#xe2;metros VR"/>
           </JTabbedPaneConstraints>
         </Constraint>
       </Constraints>
@@ -55,9 +55,19 @@
             <Property name="useNullLayout" type="boolean" value="true"/>
           </Layout>
           <SubComponents>
-            <Component class="vr.view.components.checkbox.VRCheckBox" name="vRCheckBox1">
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEANAtacado">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Importar Icms Entrada (Cad)"/>
+                <Property name="text" type="java.lang.String" value="Importar EAN Atacado"/>
+              </Properties>
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
+                  <AbsoluteConstraints x="10" y="30" width="-1" height="-1"/>
+                </Constraint>
+              </Constraints>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSomenteAtivo">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Somente Produto Ativo"/>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">

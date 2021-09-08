@@ -4,9 +4,9 @@ package vrimplantacao2_5.gui.sistema.checks;
  *
  * @author Lucas
  */
-public class ChecksOptionsHipcomPanelGUI extends javax.swing.JTabbedPane {
+public class ChecksOptionsVRPanelGUI extends javax.swing.JTabbedPane {
 
-    public ChecksOptionsHipcomPanelGUI() {
+    public ChecksOptionsVRPanelGUI() {
         super();
         initComponents();
     }
@@ -24,7 +24,8 @@ public class ChecksOptionsHipcomPanelGUI extends javax.swing.JTabbedPane {
         vRCheckBox3 = new vrframework.bean.checkBox.VRCheckBox();
         scrollParametros = new javax.swing.JScrollPane();
         tabParametros = new vrframework.bean.panel.VRPanel();
-        vRCheckBox1 = new vr.view.components.checkbox.VRCheckBox();
+        chkEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkSomenteAtivo = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -34,20 +35,25 @@ public class ChecksOptionsHipcomPanelGUI extends javax.swing.JTabbedPane {
         tabParametros.setPreferredSize(new java.awt.Dimension(300, 219));
         tabParametros.setLayout(null);
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox1, "Importar Icms Entrada (Cad)");
-        tabParametros.add(vRCheckBox1);
-        vRCheckBox1.setBounds(10, 10, 181, 25);
+        org.openide.awt.Mnemonics.setLocalizedText(chkEANAtacado, "Importar EAN Atacado");
+        tabParametros.add(chkEANAtacado);
+        chkEANAtacado.setBounds(10, 30, 133, 23);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkSomenteAtivo, "Somente Produto Ativo");
+        tabParametros.add(chkSomenteAtivo);
+        chkSomenteAtivo.setBounds(10, 10, 137, 23);
 
         scrollParametros.setViewportView(tabParametros);
 
-        addTab("Parâmetros Hipcom", scrollParametros);
+        addTab("Parâmetros VR", scrollParametros);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.ButtonGroup btgPautaFiscal;
+    public vrframework.bean.checkBox.VRCheckBox chkEANAtacado;
+    public vrframework.bean.checkBox.VRCheckBox chkSomenteAtivo;
     public javax.swing.JScrollPane scrollParametros;
     public vrframework.bean.panel.VRPanel tabParametros;
-    public vr.view.components.checkbox.VRCheckBox vRCheckBox1;
     public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
     
