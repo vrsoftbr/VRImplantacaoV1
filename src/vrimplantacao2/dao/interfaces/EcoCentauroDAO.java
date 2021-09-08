@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DateFormat;
@@ -627,7 +626,8 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO \n"
                     + "WHERE\n"
                     + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
-                    + "	AND cr.databaixa IS NULL"
+                    + "	AND cr.databaixa IS NULL \n"
+                    + " AND cr.tipo = '01'"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
