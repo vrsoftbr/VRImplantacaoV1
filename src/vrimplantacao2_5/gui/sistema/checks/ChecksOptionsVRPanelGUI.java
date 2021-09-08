@@ -37,7 +37,7 @@ public class ChecksOptionsVRPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkEANAtacado, "Importar EAN Atacado");
         tabParametros.add(chkEANAtacado);
-        chkEANAtacado.setBounds(10, 30, 133, 23);
+        chkEANAtacado.setBounds(10, 40, 133, 23);
 
         org.openide.awt.Mnemonics.setLocalizedText(chkSomenteAtivo, "Somente Produto Ativo");
         tabParametros.add(chkSomenteAtivo);
