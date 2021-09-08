@@ -131,10 +131,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select l.cod_loja, l.cod_loja || ' - ' || l.des_fantasia descricao from " + tab_loja + " l order by 1"
+                    "select l.cod_loja, l.cod_loja || ' - ' || l.des_fantasia descricao, num_cgc from " + tab_loja + " l where flg_desativada = 'N' order by 1"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("cod_loja"), rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("cod_loja"), rst.getString("descricao") + " - " + rst.getString("num_cgc")));
                 }
             }
         }
@@ -744,6 +744,38 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    /*@Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.PRECO) {
+            try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "COD_PRODUTO, "
+                        + "VAL_VENDA, "
+                        + "VAL_OFERTA, "
+                        + "DTA_VALIDA_OFERTA\n"
+                        + "from intersolid.tab_produto_loja \n"
+                        + "where cod_loja = 2\n"
+                        + "and DTA_VALIDA_OFERTA > '07/09/2021'"
+                )) {
+                    while (rst.next()) {
+                        System.out.println("Migração Preço");
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("COD_PRODUTO"));
+                        imp.setPrecovenda(rst.getDouble("VAL_OFERTA") > 0 ? rst.getDouble("VAL_OFERTA") : rst.getDouble("VAL_VENDA"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }*/
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
