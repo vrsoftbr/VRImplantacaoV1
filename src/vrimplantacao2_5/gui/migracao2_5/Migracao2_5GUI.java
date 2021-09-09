@@ -4,6 +4,7 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.migracao2_5.Migracao2_5Controller;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
@@ -103,7 +104,49 @@ public class Migracao2_5GUI extends VRInternalFrame {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
+                    
+                    idLojaVR = pnlConn.getLojaVR();
+                    idLojaCliente = pnlConn.getLojaOrigem();
 
+                    Importador importador = new Importador(eSistema.getDao());
+                    importador.setLojaOrigem(idLojaCliente);
+                    importador.setLojaVR(idLojaVR);
+                    
+                    if (tabs.getSelectedIndex() == 0) {
+                        switch (tabParametros.getSelectedIndex()) {
+                            case 0:
+                                tabProdutos.setImportador(importador);
+                                tabProdutos.executarImportacao();
+                                break;
+                            case 1:
+                                tabFornecedores.setImportador(importador);
+                                tabFornecedores.executarImportacao();
+                                break;
+                            case 2:
+                                tabClientes.setImportador(importador);
+                                tabClientes.executarImportacao();
+                                break;
+                            default:
+                                break;
+                        }
+                    } else if (tabs.getSelectedIndex() == 1) {
+                        if (chkUnifProdutos.isSelected()) {
+                            importador.unificarProdutos();
+                        }
+                        if (chkUnifFornecedor.isSelected()) {
+                            importador.unificarFornecedor();
+                        }
+                        if (chkUnifProdutoFornecedor.isSelected()) {
+                            importador.unificarProdutoFornecedor();
+                        }
+                        if (chkUnifClientePreferencial.isSelected()) {
+                            importador.unificarClientePreferencial();
+                        }
+                        if (chkUnifClienteEventual.isSelected()) {
+                            importador.unificarClienteEventual();
+                        }
+                    }
+                    
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -130,13 +173,14 @@ public class Migracao2_5GUI extends VRInternalFrame {
         tabParametros = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
-        tabFornecedor = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
+        tabFornecedores = new vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI();
         tabClientes = new vrimplantacao2.gui.component.checks.ChecksClientePanelGUI();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -159,11 +203,11 @@ public class Migracao2_5GUI extends VRInternalFrame {
         tabImpFornecedor.setLayout(tabImpFornecedorLayout);
         tabImpFornecedorLayout.setHorizontalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+            .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tabFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+            .addComponent(tabFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
         );
 
         tabParametros.addTab("Fornecedores", tabImpFornecedor);
@@ -179,6 +223,8 @@ public class Migracao2_5GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkUnifClientePreferencial, "Cliente Preferencial (Somente com CPF/CNPJ)");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClienteEventual, "Cliente Eventual (Somente com CPF/CNPJ)");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -189,7 +235,8 @@ public class Migracao2_5GUI extends VRInternalFrame {
                     .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(330, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -203,7 +250,9 @@ public class Migracao2_5GUI extends VRInternalFrame {
                 .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(160, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -272,13 +321,14 @@ public class Migracao2_5GUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrimplantacao2_5.gui.componente.conexao.configuracao.BaseDeDadosPanel pnlConn;
     private vrimplantacao2.gui.component.checks.ChecksClientePanelGUI tabClientes;
-    private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedor;
+    private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.tabbedPane.VRTabbedPane tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
