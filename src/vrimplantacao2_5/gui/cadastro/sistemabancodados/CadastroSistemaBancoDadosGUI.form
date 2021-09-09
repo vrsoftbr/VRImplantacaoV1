@@ -109,25 +109,28 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="74" max="32767" attributes="0"/>
                               </Group>
                               <Component id="txtPorta" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtNomeSchema" alignment="0" min="-2" pref="200" max="-2" attributes="0"/>
-                              <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtNomeSchema" min="-2" pref="298" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtUsuario" alignment="0" min="-2" pref="200" max="-2" attributes="0"/>
-                              <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtUsuario" max="32767" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSenha" min="-2" pref="200" max="-2" attributes="0"/>
+                              <Component id="txtSenha" min="-2" pref="150" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -159,20 +162,19 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtUsuario" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                              <Component id="txtSenha" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="txtSenha" min="-2" pref="20" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtNomeSchema" min="-2" pref="20" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtUsuario" min="-2" pref="20" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -242,7 +244,7 @@
         </Component>
         <Component class="vrframework.bean.textField.VRTextField" name="txtNomeSchema">
           <Properties>
-            <Property name="columns" type="int" value="25"/>
+            <Property name="columns" type="int" value="255"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
             <Property name="obrigatorio" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="false" type="code"/>

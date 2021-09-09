@@ -146,7 +146,7 @@ public class ConfiguracaoBaseDadosGUI extends VRInternalFrame {
                 Exceptions.printStackTrace(ex);
             }
         } else {
-            tabConexao.add((JPanel) painelDeConexaoDinamico);
+            tabConexao.add("Paramêtros de Conexão", (JPanel) painelDeConexaoDinamico);
         }
 
         if (configuracaoBancoVO.getId() > 0) {
