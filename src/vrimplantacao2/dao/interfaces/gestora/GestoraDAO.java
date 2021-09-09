@@ -71,13 +71,13 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	EMP_CODIGO id,\n"
-                    + "	EMP_NOME descricao\n"
+                    + "	EMP_NOME descricao,\n"
+                    + "	EMP_CGC as cnpj \n"
                     + "from\n"
-                    + "	EMPRESA e\n"
-                    + "	"
+                    + "	EMPRESA e"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao") + " - " + rst.getString("cnpj")));
                 }
             }
         }
@@ -169,21 +169,22 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	  tri_codigo as codigo,\n"
-                    + "	  tri_descricao as descricao,\n"
-                    + "	case \n"
-                    + "     when tri_descricao like 'TRIBUT%' then 00\n"
-                    + "     when tri_descricao like 'RED%' then 20\n"
-                    + "     when tri_descricao like 'ISEN%' then 40\n"
-                    + "     when tri_descricao like 'NAO TRIB%' then 41\n"
-                    + "     when tri_descricao like 'SUBSTI%' then 60\n"
-                    + "	end cst,\n"
-                    + "   tri_aliquota as aliquota,\n"
-                    + "   tri_reducao as reducao\n"
-                    + " from\n"
-                    + "	  tributacao\n"
-                    + " order by\n"
-                    + "	  tri_codigo"
+                    + "    tri_codigo as codigo,\n"
+                    + "    tri_descricao as descricao,\n"
+                    + "    case\n"
+                    + "        when tri_descricao like '%TRIBUT%' then 00\n"
+                    + "        when tri_descricao like '%RED%' then 20\n"
+                    + "        when tri_descricao like '%ISEN%' then 40\n"
+                    + "        when tri_descricao like '%NAO TRIB%' then 41\n"
+                    + "	       when tri_descricao like '%DIFER%' then 51\n"
+                    + "        when tri_descricao like '%SUBSTI%' then 60\n"
+                    + "    end cst,\n"
+                    + "    tri_aliquota as aliquota,\n"
+                    + "    tri_reducao as reducao\n"
+                    + "from\n"
+                    + "tributacao\n"
+                    + "order by\n"
+                    + "3, 4"
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codigo"),
