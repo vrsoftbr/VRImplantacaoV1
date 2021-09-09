@@ -35,6 +35,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -52,9 +53,10 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     public String getSistema() {
         return "Gestora";
     }
-
+    
     private Date vendaDataIni;
     private Date vendaDataFim;
+    private boolean migrarMargemProduto;
 
     public void setVendaDataIni(Date vendaDataIni) {
         this.vendaDataIni = vendaDataIni;
@@ -63,7 +65,14 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataFim(Date vendaDataFim) {
         this.vendaDataFim = vendaDataFim;
     }
-
+    
+    public boolean isMigrarMargemProduto() {
+        return this.migrarMargemProduto;
+    }
+    
+    public void setMigrarMargemProduto(boolean migrarMargemProduto) {
+        this.migrarMargemProduto = migrarMargemProduto;
+    }
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -217,7 +226,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.PRO_VALIDADE validade,\n"
                     + "	p.PRO_DESCRICAO descricaocompleta,\n"
                     + "	replace(p.pro_desc_etiqueta, '  ', '') descricaoreduzida,\n"
-                    + "	p.PRO_DESCRICAO descricaocompleta,\n"
+                    + "	p.PRO_DESCRICAO descricaogondola,\n"
                     + "	p.dep_codigo merc1,\n"
                     + "	p.gru_codigo merc2,\n"
                     + "	p.SUB_CODIGO merc3,\n"
@@ -242,6 +251,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	end as icmsCst,\n"
                     + "	t.TRI_ALIQUOTA icmsAliq,\n"
                     + "	t.TRI_REDUCAO icmsRed,\n"
+                    + " t.tri_codigo, \n"        
                     + "	p.PRO_CST_PIS_ENTRADA piscofinsCredito,\n"
                     + "	p.PRO_CST_PIS piscofinsSaida,\n"
                     + "	p.natr_codigo piscofinsNatureza\n"
@@ -288,21 +298,30 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    //imp.setMargem(rst.getDouble("p_margem"));
-                    imp.setMargem(rst.getDouble("merc_margem"));
+                    
+                    if (isMigrarMargemProduto()) {
+                        imp.setMargem(rst.getDouble("p_margem"));
+                    } else {
+                        imp.setMargem(rst.getDouble("merc_margem"));
+                    }
+                    
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaoCadastro")));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setIcmsCst(rst.getInt("icmsCst"));
-                    imp.setIcmsAliq(rst.getDouble("icmsAliq"));
-                    imp.setIcmsReducao(rst.getDouble("icmsRed"));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofinsCredito")));
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("piscofinsSaida")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofinsNatureza")));
 
+                    imp.setIcmsDebitoId(rst.getString("tri_codigo"));
+                    imp.setIcmsDebitoForaEstadoId(rst.getString("tri_codigo"));
+                    imp.setIcmsDebitoForaEstadoNfId(rst.getString("tri_codigo"));
+                    imp.setIcmsCreditoId(rst.getString("tri_codigo"));
+                    imp.setIcmsCreditoForaEstadoId(rst.getString("tri_codigo"));
+                    imp.setIcmsConsumidorId(rst.getString("tri_codigo"));
+                    
                     result.add(imp);
                 }
             }
@@ -555,6 +574,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
@@ -619,6 +639,36 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	rc.PRO_CODIGO_RECEITA as id,\n"
+                    + "	p.PRO_DESCRICAO as descricaoreceita,\n"
+                    + "	rc.PRO_CODIGO as idproduto,\n"
+                    + "	p2.PRO_DESCRICAO as descricaoproduto,\n"
+                    + "	rc.REC_QTDE as qtdproduto,\n"
+                    + "	rc.REC_EMBALAGEM as qtdembalagemreceita,\n"
+                    + "	rc.REC_STATUS\n"
+                    + "from RECEITA rc\n"
+                    + "join PRODUTOS p on p.PRO_CODIGO = rc.PRO_CODIGO_RECEITA\n"
+                    + "join PRODUTOS p2 on p2.PRO_CODIGO = rc.PRO_CODIGO\n"
+                    + "where rc.REC_STATUS = 'A'\n"
+                    + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+    
     /*public void importarCreditoRotativo(int vrLoja) throws Exception {
      ProgressBar.setStatus("Carregando dados...Receber Cliente...");
      List<ReceberCreditoRotativoVO> vReceberCliente = carregarReceberCliente();
