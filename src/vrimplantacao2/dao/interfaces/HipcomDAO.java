@@ -145,10 +145,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select lojcod, concat(lojcod,' - ', lojfantas) descricao from hiploj order by 1"
+                    "select lojcod, concat(lojcod,' - ', lojfantas) descricao, lojcnpj from hiploj order by 1"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("lojcod"), rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("lojcod"), rst.getString("descricao") + " - " + rst.getString("lojcnpj")));
                 }
             }
         }
