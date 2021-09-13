@@ -1255,6 +1255,19 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                 try (ResultSet rst = stm.executeQuery(
                         "select  \n"
                         + "	e.codprod id_produto, \n"
+                        + "	replace(replace(rtrim(e.barra_emb),'00789','55789'),'0789','5789')as ean, \n"
+                        + "	e.qtd qtdembalagem,\n"
+                        + "	e.preco_unit precoAtacado,\n"
+                        + "	p.PRECO_UNIT precoVenda\n"
+                        + "from\n"
+                        + "	EMBALAGENS e, PRODUTOS p\n"
+                        + "where\n"
+                        + "	e.CODPROD = p.CODPROD and\n"
+                        + "	barra_emb is not null and\n"
+                        + "	coalesce(e.PRECO_UNIT, 0) > 0\n"
+                        + "order by 1"
+                /*"select  \n"
+                        + "	e.codprod id_produto, \n"
                         + "	rtrim(e.barra_emb) ean, \n"
                         + "	e.qtd qtdembalagem,\n"
                         + "	e.preco_unit precoAtacado,\n"
@@ -1266,7 +1279,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                         + "	barra_emb is not null and\n"
                         + "	coalesce(e.PRECO_UNIT, 0) > 0\n"
                         + "order by \n"
-                        + "	1"
+                        + "	1"*/
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
