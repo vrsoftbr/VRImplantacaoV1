@@ -524,7 +524,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
@@ -580,11 +580,11 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCep(rs.getString("cep"));
 
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    
+
                     if (rs.getString("datanascimento") != null && !rs.getString("datanascimento").trim().isEmpty()) {
                         imp.setDataNascimento(new java.sql.Date(fmt.parse(rs.getString("datanascimento")).getTime()));
                     }
-                    
+
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setValorLimite(rs.getDouble("limite"));
 
@@ -593,7 +593,7 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
                     imp.setObservacao(rs.getString("obs"));
-                    
+
                     imp.setBloqueado(rs.getInt("BLOQUEADO") == 1);
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeMae(rs.getString("nomemae"));
@@ -611,23 +611,24 @@ public class EcoCentauroDAO extends InterfaceDAO implements MapaTributoProvider 
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT\n"
-                    + "	cr.IDTRECPARCELA id,\n"
-                    + "	cr.DOCUMENTO numerocupom,\n"
-                    + "	cr.valor,\n"
-                    + "	cr.CLIENTE codcli,\n"
-                    + "	cpfcnpj cnpjcliente,\n"
-                    + "	1 AS ecf,\n"
-                    + "	t.EMISSAO emissao,\n"
-                    + "	cr.vencimento\n"
-                    + "FROM\n"
-                    + "	TRECPARCELA cr\n"
-                    + "LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE\n"
-                    + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO \n"
-                    + "WHERE\n"
-                    + "	cr.EMPRESA = " + getLojaOrigem() + "\n"
-                    + "	AND cr.databaixa IS NULL \n"
-                    + " AND cr.tipo = '01'"
+                    "SELECT    \n"
+                    + "        cr.IDTRECPARCELA id,    \n"
+                    + "        cr.DOCUMENTO numerocupom,    \n"
+                    + "        cr.valorpendente valor,\n"
+                    + "        cr.CLIENTE codcli,    \n"
+                    + "        cpfcnpj cnpjcliente,    \n"
+                    + "        1 AS ecf,    \n"
+                    + "        t.EMISSAO emissao,    \n"
+                    + "        cr.vencimento    \n"
+                    + "FROM    \n"
+                    + "       TRECPARCELA cr    \n"
+                    + "LEFT JOIN TRECCLIENTEGERAL c ON c.CODIGO = cr.CLIENTE    \n"
+                    + "LEFT JOIN TRECDOCUMENTO t ON cr.DOCUMENTO = t.DOCUMENTO     \n"
+                    + "WHERE    \n"
+                    + "       cr.EMPRESA = '" + getLojaOrigem() + "'\n"
+                    + "AND cr.tipo = '01'\n"
+                    + "AND cr.databaixa IS NULL\n"
+                    + "AND cr.valorpendente >0"
             )) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
