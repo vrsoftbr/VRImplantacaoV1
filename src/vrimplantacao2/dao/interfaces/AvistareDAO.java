@@ -713,24 +713,6 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setCpf(rst.getString("cpf"));
-
-                        if (rst.getString("nomecliente") != null
-                                && !rst.getString("nomecliente").trim().isEmpty()
-                                && rst.getString("nomecliente").trim().length() > 45) {
-
-                            next.setNomeCliente(rst.getString("nomecliente").substring(0, 45));
-                        } else {
-                            next.setNomeCliente(rst.getString("nomecliente"));
-                        }
-
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("Complemento")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado"));
-                        next.setEnderecoCliente(endereco);
                     }
                 }
             } catch (SQLException | ParseException ex) {
