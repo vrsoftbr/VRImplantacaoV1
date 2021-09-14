@@ -470,7 +470,8 @@ public class ProdutoRepository {
                             }
                         }
 
-                        if (precoAtacadoDesconto.getDesconto() > 0) {
+                        if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
+                        //if (precoAtacadoDesconto.getDesconto() > 0) {
                             provider.atacado().atualizarDesconto(precoAtacadoDesconto, optSimples);
                         }
                     }

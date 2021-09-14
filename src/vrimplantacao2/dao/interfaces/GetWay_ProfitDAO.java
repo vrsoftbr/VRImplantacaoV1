@@ -1265,6 +1265,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                         + "	e.CODPROD = p.CODPROD and\n"
                         + "	barra_emb is not null and\n"
                         + "	coalesce(e.PRECO_UNIT, 0) > 0\n"
+                        + "     and e.qtd > 1\n"        
                         + "order by 1"
                 /*"select  \n"
                         + "	e.codprod id_produto, \n"
