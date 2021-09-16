@@ -98,7 +98,6 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.OFERTA);
         result.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         result.add(OpcaoProduto.ICMS_CONSUMIDOR);
-        result.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         result.add(OpcaoProduto.PAUTA_FISCAL);
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
         result.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
