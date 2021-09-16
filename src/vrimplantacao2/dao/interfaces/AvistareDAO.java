@@ -657,7 +657,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
@@ -678,7 +678,6 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
-
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
@@ -703,16 +702,17 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setIdClientePreferencial(rst.getString("idcliente"));
+                      //next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setNomeCliente(rst.getString("nome_cliente"));
+                        next.setCpf(rst.getString("cpf_cnpj"));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setData(rst.getDate("emissao"));
+                        String horaInicio = timestampDate.format(rst.getDate("emissao")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("emissao")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                        next.setCpf(rst.getString("cpf"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -726,30 +726,28 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
             this.sql
-                    = "select\n"
-                    + "	cod_all_head id_venda,\n"
-                    + "	Coo_Cupom numerocupom,\n"
-                    + "	case when Status_Cupom = 'C' then 1 else 0 end cancelado,\n"
-                    + "	v.Cod_Cliente idcliente,\n"
-                    + "	Ecf,\n"
-                    + "	Data_Emissao_Cupom data,\n"
-                    + "	substring(Data_Emissao_Cupom,12,8) horainicio,\n"
-                    + "	substring(Data_Emissao_Cupom,12,8) horatermino,\n"
-                    + "	Valor_Liquido_Cupom subtotalimpressora,\n"
-                    + "	Cpf_Consumidor cpf,\n"
-                    + "	c.nome nomecliente,\n"
-                    + "	c.Endereco,\n"
-                    + "	c.Numero,\n"
-                    + "	c.Complemento,\n"
-                    + "	c.Bairro,\n"
-                    + "	c.Cidade,\n"
-                    + "	c.Estado \n"
-                    + "from\n"
-                    + "	tbl_all_head v\n"
-                    + "	left join tbl_cliente c on v.Cod_Cliente = c.Cod_Cliente \n"
-                    + "where\n"
-                    + "	Data_Emissao_Cupom between '" + strDataInicio + "' and '" + strDataTermino + "'\n"
-                    + " and v.Status_Cupom <> 'C'";
+                    = "SELECT\n"
+                    + "	v.VndNumeroVenda id_venda,\n"
+                    + "	d.VndDocNumero numerocupom,\n"
+                    + "	VndClienteID id_cliente,\n"
+                    + "	c.PessoaNome nome_cliente,\n"
+                    + "	v.VndNfpCpfCnpj cpf_cnpj,\n"
+                    + "	SUBSTRING(e.EstacaoDescricao, 4, 2) ecf,\n"
+                    + "	v.VndDtEmissao emissao,\n"
+                    + "	CAST (VndDtAbertura as time) horainicio,\n"
+                    + "	CAST (VndDtFechamento as time) horatermino,\n"
+                    + "	CASE\n"
+                    + "	  when v.VndClienteValor = 0\n"
+                    + "   then v.VndConvenioValor\n"
+                    + "	  ELSE v.VndClienteValor\n"
+                    + "	END subtotalimpressora\n"
+                    + "FROM\n"
+                    + "	TB_VENDA v\n"
+                    + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID\n"
+                    + "LEFT JOIN TB_ESTACAO e on e.EstacaoID = v.VndEstacaoID\n"
+                    + "LEFT JOIN TB_PESSOA_PFPJ c on c.PessoaID = v.VndClienteID\n"
+                    + "WHERE\n"
+                    + "	v.VndDtEmissao between '" + strDataInicio + "' and '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
