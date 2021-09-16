@@ -73,7 +73,8 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.MARGEM,
                     OpcaoProduto.OFERTA,
-                    OpcaoProduto.VOLUME_QTD
+                    OpcaoProduto.VOLUME_QTD,
+                    OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS
                 }
         ));
     }
@@ -288,7 +289,8 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.JUROS,\n"
                     + "	r.VALPAGO,\n"
                     + "	r.NOTAPEDIDO,\n"
-                    + "	r.FATURA,\n"
+                  //+ " r.FATURA,\n"
+                    + "	case when VALPAGO > 0 then FATURA-VALPAGO else FATURA end fatura,\n"                            
                     + "	r.OBS,\n"
                     + "	r.VENCIMENTO,\n"
                     + "	r.UltPag\n"
@@ -308,7 +310,7 @@ public class SBOnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rs.getString("cliente"));
                     imp.setCnpjCliente(rs.getString("cpf_cnpj"));
                     imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setJuros(rs.getDouble("juros"));
+                  //imp.setJuros(rs.getDouble("juros"));
                     imp.setValor(rs.getDouble("fatura"));
                     imp.setNumeroCupom(rs.getString("notapedido"));
                     imp.setObservacao(rs.getString("obs"));
