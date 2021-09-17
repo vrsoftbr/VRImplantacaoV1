@@ -284,6 +284,7 @@ import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
+import vrimplantacao2.gui.interfaces.MRC6GUI;
 import vrimplantacao2.gui.interfaces.MSuperGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
@@ -878,6 +879,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuVisualMix = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuSQLServer3 = new javax.swing.JMenu();
+        mnuMRC6 = new javax.swing.JMenuItem();
         mnuPoligon = new javax.swing.JMenuItem();
         mnuSBOnline = new javax.swing.JMenuItem();
         mnuSTSistemas_v2 = new javax.swing.JMenuItem();
@@ -3180,6 +3182,14 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuSQLServer3.setText("SQL Server 3");
 
+        mnuMRC6.setText("MRC6");
+        mnuMRC6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMRC6ActionPerformed(evt);
+            }
+        });
+        mnuSQLServer3.add(mnuMRC6);
+
         mnuPoligon.setText("Poligon");
         mnuPoligon.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -5394,6 +5404,10 @@ public final class MenuGUI extends VRMdiFrame {
         MSuperGUI.exibir(this);
     }//GEN-LAST:event_mnuMSuperActionPerformed
 
+    private void mnuMRC6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMRC6ActionPerformed
+        MRC6GUI.exibir(this);
+    }//GEN-LAST:event_mnuMRC6ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5604,6 +5618,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLoja;
     private javax.swing.JMenuItem mnuLyncis;
+    private javax.swing.JMenuItem mnuMRC6;
     private javax.swing.JMenuItem mnuMSIInfor;
     private javax.swing.JMenuItem mnuMSuper;
     private javax.swing.JMenuItem mnuMarket;
