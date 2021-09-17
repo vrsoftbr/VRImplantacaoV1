@@ -284,6 +284,7 @@ import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
+import vrimplantacao2.gui.interfaces.MSuperGUI;
 import vrimplantacao2.gui.interfaces.MercaLiteGUI;
 import vrimplantacao2.gui.interfaces.MerceariaSeneGUI;
 import vrimplantacao2.gui.interfaces.NeoGUI;
@@ -697,6 +698,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuiWeber = new javax.swing.JMenuItem();
         mnuFirebird3 = new javax.swing.JMenu();
         mnuAutocom = new javax.swing.JMenuItem();
+        mnuAutoMac = new javax.swing.JMenuItem();
         mnuDSoft = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         mnuFutura = new javax.swing.JMenuItem();
@@ -704,10 +706,10 @@ public final class MenuGUI extends VRMdiFrame {
         chkGigatron = new javax.swing.JMenuItem();
         chkLogicBox = new javax.swing.JMenuItem();
         mnuMercaLite = new javax.swing.JMenuItem();
+        mnuMSuper = new javax.swing.JMenuItem();
         mnuNeo = new javax.swing.JMenuItem();
         mnuPlenus = new javax.swing.JMenuItem();
         chkSGMaster = new javax.swing.JMenuItem();
-        mnuAutoMac = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuInformix = new javax.swing.JMenu();
@@ -1787,6 +1789,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuAutocom);
 
+        mnuAutoMac.setText("AutoMac");
+        mnuAutoMac.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoMacActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuAutoMac);
+
         mnuDSoft.setText("DSoft");
         mnuDSoft.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1843,6 +1853,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird3.add(mnuMercaLite);
 
+        mnuMSuper.setText("MSuper");
+        mnuMSuper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMSuperActionPerformed(evt);
+            }
+        });
+        mnuFirebird3.add(mnuMSuper);
+
         mnuNeo.setText("Neo");
         mnuNeo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1866,14 +1884,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird3.add(chkSGMaster);
-
-        mnuAutoMac.setText("AutoMac");
-        mnuAutoMac.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuAutoMacActionPerformed(evt);
-            }
-        });
-        mnuFirebird3.add(mnuAutoMac);
 
         mnuDatabase.add(mnuFirebird3);
 
@@ -5380,6 +5390,10 @@ public final class MenuGUI extends VRMdiFrame {
         SBOnlineGUI.exibir(this);
     }//GEN-LAST:event_mnuSBOnlineActionPerformed
 
+    private void mnuMSuperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMSuperActionPerformed
+        MSuperGUI.exibir(this);
+    }//GEN-LAST:event_mnuMSuperActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5591,6 +5605,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLoja;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
+    private javax.swing.JMenuItem mnuMSuper;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuItem mnuMaster;
     private javax.swing.JMenuBar mnuMenu;

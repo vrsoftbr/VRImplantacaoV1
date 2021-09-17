@@ -740,6 +740,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutocomActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuAutoMac">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="AutoMac"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoMacActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuDSoft">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="DSoft"/>
@@ -796,6 +804,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMercaLiteActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuMSuper">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="MSuper"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMSuperActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuNeo">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Neo"/>
@@ -818,14 +834,6 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkSGMasterActionPerformed"/>
-                          </Events>
-                        </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuAutoMac">
-                          <Properties>
-                            <Property name="text" type="java.lang.String" value="AutoMac"/>
-                          </Properties>
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoMacActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
