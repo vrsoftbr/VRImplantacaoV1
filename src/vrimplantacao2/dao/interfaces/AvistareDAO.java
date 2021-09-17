@@ -702,7 +702,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                      //next.setCancelado(rst.getBoolean("cancelado"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
                         next.setNomeCliente(rst.getString("nome_cliente"));
                         next.setCpf(rst.getString("cpf_cnpj"));
@@ -747,7 +747,8 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "LEFT JOIN TB_ESTACAO e on e.EstacaoID = v.VndEstacaoID\n"
                     + "LEFT JOIN TB_PESSOA_PFPJ c on c.PessoaID = v.VndClienteID\n"
                     + "WHERE\n"
-                    + "	v.VndDtEmissao between '" + strDataInicio + "' and '" + strDataTermino + "'";
+                    + " d.VndDocNumero is not NULL \n"
+                    + "	and v.VndDtEmissao between '" + strDataInicio + "' and '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -788,7 +789,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         next.setVenda(rst.getString("id_venda"));
                         next.setId(rst.getString("id_item"));
-                        next.setSequencia(rst.getInt("nroitem"));
+                        next.setSequencia(rst.getInt("nro_item"));
                         next.setProduto(rst.getString("produto"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
@@ -796,8 +797,6 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("precovenda"));
                         next.setTotalBruto(rst.getDouble("total"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-
                     }
                 }
             } catch (Exception ex) {
@@ -809,29 +808,29 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "	v.cod_all_head id_venda,\n"
-                    + "	Cod_All_Item id_item,\n"
-                    + "	Coo_Cupom numerocupom,\n"
-                    + "	Posicao_Item_Cupom nroitem,\n"
-                    + "	Cod_Interno_Produto produto,\n"
-                    + "	Codigo_Barra_Produto codigobarras,\n"
-                    + "	p.Unidade_Prod unidade,\n"
-                    + "	i.Descricao_Produto descricao,\n"
-                    + "	i.Quantidade_Produto quantidade,\n"
-                    + "	i.Preco_Item precovenda,\n"
-                    + "	i.Preco_Total_Item total,\n"
-                    + "	case when i.Status_Cupom = 'C' then 1 else 0 end cancelado,\n"
-                    + "	i.Ecf ecf,\n"
-                    + "	i.Data_Emissao data\n"
+                    + "	v.VndNumeroVenda id_venda,\n"
+                    + "	vi.DocBaseItemID id_item,\n"
+                    + "	vi.DocBaseItemSequencia nro_item,\n"
+                    + "	vi.DocBaseItemProdID produto,\n"
+                    + "	un.UnSigla unidade,\n"
+                    + "	case\n"
+                    + "	   when p.ProdCodBarras1 is null then p.ProdCodInterno\n"
+                    + "	   else p.ProdCodBarras1\n"
+                    + "	end as codigobarras,\n"
+                    + "	p.ProdDescricao descricao,\n"
+                    + "	vi.DocBaseItemQuantidade quantidade,\n"
+                    + "	vi.DocBaseItemValorUnitario precovenda,\n"
+                    + "	vi.DocBaseItemValorTotal total\n"
                     + "from\n"
-                    + "	tbl_all_item i\n"
-                    + "join tbl_all_head v on\n"
-                    + "	v.id_Documento = i.Id_Documento\n"
-                    + "left join tbl_produto p on\n"
-                    + "	p.Codigo_Prod = i.Cod_Interno_Produto\n"
-                    + "where\n"
-                    + "	v.Data_Emissao_Cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
-                    + " and v.Status_Cupom <> 'C'";
+                    + "	TB_DOCUMENTO_BASE_ITENS vi\n"
+                    + "left join TB_VENDA v on v.VndDocBaseID = vi.DocBaseItemDocBaseID \n"
+                    + "left join TB_PRODUTO p on p.ProdID = vi.DocBaseItemProdID \n"
+                    + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID \n"
+                    + "left join TB_UNIDADE_MEDIDA un on un.UnID = vi.DocBaseItemUnidadeID \n"
+                    + "WHERE\n"
+                    + " d.VndDocNumero is not NULL \n"
+                    + "	and v.VndDtEmissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "order by 2,1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
