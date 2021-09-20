@@ -8,7 +8,6 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.migracao2_5.Migracao2_5Controller;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
-import vrimplantacao2_5.gui.sistema.checks.ChecksOptionsHipcomPanelGUI;
 import vrimplantacao2_5.vo.enums.ESistema;
 
 /**
@@ -21,7 +20,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
     private static Migracao2_5GUI instance;
     private Migracao2_5Controller controller = new Migracao2_5Controller();
     private ESistema eSistema;
-    private ChecksOptionsHipcomPanelGUI pnlChkPptHippicom = new ChecksOptionsHipcomPanelGUI();
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -68,8 +66,6 @@ public class Migracao2_5GUI extends VRInternalFrame {
 
         pnlConn.setSistema(sistema);
         pnlConn.getNomeConexao();
-        
-        tabs.add("Paramêtros", pnlChkPptHippicom);
         
         centralizarForm();
         this.setMaximum(false);
