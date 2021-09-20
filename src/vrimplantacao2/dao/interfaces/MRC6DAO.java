@@ -41,13 +41,13 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
- * @author Lucas
+ * @author Wagner
  */
-public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
+public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Avistare";
+        return "MRC6";
     }
 
     @Override
@@ -671,12 +671,12 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new AvistareDAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new MRC6DAO.VendaIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new AvistareDAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
+        return new MRC6DAO.VendaItemIterator(getLojaOrigem(), this.dataInicioVenda, this.dataTerminoVenda);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {

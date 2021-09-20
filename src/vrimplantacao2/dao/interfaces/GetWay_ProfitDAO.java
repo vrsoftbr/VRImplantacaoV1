@@ -334,7 +334,7 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     + "left join PROD_TRIBFCP fcp on prod.CODPROD = fcp.CODPROD\n"
                     + "left join prod_loja pl on prod.codprod = pl.CODPROD\n"
                     + "and pl.codloja = " + getLojaOrigem() + "\n"
-                    + (apenasProdutoAtivo == true ? " and upper(ltrim(rtrim(prod.ativo))) = 'S'\n" : "")
+                    + (apenasProdutoAtivo == true ? " where upper(ltrim(rtrim(prod.ativo))) = 'S'\n" : "")
                     + "order by\n"
                     + "	id"
             )) {
