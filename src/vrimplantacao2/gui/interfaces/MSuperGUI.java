@@ -199,10 +199,6 @@ public class MSuperGUI extends VRInternalFrame {
                             }   if (cbxUnifCliPreferencial.isSelected()) {
                                 importador.unificarClientePreferencial();
                             }   break;
-                        case 4:
-                            if (chkAjustarDigitoVerificador.isSelected()){
-                                dao.importarDigitoVerificador();
-                            }   break;
                         default:
                             break;
                     }

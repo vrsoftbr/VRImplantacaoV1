@@ -18,7 +18,6 @@ import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.parametro.Parametros;
@@ -50,7 +49,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Eco Centauro";
+        return "MSuper";
     }
 
     @Override
@@ -58,14 +57,13 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT DISTINCT\n"
-                    + "    icm.vendacsf1 AS cst_saida,\n"
-                    + "    icm.vendaicms1 AS aliquota_saida,\n"
-                    + "    icm.vendareducao1 AS reducao_saida\n"
-                    + "FROM TESTPRODUTOGERAL pg\n"
-                    + "JOIN TESTICMS icm ON icm.produto = pg.codigo\n"
-                    + "    AND icm.empresa = " + getLojaOrigem() + "\n"
-                    + "    AND icm.estado = '" + Parametros.get().getUfPadraoV2().getSigla() + "'"
+                    "SELECT\n"
+                    + "	SUP002 id,\n"
+                    + "	DESCRICAO,\n"
+                    + "	PERCENTUAL \n"
+                    + "FROM\n"
+                    + "	SUP002\n"
+                    + "	ORDER BY 1"
             )) {
                 while (rs.next()) {
                     String id = rs.getString("cst_saida") + "-" + rs.getString("aliquota_saida") + "-" + rs.getString("reducao_saida");
@@ -169,10 +167,11 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "    codigo,\n"
-                    + "    nomefantasia,\n"
-                    + "    cpfcnpj\n"
-                    + "FROM TGEREMPRESA\n"
+                    + "	SUP999 codigo,\n"
+                    + "	FANTASIA nomefantasia,\n"
+                    + "	CNPJ cpfcnpj\n"
+                    + "FROM\n"
+                    + "	SUP999\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -195,26 +194,30 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "    m1.codigo AS merc1,\n"
-                    + "    m1.descricao AS desc_merc1,\n"
-                    + "    m2.subgrupo AS merc2,\n"
-                    + "    m2.descricao AS desc_merc2\n"
-                    + "FROM TESTGRUPO m1\n"
-                    + "LEFT JOIN TESTSUBGRUPO m2 ON m2.grupo = m1.codigo\n"
-                    + "WHERE m1.empresa = '" + getLojaOrigem() + "'\n"
-                    + "AND m2.empresa = '" + getLojaOrigem() + "'\n"
-                    + "order by 1, 3"
+                    + "	m1.CODIGO codmerc1,\n"
+                    + "	m1.DESCRICAO descmerc1,\n"
+                    + "	m2.CODIGO codmerc2,\n"
+                    + "	m2.DESCRICAO descmerc2,\n"
+                    + "	m3.CODIGO codmerc3,\n"
+                    + "	m3.DESCRICAO descmerc3\n"
+                    + "FROM \n"
+                    + "	SUP004 m1\n"
+                    + "	LEFT JOIN SUP005 m2 ON m2.SUP004 = m1.SUP004\n"
+                    + "	LEFT JOIN SUP006 m3 ON m3.SUP005 = m2.SUP005 AND m2.SUP004 = m1.SUP004\n"
+                    + "WHERE m1.ATIVO = 'S' AND m2.ATIVO = 'S' AND m3.ATIVO = 'S'\n"
+                    + "ORDER BY 1,3,5"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("merc1"));
-                    imp.setMerc1Descricao(rst.getString("desc_merc1"));
-                    imp.setMerc2ID(rst.getString("merc2"));
-                    imp.setMerc2Descricao(rst.getString("desc_merc2"));
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+
+                    imp.setMerc1ID(rst.getString("codmerc1"));
+                    imp.setMerc1Descricao(rst.getString("descmerc1"));
+                    imp.setMerc2ID(rst.getString("codmerc2"));
+                    imp.setMerc2Descricao(rst.getString("descmerc2"));
+                    imp.setMerc3ID(rst.getString("codmerc3"));
+                    imp.setMerc3Descricao(rst.getString("descmerc3"));
                     result.add(imp);
                 }
             }
@@ -361,12 +364,12 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "    produtoprincipal AS idproduto,\n"
-                    + "    codigobarra AS ean,\n"
-                    + "    embalagem AS tipoembalagem,\n"
-                    + "    qtdeembalagem AS qtdembalagem\n"
-                    + "FROM TESTPRODUTOGERAL\n"
+                    "SELECT\n"
+                    + "	SUP001 id,\n"
+                    + "	EAN,\n"
+                    + "	MULTIPLICADOR qtdembalagem\n"
+                    + "FROM\n"
+                    + "	SUP013\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -377,6 +380,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+
                     result.add(imp);
                 }
             }
@@ -391,55 +395,55 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + "    f.codigo AS id,\n"
-                    + "    f.nome AS razao,\n"
-                    + "    f.fantasia AS fantasia,\n"
-                    + "    f.cpfcnpj AS cnpj,\n"
-                    + "    f.rgie AS inscricaoestadual,\n"
-                    + "    f.endereco,\n"
-                    + "    f.numeroendereco AS numero,\n"
-                    + "    f.complemento,\n"
-                    + "    f.bairro,\n"
-                    + "    cid.nome AS municipio,\n"
-                    + "    cid.estado AS uf,\n"
-                    + "    f.cep,\n"
-                    + "    f.fone AS telefone,\n"
-                    + "    f.fax,\n"
-                    + "    f.homepage AS email2,\n"
-                    + "    f.email,\n"
-                    + "    f.fonecomervend,\n"
-                    + "    f.foneresidvend,\n"
-                    + "    f.fonetelevendas,\n"
-                    + "    f.celularvend,\n"
-                    + "    f.emailvend,\n"
-                    + "    f.datacadastro,\n"
-                    + "    f.observacao,\n"
-                    + "    f.contribuinte,\n"
-                    + "    CASE f.ativo WHEN 'S' THEN 1 ELSE 0 END ativo\n"
-                    + "FROM tpagfornecedor f\n"
-                    + "LEFT JOIN tgercidade cid ON cid.codigo = f.cidade\n"
+                    + "	sup010 id,\n"
+                    + "	razaosocial razao,\n"
+                    + "	fantasia,\n"
+                    + "	cgc cnpj_cpf,\n"
+                    + "	inscricao ie_rg,\n"
+                    + "	inscmunicipal insc_municipal,\n"
+                    + "	case when ativo = 'S' then 1 else 0 end ativo,\n"
+                    + "	endereco,\n"
+                    + "	numero,\n"
+                    + "	complemento,\n"
+                    + "	bairro,\n"
+                    + "	cep,\n"
+                    + "	c.nome municipio,\n"
+                    + "	f.sup118 ibge_municipio,\n"
+                    + "	c.uf uf,\n"
+                    + "	telefone tel_principal,\n"
+                    + "	dtcadastro datacadastro,\n"
+                    + "	obs observacao\n"
+                    + "FROM\n"
+                    + "	sup010 f\n"
+                    + "JOIN sup118 c ON c.sup118 = f.sup118\n"
+                    + "WHERE\n"
+                    + "	sup999 = 1\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setCnpj_cpf(rst.getString("cnpj"));
-                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setCnpj_cpf(rst.getString("cnpj_cpf"));
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setInsc_municipal(rst.getString("insc_municipal"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("municipio"));
-                    imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setAtivo(rst.getInt("ativo") == 1);
-                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("ibge_municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("tel_principal"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
+
                     result.add(imp);
                 }
             }
@@ -471,6 +475,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
+
                     result.add(imp);
                 }
             }
@@ -647,124 +652,5 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
-
-    private List<ProdutoAutomacaoVO> getDigitoVerificador() throws Exception {
-        List<ProdutoAutomacaoVO> result = new ArrayList<>();
-
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select id, id_tipoembalagem from produto \n"
-                    + "order by id"
-            )) {
-                while (rst.next()) {
-                    ProdutoAutomacaoVO vo = new ProdutoAutomacaoVO();
-                    vo.setIdproduto(rst.getInt("id"));
-                    vo.setIdTipoEmbalagem(rst.getInt("id_tipoembalagem"));
-                    vo.setCodigoBarras(gerarEan13(Long.parseLong(rst.getString("id")), true));
-                    result.add(vo);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public void importarDigitoVerificador() throws Exception {
-        List<ProdutoAutomacaoVO> result = new ArrayList<>();
-        ProgressBar.setStatus("Carregar Produtos...");
-        try {
-            result = getDigitoVerificador();
-
-            if (!result.isEmpty()) {
-                gravarCodigoBarrasDigitoVerificador(result);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-
-    private void gravarCodigoBarrasDigitoVerificador(List<ProdutoAutomacaoVO> vo) throws Exception {
-
-        Conexao.begin();
-        Statement stm, stm2 = null;
-        ResultSet rst = null;
-
-        stm = Conexao.createStatement();
-        stm2 = Conexao.createStatement();
-
-        String sql = "";
-        ProgressBar.setStatus("Gravando Código de Barras...");
-        ProgressBar.setMaximum(vo.size());
-
-        try {
-
-            for (ProdutoAutomacaoVO i_vo : vo) {
-
-                sql = "select codigobarras from produtoautomacao where codigobarras = " + i_vo.getCodigoBarras();
-                rst = stm.executeQuery(sql);
-
-                if (!rst.next()) {
-                    sql = "insert into produtoautomacao ("
-                            + "id_produto, "
-                            + "codigobarras, "
-                            + "id_tipoembalagem, "
-                            + "qtdembalagem) "
-                            + "values ("
-                            + i_vo.getIdproduto() + ", "
-                            + i_vo.getCodigoBarras() + ", "
-                            + i_vo.getIdTipoEmbalagem() + ", 1);";
-                    stm2.execute(sql);
-                } else {
-                    sql = "insert into implantacao.produtonaogerado ("
-                            + "id_produto, "
-                            + "codigobarras) "
-                            + "values ("
-                            + i_vo.getIdproduto() + ", "
-                            + i_vo.getCodigoBarras() + ");";
-                    stm2.execute(sql);
-                }
-                ProgressBar.next();
-            }
-
-            stm.close();
-            stm2.close();
-            Conexao.commit();
-        } catch (Exception ex) {
-            Conexao.rollback();
-            throw ex;
-        }
-    }
-
-    public long gerarEan13(long i_codigo, boolean i_digito) throws Exception {
-        String codigo = String.format("%012d", i_codigo);
-
-        int somaPar = 0;
-        int somaImpar = 0;
-
-        for (int i = 0; i < 12; i += 2) {
-            somaImpar += Integer.parseInt(String.valueOf(codigo.charAt(i)));
-            somaPar += Integer.parseInt(String.valueOf(codigo.charAt(i + 1)));
-        }
-
-        int soma = somaImpar + (3 * somaPar);
-        int digito = 0;
-        boolean verifica = false;
-        int calculo = 0;
-
-        do {
-            calculo = soma % 10;
-
-            if (calculo != 0) {
-                digito += 1;
-                soma += 1;
-            }
-        } while (calculo != 0);
-
-        if (i_digito) {
-            return Long.parseLong(codigo + digito);
-        } else {
-            return Long.parseLong(codigo);
-        }
     }
 }
