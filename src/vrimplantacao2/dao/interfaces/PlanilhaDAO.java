@@ -626,7 +626,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-
+        String dataNascimento;
         Map<String, TipoEstadoCivil> estCivil = new HashMap<>();
         for (TipoEstadoCivil est : TipoEstadoCivil.values()) {
             estCivil.put(est.toString().substring(0, 3), est);
@@ -669,7 +669,18 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 String civil = linha.getString("estadoCivil") + "   ";
                 civil = (civil != null ? civil.substring(1, 3) : "NAO");
                 imp.setEstadoCivil(estCivil.get(civil));
-                imp.setDataNascimento(getData(linha.getString("dataNascimento")));
+                
+                if (linha.getString("dataNascimento") != null && !linha.getString("dataNascimento").trim().isEmpty()
+                        && linha.getString("dataNascimento").trim().length() == 10) {
+                    
+                        dataNascimento = linha.getString("dataNascimento").substring(6, 10);
+                        dataNascimento = dataNascimento + "-" + linha.getString("dataNascimento").substring(3, 5);
+                        dataNascimento = dataNascimento + "-" + linha.getString("dataNascimento").substring(0, 2);
+                    
+                        imp.setDataNascimento(getData(dataNascimento));
+                }
+                
+                
                 imp.setDataCadastro(getData(linha.getString("dataCadastro")));
                 String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
                 imp.setSexo("F".startsWith(sexo.toUpperCase()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
