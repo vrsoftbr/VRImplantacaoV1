@@ -83,7 +83,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	EMP_NOME descricao,\n"
                     + "	EMP_CGC as cnpj \n"
                     + "from\n"
-                    + "	EMPRESA e"
+                    + "	EMPRESA e order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao") + " - " + rst.getString("cnpj")));
@@ -486,7 +486,7 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(c.cli_obs1,'') obs2,\n"
                     + "	coalesce(ltrim(rtrim(sta.STA_DESCRICAO)),'') obs3,\n"
                     + "	c.CLI_LIMITE limite,\n"
-                    + "	c.CLI_LIMITE_CHEQ limite_cheque,\n"
+                    + "	-- c.CLI_LIMITE_CHEQ limite_cheque,\n"
                     + "	c.CLI_CONJUGUE conjuge,\n"
                     + "	c.CLI_PAI nomepai,\n"
                     + "	c.CLI_MAE nomemae,\n"

@@ -51,7 +51,6 @@ import vrimplantacao2.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.GdoorGUI;
 import vrimplantacao.gui.interfaces.GeraContaPagarGUI;
 import vrimplantacao.gui.interfaces.GerarCodigoBarrasAtacadoGUI;
-import vrimplantacao.gui.interfaces.GestoraGUI;
 import vrimplantacao.gui.interfaces.GetWayCloudGUI;
 import vrimplantacao.gui.interfaces.HostMundoGUI;
 import vrimplantacao.gui.interfaces.IdealGUI;
@@ -280,6 +279,7 @@ import vrimplantacao2.gui.interfaces.FuturaGUI;
 import vrimplantacao2.gui.interfaces.GComGUI;
 import vrimplantacao2.gui.interfaces.SysAutGUI;
 import vrimplantacao2.gui.interfaces.GDIGUI;
+import vrimplantacao2.gui.interfaces.GestoraV2GUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
@@ -4322,7 +4322,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuFGActionPerformed
 
     private void mmnuGestoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mmnuGestoraActionPerformed
-        GestoraGUI.exibir(this);
+        GestoraV2GUI.exibir(this);
     }//GEN-LAST:event_mmnuGestoraActionPerformed
 
     private void mnuIdealSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIdealSoftActionPerformed
