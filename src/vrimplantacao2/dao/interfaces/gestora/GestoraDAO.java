@@ -4,9 +4,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -15,6 +18,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -73,6 +77,51 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setMigrarMargemProduto(boolean migrarMargemProduto) {
         this.migrarMargemProduto = migrarMargemProduto;
     }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.CUSTO_COM_IMPOSTO,
+                OpcaoProduto.CUSTO_SEM_IMPOSTO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.EXCECAO,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.RECEITA
+        ));
+    }
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -650,17 +699,30 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.PRO_DESCRICAO as descricaoreceita,\n"
                     + "	rc.PRO_CODIGO as idproduto,\n"
                     + "	p2.PRO_DESCRICAO as descricaoproduto,\n"
-                    + "	rc.REC_QTDE as qtdproduto,\n"
-                    + "	rc.REC_EMBALAGEM as qtdembalagemreceita,\n"
+                    + "	rc.REC_QTDE * 1000 as qtdproduto,\n"
+                    + "	rc.REC_QTDE,\n"
+                    + "	coalesce(rc.REC_EMBALAGEM, 1) as qtdembalagemreceita,\n"
                     + "	rc.REC_STATUS\n"
                     + "from RECEITA rc\n"
                     + "join PRODUTOS p on p.PRO_CODIGO = rc.PRO_CODIGO_RECEITA\n"
                     + "join PRODUTOS p2 on p2.PRO_CODIGO = rc.PRO_CODIGO\n"
-                    + "where rc.REC_STATUS = 'A'\n"
+                    + "and rc.REC_STATUS = 'A'\n"
                     + "order by 1"
             )) {
                 while (rst.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportsistema(getSistema());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricaoreceita"));
+                    imp.setRendimento(rst.getDouble("qtdembalagemreceita"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setQtdembalagemreceita(rst.getInt("qtdproduto"));
+                    imp.setFator(1);
+                    imp.setFichatecnica("");
+                    
+                    imp.getProdutos().add(rst.getString("idproduto"));
                     result.add(imp);
                 }
             }
