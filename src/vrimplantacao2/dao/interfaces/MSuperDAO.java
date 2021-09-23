@@ -417,14 +417,14 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	sup010 f\n"
                     + "JOIN sup118 c ON c.sup118 = f.sup118\n"
                     + "WHERE\n"
-                    + "	sup999 = 1\n"
+                    + "	sup999 = " + getLojaOrigem() + "\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -534,76 +534,94 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT\n"
-                    + "    c.codigo id,\n"
-                    + "    c.nome,\n"
-                    + "    C.FANTASIA,\n"
-                    + "    C.CPFCNPJ,\n"
-                    + "    C.RGIE,\n"
-                    + "    C.INSCRICAOMUNICIPAL im,\n"
-                    + "    C.PESSOA tipopessoa,\n"
-                    + "    C.ENDERECO,\n"
-                    + "    C.NUMEROENDERECO numero,\n"
-                    + "    C.BAIRRO,\n"
-                    + "    C.COMPLEMENTO,\n"
-                    + "    m.nome CIDADE,\n"
-                    + "    m.ESTADO uf,\n"
-                    + "    C.CEP,\n"
-                    + "    coalesce(SUBSTRING(P.datanasc from 9 FOR 2)||'/'||SUBSTRING(P.datanasc from 6 FOR 2)||'/'||SUBSTRING(P.datanasc from 1 FOR 4), '') datanascimento,\n"
-                    + "    C.datacadastro data_cadastro,\n"
-                    + "    CASE WHEN C.bloqueado = 'S' THEN 1 ELSE 0 END BLOQUEADO,\n"
-                    + "    p.localtrabalho empresa,\n"
-                    + "    C.LIMITE,\n"
-                    + "    p.nomepai,\n"
-                    + "    p.nomemae,\n"
-                    + "    C.FONE telefone,\n"
-                    + "    C.FAX,\n"
-                    + "    C.FONECELULAR celular,\n"
-                    + "    C.EMAIL,\n"
-                    + "    C.OBS\n"
+                    + "	c.sup025 id,\n"
+                    + "	c.nome razao,\n"
+                    + "	APELIDO fantasia,\n"
+                    + "	NASCIMENTO dtnascimento,\n"
+                    + "	CPF,\n"
+                    + "	rg,\n"
+                    + "	TELEFONE1,\n"
+                    + "	TELEFONE2,\n"
+                    + "	CELULAR,\n"
+                    + "	EMAIL,\n"
+                    + "	EMISSAO AS datacadastro,\n"
+                    + "	CASE\n"
+                    + "		WHEN BLOQUEADO = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END BLOQUEADO,\n"
+                    + "	databloq databloqueio,\n"
+                    + "	CASE\n"
+                    + "		WHEN CANCELADO = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END ativo,\n"
+                    + "	OBSERVACAO,\n"
+                    + "	PRAZO_PGTO,\n"
+                    + "	DIA_VENCTO vencimento,\n"
+                    + "	CASE\n"
+                    + "		WHEN CHEQUE_BLOQUEADO = 'S' THEN 1\n"
+                    + "		ELSE 0\n"
+                    + "	END permitechq,\n"
+                    + "	ENDERECO,\n"
+                    + "	NUMERO,\n"
+                    + "	COMPLEMENTO,\n"
+                    + "	BAIRRO,\n"
+                    + "	CEP,\n"
+                    + "	mun.nome municipio,\n"
+                    + "	mun.uf uf,\n"
+                    + "	pai,\n"
+                    + "	MAE,\n"
+                    + "	CONJUGE,\n"
+                    + "	CPFCONJUGE,\n"
+                    + "	PROFISSAO,\n"
+                    + "	RENDAMENSAL SALARIO,\n"
+                    + "	LIMITE valorlimite\n"
                     + "FROM\n"
-                    + "    TRECCLIENTEGERAL c\n"
-                    + "LEFT JOIN TGERCIDADE m ON m.CODIGO = c.CIDADE\n"
-                    + "left JOIN trecpfisica p ON  C.codigo = P.codigo\n"
+                    + "	SUP025 C\n"
+                    + "JOIN sup118 Mun ON\n"
+                    + "	Mun.sup118 = c.sup118\n"
+                    + "WHERE\n"
+                    + "	sup999 = 1\n"
                     + "ORDER BY 1"
             )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setRazao(rs.getString("nome"));
+                    imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj(rs.getString("CPFCNPJ"));
-                    imp.setInscricaoestadual(rs.getString("RGIE"));
-                    imp.setInscricaoMunicipal(rs.getString("im"));
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setComplemento(rs.getString("complemento"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("uf"));
-                    imp.setCep(rs.getString("cep"));
-
-                    imp.setDataCadastro(rs.getDate("data_cadastro"));
-
-                    if (rs.getString("datanascimento") != null && !rs.getString("datanascimento").trim().isEmpty()) {
-                        imp.setDataNascimento(new java.sql.Date(fmt.parse(rs.getString("datanascimento")).getTime()));
-                    }
-
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    imp.setValorLimite(rs.getDouble("limite"));
-
-                    imp.setTelefone(rs.getString("telefone"));
-                    imp.setFax(rs.getString("fax"));
+                    
+                    imp.setDataNascimento(rs.getDate("dtnascimento"));
+                                        
+                    imp.setCnpj(rs.getString("cpf"));
+                    imp.setInscricaoestadual(rs.getString("rg"));
+                    
+                    imp.setTelefone(rs.getString("telefone1"));
+                    imp.setFax(rs.getString("telefone2"));                    
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setObservacao(rs.getString("obs"));
-
-                    imp.setBloqueado(rs.getInt("BLOQUEADO") == 1);
-                    imp.setNomePai(rs.getString("nomepai"));
-                    imp.setNomeMae(rs.getString("nomemae"));
-                    imp.setEmpresa(rs.getString("empresa"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setDataBloqueio(rs.getDate("databloqueio"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setObservacao(rs.getString("OBSERVACAO"));
+                    imp.setPrazoPagamento(rs.getInt("prazo_pgto"));
+                    imp.setDiaVencimento(rs.getInt("vencimento"));
+                    imp.setPermiteCheque(rs.getBoolean("permitechq"));
+                    
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
+                    
+                    imp.setNomePai(rs.getString("pai"));
+                    imp.setNomeMae(rs.getString("mae"));
+                    imp.setNomeConjuge(rs.getString("conjuge"));
+                    imp.setCargo(rs.getString("profissao"));
+                    imp.setSalario(rs.getDouble("salario"));
+                    imp.setValorLimite(rs.getDouble("valorlimite"));
 
                     result.add(imp);
                 }

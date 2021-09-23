@@ -534,22 +534,18 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pes.PessoaDtCadastro as datacadastro\n"
                     + "from\n"
                     + "	dbo.TB_CLIENTE c\n"
-                    + "	join dbo.TB_PESSOA_PFPJ pes on\n"
-                    + "		pes.PessoaID = c.CliID\n"
-                    + "	left join dbo.TB_PESSOA_ENDERECOS pend on\n"
-                    + "		pend.PessoaID = pes.PessoaID\n"
-                    + "	left join dbo.TB_ENDERECO ende on\n"
-                    + "		ende.EndID = pend.PessoaEndID\n"
-                    + "	left join dbo.TB_CIDADE cid on\n"
-                    + "		cid.CidID = ende.EndCidadeID\n"
-                    + "	left join dbo.TB_UF uf on\n"
-                    + "		uf.UfID = cid.CidUfID\n"
+                    + "	join dbo.TB_PESSOA_PFPJ pes on pes.PessoaID = c.CliID\n"
+                    + "	left join dbo.TB_PESSOA_ENDERECOS pend on pend.PessoaID = pes.PessoaID\n"
+                    + "	left join dbo.TB_ENDERECO ende on ende.EndID = pend.PessoaEndID\n"
+                    + "	left join dbo.TB_CIDADE cid on cid.CidID = ende.EndCidadeID\n"
+                    + "	left join dbo.TB_UF uf on uf.UfID = cid.CidUfID\n"
                     + "order by\n"
                     + "	c.CliID"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rst.getString("id"));
+                  //imp.setId(rst.getString("id"));                        ID DO CLIENTE, 
+                    imp.setId(rst.getString("CliCodigoPessoal"));       // CODIGO INTERNO CLIENTE
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj"));
@@ -626,11 +622,12 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	v.VndEstacaoID as ecf,\n"
                     + "	t.CliSaldoMovValor as valor,\n"
                     + "	t.CliSaldoMovObservacao as observacao,\n"
-                    + "	t.CliSaldoMovCliID as id_cliente\n"
+                    + "	tc.CliCodigoPessoal as id_cliente\n"
+                  //+ "	t.CliSaldoMovCliID as id_cliente\n"             // ROTATIVO POR ID_CLIENTE
                     + "from\n"
                     + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
-                    + "	join TB_VENDA v on\n"
-                    + "		t.CliSaldoMovOrigemID = v.VndID\n"
+                    + "	join TB_VENDA v on t.CliSaldoMovOrigemID = v.VndID\n"
+                    + "	join TB_CLIENTE tc on tc.CliID =  t.CliSaldoMovCliID\n"
                     + "where\n"
                     + "	t.CliSaldoMovNaturezaID = 99 and\n"
                     + "	v.VndDtCancelamento is null\n"
@@ -702,7 +699,6 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
-                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
                         next.setNomeCliente(rst.getString("nome_cliente"));
                         next.setCpf(rst.getString("cpf_cnpj"));
@@ -728,8 +724,12 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n"
                     + "	v.VndNumeroVenda id_venda,\n"
-                    + "	d.VndDocNumero numerocupom,\n"
-                    + "	VndClienteID id_cliente,\n"
+                    + "	CASE\n"
+                    + "     when d.VndDocNumero is null\n"
+                    + "     then v.VndNumeroVenda\n"
+                    + "     else d.VndDocNumero\n"
+                    + " END numerocupom,\n"
+                    + "	c2.CliCodigoPessoal id_cliente,\n"
                     + "	c.PessoaNome nome_cliente,\n"
                     + "	v.VndNfpCpfCnpj cpf_cnpj,\n"
                     + "	SUBSTRING(e.EstacaoDescricao, 4, 2) ecf,\n"
@@ -737,17 +737,18 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	CAST (VndDtAbertura as time) horainicio,\n"
                     + "	CAST (VndDtFechamento as time) horatermino,\n"
                     + "	CASE\n"
-                    + "	  when v.VndClienteValor = 0\n"
-                    + "   then v.VndConvenioValor\n"
-                    + "	  ELSE v.VndClienteValor\n"
+                    + "     when v.VndClienteValor = 0\n"
+                    + "     then v.VndConvenioValor\n"
+                    + "     ELSE v.VndClienteValor\n"
                     + "	END subtotalimpressora\n"
                     + "FROM\n"
                     + "	TB_VENDA v\n"
                     + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID\n"
                     + "LEFT JOIN TB_ESTACAO e on e.EstacaoID = v.VndEstacaoID\n"
                     + "LEFT JOIN TB_PESSOA_PFPJ c on c.PessoaID = v.VndClienteID\n"
+                    + "LEFT JOIN TB_CLIENTE c2 on c2.CliID = v.VndClienteID\n"
                     + "WHERE\n"
-                    + " d.VndDocNumero is not NULL \n"
+                    + " v.VndDtCancelamento is NULL \n"
                     + "	and v.VndDtEmissao between '" + strDataInicio + "' and '" + strDataTermino + "'";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
