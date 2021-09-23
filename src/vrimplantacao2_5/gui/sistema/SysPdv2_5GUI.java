@@ -84,6 +84,7 @@ public class SysPdv2_5GUI extends VRInternalFrame {
 
         carregarParametros();
         centralizarForm();
+        
         pnlConn.setSistema(ESistema.SYSPDV);
         pnlConn.getNomeConexao();
         
@@ -241,8 +242,10 @@ public class SysPdv2_5GUI extends VRInternalFrame {
                     idLojaCliente = pnlConn.getLojaOrigem(); 
                     
                     Importador importador = new Importador(dao);
+                    
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    importador.setIdConexao(pnlConn.idConexao);
                     
                     dao.setComplementoSistema(pnlConn.getComplemento());
                     dao.setFinalizadorasRotativo(rotativoSelecionado);

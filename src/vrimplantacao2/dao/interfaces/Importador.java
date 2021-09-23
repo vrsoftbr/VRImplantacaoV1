@@ -123,6 +123,7 @@ public class Importador {
 
     private InterfaceDAO interfaceDAO;
     private int lojaVR = 1;
+    private int idConexao = 0;
     private boolean importarIndividualLoja = false;
     public boolean idProdutoSemUltimoDigito = false;
     public boolean eBancoUnificado = false;
@@ -137,6 +138,14 @@ public class Importador {
 
     public InterfaceDAO getInterfaceDAO() {
         return interfaceDAO;
+    }
+
+    public int getIdConexao() {
+        return idConexao;
+    }
+
+    public void setIdConexao(int idConexao) {
+        this.idConexao = idConexao;
     }
 
     public int getLojaVR() {
@@ -306,16 +315,19 @@ public class Importador {
     public void importarProduto(OpcaoProduto... opcoes) throws Exception {
 
         ProgressBar.setStatus("Carregando produtos...");
+        
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        
+        provider.setIdConexao(getIdConexao());
         provider.setLoja(getLojaOrigem());
         provider.setSistema(getSistema());
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
 
         ProdutoRepository repository = new ProdutoRepository(provider);
-        repository.salvar(produtos);
-
+        
+        repository.salvar2_5(produtos);
     }
     
     public void importarAtacado() throws Exception {
