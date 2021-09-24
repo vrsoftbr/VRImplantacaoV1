@@ -1,10 +1,14 @@
 package vrimplantacao2_5.gui.migracao2_5;
 
+import java.awt.Frame;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2_5.controller.migracao2_5.Migracao2_5Controller;
 import vrimplantacao2_5.gui.componente.conexao.ConexaoEvent;
@@ -55,7 +59,34 @@ public class Migracao2_5GUI extends VRInternalFrame {
         eSistema.setDao(sistema.getDao());
         
         tabProdutos.setOpcoesDisponiveis(sistema.getDao());
-        tabProdutos.btnMapaTribut.setVisible(false);        
+        
+        if (eSistema.getDao().getOpcoesDisponiveisProdutos().contains(OpcaoProduto.MAPA_TRIBUTACAO)) {
+            tabProdutos.btnMapaTribut.setProvider(new MapaTributacaoButtonProvider() {
+                @Override
+                public MapaTributoProvider getProvider() {
+                    return (MapaTributoProvider) eSistema.getDao();
+                }
+
+                @Override
+                public String getSistema() {
+                    return SISTEMA;
+                }
+
+                @Override
+                public String getLoja() {
+                    return pnlConn.getLojaOrigem();
+                }
+
+                @Override
+                public Frame getFrame() {
+                    return mdiFrame;
+                }
+                
+            });
+        }
+        
+        
+        //tabProdutos.btnMapaTribut.setVisible(false);        
         pnlConn.setOnConectar(new ConexaoEvent() {
             @Override
             public void executar() throws Exception {
