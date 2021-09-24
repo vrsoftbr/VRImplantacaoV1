@@ -46,7 +46,7 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
         return "select\n"
                 + "	cp.com_registro id,\n"
                 + "	sai_registro nritem,\n"
-                + "	cp.lote_codigo numerocupom,\n"
+                + "	cp.COM_NCUPOM numerocupom,\n"
                 + "	cli_codigo idclientepreferencial,\n"
                 + "	cp.com_status status,\n"
                 + "case maq_nome\n"
