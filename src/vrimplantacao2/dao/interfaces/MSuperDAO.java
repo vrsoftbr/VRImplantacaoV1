@@ -10,11 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -279,38 +276,13 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "AND pg.codigo IN (SELECT produtoprincipal FROM TESTPRODUTOGERAL)"
                     + "ORDER BY 1"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
+                    
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-
-                    long longEAN = Utils.stringToLong(imp.getEan(), -2);
-                    String strEAN = String.valueOf(longEAN);
-
-                    if (strEAN.startsWith("999000") && strEAN.length() == 13) {
-                        final String eanBal = strEAN.substring(7, strEAN.length() - 1);
-                        final int plu = Utils.stringToInt(eanBal, -1);
-                        ProdutoBalancaVO bal = produtosBalanca.get(plu);
-                        if (bal != null) {
-                            imp.setEan(String.valueOf(bal.getCodigo()));
-                            imp.seteBalanca(true);
-                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                            imp.setValidade(bal.getValidade());
-                        } else {
-                            imp.setEan(eanBal);
-                            imp.seteBalanca(rst.getBoolean("ebalanca"));
-                            imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                            imp.setValidade(rst.getInt("validade"));
-                        }
-                    } else {
-                        imp.seteBalanca(rst.getBoolean("ebalanca"));
-                        imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                        imp.setValidade(rst.getInt("validade"));
-                    }
-
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
@@ -345,11 +317,6 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(IdIcmsCredito);
                     imp.setIcmsConsumidorId(idIcmsDebito);
 
-                    if (rst.getString("referencia") != null && !rst.getString("referencia").trim().isEmpty()) {
-                        if (!rst.getString("descricaocompleta").contains(rst.getString("referencia").trim())) {
-                            imp.setDescricaoCompleta(rst.getString("descricao") + " " + rst.getString("referencia"));
-                        }
-                    }
                     result.add(imp);
                 }
             }

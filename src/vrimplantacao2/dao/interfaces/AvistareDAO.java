@@ -297,6 +297,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoForaEstadoId(rst.getString("tribicms"));
                     imp.setIcmsConsumidorId(rst.getString("tribicms"));
                     imp.setVolume(rst.getDouble("volume"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("volume"));
 
                     result.add(imp);
                 }
