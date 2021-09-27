@@ -75,7 +75,7 @@ public class EmporioDAO extends InterfaceDAO {
                     "    and cpf.customer_sku_id > 999999\n" +
                     "  left join customer_sku ie on\n" +
                     "    c.customer_key = ie.customer_key\n" +
-                    "    and ie.customer_sku_type_key in (8)\n" +
+                    "    and ie.customer_sku_typ00e_key in (8)\n" +
                     "order by\n" +
                     "  id"
             )) {
