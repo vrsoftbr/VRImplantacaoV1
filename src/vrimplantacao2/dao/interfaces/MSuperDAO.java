@@ -474,7 +474,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	SUP020 cp\n"
                     + "JOIN SUP010 fr ON fr.SUP010 = cp.SUP010\n"
                     + "WHERE\n"
-                    + "	cp.SUP999 = " + getLojaOrigem() + " --(Num.Loja)"
+                    + "	cp.SUP999 = " + getLojaOrigem() + " ;--(Num.Loja)"
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
