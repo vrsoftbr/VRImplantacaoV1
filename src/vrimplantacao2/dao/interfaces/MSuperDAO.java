@@ -417,14 +417,14 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	sup010 f\n"
                     + "JOIN sup118 c ON c.sup118 = f.sup118\n"
                     + "WHERE\n"
-                    + "	sup999 = 1\n"
+                    + "	sup999 = " + getLojaOrigem() + "\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    
+
                     imp.setImportId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
@@ -457,24 +457,24 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "    fornecedor AS idfornecedor,\n"
-                    + "    produto AS idproduto,\n"
-                    + "    ultcompraqtde AS qtdembalagem,\n"
-                    + "    ultcompradata AS dataalteracao,\n"
-                    + "    codnofornecedor AS codigoexterno\n"
-                    + "FROM testfornecproduto\n"
-                    + "ORDER BY 1, 2"
+                    "  SELECT\n"
+                    + "	f.SUP010 AS idfornecedor,\n"
+                    + "	p.SUP001 AS idproduto,\n"
+                    + "	f.DTALTERACAO AS dtalteracao,\n"
+                    + "FROM\n"
+                    + "	SUP010 f\n"
+                    + "JOIN SUP001 p ON p.SUP010 = f.SUP010\n"
+                    + "ORDER BY 1"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
 
                     result.add(imp);
                 }
@@ -488,23 +488,26 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n"
-                    + " cp.IDSEQUENCIA id,\n"
-                    + " cp.FORNECEDOR idfornecedor,\n"
-                    + " cpfcnpj cnpj,\n"
-                    + " cp.DOCUMENTO numerodocumento,\n"
-                    + " d.EMISSAO dataemissao,\n"
-                    + " d.DATADIGITACAO dataentrada,\n"
-                    + " cp.VALOR, \n"
-                    + " cp.VENCIMENTO datavencimento,\n"
-                    + " COALESCE (cp.OBS,'')||cp.DOCUMENTO||'-'||cp.PARCELA AS OBS \n"
-                    + "FROM \n"
-                    + "	TPAGPARCELA cp\n"
-                    + "	LEFT JOIN TPAGDOCUMENTO d ON d.DOCUMENTO = cp.DOCUMENTO \n"
-                    + "	LEFT JOIN TPAGFORNECEDOR f ON cp.FORNECEDOR = f.CODIGO \n"
-                    + "WHERE \n"
-                    + "	cp.EMPRESA = " + getLojaOrigem() + "\n"
-                    + "	AND cp.DATABAIXA IS NULL"
+                    "SELECT\n"
+                    + "	cp.SUP020 AS id,\n"
+                    + "	fr.SUP010 AS idfornecedor,\n"
+                    + "	cp.SUP999 AS loja,\n"
+                    + "	fr.CGC AS cnpj,\n"
+                    + "	cp.DUPLICATA AS numerodocumento,\n"
+                    + "	cp.EMISSAO AS dataemissao,\n"
+                    + "	cp.DATA_ENTRADA AS dataentrada,\n"
+                    + "	cp.DATALANCAMENTO,\n"
+                    + "	cp.HORALANCAMENTO,\n"
+                    + "	cp.VALOR as valor,\n"
+                    + "	cp.VALOR_PGTO,\n"
+                    + "	cp.VALOR_DESCONTAR,\n"
+                    + "	cp.OBSERVACAO as obs,\n"
+                    + "	cp.VENCIMENTO as datavencimento\n"
+                    + "FROM\n"
+                    + "	SUP020 cp\n"
+                    + "JOIN SUP010 fr ON fr.SUP010 = cp.SUP010\n"
+                    + "WHERE\n"
+                    + "	cp.SUP999 = " + getLojaOrigem() + " --(Num.Loja)"
             )) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();

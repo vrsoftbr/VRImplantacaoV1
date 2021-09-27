@@ -102,10 +102,12 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = 'CNPJ') as cnpj,\n"
-                    + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = 'EmpresaRegistro') as razao\n"
-                    + "from dbo.TB_CONFIG"
+                    "select\n"
+                    + "	codigo,\n"
+                    + "	nome as razao,\n"
+                    + "	cnpj\n"
+                    + "from\n"
+                    + "	entidades;"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("cnpj"), rst.getString("razao")));
@@ -121,9 +123,12 @@ public class MRC6DAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "	(select CfgValue from dbo.TB_CONFIG where CfgChave = 'EmpresaRegistro') as razao\n"
-                    + "from dbo.TB_CONFIG"
+                    "select\n"
+                    + "	codigo,\n"
+                    + "	nomefantasia as razao,\n"
+                    + "	cnpj\n"
+                    + "from\n"
+                    + "	entidades;"
             )) {
                 while (rst.next()) {
                     result.add(rst.getString("razao"));
