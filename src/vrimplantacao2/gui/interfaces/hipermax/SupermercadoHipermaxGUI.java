@@ -1,10 +1,6 @@
 package vrimplantacao2.gui.interfaces.hipermax;
 
-import vrimplantacao2.gui.interfaces.*;
 import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.WindowConstants;
 import javax.swing.event.InternalFrameAdapter;
@@ -15,15 +11,11 @@ import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.VRToVRDAO;
+import vrimplantacao2.dao.interfaces.hipermax.SupermercadoHipermaxDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -35,13 +27,13 @@ import vrimplantacao2.parametro.Parametros;
  */
 public class SupermercadoHipermaxGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "VR";
+    private static final String SISTEMA = "SupermercadoHipermax";
 
     private static SupermercadoHipermaxGUI instance;
 
     private String vLojaCliente;
     private int vLojaVR;
-    private final VRToVRDAO dao;
+    private final SupermercadoHipermaxDAO dao;
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -65,7 +57,7 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
      */
     public SupermercadoHipermaxGUI(VRMdiFrame frame) throws Exception {
         super(frame);
-        this.dao = new VRToVRDAO();
+        this.dao = new SupermercadoHipermaxDAO();
         initComponents();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         addInternalFrameListener(new InternalFrameAdapter() {
@@ -75,32 +67,9 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
             }
         });
 
-        tabProdutos.btnMapaTribut.setProvider(new MapaTributacaoButtonProvider() {
-            @Override
-            public MapaTributoProvider getProvider() {
-                return dao;
-            }
-
-            @Override
-            public String getSistema() {
-                return dao.getSistema();
-            }
-
-            @Override
-            public String getLoja() {
-                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
-                return dao.getLojaOrigem();
-            }
-
-            @Override
-            public Frame getFrame() {
-                return mdiFrame;
-            }
-        });
-
         conexao.setSistema(SISTEMA);
         conexao.host = "localhost";
-        conexao.database = "public";
+        conexao.database = "vr_supermercadohipermax";
         conexao.port = "8745";
         conexao.user = "postgres";
         conexao.pass = "VrPost@Server";
@@ -124,7 +93,7 @@ public class SupermercadoHipermaxGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : dao.getLojas()) {
+        for (Estabelecimento loja : dao.getLojaCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;

@@ -1147,7 +1147,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "	pr.prlloja = " + getLojaOrigem() + " and\n" +
                     "	not pr.prldtfimpr is null and\n" +
-                    "	pr.prldtfimpr >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'\n" +
+                    "	pr.prldtfimpr >= '2021-09-28' and\n" +
+                    "   pr.prldtinipr is not null \n" +
                     "order by\n" +
                     "	datainicio"
             )) {

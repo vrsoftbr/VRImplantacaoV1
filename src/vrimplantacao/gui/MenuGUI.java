@@ -308,6 +308,7 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.ZoomboxGUI;
 import vrimplantacao2.gui.interfaces.ZpfGUI;
+import vrimplantacao2.gui.interfaces.hipermax.SupermercadoHipermaxGUI;
 import vrimplantacao2.gui.interfaces.rodrigues.SupermercadoRodriguesGUI;
 import vrimplantacao2.gui.interfaces.unificacao.primeiropreco.PrimeiroPrecoGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
@@ -906,6 +907,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPlanilhaVr = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
+        mnuSupermercadoHipermax = new javax.swing.JMenuItem();
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         mnuContaPagar = new javax.swing.JMenuItem();
         mnuVRPdv = new javax.swing.JMenuItem();
@@ -3388,6 +3390,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuEspeciais.add(jMenuItem12);
 
+        mnuSupermercadoHipermax.setText("Migração Supermercado Hipermax");
+        mnuSupermercadoHipermax.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSupermercadoHipermaxActionPerformed(evt);
+            }
+        });
+        mnuEspeciais.add(mnuSupermercadoHipermax);
+
         mnuImpSistema.add(mnuEspeciais);
 
         mnuAcertarIdsProdutos.setText("Acertar Ids Produtos");
@@ -5408,6 +5418,11 @@ public final class MenuGUI extends VRMdiFrame {
         MRC6GUI.exibir(this);
     }//GEN-LAST:event_mnuMRC6ActionPerformed
 
+    private void mnuSupermercadoHipermaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSupermercadoHipermaxActionPerformed
+        // TODO add your handling code here:
+        SupermercadoHipermaxGUI.exibir(this);
+    }//GEN-LAST:event_mnuSupermercadoHipermaxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5703,6 +5718,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperControle;
     private javax.swing.JMenuItem mnuSuperLoja10;
+    private javax.swing.JMenuItem mnuSupermercadoHipermax;
     private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSysAut;
     private javax.swing.JMenuItem mnuSysmoFirebird;
