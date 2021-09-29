@@ -504,8 +504,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	else coalesce(est.get_preco_venda,0) end precovenda,\n"
                     //+ " coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n"
                     //+ " p.git_cus_rep custosemimposto,\n"
-                    //+ " p.git_cus_ult_ent_bru as custocomimposto,\n"
-                    //+ " p.git_cus_ult_ent as custosemimposto,\n"        
+                    + " p.git_cus_ult_ent_bru as custocomimposto,\n"
+                    + " p.git_cus_ult_ent as custosemimposto,\n"        
                     + "	det.DET_CLASS_FIS ncm,\n"
                     + "	det.DET_NCM_EXCECAO excecao,\n"
                     + "	det.DET_CEST cest,\n"
@@ -558,7 +558,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	    PDV_ITEM id,\n"
                     + "	    PDV_ITEM_DIGITO digito,\n"
                     + "	    max(PDV_CUSTO) custo,\n"
-                    + "	    max(cast((PDV_PRECO_NORMAL / PDV_EMB_VENDA_UN) as numeric(10,2))) preco,\n"
+                    + "	    max(cast((PDV_PRECO_NORMAL / case when coalesce(PDV_EMB_VENDA_UN, 1) = 0 then 1 else PDV_EMB_VENDA_UN end) as numeric(10,2))) preco,\n"
                     + "	    max(case when PDV_EXCLUIR = 'S' then 0 else 1 end) id_situacaocadastral\n"
                     + "	    from\n"
                     + "	    AG1PDVPD\n"
@@ -590,7 +590,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	    select distinct\n"
                     + "	    pdv.PDV_FILIAL filial,\n"
                     + "	    pdv.PDV_CODIGO_EAN13 ean,\n"
-                    + "	    pdv.PDV_PRECO_NORMAL / pdv.PDV_EMB_VENDA_UN precoatac,\n"
+                    + "	    pdv.PDV_PRECO_NORMAL / case when coalesce(pdv.PDV_EMB_VENDA_UN, 1) = 0 then 1 else pdv.PDV_EMB_VENDA_UN end precoatac,\n"
                     + "	    pdv.PDV_TPO_EMB_VENDA tipoembalagem,\n"
                     + "	    pdv.PDV_EMB_VENDA qtd\n"
                     + "	    from\n"
@@ -1493,8 +1493,20 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
                     imp.setTelefone(rst.getString("fone1"));
-                    imp.setDataInicio(format.parse(rst.getString("datainicio")));
-                    imp.setDataTermino(format.parse(rst.getString("datatermino")));
+                    
+                    String dataInicio = rst.getString("datainicio");
+                    String dataTermino = rst.getString("datatermino");
+                    
+                    if (dataInicio == null) {
+                        dataInicio = "1280920";
+                    }
+                    
+                    if (dataTermino == null) {
+                        dataTermino = "1280926";
+                    }
+                    
+                    imp.setDataInicio(format.parse(dataInicio));
+                    imp.setDataTermino(format.parse(dataTermino));
                     imp.setDesconto(rst.getDouble("desconto"));
                     imp.setDiaPagamento(rst.getInt("diapagamento"));
                     imp.setDiaInicioRenovacao(rst.getInt("diainiciorenovacao"));

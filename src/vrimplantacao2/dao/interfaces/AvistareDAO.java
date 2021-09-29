@@ -503,7 +503,7 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "	c.CliID as id,\n"
-                    + "	c.CliCodigoPessoal,\n"
+                    + "	coalesce(c.CliCodigoPessoal, c.cliId) as CliCodigoPessoal,\n"
                     + "	c.CliLimiteTotal as valortotal,\n"
                     + "	c.CliLimiteSaldo as valorsaldo,\n"
                     + "	case pes.PessoaSituacaoID\n"
@@ -590,14 +590,16 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                 Statement stm = ConexaoSqlServer.getConexao().createStatement();
                 ResultSet rst = stm.executeQuery(
                         "select\n"
-                        + "	t.CliSaldoMovCliID as id_cliente,\n"
+                        //+ "	t.CliSaldoMovCliID as id_cliente,\n"
+                        + "     tc.CliCodigoPessoal as id_cliente,\n"          
                         + "	sum(t.CliSaldoMovValor) as valor\n"
                         + "from\n"
                         + "	TB_CLIENTE_SALDO_MOVIMENTO t\n"
+                        + "     join TB_CLIENTE tc on tc.CliID =  t.CliSaldoMovCliID\n"        
                         + "where\n"
                         + "	t.CliSaldoMovNaturezaID = 100\n"
                         + "group by\n"
-                        + "	t.CliSaldoMovCliID"
+                        + "	tc.CliCodigoPessoal"
                 )) {
             while (rst.next()) {
                 result.add(new CreditoRotativoPagamentoAgrupadoIMP(
