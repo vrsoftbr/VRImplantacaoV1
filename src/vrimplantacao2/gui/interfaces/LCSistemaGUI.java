@@ -1,6 +1,5 @@
 package vrimplantacao2.gui.interfaces;
 
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -15,16 +14,11 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-import vrimplantacao2.dao.interfaces.HipcomDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.LCSistemaDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 
 public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
@@ -65,7 +59,7 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private HipcomDAO dao = new HipcomDAO();
+    private LCSistemaDAO dao = new LCSistemaDAO();
 
     private LCSistemaGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -75,7 +69,7 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         
         tabProdutos.setOpcoesDisponiveis(dao);
         
-        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -98,13 +92,13 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                 return mdiFrame;
             }
             
-        });
+        });*/
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "dbHipcom";
+        conexaoMySQL.database = "lc_sistemas";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "hpc00";
+        conexaoMySQL.pass = "123456";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -160,14 +154,7 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         }
     }
 
-    public void importarTabelas() throws Exception {
-        
-        if (chkCreditoRotativo.isSelected()) {
-            if (txtRotDtIni.getDate() == null || txtRotDtFim.getDate() == null) {
-                Util.exibirMensagem("Verifique o intervalo de datas do crédito rotativo", "Atenção");
-                return;
-            }
-        }        
+    public void importarTabelas() throws Exception {      
         
         Thread thread = new Thread() {
             int idLojaVR;
@@ -181,9 +168,6 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-
-                    dao.setVersaoVenda(rdbVendasV1.isSelected() ? 1 : 2);
-                    dao.setImportarIcmsEntradaCad(chkImportarIcmsEntradaCad.isSelected());
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -235,24 +219,16 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                         }
                         
-                        if (chkOutrasReceitas.isSelected()) {
-                            dao.setReceberDataInicial(txtOtRecDtIni.getDate());
-                            dao.setReceberDataFinal(txtOtRecDtFim.getDate());
-                            importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
-                        }
-                        
-                        if (chkContasPagar.isSelected()) {
-                            dao.setCpDataInicial(txtDtCPEntrada.getDate());
-                            dao.setCpDataFinal(txtDtCPFim.getDate());
-                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }
-                        
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
                         }
                         
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
+                        }
+                        
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
                         }
                         
                         {
@@ -269,25 +245,6 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencialNovo(opcoes.toArray(new OpcaoCliente[]{}));
                             }
-                        }
-                
-                        if (chkCreditoRotativo.isSelected()) {
-                            dao.setRotativoDataInicial(txtRotDtIni.getDate());
-                            dao.setRotativoDataFinal(txtRotDtFim.getDate());
-                            importador.importarCreditoRotativo();
-                        }
-                        
-                        if (chkCheque.isSelected()) {
-                            dao.setRotativoDataInicial(txtRotDtIni.getDate());
-                            dao.setRotativoDataFinal(txtRotDtFim.getDate());
-                            importador.importarCheque();
-                        }
-                        
-                        if (chkVendas.isSelected()) {
-                            dao.setVendaDataInicial(txtDtVendaIni.getDate());
-                            dao.setVendaDataFinal(txtDtVendaFim.getDate());
-                            dao.setVendaUtilizaDigito(chkVendaUtilizaDigito.isSelected());
-                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         
@@ -334,9 +291,6 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
-        jPanel4 = new javax.swing.JPanel();
-        vRPanel3 = new vr.view.components.panel.VRPanel();
-        chkImportarIcmsEntradaCad = new vr.view.components.checkbox.VRCheckBox();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -360,15 +314,10 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
-        jPanel1 = new javax.swing.JPanel();
-        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        txtRotDtIni = new org.jdesktop.swingx.JXDatePicker();
-        txtRotDtFim = new org.jdesktop.swingx.JXDatePicker();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         chkClienteTipoInscricao = new vrframework.bean.checkBox.VRCheckBox();
         chkCIE = new javax.swing.JCheckBox();
         chkClienteEventual = new javax.swing.JCheckBox();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabOutras = new javax.swing.JPanel();
         chkContasPagar = new javax.swing.JCheckBox();
         txtDtCPEntrada = new org.jdesktop.swingx.JXDatePicker();
@@ -394,52 +343,13 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
         tabs = new javax.swing.JTabbedPane();
         conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
 
-        setTitle("Importação Emporio");
+        setTitle("Importação LC Sistema");
         setToolTipText("");
 
         vRLabel1.setText("Loja (Cliente):");
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
 
-        vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Produtos"));
-
-        chkImportarIcmsEntradaCad.setText("Importar Icms Entrada (Cad)");
-
-        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
-        vRPanel3.setLayout(vRPanel3Layout);
-        vRPanel3Layout.setHorizontalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkImportarIcmsEntradaCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(377, Short.MAX_VALUE))
-        );
-        vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkImportarIcmsEntradaCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(217, Short.MAX_VALUE))
-        );
-
-        tabImportacao.addTab("Paramêtros Hipcom", jPanel4);
         tabImportacao.addTab("Produtos", tabProdutos);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -554,55 +464,13 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCheque.setText("Cheque");
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        chkCreditoRotativo.setText("Crédito Rotativo");
-
-        jLabel2.setText("Dt. Inicial");
-
-        jLabel3.setText("Dt. Termino");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-                        .addGap(67, 67, 67))
-                    .addComponent(txtRotDtIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
-                        .addGap(56, 56, 56))
-                    .addComponent(txtRotDtFim, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(5, 5, 5))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtRotDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtRotDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(5, 5, 5))
-        );
-
         chkClienteTipoInscricao.setText("Tipo Inscrição");
 
         chkCIE.setText("Inscrição Estadual");
 
         chkClienteEventual.setText("Cliente Eventual");
+
+        chkCreditoRotativo.setText("Crédito Rotativo");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -611,20 +479,17 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tabClientesLayout.createSequentialGroup()
                         .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(tabClientesLayout.createSequentialGroup()
-                                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkClienteEventual))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkCIE))))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkClienteEventual))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCIE)))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(288, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -637,11 +502,11 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEventual))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(53, 53, 53)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(134, Short.MAX_VALUE))
+                .addContainerGap(121, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -692,7 +557,7 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(rdbVendasV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkBancoUnificado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -866,7 +731,7 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap())
         );
 
-        getAccessibleContext().setAccessibleName("Avance");
+        getAccessibleContext().setAccessibleName("LC Sistema");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -922,7 +787,6 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
-    private vr.view.components.checkbox.VRCheckBox chkImportarIcmsEntradaCad;
     private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
@@ -935,14 +799,10 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private javax.swing.JPanel pnlOutrasReceitas;
@@ -962,12 +822,9 @@ public class LCSistemaGUI extends VRInternalFrame implements ConexaoEvent {
     private org.jdesktop.swingx.JXDatePicker txtDtVendaIni;
     private org.jdesktop.swingx.JXDatePicker txtOtRecDtFim;
     private org.jdesktop.swingx.JXDatePicker txtOtRecDtIni;
-    private org.jdesktop.swingx.JXDatePicker txtRotDtFim;
-    private org.jdesktop.swingx.JXDatePicker txtRotDtIni;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
-    private vr.view.components.panel.VRPanel vRPanel3;
     private vr.view.components.panel.VRPanelBeanInfo vRPanelBeanInfo1;
     // End of variables declaration//GEN-END:variables
 

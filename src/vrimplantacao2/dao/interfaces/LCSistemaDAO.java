@@ -99,7 +99,7 @@ public class LCSistemaDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("estado"));
                     imp.setCep(rst.getString("cep"));
 
-                    String estCiv = Utils.acertarTexto(rst.getString("estadocivil"));
+                    String estCiv = Utils.acertarTexto(rst.getString("estcivil_adi"));
                     String sexo = Utils.acertarTexto(rst.getString("sexo_adi"));
 
                     if (sexo != null && !sexo.isEmpty() && sexo.equals("Feminino")) {
@@ -127,11 +127,9 @@ public class LCSistemaDAO extends InterfaceDAO {
                         imp.setPermiteCreditoRotativo(true);
                     }
 
-                    imp.setNomeConjuge(rst.getString("conjuge"));
                     imp.setNomePai(rst.getString("pai_adi"));
                     imp.setNomeMae(rst.getString("mae_adi"));
-                    imp.setTelefone(rst.getString("fone"));
-                    imp.setCelular(rst.getString("clifonepro"));
+                    imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email_adi"));
                     imp.setFax(rst.getString("fax"));
                     imp.addCelular("TEL COMERCIAL", rst.getString("tel_comercial"));

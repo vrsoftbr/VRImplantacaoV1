@@ -1968,7 +1968,8 @@ public class GetWay_ProfitDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setObservacao((rst.getString("OBS") == null ? "" : rst.getString("OBS")) + " "
                             + (rst.getString("OBS2") == null ? "" : rst.getString("OBS2")));
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("DTVENCTO"), imp.getValor());
-                    parc.setNumeroParcela(rst.getInt("PARCELA"));
+                    String parcela = Utils.formataNumero(rst.getString("PARCELA"));
+                    parc.setNumeroParcela(Integer.valueOf(parcela));
 
                     vResult.add(imp);
                 }

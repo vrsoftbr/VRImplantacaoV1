@@ -283,6 +283,7 @@ import vrimplantacao2.gui.interfaces.GDIGUI;
 import vrimplantacao2.gui.interfaces.GigatronGUI;
 import vrimplantacao2.gui.interfaces.GondolaGUI;
 import vrimplantacao2.gui.interfaces.IServerGUI;
+import vrimplantacao2.gui.interfaces.LCSistemaGUI;
 import vrimplantacao2.gui.interfaces.LogicboxGUI;
 import vrimplantacao2.gui.interfaces.MRC6GUI;
 import vrimplantacao2.gui.interfaces.MSuperGUI;
@@ -752,6 +753,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSTI = new javax.swing.JMenuItem();
         mnuSTI3 = new javax.swing.JMenuItem();
         mnuEptus = new javax.swing.JMenuItem();
+        mnuLCSistema = new javax.swing.JMenuItem();
         mnuOracle = new javax.swing.JMenu();
         mnuApollo = new javax.swing.JMenuItem();
         jMenuItemArius = new javax.swing.JMenuItem();
@@ -2198,6 +2200,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuMySQL2.add(mnuEptus);
+
+        mnuLCSistema.setText("LC Sistema");
+        mnuLCSistema.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLCSistemaActionPerformed(evt);
+            }
+        });
+        mnuMySQL2.add(mnuLCSistema);
 
         mnuDatabase.add(mnuMySQL2);
 
@@ -5408,6 +5418,10 @@ public final class MenuGUI extends VRMdiFrame {
         MRC6GUI.exibir(this);
     }//GEN-LAST:event_mnuMRC6ActionPerformed
 
+    private void mnuLCSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLCSistemaActionPerformed
+        LCSistemaGUI.exibir(this);
+    }//GEN-LAST:event_mnuLCSistemaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5608,6 +5622,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuJanela;
     private javax.swing.JMenuItem mnuJrf;
     private javax.swing.JMenuItem mnuKcms;
+    private javax.swing.JMenuItem mnuLCSistema;
     private javax.swing.JMenuItem mnuLiderNetWork;
     private javax.swing.JMenuItem mnuLince;
     private javax.swing.JMenuItem mnuLinear;
