@@ -818,7 +818,13 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setValorJuros(rst.getDouble("valorjuros"));
-                    imp.setBanco(rst.getInt("id_banco"));
+                    
+                    if (rst.getString("id_banco") != null && !rst.getString("id_banco").trim().isEmpty()) {
+                        imp.setBanco(Integer.parseInt(rst.getString("id_banco").trim()));
+                    } else {
+                        imp.setBanco(804);
+                    }
+                    
                     imp.setCmc7(rst.getString("cm7"));
 
                     Result.add(imp);
