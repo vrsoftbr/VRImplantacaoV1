@@ -983,6 +983,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	clicli c\n" +
                     "	left join clisit sit on\n" +
                     "		c.clicodsitu = sit.sitcod\n" +
+                    "where cliloja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "	1"
             )) {
@@ -1148,6 +1149,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pr.prlloja = " + getLojaOrigem() + " and\n" +
                     "	not pr.prldtfimpr is null and\n" +
                     "	pr.prldtfimpr >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'\n" +
+                    "   and prldtinipr is not null\n" +
                     "order by\n" +
                     "	datainicio"
             )) {
