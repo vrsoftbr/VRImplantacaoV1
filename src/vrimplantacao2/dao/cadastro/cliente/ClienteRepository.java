@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -11,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.venda.PdvVendaDAO;
+import vrimplantacao2.dao.cadastro.venda.PdvVendaItemDAO;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualAnteriorVO;
@@ -22,49 +26,54 @@ import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodVO;
 import vrimplantacao2.vo.cadastro.local.MunicipioVO;
+import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
+import vrimplantacao2.vo.cadastro.venda.PdvVendaPromocaoPontuacaoVO;
+import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 
 /**
- * Repositório do Cliente para efetuar a importação de Eventuais e Preferenciais.
+ * Repositório do Cliente para efetuar a importação de Eventuais e
+ * Preferenciais.
+ *
  * @author Leandro
  */
 public class ClienteRepository {
-    
+
     private static final Logger LOG = Logger.getLogger(ClienteRepository.class.getName());
-    
+
     private ClienteRepositoryProvider provider;
 
     public ClienteRepository(ClienteRepositoryProvider provider) throws Exception {
         this.provider = provider;
     }
-    
-    public void importarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {  
-                
+
+    public void importarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
+
         int iniciarEm = 1;
-        
+
         //Tratar opções
         boolean parametroValidos = true;
-        for (OpcaoCliente opcao: opt) {            
+        for (OpcaoCliente opcao : opt) {
             if (OpcaoCliente.IMP_REINICIAR_NUMERACAO.equals(opcao)) {
                 iniciarEm = (int) opcao.getParametros().get("N_REINICIO");
-            }            
+            }
             parametroValidos &= opcao.checkParametros();
         }
-        
+
         if (parametroValidos) {
-        
+
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);        
+            clientes = organizarListagem(clientes);
             System.gc();
 
             this.provider.begin();
             try {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-                provider.setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());                
-                
+                provider.setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
+
                 ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack(iniciarEm);
                 Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
                 MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
@@ -72,10 +81,10 @@ public class ClienteRepository {
                 //</editor-fold>
 
                 provider.setNotificacao("Gravando cliente preferêncial...", clientes.size());
-                
+
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
-                
-                for (ClienteIMP imp: clientes) {
+
+                for (ClienteIMP imp : clientes) {
                     ClientePreferencialAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
@@ -87,7 +96,7 @@ public class ClienteRepository {
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
                     if (anterior == null) {
                         //Obtem um ID válido.                    
-                        int id = ids.obterID(reiniciarID ? "A": imp.getId());
+                        int id = ids.obterID(reiniciarID ? "A" : imp.getId());
 
                         //Trata o cnpj
                         long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
@@ -101,7 +110,7 @@ public class ClienteRepository {
                         }
 
                         //Converte os dados.
-                        cliente = converterClientePreferencial(imp);                    
+                        cliente = converterClientePreferencial(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
 
@@ -115,7 +124,7 @@ public class ClienteRepository {
                         //Incluindo o produto nas listagens
                         cnpjCadastrados.put(cnpj, id);
                         anteriores.put(
-                                anterior, 
+                                anterior,
                                 provider.getSistema(),
                                 provider.getLojaOrigem(),
                                 imp.getId()
@@ -136,17 +145,17 @@ public class ClienteRepository {
                 this.provider.rollback();
                 throw e;
             }
-        
+
         } else {
             throw new Exception("Há valores incorretos nos parametros.");
         }
-    }  
-                                             
+    }
+
     public void atualizarClientePreferencial(List<ClienteIMP> clientes, OpcaoCliente... opcoes) throws Exception {
         Set<OpcaoCliente> opt = new HashSet<>(Arrays.asList(opcoes));
-        clientes = organizarListagem(clientes);  
+        clientes = organizarListagem(clientes);
         System.gc();
-        
+
         try {
             if (opt.isEmpty()) {
                 opt.add(OpcaoCliente.DADOS);
@@ -155,27 +164,26 @@ public class ClienteRepository {
                 opt.add(OpcaoCliente.ENDERECO_COMPLETO);
             }
             provider.begin();
-            
+
             //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
             provider.setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
             //</editor-fold>
-            
 
             provider.setNotificacao("Atualizando cliente preferêncial...", clientes.size());
-            
-            for (ClienteIMP imp: clientes) {                
+
+            for (ClienteIMP imp : clientes) {
                 ClientePreferencialAnteriorVO anterior = anteriores.get(
-                       provider.getSistema(),
+                        provider.getSistema(),
                         provider.getLojaOrigem(),
                         imp.getId()
                 );
-                
+
                 if (anterior != null && anterior.getCodigoAtual() != null) {
-                    
+
                     ClientePreferencialVO vo = converterClientePreferencial(imp);
                     vo.setId(anterior.getCodigoAtual().getId());
-                    
+
                     if (opt.contains(OpcaoCliente.OBSERVACOES2)) {
                         atualizarClientePreferencial(vo, opt);
                     }
@@ -203,10 +211,10 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CEP)) {
                         atualizarClientePreferencial(vo, opt);
                     }
-                    if(opt.contains(OpcaoCliente.COMPLEMENTO)) {
+                    if (opt.contains(OpcaoCliente.COMPLEMENTO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
-                    if(opt.contains(OpcaoCliente.ESTADO_CIVIL)) {
+                    if (opt.contains(OpcaoCliente.ESTADO_CIVIL)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.PERMITE_CHEQUE)) {
@@ -246,7 +254,7 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
-                    
+
                     if (opt.contains(OpcaoCliente.EMPRESA)) {
                         atualizarClientePreferencial(vo, opt);
                     }
@@ -286,18 +294,18 @@ public class ClienteRepository {
                 }
                 provider.notificar();
             }
-            
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
     }
-    
+
     private void importarContatoPreferencial(ClientePreferencialVO cliente, ClienteIMP imp, MultiMap<String, Void> contatos) throws Exception {
         //Gravando os contatos se o código atual estiver preenchido.
         if (cliente != null) {
-            for (ClienteContatoIMP impCont: imp.getContatos()) {
+            for (ClienteContatoIMP impCont : imp.getContatos()) {
                 //Converte o IMP em VO
                 ClientePreferencialContatoVO contato = converterContatoPreferencial(impCont);
                 contato.setIdClientePreferencial(cliente.getId());
@@ -323,22 +331,22 @@ public class ClienteRepository {
     }
 
     public void importarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
-        
+
         int iniciarEm = 1;
-        
+
         //Tratar opções
         boolean parametroValidos = true;
-        for (OpcaoCliente opcao: opt) {            
+        for (OpcaoCliente opcao : opt) {
             if (OpcaoCliente.IMP_REINICIAR_NUMERACAO.equals(opcao)) {
                 iniciarEm = (int) opcao.getParametros().get("N_REINICIO");
-            }            
+            }
             parametroValidos &= opcao.checkParametros();
         }
-        
+
         if (parametroValidos) {
 
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);        
+            clientes = organizarListagem(clientes);
             System.gc();
 
             if (opt.isEmpty() || (opt.size() == 1 && opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO))) {
@@ -357,9 +365,9 @@ public class ClienteRepository {
                 //</editor-fold>
 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
-                
+
                 provider.setNotificacao("Gravando cliente eventual...", clientes.size());
-                for (ClienteIMP imp: clientes) {
+                for (ClienteIMP imp : clientes) {
                     ClienteEventualAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
@@ -369,7 +377,7 @@ public class ClienteRepository {
                     ClienteEventualVO cliente = null;
 
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
-                    if (anterior == null) { 
+                    if (anterior == null) {
                         if (opt.contains(OpcaoCliente.DADOS)) {
                             //Trata o cnpj
                             long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
@@ -379,14 +387,14 @@ public class ClienteRepository {
                             }
 
                             //Obtem um ID válido.                    
-                            int id = ids.obterID(reiniciarID ? "A": imp.getId());
+                            int id = ids.obterID(reiniciarID ? "A" : imp.getId());
 
                             if (cnpj < 0) {
                                 cnpj = id;
                             }
 
                             //Converte os dados.
-                            cliente = converterClienteEventual(imp);                    
+                            cliente = converterClienteEventual(imp);
                             cliente.setId(id);
                             cliente.setCnpj(cnpj);
 
@@ -395,12 +403,12 @@ public class ClienteRepository {
 
                             //Grava as informações
                             gravarClienteEventual(cliente);
-                            gravarClienteEventualAnterior(anterior);   
+                            gravarClienteEventualAnterior(anterior);
 
                             //Incluindo o produto nas listagens
                             cnpjCadastrados.put(cnpj, id);
                             anteriores.put(
-                                    anterior, 
+                                    anterior,
                                     provider.getSistema(),
                                     provider.getLojaOrigem(),
                                     imp.getId()
@@ -423,14 +431,14 @@ public class ClienteRepository {
                 this.provider.rollback();
                 throw e;
             }
-        
+
         }
     }
 
     private void importarContatoEventual(ClienteEventualVO cliente, ClienteIMP imp, MultiMap<String, Void> contatos) throws Exception {
         //Gravando os contatos se o código atual estiver preenchido.
         if (cliente != null) {
-            for (ClienteContatoIMP impCont: imp.getContatos()) {
+            for (ClienteContatoIMP impCont : imp.getContatos()) {
                 //Converte o IMP em VO
                 ClienteEventualContatoVO contato = converterContatoEventual(impCont);
                 contato.setIdClienteEventual(cliente.getId());
@@ -458,18 +466,18 @@ public class ClienteRepository {
     }
 
     public List<ClienteIMP> organizarListagem(List<ClienteIMP> clientes) {
-        
+
         LOG.fine("Organizando a listagem dos clientes");
-        
+
         List<ClienteIMP> result = new ArrayList<>();
         Map<String, ClienteIMP> validos = new LinkedHashMap<>();
         Map<String, ClienteIMP> invalidos = new LinkedHashMap<>();
-        
-        for (ClienteIMP imp: clientes) {
+
+        for (ClienteIMP imp : clientes) {
             //Verifica se o ID é válido para organizar a listagem;
             try {
                 long id = Long.parseLong(imp.getId());
-                
+
                 if (id > 0 && id <= 999999) {
                     validos.put(imp.getId(), imp);
                 } else {
@@ -479,52 +487,51 @@ public class ClienteRepository {
                 invalidos.put(imp.getId(), imp);
             }
         }
-        
+
         /**
          * Unifica os resultados, colocando primeiro os clientes com IDs válidos
          * e depois os inválidos que receberão um novo id posteriormente.
          */
         result.addAll(validos.values());
         result.addAll(invalidos.values());
-        
-        LOG.fine("Quantidade de registros validos: " + validos.size() +  ", inválidos: " + invalidos.size());
-                
+
+        LOG.fine("Quantidade de registros validos: " + validos.size() + ", inválidos: " + invalidos.size());
+
         //Liberar memória
         validos.clear();
         invalidos.clear();
-        
+
         return result;
     }
 
-
     public ClientePreferencialVO converterClientePreferencial(ClienteIMP imp) throws Exception {
         ClientePreferencialVO vo = new ClientePreferencialVO();
-        
+
         vo.setCnpj(Utils.stringToLong(imp.getCnpj()));
-        
+
         if (imp.getTipoInscricao() == TipoInscricao.VAZIO) {
             vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
         } else {
             vo.setTipoInscricao(imp.getTipoInscricao());
         }
-        
+
         vo.setInscricaoEstadual(imp.getInscricaoestadual());
         vo.setOrgaoEmissor(imp.getOrgaoemissor());
         vo.setNome(imp.getRazao());
         vo.setSituacaocadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
         vo.setBloqueado(imp.isBloqueado());
         vo.setDataRestricao(imp.getDataBloqueio());
-        
+
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());
         vo.setComplemento(imp.getComplemento());
-        vo.setBairro(imp.getBairro());        
-        
+        vo.setBairro(imp.getBairro());
+
         {
             MunicipioVO mun = provider.getMunicipioById(imp.getMunicipioIBGE());
             if (mun == null) {
                 mun = provider.getMunicipioByNomeUf(
-                        Utils.acertarTexto(imp.getMunicipio()), 
+                        Utils.acertarTexto(imp.getMunicipio()),
                         Utils.acertarTexto(imp.getUf())
                 );
                 if (mun == null) {
@@ -534,7 +541,7 @@ public class ClienteRepository {
             vo.setId_municipio(mun.getId());
             vo.setId_estado(mun.getEstado().getId());
         }
-              
+
         vo.setCep(Utils.stringToInt(imp.getCep()));
         vo.setTipoEstadoCivil(imp.getEstadoCivil());
         vo.setDataNascimento(imp.getDataNascimento());
@@ -544,13 +551,13 @@ public class ClienteRepository {
         vo.setEnderecoEmpresa(imp.getEmpresaEndereco());
         vo.setNumeroEmpresa(imp.getEmpresaNumero());
         vo.setComplementoEmpresa(imp.getEmpresaComplemento());
-        vo.setBairroEmpresa(imp.getEmpresaBairro());   
-        
+        vo.setBairroEmpresa(imp.getEmpresaBairro());
+
         {
             MunicipioVO mun = provider.getMunicipioById(imp.getEmpresaMunicipioIBGE());
             if (mun == null) {
                 mun = provider.getMunicipioByNomeUf(
-                        Utils.acertarTexto(imp.getEmpresaMunicipio()), 
+                        Utils.acertarTexto(imp.getEmpresaMunicipio()),
                         Utils.acertarTexto(imp.getEmpresaUf())
                 );
                 if (mun == null) {
@@ -560,7 +567,7 @@ public class ClienteRepository {
             vo.setId_municipioEmpresa(mun.getId());
             vo.setId_estadoEmpresa(mun.getEstado().getId());
         }
-        
+
         vo.setCepEmpresa(Utils.stringToInt(imp.getEmpresaCep()));
         vo.setTelefoneEmpresa(imp.getEmpresaTelefone());
         vo.setDataAdmissao(imp.getDataAdmissao());
@@ -582,7 +589,7 @@ public class ClienteRepository {
         vo.setEmail(imp.getEmail());
         vo.setSenha(imp.getSenha());
         vo.setGrupo(imp.getGrupo());
-        
+
         return vo;
     }
 
@@ -600,25 +607,25 @@ public class ClienteRepository {
     public void gravarClientePreferencial(ClientePreferencialVO cliente) throws Exception {
         provider.preferencial().salvar(cliente);
     }
-    
+
     public void gravarClientePreferencialAnterior(ClientePreferencialAnteriorVO anterior) throws Exception {
         provider.preferencial().salvar(anterior);
     }
 
     public ClienteEventualVO converterClienteEventual(ClienteIMP imp) throws Exception {
         ClienteEventualVO vo = new ClienteEventualVO();
-        
+
         vo.setNome(imp.getRazao());
-        
+
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());
         vo.setComplemento(imp.getComplemento());
-        vo.setBairro(imp.getBairro());        
+        vo.setBairro(imp.getBairro());
         {
             MunicipioVO mun = provider.getMunicipioById(imp.getMunicipioIBGE());
             if (mun == null) {
                 mun = provider.getMunicipioByNomeUf(
-                        Utils.acertarTexto(imp.getMunicipio()), 
+                        Utils.acertarTexto(imp.getMunicipio()),
                         Utils.acertarTexto(imp.getUf())
                 );
                 if (mun == null) {
@@ -627,22 +634,22 @@ public class ClienteRepository {
             }
             vo.setId_municipio(mun.getId());
             vo.setId_estado(mun.getEstado().getId());
-        }        
+        }
         vo.setCep(Utils.stringToInt(imp.getCep()));
-       
+
         vo.setTelefone(imp.getTelefone());
-        
+
         vo.setCnpj(Utils.stringToLong(imp.getCnpj()));
         if (imp.getTipoInscricao() == TipoInscricao.VAZIO) {
             vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
         } else {
             vo.setTipoInscricao(imp.getTipoInscricao());
         }
-        
+
         vo.setInscricaoEstadual(imp.getInscricaoestadual());
         vo.setSituacaoCadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
         vo.setFax(imp.getFax());
-        
+
         vo.setEnderecoCobranca(imp.getCobrancaEndereco());
         vo.setNumeroCobranca(imp.getCobrancaNumero());
         vo.setComplementoCobranca(imp.getCobrancaComplemento());
@@ -651,7 +658,7 @@ public class ClienteRepository {
             MunicipioVO mun = provider.getMunicipioById(imp.getCobrancaMunicipioIBGE());
             if (mun == null) {
                 mun = provider.getMunicipioByNomeUf(
-                        Utils.acertarTexto(imp.getCobrancaMunicipio()), 
+                        Utils.acertarTexto(imp.getCobrancaMunicipio()),
                         Utils.acertarTexto(imp.getCobrancaUf())
                 );
                 if (mun == null) {
@@ -660,16 +667,16 @@ public class ClienteRepository {
             }
             vo.setId_municipioCobranca(mun.getId());
             vo.setId_estadoCobranca(mun.getEstado().getId());
-        } 
+        }
         vo.setCepCobranca(Utils.stringToInt(imp.getCobrancaCep()));
-        
+
         vo.setTelefoneCobranca(imp.getCobrancaTelefone());
         vo.setPrazoPagamento(imp.getPrazoPagamento());
         vo.setTipoOrgaoPublico(imp.getTipoOrgaoPublico());
         vo.setDataCadastro(imp.getDataCadastro() == null ? new Date() : imp.getDataCadastro());
         vo.setLimiteCompra(imp.getLimiteCompra());
         vo.setCobraTaxaNotaFiscal(false);
-        
+
         vo.setId_tiporecebimento(0);
         vo.setBloqueado(imp.isBloqueado());
         vo.setObservacao("IMPORTADO VR " + imp.getObservacao());
@@ -679,7 +686,7 @@ public class ClienteRepository {
         vo.setId_contaContabilFiscalAtivo(0);
         vo.setTipoIndicadorIe(imp.getTipoIndicadorIe());
         vo.setId_classeRisco(0);
-        
+
         return vo;
     }
 
@@ -704,27 +711,28 @@ public class ClienteRepository {
 
     /**
      * Efetuar a unificação de clientes preferênciais. (NÃO TESTADO)
+     *
      * @param clientes
      * @param opt
-     * @throws Exception 
+     * @throws Exception
      */
     public void unificarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
-        
+
         int iniciarEm = 1;
-        
+
         //Tratar opções
         boolean parametroValidos = true;
-        for (OpcaoCliente opcao: opt) {            
+        for (OpcaoCliente opcao : opt) {
             if (OpcaoCliente.IMP_REINICIAR_NUMERACAO.equals(opcao)) {
                 iniciarEm = (int) opcao.getParametros().get("N_REINICIO");
-            }            
+            }
             parametroValidos &= opcao.checkParametros();
         }
-        
-        if (parametroValidos) {        
-        
+
+        if (parametroValidos) {
+
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);        
+            clientes = organizarListagem(clientes);
             System.gc();
 
             this.provider.begin();
@@ -737,33 +745,34 @@ public class ClienteRepository {
                 MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
                 //</editor-fold>
 
-                boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO); 
-                
+                boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
+
                 provider.setNotificacao("Gravando cliente preferêncial (Unificação)...", clientes.size());
-                for (ClienteIMP imp: clientes) {
+                for (ClienteIMP imp : clientes) {
                     ClientePreferencialAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
                             imp.getId()
-                    );                
+                    );
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
                     if (anterior == null) {
                         //Trata o cnpj
                         long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
                         /**
-                         * Se o CNPJ/CPF é inválido, não importa o cliente, mas grava
-                         * o cliente anterior.
+                         * Se o CNPJ/CPF é inválido, não importa o cliente, mas
+                         * grava o cliente anterior.
                          */
                         if (String.valueOf(cnpj).length() < 8) {
                             anterior = converterClientePreferencialAnterior(imp);
-                            gravarClientePreferencialAnterior(anterior);  
+                            gravarClientePreferencialAnterior(anterior);
                             continue;
-                        }                    
+                        }
 
                         /**
-                         * Se o cnpj já estiver cadastrado, grava o código anterior 
-                         * relacionando com o id do cliente já cadastrado.
-                        */
+                         * Se o cnpj já estiver cadastrado, grava o código
+                         * anterior relacionando com o id do cliente já
+                         * cadastrado.
+                         */
                         if (cnpjCadastrados.containsKey(cnpj)) {
                             anterior = converterClientePreferencialAnterior(imp);
                             ClientePreferencialVO cliente = new ClientePreferencialVO();
@@ -775,19 +784,18 @@ public class ClienteRepository {
                         }
 
                         /**
-                         * Se passar por todas as validações, ou seja, o cnpj é 
+                         * Se passar por todas as validações, ou seja, o cnpj é
                          * válido não e existe no VR.
                          */
-
                         //Obtem um ID válido.                    
-                        int id = ids.obterID(reiniciarID ? "A": imp.getId());
+                        int id = ids.obterID(reiniciarID ? "A" : imp.getId());
 
                         if (cnpj < 0) {
                             cnpj = id;
                         }
 
                         //Converte os dados.
-                        ClientePreferencialVO cliente = converterClientePreferencial(imp);                    
+                        ClientePreferencialVO cliente = converterClientePreferencial(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
 
@@ -796,21 +804,21 @@ public class ClienteRepository {
 
                         //Grava as informações
                         gravarClientePreferencial(cliente);
-                        gravarClientePreferencialAnterior(anterior);  
+                        gravarClientePreferencialAnterior(anterior);
 
-                        importarContatoPreferencial(cliente, imp, contatos); 
+                        importarContatoPreferencial(cliente, imp, contatos);
 
                         //Incluindo o produto nas listagens
                         cnpjCadastrados.put(cnpj, id);
                         anteriores.put(
-                                anterior, 
+                                anterior,
                                 provider.getSistema(),
                                 provider.getLojaOrigem(),
                                 imp.getId()
                         );
                     } else {
                         if (anterior.getCodigoAtual() != null) {
-                            importarContatoPreferencial(anterior.getCodigoAtual(), imp, contatos); 
+                            importarContatoPreferencial(anterior.getCodigoAtual(), imp, contatos);
                         }
                     }
 
@@ -825,30 +833,31 @@ public class ClienteRepository {
             }
         }
     }
-    
+
     /**
      * Efetua a unificação do cliente eventual. (NÃO TESTADO)
+     *
      * @param clientes Listagem de clientes.
      * @param opt
-     * @throws Exception 
+     * @throws Exception
      */
     public void unificarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
-        
+
         int iniciarEm = 1;
-        
+
         //Tratar opções
         boolean parametroValidos = true;
-        for (OpcaoCliente opcao: opt) {            
+        for (OpcaoCliente opcao : opt) {
             if (OpcaoCliente.IMP_REINICIAR_NUMERACAO.equals(opcao)) {
                 iniciarEm = (int) opcao.getParametros().get("N_REINICIO");
-            }            
+            }
             parametroValidos &= opcao.checkParametros();
         }
-        
+
         if (parametroValidos) {
-        
+
             //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-            clientes = organizarListagem(clientes);        
+            clientes = organizarListagem(clientes);
             System.gc();
 
             this.provider.begin();
@@ -860,58 +869,58 @@ public class ClienteRepository {
                 MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
                 MultiMap<String, Void> contatos = provider.eventual().getContatosExistentes();
                 //</editor-fold>
-                
+
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
 
                 provider.setNotificacao("Gravando cliente eventual (Unificação)...", clientes.size());
-                for (ClienteIMP imp: clientes) {
+                for (ClienteIMP imp : clientes) {
                     ClienteEventualAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
                             provider.getLojaOrigem(),
                             imp.getId()
-                    );                
+                    );
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
                     if (anterior == null) {
                         //Trata o cnpj
                         long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
                         /**
-                         * Se o CNPJ/CPF é inválido, não importa o cliente, mas grava
-                         * o cliente anterior.
+                         * Se o CNPJ/CPF é inválido, não importa o cliente, mas
+                         * grava o cliente anterior.
                          */
                         if (String.valueOf(cnpj).length() < 8) {
                             anterior = converterClienteEventualAnterior(imp);
-                            gravarClienteEventualAnterior(anterior);  
+                            gravarClienteEventualAnterior(anterior);
                             continue;
-                        }                    
+                        }
 
                         /**
-                         * Se o cnpj já estiver cadastrado, grava o código anterior 
-                         * relacionando com o id do cliente já cadastrado.
-                        */
+                         * Se o cnpj já estiver cadastrado, grava o código
+                         * anterior relacionando com o id do cliente já
+                         * cadastrado.
+                         */
                         if (cnpjCadastrados.containsKey(cnpj)) {
                             anterior = converterClienteEventualAnterior(imp);
                             ClienteEventualVO cliente = new ClienteEventualVO();
                             cliente.setId(cnpjCadastrados.get(cnpj));
                             anterior.setCodigoAtual(cliente);
-                            gravarClienteEventualAnterior(anterior);  
-                            importarContatoEventual(anterior.getCodigoAtual(), imp, contatos); 
+                            gravarClienteEventualAnterior(anterior);
+                            importarContatoEventual(anterior.getCodigoAtual(), imp, contatos);
                             continue;
                         }
 
                         /**
-                         * Se passar por todas as validações, ou seja, o cnpj é 
+                         * Se passar por todas as validações, ou seja, o cnpj é
                          * válido não e existe no VR.
                          */
-
                         //Obtem um ID válido.                    
-                        int id = ids.obterID(reiniciarID ? "A": imp.getId());
+                        int id = ids.obterID(reiniciarID ? "A" : imp.getId());
 
                         if (cnpj < 0) {
                             cnpj = id;
                         }
 
                         //Converte os dados.
-                        ClienteEventualVO cliente = converterClienteEventual(imp);                    
+                        ClienteEventualVO cliente = converterClienteEventual(imp);
                         cliente.setId(id);
                         cliente.setCnpj(cnpj);
 
@@ -920,14 +929,14 @@ public class ClienteRepository {
 
                         //Grava as informações
                         gravarClienteEventual(cliente);
-                        gravarClienteEventualAnterior(anterior);  
+                        gravarClienteEventualAnterior(anterior);
 
-                        importarContatoEventual(cliente, imp, contatos); 
+                        importarContatoEventual(cliente, imp, contatos);
 
                         //Incluindo o produto nas listagens
                         cnpjCadastrados.put(cnpj, id);
                         anteriores.put(
-                                anterior, 
+                                anterior,
                                 provider.getSistema(),
                                 provider.getLojaOrigem(),
                                 imp.getId()
@@ -935,7 +944,7 @@ public class ClienteRepository {
 
                     } else {
                         if (anterior.getCodigoAtual() != null) {
-                            importarContatoEventual(anterior.getCodigoAtual(), imp, contatos); 
+                            importarContatoEventual(anterior.getCodigoAtual(), imp, contatos);
                         }
                     }
 
@@ -947,8 +956,8 @@ public class ClienteRepository {
             } catch (Exception e) {
                 this.provider.rollback();
                 throw e;
-            }   
-            
+            }
+
         }
     }
 
@@ -959,24 +968,24 @@ public class ClienteRepository {
         cont.setCelular(impCont.getCelular());
         return cont;
     }
-    
+
     public ClienteEventualContatoVO converterContatoEventual(ClienteContatoIMP impCont) {
         ClienteEventualContatoVO cont = new ClienteEventualContatoVO();
-        
+
         String celular = "", telefone = "";
-        
-        if(impCont.getTelefone() != null && !"".equals(impCont.getTelefone())) {
-            if(impCont.getTelefone().length() > 14) {
+
+        if (impCont.getTelefone() != null && !"".equals(impCont.getTelefone())) {
+            if (impCont.getTelefone().length() > 14) {
                 telefone = impCont.getTelefone().substring(0, 14);
             }
         }
-        
-        if(impCont.getCelular() != null && !"".equals(impCont.getCelular())) {
-            if(impCont.getCelular().length() > 14) {
+
+        if (impCont.getCelular() != null && !"".equals(impCont.getCelular())) {
+            if (impCont.getCelular().length() > 14) {
                 celular = impCont.getCelular().substring(0, 14);
             }
         }
-        
+
         cont.setNome(impCont.getNome());
         cont.setTelefone(telefone);
         cont.setCelular(celular);
@@ -986,18 +995,18 @@ public class ClienteRepository {
 
     public void gravarClientePreferencialContato(ClientePreferencialContatoVO contato) throws Exception {
         provider.preferencial().salvar(contato);
-    }    
-    
+    }
+
     public void gravarClienteEventualContato(ClienteEventualContatoVO contato) throws Exception {
         provider.eventual().salvar(contato);
-    }    
+    }
 
     private void atualizarClientePreferencial(ClientePreferencialVO vo, Set<OpcaoCliente> opt) throws Exception {
         provider.atualizarClientePreferencial(vo, opt);
     }
-    
+
     public void importarClienteVRFood(List<ClienteIMP> clientes, HashSet<OpcaoCliente> opt) throws Exception {
-        
+
         provider.begin();
         try {
             provider.setNotificacao("Cliente (VRFood)...Carregando dados necessários...", 0);
@@ -1009,7 +1018,7 @@ public class ClienteRepository {
 
             provider.setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
             LOG.info("Iniciando gravação das informações: " + clientes.size() + " registro(s)");
-            for (ClienteIMP imp: organizarListagem(clientes)) {
+            for (ClienteIMP imp : organizarListagem(clientes)) {
 
                 ClienteFoodAnteriorVO anterior = anteriores.get(imp.getId());
 
@@ -1019,7 +1028,7 @@ public class ClienteRepository {
                 //Verifica se o telefone já existe e retorna o código do cliente 
                 //que o possuí ou nulo.
                 ClienteFoodVO codigoAtual = null;
-                for (Long telefone: impTelefones) {
+                for (Long telefone : impTelefones) {
                     codigoAtual = telefones.get(telefone);
                     if (codigoAtual != null) {
                         break;
@@ -1035,7 +1044,7 @@ public class ClienteRepository {
                         int id = codigoAtual.getId();
                         //Atualizo o código anterior
                         anterior.setCodigoAtual(id);
-                        provider.food().gravarClienteFoodAnterior(anterior);                    
+                        provider.food().gravarClienteFoodAnterior(anterior);
                         anteriores.put(imp.getId(), anterior); //Inclui o anterior na lista.
 
                         //Atualiza o cliente food
@@ -1044,7 +1053,7 @@ public class ClienteRepository {
                         provider.food().atualizarClienteFood(codigoAtual, opt);
 
                         //Inclui os telefones
-                        for (Long telefone: impTelefones) {
+                        for (Long telefone : impTelefones) {
                             if (!codigoAtual.getTelefones().contains(telefone)) {
                                 codigoAtual.getTelefones().add(telefone);
                                 provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
@@ -1066,14 +1075,14 @@ public class ClienteRepository {
                         anteriores.put(imp.getId(), anterior);
 
                         //Inclui os telefones
-                        for (Long telefone: impTelefones) {
+                        for (Long telefone : impTelefones) {
                             if (!codigoAtual.getTelefones().contains(telefone)) {
                                 codigoAtual.getTelefones().add(telefone);
                                 provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
                                 telefones.put(telefone, codigoAtual); //Inclui o telefone na lista
                             }
                         }
-                    }                
+                    }
 
                 } else {
                     // Se o produto já houver sido importado, verifica se há alguma
@@ -1086,7 +1095,7 @@ public class ClienteRepository {
                         provider.food().atualizarClienteFood(codigoAtual, opt);
 
                         //Inclui os telefones
-                        for (Long telefone: impTelefones) {
+                        for (Long telefone : impTelefones) {
                             if (!codigoAtual.getTelefones().contains(telefone)) {
                                 codigoAtual.getTelefones().add(telefone);
                                 provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
@@ -1104,11 +1113,11 @@ public class ClienteRepository {
 
                         //Atualizo o código anterior
                         anterior.setCodigoAtual(codigoAtual.getId());
-                        provider.food().atualizarClienteFoodAnterior(anterior);                    
+                        provider.food().atualizarClienteFoodAnterior(anterior);
                         anteriores.put(imp.getId(), anterior); //Inclui o anterior na lista.                    
 
                         //Inclui os telefones
-                        for (Long telefone: impTelefones) {
+                        for (Long telefone : impTelefones) {
                             if (!codigoAtual.getTelefones().contains(telefone)) {
                                 codigoAtual.getTelefones().add(telefone);
                                 provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
@@ -1118,22 +1127,22 @@ public class ClienteRepository {
 
                     }
 
-                }            
+                }
 
                 provider.notificar();
             }
-            
+
             provider.commit();
         } catch (Exception ex) {
             provider.rollback();
             throw ex;
         }
-        
+
     }
 
     public Set<Long> converterTelefones(ClienteIMP imp) {
         Set<Long> result = new HashSet<>();
-                
+
         if (Utils.stringToLong(imp.getTelefone()) != 0) {
             result.add(Utils.stringToLong(imp.getTelefone()));
         }
@@ -1143,7 +1152,7 @@ public class ClienteRepository {
         if (Utils.stringToLong(imp.getFax()) != 0) {
             result.add(Utils.stringToLong(imp.getFax()));
         }
-        for (ClienteContatoIMP contato: imp.getContatos()) {
+        for (ClienteContatoIMP contato : imp.getContatos()) {
             if (Utils.stringToLong(contato.getTelefone()) != 0) {
                 result.add(Utils.stringToLong(contato.getTelefone()));
             }
@@ -1151,32 +1160,32 @@ public class ClienteRepository {
                 result.add(Utils.stringToLong(contato.getCelular()));
             }
         }
-        
-        for (Iterator<Long> iterator = result.iterator(); iterator.hasNext(); ) {
+
+        for (Iterator<Long> iterator = result.iterator(); iterator.hasNext();) {
             long telefone = iterator.next();
             if (telefone > 99999999999999L || telefone < 1) {
                 iterator.remove();
             }
         }
-        
+
         return result;
     }
 
     private ClienteFoodAnteriorVO converterClienteFoodAnterior(ClienteIMP imp) throws Exception {
         ClienteFoodAnteriorVO ant = new ClienteFoodAnteriorVO();
-        
+
         ant.setSistema(provider.getSistema());
         ant.setLoja(provider.getLojaOrigem());
         ant.setId(imp.getId());
         ant.setNome(imp.getRazao());
         ant.setForcarGravacao(false);
-        
+
         return ant;
     }
 
     private ClienteFoodVO converterClienteFood(ClienteIMP imp) throws Exception {
         ClienteFoodVO vo = new ClienteFoodVO();
-        
+
         vo.setNome(imp.getRazao());
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());
@@ -1185,7 +1194,7 @@ public class ClienteRepository {
             MunicipioVO mun = provider.getMunicipioById(imp.getMunicipioIBGE());
             if (mun == null) {
                 mun = provider.getMunicipioByNomeUf(
-                        Utils.acertarTexto(imp.getMunicipio()), 
+                        Utils.acertarTexto(imp.getMunicipio()),
                         Utils.acertarTexto(imp.getUf())
                 );
                 if (mun == null) {
@@ -1196,7 +1205,139 @@ public class ClienteRepository {
         }
         vo.setObservacao(imp.getObservacao());
         vo.setSituacaoCadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-        
+
         return vo;
+    }
+
+    public void importarClientePontuacao(List<ClienteIMP> clientes) throws Exception {
+
+        PdvVendaDAO vendaDAO = new PdvVendaDAO();
+        PdvVendaItemDAO vendaItemDAO = new PdvVendaItemDAO(provider.getSistema(), provider.getLojaOrigem());
+
+        //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
+        clientes = organizarListagem(clientes);
+        System.gc();
+
+        this.provider.begin();
+        try {
+            //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
+            provider.setNotificacao("Preparando para gravar cliente pontuação...", clientes.size());
+            MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
+
+            provider.setNotificacao("Gravando cliente pontuação...", clientes.size());
+
+            java.sql.Date dataPontuacao = Utils.getDataAtual();
+            int numeroCupom = 1;
+
+            for (ClienteIMP imp : clientes) {
+                ClientePreferencialAnteriorVO anterior = anteriores.get(
+                        provider.getSistema(),
+                        provider.getLojaOrigem(),
+                        imp.getId()
+                );
+
+                ClientePreferencialVO cliente = null;
+
+                //Se o cliente não tiver sido cadastrado anteriormente, executa.
+                if (anterior == null) {
+                    System.out.println("id: " + imp.getId() + " - nome: " + imp.getRazao() + " não encontrado!");
+                    continue;
+                } else {
+                    cliente = anterior.getCodigoAtual();
+
+                    if (cliente == null) {
+                        System.out.println("id: " + imp.getId() + " - nome: " + imp.getRazao() + " não encontrado!");
+                        continue;
+                    }
+
+                    if (imp.getPonto() > 0) {
+
+                        PdvVendaVO vo = new PdvVendaVO();
+                        PdvVendaItemVO itemVO = new PdvVendaItemVO();
+                        PdvVendaPromocaoPontuacaoVO pontuacaoVO = new PdvVendaPromocaoPontuacaoVO();
+
+                        vo.setId_loja(provider.getLojaVR());
+                        vo.setNumeroCupom(numeroCupom);
+                        vo.setEcf(0);
+                        vo.setData(dataPontuacao);
+                        vo.setId_clientePreferencial(cliente.getId());
+                        vo.setHoraInicio(new Time(new Date().getTime()));
+                        vo.setHoraTermino(new Time(new Date().getTime()));
+                        vo.setCancelado(true);
+                        vo.setSubTotalImpressora(0);
+                        vo.setCpf(Utils.stringToLong(imp.getCnpj()));
+                        vo.setContadorDoc(0);
+                        vo.setValorDesconto(0);
+                        vo.setValorAcrescimo(0);
+                        vo.setCanceladoEmVenda(true);
+                        vo.setNumeroSerie("");
+                        vo.setMfAdicional(0);
+                        vo.setModeloImpressora("");
+                        vo.setNumeroUsuario(0);
+
+                        if (imp.getRazao() != null && imp.getRazao().length() > 45) {
+                            vo.setNomeCliente(imp.getRazao().substring(0, 45));
+                        }
+
+                        String endereco = imp.getEndereco() + ","
+                                + imp.getNumero() + ","
+                                + imp.getBairro() + ","
+                                + imp.getMunicipio();
+
+                        if (endereco != null && endereco.length() > 50) {
+                            endereco = endereco.substring(0, 50);
+                        }
+
+                        vo.setEnderecoCliente(endereco);
+
+                        //Gerar venda
+                        vendaDAO.gerarVendaPontuacao(vo);
+
+                        itemVO.setVenda(vo);
+                        itemVO.setId_produto(53687);
+                        itemVO.setQuantidade(1);
+                        itemVO.setPrecoVenda(0);
+                        itemVO.setId_aliquota(6);
+                        itemVO.setCancelado(true);
+                        itemVO.setValorCancelado(0);
+                        itemVO.setContadorDoc(0);
+                        itemVO.setValorDesconto(0);
+                        itemVO.setValorDescontoCupom(0);
+                        itemVO.setValorAcrescimo(0);
+                        itemVO.setValorAcrescimoCupom(0);
+                        itemVO.setRegraCalculo("");
+                        itemVO.setCodigoBarras(7896950800059L);
+                        itemVO.setUnidadeMedida("");
+                        itemVO.setTotalizadorParcial("");
+                        itemVO.setSequencia(1);
+
+                        //Gerar Venda Item
+                        vendaItemDAO.gravarItemPontuacao(itemVO);
+
+                        pontuacaoVO.setIdVenda(vo.getId());
+                        pontuacaoVO.setIdPromocao(1);
+                        pontuacaoVO.setPonto(imp.getPonto());
+                        pontuacaoVO.setCnpj(Utils.stringToLong(imp.getCnpj()));
+                        pontuacaoVO.setIdSituacaoPromocaoPontuacao(1);
+                        pontuacaoVO.setLancamentoManual(false);
+                        pontuacaoVO.setIdLoja(provider.getLojaVR());
+                        pontuacaoVO.setDataCompra(dataPontuacao);
+                        pontuacaoVO.setDataExpiracao(Utils.getDataAtual());
+
+                        //Gerar Venda Promoção Pontuação
+                        vendaDAO.gerarVendaPromocaoPontuacao(pontuacaoVO);
+                        numeroCupom++;
+                    }
+                }
+
+                provider.notificar();
+            }
+            this.provider.commit();
+
+            System.gc();
+        } catch (Exception e) {
+            this.provider.rollback();
+            throw e;
+        }
     }
 }

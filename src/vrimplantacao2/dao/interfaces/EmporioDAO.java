@@ -67,7 +67,8 @@ public class EmporioDAO extends InterfaceDAO {
                     "  c.customer_phone1 telefone1,\n" +
                     "  c.customer_phone2 telefone2,\n" +
                     "  c.customer_type,\n" +
-                    "  c.customer_email email\n" +
+                    "  c.customer_email email,\n" +
+                    "  customer_points pontos\n" +        
                     "FROM\n" +
                     "  customer c\n" +
                     "  join customer_status st on c.customer_key = st.customer_key\n" +
@@ -138,6 +139,7 @@ public class EmporioDAO extends InterfaceDAO {
                         imp.setPermiteCheque(true);
                         imp.setPermiteCreditoRotativo(false);
                     }
+                    imp.setPonto(rst.getDouble("pontos"));
                     
                     result.add(imp);
                 }
