@@ -81,6 +81,7 @@ public class ClienteIMP {
     private boolean permiteCreditoRotativo;
     private boolean permiteCheque;
     private int senha;
+    private double ponto;
 
     private String telefone;
     private String celular;
@@ -769,4 +770,13 @@ public class ClienteIMP {
     public void setGrupo(int grupo) {
         this.grupo = grupo;
     }
+
+    public double getPonto() {
+        return ponto;
+    }
+
+    public void setPonto(double ponto) {
+        this.ponto = ponto;
+    }
+    
 }

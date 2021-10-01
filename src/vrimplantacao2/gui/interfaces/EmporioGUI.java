@@ -158,11 +158,10 @@ public class EmporioGUI extends VRInternalFrame {
                     
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);     
+                    emporioDAO.setClienteSomentePontos(chkSomentePontos.isSelected());
 
                     if (tabs.getSelectedIndex() == 0) {
                         if (chkClientePreferencial.isSelected()) {
-                            emporioDAO.setClienteSomentePontos(chkSomentePontos.isSelected());
-                            
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
                         if (chkClienteEventual.isSelected()) {
@@ -175,6 +174,7 @@ public class EmporioGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
+                        
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
                         }

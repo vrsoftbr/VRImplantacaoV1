@@ -98,7 +98,13 @@ public class EmporioDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
-                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    
+                    String dtNascimento = rst.getString("datanascimento");
+                    
+                    if(dtNascimento != null && !dtNascimento.isEmpty()) {
+                        imp.setDataNascimento(rst.getDate("datanascimento"));
+                    }   
+                    
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     imp.setEmpresa(rst.getString("empresa"));
@@ -109,7 +115,13 @@ public class EmporioDAO extends InterfaceDAO {
                     imp.setEmpresaUf(rst.getString("empresa_uf"));
                     imp.setEmpresaCep(rst.getString("empresa_cep"));
                     imp.setEmpresaTelefone(rst.getString("empresa_telefone"));
-                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    
+                    String dtAdmissao = rst.getString("dataadmissao");
+                    
+                    if(dtAdmissao != null && !dtAdmissao.isEmpty()) {
+                        imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    }
+
                     imp.setCargo(rst.getString("cargo"));
                     imp.setValorLimite(rst.getDouble("limite"));
                     imp.setObservacao("Valor restante de credito " + rst.getString("customer_amount_left"));

@@ -79,6 +79,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(RMSDAO.class.getName());
     public static String tabela_venda = "";
     public static int digito;
+    private boolean digitoCliente = false;
 
     private boolean utilizarViewMixFiscal = true;
 
@@ -96,6 +97,14 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVersaoDaVenda(int versaoDaVenda) {
         this.versaoDaVenda = versaoDaVenda;
+    }
+
+    public boolean isDigitoCliente() {
+        return digitoCliente;
+    }
+
+    public void setDigitoCliente(boolean digitoCliente) {
+        this.digitoCliente = digitoCliente;
     }
 
     @Override
@@ -1082,29 +1091,30 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "SELECT \n"
                     + "	     TIP.tip_cgc_cpf Cgc_cpf, \n"
-                    + "        TIP.tip_codigo Codigo , \n"
+                    + "      TIP.tip_codigo Codigo, \n"
+                    + "      TIP.tip_digito Digito, \n"        
                     + "	     TIP.tip_razao_social Razao_social, \n"
-                    + "        TIP.tip_nome_fantasia Nome_fantasia,  \n"
+                    + "      TIP.tip_nome_fantasia Nome_fantasia,  \n"
                     + "	     TIP.tip_endereco Endereco, \n"
-                    + "        TIP.tip_bairro Bairro, \n"
-                    + "        TIP.tip_cidade Cidade,  \n"
+                    + "      TIP.tip_bairro Bairro, \n"
+                    + "      TIP.tip_cidade Cidade,  \n"
                     + "	     TIP.tip_estado Estado, \n"
-                    + "        TIP.tip_cep Cep, \n"
-                    + "        TIP.tip_natureza Natureza,  \n"
+                    + "      TIP.tip_cep Cep, \n"
+                    + "      TIP.tip_natureza Natureza,  \n"
                     + "	     TIP.tip_data_cad Data_cad, \n"
-                    + "        TIP.tip_fax_ddd Fax_ddd, \n"
-                    + "        TIP.tip_fax_num Fax_num,  \n"
-                    + "        TIP.tip_fone_ddd Fone_ddd, \n"
-                    + "        TIP.tip_fone_num Fone_num, \n"
-                    + "        TIP.tip_fis_jur Fis_jur,  \n"
+                    + "      TIP.tip_fax_ddd Fax_ddd, \n"
+                    + "      TIP.tip_fax_num Fax_num,  \n"
+                    + "      TIP.tip_fone_ddd Fone_ddd, \n"
+                    + "      TIP.tip_fone_num Fone_num, \n"
+                    + "      TIP.tip_fis_jur Fis_jur,  \n"
                     + "	     TIP.tip_insc_est_ident Insc_est_ident, \n"
-                    + "        TIP.tip_regiao  Regiao,  \n"
+                    + "      TIP.tip_regiao  Regiao,  \n"
                     + "	     TIP.tip_divisao Divisao, \n"
-                    + "        TIP.tip_distrito Distrito, \n"
-                    + "        CLI.cli_contato Contato_principal,  \n"
+                    + "      TIP.tip_distrito Distrito, \n"
+                    + "      CLI.cli_contato Contato_principal,  \n"
                     + "	     CLI.cli_cod_vend Vendedor,  \n"
                     + "	     CLI.cli_situacao Status, \n"
-                    + "        CLI.cli_limite_cred,  \n"
+                    + "      CLI.cli_limite_cred,  \n"
                     + "	     Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n"
                     + "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite  \n"
                     + "				FROM   aa2cempr  \n"
@@ -1137,7 +1147,13 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rs.getString("Codigo"));
+                    
+                    if(isDigitoCliente()) {
+                        imp.setId(rs.getString("Codigo") + rs.getString("Digito"));   
+                    }
+                    
                     imp.setRazao(rs.getString("Razao_social"));
                     imp.setCnpj(rs.getString("Cgc_cpf"));
                     imp.setFantasia(rs.getString("Nome_fantasia"));
@@ -1415,6 +1431,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
+                    
                     imp.setId(rst.getString("id"));
                     imp.setCpf(rst.getString("cpf"));
                     imp.setNumeroCheque(rst.getString("numeroCheque"));
@@ -1429,7 +1446,19 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCmc7(rst.getString("cmc7"));
                     imp.setAlinea(rst.getInt("alinea"));
                     imp.setValorJuros(rst.getDouble("juros"));
-                    imp.setDataHoraAlteracao(new Timestamp(format.parse(rst.getString("dataHoraAlteracao")).getTime()));
+                    
+                    String dataAlteracao = rst.getString("dataHoraAlteracao");
+                    
+                    if (dataAlteracao != null && !dataAlteracao.equals("") && dataAlteracao.equals("0")) {
+                        imp.setDataHoraAlteracao(new Timestamp(format.
+                                                parse(rst.getString("data")).
+                                                    getTime()));
+                    } else {
+                        imp.setDataHoraAlteracao(new Timestamp(format.
+                                                parse(rst.getString("dataHoraAlteracao")).
+                                                    getTime()));
+                    }
+
                     result.add(imp);
                 }
             }
@@ -1847,8 +1876,17 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("duplicata")
                     ));
                     vo.setIdFornecedor(rst.getString("id_fornecedor"));
-                    vo.setDataHoraAlteracao(new Timestamp(format.parse(rst.getString("dataemissao")).getTime()));
-                    vo.setDataEmissao(format.parse(rst.getString("dataemissao")));
+                    
+                    if(rst.getString("dataemissao") != null && rst.getString("dataemissao").length() > 5) {
+                        vo.setDataHoraAlteracao(
+                                new Timestamp(format.parse(rst.getString("dataemissao")).getTime()));
+                        vo.setDataEmissao(format.parse(rst.getString("dataemissao")));
+                    } else {
+                        vo.setDataHoraAlteracao(
+                                new Timestamp(format.parse(rst.getString("dataentrada")).getTime()));
+                        vo.setDataEmissao(format.parse(rst.getString("dataentrada")));
+                    }
+                    
                     vo.setDataEntrada(format.parse(rst.getString("dataentrada")));
                     vo.setNumeroDocumento(rst.getString("numerodocumento"));
                     vo.setObservacao("DUPLICATA " + rst.getString("duplicata"));
