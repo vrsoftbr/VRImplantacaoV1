@@ -17,6 +17,8 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
  * @author Leandro
  */
 public class EmporioDAO extends InterfaceDAO {
+    
+    private boolean clienteSomentePontos = false;
 
     @Override
     public String getSistema() {
@@ -76,6 +78,7 @@ public class EmporioDAO extends InterfaceDAO {
                     "  left join customer_sku ie on\n" +
                     "    c.customer_key = ie.customer_key\n" +
                     "    and ie.customer_sku_type_key in (8)\n" +
+                    (isClienteSomentePontos() ? "where st.customer_points > 0\n" : "") +                
                     "order by\n" +
                     "  id"
             )) {
@@ -260,5 +263,12 @@ public class EmporioDAO extends InterfaceDAO {
         
         return result;
     }
-    
+
+    public void setClienteSomentePontos(boolean clienteSomentePontos) {
+        this.clienteSomentePontos = clienteSomentePontos;
+    }
+
+    public boolean isClienteSomentePontos() {
+        return clienteSomentePontos;
+    }
 }

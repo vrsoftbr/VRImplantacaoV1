@@ -154,16 +154,15 @@ public class LCSistemaDAO extends InterfaceDAO {
                     "	r.documento,\n" +
                     "	r.emissao,\n" +
                     "	r.vencimento,\n" +
-                    "	r.valor_original,\n" +
+                    "	r.valor_original + r.juros_rec total,\n" +
                     "	r.valor_arec,\n" +
-                    "	r.valor_rec,\n" +
-                    "	r.valor_original - r.valor_rec total, \n" +
+                    "	r.valor_rec, \n" +
                     "	r.parcela \n" +
                     "from \n" +
                     "	receber r \n" +
                     "where \n" +
                     "	r.id_empresa = " + getLojaOrigem() + " and \n" +
-                    "	r.data_rec is null || r.valor_rec < r.valor_original \n" +
+                    "	r.data_rec is null\n" +
                     "order by \n" +
                     "	r.emissao")) {
                 while (rs.next()) {
