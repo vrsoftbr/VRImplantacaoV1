@@ -680,7 +680,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDataNascimento(getData(dataNascimento));
                 }
                 
-                
+                imp.setDataNascimento(getData(linha.getString("dataNascimento")));
                 imp.setDataCadastro(getData(linha.getString("dataCadastro")));
                 String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
                 imp.setSexo("F".startsWith(sexo.toUpperCase()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);

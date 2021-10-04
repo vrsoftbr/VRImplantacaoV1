@@ -309,5 +309,81 @@ public class PdvVendaItemDAO {
     private boolean isMaisQueUmItemAlterado(int alterados) {
         return alterados > 1;
     }
+    
+    public void gravarItemPontuacao(PdvVendaItemVO item) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {         
+            
+            SQLBuilder sql = new SQLBuilder();
+            
+            sql.setSchema("pdv");
+            sql.setTableName("vendaitem");
+            sql.put("id_venda", item.getVenda().getId());
+            sql.put("id_produto", item.getId_produto());
+            sql.put("quantidade", item.getQuantidade());
+            sql.put("precoVenda", item.getPrecoVenda());
+            sql.put("valortotal", item.getValorTotal());
+            sql.put("id_aliquota", item.getId_aliquota());
+            sql.put("cancelado", item.isCancelado());
+            sql.put("valorCancelado", item.getValorCancelado());
+            if ( item.getTipoCancelamento() != null ) {
+                sql.put("id_tipocancelamento", item.getTipoCancelamento().getId());
+            }
+            
+            sql.put("contadorDoc", item.getContadorDoc());
+            sql.put("valorDesconto", item.getValorDesconto());
+            sql.put("valorAcrescimo", item.getValorAcrescimo());
+            sql.put("valorDescontoCupom", item.getValorDescontoCupom());
+            sql.put("valorAcrescimoCupom", item.getValorAcrescimoCupom());
+            sql.put("regraCalculo", item.getRegraCalculo());
+            sql.put("codigoBarras", item.getCodigoBarras());
+            sql.put("unidadeMedida", item.getUnidadeMedida());
+            sql.put("totalizadorParcial", item.getTotalizadorParcial());
+            sql.put("sequencia", item.getSequencia());
+            
+            if (versao.igualOuMaiorQue(3, 21, 10)) {
+                if (item.getData() != null) {
+                    sql.put("data", item.getData());
+                }
+            }
+            
+            sql.getReturning().add("id");
+            
+            String strSQL = sql.getInsert();
+            
+            LOG.finer(
+                String.format(
+                        "Venda: %d Item: (%d) %d - %.2f X %.2f",
+                        item.getVenda().getId(),
+                        item.getId_produto(),
+                        item.getCodigoBarras(),
+                        item.getQuantidade(),
+                        item.getPrecoVenda()
+                )
+            );
+            LOG.finest(strSQL);
+            
+            try (ResultSet rst = stm.executeQuery(
+                    strSQL
+            )) {
+                if (rst.next()) {
+                    item.setId(rst.getLong("id"));
+                }
+            } catch (Exception e) {
+                LOG.log(Level.SEVERE, 
+                        String.format(
+                                "Erro ao processar o produto\n"
+                                + "Venda: %d Item: (%d) %d - %.2f X %.2f\n"
+                                + "SQL: " + strSQL,
+                                item.getVenda().getId(),
+                                item.getId_produto(),
+                                item.getCodigoBarras(),
+                                item.getQuantidade(),
+                                item.getPrecoVenda()
+                        )
+                , e);
+                throw e;
+            }
+        }
+    }
 
 }

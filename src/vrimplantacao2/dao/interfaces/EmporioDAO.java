@@ -17,6 +17,8 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
  * @author Leandro
  */
 public class EmporioDAO extends InterfaceDAO {
+    
+    private boolean clienteSomentePontos = false;
 
     @Override
     public String getSistema() {
@@ -65,7 +67,8 @@ public class EmporioDAO extends InterfaceDAO {
                     "  c.customer_phone1 telefone1,\n" +
                     "  c.customer_phone2 telefone2,\n" +
                     "  c.customer_type,\n" +
-                    "  c.customer_email email\n" +
+                    "  c.customer_email email,\n" +
+                    "  customer_points pontos\n" +        
                     "FROM\n" +
                     "  customer c\n" +
                     "  join customer_status st on c.customer_key = st.customer_key\n" +
@@ -76,6 +79,7 @@ public class EmporioDAO extends InterfaceDAO {
                     "  left join customer_sku ie on\n" +
                     "    c.customer_key = ie.customer_key\n" +
                     "    and ie.customer_sku_type_key in (8)\n" +
+                    (isClienteSomentePontos() ? "where st.customer_points > 0\n" : "") +                
                     "order by\n" +
                     "  id"
             )) {
@@ -95,7 +99,13 @@ public class EmporioDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
-                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    
+                    String dtNascimento = rst.getString("datanascimento");
+                    
+                    if(dtNascimento != null && !dtNascimento.isEmpty()) {
+                        imp.setDataNascimento(rst.getDate("datanascimento"));
+                    }   
+                    
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     imp.setEmpresa(rst.getString("empresa"));
@@ -106,7 +116,13 @@ public class EmporioDAO extends InterfaceDAO {
                     imp.setEmpresaUf(rst.getString("empresa_uf"));
                     imp.setEmpresaCep(rst.getString("empresa_cep"));
                     imp.setEmpresaTelefone(rst.getString("empresa_telefone"));
-                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    
+                    String dtAdmissao = rst.getString("dataadmissao");
+                    
+                    if(dtAdmissao != null && !dtAdmissao.isEmpty()) {
+                        imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    }
+
                     imp.setCargo(rst.getString("cargo"));
                     imp.setValorLimite(rst.getDouble("limite"));
                     imp.setObservacao("Valor restante de credito " + rst.getString("customer_amount_left"));
@@ -123,6 +139,7 @@ public class EmporioDAO extends InterfaceDAO {
                         imp.setPermiteCheque(true);
                         imp.setPermiteCreditoRotativo(false);
                     }
+                    imp.setPonto(rst.getDouble("pontos"));
                     
                     result.add(imp);
                 }
@@ -260,5 +277,12 @@ public class EmporioDAO extends InterfaceDAO {
         
         return result;
     }
-    
+
+    public void setClienteSomentePontos(boolean clienteSomentePontos) {
+        this.clienteSomentePontos = clienteSomentePontos;
+    }
+
+    public boolean isClienteSomentePontos() {
+        return clienteSomentePontos;
+    }
 }
