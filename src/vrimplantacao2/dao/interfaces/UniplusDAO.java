@@ -264,7 +264,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "	pr1.preco p1,\n" +
                     "	pr2.preco p2,\n" +
                     "	p.preco pbkp,\n" +
-                    "	coalesce(pr1.preco, pr2.preco, p.preco) as precovenda,\n" +
+                    "	coalesce(pr1.preco, pr2.preco, p.preco) as precovenda1,\n" +
                     "	coalesce(pr2.preco, pr1.preco, p.preco) as precovenda2,\n" +
                     "	p.quantidademinima, \n" +
                     "	p.quantidademaxima, \n" +
