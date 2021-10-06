@@ -185,6 +185,7 @@ public class IServerGUI extends VRInternalFrame implements ConexaoEvent {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     dao.setComplemento(txtComplemento.getText());
+                    dao.setSomenteProdutosAtivos(chkSomenteProdutosAtivos.isSelected());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -292,6 +293,7 @@ public class IServerGUI extends VRInternalFrame implements ConexaoEvent {
         chkSomenteEansUnitarios = new vrframework.bean.checkBox.VRCheckBox();
         chkUtilizarEs1ParaCotacao = new vrframework.bean.checkBox.VRCheckBox();
         chkFiltrarProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        chkSomenteProdutosAtivos = new vr.view.components.checkbox.VRCheckBox();
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
@@ -339,6 +341,8 @@ public class IServerGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkFiltrarProdutos.setText("Rede Paranaíba: Filtrar produtos");
 
+        chkSomenteProdutosAtivos.setText("Somente Produtos Ativos");
+
         javax.swing.GroupLayout pnlOutrosLayout = new javax.swing.GroupLayout(pnlOutros);
         pnlOutros.setLayout(pnlOutrosLayout);
         pnlOutrosLayout.setHorizontalGroup(
@@ -348,8 +352,9 @@ public class IServerGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkSomenteEansUnitarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(154, Short.MAX_VALUE))
+                    .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(213, Short.MAX_VALUE))
         );
         pnlOutrosLayout.setVerticalGroup(
             pnlOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -360,7 +365,9 @@ public class IServerGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkUtilizarEs1ParaCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFiltrarProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(155, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkSomenteProdutosAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(128, Short.MAX_VALUE))
         );
 
         tabOperacoes.addTab("Parâmetros", pnlOutros);
@@ -695,6 +702,7 @@ public class IServerGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkSomenteEansUnitarios;
+    private vr.view.components.checkbox.VRCheckBox chkSomenteProdutosAtivos;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
