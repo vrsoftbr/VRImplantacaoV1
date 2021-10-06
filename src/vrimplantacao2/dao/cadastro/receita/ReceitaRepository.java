@@ -56,7 +56,6 @@ public class ReceitaRepository {
             for (ReceitaIMP imp : receita) {
 
                 ReceitaAnteriorVO anterior = anteriores.get(imp.getImportid());
-                System.out.println("AQUI " + imp.getImportid());
                 if (anterior == null) {
 
                     /* gravando cabeçalho */
@@ -97,8 +96,10 @@ public class ReceitaRepository {
 
                     ProdutoVO prodItemVO = null;
                     for (String produto : imp.getProdutos()) {
+                        System.out.println("Item Pai: " + imp.getIdproduto()  + " Produto Item -> " + produto);
                         Integer idProduto = null;
                         idProduto = produtos.get(produto);
+                        
                         prodItemVO = prodAntDAO.getCodigoAnterior().get(
                                 imp.getImportsistema(),
                                 imp.getImportloja(),

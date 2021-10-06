@@ -64,6 +64,7 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -82,6 +83,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean digitoCliente = false;
 
     private boolean utilizarViewMixFiscal = true;
+    private Date dataFinalTroca;
 
     private int versaoDaVenda;
 
@@ -105,6 +107,14 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setDigitoCliente(boolean digitoCliente) {
         this.digitoCliente = digitoCliente;
+    }
+
+    public Date getDataFinalTroca() {
+        return dataFinalTroca;
+    }
+
+    public void setDataFinalTroca(Date dataFinalTroca) {
+        this.dataFinalTroca = dataFinalTroca;
     }
 
     @Override
@@ -419,6 +429,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
                 OpcaoProduto.ESTOQUE,
+                OpcaoProduto.TROCA,
                 OpcaoProduto.MARGEM,
                 OpcaoProduto.VENDA_PDV,
                 OpcaoProduto.PRECO,
@@ -442,7 +453,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.COMPRADOR,
                 OpcaoProduto.COMPRADOR_PRODUTO,
                 OpcaoProduto.FABRICANTE,
-                OpcaoProduto.VOLUME_QTD
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.RECEITA
         ));
     }
 
@@ -702,6 +714,161 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        
+    SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+    
+        if (opt == OpcaoProduto.TROCA) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n" +
+                        "       cd_fil_origem id_loja,\n" +
+                        "       cd_prod, \n" +
+                        "       sum(qtde_mvto) troca\n" +
+                        "from\n" +
+                        "     (select distinct nr_seq,\n" +
+                        "       dt_mvto,\n" +
+                        "       cd_fil_origem,\n" +
+                        "       git_codigo_ean13,\n" +
+                        "       cd_prod,\n" +
+                        "       git_descricao,\n" +
+                        "       git_sis_abast,\n" +
+                        "       cd_fornec_fat as cod_fornec,\n" +
+                        "       sum(qtde_mvto)  qtde_mvto,\n" +
+                        "       OBSERVACAO,cd_ent_estq,\n" +
+                        "       nvl(tab_conteudo,0) as motivo,\n" +
+                        "       GET_CUS_MED,\n" +
+                        "       GET_CUS_ULT_ENT,\n" +
+                        "       GIT_CUS_REP,\n" +
+                        "       GIT_CUS_FOR,\n" +
+                        "       GET_CUS_MED_C,\n" +
+                        "       CD_FORNEC_FAT, CD_ORD_COL,\n" +
+                        "       CD_CUSTO,\n" +
+                        "       CD_CUSTO_BRU,\n" +
+                        "       CD_ped_fat,\n" +
+                        "       CD_agd_fat,\n" +
+                        "       cd_movimento,\n" +
+                        "       sts_atu,\n" +
+                        "       NRO_NOTA,\n" +
+                        "       SERIE_NOTA,\n" +
+                        "       GIT_TPO_EMB_VENDA,\n" +
+                        "       GIT_TIPO_ETQ,\n" +
+                        "       GIT_TIPO_PRO,\n" +
+                        "       CD_USR_NTF,\n" +
+                        "       DET_DEST_DEP_TROCAS\n" +
+                        "FROM   ag3ttrdv, aa3citem, aa2ctabe, aa2cestq, aa2ctipo, aa1ditem\n" +
+                        "Where  CD_PROD_PRINC = 0\n" +
+                        "and    dt_mvto       <= " + format.format(getDataFinalTroca()) + "\n" +
+                        "and    cd_fil_origem = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
+                        "and    sts_atu in(1)\n" +
+                        "and    git_sis_abast IN (10,20,1,11,2)\n" +
+                        "and    dt_mvto       <= " + format.format(getDataFinalTroca()) + "\n" +
+                        "and    CD_ENT_ESTQ       = 1\n" +
+                        "and    git_cod_item  = cd_prod\n" +
+                        "and    git_digito    = dac(cd_prod)\n" +
+                        "and    tab_codigo (+)= 76\n" +
+                        "and    tab_acesso (+)='MOTIVO' || to_char(cd_motivo,'fm0000')\n" +
+                        "and    git_cod_item  = det_cod_item\n" +
+                        "and    get_cod_local = cd_ent_estq || dac(cd_ent_estq)\n" +
+                        "and    get_cod_produto = cd_prod || dac(cd_prod)\n" +
+                        "and    tip_codigo= cd_ent_estq \n" +
+                        "and    CD_PROD_PRINC = 0\n" +
+                        "Group By nr_seq,\n" +
+                        "  dt_mvto,\n" +
+                        "  cd_fil_origem,\n" +
+                        "  cd_prod, git_codigo_ean13, \n" +
+                        "  git_descricao,\n" +
+                        "  git_sis_abast,\n" +
+                        "  git_cod_for,\n" +
+                        "  OBSERVACAO,\n" +
+                        "  cd_ent_estq,\n" +
+                        "  nvl(tab_conteudo, 0),\n" +
+                        "  GET_CUS_MED,\n" +
+                        "  GET_CUS_ULT_ENT,\n" +
+                        "  GIT_CUS_REP,\n" +
+                        "  GIT_CUS_FOR,\n" +
+                        "  GET_CUS_MED_C,\n" +
+                        "  CD_FORNEC_FAT,\n" +
+                        "  CD_ORD_COL,\n" +
+                        "  CD_CUSTO,\n" +
+                        "  CD_CUSTO_BRU,\n" +
+                        "  CD_ped_fat, CD_agd_fat,\n" +
+                        "  cd_movimento,\n" +
+                        "  sts_atu,\n" +
+                        "  NRO_NOTA,\n" +
+                        "  SERIE_NOTA,\n" +
+                        "  GIT_TPO_EMB_VENDA, GIT_TIPO_ETQ, GIT_TIPO_PRO, CD_USR_NTF, DET_DEST_DEP_TROCAS\n" +
+                        " order by dt_mvto, cd_fil_origem, nr_seq, cd_prod) troca\n" +
+                        " group by cd_fil_origem, cd_prod"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("cd_prod"));
+                        imp.setTroca(rst.getDouble("troca"));
+
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
+    }
+    
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "       it.git_cod_item id_produtopai,\n" +
+                    "       it.git_descricao,\n" +
+                    "       itf.git_cod_item id_produtofilho,\n" +
+                    "       itf.git_descricao descricaofilho,\n" +
+                    "       rec.rece_quantidade,\n" +
+                    "       rec.rece_quantidade * 1000 as qtd\n" +
+                    "from \n" +
+                    "     AA1CRECE rec \n" +
+                    "join AA3CITEM it on rec.rece_produto = it.git_cod_item || it.git_digito\n" +
+                    "join AA3CITEM itf on rec.rece_componente = itf.git_cod_item || itf.git_digito\n" +
+                    "join AA2CESTQ est on est.GET_COD_PRODUTO = it.GIT_COD_ITEM || it.GIT_DIGITO and \n" +
+                    "     est.get_cod_produto = rec.rece_produto\n" +
+                    "join AA2CESTQ esti on esti.GET_COD_PRODUTO = itf.GIT_COD_ITEM || itf.GIT_DIGITO and \n" +
+                    "     esti.get_cod_produto = rec.rece_componente\n" +
+                    "join AA2CLOJA loja on est.GET_COD_LOCAL = loja.LOJ_CODIGO || loja.LOJ_DIGITO and \n" +
+                    "     esti.get_cod_local = loja.LOJ_CODIGO || loja.LOJ_DIGITO\n" +
+                    "where \n" +
+                    "      loja.LOJ_CODIGO || loja.LOJ_DIGITO = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id_produtopai"));
+                    imp.setIdproduto(rst.getString("id_produtopai"));
+                    imp.setDescricao(rst.getString("git_descricao"));
+                    imp.setRendimento(1d);
+                    imp.setQtdembalagemreceita(rst.getInt("qtd"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("id_produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 
@@ -1582,6 +1749,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
+                    
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setNome(rst.getString("razao"));

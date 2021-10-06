@@ -132,7 +132,7 @@ public class VendaImpDao {
                 try {
                     LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() + " - " + imp.getId() : "") + e.getMessage(), e);
                     System.out.println(
-                            "COO: " + vimp.getNumeroCupom() + " Data: " + vimp.getData() + 
+                            "ID: " + vimp.getId() + " COO: " + vimp.getNumeroCupom() + " Data: " + vimp.getData() + 
                                     " ECF: " + vimp.getEcf());
                     if (e.getCause() != null) {                    
                         throw (Exception) e.getCause();

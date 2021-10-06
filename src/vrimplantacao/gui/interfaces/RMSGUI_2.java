@@ -174,6 +174,9 @@ public class RMSGUI_2 extends VRInternalFrame {
         
         carregarLojaVR();
         carregarLojaCliente();
+        
+        pnlBalanca.setSistema(SISTEMA);
+        pnlBalanca.setLoja(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
     }
     
     public void carregarLojaVR() throws Exception {
@@ -239,6 +242,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                     dao.setUtilizarViewMixFiscal(chkUtilizarViewMixFiscal.isSelected());
                     dao.setSomenteAtivos(chkPSomenteAtivos2.isSelected());
                     dao.setDigitoCliente(chkDigitoCliente.isSelected());
+                    dao.setDataFinalTroca(edtDataTroca.getDate());
 
                     if (tabs.getSelectedIndex() == 0) {
                                             
@@ -433,12 +437,16 @@ public class RMSGUI_2 extends VRInternalFrame {
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkNotasFiscais = new vrframework.bean.checkBox.VRCheckBox();
         edtDtNotaIni = new org.jdesktop.swingx.JXDatePicker();
+        jLabel3 = new javax.swing.JLabel();
+        edtDataTroca = new org.jdesktop.swingx.JXDatePicker();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        tabBalanca = new javax.swing.JPanel();
+        pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         txtUsuario = new vrframework.bean.textField.VRTextField();
         txtSenha = new vrframework.bean.passwordField.VRPasswordField();
@@ -922,21 +930,30 @@ public class RMSGUI_2 extends VRInternalFrame {
                 .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        jLabel3.setText("Data da Troca");
+
         javax.swing.GroupLayout tabOutrosLayout = new javax.swing.GroupLayout(tabOutros);
         tabOutros.setLayout(tabOutrosLayout);
         tabOutrosLayout.setHorizontalGroup(
             tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabOutrosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(451, Short.MAX_VALUE))
+                .addGroup(tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(edtDataTroca, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(456, Short.MAX_VALUE))
         );
         tabOutrosLayout.setVerticalGroup(
             tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabOutrosLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(19, 19, 19)
                 .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(272, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDataTroca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(215, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Outros", tabOutros);
@@ -985,6 +1002,25 @@ public class RMSGUI_2 extends VRInternalFrame {
         );
 
         tabs.addTab("Unificação", vRPanel2);
+
+        javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
+        tabBalanca.setLayout(tabBalancaLayout);
+        tabBalancaLayout.setHorizontalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabBalancaLayout.setVerticalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlBalanca, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        tabs.addTab("Balança", tabBalanca);
 
         vRPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - ORACLE"));
         vRPanel6.setPreferredSize(new java.awt.Dimension(350, 350));
@@ -1374,21 +1410,25 @@ public class RMSGUI_2 extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.textField.VRTextField dtVenda;
+    private org.jdesktop.swingx.JXDatePicker edtDataTroca;
     private org.jdesktop.swingx.JXDatePicker edtDtNotaIni;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtFim;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtIni;
     private javax.swing.ButtonGroup groupVendasPdv;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private vrframework.bean.label.VRLabel lblMesVenda;
     private vrframework.bean.label.VRLabel lblMesVenda1;
     private vrframework.bean.label.VRLabel lblMesVenda2;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlCustom;
     private vrframework.bean.radioButton.VRRadioButton rdbVendasV1;
     private vrframework.bean.radioButton.VRRadioButton rdbVendasV2;
     private vrframework.bean.radioButton.VRRadioButton rdbVendasV3;
+    private javax.swing.JPanel tabBalanca;
     private javax.swing.JPanel tabConvenio;
     private javax.swing.JPanel tabOutros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;

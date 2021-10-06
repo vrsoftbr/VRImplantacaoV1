@@ -701,7 +701,16 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
+                        
+                        String numeroCupom = rst.getString("numerocupom");
+                        
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        
+                        if(numeroCupom != null && numeroCupom.length() > 10) {
+                            numeroCupom = numeroCupom.substring(5, numeroCupom.length());
+                            next.setNumeroCupom(Utils.stringToInt(numeroCupom));
+                        }
+                                                
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
                         next.setNomeCliente(rst.getString("nome_cliente"));
                         next.setCpf(rst.getString("cpf_cnpj"));
@@ -727,11 +736,12 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n"
                     + "	v.VndNumeroVenda id_venda,\n"
-                    + "	CASE\n"
+                    /*+ "	CASE\n"
                     + "     when d.VndDocNumero is null\n"
                     + "     then v.VndNumeroVenda\n"
                     + "     else d.VndDocNumero\n"
-                    + " END numerocupom,\n"
+                    + " END numerocupom,\n"*/
+                    + " v.vndnumerovenda numerocupom,\n"
                     + "	c2.CliCodigoPessoal id_cliente,\n"
                     + "	c.PessoaNome nome_cliente,\n"
                     + "	v.VndNfpCpfCnpj cpf_cnpj,\n"
@@ -829,11 +839,11 @@ public class AvistareDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	TB_DOCUMENTO_BASE_ITENS vi\n"
                     + "left join TB_VENDA v on v.VndDocBaseID = vi.DocBaseItemDocBaseID \n"
                     + "left join TB_PRODUTO p on p.ProdID = vi.DocBaseItemProdID \n"
-                    + "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID \n"
+                    //+ "LEFT JOIN TB_VENDA_DOCUMENTO d on d.VndDocID = v.VndID \n"
                     + "left join TB_UNIDADE_MEDIDA un on un.UnID = vi.DocBaseItemUnidadeID \n"
                     + "WHERE\n"
-                    + " d.VndDocNumero is not NULL \n"
-                    + "	and v.VndDtEmissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    //+ " d.VndDocNumero is not NULL \n"
+                    + "v.VndDtEmissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
                     + "order by 2,1";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
