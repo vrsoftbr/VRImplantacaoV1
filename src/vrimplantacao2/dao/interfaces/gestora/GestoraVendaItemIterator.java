@@ -87,12 +87,7 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
         public VendaItemIMP makeNext(ResultSet rs) throws Exception {
             VendaItemIMP v = new VendaItemIMP();
 
-            v.setVenda(GestoraVendaIterator.formatID(
-                    rs.getInt("numerocupom"),
-                    rs.getInt("id"),
-                    rs.getInt("ecf"),
-                    rs.getDate("data")
-            ));
+            v.setVenda(rs.getString("id"));
             v.setId(formatID(
                     rs.getInt("id"),
                     rs.getInt("numerocupom"),
