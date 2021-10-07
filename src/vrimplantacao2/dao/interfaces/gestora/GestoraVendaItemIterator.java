@@ -1,10 +1,12 @@
 package vrimplantacao2.dao.interfaces.gestora;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -66,7 +68,8 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
                 + "	round(sai_total, 2) total,\n"
                 + "	sp.pro_desconto desconto,\n"
                 + "	p.pro_barra codigobarras,\n"
-                + "	case when sp.data_processo_cancel is null then 0 else 1 end cancelado\n"
+                + "	case when sp.data_processo_cancel is null then 0 else 1 end cancelado,\n"
+                + "     concat(sp.tributacao, '-', sp.tri_aliquota) as tributacaoicms\n"
                 + "from\n"
                 + "     " + getNomeTabela(intervalo.dataInicial) + " as SP\n"
                 + "	left join " + getNomeTabelaV(intervalo.dataInicial) + " cp on cp.com_registro = sp.com_registro\n"
@@ -103,11 +106,96 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
             v.setValorDesconto(rs.getDouble("Desconto"));
             v.setCodigoBarras(rs.getString("codigobarras"));
             v.setUnidadeMedida(rs.getString("unidade"));
+            
+            String trib = Utils.acertarTexto(rs.getString("tributacaoicms"));
+            if (trib == null || "".equals(trib)) {
+                trib = Utils.acertarTexto(rs.getString("tributacaoicms"));
+            }
+
+            obterAliquota(v, trib);
+            
 
             return v;
         }
+        
+        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
+            /*
+             0700   7.00    ALIQUOTA 07%
+             1200   12.00   ALIQUOTA 12%
+             1800   18.00   ALIQUOTA 18%
+             2500   25.00   ALIQUOTA 25%
+             1100   11.00   ALIQUOTA 11%
+             I      0.00    ISENTO
+             F      0.00    SUBST TRIBUTARIA
+             N      0.00    NAO INCIDENTE
+             */
+            int cst;
+            double aliq;
+            switch (icms) {
+                case "R26-18.00":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "T01-18.00":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "III-0.00":
+                    cst = 40;
+                    aliq = 0;
+                    break;
+                case "NNN-0.00":
+                    cst = 41;
+                    aliq = 0;
+                    break;
+                case "T02-18.00":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "T06-11.00":
+                    cst = 0;
+                    aliq = 11;
+                    break;
+                case "FFF-0.00":
+                    cst = 60;
+                    aliq = 0;
+                    break;
+                case "T04-25.00":
+                    cst = 0;
+                    aliq = 25;
+                    break;
+                case "T03-18.00":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "T01-7.00":
+                    cst = 0;
+                    aliq = 7;
+                    break;
+                case "T02-12.00":
+                    cst = 0;
+                    aliq = 12;
+                    break;
+                case "T47-4.70":
+                    cst = 0;
+                    aliq = 4.7;
+                    break;
+                case "T07-4.50":
+                    cst = 0;
+                    aliq = 4.5;
+                    break;
+                default:
+                    cst = 40;
+                    aliq = 0;
+                    break;
+            }
+            item.setIcmsCst(cst);
+            item.setIcmsAliq(aliq);
+        }
+        
     }
 
+    
     private static class GestoraVendaItemStatementBuilder implements StatementBuilder {
 
         @Override

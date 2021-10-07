@@ -318,9 +318,9 @@ public class GestoraDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "		end qtdEmbalagem\n"
                     + "	from\n"
                     + "		produtos) ean\n"
-                    + "join produtos p on p.PRO_CODIGO = ean.id\n"
-                    + "join GRU_PRODUTOS gp on p.GRU_CODIGO = gp.GRU_CODIGO\n"
-                    + "join SUBGRUPO_PRODUTOS sb on p.SUB_CODIGO = sb.sub_codigo\n"
+                    + "left join produtos p on p.PRO_CODIGO = ean.id\n"
+                    + "left join GRU_PRODUTOS gp on p.GRU_CODIGO = gp.GRU_CODIGO\n"
+                    + "left join SUBGRUPO_PRODUTOS sb on p.SUB_CODIGO = sb.sub_codigo\n"
                     + "left join tributacao t on p.tri_codigo = t.tri_codigo\n"
                     + "order by id"
             )) {
