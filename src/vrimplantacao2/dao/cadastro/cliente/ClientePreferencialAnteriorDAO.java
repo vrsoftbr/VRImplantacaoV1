@@ -42,6 +42,27 @@ public class ClientePreferencialAnteriorDAO {
             );
         }
     }
+    
+    public void createTablePontuacao() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "do $$\n" +
+                    "declare\n" +
+                    "begin\n" +
+                    "	if not exists(select table_name from information_schema.tables where table_schema = 'implantacao' and table_name = 'codant_clientepreferencialpontuacao') then\n" +
+                    "		create table implantacao.codant_clientepreferencialpontuacao (\n" +
+                    "			sistema varchar not null,\n" +
+                    "			loja varchar not null,\n" +
+                    "			id varchar not null,\n" +
+                    "			id_venda integer,\n" +
+                    "                   nome varchar not null,\n" +        
+                    "			ponto integer);\n" +
+                    "	end if;\n" +
+                    "end;\n" +
+                    "$$;"
+            );
+        }
+    }
 
     public void salvar(ClientePreferencialAnteriorVO anterior) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -58,6 +79,28 @@ public class ClientePreferencialAnteriorDAO {
             sql.put("ie", anterior.getIe());
             sql.put("nome", anterior.getNome());
             sql.put("forcarGravacao", anterior.isForcarGravacao());
+            
+            try {
+                stm.execute(sql.getInsert());
+            } catch (Exception e) {
+                System.out.println(sql.getInsert());
+                e.printStackTrace();
+                throw e;
+            }
+        }
+    }
+    
+    public void salvarPontuacao(ClientePreferencialAnteriorVO anterior, long id_venda) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setTableName("codant_clientepreferencialpontuacao");
+            sql.setSchema("implantacao");            
+            sql.put("sistema", anterior.getSistema());
+            sql.put("loja", anterior.getLoja());
+            sql.put("id", anterior.getId());
+            sql.put("id_venda", id_venda);
+            sql.put("nome", anterior.getNome());
+            sql.put("ponto", anterior.getPonto());
             
             try {
                 stm.execute(sql.getInsert());
@@ -165,4 +208,15 @@ public class ClientePreferencialAnteriorDAO {
         return result;
     }
     
+    public void deletarPontuacao() throws Exception {
+        try(Statement stm = Conexao.createStatement()) {
+                stm.execute("delete from pdv.vendapromocaopontuacao where id_venda in "
+                        + "(select id_venda from implantacao.codant_clientepreferencialpontuacao);\n" +
+                        "delete from pdv.vendaitem where id_venda in "
+                        + "(select id_venda from implantacao.codant_clientepreferencialpontuacao);\n" +
+                        "delete from pdv.venda where id in "
+                        + "(select id_venda from implantacao.codant_clientepreferencialpontuacao);\n" +
+                        "delete from implantacao.codant_clientepreferencialpontuacao;");
+        }
+    }
 }

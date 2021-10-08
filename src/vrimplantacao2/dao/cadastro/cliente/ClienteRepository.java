@@ -1213,6 +1213,10 @@ public class ClienteRepository {
 
         PdvVendaDAO vendaDAO = new PdvVendaDAO();
         PdvVendaItemDAO vendaItemDAO = new PdvVendaItemDAO(provider.getSistema(), provider.getLojaOrigem());
+        ClientePreferencialAnteriorDAO clienteAnteriorDAO = new ClientePreferencialAnteriorDAO();
+        
+        clienteAnteriorDAO.createTablePontuacao();
+        clienteAnteriorDAO.deletarPontuacao();
 
         //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
         clientes = organizarListagem(clientes);
@@ -1252,31 +1256,32 @@ public class ClienteRepository {
 
                     if (imp.getPonto() > 0) {
 
-                        PdvVendaVO vo = new PdvVendaVO();
+                        PdvVendaVO vendaVO = new PdvVendaVO();
                         PdvVendaItemVO itemVO = new PdvVendaItemVO();
                         PdvVendaPromocaoPontuacaoVO pontuacaoVO = new PdvVendaPromocaoPontuacaoVO();
+                        ClientePreferencialAnteriorVO pontuacaoAnteriorVO = new ClientePreferencialAnteriorVO();
 
-                        vo.setId_loja(provider.getLojaVR());
-                        vo.setNumeroCupom(numeroCupom);
-                        vo.setEcf(0);
-                        vo.setData(dataPontuacao);
-                        vo.setId_clientePreferencial(cliente.getId());
-                        vo.setHoraInicio(new Time(new Date().getTime()));
-                        vo.setHoraTermino(new Time(new Date().getTime()));
-                        vo.setCancelado(true);
-                        vo.setSubTotalImpressora(0);
-                        vo.setCpf(Utils.stringToLong(imp.getCnpj()));
-                        vo.setContadorDoc(0);
-                        vo.setValorDesconto(0);
-                        vo.setValorAcrescimo(0);
-                        vo.setCanceladoEmVenda(true);
-                        vo.setNumeroSerie("");
-                        vo.setMfAdicional(0);
-                        vo.setModeloImpressora("");
-                        vo.setNumeroUsuario(0);
+                        vendaVO.setId_loja(provider.getLojaVR());
+                        vendaVO.setNumeroCupom(numeroCupom);
+                        vendaVO.setEcf(0);
+                        vendaVO.setData(dataPontuacao);
+                        vendaVO.setId_clientePreferencial(cliente.getId());
+                        vendaVO.setHoraInicio(new Time(new Date().getTime()));
+                        vendaVO.setHoraTermino(new Time(new Date().getTime()));
+                        vendaVO.setCancelado(true);
+                        vendaVO.setSubTotalImpressora(0);
+                        vendaVO.setCpf(Utils.stringToLong(imp.getCnpj()));
+                        vendaVO.setContadorDoc(0);
+                        vendaVO.setValorDesconto(0);
+                        vendaVO.setValorAcrescimo(0);
+                        vendaVO.setCanceladoEmVenda(true);
+                        vendaVO.setNumeroSerie("");
+                        vendaVO.setMfAdicional(0);
+                        vendaVO.setModeloImpressora("");
+                        vendaVO.setNumeroUsuario(0);
 
                         if (imp.getRazao() != null && imp.getRazao().length() > 45) {
-                            vo.setNomeCliente(imp.getRazao().substring(0, 45));
+                            vendaVO.setNomeCliente(imp.getRazao().substring(0, 45));
                         }
 
                         String endereco = imp.getEndereco() + ","
@@ -1288,12 +1293,12 @@ public class ClienteRepository {
                             endereco = endereco.substring(0, 50);
                         }
 
-                        vo.setEnderecoCliente(endereco);
+                        vendaVO.setEnderecoCliente(endereco);
 
                         //Gerar venda
-                        vendaDAO.gerarVendaPontuacao(vo);
+                        vendaDAO.gerarVendaPontuacao(vendaVO);
 
-                        itemVO.setVenda(vo);
+                        itemVO.setVenda(vendaVO);
                         itemVO.setId_produto(53687);
                         itemVO.setQuantidade(1);
                         itemVO.setPrecoVenda(0);
@@ -1314,7 +1319,7 @@ public class ClienteRepository {
                         //Gerar Venda Item
                         vendaItemDAO.gravarItemPontuacao(itemVO);
 
-                        pontuacaoVO.setIdVenda(vo.getId());
+                        pontuacaoVO.setIdVenda(vendaVO.getId());
                         pontuacaoVO.setIdPromocao(1);
                         pontuacaoVO.setPonto(imp.getPonto());
                         pontuacaoVO.setCnpj(Utils.stringToLong(imp.getCnpj()));
@@ -1327,6 +1332,15 @@ public class ClienteRepository {
                         //Gerar Venda Promoção Pontuação
                         vendaDAO.gerarVendaPromocaoPontuacao(pontuacaoVO);
                         numeroCupom++;
+                        
+                        pontuacaoAnteriorVO.setSistema(provider.getSistema());
+                        pontuacaoAnteriorVO.setLoja(provider.getLojaOrigem());
+                        pontuacaoAnteriorVO.setId(String.valueOf(cliente.getId()));
+                        pontuacaoAnteriorVO.setNome(imp.getRazao());
+                        pontuacaoAnteriorVO.setPonto((int) imp.getPonto());
+                        
+                        //Gravar Código anterior
+                        clienteAnteriorDAO.salvarPontuacao(pontuacaoAnteriorVO, vendaVO.getId());
                     }
                 }
 

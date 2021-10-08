@@ -70,7 +70,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /*
  *
- * @author Leandro, Guilherme
+ * @author Leandro
  * Para localizar tabelas do RMS, utilizar o sistema RMS Log Viewer, 
  * o mesmo gera os scripts e nomes da tabela, caso necessário.
  * Site com manual do sistema: https://tdn.totvs.com/display/public/LRMS/Manual+de+Extrato+de+Itens
@@ -1310,7 +1310,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "       AND 	FIN.cli_codigo(+) = CLI.cli_codigo \n"
                     + "       AND 	por_portador (+) = cli.cli_port \n"
                     + "       AND 	dtip_codigo (+) = tip_codigo\n"
-                    + "       and  tip.tip_loj_cli in ('C','R')")) {
+                    + "       and  tip.tip_loj_cli in ('C','R', 'V')")) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
