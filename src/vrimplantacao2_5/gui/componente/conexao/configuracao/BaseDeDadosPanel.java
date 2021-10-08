@@ -68,6 +68,10 @@ public class BaseDeDadosPanel extends VRPanel implements ConfiguracaoPanel {
 
         conexoes = controller.consultar(sistema.getId());
         
+        if (conexoes.size() == 0) {
+            throw new VRException("Nenhuma conexão cadastrada para o sistema informado!");
+        }
+        
         for (ConfiguracaoBaseDadosVO configuracaoVO : conexoes) {
             String complemento = (configuracaoVO.getComplemento() != null && 
                             !configuracaoVO.getComplemento().isEmpty()) ?

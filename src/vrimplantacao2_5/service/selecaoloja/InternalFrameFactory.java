@@ -36,6 +36,7 @@ public abstract class InternalFrameFactory {
                 break;
             case HIPCOM:
                 internalFrame = new Hipcom2_5GUI(frame);
+                break;
             default:
                 internalFrame = null;
         }
