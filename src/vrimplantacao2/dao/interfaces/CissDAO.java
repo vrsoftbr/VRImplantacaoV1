@@ -37,9 +37,9 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  * @author Leandro
  */
 public class CissDAO extends InterfaceDAO {
-    
+
     private static final Logger LOG = Logger.getLogger(CissDAO.class.getName());
-    
+
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
     private boolean soAtivo = false;
@@ -144,89 +144,90 @@ public class CissDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoDB2.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	ean.idsubproduto id,\n"
-                    + "	ean.dtcadastro datacadastro,\n"
-                    + "	bar.ean,\n"
-                    + "	p.embalagemsaida tipoembalagem,\n"
-                    + "	case p.flagexpbalanca when 'F' then 0 else 1 end ebalanca,\n"
-                    + "	ean.diasvalidade validade,\n"
-                    + "	p.descrcomproduto || coalesce(' ' || ean.subdescricao, '') descricaocompleta,\n"
-                    + "	ean.descrresproduto descricaoreduzida,\n"
-                    + "	p.descrcomproduto || coalesce(' ' || ean.subdescricao, '') descricaogondola,\n"
-                    + "	p.idsecao as mercadologico1,\n"
-                    + "	p.idgrupo as mercadologico2,\n"
-                    + "	p.idsubgrupo as mercadologico3,\n"
-                    + "	ean.idproduto as id_familiaproduto,\n"
-                    + "	case ean.flaginativo when 'F' then 1 else 0 end as situacaocadastro,\n"
-                    + "	ean.pesobruto,\n"
-                    + "	ean.pesoliquido,\n"
-                    + "	pc.qtdestminimo estoqueminimo,\n"
-                    + "	pc.qtdestmaximo estoquemaximo,\n"
-                    + "	est.qtdatualestoque estoque,\n"
-                    + "	preco.permargemvarejo margem,\n"
-                    + "	ean.ncm,\n"
-                    + "	ean.codcest cest,\n"
-                    + "	preco.valprecovarejo preco,\n"
-                    + "	custo.custonotafiscal custocomimposto,\n"
-                    + "	custo.custoultimacompra custosemimposto,\n"
-                    + "	p.idcstpiscofinssaida piscofinssaida,\n"
-                    + "	p.idcstpiscofinsentrada piscofinsentrada,\n"
-                    + "	nat.idcodnatureza as tipoNaturezaReceita,\n"
-                    + "	trib.idsittribsai as icmsCstDebito,\n"
-                    + "	trib.idsittribent as icmsCstCredito,\n"
-                    + "	trib.pericment as icmsAliqCredito,\n"
-                    + "	trib.pericmsai as icmsAliqDebito,\n"
-                    + "	trib.perredtribsai as icmsPercReducaoSaida,\n"
-                    + "	trib.perredtribent as icmsPercReducaoEntrada,\n"
-                    + "	trib.permargemsubsti as percSubst\n"
-                    + "from\n"
-                    + "	dba.produto_grade ean\n"
-                    + "	join (\n"
-                    + "		select\n"
-                    + "			pg.idproduto,\n"
-                    + "			pg.idsubproduto,\n"
-                    + "			pg.idcodbarprod ean,\n"
-                    + "			1 as qtd\n"
-                    + "		from\n"
-                    + "			dba.produto_grade pg\n"
-                    + "		union\n"
-                    + "		select\n"
-                    + "			cx.idproduto,\n"
-                    + "			cx.idsubproduto,\n"
-                    + "			cx.idcodbarcx ean,\n"
-                    + "			cx.qtdmultipla qtd\n"
-                    + "		from\n"
-                    + "			dba.produto_grade_codbarcx cx\n"
-                    + "	) bar on bar.idproduto = ean.idproduto and bar.idsubproduto = ean.idsubproduto\n"
-                    + "	join dba.produto p on ean.idproduto = p.idproduto\n"
-                    + "	join dba.empresa emp on emp.idempresa = " + getLojaOrigem() + "\n"
-                    + "	left join dba.produto_compras pc on \n"
-                    + "		pc.idproduto = ean.idproduto and\n"
-                    + "		pc.idsubproduto = ean.idsubproduto and\n"
-                    + "		pc.idempresa = emp.idempresa\n"
-                    + "	left join dba.estoque_saldo_atual est on\n"
-                    + "		est.idproduto = ean.idproduto and\n"
-                    + "		est.idsubproduto = ean.idsubproduto and\n"
-                    + "		est.idempresa = emp.idempresa and\n"
-                    + "		est.IDLOCALESTOQUE = 1\n"
-                    + "	left join DBA.POLITICA_PRECO_PRODUTO preco on\n"
-                    + "		preco.idproduto = ean.idproduto and\n"
-                    + "		preco.idsubproduto = ean.idsubproduto and\n"
-                    + "		preco.idempresa = emp.idempresa\n"
-                    + "	left join dba.produto_grade_custo_view custo on\n"
-                    + "		custo.idproduto = ean.idproduto and\n"
-                    + "		custo.idsubproduto = ean.idsubproduto and\n"
-                    + "		custo.idempresa = emp.idempresa\n"
-                    + "	left join DBA.PRODUTO_TRIBUTACAO_VW trib on\n"
-                    + "		trib.idproduto = ean.idproduto and\n"
-                    + "		trib.idsubproduto = ean.idsubproduto and\n"
-                    + "		trib.uf = emp.UF and \n"
-                    + "		trib.uforigem = emp.uf\n"
-                    + "	left join dba.piscofins_codigo_natureza_receita nat on\n"
-                    + "           nat.idnaturezapiscofins = p.IDNATUREZAPISCOFINS\n"
+                    "select    \n"
+                    + "    	ean.idsubproduto id,    \n"
+                    + "    	ean.dtcadastro datacadastro,    \n"
+                    + "    	bar.ean,    \n"
+                    + "    	p.embalagemsaida tipoembalagem,    \n"
+                    + "    	case p.flagexpbalanca when 'F' then 0 else 1 end ebalanca,    \n"
+                    + "    	ean.diasvalidade validade,    \n"
+                    + "    	p.descrcomproduto || coalesce(' ' || ean.subdescricao, '') descricaocompleta,    \n"
+                    + "    	ean.descrresproduto descricaoreduzida,    \n"
+                    + "    	p.descrcomproduto || coalesce(' ' || ean.subdescricao, '') descricaogondola,    \n"
+                    + "    	p.idsecao as mercadologico1,    \n"
+                    + "    	p.idgrupo as mercadologico2,    \n"
+                    + "    	p.idsubgrupo as mercadologico3,    \n"
+                    + "    	ean.idproduto as id_familiaproduto,    \n"
+                    + "    	case ean.flaginativo when 'F' then 1 else 0 end as situacaocadastro,    \n"
+                    + "    	ean.pesobruto,    \n"
+                    + "    	ean.pesoliquido,    \n"
+                    + "    	pc.qtdestminimo estoqueminimo,    \n"
+                    + "    	pc.qtdestmaximo estoquemaximo,    \n"
+                    + "    	est.qtdatualestoque estoque,    \n"
+                    + "    	preco.permargemvarejo margem,    \n"
+                    + "    	ean.ncm,    \n"
+                    + "    	ean.codcest cest,    \n"
+                    + "    	preco.valprecovarejo preco,    \n"
+                    + "    	custo.custonotafiscal custocomimposto,    \n"
+                    + "    	custo.custoultimacompra custosemimposto,    \n"
+                    + "    	coalesce(g.IDCSTPISCOFINSSAIDA, p.idcstpiscofinssaida) piscofinssaida,\n"
+                    + "    	coalesce(g.IDCSTPISCOFINSENTRADA, p.IDCSTPISCOFINSENTRADA)piscofinsentrada,   \n"
+                    + "    	nat.idcodnatureza as tipoNaturezaReceita,    \n"
+                    + "    	trib.idsittribsai as icmsCstDebito,    \n"
+                    + "    	trib.idsittribent as icmsCstCredito,    \n"
+                    + "    	trib.pericment as icmsAliqCredito,    \n"
+                    + "    	trib.pericmsai as icmsAliqDebito,    \n"
+                    + "    	trib.perredtribsai as icmsPercReducaoSaida,    \n"
+                    + "    	trib.perredtribent as icmsPercReducaoEntrada,    \n"
+                    + "    	trib.permargemsubsti as percSubst    \n"
+                    + "    from    \n"
+                    + "    	dba.produto_grade ean    \n"
+                    + "    	join (    \n"
+                    + "    		select    \n"
+                    + "    			pg.idproduto,    \n"
+                    + "    			pg.idsubproduto,    \n"
+                    + "    			pg.idcodbarprod ean,    \n"
+                    + "    			1 as qtd    \n"
+                    + "    		from    \n"
+                    + "    			dba.produto_grade pg    \n"
+                    + "    		union    \n"
+                    + "    		select    \n"
+                    + "    			cx.idproduto,    \n"
+                    + "    			cx.idsubproduto,    \n"
+                    + "    			cx.idcodbarcx ean,    \n"
+                    + "    			cx.qtdmultipla qtd    \n"
+                    + "    		from    \n"
+                    + "    			dba.produto_grade_codbarcx cx    \n"
+                    + "    	) bar on bar.idproduto = ean.idproduto and bar.idsubproduto = ean.idsubproduto    \n"
+                    + "    	join dba.produto p on ean.idproduto = p.idproduto    \n"
+                    + "    	join dba.empresa emp on emp.idempresa = " + getLojaOrigem() + "  \n"
+                    + "    	left join dba.produto_compras pc on     \n"
+                    + "    		pc.idproduto = ean.idproduto and    \n"
+                    + "    		pc.idsubproduto = ean.idsubproduto and    \n"
+                    + "    		pc.idempresa = emp.idempresa    \n"
+                    + "    	left join dba.estoque_saldo_atual est on    \n"
+                    + "    		est.idproduto = ean.idproduto and    \n"
+                    + "    		est.idsubproduto = ean.idsubproduto and    \n"
+                    + "    		est.idempresa = emp.idempresa and    \n"
+                    + "    		est.IDLOCALESTOQUE = 1    \n"
+                    + "    	left join DBA.POLITICA_PRECO_PRODUTO preco on    \n"
+                    + "    		preco.idproduto = ean.idproduto and    \n"
+                    + "    		preco.idsubproduto = ean.idsubproduto and    \n"
+                    + "    		preco.idempresa = emp.idempresa    \n"
+                    + "    	left join dba.produto_grade_custo_view custo on    \n"
+                    + "    		custo.idproduto = ean.idproduto and    \n"
+                    + "    		custo.idsubproduto = ean.idsubproduto and    \n"
+                    + "    		custo.idempresa = emp.idempresa    \n"
+                    + "    	left join DBA.PRODUTO_TRIBUTACAO_VW trib on    \n"
+                    + "    		trib.idproduto = ean.idproduto and    \n"
+                    + "    		trib.idsubproduto = ean.idsubproduto and    \n"
+                    + "    		trib.uf = emp.UF and     \n"
+                    + "    		trib.uforigem = emp.uf    \n"
+                    + "    	left join dba.piscofins_codigo_natureza_receita nat on    \n"
+                    + "               nat.idnaturezapiscofins = p.IDNATUREZAPISCOFINS  \n"
+                    + "        LEFT JOIN dba.GRUPO g ON p.IDGRUPO = g.IDGRUPO \n"
                     + (this.soAtivo ? "where ean.flaginativo = 'F'\n" : "")
-                    + "order by ean"
+                    + "    order by ean"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -357,7 +358,7 @@ public class CissDAO extends InterfaceDAO {
                     + "	f.TIPOCADASTRO in ('A','F')\n"
                     + "order by f.idclifor"
             )) {
-                
+
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
 
@@ -389,8 +390,7 @@ public class CissDAO extends InterfaceDAO {
                     if (!"".equals(Utils.acertarTexto(rst.getString("EMAIL")))) {
                         imp.addContato("C", "EMAIL", "", "", TipoContato.COMERCIAL, rst.getString("EMAIL"));
                     }
-                    
-                    
+
                     if ((rst.getString("tiporegimetribfederal") != null)
                             && (!rst.getString("tiporegimetribfederal").trim().isEmpty())) {
                         switch (rst.getString("tiporegimetribfederal")) {
@@ -408,12 +408,20 @@ public class CissDAO extends InterfaceDAO {
                     } else {
                         imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                     }
-                    
+
                     switch (Utils.acertarTexto(rst.getString("tiporegimetributacao"))) {
-                        case "A": imp.setTipoFornecedor(TipoFornecedor.ATACADO); break;
-                        case "S": imp.setTipoFornecedor(TipoFornecedor.SEMTIPO); break;
-                        case "F": imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA); break;
-                        case "N": imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR); break;
+                        case "A":
+                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                            break;
+                        case "S":
+                            imp.setTipoFornecedor(TipoFornecedor.SEMTIPO);
+                            break;
+                        case "F":
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                            break;
+                        case "N":
+                            imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
+                            break;
                     }
 
                     result.add(imp);
@@ -466,29 +474,29 @@ public class CissDAO extends InterfaceDAO {
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoDB2.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "        trim(cp.IDEMPRESA||'-'||cp.IDCLIFOR||'-'||cp.DIGITOTITULO||'-'||cp.SERIENOTA||'-'||cp.IDTITULO) id,\n" +
-                    "        cp.idclifor idfornecedor,\n" +
-                    "        cp.idtitulo,\n" +
-                    "        cp.dtmovimento dataemissao,\n" +
-                    "        cp.valtitulo valor,\n" +
-                    "        cp.dtvencimento vencimento,\n" +
-                    "        cp.obstitulo observacao,\n" +
-                    "        cp.origemmovimento\n" +
-                    "from\n" +
-                    "        dba.contas_pagar cp\n" +
-                    "where\n" +
-                    "        cp.idempresa = " + getLojaOrigem() + "\n" +
-                    "        and cp.flagbaixada = 'F'\n" +
-                    "order by\n" +
-                    "        cp.dtmovimento"
+                    "select\n"
+                    + "        trim(cp.IDEMPRESA||'-'||cp.IDCLIFOR||'-'||cp.DIGITOTITULO||'-'||cp.SERIENOTA||'-'||cp.IDTITULO) id,\n"
+                    + "        cp.idclifor idfornecedor,\n"
+                    + "        cp.idtitulo,\n"
+                    + "        cp.dtmovimento dataemissao,\n"
+                    + "        cp.valtitulo valor,\n"
+                    + "        cp.dtvencimento vencimento,\n"
+                    + "        cp.obstitulo observacao,\n"
+                    + "        cp.origemmovimento\n"
+                    + "from\n"
+                    + "        dba.contas_pagar cp\n"
+                    + "where\n"
+                    + "        cp.idempresa = " + getLojaOrigem() + "\n"
+                    + "        and cp.flagbaixada = 'F'\n"
+                    + "order by\n"
+                    + "        cp.dtmovimento"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setNumeroDocumento(rst.getString("idtitulo"));
@@ -496,16 +504,14 @@ public class CissDAO extends InterfaceDAO {
                     imp.setValor(rst.getDouble("valor"));
                     imp.setVencimento(rst.getDate("vencimento"));
                     imp.setObservacao("ORIGEM - " + rst.getString("origemmovimento") + " - " + rst.getString("observacao"));
-                    
+
                     result.add(imp);
                 }
-            }            
+            }
         }
-        
+
         return result;
     }
-    
-    
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
@@ -580,37 +586,37 @@ public class CissDAO extends InterfaceDAO {
 
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoDB2.getConexao().createStatement()){
-            try(ResultSet rs = stm.executeQuery(                    
-                    "select\n" +
-                    "        cr.idplanilha as id,\n" +
-                    "        cr.idtitulo,\n" +
-                    "        cr.dtmovimento as dataemissao,\n" +
-                    "        cr.numcupomfiscal as ccf,\n" +
-                    "        cr.idcaixa as ecf,\n" +
-                    "        cr.idclifor as idcliente,\n" +
-                    "        cf.cnpjcpf as cnpj,\n" +
-                    "        cr.valtitulo as valor,\n" +
-                    "        cr.dtvencimento as vencimento,\n" +
-                    "        cr.obstitulo as observacao,\n" +
-                    "        cr.sumvaljuroscobrado as juros\n" +
-                    "from\n" +
-                    "        dba.contas_receber cr\n" +
-                    "        join dba.cliente_fornecedor cl on\n" +
-                    "                cr.idclifor = cl.idclifor\n" +
-                    "join\n" +
-                    "        dba.cliente_fornecedor cf on cr.idclifor = cf.idclifor\n" +
-                    "where\n" +
-                    "        idempresa = " + getLojaOrigem() + "  and\n" +
-                    "        flagbaixada = 'F' and\n" +
-                    "        not upper(cl.nome) like '%CONSUMIDOR%FINAL%'\n" +
-                    "order by\n" +
-                    "        cr.dtmovimento")) {
-                while(rs.next()) {
+        try (Statement stm = ConexaoDB2.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "        cr.idplanilha as id,\n"
+                    + "        cr.idtitulo,\n"
+                    + "        cr.dtmovimento as dataemissao,\n"
+                    + "        cr.numcupomfiscal as ccf,\n"
+                    + "        cr.idcaixa as ecf,\n"
+                    + "        cr.idclifor as idcliente,\n"
+                    + "        cf.cnpjcpf as cnpj,\n"
+                    + "        cr.valtitulo as valor,\n"
+                    + "        cr.dtvencimento as vencimento,\n"
+                    + "        cr.obstitulo as observacao,\n"
+                    + "        cr.sumvaljuroscobrado as juros\n"
+                    + "from\n"
+                    + "        dba.contas_receber cr\n"
+                    + "        join dba.cliente_fornecedor cl on\n"
+                    + "                cr.idclifor = cl.idclifor\n"
+                    + "join\n"
+                    + "        dba.cliente_fornecedor cf on cr.idclifor = cf.idclifor\n"
+                    + "where\n"
+                    + "        idempresa = " + getLojaOrigem() + "  and\n"
+                    + "        flagbaixada = 'F' and\n"
+                    + "        not upper(cl.nome) like '%CONSUMIDOR%FINAL%'\n"
+                    + "order by\n"
+                    + "        cr.dtmovimento")) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
                     imp.setCnpjCliente(rs.getString("cnpj"));
@@ -622,46 +628,46 @@ public class CissDAO extends InterfaceDAO {
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setJuros(rs.getDouble("juros"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-                
+
         return result;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoDB2.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "        ch.idplanilha as id,\n" +
-                    "        cf.nome,\n" +
-                    "        ch.cnpjcpfdono as cpf,\n" +
-                    "        cf.inscrestadual as rg,\n" +
-                    "        ch.idnumcheque as idcheque,\n" +
-                    "        ch.idclifor as idcliente,\n" +
-                    "        ch.idbanco,\n" +
-                    "        ch.idagencia,\n" +
-                    "        ch.numconta as numeroconta,\n" +
-                    "        ch.valor,\n" +
-                    "        ch.dtvencimento\n" +
-                    "from\n" +
-                    "        dba.cheques ch\n" +
-                    "join\n" +
-                    "        dba.cliente_fornecedor cf on ch.idclifor = cf.idclifor\n" +
-                    "where\n" +
-                    "        ch.idempresa = " + getLojaOrigem() + " and\n" +
-                    "        not upper(cf.nome) like '%CONSUMIDOR%FINAL%' and\n" +
-                    "        ch.codcompensacao = 18\n" +
-                    "order by\n" +
-                    "        ch.dtvencimento")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoDB2.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "        ch.idplanilha as id,\n"
+                    + "        cf.nome,\n"
+                    + "        ch.cnpjcpfdono as cpf,\n"
+                    + "        cf.inscrestadual as rg,\n"
+                    + "        ch.idnumcheque as idcheque,\n"
+                    + "        ch.idclifor as idcliente,\n"
+                    + "        ch.idbanco,\n"
+                    + "        ch.idagencia,\n"
+                    + "        ch.numconta as numeroconta,\n"
+                    + "        ch.valor,\n"
+                    + "        ch.dtvencimento\n"
+                    + "from\n"
+                    + "        dba.cheques ch\n"
+                    + "join\n"
+                    + "        dba.cliente_fornecedor cf on ch.idclifor = cf.idclifor\n"
+                    + "where\n"
+                    + "        ch.idempresa = " + getLojaOrigem() + " and\n"
+                    + "        not upper(cf.nome) like '%CONSUMIDOR%FINAL%' and\n"
+                    + "        ch.codcompensacao = 18\n"
+                    + "order by\n"
+                    + "        ch.dtvencimento")) {
+                while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    
+
                     int idBanco = new BancoDAO().getId(rs.getInt("idbanco"));
                     imp.setId(rs.getString("id"));
                     imp.setNome(rs.getString("nome"));
@@ -675,12 +681,12 @@ public class CissDAO extends InterfaceDAO {
                     imp.setAgencia(rs.getString("idagencia"));
                     imp.setAlinea(0);
                     imp.setConta(rs.getString("numeroconta"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -692,64 +698,64 @@ public class CissDAO extends InterfaceDAO {
     public void setSoAtivos(boolean soAtivo) {
         this.soAtivo = soAtivo;
     }
-    
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-        
+
         private Statement stm;
         private ResultSet rst;
         private VendaIMP next;
-        
+
         public VendaIterator(String idLoja, Date dataInicial, Date dataFinal) throws Exception {
-            String sql = 
-                    "SELECT\n" +
-                    "	n.idplanilha id,\n" +
-                    "	n.numcupomfiscal numerocupom,\n" +
-                    "	n.idcaixa ecf,\n" +
-                    "	n.dtmovimento data,\n" +
-                    "	n.IDCLIFOR idcliente,\n" +
-                    "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
-                    "	sum(cr.valtitulo) subtotalimpressora,\n" +
-                    "	v.CNPJCPF cpf,\n" +
-                    "	v.NOME nomecliente,\n" +
-                    "	v.ENDERECO,\n" +
-                    "	v.NUMERo,\n" +
-                    "	v.COMPLEMENTO,\n" +
-                    "	v.BAIRRO,\n" +
-                    "	v.IDCIDADE,\n" +
-                    "	v.idcep cep\n" +
-                    "FROM \n" +
-                    "	dba.CONTAS_RECEBER cr\n" +
-                    "	join dba.NOTAS n on\n" +
-                    "		cr.IDEMPRESA = n.IDEMPRESA AND\n" +
-                    "		cr.IDPLANILHA = n.IDPLANILHA\n" +
-                    "	join dba.NOTAS_ENTRADA_SAIDA v on\n" +
-                    "		cr.IDEMPRESA = v.IDEMPRESA AND\n" +
-                    "		cr.IDPLANILHA = v.IDPLANILHA\n" +
-                    "	join dba.FRCAIXA_RECEBIMENTO fr on\n" +
-                    "		cr.IDEMPRESA = fr.IDEMPRESA AND\n" +
-                    "		cr.IDPLANILHA = fr.IDPLANILHA AND\n" +
-                    "		cr.IDRECEBIMENTO = fr.IDRECEBIMENTO	\n" +
-                    "WHERE\n" +
-                    "	v.IDOPERACAO = 1300 AND\n" +
-                    "	cr.IDEMPRESA IN (" + idLoja + ") AND\n" +
-                    "	cr.DTMOVIMENTO BETWEEN '" + FORMAT.format(dataInicial) + "' AND '" + FORMAT.format(dataFinal) + "'\n" +
-                    "group by\n" +
-                    "	n.idplanilha,\n" +
-                    "	n.numcupomfiscal,\n" +
-                    "	n.idcaixa,\n" +
-                    "	n.dtmovimento,\n" +
-                    "	n.IDCLIFOR,\n" +
-                    "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end,\n" +
-                    "	v.CNPJCPF,\n" +
-                    "	v.NOME,\n" +
-                    "	v.ENDERECO,\n" +
-                    "	v.NUMERo,\n" +
-                    "	v.COMPLEMENTO,\n" +
-                    "	v.BAIRRO,\n" +
-                    "	v.IDCIDADE,\n" +
-                    "	v.idcep";
+            String sql
+                    = "SELECT\n"
+                    + "	n.idplanilha id,\n"
+                    + "	n.numcupomfiscal numerocupom,\n"
+                    + "	n.idcaixa ecf,\n"
+                    + "	n.dtmovimento data,\n"
+                    + "	n.IDCLIFOR idcliente,\n"
+                    + "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n"
+                    + "	sum(cr.valtitulo) subtotalimpressora,\n"
+                    + "	v.CNPJCPF cpf,\n"
+                    + "	v.NOME nomecliente,\n"
+                    + "	v.ENDERECO,\n"
+                    + "	v.NUMERo,\n"
+                    + "	v.COMPLEMENTO,\n"
+                    + "	v.BAIRRO,\n"
+                    + "	v.IDCIDADE,\n"
+                    + "	v.idcep cep\n"
+                    + "FROM \n"
+                    + "	dba.CONTAS_RECEBER cr\n"
+                    + "	join dba.NOTAS n on\n"
+                    + "		cr.IDEMPRESA = n.IDEMPRESA AND\n"
+                    + "		cr.IDPLANILHA = n.IDPLANILHA\n"
+                    + "	join dba.NOTAS_ENTRADA_SAIDA v on\n"
+                    + "		cr.IDEMPRESA = v.IDEMPRESA AND\n"
+                    + "		cr.IDPLANILHA = v.IDPLANILHA\n"
+                    + "	join dba.FRCAIXA_RECEBIMENTO fr on\n"
+                    + "		cr.IDEMPRESA = fr.IDEMPRESA AND\n"
+                    + "		cr.IDPLANILHA = fr.IDPLANILHA AND\n"
+                    + "		cr.IDRECEBIMENTO = fr.IDRECEBIMENTO	\n"
+                    + "WHERE\n"
+                    + "	v.IDOPERACAO = 1300 AND\n"
+                    + "	cr.IDEMPRESA IN (" + idLoja + ") AND\n"
+                    + "	cr.DTMOVIMENTO BETWEEN '" + FORMAT.format(dataInicial) + "' AND '" + FORMAT.format(dataFinal) + "'\n"
+                    + "group by\n"
+                    + "	n.idplanilha,\n"
+                    + "	n.numcupomfiscal,\n"
+                    + "	n.idcaixa,\n"
+                    + "	n.dtmovimento,\n"
+                    + "	n.IDCLIFOR,\n"
+                    + "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end,\n"
+                    + "	v.CNPJCPF,\n"
+                    + "	v.NOME,\n"
+                    + "	v.ENDERECO,\n"
+                    + "	v.NUMERo,\n"
+                    + "	v.COMPLEMENTO,\n"
+                    + "	v.BAIRRO,\n"
+                    + "	v.IDCIDADE,\n"
+                    + "	v.idcep";
             try {
                 stm = ConexaoDB2.getConexao().createStatement();
                 LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -759,7 +765,7 @@ public class CissDAO extends InterfaceDAO {
                 throw new RuntimeException(ex);
             }
         }
-        
+
         @Override
         public boolean hasNext() {
             obterNext();
@@ -786,7 +792,7 @@ public class CissDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        
+
                         next.setId(rst.getString("id"));
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
@@ -799,7 +805,7 @@ public class CissDAO extends InterfaceDAO {
                         next.setCpf(rst.getString("cpf"));
                         next.setNomeCliente(rst.getString("nomecliente"));
                         next.setEnderecoCliente(String.format(
-                                "%s,%s,%s,%s  %s  %s", 
+                                "%s,%s,%s,%s  %s  %s",
                                 rst.getString("ENDERECO"),
                                 rst.getString("NUMERo"),
                                 rst.getString("COMPLEMENTO"),
@@ -820,49 +826,49 @@ public class CissDAO extends InterfaceDAO {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-    
+
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-        
+
         private Statement stm;
         private ResultSet rst;
         private VendaItemIMP next;
-        
+
         public VendaItemIterator(String idLoja, Date dataInicial, Date dataFinal) throws Exception {
-            String sql = 
-                    "select\n" +
-                    "	e.idplanilha || '-' || e.numsequencia id,\n" +
-                    "	e.NUMSEQUENCIA sequencia,\n" +
-                    "	e.IDPLANILHA id_venda,\n" +
-                    "	e.IDSUBPRODUTO idproduto,\n" +
-                    "	e.VALTOTLIQUIDO totalbruto,\n" +
-                    "	e.QTDPRODUTO quantidade,\n" +
-                    "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
-                    "	0 desconto,\n" +
-                    "	0 acrescimo,\n" +
-                    "	ean.descrresproduto descricaoreduzida,\n" +
-                    "	ean.CODBAR codigobarras,\n" +
-                    "	p.embalagemsaida embalagem,\n" +
-                    "	e.IDSITTRIB icms_cst,\n" +
-                    "	e.PERICM icms_aliq,\n" +
-                    "	e.PERREDTRIB icms_reducao\n" +
-                    "from\n" +
-                    "	notas n\n" +
-                    "	join estoque_analitico e on\n" +
-                    "		e.idempresa = n.idempresa and\n" +
-                    "		e.idplanilha = n.idplanilha and\n" +
-                    "		(e.numsequenciakit is null or e.numsequenciakit <= 0)\n" +
-                    "	join produto_grade ean on\n" +
-                    "		ean.idsubproduto = e.idsubproduto\n" +
-                    "	join produto p on\n" +
-                    "		p.idproduto = e.idproduto\n" +
-                    "where\n" +
-                    "	e.idoperacao = 1300 and\n" +
-                    "	e.idempresa in (" + idLoja + ") and\n" +
-                    "	e.dtmovimento between '" + FORMAT.format(dataInicial) + "' and '" + FORMAT.format(dataFinal) + "'\n" +
-                    "order by 1";
-            
+            String sql
+                    = "select\n"
+                    + "	e.idplanilha || '-' || e.numsequencia id,\n"
+                    + "	e.NUMSEQUENCIA sequencia,\n"
+                    + "	e.IDPLANILHA id_venda,\n"
+                    + "	e.IDSUBPRODUTO idproduto,\n"
+                    + "	e.VALTOTLIQUIDO totalbruto,\n"
+                    + "	e.QTDPRODUTO quantidade,\n"
+                    + "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n"
+                    + "	0 desconto,\n"
+                    + "	0 acrescimo,\n"
+                    + "	ean.descrresproduto descricaoreduzida,\n"
+                    + "	ean.CODBAR codigobarras,\n"
+                    + "	p.embalagemsaida embalagem,\n"
+                    + "	e.IDSITTRIB icms_cst,\n"
+                    + "	e.PERICM icms_aliq,\n"
+                    + "	e.PERREDTRIB icms_reducao\n"
+                    + "from\n"
+                    + "	notas n\n"
+                    + "	join estoque_analitico e on\n"
+                    + "		e.idempresa = n.idempresa and\n"
+                    + "		e.idplanilha = n.idplanilha and\n"
+                    + "		(e.numsequenciakit is null or e.numsequenciakit <= 0)\n"
+                    + "	join produto_grade ean on\n"
+                    + "		ean.idsubproduto = e.idsubproduto\n"
+                    + "	join produto p on\n"
+                    + "		p.idproduto = e.idproduto\n"
+                    + "where\n"
+                    + "	e.idoperacao = 1300 and\n"
+                    + "	e.idempresa in (" + idLoja + ") and\n"
+                    + "	e.dtmovimento between '" + FORMAT.format(dataInicial) + "' and '" + FORMAT.format(dataFinal) + "'\n"
+                    + "order by 1";
+
             try {
                 stm = ConexaoDB2.getConexao().createStatement();
                 LOG.log(Level.FINE, "SQL da venda item: " + sql);
@@ -872,7 +878,7 @@ public class CissDAO extends InterfaceDAO {
                 throw new RuntimeException(ex);
             }
         }
-        
+
         @Override
         public boolean hasNext() {
             obterNext();
@@ -899,7 +905,7 @@ public class CissDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        
+
                         next.setId(rst.getString("id"));
                         next.setSequencia(rst.getInt("sequencia"));
                         next.setVenda(rst.getString("id_venda"));
