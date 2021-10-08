@@ -17,6 +17,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -73,8 +74,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
                     OpcaoProduto.MARGEM,
-                    OpcaoProduto.OFERTA,
-                }
+                    OpcaoProduto.OFERTA,}
         ));
     }
 
@@ -190,48 +190,48 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "SELECT \n" +
-                    "   p.id,\n" +
-                    "   p.codigo_barras ean,\n" +
-                    "   p.codigo_interno,   \n" +
-                    "   p.ativo,   \n" +
-                    "   p.descricao descricaocompleta,\n" +
-                    "   CASE\n" +
-                    "   	WHEN p.id = 31843 THEN p.descricao\n" +
-                    "   	ELSE p.descricao_resumida\n" +
-                    "   END descricaoreduzida, \n" +
-                    "   p.grupo merc1,\n" +
-                    "   p.departamento merc2,\n" +
-                    "   p.sessao merc3,\n" +
-                    "   p.familia,\n" +
-                    "   p.unidade,\n" +
-                    "   p.margem,   \n" +
-                    "   p.f_ult_preco_compra custoanterior,\n" +
-                    "   p.preco_compra custosemimposto,\n" +
-                    "   p.preco_custo custocomimposto,\n" +
-                    "   p.preco_venda1 precovenda,\n" +
-                    "   p.pesado,\n" +
-                    "   p.validade,\n" +
-                    "   p.estoque_max,\n" +
-                    "   p.estoque_min,\n" +
-                    "   p.estoque_atual,\n" +
-                    "   p.data_inclusao,\n" +
-                    "   p.s_ncm ncm,\n" +
-                    "   p.f_mva_st mva,\n" +
-                    "   p.aliquota id_aliquota,\n" +
-                    "   p.icms icms_credito,\n" +
-                    "   p.st cst_credito,\n" +
-                    "   p.f_porcent_red_icms icms_red_credito,\n" +
-                    "   p.s_cod_cst_pis_entrada pis_entrada,\n" +
-                    "   p.s_cod_cst_pis_saida pis_saida,\n" +
-                    "   p.s_cod_cst_cofins_entrada cofins_entrada,\n" +
-                    "   p.s_cod_cst_cofins_saida cofins_saida,\n" +
-                    "   p.s_cest cest,\n" +
-                    "   p.s_cod_pis_saida naturezareceita\n" +
-                    "from\n" +
-                    "    produtos p\n" +
-                    "order by\n" +
-                    "    p.id"
+                    "SELECT \n"
+                    + "   p.id,\n"
+                    + "   p.codigo_barras ean,\n"
+                    + "   p.codigo_interno,   \n"
+                    + "   p.ativo,   \n"
+                    + "   p.descricao descricaocompleta,\n"
+                    + "   CASE\n"
+                    + "   	WHEN p.id = 31843 THEN p.descricao\n"
+                    + "   	ELSE p.descricao_resumida\n"
+                    + "   END descricaoreduzida, \n"
+                    + "   p.grupo merc1,\n"
+                    + "   p.departamento merc2,\n"
+                    + "   p.sessao merc3,\n"
+                    + "   p.familia,\n"
+                    + "   p.unidade,\n"
+                    + "   p.margem,   \n"
+                    + "   p.f_ult_preco_compra custoanterior,\n"
+                    + "   p.preco_compra custosemimposto,\n"
+                    + "   p.preco_custo custocomimposto,\n"
+                    + "   p.preco_venda1 precovenda,\n"
+                    + "   p.pesado,\n"
+                    + "   p.validade,\n"
+                    + "   p.estoque_max,\n"
+                    + "   p.estoque_min,\n"
+                    + "   p.estoque_atual,\n"
+                    + "   p.data_inclusao,\n"
+                    + "   p.s_ncm ncm,\n"
+                    + "   p.f_mva_st mva,\n"
+                    + "   p.aliquota id_aliquota,\n"
+                    + "   p.icms icms_credito,\n"
+                    + "   p.st cst_credito,\n"
+                    + "   p.f_porcent_red_icms icms_red_credito,\n"
+                    + "   p.s_cod_cst_pis_entrada pis_entrada,\n"
+                    + "   p.s_cod_cst_pis_saida pis_saida,\n"
+                    + "   p.s_cod_cst_cofins_entrada cofins_entrada,\n"
+                    + "   p.s_cod_cst_cofins_saida cofins_saida,\n"
+                    + "   p.s_cest cest,\n"
+                    + "   p.s_cod_pis_saida naturezareceita\n"
+                    + "from\n"
+                    + "    produtos p\n"
+                    + "order by\n"
+                    + "    p.id"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rs.next()) {
@@ -564,15 +564,15 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setCnpj(rs.getString("cpf"));
                     }
-                    
+
                     String ie = rs.getString("insc_estadual");
-                    
+
                     if (ie != null && !"".equals(ie)) {
                         imp.setInscricaoestadual(ie);
                     } else {
                         imp.setInscricaoestadual(rs.getString("rg"));
                     }
-                    
+
                     imp.setTelefone(rs.getString("ddd") + rs.getString("telefone"));
                     imp.setCelular(rs.getString("ddd") + rs.getString("celular"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
@@ -586,7 +586,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
@@ -594,25 +594,93 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             StringBuilder builder = new StringBuilder();
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT \n"
+                    + " cv.id AS id,\n"
+                    + " cl.id AS clienteid,\n"
+                    + " cl.nome AS nome,\n"
+                    + " cv.s_cupom AS numerocupom,\n"
+                    + " cv.f_debito AS valor,\n"
+                    + " cv.f_val_pago_ref AS valpago,\n"
+                    + " CASE WHEN cv.f_val_pago_ref <> 0 THEN (cv.f_debito - cv.f_val_pago_ref)\n"
+                    + " ELSE cv.f_debito\n"
+                    + " END AS valortotal,\n"
+                    + " cv.f_juros AS juros,\n"
+                    + " cv.d_data AS dataemissao,\n"
+                    + " cv.d_dia_pagamento AS datavencimento,\n"
+                    + " cv.s_observacao AS obs\n"
+                    + "FROM CONVENIOS cv\n"
+                    + "JOIN CLIENTES cl ON cl.id = cv.id_cliente \n"
+                    + "WHERE \n"
+                    + "cv.f_debito <> cv.f_val_pago_ref\n"
+                    + "AND \n"
+                    + "cv.f_debito > cv.f_val_pago_ref"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
 
-                    imp.setId(rst.getString("CTRID"));
-                    imp.setNumeroCupom(rst.getString("ctrnum"));
-                    imp.setIdCliente(rst.getString("clicod"));
-                    imp.setEcf(rst.getString("cxanum"));
-                    imp.setDataEmissao(rst.getDate("ctrdatemi"));
-                    imp.setDataVencimento(rst.getDate("ctrdatvnc"));
-                    imp.setValor(rst.getDouble("ctrvlrdev"));
-                    imp.setObservacao(rst.getString("ctrobs"));
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setIdCliente(rst.getString("clienteid"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setValor(rst.getDouble("valortotal"));
+                    imp.setObservacao(rst.getString("obs"));
 
                     result.add(imp);
                 }
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT\n"
+                    + " icp.id as id,\n"
+                    + " --cp.id,\n"
+                    + "	--CAST(cp.id AS varchar(100)) ||'.'|| CAST(icp.pp AS varchar(100)) AS id_concat,\n"
+                    + "	f.id AS fornecedorid,\n"
+                    + "	f.cnpj AS cnpj,\n"
+                    + "	cp.doc_fiscal AS numerodocumento,\n"
+                    + "	icp.dt_cadastro AS dataemissao,\n"
+                    + "	cp.dt_cadastro AS dataentrada,\n"
+                    + "	icp.vlr_real AS valor,\n"
+                    + "	icp.vlr_pago,\n"
+                    + "	icp.juros AS juros,\n"
+                    + "	icp.mora,\n"
+                    + "	icp.dt_vecto AS datavencimento,\n"
+                    + "	icp.desconto AS desconto,\n"
+                    + "	icp.pp AS parcela,\n"
+                    + "	COALESCE(icp.obs,\n"
+                    + "	cp.descricao) AS obs\n"
+                    + "FROM\n"
+                    + "	CONTAS_PAGAR cp\n"
+                    + "JOIN FORNECEDORES f ON	f.id = cp.id_fornecedor\n"
+                    + "JOIN ITENS_CONTAS_PAGAR icp ON	icp.id_contas_pagar = cp.id\n"
+                    + "WHERE\n"
+                    + "	icp.vlr_pago = 0"
+            )) {
+                while (rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setNumeroDocumento(rs.getString("numerodocumento"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntrada(rs.getDate("dataentrada"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setVencimento(rs.getDate("datavencimento"));
+                    imp.setObservacao(rs.getString("obs"));
+
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 }

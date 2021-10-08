@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -13,6 +14,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.MSuperDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -20,18 +22,18 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class MSuperGUI extends VRInternalFrame {
-
+    
     private static final String NOME_SISTEMA = "MSuper";
     private static final String SERVIDOR_SQL = "Firebird";
     private static MSuperGUI instance;
-
+    
     private final MSuperDAO dao = new MSuperDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
-
+    
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private int vTipoVenda = -1;
-
+    
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, NOME_SISTEMA);
@@ -44,7 +46,7 @@ public class MSuperGUI extends VRInternalFrame {
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
     }
-
+    
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, NOME_SISTEMA);
@@ -65,36 +67,36 @@ public class MSuperGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-
+    
     private MSuperGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         this.title = "Importação " + NOME_SISTEMA;
-
+        
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-
+        
         carregarParametros();
-
+        
         tabProdutos.setOpcoesDisponiveis(dao);
-
+        
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
-
+            
             @Override
             public MapaTributoProvider getProvider() {
                 return dao;
             }
-
+            
             @Override
             public String getSistema() {
                 return dao.getSistema();
             }
-
+            
             @Override
             public String getLoja() {
                 dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
                 return dao.getLojaOrigem();
             }
-
+            
             @Override
             public Frame getFrame() {
                 return mdiFrame;
@@ -105,7 +107,7 @@ public class MSuperGUI extends VRInternalFrame {
         centralizarForm();
         this.setMaximum(false);
     }
-
+    
     public void validarDadosAcessoPostgres() throws Exception {
         if (txtHostFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL);
@@ -113,23 +115,23 @@ public class MSuperGUI extends VRInternalFrame {
         if (txtBancoDadosFirebird.getArquivo().isEmpty()) {
             throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL);
         }
-
+        
         if (txtSenhaFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL);
         }
-
+        
         if (txtUsuarioFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
         }
-
+        
         connSQL.abrirConexao(txtHostFirebird.getText(), txtPortaFirebird.getInt(),
                 txtBancoDadosFirebird.getArquivo(), txtUsuarioFirebird.getText(), txtSenhaFirebird.getText());
-
+        
         carregarLojaVR();
         carregarLojaCliente();
         gravarParametros();
     }
-
+    
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -143,7 +145,7 @@ public class MSuperGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-
+    
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -157,18 +159,18 @@ public class MSuperGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-
+    
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
             String idLojaCliente;
-
+            
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-
+                    
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     
@@ -192,22 +194,33 @@ public class MSuperGUI extends VRInternalFrame {
                         case 3:
                             if (cbxUnifProdutos.isSelected()) {
                                 importador.unificarProdutos();
-                            }   if (cbxUnifFornecedores.isSelected()) {
+                            }
+                            if (cbxUnifFornecedores.isSelected()) {
                                 importador.unificarFornecedor();
-                            }   if (cbxUnifProdFornecedor.isSelected()) {
+                            }
+                            if (cbxUnifProdFornecedor.isSelected()) {
                                 importador.unificarProdutoFornecedor();
-                            }   if (cbxUnifCliPreferencial.isSelected()) {
+                            }
+                            if (cbxUnifCliPreferencial.isSelected()) {
                                 importador.unificarClientePreferencial();
-                            }   break;
+                            }
+                            break;
+                        case 5:
+                            if (chkPdvVendas.isSelected()) {
+                                dao.setVendaDataInicio(txtDtIInicioVenda.getDate());
+                                dao.setVendaDataTermino(txtDtTerminoVenda.getDate());
+                                
+                                importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                            }
                         default:
                             break;
                     }
                     gravarParametros();
-
+                    
                     ProgressBar.dispose();
-
+                    
                     Util.exibirMensagem("Importação " + NOME_SISTEMA + " realizada com sucesso!", getTitle());
-
+                    
                     connSQL.close();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
@@ -215,17 +228,17 @@ public class MSuperGUI extends VRInternalFrame {
                 }
             }
         };
-
+        
         thread.start();
     }
-
+    
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new MSuperGUI(i_mdiFrame);
             }
-
+            
             instance.setVisible(true);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
@@ -233,7 +246,7 @@ public class MSuperGUI extends VRInternalFrame {
             i_mdiFrame.setDefaultCursor();
         }
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -261,6 +274,10 @@ public class MSuperGUI extends VRInternalFrame {
         cbxUnifProdFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkAjustarDigitoVerificador = new vrframework.bean.checkBox.VRCheckBox();
+        tabVendas = new javax.swing.JPanel();
+        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
+        txtDtIInicioVenda = new org.jdesktop.swingx.JXDatePicker();
+        txtDtTerminoVenda = new org.jdesktop.swingx.JXDatePicker();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioFirebird = new vrframework.bean.textField.VRTextField();
@@ -432,6 +449,39 @@ public class MSuperGUI extends VRInternalFrame {
 
         tab.addTab("Especiais", vRPanel1);
 
+        chkPdvVendas.setText("Vendas (PDV)");
+        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPdvVendasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
+        tabVendas.setLayout(tabVendasLayout);
+        tabVendasLayout.setHorizontalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDtIInicioVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDtTerminoVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(319, Short.MAX_VALUE))
+        );
+        tabVendasLayout.setVerticalGroup(
+            tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtIInicioVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtTerminoVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(323, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Vendas", tabVendas);
+
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Firebird"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
@@ -597,10 +647,10 @@ public class MSuperGUI extends VRInternalFrame {
         try {
             this.setWaitCursor();
             importarTabelas();
-
+            
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
-
+            
         } finally {
             this.setDefaultCursor();
         }
@@ -621,17 +671,17 @@ public class MSuperGUI extends VRInternalFrame {
     private void btnConectarFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarFirebirdActionPerformed
         try {
             this.setWaitCursor();
-
+            
             if (connSQL != null) {
                 connSQL.close();
             }
-
+            
             validarDadosAcessoPostgres();
             btnConectarFirebird.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
-
+            
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
-
+            
         } finally {
             this.setDefaultCursor();
         }
@@ -645,6 +695,15 @@ public class MSuperGUI extends VRInternalFrame {
 
     }//GEN-LAST:event_txtComplementoKeyReleased
 
+    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
+        if (txtDtIInicioVenda.getDate() == null) {
+            txtDtIInicioVenda.setDate(new Date(System.currentTimeMillis()));
+        }
+        if (txtDtTerminoVenda.getDate() == null) {
+            txtDtTerminoVenda.setDate(new Date(System.currentTimeMillis()));
+        }
+    }//GEN-LAST:event_chkPdvVendasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarFirebird;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -654,6 +713,7 @@ public class MSuperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkAjustarDigitoVerificador;
+    private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JPanel jPanel1;
@@ -665,8 +725,11 @@ public class MSuperGUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksFornecedorPanelGUI tabFornecedores;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
+    private javax.swing.JPanel tabVendas;
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
     private vrframework.bean.textField.VRTextField txtComplemento;
+    private org.jdesktop.swingx.JXDatePicker txtDtIInicioVenda;
+    private org.jdesktop.swingx.JXDatePicker txtDtTerminoVenda;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
     private vrframework.bean.textField.VRTextField txtPortaFirebird;
     private vrframework.bean.passwordField.VRPasswordField txtSenhaFirebird;
