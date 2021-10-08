@@ -668,7 +668,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
                     imp.setId(rs.getString("id"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setIdFornecedor(rs.getString("fornecedorid"));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setNumeroDocumento(rs.getString("numerodocumento"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
