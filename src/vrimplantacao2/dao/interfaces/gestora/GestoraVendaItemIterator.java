@@ -75,7 +75,8 @@ public class GestoraVendaItemIterator extends MultiStatementIterator<VendaItemIM
                 + "	left join " + getNomeTabelaV(intervalo.dataInicial) + " cp on cp.com_registro = sp.com_registro\n"
                 + "     left join produtos p on p.pro_codigo = sp.pro_codigo\n"
                 + "where\n"
-                + "     CAST (CONVERT(NVARCHAR,SP.DATA_PROCESSO,23) AS DATE) between '" + DATE_FORMAT.format(intervalo.dataInicial) + "' and '" + DATE_FORMAT.format(intervalo.dataFinal) + "'\n";
+                + "     CAST (CONVERT(NVARCHAR,SP.DATA_PROCESSO,23) AS DATE) between '" + DATE_FORMAT.format(intervalo.dataInicial) + "' and '" + DATE_FORMAT.format(intervalo.dataFinal) + "'\n"
+                + "and sp.pro_codigo > 0";
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
