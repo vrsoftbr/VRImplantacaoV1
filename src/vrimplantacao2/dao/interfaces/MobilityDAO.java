@@ -1,14 +1,22 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -25,6 +33,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -33,6 +43,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean importarSomenteBalanca = false;
+    
+    private Date vendaDataInicio;
+    private Date vendaDataTermino;
+
+    private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -682,5 +697,142 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        private Statement stm;
+        private ResultSet rst;
+        private final String sql;
+
+        public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
+            this.stm = ConexaoOracle.createStatement();
+            this.sql
+                    = "";
+            this.stm.setFetchSize(10000);
+            this.rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                return !rst.isClosed() && !rst.isLast();
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public VendaIMP next() {
+            try {
+                if (rst.next()) {
+                    VendaIMP imp = new VendaIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(rst.getInt("numerocupom"));
+                    imp.setEcf(rst.getInt("ecf"));
+                    imp.setData(rst.getDate("data"));
+                    imp.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                    imp.setHoraInicio(rst.getDate("data"));
+                    imp.setHoraTermino(rst.getDate("data"));
+                    imp.setCancelado(rst.getBoolean("cancelado"));
+                    imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroSerie(rst.getString("numeroserie"));
+                    imp.setModeloImpressora(rst.getString("modeloimpressora"));
+                    imp.setNomeCliente(rst.getString("nomecliente"));
+                    imp.setEnderecoCliente(rst.getString("enderecocliente"));
+                    imp.setChaveNfCe(rst.getString("chavenfce"));
+
+                    return imp;
+                } else {
+                    rst.close();
+                    stm.close();
+                    return null;
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no next()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Não suportado.");
+        }
+    }
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm;
+        private ResultSet rst;
+        private String sql;
+
+        public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
+            this.stm = ConexaoOracle.createStatement();
+            this.sql
+                    = "";
+            this.stm.setFetchSize(10000);
+            this.rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                return !rst.isClosed() && !rst.isLast();
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            try {
+                if (rst.next()) {
+                    VendaItemIMP imp = new VendaItemIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setSequencia(rst.getInt("sequencia"));
+                    imp.setVenda(rst.getString("venda"));
+                    imp.setProduto(rst.getString("produto"));
+                    imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
+                    imp.setQuantidade(rst.getDouble("qtde"));
+                    imp.setPrecoVenda(rst.getDouble("valor"));
+                    imp.setValorDesconto(rst.getDouble("desconto"));
+                    imp.setValorAcrescimo(rst.getDouble("acrescimo"));
+                    imp.setCodigoBarras(rst.getString("ean"));
+                    imp.setUnidadeMedida(rst.getString("unidade"));
+                    imp.setIcmsCst(rst.getInt("cst"));
+                    imp.setIcmsAliq(rst.getDouble("aliquota"));
+
+                    return imp;
+                } else {
+                    rst.close();
+                    stm.close();
+                    return null;
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no next()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Não suportado.");
+        }
     }
 }
