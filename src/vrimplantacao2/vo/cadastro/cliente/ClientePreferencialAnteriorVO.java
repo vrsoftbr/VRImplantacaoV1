@@ -16,6 +16,7 @@ public class ClientePreferencialAnteriorVO {
     private String ie;
     private String nome;
     private boolean forcarGravacao = false;
+    private int ponto;
 
     public String getSistema() {
         return sistema;
@@ -79,6 +80,14 @@ public class ClientePreferencialAnteriorVO {
 
     public void setForcarGravacao(boolean forcarGravacao) {
         this.forcarGravacao = forcarGravacao;
+    }
+
+    public int getPonto() {
+        return ponto;
+    }
+
+    public void setPonto(int ponto) {
+        this.ponto = ponto;
     }
     
 }
