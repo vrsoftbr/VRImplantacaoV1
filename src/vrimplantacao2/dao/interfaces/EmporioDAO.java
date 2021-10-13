@@ -39,12 +39,13 @@ public class EmporioDAO extends InterfaceDAO {
                     "  c.customer_name razao,\n" +
                     "  c.customer_name2 fantasia,\n" +
                     "  case st.customer_status when 5 then 1 else 0 end bloqueado,\n" +
-                    "  c.customer_address endereco,\n" +
-                    "  c.customer_comple complemento,\n" +
-                    "  c.customer_neig bairro,\n" +
-                    "  c.customer_city municipio,\n" +
-                    "  c.customer_state uf,\n" +
-                    "  c.customer_zip cep,\n" +
+                    "  ca.custaddr_address endereco,\n" +
+                    "  ca.custaddr_number numero,\n" +
+                    "  ca.custaddr_comple complemento,\n" +
+                    "  ca.custaddr_neig bairro,\n" +
+                    "  ca.custaddr_city municipio,\n" +
+                    "  ca.custaddr_state uf,\n" +
+                    "  ca.custaddr_zip cep,\n" +
                     "  c.customer_civil_status estado_civil,\n" +
                     "  c.customer_birthday datanascimento,\n" +
                     "  c.customer_date_inc datacadastro,\n" +
@@ -79,6 +80,7 @@ public class EmporioDAO extends InterfaceDAO {
                     "  left join customer_sku ie on\n" +
                     "    c.customer_key = ie.customer_key\n" +
                     "    and ie.customer_sku_type_key in (8)\n" +
+                    "  left join customer_address ca on c.customer_key = ca.customer_key\n" +        
                     (isClienteSomentePontos() ? "where st.customer_points > 0\n" : "") +                
                     "order by\n" +
                     "  id"

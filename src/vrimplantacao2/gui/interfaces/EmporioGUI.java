@@ -1,5 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import org.openide.util.Exceptions;
@@ -175,7 +177,18 @@ public class EmporioGUI extends VRInternalFrame {
                         }
                         if (chkPontos.isSelected()) {
                             importador.importarClientePontuacao();
-                        }                        
+                        }
+
+                        List<OpcaoCliente> opcoes = new ArrayList<>();
+                        
+                        if(chkEndereco.isSelected()) {
+                            opcoes.add(OpcaoCliente.ENDERECO_COMPLETO);
+                        }
+                        
+                        if(!opcoes.isEmpty()) {
+                            importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
+                        }
+                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         
                         if (chkUnifClientePreferencial.isSelected()) {
@@ -221,6 +234,7 @@ public class EmporioGUI extends VRInternalFrame {
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkSomentePontos = new vrframework.bean.checkBox.VRCheckBox();
         chkPontos = new vrframework.bean.checkBox.VRCheckBox();
+        chkEndereco = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -333,6 +347,14 @@ public class EmporioGUI extends VRInternalFrame {
             }
         });
 
+        chkEndereco.setText("Endereço");
+        chkEndereco.setEnabled(true);
+        chkEndereco.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkEnderecoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
         vRPanel8.setLayout(vRPanel8Layout);
         vRPanel8Layout.setHorizontalGroup(
@@ -340,19 +362,24 @@ public class EmporioGUI extends VRInternalFrame {
             .addGroup(vRPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel8Layout.createSequentialGroup()
-                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(48, 48, 48))
                     .addGroup(vRPanel8Layout.createSequentialGroup()
                         .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkSomentePontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkPontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(236, 236, 236))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel8Layout.createSequentialGroup()
+                                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(48, 48, 48))
+                            .addGroup(vRPanel8Layout.createSequentialGroup()
+                                .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkSomentePontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkPontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(236, 236, 236))
+                    .addGroup(vRPanel8Layout.createSequentialGroup()
+                        .addComponent(chkEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         vRPanel8Layout.setVerticalGroup(
             vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -372,7 +399,9 @@ public class EmporioGUI extends VRInternalFrame {
                         .addComponent(chkSomentePontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkPontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(117, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(87, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel8);
@@ -641,6 +670,10 @@ public class EmporioGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkPontosActionPerformed
 
+    private void chkEnderecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkEnderecoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkEnderecoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarMySQL;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -648,6 +681,7 @@ public class EmporioGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkPontos;
     private vrframework.bean.checkBox.VRCheckBox chkSomentePontos;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;

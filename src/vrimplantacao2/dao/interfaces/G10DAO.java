@@ -358,6 +358,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescontinuado(rs.getBoolean("situacaoCadastro"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
+                    imp.setSituacaoCadastro(rs.getInt("situacaoCadastro"));
 
                     imp.setPiscofinsCstCredito(rs.getString("piscofinsCstCredito"));
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsCstDebito"));

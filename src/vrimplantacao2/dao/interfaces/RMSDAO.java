@@ -43,6 +43,7 @@ import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -531,6 +532,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	det.DET_NCM_EXCECAO excecao,\n"
                     + "	det.DET_CEST cest,\n"
                     + "	trib.piscofins_debito,\n"
+                    + " trib.pis_cofins_debito,\n"        
                     + "	det.DET_NAT_REC nat_rec,\n"
                     + "	p.git_nat_fiscal icms_id,\n"
                     + "	trib.icms_cst,\n"
@@ -599,7 +601,8 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	    pdv.PDV_SIT_TRIBUT icms_cst,\n"
                     + "	    pdv.PDV_TRIBUT icms_aliq,\n"
                     + "	    pdv.PDV_REDUCAO icms_red,\n"
-                    + "	    pdv.PDV_CST_PIS piscofins_debito\n"
+                    + "	    pdv.PDV_CST_PIS piscofins_debito,\n"
+                    + "     pdv.pdv_pis_cofins pis_cofins_debito\n"        
                     + "	    from\n"
                     + "	    AG1PDVPD pdv\n"
                     + "	    where pdv.PDV_EXCLUIR != 'S'\n"
@@ -691,16 +694,20 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.setIcmsCstSaida(rst.getInt("icms_cst_s"));
                         imp.setIcmsCstEntrada(rst.getInt("icms_cst_e"));
+                        imp.setIcmsCstConsumidor(rst.getInt("icms_cst_s"));
 
                         imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq_e"));
                         imp.setIcmsAliqSaida(rst.getDouble("icms_aliq_s"));
+                        imp.setIcmsAliqConsumidor(rst.getDouble("icms_aliq_e"));
+                        
                         imp.setIcmsReducaoEntrada(rst.getDouble("icms_rbc_e"));
                         imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
+                        imp.setIcmsReducaoConsumidor(rst.getDouble("icms_rbc_s"));
                         imp.setAtacadoPreco(rst.getDouble("precoatac"));
 
                         imp.setPautaFiscalId(rst.getString("idpautafiscal"));
                     } else {
-                        imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                        imp.setPiscofinsCstDebito(rst.getInt("pis_cofins_debito"));
                         imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
 
                         imp.setIcmsDebitoId(rst.getString("icms_id"));
@@ -836,7 +843,13 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "       itf.git_cod_item id_produtofilho,\n" +
                     "       itf.git_descricao descricaofilho,\n" +
                     "       rec.rece_quantidade,\n" +
-                    "       rec.rece_quantidade * 1000 as qtd\n" +
+                    "       rec.rece_quantidade * 1000 as qtd,\n" +
+                    "       (select \n" +
+                    "             sum(rece_quantidade)\n" +
+                    "        from \n" +
+                    "            AA1CRECE\n" +
+                    "        where \n" +
+                    "            rece_produto = rec.rece_produto) as rendimento\n" +        
                     "from \n" +
                     "     AA1CRECE rec \n" +
                     "join AA3CITEM it on rec.rece_produto = it.git_cod_item || it.git_digito\n" +
@@ -858,10 +871,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportid(rst.getString("id_produtopai"));
                     imp.setIdproduto(rst.getString("id_produtopai"));
                     imp.setDescricao(rst.getString("git_descricao"));
-                    imp.setRendimento(1d);
+                    imp.setRendimento(rst.getDouble("rendimento"));
                     imp.setQtdembalagemreceita(rst.getInt("qtd"));
                     imp.setQtdembalagemproduto(1000);
                     imp.setFator(1);
+                    imp.setFichatecnica("");
                     imp.getProdutos().add(rst.getString("id_produtofilho"));
 
                     result.add(imp);
@@ -878,39 +892,51 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	F.TIP_CODIGO||F.TIP_DIGITO id,\n"
-                    + "	F.TIP_RAZAO_SOCIAL razao,\n"
-                    + "	F.TIP_NOME_FANTASIA fantasia,\n"
-                    + "	F.TIP_CGC_CPF cnpj,\n"
-                    + "	F.TIP_INSC_EST_IDENT inscricaoestadual,\n"
-                    + "	F.TIP_INSC_MUN insc_municipal,\n"
-                    + "	F.TIP_ENDERECO endereco,\n"
-                    + "	F.TIP_BAIRRO bairro,\n"
-                    + "	F.TIP_CIDADE cidade,\n"
-                    + "	F.TIP_ESTADO uf,\n"
-                    + "	F.TIP_CEP cep,\n"
-                    + "	F.TIP_DATA_CAD datacadastro,\n"
-                    + "	coalesce(cast(F.TIP_FONE_DDD as varchar(20)), '') ||	cast(F.TIP_FONE_NUM as varchar(20)) fone1,\n"
-                    + "	case when not F.TIP_TELEX_NUM is null then coalesce(cast(F.TIP_TELEX_DDD as varchar(20)), '') || cast(F.TIP_TELEX_NUM as varchar(20)) else null end fone2,\n"
-                    + "	case when not F.TIP_FAX_NUM is null then coalesce(cast(F.TIP_FAX_DDD as varchar(20)), '') || cast(F.TIP_FAX_NUM as varchar(20)) else null end fax,\n"
-                    + "    F2.FOR_COND_1 condicaopag,\n"
-                    + "    f2.FOR_PRZ_ENTREGA entrega,\n"
-                    + "    f2.FOR_FREQ_VISITA visita,\n"
-                    + "    f3.FOR_PED_MIN_EMB qtd_pedido_minimo,\n"
-                    + "    f3.FOR_PED_MIN_VLR valor_pedido_minimo\n"
-                    + "FROM\n"
-                    + "	AA2CTIPO F\n"
-                    + "    left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n"
-                    + "    left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n"
-                    + "WHERE\n"
-                    + "	F.TIP_LOJ_CLI in ('F', 'L')\n"
-                    + "order by\n"
-                    + "    id"
+                    "SELECT\n" +
+                    "	F.TIP_CODIGO||F.TIP_DIGITO id,\n" +
+                    "	F.TIP_RAZAO_SOCIAL razao,\n" +
+                    "	F.TIP_NOME_FANTASIA fantasia,\n" +
+                    "	F.TIP_CGC_CPF cnpj,\n" +
+                    "	F.TIP_INSC_EST_IDENT inscricaoestadual,\n" +
+                    "	F.TIP_INSC_MUN insc_municipal,\n" +
+                    "	F.TIP_ENDERECO endereco,\n" +
+                    "	F.TIP_BAIRRO bairro,\n" +
+                    "	F.TIP_CIDADE cidade,\n" +
+                    "	F.TIP_ESTADO uf,\n" +
+                    "	F.TIP_CEP cep,\n" +
+                    "	F.TIP_DATA_CAD datacadastro,\n" +
+                    "	coalesce(cast(F.TIP_FONE_DDD as varchar(20)), '') ||	cast(F.TIP_FONE_NUM as varchar(20)) fone1,\n" +
+                    "	case when not F.TIP_TELEX_NUM is null then coalesce(cast(F.TIP_TELEX_DDD as varchar(20)), '') || cast(F.TIP_TELEX_NUM as varchar(20)) else null end fone2,\n" +
+                    "	case when not F.TIP_FAX_NUM is null then coalesce(cast(F.TIP_FAX_DDD as varchar(20)), '') || cast(F.TIP_FAX_NUM as varchar(20)) else null end fax,\n" +
+                    "  f2.for_contato contato,\n" +
+                    "  f4.tipc_nome nome_contato,\n" +
+                    "  f4.tipc_ddd_1 ddd,\n" +
+                    "  f4.tipc_ddd_2 ddd2,\n" +
+                    "  f4.tipc_fone_1 fone_contato,\n" +
+                    "  f4.tipc_fone_2 fone_contato2,\n" +
+                    "  f4.tipc_cargo cargo,\n" +
+                    "  f4.tipc_email_1 email_cont,\n" +
+                    "  f4.tipc_email_2 email2_cont,\n" +
+                    "  f4.tipc_obs obs_cont,\n" +
+                    "	F2.FOR_COND_1 condicaopag,\n" +
+                    "	f2.FOR_PRZ_ENTREGA entrega,\n" +
+                    "	f2.FOR_FREQ_VISITA visita,\n" +
+                    "	f3.FOR_PED_MIN_EMB qtd_pedido_minimo,\n" +
+                    "	f3.FOR_PED_MIN_VLR valor_pedido_minimo\n" +
+                    "FROM\n" +
+                    "	AA2CTIPO F\n" +
+                    "	left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n" +
+                    "	left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n" +
+                    "  left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n" +
+                    "WHERE\n" +
+                    "	F.TIP_LOJ_CLI in ('F', 'L')\n" +
+                    "order by\n" +
+                    "	id"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy");
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
+                    
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -975,6 +1001,18 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoVisita(rst.getInt("visita"));
                     imp.setPrazoSeguranca(0);
                     imp.setCondicaoPagamento(rst.getInt("condicaopag"));
+                    
+                    int cargo = rst.getInt("cargo");
+                    imp.addContato(null, 
+                            rst.getString("nome_contato"), 
+                            rst.getString("ddd") + "" + rst.getString("fone_contato"), 
+                            rst.getString("ddd2") + "" + rst.getString("fone_contato2"), 
+                            cargo == 3 ? TipoContato.COMERCIAL :
+                                    cargo == 4 ? TipoContato.NFE :
+                                    cargo == 2 ? TipoContato.COMERCIAL :
+                                            TipoContato.FISCAL, 
+                            rst.getString("email_cont"));
+                    
                     result.add(imp);
                 }
             }
