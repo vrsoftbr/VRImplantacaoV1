@@ -7,16 +7,18 @@ import java.util.List;
 import vr.core.parametro.versao.Versao;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
-import vrframework.classe.VRException;
 import vrimplantacao.dao.CodigoInternoDAO;
 import vrimplantacao.dao.DataProcessamentoDAO;
 import vrimplantacao.vo.loja.LojaFiltroConsultaVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.SituacaoCadastro;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.utils.sql.SQLBuilder;
 
 public class LojaDAO {
 
+    private Versao versao = Versao.createFromConnectionInterface(Conexao.getConexao());
+    
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
         List<LojaVO> result = new ArrayList();
 
@@ -138,6 +140,150 @@ public class LojaDAO {
         return oLoja;
     }
 
+    public void salvarNovo(LojaVO i_loja) throws Exception {
+        
+        String sql = "SELECT id FROM loja WHERE id = " + i_loja.getId();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                if (!rst.next()) {
+                    SQLBuilder sqlInsert = new SQLBuilder();
+                    sqlInsert.setSchema("public");
+                    sqlInsert.setTableName("loja");
+
+                    sqlInsert.put("id", i_loja.getId());
+                    sqlInsert.put("descricao", i_loja.getDescricao());
+                    sqlInsert.put("id_fornecedor", i_loja.getIdFornecedor());
+                    sqlInsert.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+                    sqlInsert.put("nomeservidor", i_loja.getNomeServidor());
+                    sqlInsert.put("servidorcentral", i_loja.isServidorCentral());
+                    sqlInsert.put("id_regiao", i_loja.getIdRegiao());
+                    sqlInsert.put("geraconcentrador", i_loja.isGeraConcentrador());
+                    
+                    if (!sqlInsert.isEmpty()) {
+                        try (Statement stmInsert = Conexao.createStatement()) {
+                            stmInsert.execute(sqlInsert.getInsert());
+                        }
+                    }
+                    
+                    /* cópia da tabela produtocomplemento */
+                    stm.execute(copiarProdutoComplemento(i_loja));
+                    
+                    /* cópia da tabela fornecedorprazo */
+                    stm.execute(copiarFornecedorPrazo(i_loja));
+                    
+                    /* cópia da tabela fornecedorprazopedido */
+                    stm.execute(copiarFornecedorPrazoPedido(i_loja));
+                    
+                    /*cópia da tabela parametrovalor */
+                    stm.execute(copiarParametroValor(i_loja));
+                    
+                } else {                    
+                    SQLBuilder sqlUpdate = new SQLBuilder();
+                    sqlUpdate.setSchema("public");
+                    sqlUpdate.setTableName("loja");
+                    
+                    sqlUpdate.put("descricao", i_loja.getDescricao());
+                    sqlUpdate.put("id_fornecedor", i_loja.getIdFornecedor());
+                    sqlUpdate.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+                    sqlUpdate.put("nomeservidor", i_loja.getNomeServidor());
+                    sqlUpdate.put("servidorcentral", i_loja.isServidorCentral());
+                    sqlUpdate.put("id_regiao", i_loja.getIdRegiao());
+                    sqlUpdate.put("geraconcentrador", i_loja.isGeraConcentrador());
+
+                    sqlUpdate.setWhere("id = " + i_loja.getId());
+                    
+                    if (!sqlUpdate.isEmpty()) {
+                        try (Statement stmUpdate = Conexao.createStatement()) {
+                            stmUpdate.execute(sqlUpdate.getUpdate());
+                        }
+                    }
+                }
+            }
+        }        
+    }
+    
+    private String copiarProdutoComplemento(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO produtocomplemento ("
+                + "id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, dataultimopreco, \n"
+                + "dataultimaentrada, custosemimposto, custocomimposto, custosemimpostoanterior, custocomimpostoanterior, precovenda, precovendaanterior, \n"
+                + "precodiaseguinte, estoque, troca, emiteetiqueta, custosemperdasemimposto, custosemperdasemimpostoanterior, customediocomimposto, \n"
+                + "customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado, \n"
+                + "quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao, id_tipocalculoddv \n";
+
+        if (versao.igualOuMaiorQue(3, 17, 10)) {
+            sql = sql + ", id_tipoproduto, fabricacaopropria ";
+        }
+        if (versao.igualOuMaiorQue(3, 21)) {
+            sql = sql + ", dataprimeiraentrada ";
+        }
+        if (versao.igualOuMaiorQue(4)) {
+            sql = sql + ", margem, margemminima, margemmaxima ";
+        }
+
+        sql = sql + ")";
+
+        sql = sql + " (SELECT id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, null, null, " + (i_loja.isCopiaCusto() ? "custosemimposto" : "0") + ","
+                + " " + (i_loja.isCopiaCusto() ? "custocomimposto" : "0") + ", 0, 0, " + (i_loja.isCopiaPrecoVenda() ? "precovenda" : "0") + ","
+                + "  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,"
+                + " null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,"
+                + " valoricmssubstituicao, null, cestabasica, 0, 3";
+
+        if (versao.igualOuMaiorQue(3, 17, 10)) {
+            sql = sql + ", 0, false";
+        }
+        if (versao.igualOuMaiorQue(3, 21)) {
+            sql = sql + ", dataprimeiraentrada ";
+        }
+        if (versao.igualOuMaiorQue(4)) {
+            sql = sql + (i_loja.isCopiaMargem() ? ", margem" : ", 0");
+            sql = sql + (i_loja.isCopiaMargem() ? ", margemminima" : ", 0");
+            sql = sql + (i_loja.isCopiaMargem() ? ", margemmaxima" : ", 0");
+        }
+
+        sql = sql + " from produtocomplemento where id_loja = " + i_loja.getIdCopiarLoja() + ")";
+        
+        return sql;
+    }
+    
+    private String copiarFornecedorPrazo(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO fornecedorprazo("
+                + "id_fornecedor, id_loja, id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca)"
+                + "(SELECT id_fornecedor, " + i_loja.getId() + ", id_divisaofornecedor, prazoentrega, prazovisita, prazoseguranca \n"
+                + "FROM fornecedorprazo WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
+        
+        return sql;
+    }
+    
+    private String copiarFornecedorPrazoPedido(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO fornecedorprazopedido(id_fornecedor, id_loja, \n"
+                + "diasentregapedido,diasatualizapedidoparcial) \n"
+                + "(SELECT id_fornecedor, " + i_loja.getId() + ", diasentregapedido,diasatualizapedidoparcial \n"
+                + "FROM fornecedorprazopedido WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
+        return sql;
+    }
+    
+    private String copiarParametroValor(LojaVO i_loja) throws Exception {
+        String sql = "insert into parametrovalor (\n"
+                + "	id_loja,\n"
+                + "	id_parametro,\n"
+                + "	valor\n"
+                + ") \n"
+                + "select\n"
+                + "	" + i_loja.getId() + ",\n"
+                + "	id_parametro,\n"
+                + "	valor\n"
+                + "from\n"
+                + "	parametrovalor\n"
+                + "where\n"
+                + "	id_loja = " + i_loja.getIdCopiarLoja() + "\n"
+                + "	and id_parametro not in (456, 485, 486)";
+
+        return sql;
+    }
+    
     public void salvar(LojaVO i_loja) throws Exception {
         Statement stm = null;
         Statement stm2 = null;

@@ -16,6 +16,7 @@ public class LojaVO {
     public boolean copiaPrecoVenda = false;
     public boolean copiaCusto = false;
     public boolean copiaTecladoLayout = false;
+    private boolean copiaMargem = false;
 
     public int getId() {
         return id;
@@ -132,5 +133,13 @@ public class LojaVO {
     @Override
     public String toString() {
         return descricao;
+    }
+    
+    public boolean isCopiaMargem() {
+        return this.copiaMargem;
+    }
+    
+    public void setCopiaMargem(boolean copiaMargem) {
+        this.copiaMargem = copiaMargem;
     }
 }
