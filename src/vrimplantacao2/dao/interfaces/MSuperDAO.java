@@ -253,7 +253,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ncm.digitos AS NCM,\n"
                     + "	pr.custo AS custocomimposto,\n"
                     + "	pr.custo_medio AS custosemimposto,\n"
-                    + "	pr.margem AS margem,\n"
+                    + "	pr.margemsug AS margem,\n"
                     + "	pr.venda AS precovenda,\n"
                     + "	pr.SALDO_MINIMO AS estoqueminimo,\n"
                     + "	pr.SALDO_MAXIMO AS estoquemaximo,\n"
