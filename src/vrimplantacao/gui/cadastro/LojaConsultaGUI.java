@@ -64,10 +64,10 @@ public class LojaConsultaGUI extends VRInternalFrame {
     @Override
     public void consultar() throws Exception {
         LojaFiltroConsultaVO oFiltro = new LojaFiltroConsultaVO();
-        oFiltro.id = (!txtCodigo.getText().equals("")) ? txtCodigo.getInt() : -1;
-        oFiltro.descricao = txtDescricao.getText();
-        oFiltro.ordenacao = formFiltro.getOrdenacao();
-        oFiltro.limite = formFiltro.getLimite();
+        oFiltro.setId((!txtCodigo.getText().equals("")) ? txtCodigo.getInt() : -1);
+        oFiltro.setDescricao(txtDescricao.getText());
+        oFiltro.setOrdenacao(formFiltro.getOrdenacao());
+        oFiltro.setLimite(formFiltro.getLimite());
 
         vLoja = new LojaDAO().consultar(oFiltro);
 

@@ -18,143 +18,124 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 public class LojaDAO {
 
     public List<LojaVO> consultar(LojaFiltroConsultaVO i_filtro) throws Exception {
-        Statement stm = null;
-        StringBuilder sql = null;
-        ResultSet rst = null;
+        List<LojaVO> result = new ArrayList();
 
-        stm = Conexao.createStatement();
+        String sql = "SELECT "
+                + "     lj.*, sc.descricao AS situacaocadastro,\n"
+                + "     r.descricao AS regiao\n"
+                + "FROM loja AS lj\n"
+                + "INNER JOIN situacaocadastro AS sc ON sc.id = lj.id_situacaocadastro\n"
+                + "INNER JOIN regiao AS r ON r.id = lj.id_regiao\n"
+                + "WHERE 1 = 1";
 
-        sql = new StringBuilder();
-        sql.append("SELECT lj.*, sc.descricao AS situacaocadastro, r.descricao AS regiao FROM loja AS lj");
-        sql.append(" INNER JOIN situacaocadastro AS sc ON sc.id = lj.id_situacaocadastro");
-        sql.append(" INNER JOIN regiao AS r ON r.id = lj.id_regiao");
-        sql.append(" WHERE 1 = 1");
-
-        if (i_filtro.id > -1) {
-            sql.append(" AND lj.id = " + i_filtro.id);
+        if (i_filtro.getId() > -1) {
+            sql = sql + " AND lj.id = " + i_filtro.getId();
         }
-
-        if (!i_filtro.descricao.trim().equals("")) {
-            sql.append(" AND " + Util.getGoogle("lj.descricao", i_filtro.descricao));
+        
+        if (!i_filtro.getDescricao().trim().equals("")) {
+            sql = sql + " AND " + Util.getGoogle("lj.descricao", i_filtro.getDescricao());
         }
-
-        if (i_filtro.ordenacao.isEmpty()) {
-            sql.append(" ORDER BY lj.descricao");
+        
+        if (i_filtro.getOrdenacao().isEmpty()) {
+            sql = sql + " ORDER BY lj.descricao";
         } else {
-            sql.append(" ORDER BY " + i_filtro.ordenacao + ", lj.descricao");
+            sql = sql + " ORDER BY " + i_filtro.getOrdenacao() + ", lj.descricao";
+        }
+        
+        if (i_filtro.getLimite() > 0) {
+            sql = sql + " LIMIT " + i_filtro.getLimite();
         }
 
-        if (i_filtro.limite > 0) {
-            sql.append(" LIMIT " + i_filtro.limite);
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+                    LojaVO oLoja = new LojaVO();
+                    oLoja.setId(rst.getInt("id"));
+                    oLoja.setDescricao(rst.getString("descricao"));
+                    oLoja.setIdFornecedor(rst.getInt("id_fornecedor"));
+                    oLoja.setNomeServidor(rst.getString("nomeservidor"));
+                    oLoja.setServidorCentral(rst.getBoolean("servidorcentral"));
+                    oLoja.setIdSituacaoCadastro(rst.getInt("id_situacaocadastro"));
+                    oLoja.setSituacaoCadastro(rst.getString("situacaocadastro"));
+                    oLoja.setIdRegiao(rst.getInt("id_regiao"));
+                    oLoja.setGeraConcentrador(rst.getBoolean("geraconcentrador"));
+                    oLoja.setRegiao(rst.getString("regiao"));
+
+                    result.add(oLoja);
+                }
+            }
         }
-
-        rst = stm.executeQuery(sql.toString());
-
-        List<LojaVO> vLoja = new ArrayList();
-
-        while (rst.next()) {
-            LojaVO oLoja = new LojaVO();
-            oLoja.id = rst.getInt("id");
-            oLoja.descricao = rst.getString("descricao");
-            oLoja.idFornecedor = rst.getInt("id_fornecedor");
-            oLoja.nomeServidor = rst.getString("nomeservidor");
-            oLoja.servidorCentral = rst.getBoolean("servidorcentral");
-            oLoja.idSituacaoCadastro = rst.getInt("id_situacaocadastro");
-            oLoja.situacaoCadastro = rst.getString("situacaocadastro");
-            oLoja.idRegiao = rst.getInt("id_regiao");
-            oLoja.geraConcentrador = rst.getBoolean("geraconcentrador");
-            oLoja.regiao = rst.getString("regiao");
-
-            vLoja.add(oLoja);
-        }
-
-        stm.close();
-
-        return vLoja;
+        return result;
     }
 
     public LojaVO carregar(int i_id) throws Exception {
-        Statement stm = null;
-        StringBuilder sql = null;
-        ResultSet rst = null;
-
-        stm = Conexao.createStatement();
-
-        sql = new StringBuilder();
-        sql.append("SELECT * FROM loja WHERE id = " + i_id);
-
-        rst = stm.executeQuery(sql.toString());
-
-        if (!rst.next()) {
-            throw new VRException("Loja não encontrada!");
-        }
-
         LojaVO oLoja = new LojaVO();
-        oLoja.id = rst.getInt("id");
-        oLoja.descricao = rst.getString("descricao");
-        oLoja.idFornecedor = rst.getInt("id_fornecedor");
-        oLoja.nomeServidor = rst.getString("nomeservidor");
-        oLoja.servidorCentral = rst.getBoolean("servidorcentral");
-        oLoja.idRegiao = rst.getInt("id_regiao");
-        oLoja.geraConcentrador = rst.getBoolean("geraconcentrador");
 
-        stm.close();
+        String sql = "SELECT * FROM loja WHERE id = " + i_id;
 
-        return oLoja;
-    }
-
-    public LojaVO carregar2(int i_id) throws Exception {
-        Statement stm = null;
-        StringBuilder sql = null;
-        ResultSet rst = null;
-        LojaVO oLoja = new LojaVO();
-        stm = Conexao.createStatement();
-
-        sql = new StringBuilder();
-        sql.append("SELECT * FROM loja WHERE id = " + i_id);
-        rst = stm.executeQuery(sql.toString());
-
-        if (rst.next()) {
-            oLoja.id = rst.getInt("id");
-            oLoja.descricao = rst.getString("descricao");
-            oLoja.idFornecedor = rst.getInt("id_fornecedor");
-            oLoja.nomeServidor = rst.getString("nomeservidor");
-            oLoja.servidorCentral = rst.getBoolean("servidorcentral");
-            oLoja.idRegiao = rst.getInt("id_regiao");
-            oLoja.geraConcentrador = rst.getBoolean("geraconcentrador");
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                if (rst.next()) {
+                    oLoja.setId(rst.getInt("id"));
+                    oLoja.setDescricao(rst.getString("descricao"));
+                    oLoja.setIdFornecedor(rst.getInt("id_fornecedor"));
+                    oLoja.setNomeServidor(rst.getString("nomeservidor"));
+                    oLoja.setServidorCentral(rst.getBoolean("servidorcentral"));
+                    oLoja.setIdRegiao(rst.getInt("id_regiao"));
+                    oLoja.setGeraConcentrador(rst.getBoolean("geraconcentrador"));
+                }
+            }
         }
-        stm.close();
         return oLoja;
     }
 
     public List<LojaVO> carregar() throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
+        List<LojaVO> result = new ArrayList<>();
 
-        try {
-            stm = Conexao.createStatement();
+        String sql = "SELECT * FROM loja ORDER BY loja ASC";
 
-            rst = stm.executeQuery("SELECT * FROM loja ORDER BY loja ASC");
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+                    LojaVO oLoja = new LojaVO();
+                    oLoja.setId(rst.getInt("id"));
+                    oLoja.setDescricao(rst.getString("descricao"));
 
-            List<LojaVO> vLoja = new ArrayList<>();
-
-            while (rst.next()) {
-                LojaVO oLoja = new LojaVO();
-                oLoja.id = rst.getInt("id");
-                oLoja.descricao = rst.getString("descricao");
-
-                vLoja.add(oLoja);
+                    result.add(oLoja);
+                }
             }
-
-            return vLoja;
-
-        } catch (Exception e) {
-            throw e;
-
-        } finally {
-            Conexao.destruir(null, stm, rst);
+            return result;
         }
+    }
 
+    public LojaVO carregar2(int i_id) throws Exception {
+        LojaVO oLoja = new LojaVO();
+        
+        String sql = "SELECT * FROM loja WHERE id = " + i_id;
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                if (rst.next()) {
+                    oLoja.setId(rst.getInt("id"));
+                    oLoja.setDescricao(rst.getString("descricao"));
+                    oLoja.setIdFornecedor(rst.getInt("id_fornecedor"));
+                    oLoja.setNomeServidor(rst.getString("nomeservidor"));
+                    oLoja.setServidorCentral(rst.getBoolean("servidorcentral"));
+                    oLoja.setIdRegiao(rst.getInt("id_regiao"));
+                    oLoja.setGeraConcentrador(rst.getBoolean("geraconcentrador"));
+                }
+            }
+        }
+        
+        return oLoja;
     }
 
     public void salvar(LojaVO i_loja) throws Exception {
@@ -430,60 +411,58 @@ public class LojaDAO {
     }
 
     public boolean isLoja(int i_idLoja) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
-        stm = Conexao.createStatement();
-        rst = stm.executeQuery("SELECT id from loja where id = " + i_idLoja);
-
-        if (rst.next()) {
-            return true;
-        } else {
-            return false;
+        String sql = "SELECT id from loja where id = " + i_idLoja;
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
         }
     }
 
     public boolean isFornecedor(int i_idFornecedor) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
+        String sql = "SELECT id FROM loja WHERE id_fornecedor = " + i_idFornecedor;
 
-        stm = Conexao.createStatement();
-
-        rst = stm.executeQuery("SELECT id FROM loja WHERE id_fornecedor = " + i_idFornecedor);
-
-        if (rst.next()) {
-            return true;
-        } else {
-            return false;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                return rst.next();
+            }
         }
     }
 
     public int getId(int i_idFornecedor) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
+        String sql = "SELECT id FROM loja WHERE id_fornecedor = " + i_idFornecedor;
 
-        stm = Conexao.createStatement();
-
-        rst = stm.executeQuery("SELECT id FROM loja WHERE id_fornecedor = " + i_idFornecedor);
-
-        if (rst.next()) {
-            return rst.getInt("id");
-        } else {
-            return 0;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                } else {
+                    return 0;
+                }
+            }
         }
     }
 
     public int getIdFornecedor(int i_idLoja) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
+        String sql = "SELECT id_fornecedor FROM loja WHERE id = " + i_idLoja;
 
-        stm = Conexao.createStatement();
-
-        rst = stm.executeQuery("SELECT id_fornecedor FROM loja WHERE id = " + i_idLoja);
-
-        if (rst.next()) {
-            return rst.getInt("id_fornecedor");
-        } else {
-            return 0;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id_fornecedor");
+                } else {
+                    return 0;
+                }
+            }
         }
     }
 
