@@ -516,8 +516,9 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n"
                     + "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n"
                     + "	0 estoqueminimo,\n"
-                    + "	0 estoquemaximo,    \n"
+                    + "	0 estoquemaximo,\n"
                     + "	est.GET_ESTOQUE estoque,\n"
+                    + " est.get_qtd_pend_vda pendencia,\n"        
                     + "	p.GIT_MRG_LUCRO_1 margem,\n"
                     + "	p.git_envia_pdv,\n"
                     + "	p.git_dat_sai_lin saidadelinha,\n"
@@ -678,6 +679,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescontinuado(dataForaDeLinha < dataatual);
                     }
                     imp.setEstoque(rst.getDouble("estoque"));
+                    
+                    if(imp.getEstoque() == 0) {
+                        imp.setEstoque(rst.getDouble("pendencia") * -1);
+                    }
+                    
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
@@ -908,16 +914,16 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	coalesce(cast(F.TIP_FONE_DDD as varchar(20)), '') ||	cast(F.TIP_FONE_NUM as varchar(20)) fone1,\n" +
                     "	case when not F.TIP_TELEX_NUM is null then coalesce(cast(F.TIP_TELEX_DDD as varchar(20)), '') || cast(F.TIP_TELEX_NUM as varchar(20)) else null end fone2,\n" +
                     "	case when not F.TIP_FAX_NUM is null then coalesce(cast(F.TIP_FAX_DDD as varchar(20)), '') || cast(F.TIP_FAX_NUM as varchar(20)) else null end fax,\n" +
-                    "  f2.for_contato contato,\n" +
-                    "  f4.tipc_nome nome_contato,\n" +
-                    "  f4.tipc_ddd_1 ddd,\n" +
-                    "  f4.tipc_ddd_2 ddd2,\n" +
-                    "  f4.tipc_fone_1 fone_contato,\n" +
-                    "  f4.tipc_fone_2 fone_contato2,\n" +
-                    "  f4.tipc_cargo cargo,\n" +
-                    "  f4.tipc_email_1 email_cont,\n" +
-                    "  f4.tipc_email_2 email2_cont,\n" +
-                    "  f4.tipc_obs obs_cont,\n" +
+                    "   f2.for_contato contato,\n" +
+                    "   f4.tipc_nome nome_contato,\n" +
+                    "   f4.tipc_ddd_1 ddd,\n" +
+                    "   f4.tipc_ddd_2 ddd2,\n" +
+                    "   f4.tipc_fone_1 fone_contato,\n" +
+                    "   f4.tipc_fone_2 fone_contato2,\n" +
+                    "   f4.tipc_cargo cargo,\n" +
+                    "   f4.tipc_email_1 email_cont,\n" +
+                    "   f4.tipc_email_2 email2_cont,\n" +
+                    "   f4.tipc_obs obs_cont,\n" +
                     "	F2.FOR_COND_1 condicaopag,\n" +
                     "	f2.FOR_PRZ_ENTREGA entrega,\n" +
                     "	f2.FOR_FREQ_VISITA visita,\n" +
@@ -927,7 +933,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	AA2CTIPO F\n" +
                     "	left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n" +
                     "	left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n" +
-                    "  left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n" +
+                    "   left join AA1CTIPC f4 on f.tip_codigo = f4.tipc_codigo\n" +
                     "WHERE\n" +
                     "	F.TIP_LOJ_CLI in ('F', 'L')\n" +
                     "order by\n" +
@@ -1615,6 +1621,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ch.CHE_AGENCIA agencia,\n"
                     + "    ch.CHE_CONTA_CORRENTE conta,\n"
                     + "    ch.CHE_EMISSAO data,\n"
+                    + "    ch.CHE_VENCIMENTO vencimento,\n"        
                     + "    ch.CHE_VALOR valor,\n"
                     + "    cli.CLI_RG_INSC_EST rg,\n"
                     + "    (select cast(CONT_DDD||CONT_NUMERO as numeric) from CONTATO_CLIENTE where CLI_CODIGO = cli.CLI_CODIGO and ROWNUM = 1) telefone,\n"
@@ -1643,7 +1650,7 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setBanco(rst.getInt("banco"));
                     imp.setAgencia(rst.getString("agencia"));
                     imp.setConta(rst.getString("conta"));
-                    imp.setDate(format.parse(rst.getString("data")));
+                    imp.setDate(format.parse(rst.getString("vencimento")));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setRg(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
@@ -1720,6 +1727,11 @@ public class RMSDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setCnpj(rst.getString("cnpj"));
+                    
+                    if(imp.getId().equals("13")) {
+                        imp.setCnpj(imp.getId());
+                    }
+                    
                     imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero("0");

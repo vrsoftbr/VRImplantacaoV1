@@ -430,6 +430,15 @@ public class LojaDAO {
 
                 stm.execute(sql.toString());
             }
+            
+            if (versao.igualOuMaiorQue(4, 1, 5)) {
+                sql = new StringBuilder();
+                
+                sql.append("insert into contabilidade.grupoeconomicoloja (id_grupoeconomico, id_loja, matriz) "
+                                                                     + "values (1, " + i_loja.id + ", false);");
+                
+                stm.execute(sql.toString());
+            }
 
             stm.close();
             stm2.close();

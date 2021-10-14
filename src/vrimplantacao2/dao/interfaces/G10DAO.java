@@ -295,7 +295,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pa.preco precoatacado,\n" +
                     "	case \n" +
                     "		when statusid = 29 then 1 else 0 \n" +
-                    "	end situacaoCadastro ,\n" +
+                    "	end situacaoCadastro,\n" +
                     "	ncmsh ncm,\n" +
                     "	p.cest,\n" +
                     "	piscste.codigo piscofinsCstCredito,\n" +
@@ -304,7 +304,7 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "	icms.tabelaimpostosid\n" +
                     "from \n" +
                     "	produto p\n" +
-                    "	JOIN ean ON\n" +
+                    "	left JOIN ean ON\n" +
                     "		ean.produtoid = p.id\n" +
                     "	join unidade un on \n" +
                     "		un.id = p.unidadeid\n" +
@@ -314,10 +314,10 @@ public class G10DAO extends InterfaceDAO implements MapaTributoProvider {
                     "		icms.produtoid = p.id and\n" +
                     "		icms.pessoaemitente = 1428\n" +
                     "	join tabelaimpostos imp ON \n" +
-                    "	 	imp.id = icms.tabelaimpostosid\n" +
-                    "   join cstpis piscste ON\n" +
+                    "		imp.id = icms.tabelaimpostosid\n" +
+                    "	left join cstpis piscste ON\n" +
                     "		piscste.id = imp.cstpisentradaid\n" +
-                    "	join cstpis piscsts ON\n" +
+                    "	left join cstpis piscsts ON\n" +
                     "		piscsts.id = imp.cstpissaidaid\n" +
                     "order by 1"
             )) {
