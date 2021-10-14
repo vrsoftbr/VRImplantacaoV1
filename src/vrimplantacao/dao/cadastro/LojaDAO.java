@@ -180,6 +180,15 @@ public class LojaDAO {
                     /*cópia da tabela parametrovalor */
                     stm.execute(copiarParametroValor(i_loja));
                     
+                    /*cópia da tabela pdv.funcaoniveloperador */
+                    stm.execute(copiarPdvFuncaoNivelOperador(i_loja));
+                    
+                    /* cópia da tabela pdv.parametrovalor */
+                    stm.execute(copiarPdvParametroValor(i_loja));
+                    
+                    /* update campo valor na tabela pdv.parametrovalor */
+                    updateValorPdvParametroValor(i_loja);
+                    
                 } else {                    
                     SQLBuilder sqlUpdate = new SQLBuilder();
                     sqlUpdate.setSchema("public");
@@ -282,6 +291,37 @@ public class LojaDAO {
                 + "	and id_parametro not in (456, 485, 486)";
 
         return sql;
+    }
+
+    private String copiarPdvFuncaoNivelOperador(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO pdv.funcaoniveloperador (id_loja, id_funcao, id_tiponiveloperador)\n"
+                + "(SELECT " + i_loja.getId() + ", id_funcao, id_tiponiveloperador FROM pdv.funcaoniveloperador WHERE id_loja = " + i_loja.getIdCopiarLoja() + ")";
+
+        return sql;
+    }
+
+    private String copiarPdvParametroValor(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO pdv.parametrovalor (id_loja,id_parametro,valor)\n"
+                + "(SELECT " + i_loja.getId() + ",id_parametro,valor FROM pdv.parametrovalor WHERE id_loja = " + i_loja.getIdCopiarLoja() + ""
+                + "AND id_parametro not in (67, 97))";
+
+        return sql;
+    }
+    
+    private void updateValorPdvParametroValor(LojaVO i_loja) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("pdv");
+        sql.setTableName("parametrovalor");
+        
+        sql.put("valor", i_loja.getId());
+        
+        sql.setWhere("id_loja = " + i_loja.getId() + " and id_parametro = 99");
+        
+        if (!sql.isEmpty()) {
+            try (Statement stmUpdate = Conexao.createStatement()) {
+                stmUpdate.execute(sql.getUpdate());
+            }
+        }        
     }
     
     public void salvar(LojaVO i_loja) throws Exception {
