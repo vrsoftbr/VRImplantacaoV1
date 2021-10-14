@@ -208,9 +208,9 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	m3.DESCRICAO descmerc3\n"
                     + "FROM \n"
                     + "	SUP004 m1\n"
-                    + "	LEFT JOIN SUP005 m2 ON m2.SUP004 = m1.SUP004\n"
-                    + "	LEFT JOIN SUP006 m3 ON m3.SUP005 = m2.SUP005 AND m2.SUP004 = m1.SUP004\n"
-                    + "WHERE m1.ATIVO = 'S' AND m2.ATIVO = 'S' AND m3.ATIVO = 'S'\n"
+                    + "	LEFT JOIN SUP005 m2 ON m2.SUP004 = m1.SUP004 AND m2.ATIVO = 'S'\n"
+                    + "	LEFT JOIN SUP006 m3 ON m3.SUP005 = m2.SUP005 AND m2.SUP004 = m1.SUP004 AND m3.ATIVO = 'S'\n"
+                    + "WHERE m1.ATIVO = 'S'\n"
                     + "ORDER BY 1,3,5"
             )) {
                 while (rst.next()) {
@@ -224,6 +224,43 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rst.getString("descmerc2"));
                     imp.setMerc3ID(rst.getString("codmerc3"));
                     imp.setMerc3Descricao(rst.getString("descmerc3"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "  p.SUP001 AS idproduto,\n"
+                    + "  cx.DUN AS ean,\n"
+                    + "  c.MULTIPLICADOR AS qtdembalagem\n"
+                    + " FROM SUP081 cx\n"
+                    + " JOIN SUP001 p ON p.SUP001 = cx.SUP001 \n"
+                    + " JOIN SUP009 c ON c.SUP009 = cx.SUP009\n"
+                    + " UNION\n"
+                    + " SELECT\n"
+                    + "	SUP001 idproduto,\n"
+                    + "	EAN,\n"
+                    + "	MULTIPLICADOR qtdembalagem\n"
+                    + "FROM\n"
+                    + "	SUP013\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("idproduto"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+
                     result.add(imp);
                 }
             }
@@ -347,36 +384,6 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	SUP001 id,\n"
-                    + "	EAN,\n"
-                    + "	MULTIPLICADOR qtdembalagem\n"
-                    + "FROM\n"
-                    + "	SUP013\n"
-                    + "ORDER BY 1"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("idproduto"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -492,13 +499,14 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "  SELECT\n"
-                    + "	f.SUP010 AS idfornecedor,\n"
+                    "SELECT\n"
+                    + "	pf.SUP010 AS idfornecedor,\n"
                     + "	p.SUP001 AS idproduto,\n"
-                    + "	f.DTALTERACAO AS dtalteracao,\n"
+                    + "	pf.ULTIMA_COMPRA AS dtalteracao,\n"
+                    + "	pf.REFERENCIA AS codigoexterno\n"
                     + "FROM\n"
-                    + "	SUP010 f\n"
-                    + "JOIN SUP001 p ON p.SUP010 = f.SUP010\n"
+                    + "	SUP016 pf\n"
+                    + "JOIN SUP001 p ON p.SUP001 = pf.SUP001\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -507,9 +515,9 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setIdProduto(rst.getString("idproduto"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setDataAlteracao(rst.getDate("dtalteracao"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    //imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
 
                     result.add(imp);
                 }
@@ -706,7 +714,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setVendaDataTermino(Date vendaDataTermino) {
         this.vendaDataTermino = vendaDataTermino;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(Utils.stringToInt(getLojaOrigem()), vendaDataInicio, vendaDataTermino);
@@ -773,10 +781,10 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroCupom(Utils.stringToInt(imp.getId()));
                     imp.setEcf(rst.getInt("ecf"));
                     imp.setData(rst.getDate("data"));
-                    
+
                     String horaInicio = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                     String horaTermino = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horafim");
-                    
+
                     imp.setHoraInicio(TIMESTAMP.parse(horaInicio));
                     imp.setHoraTermino(TIMESTAMP.parse(horaTermino));
                     imp.setCancelado(rst.getBoolean("cancelado"));
