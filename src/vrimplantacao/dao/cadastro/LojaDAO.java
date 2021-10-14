@@ -200,9 +200,14 @@ public class LojaDAO {
                 updateValorPdvParametroValor(i_loja);
                 
                 /* cópia da tabela pdv.cartaolayout */
-                stm.execute(copiarPdvCartaoLayout(i_loja).getInsert());
-                
-                
+                if (copiarPdvCartaoLayout(i_loja) != null && !copiarPdvCartaoLayout(i_loja).isEmpty()) {
+                    stm.execute(copiarPdvCartaoLayout(i_loja).getInsert());
+                }
+
+                /* cópia da tabela pdv.balancaetiquetalayout */
+                if (copiarPdvBalancaEtiquetaLayout(i_loja) != null && !copiarPdvBalancaEtiquetaLayout(i_loja).isEmpty()) {
+                    stm.execute(copiarPdvBalancaEtiquetaLayout(i_loja).getInsert());
+                }
             }
         } else {
             SQLBuilder sql = new SQLBuilder();
@@ -359,6 +364,36 @@ public class LojaDAO {
                     sqlInsert.put("posicao", rst.getInt("posicao"));
                     sqlInsert.put("tamanho", rst.getInt("tamanho"));
                     sqlInsert.put("id_tipocartaocampo", rst.getInt("id_tipocartaocampo"));                    
+                }
+            }
+        }
+        
+        return sqlInsert;
+    }
+    
+    private SQLBuilder copiarPdvBalancaEtiquetaLayout(LojaVO i_loja) throws Exception {
+        String sql = "SELECT * FROM pdv.balancaetiquetalayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
+        SQLBuilder sqlInsert = null;
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+                    sqlInsert = new SQLBuilder();
+                    int proximoId = new CodigoInternoDAO().get("pdv.balancaetiquetalayout");
+                    
+                    sqlInsert.setSchema("pdv");
+                    sqlInsert.setTableName("balancaetiquetalayout");
+                    
+                    sqlInsert.put("id", proximoId);
+                    sqlInsert.put("id_loja", i_loja.getId());                    
+                    sqlInsert.put("id_tipobalancaetiqueta", rst.getInt("id_tipobalancaetiqueta"));
+                    sqlInsert.put("id_tipobalancoetiquetacampo", rst.getInt("id_tipobalancoetiquetacampo"));
+                    sqlInsert.put("iniciopeso", rst.getInt("iniciopeso"));
+                    sqlInsert.put("tamanhopeso", rst.getInt("tamanhopeso"));
+                    sqlInsert.put("iniciopreco", rst.getInt("iniciopreco"));
+                    sqlInsert.put("tamanhopreco", rst.getInt("tamanhopreco"));                    
                 }
             }
         }
