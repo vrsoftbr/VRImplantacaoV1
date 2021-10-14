@@ -198,6 +198,11 @@ public class LojaDAO {
 
                 /* update campo valor na tabela pdv.parametrovalor */
                 updateValorPdvParametroValor(i_loja);
+                
+                /* cópia da tabela pdv.cartaolayout */
+                stm.execute(copiarPdvCartaoLayout(i_loja).getInsert());
+                
+                
             }
         } else {
             SQLBuilder sql = new SQLBuilder();
@@ -331,6 +336,34 @@ public class LojaDAO {
                 stmUpdate.execute(sql.getUpdate());
             }
         }        
+    }
+    
+    private SQLBuilder copiarPdvCartaoLayout(LojaVO i_loja) throws Exception {
+        String sql = "SELECT * FROM pdv.cartaolayout WHERE id_loja = " + i_loja.getIdCopiarLoja();
+        SQLBuilder sqlInsert = null;
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql
+            )) {
+                while (rst.next()) {
+                    int proximoId = new CodigoInternoDAO().get("pdv.cartaolayout");
+                    
+                    sqlInsert = new SQLBuilder();
+                    sqlInsert.setSchema("pdv");
+                    sqlInsert.setTableName("cartaolayout");
+                    
+                    sqlInsert.put("id", proximoId);
+                    sqlInsert.put("id_loja", i_loja.getId());
+                    sqlInsert.put("id_tipocartao", rst.getInt("id_tipocartao"));
+                    sqlInsert.put("posicao", rst.getInt("posicao"));
+                    sqlInsert.put("tamanho", rst.getInt("tamanho"));
+                    sqlInsert.put("id_tipocartaocampo", rst.getInt("id_tipocartaocampo"));                    
+                }
+            }
+        }
+        
+        return sqlInsert;
     }
     
     public void salvar(LojaVO i_loja) throws Exception {
