@@ -140,78 +140,86 @@ public class LojaDAO {
         return oLoja;
     }
 
-    public void salvarNovo(LojaVO i_loja) throws Exception {
-        
+    private boolean isLojaExiste(LojaVO i_loja) throws Exception {
         String sql = "SELECT id FROM loja WHERE id = " + i_loja.getId();
         
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     sql
             )) {
-                if (!rst.next()) {
-                    SQLBuilder sqlInsert = new SQLBuilder();
-                    sqlInsert.setSchema("public");
-                    sqlInsert.setTableName("loja");
+                return rst.next();
+            }
+        }
+    }
+    
+    private SQLBuilder criarLoja(LojaVO i_loja) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("public");
+        sql.setTableName("loja");
 
-                    sqlInsert.put("id", i_loja.getId());
-                    sqlInsert.put("descricao", i_loja.getDescricao());
-                    sqlInsert.put("id_fornecedor", i_loja.getIdFornecedor());
-                    sqlInsert.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
-                    sqlInsert.put("nomeservidor", i_loja.getNomeServidor());
-                    sqlInsert.put("servidorcentral", i_loja.isServidorCentral());
-                    sqlInsert.put("id_regiao", i_loja.getIdRegiao());
-                    sqlInsert.put("geraconcentrador", i_loja.isGeraConcentrador());
-                    
-                    if (!sqlInsert.isEmpty()) {
-                        try (Statement stmInsert = Conexao.createStatement()) {
-                            stmInsert.execute(sqlInsert.getInsert());
-                        }
-                    }
-                    
-                    /* cópia da tabela produtocomplemento */
-                    stm.execute(copiarProdutoComplemento(i_loja));
-                    
-                    /* cópia da tabela fornecedorprazo */
-                    stm.execute(copiarFornecedorPrazo(i_loja));
-                    
-                    /* cópia da tabela fornecedorprazopedido */
-                    stm.execute(copiarFornecedorPrazoPedido(i_loja));
-                    
-                    /*cópia da tabela parametrovalor */
-                    stm.execute(copiarParametroValor(i_loja));
-                    
-                    /*cópia da tabela pdv.funcaoniveloperador */
-                    stm.execute(copiarPdvFuncaoNivelOperador(i_loja));
-                    
-                    /* cópia da tabela pdv.parametrovalor */
-                    stm.execute(copiarPdvParametroValor(i_loja));
-                    
-                    /* update campo valor na tabela pdv.parametrovalor */
-                    updateValorPdvParametroValor(i_loja);
-                    
-                } else {                    
-                    SQLBuilder sqlUpdate = new SQLBuilder();
-                    sqlUpdate.setSchema("public");
-                    sqlUpdate.setTableName("loja");
-                    
-                    sqlUpdate.put("descricao", i_loja.getDescricao());
-                    sqlUpdate.put("id_fornecedor", i_loja.getIdFornecedor());
-                    sqlUpdate.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
-                    sqlUpdate.put("nomeservidor", i_loja.getNomeServidor());
-                    sqlUpdate.put("servidorcentral", i_loja.isServidorCentral());
-                    sqlUpdate.put("id_regiao", i_loja.getIdRegiao());
-                    sqlUpdate.put("geraconcentrador", i_loja.isGeraConcentrador());
+        sql.put("id", i_loja.getId());
+        sql.put("descricao", i_loja.getDescricao());
+        sql.put("id_fornecedor", i_loja.getIdFornecedor());
+        sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+        sql.put("nomeservidor", i_loja.getNomeServidor());
+        sql.put("servidorcentral", i_loja.isServidorCentral());
+        sql.put("id_regiao", i_loja.getIdRegiao());
+        sql.put("geraconcentrador", i_loja.isGeraConcentrador());
 
-                    sqlUpdate.setWhere("id = " + i_loja.getId());
-                    
-                    if (!sqlUpdate.isEmpty()) {
-                        try (Statement stmUpdate = Conexao.createStatement()) {
-                            stmUpdate.execute(sqlUpdate.getUpdate());
-                        }
-                    }
+        return sql;
+    }
+    
+    public void salvarNovo(LojaVO i_loja) throws Exception {
+
+        if (!isLojaExiste(i_loja)) {
+
+            try (Statement stm = Conexao.createStatement()) {
+
+                /* criar loja */
+                stm.execute(criarLoja(i_loja).getInsert());
+                
+                /* cópia da tabela produtocomplemento */
+                stm.execute(copiarProdutoComplemento(i_loja));
+
+                /* cópia da tabela fornecedorprazo */
+                stm.execute(copiarFornecedorPrazo(i_loja));
+
+                /* cópia da tabela fornecedorprazopedido */
+                stm.execute(copiarFornecedorPrazoPedido(i_loja));
+
+                /*cópia da tabela parametrovalor */
+                stm.execute(copiarParametroValor(i_loja));
+
+                /*cópia da tabela pdv.funcaoniveloperador */
+                stm.execute(copiarPdvFuncaoNivelOperador(i_loja));
+
+                /* cópia da tabela pdv.parametrovalor */
+                stm.execute(copiarPdvParametroValor(i_loja));
+
+                /* update campo valor na tabela pdv.parametrovalor */
+                updateValorPdvParametroValor(i_loja);
+            }
+        } else {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("public");
+            sql.setTableName("loja");
+
+            sql.put("descricao", i_loja.getDescricao());
+            sql.put("id_fornecedor", i_loja.getIdFornecedor());
+            sql.put("id_situacaocadastro", SituacaoCadastro.ATIVO.getId());
+            sql.put("nomeservidor", i_loja.getNomeServidor());
+            sql.put("servidorcentral", i_loja.isServidorCentral());
+            sql.put("id_regiao", i_loja.getIdRegiao());
+            sql.put("geraconcentrador", i_loja.isGeraConcentrador());
+
+            sql.setWhere("id = " + i_loja.getId());
+
+            if (!sql.isEmpty()) {
+                try (Statement stmUpdate = Conexao.createStatement()) {
+                    stmUpdate.execute(sql.getUpdate());
                 }
             }
-        }        
+        }
     }
     
     private String copiarProdutoComplemento(LojaVO i_loja) throws Exception {
@@ -271,6 +279,7 @@ public class LojaDAO {
                 + "diasentregapedido,diasatualizapedidoparcial) \n"
                 + "(SELECT id_fornecedor, " + i_loja.getId() + ", diasentregapedido,diasatualizapedidoparcial \n"
                 + "FROM fornecedorprazopedido WHERE id_loja = " + i_loja.getIdCopiarLoja() + ");";
+        
         return sql;
     }
     
