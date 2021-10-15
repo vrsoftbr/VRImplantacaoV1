@@ -197,7 +197,7 @@ public class LojaDAO {
                 stm.execute(copiarPdvParametroValor(i_loja));
 
                 /* update campo valor na tabela pdv.parametrovalor */
-                updateValorPdvParametroValor(i_loja);
+                atualizarValorPdvParametroValor(i_loja);
                 
                 /* cópia da tabela pdv.cartaolayout */
                 if (copiarPdvCartaoLayout(i_loja) != null && !copiarPdvCartaoLayout(i_loja).isEmpty()) {
@@ -210,7 +210,27 @@ public class LojaDAO {
                 }
                 
                 /* cópia da tabela pdv.tecladolayout e tecladolayoutfuncao*/
-                copiarPdvTecladoLayout(i_loja);
+                if (i_loja.isCopiaTecladoLayout()) {
+                    copiarPdvTecladoLayout(i_loja);
+                }
+                
+                /* cópia da tabela pdv.finalizadoraconfiguracao */
+                stm.execute(copiarPdvFinalizadoraConfiguracao(i_loja));
+                
+                /* inserir tabela dataprocessamento */
+                stm.execute(inserirDataProcessamento(i_loja).getInsert());
+                
+                /* inserir tabela comprovante */
+                stm.execute(inserirComprovante(i_loja));
+                
+                /* cópia da tabela pdv.operador */
+                stm.execute(copiarPdvOperador(i_loja));
+                
+                /* inserir tabela notasaidasequencia */
+                stm.execute(inserirNotaSaidaSequencia(i_loja).getInsert());
+                
+                /* cópia tabela tiposaidanotasaidasequencia */
+                stm.execute(copiarTipoSaidaNotaSaidaSequencia(i_loja));                
             }
         } else {
             SQLBuilder sql = new SQLBuilder();
@@ -330,7 +350,7 @@ public class LojaDAO {
         return sql;
     }
     
-    private void updateValorPdvParametroValor(LojaVO i_loja) throws Exception {
+    private void atualizarValorPdvParametroValor(LojaVO i_loja) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setSchema("pdv");
         sql.setTableName("parametrovalor");
@@ -451,6 +471,80 @@ public class LojaDAO {
             }
         }
     }
+
+    private String copiarPdvFinalizadoraConfiguracao(LojaVO i_loja) throws Exception {
+        String sql = "INSERT INTO pdv.finalizadoraconfiguracao (id_loja,id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento, \n"
+                + "aceitarecebimento,utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado)\n"
+                + "INSERT INTO pdv.finalizadoraconfiguracao (id_loja,id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento,\n"
+                + "(SELECT " + i_loja.getId() + ",id_finalizadora,aceitatroco,aceitaretirada,aceitaabastecimento,aceitarecebimento, \n"
+                + "utilizacontravale,retiradatotal,valormaximotroco,juros,tipomaximotroco,aceitaretiradacf,retiradatotalcf,utilizado \n"
+                + "FROM pdv.finalizadoraconfiguracao WHERE id_loja = " + i_loja.getIdCopiarLoja() + ")";
+
+        return sql;
+    }
+    
+    private SQLBuilder inserirDataProcessamento(LojaVO i_loja) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("public");
+        sql.setTableName("dataprocessamento");
+        
+        sql.put("id_loja", i_loja.getId());
+        sql.put("data", Util.formatDataBanco(new DataProcessamentoDAO().get()));
+        
+        return sql;
+    }
+    
+    private String inserirComprovante(LojaVO i_loja) throws Exception {
+        String sql = "insert into comprovante select id, " + i_loja.getId() + " as id_loja, descricao, cabecalho, \n"
+                + "detalhe, rodape from comprovante where id_loja = " + i_loja.getIdCopiarLoja();
+        
+        return sql;
+    }
+    
+    private String copiarPdvOperador(LojaVO i_loja) throws Exception {
+        String sql = "insert into pdv.operador (id_loja, matricula,nome,senha,codigo,id_tiponiveloperador,id_situacaocadastro) \n"
+                + "select " + i_loja.getId() + ", matricula, nome, senha, codigo, id_tiponiveloperador, id_situacaocadastro \n"
+                + "from pdv.operador \n"
+                + "where id_loja = " + i_loja.getIdCopiarLoja() + " "
+                + "and matricula = 500001";
+        
+        return sql;
+    }
+    
+    private SQLBuilder inserirNotaSaidaSequencia(LojaVO i_loja) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("public");
+        sql.setTableName("notasaidasequencia");
+        
+        sql.put("id_loja", i_loja.getId());
+        sql.put("numerocontrole", 1);
+        sql.put("serie", 1);
+        
+        return sql;
+    }
+    
+    private String copiarTipoSaidaNotaSaidaSequencia(LojaVO i_loja) throws Exception {
+        String sql = "insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia) \n"
+                + "select\n"
+                + i_loja.getId() + ", \n"
+                + "	t.id_tiposaida, \n"
+                + "	(select id from notasaidasequencia where id_loja = " + i_loja.getId() + ") id  \n"
+                + "from  \n"
+                + "	tiposaidanotasaidasequencia t\n"
+                + "where  \n"
+                + "   t.id_notasaidasequencia in "
+                + " (select\n"
+                + " min(n.id)\n"
+                + " from\n"
+                + " notasaidasequencia n\n"
+                + " join\n"
+                + " loja l on l.id = n.id_loja\n"
+                + " where\n"
+                + " l.id_situacaocadastro = 1)";
+        
+        return sql;
+    }
+    
     
     public void salvar(LojaVO i_loja) throws Exception {
         Statement stm = null;
