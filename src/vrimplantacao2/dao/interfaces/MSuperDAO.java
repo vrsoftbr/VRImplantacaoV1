@@ -1,21 +1,28 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -26,6 +33,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -34,6 +43,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private boolean importarCodigoPrincipal;
+
+    private Date vendaDataInicio;
+    private Date vendaDataTermino;
+
+    private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
 
     public boolean isImportarCodigoPrincipal() {
         return this.importarCodigoPrincipal;
@@ -194,9 +208,9 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	m3.DESCRICAO descmerc3\n"
                     + "FROM \n"
                     + "	SUP004 m1\n"
-                    + "	LEFT JOIN SUP005 m2 ON m2.SUP004 = m1.SUP004\n"
-                    + "	LEFT JOIN SUP006 m3 ON m3.SUP005 = m2.SUP005 AND m2.SUP004 = m1.SUP004\n"
-                    + "WHERE m1.ATIVO = 'S' AND m2.ATIVO = 'S' AND m3.ATIVO = 'S'\n"
+                    + "	LEFT JOIN SUP005 m2 ON m2.SUP004 = m1.SUP004 AND m2.ATIVO = 'S'\n"
+                    + "	LEFT JOIN SUP006 m3 ON m3.SUP005 = m2.SUP005 AND m2.SUP004 = m1.SUP004 AND m3.ATIVO = 'S'\n"
+                    + "WHERE m1.ATIVO = 'S'\n"
                     + "ORDER BY 1,3,5"
             )) {
                 while (rst.next()) {
@@ -210,6 +224,43 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc2Descricao(rst.getString("descmerc2"));
                     imp.setMerc3ID(rst.getString("codmerc3"));
                     imp.setMerc3Descricao(rst.getString("descmerc3"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "  p.SUP001 AS idproduto,\n"
+                    + "  cx.DUN AS ean,\n"
+                    + "  c.MULTIPLICADOR AS qtdembalagem\n"
+                    + " FROM SUP081 cx\n"
+                    + " JOIN SUP001 p ON p.SUP001 = cx.SUP001 \n"
+                    + " JOIN SUP009 c ON c.SUP009 = cx.SUP009\n"
+                    + " UNION\n"
+                    + " SELECT\n"
+                    + "	SUP001 idproduto,\n"
+                    + "	EAN,\n"
+                    + "	MULTIPLICADOR qtdembalagem\n"
+                    + "FROM\n"
+                    + "	SUP013\n"
+                    + "ORDER BY 1"
+            )) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("idproduto"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+
                     result.add(imp);
                 }
             }
@@ -239,7 +290,7 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ncm.digitos AS NCM,\n"
                     + "	pr.custo AS custocomimposto,\n"
                     + "	pr.custo_medio AS custosemimposto,\n"
-                    + "	pr.margem AS margem,\n"
+                    + "	pr.margemsug AS margem,\n"
                     + "	pr.venda AS precovenda,\n"
                     + "	pr.SALDO_MINIMO AS estoqueminimo,\n"
                     + "	pr.SALDO_MAXIMO AS estoquemaximo,\n"
@@ -329,36 +380,6 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "	SUP001 id,\n"
-                    + "	EAN,\n"
-                    + "	MULTIPLICADOR qtdembalagem\n"
-                    + "FROM\n"
-                    + "	SUP013\n"
-                    + "ORDER BY 1"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("idproduto"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-
-                    result.add(imp);
-                }
-            }
-        }
         return result;
     }
 
@@ -478,13 +499,14 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "  SELECT\n"
-                    + "	f.SUP010 AS idfornecedor,\n"
+                    "SELECT\n"
+                    + "	pf.SUP010 AS idfornecedor,\n"
                     + "	p.SUP001 AS idproduto,\n"
-                    + "	f.DTALTERACAO AS dtalteracao,\n"
+                    + "	pf.ULTIMA_COMPRA AS dtalteracao,\n"
+                    + "	pf.REFERENCIA AS codigoexterno\n"
                     + "FROM\n"
-                    + "	SUP010 f\n"
-                    + "JOIN SUP001 p ON p.SUP010 = f.SUP010\n"
+                    + "	SUP016 pf\n"
+                    + "JOIN SUP001 p ON p.SUP001 = pf.SUP001\n"
                     + "ORDER BY 1"
             )) {
                 while (rst.next()) {
@@ -493,9 +515,9 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setIdProduto(rst.getString("idproduto"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setDataAlteracao(rst.getDate("dtalteracao"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    //imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
 
                     result.add(imp);
                 }
@@ -683,5 +705,208 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    public void setVendaDataInicio(Date vendaDataInicio) {
+        this.vendaDataInicio = vendaDataInicio;
+    }
+
+    public void setVendaDataTermino(Date vendaDataTermino) {
+        this.vendaDataTermino = vendaDataTermino;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(Utils.stringToInt(getLojaOrigem()), vendaDataInicio, vendaDataTermino);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(Utils.stringToInt(getLojaOrigem()), vendaDataInicio, vendaDataTermino);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        private Statement stm;
+        private ResultSet rst;
+        private final String sql;
+
+        public VendaIterator(int origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
+            this.stm = ConexaoFirebird.getConexao().createStatement();
+            this.sql
+                    = "SELECT\n"
+                    + "	v.SUP184 AS id,\n"
+                    + "	v.COO AS numerocupom,\n"
+                    + "	s.ECF_NUMERO AS ecf,\n"
+                    + "	v.ECF_SERIE AS numeroserie,\n"
+                    + "	v.DATA,\n"
+                    + "	CASE\n"
+                    + "		WHEN v.CANCELADO = 'N' THEN 0\n"
+                    + "		ELSE 1\n"
+                    + "	END AS cancelado,\n"
+                    + "	v.CNPJ_CPF AS cpf,\n"
+                    + "	v.HORAI AS horainicio,\n"
+                    + "	v.HORAF AS horafim,\n"
+                    + "	v.TOTAL AS valor\n"
+                    + "FROM\n"
+                    + "	SUP184 v\n"
+                    + "LEFT JOIN SUP050 s ON s.ECF_SERIE = v.ECF_SERIE\n"
+                    + "WHERE\n"
+                    + "  v.DATA >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "	AND\n"
+                    + "  v.DATA <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
+                    + "	AND\n"
+                    + "  v.SUP999 = " + origem + "\n"
+                    + "ORDER BY 1";
+            this.stm.setFetchSize(10000);
+            this.rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                return !rst.isClosed() && !rst.isLast();
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public VendaIMP next() {
+            try {
+                if (rst.next()) {
+                    VendaIMP imp = new VendaIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(Utils.stringToInt(imp.getId()));
+                    imp.setEcf(rst.getInt("ecf"));
+                    imp.setData(rst.getDate("data"));
+
+                    String horaInicio = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                    String horaTermino = TIMESTAMP.format(rst.getDate("data")) + " " + rst.getString("horafim");
+
+                    imp.setHoraInicio(TIMESTAMP.parse(horaInicio));
+                    imp.setHoraTermino(TIMESTAMP.parse(horaTermino));
+                    imp.setCancelado(rst.getBoolean("cancelado"));
+                    imp.setSubTotalImpressora(rst.getDouble("valor"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroSerie(rst.getString("numeroserie"));
+
+                    return imp;
+                } else {
+                    rst.close();
+                    stm.close();
+                    return null;
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no next()", ex);
+                throw new RuntimeException(ex);
+            } catch (ParseException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Não suportado.");
+        }
+    }
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm;
+        private ResultSet rst;
+        private String sql;
+
+        public VendaItemIterator(int origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
+            this.stm = ConexaoFirebird.getConexao().createStatement();
+            this.sql
+                    = "SELECT\n"
+                    + "	v.SUP155 AS id,\n"
+                    + " vc.sup184 idvenda,\n"
+                    + "	v.ITEM AS sequencia,\n"
+                    + "	v.COO AS numerocupom,\n"
+                    + "	vc.COO,\n"
+                    + "	v.ECFSERIE AS ecf,\n"
+                    + "	v.DATA,\n"
+                    + "	v.SUP001 AS produtoid,\n"
+                    + "	p.EAN AS ean,\n"
+                    + "	v.QUANTIDADE AS qtde,\n"
+                    + "	CASE\n"
+                    + "		WHEN v.CANCELADO = 'N' THEN 0\n"
+                    + "		ELSE 1\n"
+                    + "	END AS cancelado,\n"
+                    + "	v.DESCONTO,\n"
+                    + "	v.ACRESCIMO,\n"
+                    + "	v.TOTAL AS valor,\n"
+                    + "	tr.DESCRICAO AS unidade,\n"
+                    + "	v.CST_ICMS AS cst,\n"
+                    + "	v.VL_ICMS AS aliquota\n"
+                    + "FROM\n"
+                    + "	SUP155 v\n"
+                    + "LEFT JOIN SUP184 vc ON v.SUP184 = vc.SUP184\n"
+                    + "LEFT JOIN SUP001 p ON p.SUP001 = v.SUP001\n"
+                    + "LEFT JOIN SUP009 tr ON tr.SUP009 = p.SUP009_VENDA\n"
+                    + "WHERE\n"
+                    + "  v.DATA >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "	AND\n"
+                    + "  v.DATA <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
+                    + "	AND\n"
+                    + "   v.SUP999 = " + origem + "\n"
+                    + "ORDER BY 1";
+            this.stm.setFetchSize(10000);
+            this.rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                return !rst.isClosed() && !rst.isLast();
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            try {
+                if (rst.next()) {
+                    VendaItemIMP imp = new VendaItemIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setVenda(rst.getString("idvenda"));
+                    imp.setSequencia(rst.getInt("sequencia"));
+                    imp.setProduto(rst.getString("produtoid"));
+                    imp.setQuantidade(rst.getDouble("qtde"));
+                    imp.setPrecoVenda(rst.getDouble("valor"));
+                    imp.setValorDesconto(rst.getDouble("desconto"));
+                    imp.setValorAcrescimo(rst.getDouble("acrescimo"));
+                    imp.setCodigoBarras(rst.getString("ean"));
+                    imp.setUnidadeMedida(rst.getString("unidade"));
+                    imp.setIcmsCst(rst.getInt("cst"));
+                    imp.setIcmsAliq(rst.getDouble("aliquota"));
+                    imp.setCancelado(rst.getBoolean("cancelado"));
+
+                    return imp;
+                } else {
+                    rst.close();
+                    stm.close();
+                    return null;
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no next()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Não suportado.");
+        }
     }
 }
