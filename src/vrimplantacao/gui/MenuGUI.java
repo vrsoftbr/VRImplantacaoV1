@@ -300,6 +300,7 @@ import vrimplantacao2.gui.interfaces.SBOnlineGUI;
 import vrimplantacao2.gui.interfaces.SGMasterGUI;
 import vrimplantacao2.gui.interfaces.SicGUI;
 import vrimplantacao2.gui.interfaces.StockGUI;
+import vrimplantacao2.gui.interfaces.Stock_PostgresGUI;
 import vrimplantacao2.gui.interfaces.TeleconGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 import vrimplantacao2.gui.interfaces.WeberGUI;
@@ -818,6 +819,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPrime = new javax.swing.JMenuItem();
         mnuRMSistemas = new javax.swing.JMenuItem();
         mnuViggo = new javax.swing.JMenuItem();
+        mnuStockPostgres = new javax.swing.JMenuItem();
         mnuSuperControle = new javax.swing.JMenuItem();
         mnuSQLite = new javax.swing.JMenu();
         mnuSQLiteSophyx = new javax.swing.JMenuItem();
@@ -2702,6 +2704,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuPostgres2.add(mnuViggo);
+
+        mnuStockPostgres.setText("Stock");
+        mnuStockPostgres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuStockPostgresActionPerformed(evt);
+            }
+        });
+        mnuPostgres2.add(mnuStockPostgres);
 
         mnuSuperControle.setText("Super Controle");
         mnuSuperControle.addActionListener(new java.awt.event.ActionListener() {
@@ -5422,6 +5432,10 @@ public final class MenuGUI extends VRMdiFrame {
         LCSistemaGUI.exibir(this);
     }//GEN-LAST:event_mnuLCSistemaActionPerformed
 
+    private void mnuStockPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuStockPostgresActionPerformed
+        Stock_PostgresGUI.exibir(this);
+    }//GEN-LAST:event_mnuStockPostgresActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenuItem chkGigatron;
@@ -5715,6 +5729,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSolutionSupera;
     private javax.swing.JMenuItem mnuSri;
     private javax.swing.JMenuItem mnuStock;
+    private javax.swing.JMenuItem mnuStockPostgres;
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperControle;
     private javax.swing.JMenuItem mnuSuperLoja10;
