@@ -23,6 +23,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -31,8 +32,10 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -384,6 +387,48 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "	p.SUP001 AS id_produtopai,\n"
+                    + "	p.DESCRICAO AS descricao,\n"
+                    + "	r.PRODUTO AS id_produtofilho,\n"
+                    + "	p2.DESCRICAO AS descricaofilho,\n"
+                    + "	r.QUANTIDADE,\n"
+                    + "	(r.QUANTIDADE * 1000) AS qtde,\n"
+                    + "	1 AS rendimento\n"
+                    + "FROM\n"
+                    + "	SUP124 r\n"
+                    + "JOIN SUP001 p ON p.SUP001 = r.SUP001\n"
+                    + "JOIN SUP001 P2 ON p2.SUP001 = r.PRODUTO"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+
+                    imp.setImportsistema(getSistema());
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id_produtopai"));
+                    imp.setIdproduto(rst.getString("id_produtopai"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita(rst.getInt("qtde"));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setFator(1);
+                    imp.setFichatecnica("");
+                    imp.getProdutos().add(rst.getString("id_produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -486,6 +531,72 @@ public class MSuperDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+                    /*"select\n"
+                    + "    id_produto,\n"
+                    + "    nome_produto,\n"
+                    + "    ncm,\n"
+                    + "    tabicm aliquota_debito_id,\n"
+                    + "    icm.tabicm_st cst_debito,\n"
+                    + "    icm.tabicm_aliq icms_aliquota_debito,\n"
+                    + "    icm.tabicm_pbc icms_aliquota_debito_reducao,\n"
+                    + "    icm_aliq aliquota_credito,\n"
+                    + "    icm_cst cst_credito,\n"
+                    + "    icm_pbc aliquota_reducao_credito,\n"
+                    + "    icm_stperc aliquota_final_credito,\n"
+                    + "    icm_mva\n"
+                    + "from\n"
+                    + "    est_produtos p\n"
+                    + "join tab_icm icm on p.tabicm = icm.id_tabicm\n"
+                    + "where\n"
+                    + "    icm_mva > 0\n"
+                    + "order by\n"
+                    + "    2"*/
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("id_produto"));
+                    imp.setIva(rst.getDouble("icm_mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setNcm(rst.getString("ncm"));
+                    
+                    int cst;
+                    double aliquota = rst.getDouble("aliquota_credito");
+                    double reduzido = 0;
+                    
+                    if (rst.getDouble("aliquota_reducao_credito") == 100) {
+                        reduzido = 0;
+                    } else {
+                        reduzido = rst.getDouble("aliquota_reducao_credito");
+                    }
+                    
+                    if (reduzido > 0) {
+                        cst = 20;
+                    } else if (aliquota == 0) {
+                        cst = rst.getInt("cst_debito");
+                    } else {
+                        cst = 0;
+                    }
+                    
+                    imp.setAliquotaDebito(cst, aliquota, reduzido);
+                    imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
+                    imp.setAliquotaCredito(cst, aliquota, reduzido);
+                    imp.setAliquotaCreditoForaEstado(cst, aliquota, reduzido);
+                                        
                     result.add(imp);
                 }
             }
