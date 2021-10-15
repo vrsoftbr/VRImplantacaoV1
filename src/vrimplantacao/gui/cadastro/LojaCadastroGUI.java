@@ -6,6 +6,7 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2_5.controller.loja.LojaController;
 
 public class LojaCadastroGUI extends VRInternalFrame {
 
@@ -95,7 +96,7 @@ public class LojaCadastroGUI extends VRInternalFrame {
         oLoja.copiaCusto = chkCopiaCusto.isSelected();
         oLoja.copiaTecladoLayout = chkCopiaTecladoLayout.isSelected();
 
-        new LojaDAO().salvar(oLoja);
+        new LojaController().salvarNovo(oLoja);
 
         parentFrame.vLoja.add(oLoja);
         cboCopiarLoja.carregar();
