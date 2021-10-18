@@ -10,16 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-<<<<<<< HEAD
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-=======
 import vrimplantacao2.parametro.Parametros;
->>>>>>> a5df7d96529fb8c066af6fca67bf44a407627576
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
