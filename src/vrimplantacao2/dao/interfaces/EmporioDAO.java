@@ -98,6 +98,7 @@ public class EmporioDAO extends InterfaceDAO {
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
+                    imp.setNumero(rst.getString("numero"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
                     imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
